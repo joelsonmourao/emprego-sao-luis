@@ -65,29 +65,15 @@ export function AdminLoginForm() {
       </CardHeader>
 
       <CardContent className="space-y-5 p-8">
+        {/* Removidos os inputs fake que causavam o autofill */}
         <form className="space-y-5" onSubmit={onSubmit} autoComplete="off">
-          <input
-            type="text"
-            name="fake_username"
-            autoComplete="username"
-            tabIndex={-1}
-            className="hidden"
-            aria-hidden="true"
-          />
-          <input
-            type="password"
-            name="fake_password"
-            autoComplete="current-password"
-            tabIndex={-1}
-            className="hidden"
-            aria-hidden="true"
-          />
-
+          
           <Field label="E-mail" htmlFor="admin-email">
             <Input
               id="admin-email"
               type="email"
-              autoComplete="off"
+              // Usando um valor que o navegador não reconhece para evitar preenchimento
+              autoComplete="none" 
               autoCapitalize="none"
               autoCorrect="off"
               inputMode="email"
@@ -96,22 +82,23 @@ export function AdminLoginForm() {
               {...register("email")}
             />
           </Field>
-          {errors.email ? <p className="text-sm text-rose-600">{errors.email.message}</p> : null}
+          {errors.email && <p className="text-sm text-rose-600">{errors.email.message}</p>}
 
           <Field label="Senha" htmlFor="admin-password">
             <Input
               id="admin-password"
               type="password"
+              // new-password impede o preenchimento de senhas EXISTENTES
               autoComplete="new-password"
               placeholder="Sua senha"
               {...register("password")}
             />
           </Field>
-          {errors.password ? <p className="text-sm text-rose-600">{errors.password.message}</p> : null}
+          {errors.password && <p className="text-sm text-rose-600">{errors.password.message}</p>}
 
-          {serverError ? (
+          {serverError && (
             <p className="rounded-2xl bg-rose-50 px-4 py-3 text-sm text-rose-700">{serverError}</p>
-          ) : null}
+          )}
 
           <Button type="submit" size="lg" className="w-full" disabled={isSubmitting}>
             {isSubmitting ? "Entrando..." : "Entrar no painel"}
