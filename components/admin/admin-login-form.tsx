@@ -44,7 +44,7 @@ export function AdminLoginForm() {
     const result = (await response.json()) as { ok: boolean; error?: string };
 
     if (!response.ok || !result.ok) {
-      setServerError(result.error ?? "Nao foi possivel entrar.");
+      setServerError(result.error ?? "Não foi possível entrar.");
       return;
     }
 
@@ -58,50 +58,59 @@ export function AdminLoginForm() {
         <div className="mb-4 inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-white/14">
           <ShieldCheck className="h-7 w-7" />
         </div>
-        <CardTitle className="text-3xl text-white">Entrar no admin</CardTitle>
+        <CardTitle className="text-3xl text-white">Painel de Acesso</CardTitle>
         <CardDescription className="max-w-xl text-sky-50/85">
-          Acesse a area protegida para publicar vagas, blog e importar planilhas de forma segura.
+          Área restrita para gestão do portal. Identifique-se para continuar.
         </CardDescription>
       </CardHeader>
 
-      <CardContent className="space-y-5 p-8">
-        {/* Removidos os inputs fake que causavam o autofill */}
-        <form className="space-y-5" onSubmit={onSubmit} autoComplete="off">
+      <CardContent className="p-8">
+        {/* Usamos noValidate para evitar que o navegador interfira na validação nativa */}
+        <form className="space-y-6" onSubmit={onSubmit} noValidate autoComplete="off">
           
-          <Field label="E-mail" htmlFor="admin-email">
+          <Field label="Identificação" htmlFor="user-access-id">
             <Input
-              id="admin-email"
+              id="user-access-id" // ID genérico para evitar o preenchimento automático
               type="email"
-              // Usando um valor que o navegador não reconhece para evitar preenchimento
-              autoComplete="none" 
+              autoComplete="one-time-code" // Engana o gerenciador de senhas do Chrome
               autoCapitalize="none"
               autoCorrect="off"
               inputMode="email"
               spellCheck={false}
-              placeholder="voce@empresa.com"
+              placeholder="seu-email@dominio.com"
               {...register("email")}
             />
           </Field>
-          {errors.email && <p className="text-sm text-rose-600">{errors.email.message}</p>}
+          {errors.email && (
+            <p className="mt-1 text-sm text-rose-600">{errors.email.message}</p>
+          )}
 
-          <Field label="Senha" htmlFor="admin-password">
+          <Field label="Chave de Segurança" htmlFor="user-key-id">
             <Input
-              id="admin-password"
+              id="user-key-id" // ID genérico para que o navegador não associe à senha salva
               type="password"
-              // new-password impede o preenchimento de senhas EXISTENTES
-              autoComplete="new-password"
-              placeholder="Sua senha"
+              autoComplete="new-password" // Indica ao navegador que não deve sugerir senhas antigas
+              placeholder="Digite sua chave"
               {...register("password")}
             />
           </Field>
-          {errors.password && <p className="text-sm text-rose-600">{errors.password.message}</p>}
-
-          {serverError && (
-            <p className="rounded-2xl bg-rose-50 px-4 py-3 text-sm text-rose-700">{serverError}</p>
+          {errors.password && (
+            <p className="mt-1 text-sm text-rose-600">{errors.password.message}</p>
           )}
 
-          <Button type="submit" size="lg" className="w-full" disabled={isSubmitting}>
-            {isSubmitting ? "Entrando..." : "Entrar no painel"}
+          {serverError && (
+            <div className="rounded-2xl bg-rose-50 px-4 py-3 text-sm text-rose-700 border border-rose-100">
+              {serverError}
+            </div>
+          )}
+
+          <Button 
+            type="submit" 
+            size="lg" 
+            className="w-full h-12 text-base font-bold shadow-lg shadow-blue-500/20" 
+            disabled={isSubmitting}
+          >
+            {isSubmitting ? "Autenticando..." : "Entrar no Sistema"}
           </Button>
         </form>
       </CardContent>
