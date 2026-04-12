@@ -17,12 +17,17 @@ export function AdminLoginForm() {
   const searchParams = useSearchParams();
   const nextPath = searchParams.get("next") || "/admin";
   const [serverError, setServerError] = useState("");
+
   const {
     register,
     handleSubmit,
     formState: { errors, isSubmitting }
   } = useForm<AdminLoginValues>({
-    resolver: zodResolver(adminLoginSchema)
+    resolver: zodResolver(adminLoginSchema),
+    defaultValues: {
+      email: "",
+      password: ""
+    }
   });
 
   const onSubmit = handleSubmit(async (values) => {
@@ -58,13 +63,31 @@ export function AdminLoginForm() {
           Acesse a area protegida para publicar vagas, blog e importar planilhas de forma segura.
         </CardDescription>
       </CardHeader>
+
       <CardContent className="space-y-5 p-8">
-        <form className="space-y-5" onSubmit={onSubmit} autoComplete="on">
-          <Field label="E-mail">
+        <form className="space-y-5" onSubmit={onSubmit} autoComplete="off">
+          <input
+            type="text"
+            name="fake_username"
+            autoComplete="username"
+            tabIndex={-1}
+            className="hidden"
+            aria-hidden="true"
+          />
+          <input
+            type="password"
+            name="fake_password"
+            autoComplete="current-password"
+            tabIndex={-1}
+            className="hidden"
+            aria-hidden="true"
+          />
+
+          <Field label="E-mail" htmlFor="admin-email">
             <Input
               id="admin-email"
               type="email"
-              autoComplete="email"
+              autoComplete="off"
               autoCapitalize="none"
               autoCorrect="off"
               inputMode="email"
@@ -75,8 +98,14 @@ export function AdminLoginForm() {
           </Field>
           {errors.email ? <p className="text-sm text-rose-600">{errors.email.message}</p> : null}
 
-          <Field label="Senha">
-            <Input id="admin-password" type="password" autoComplete="current-password" placeholder="Sua senha" {...register("password")} />
+          <Field label="Senha" htmlFor="admin-password">
+            <Input
+              id="admin-password"
+              type="password"
+              autoComplete="new-password"
+              placeholder="Sua senha"
+              {...register("password")}
+            />
           </Field>
           {errors.password ? <p className="text-sm text-rose-600">{errors.password.message}</p> : null}
 
