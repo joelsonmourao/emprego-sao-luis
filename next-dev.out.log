@@ -11,3 +11,22 @@
  ✓ Compiled middleware in 201ms
  ✓ Ready in 1624ms
  ○ Compiling / ...
+ ✓ Compiled / in 2.8s
+ GET / 200 in 6120ms
+ GET / 200 in 6287ms
+ GET / 200 in 979ms
+ ○ Compiling /sobre ...
+ ✓ Compiled /sobre in 591ms
+ GET /icon.svg 200 in 655ms
+ GET /sobre 200 in 1071ms
+ GET /icon.svg 200 in 337ms
+ ✓ Compiled /contato in 306ms
+ GET /contato 200 in 857ms
+ ✓ Compiled /politica-de-privacidade in 242ms
+ GET /politica-de-privacidade 200 in 712ms
+ ✓ Compiled /politica-de-cookies in 221ms
+ GET /politica-de-cookies 200 in 684ms
+ ✓ Compiled /termos-de-uso in 258ms
+ GET /termos-de-uso 200 in 739ms
+ GET / 200 in 1057ms
+ GET / 200 in 1159ms
