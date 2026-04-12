@@ -43,14 +43,14 @@ export function AdminShell({
   children: ReactNode;
 }) {
   return (
-    <div className="min-h-screen bg-[radial-gradient(circle_at_top,_rgba(56,189,248,0.13),transparent_30%),linear-gradient(180deg,#f8fbff_0%,#eef4ff_52%,#f8fbff_100%)]">
+    <div className="min-h-screen bg-[radial-gradient(circle_at_top,_rgba(47,111,237,0.08),transparent_26%),radial-gradient(circle_at_right_top,_rgba(255,109,0,0.08),transparent_24%),linear-gradient(180deg,#fbfcfd_0%,#f4f7f6_52%,#fbfcfd_100%)]">
       <div className="mx-auto grid min-h-screen max-w-7xl gap-6 px-4 py-6 lg:grid-cols-[280px_minmax(0,1fr)] lg:px-6">
         <aside className="space-y-5">
-          <Card className="rounded-[2rem] border-slate-200 bg-slate-950 p-6 text-white shadow-[0_35px_120px_-45px_rgba(2,6,23,0.7)]">
+          <Card className="rounded-[2rem] border-slate-200 bg-[linear-gradient(160deg,#1a2b4c_0%,#21406e_56%,#2f6fed_100%)] p-6 text-white shadow-[0_35px_120px_-45px_rgba(26,43,76,0.68)]">
             <div className="space-y-2">
-              <p className="text-xs font-semibold uppercase tracking-[0.28em] text-sky-200">Admin</p>
+              <p className="text-xs font-semibold uppercase tracking-[0.28em] text-orange-100">Admin</p>
               <h1 className="text-2xl font-black tracking-tight">Jovem Aprendiz Vagas</h1>
-              <p className="text-sm leading-6 text-slate-300">Painel para vagas, empresas, blog, estrutura do portal, midia e importacao de planilhas.</p>
+              <p className="text-sm leading-6 text-white/78">Painel para vagas, empresas, blog, estrutura do portal, midia e importacao de planilhas.</p>
             </div>
 
             <nav className="mt-6 grid gap-2">
@@ -61,7 +61,7 @@ export function AdminShell({
                   <Link
                     key={item.href}
                     href={item.href}
-                    className="inline-flex items-center gap-3 rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm font-semibold text-white transition hover:border-sky-300/40 hover:bg-sky-400/10"
+                    className="inline-flex items-center gap-3 rounded-2xl border border-white/10 bg-white/6 px-4 py-3 text-sm font-semibold text-white transition hover:border-[color:rgba(255,109,0,0.34)] hover:bg-white/12"
                   >
                     <Icon className="h-4 w-4" />
                     {item.label}
@@ -83,16 +83,16 @@ export function AdminShell({
         </aside>
 
         <main className="space-y-6">
-          <Card className="rounded-[2rem] border-slate-200 bg-white/90 p-6 shadow-[0_30px_120px_-55px_rgba(14,116,144,0.4)] backdrop-blur">
+          <Card className="brand-admin-panel rounded-[2rem] border-slate-200 bg-white/92 p-6 shadow-[0_30px_120px_-55px_rgba(26,43,76,0.18)] backdrop-blur">
             <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
               <div className="space-y-2">
-                <p className="text-xs font-semibold uppercase tracking-[0.28em] text-sky-700">Gestao segura</p>
-                <h2 className="text-3xl font-black tracking-tight text-slate-950">{title}</h2>
-                <p className="max-w-3xl text-sm leading-6 text-slate-600">{description}</p>
+                <p className="text-xs font-semibold uppercase tracking-[0.28em] text-[var(--brand-orange)]">Gestao segura</p>
+                <h2 className="text-3xl font-black tracking-tight text-[var(--brand-navy)]">{title}</h2>
+                <p className="max-w-3xl text-sm leading-6 text-[var(--brand-text-secondary)]">{description}</p>
               </div>
-              <div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-600">
-                Logado como <span className="font-semibold text-slate-950">{userName}</span> ·{" "}
-                <span className="font-semibold text-[var(--brand-cobalt)]">{userRole}</span>
+              <div className="rounded-2xl border border-[color:rgba(26,43,76,0.1)] bg-[var(--brand-soft)] px-4 py-3 text-sm text-[var(--brand-text-secondary)]">
+                Logado como <span className="font-semibold text-[var(--brand-navy)]">{userName}</span> ·{" "}
+                <span className="font-semibold text-[var(--brand-orange)]">{userRole}</span>
               </div>
             </div>
           </Card>

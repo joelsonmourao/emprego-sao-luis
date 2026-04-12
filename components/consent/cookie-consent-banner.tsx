@@ -40,30 +40,29 @@ function readConsentCookie() {
 
 function persistConsent(analytics: boolean, advertising: boolean) {
   const nextConsent = buildConsentPreferences({ analytics, advertising });
-  document.cookie = `${CONSENT_COOKIE_NAME}=${serializeConsentValue(nextConsent)}; Path=/; Max-Age=${60 * 60 * 24 * 180}; SameSite=Lax`;
+  const secureFlag = typeof window !== "undefined" && window.location.protocol === "https:" ? "; Secure" : "";
+  document.cookie = `${CONSENT_COOKIE_NAME}=${serializeConsentValue(nextConsent)}; Path=/; Max-Age=${60 * 60 * 24 * 180}; SameSite=Lax${secureFlag}`;
   window.__javUpdateConsent?.({ analytics, advertising });
   window.dispatchEvent(new CustomEvent(CONSENT_EVENT_NAME, { detail: nextConsent }));
   return nextConsent;
 }
 
-export function CookieConsentBanner({ config }: { config: ConsentBannerConfig }) {
-  const [mounted, setMounted] = useState(false);
-  const [storedConsent, setStoredConsent] = useState<ReturnType<typeof readConsentCookie>>(null);
+export function CookieConsentBanner({ config, initialConsentValue = null }: { config: ConsentBannerConfig; initialConsentValue?: string | null }) {
+  const [storedConsent, setStoredConsent] = useState<ReturnType<typeof readConsentCookie>>(() => parseConsentValue(initialConsentValue));
   const [showPreferences, setShowPreferences] = useState(false);
   const initialDraft = useMemo(() => storedConsent ?? defaultConsentPreferences, [storedConsent]);
   const [analyticsEnabled, setAnalyticsEnabled] = useState(initialDraft.analytics);
   const [advertisingEnabled, setAdvertisingEnabled] = useState(initialDraft.advertising);
 
   useEffect(() => {
-    const nextConsent = readConsentCookie();
+    const nextConsent = readConsentCookie() ?? parseConsentValue(initialConsentValue);
     setStoredConsent(nextConsent);
     setAnalyticsEnabled(nextConsent?.analytics ?? false);
     setAdvertisingEnabled(nextConsent?.advertising ?? false);
     if (nextConsent) {
       window.__javUpdateConsent?.({ analytics: nextConsent.analytics, advertising: nextConsent.advertising });
     }
-    setMounted(true);
-  }, []);
+  }, [initialConsentValue]);
 
   useEffect(() => {
     function handleUpdate(event: Event) {
@@ -78,7 +77,7 @@ export function CookieConsentBanner({ config }: { config: ConsentBannerConfig })
     return () => window.removeEventListener(CONSENT_EVENT_NAME, handleUpdate as EventListener);
   }, []);
 
-  if (!mounted || !config.bannerEnabled) {
+  if (!config.bannerEnabled) {
     return null;
   }
 
@@ -87,17 +86,17 @@ export function CookieConsentBanner({ config }: { config: ConsentBannerConfig })
   return (
     <>
       {!hasConsent ? (
-        <div className="fixed inset-x-0 bottom-0 z-50 border-t border-slate-200 bg-white/95 px-4 py-4 shadow-[0_-20px_50px_-35px_rgba(15,23,42,0.35)] backdrop-blur">
+        <div className="fixed inset-x-0 bottom-0 z-50 border-t border-slate-200 bg-white/96 px-4 py-4 shadow-[0_-20px_50px_-35px_rgba(15,23,42,0.28)] backdrop-blur">
           <div className="mx-auto flex max-w-7xl flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
             <div className="max-w-3xl space-y-2">
-              <p className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.24em] text-[var(--brand-cobalt)]">
+              <p className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.24em] text-[var(--brand-orange)]">
                 <Cookie className="h-4 w-4" />
                 Cookies e privacidade
               </p>
               <h2 className="text-xl font-black text-slate-950">{config.title}</h2>
               <p className="text-sm leading-7 text-slate-600">
                 {config.description}{" "}
-                <Link href={config.policyHref as never} className="font-semibold text-[var(--brand-cobalt)] underline-offset-4 hover:underline">
+                <Link href={config.policyHref as never} className="font-semibold text-[var(--brand-blue)] underline-offset-4 hover:text-[var(--brand-orange)] hover:underline">
                   Ver politica de cookies
                 </Link>
               </p>
@@ -128,18 +127,18 @@ export function CookieConsentBanner({ config }: { config: ConsentBannerConfig })
                   <div className="flex items-start justify-between gap-3">
                     <div>
                       <p className="text-sm font-semibold text-slate-950">{config.analyticsLabel}</p>
-                      <p className="mt-2 text-sm leading-6 text-slate-600">Ajuda a entender buscas, paginas mais visitadas e desempenho do portal.</p>
+                      <p className="mt-2 text-sm leading-6 text-slate-600">Ajuda a entender paginas mais acessadas, buscas usadas e pontos que podem ser melhorados no portal.</p>
                     </div>
-                    <input type="checkbox" checked={analyticsEnabled} onChange={(event) => setAnalyticsEnabled(event.target.checked)} className="mt-1 h-4 w-4 accent-[var(--brand-cobalt)]" />
+                    <input type="checkbox" checked={analyticsEnabled} onChange={(event) => setAnalyticsEnabled(event.target.checked)} className="mt-1 h-4 w-4 accent-[var(--brand-blue)]" />
                   </div>
                 </label>
                 <label className="rounded-[1.5rem] border border-slate-200 bg-white p-4">
                   <div className="flex items-start justify-between gap-3">
                     <div>
                       <p className="text-sm font-semibold text-slate-950">{config.advertisingLabel}</p>
-                      <p className="mt-2 text-sm leading-6 text-slate-600">Permite publicidade e medicao comercial quando o portal estiver com anuncios ativos.</p>
+                      <p className="mt-2 text-sm leading-6 text-slate-600">Permite recursos de publicidade quando o portal estiver com anuncios ativos e com essa categoria habilitada.</p>
                     </div>
-                    <input type="checkbox" checked={advertisingEnabled} onChange={(event) => setAdvertisingEnabled(event.target.checked)} className="mt-1 h-4 w-4 accent-[var(--brand-coral)]" />
+                    <input type="checkbox" checked={advertisingEnabled} onChange={(event) => setAdvertisingEnabled(event.target.checked)} className="mt-1 h-4 w-4 accent-[var(--brand-orange)]" />
                   </div>
                 </label>
               </div>
@@ -158,7 +157,7 @@ export function CookieConsentBanner({ config }: { config: ConsentBannerConfig })
         <button
           type="button"
           onClick={() => setShowPreferences((value) => !value)}
-          className="fixed bottom-4 left-4 z-40 inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 shadow-[0_16px_40px_-28px_rgba(15,23,42,0.35)] transition hover:text-[var(--brand-cobalt)]"
+          className="fixed bottom-4 left-4 z-40 inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-[var(--brand-text-secondary)] shadow-[0_16px_40px_-28px_rgba(15,23,42,0.35)] transition hover:text-[var(--brand-orange)]"
         >
           <Settings2 className="h-4 w-4" />
           {config.manageLabel}
@@ -166,17 +165,17 @@ export function CookieConsentBanner({ config }: { config: ConsentBannerConfig })
       )}
 
       {hasConsent && showPreferences ? (
-        <div className="fixed bottom-20 left-4 z-40 w-[min(420px,calc(100vw-2rem))] rounded-[1.75rem] border border-slate-200 bg-white p-5 shadow-[0_24px_70px_-35px_rgba(15,23,42,0.38)]">
+        <div className="fixed bottom-20 left-4 z-40 w-[min(420px,calc(100vw-2rem))] rounded-[1.75rem] border border-slate-200 bg-white p-5 shadow-[0_24px_70px_-35px_rgba(15,23,42,0.32)]">
           <h3 className="text-lg font-black text-slate-950">{config.title}</h3>
           <p className="mt-2 text-sm leading-6 text-slate-600">{config.description}</p>
           <div className="mt-4 space-y-3">
             <label className="flex items-center justify-between gap-3 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3">
               <span className="text-sm font-medium text-slate-900">{config.analyticsLabel}</span>
-              <input type="checkbox" checked={analyticsEnabled} onChange={(event) => setAnalyticsEnabled(event.target.checked)} className="h-4 w-4 accent-[var(--brand-cobalt)]" />
+              <input type="checkbox" checked={analyticsEnabled} onChange={(event) => setAnalyticsEnabled(event.target.checked)} className="h-4 w-4 accent-[var(--brand-blue)]" />
             </label>
             <label className="flex items-center justify-between gap-3 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3">
               <span className="text-sm font-medium text-slate-900">{config.advertisingLabel}</span>
-              <input type="checkbox" checked={advertisingEnabled} onChange={(event) => setAdvertisingEnabled(event.target.checked)} className="h-4 w-4 accent-[var(--brand-coral)]" />
+              <input type="checkbox" checked={advertisingEnabled} onChange={(event) => setAdvertisingEnabled(event.target.checked)} className="h-4 w-4 accent-[var(--brand-orange)]" />
             </label>
           </div>
           <div className="mt-4 flex flex-wrap gap-3">

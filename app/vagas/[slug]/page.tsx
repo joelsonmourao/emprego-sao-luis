@@ -87,20 +87,35 @@ export default async function JobDetailPage({ params }: { params: Promise<{ slug
 
       <Breadcrumbs items={[{ label: "Home", href: "/" }, { label: "Vagas", href: "/vagas" }, { label: job.title }]} />
 
-      <div className="brand-page-hero rounded-[2.2rem] border border-slate-200 px-6 py-8 shadow-[0_35px_120px_-70px_rgba(34,73,245,0.45)] sm:px-8">
+      <div className="brand-page-hero rounded-[2.2rem] border border-slate-200 px-6 py-8 shadow-[0_35px_120px_-70px_rgba(26,43,76,0.22)] sm:px-8">
         <div className={`grid gap-6 ${job.heroImageUrl ? "lg:grid-cols-[1.15fr_0.85fr]" : "grid-cols-1"}`}>
           <div className="space-y-5">
             {job.company?.logoUrl || job.companyLogoUrl ? (
-              <div className="inline-flex items-center gap-3 rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 shadow-sm">
-                <img src={job.company?.logoUrl ?? job.companyLogoUrl ?? ""} alt={job.companyName} className="h-10 w-10 rounded-2xl border border-slate-200 bg-white object-cover p-1" />
+                <div className="inline-flex items-center gap-3 rounded-full border border-[color:rgba(26,43,76,0.1)] bg-white px-4 py-2 text-sm font-semibold text-[var(--brand-text-secondary)] shadow-sm">
+                 <img src={job.company?.logoUrl ?? job.companyLogoUrl ?? ""} alt={job.companyName} className="h-10 w-10 rounded-2xl border border-[color:rgba(26,43,76,0.1)] bg-white object-cover p-1" />
                 {job.companyName}
               </div>
             ) : null}
             <SectionHeading
               eyebrow={`${job.city.name}, ${job.state.code}`}
               title={job.title}
-              description={`${job.companyName} - publicada em ${formatDate(job.publishedAt)} - candidatura no site da empresa`}
+              description={`${job.companyName} • publicada em ${formatDate(job.publishedAt)} • candidatura no link oficial da empresa`}
             />
+            <div className="flex flex-wrap gap-3">
+              {job.locationType ? (
+                <span className="rounded-full border border-[color:rgba(26,43,76,0.1)] bg-white px-4 py-2 text-sm font-medium text-[var(--brand-text-secondary)]">
+                  {job.locationType === "REMOTE" ? "Remoto" : job.locationType === "HYBRID" ? "Hibrido" : "Presencial"}
+                </span>
+              ) : null}
+              {job.workHours ? (
+                <span className="rounded-full border border-[color:rgba(26,43,76,0.1)] bg-white px-4 py-2 text-sm font-medium text-[var(--brand-text-secondary)]">{job.workHours}</span>
+              ) : null}
+              {job.expiresAt ? (
+                  <span className="rounded-full border border-[color:rgba(26,43,76,0.1)] bg-white px-4 py-2 text-sm font-medium text-[var(--brand-text-secondary)]">
+                  Ate {formatDate(job.expiresAt)}
+                </span>
+              ) : null}
+            </div>
           </div>
           {job.heroImageUrl ? (
             <div className="overflow-hidden rounded-[2rem] border border-slate-200 bg-white/70 shadow-sm">
@@ -113,7 +128,7 @@ export default async function JobDetailPage({ params }: { params: Promise<{ slug
       <div className="grid gap-8 lg:grid-cols-[1.1fr_0.9fr]">
         <div className="space-y-6">
           <div className="rounded-3xl border border-slate-200 bg-white p-8 shadow-sm">
-            <p className="mb-6 rounded-[1.5rem] bg-slate-50 px-5 py-4 text-base leading-8 text-slate-700">
+             <p className="mb-6 rounded-[1.5rem] bg-[var(--brand-soft)] px-5 py-4 text-base leading-8 text-[var(--brand-text-secondary)]">
               {job.summary}
             </p>
             <div className="prose-content text-slate-700" dangerouslySetInnerHTML={{ __html: sanitizeRichTextHtml(job.descriptionHtml) }} />
@@ -121,16 +136,16 @@ export default async function JobDetailPage({ params }: { params: Promise<{ slug
 
           <div className="grid gap-6 md:grid-cols-2">
             <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
-              <h2 className="text-xl font-semibold text-slate-950">Requisitos</h2>
-              <ul className="mt-4 space-y-3 text-sm leading-6 text-slate-600">
+              <h2 className="text-xl font-semibold text-[var(--brand-navy)]">Requisitos</h2>
+              <ul className="mt-4 space-y-3 text-sm leading-6 text-[var(--brand-text-secondary)]">
                 {(Array.isArray(job.requirements) ? job.requirements : []).map((item: unknown, index: number) => (
                   <li key={`${item}-${index}`}>- {String(item)}</li>
                 ))}
               </ul>
             </div>
             <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
-              <h2 className="text-xl font-semibold text-slate-950">Beneficios</h2>
-              <ul className="mt-4 space-y-3 text-sm leading-6 text-slate-600">
+              <h2 className="text-xl font-semibold text-[var(--brand-navy)]">Beneficios</h2>
+              <ul className="mt-4 space-y-3 text-sm leading-6 text-[var(--brand-text-secondary)]">
                 {(Array.isArray(job.benefits) ? job.benefits : []).map((item: unknown, index: number) => (
                   <li key={`${item}-${index}`}>- {String(item)}</li>
                 ))}
@@ -138,22 +153,22 @@ export default async function JobDetailPage({ params }: { params: Promise<{ slug
             </div>
           </div>
 
-          <div className="brand-panel rounded-[2rem] border border-slate-200 p-8 shadow-[0_25px_80px_-50px_rgba(34,73,245,0.28)]">
-            <h2 className="text-2xl font-black text-slate-950">Veja mais vagas parecidas</h2>
-            <p className="mt-3 text-base leading-8 text-slate-600">
+          <div className="brand-panel rounded-[2rem] border border-slate-200 p-8 shadow-[0_25px_80px_-50px_rgba(26,43,76,0.2)]">
+            <h2 className="text-2xl font-black text-[var(--brand-navy)]">Veja mais vagas parecidas</h2>
+            <p className="mt-3 text-base leading-8 text-[var(--brand-text-secondary)]">
               Se esta oportunidade chamou a sua atencao, aproveite para ver outras vagas em {job.city.name} e mais oportunidades ligadas a empresas parecidas.
             </p>
             <div className="mt-5 flex flex-wrap gap-3">
               <Link
                 href={`/vagas/estado/${job.state.slug}/${job.city.slug}`}
-                className="rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition hover:text-[var(--brand-cobalt)]"
+                className="rounded-full border border-[color:rgba(26,43,76,0.1)] bg-white px-4 py-2 text-sm font-medium text-[var(--brand-text-secondary)] transition hover:border-[color:rgba(255,109,0,0.24)] hover:text-[var(--brand-orange)]"
               >
                 Mais vagas em {job.city.name}
               </Link>
               {job.company?.slug ? (
                 <Link
                   href={`/empresas/${job.company.slug}`}
-                  className="rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition hover:text-[var(--brand-cobalt)]"
+                  className="rounded-full border border-[color:rgba(26,43,76,0.1)] bg-white px-4 py-2 text-sm font-medium text-[var(--brand-text-secondary)] transition hover:border-[color:rgba(255,109,0,0.24)] hover:text-[var(--brand-orange)]"
                 >
                   Mais vagas da {job.company.name}
                 </Link>
@@ -163,9 +178,9 @@ export default async function JobDetailPage({ params }: { params: Promise<{ slug
         </div>
 
         <aside className="space-y-6">
-          <div className="brand-soft-panel rounded-[2rem] border border-slate-200 p-6 shadow-[0_28px_100px_-60px_rgba(16,24,39,0.35)]">
-            <h2 className="text-2xl font-black text-slate-950">Candidatura</h2>
-            <p className="mt-3 text-sm leading-7 text-slate-600">Leia os requisitos, atualize o curriculo e envie a candidatura pelo link oficial da empresa.</p>
+          <div className="brand-soft-panel rounded-[2rem] border border-slate-200 p-6 shadow-[0_28px_100px_-60px_rgba(26,43,76,0.18)]">
+            <h2 className="text-2xl font-black text-[var(--brand-navy)]">Candidatura</h2>
+            <p className="mt-3 text-sm leading-7 text-[var(--brand-text-secondary)]">Leia os requisitos com calma, atualize o curriculo e envie sua candidatura pelo link oficial da empresa.</p>
             <Button asChild size="lg" className="mt-5 w-full rounded-2xl">
               <TrackedExternalLink href={job.applyUrl} target="_blank" rel="noreferrer" eventName="apply_click" entityType="job" entitySlug={job.slug}>
                 Candidatar-se
@@ -179,7 +194,7 @@ export default async function JobDetailPage({ params }: { params: Promise<{ slug
                 eventName="company_site_click"
                 entityType="company"
                 entitySlug={job.company?.slug ?? job.slug}
-                className="mt-4 inline-flex text-sm font-semibold text-[var(--brand-cobalt)] transition hover:opacity-80"
+                className="mt-4 inline-flex text-sm font-semibold text-[var(--brand-blue)] transition hover:text-[var(--brand-orange)]"
               >
                 Conhecer a empresa
               </TrackedExternalLink>
@@ -187,14 +202,14 @@ export default async function JobDetailPage({ params }: { params: Promise<{ slug
           </div>
 
           <div className="space-y-4">
-            <h2 className="text-lg font-black text-slate-950">Vagas relacionadas</h2>
+            <h2 className="text-lg font-black text-[var(--brand-navy)]">Vagas relacionadas</h2>
             {relatedJobs.map((relatedJob) => (
               <JobCard key={relatedJob.id} job={relatedJob} />
             ))}
           </div>
 
           <div className="space-y-4">
-            <h2 className="text-lg font-black text-slate-950">Conteudos relacionados</h2>
+            <h2 className="text-lg font-black text-[var(--brand-navy)]">Conteudos relacionados</h2>
             {relatedPosts.map((post) => (
               <BlogCard key={post.id} post={post} />
             ))}

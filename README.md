@@ -37,8 +37,7 @@ pnpm --filter @workspace/jovem-aprendiz-vagas-next run dev
 
 ## Usuario inicial do admin
 
-- email: `admin@jovemaprendizvagas.local`
-- senha: `Admin@123456`
+Defina `ADMIN_EMAIL` e `ADMIN_PASSWORD` no arquivo `.env` antes de rodar o projeto ou publicar em producao.
 
 ## O que o admin controla hoje
 
@@ -123,8 +122,8 @@ Arquivo `.env.example`:
 DATABASE_URL="postgresql://postgres:postgres@localhost:5432/jovem_aprendiz_vagas?schema=jovem_aprendiz_vagas"
 NEXT_PUBLIC_SITE_URL="http://localhost:3000"
 AUTH_SECRET="troque-esta-chave-por-uma-segura"
-ADMIN_EMAIL="admin@jovemaprendizvagas.local"
-ADMIN_PASSWORD="Admin@123456"
+ADMIN_EMAIL="defina-um-email-admin@seudominio.com"
+ADMIN_PASSWORD="defina-uma-senha-admin-forte"
 ```
 
 ## Dependencias externas para producao

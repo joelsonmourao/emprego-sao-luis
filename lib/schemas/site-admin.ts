@@ -127,10 +127,17 @@ export const siteContentSchema = z.object({
     quickBlogEyebrow: z.string(),
     quickBlogTitle: z.string(),
     quickBlogDescription: z.string(),
+    heroHighlights: z.array(actionCardSchema),
     featuredTitle: z.string(),
     featuredDescription: z.string(),
     blogTitle: z.string(),
     blogDescription: z.string(),
+    citiesTitle: z.string(),
+    citiesDescription: z.string(),
+    benefitsTitle: z.string(),
+    benefitsDescription: z.string(),
+    companiesTitle: z.string(),
+    companiesDescription: z.string(),
     faqTitle: z.string(),
     faqDescription: z.string(),
     finalCtaEyebrow: z.string(),
@@ -159,8 +166,12 @@ export const siteContentSchema = z.object({
     terms: pageContentSchema
   }),
   footer: z.object({
+    navigationTitle: z.string(),
+    informationTitle: z.string(),
+    shortcutsTitle: z.string(),
     description: z.string(),
-    copyrightText: z.string()
+    copyrightText: z.string(),
+    shortcuts: z.array(contentCardSchema)
   })
 });
 
@@ -229,12 +240,44 @@ export const defaultSiteContent: SiteContent = {
     quickBlogEyebrow: "Acesso rapido",
     quickBlogTitle: "Acessar blog",
     quickBlogDescription: "Veja dicas de curriculo, entrevista e primeiro emprego para se preparar melhor.",
+    heroHighlights: [
+      {
+        title: "Ver vagas agora",
+        description: "Entre direto nas listagens com filtros por cidade, estado e empresa.",
+        href: "/vagas",
+        iconKey: "briefcase"
+      },
+      {
+        title: "Ir para o blog",
+        description: "Leia dicas de curriculo, entrevista e primeiros passos no mercado.",
+        href: "/blog",
+        iconKey: "file-text"
+      },
+      {
+        title: "Buscar por cidade",
+        description: "Descubra em quais cidades estao aparecendo mais vagas perto de voce.",
+        href: "/cidades",
+        iconKey: "compass"
+      },
+      {
+        title: "Empresas que contratam",
+        description: "Acompanhe empresas com vagas abertas para Jovem Aprendiz no portal.",
+        href: "/empresas",
+        iconKey: "handshake"
+      }
+    ],
     featuredTitle: "Comece pelas oportunidades mais relevantes",
     featuredDescription: "As vagas aparecem logo no inicio para voce encontrar oportunidades sem precisar rolar demais.",
     blogTitle: "Conteudos para curriculo, entrevista e primeiro emprego",
     blogDescription: "O blog fica separado das vagas para voce saber quando esta lendo dicas e quando esta vendo oportunidades.",
+    citiesTitle: "Navegue por cidade e estado",
+    citiesDescription: "Escolha a localidade que faz sentido para sua rotina e veja oportunidades mais perto de voce.",
+    benefitsTitle: "Por que o Jovem Aprendiz vale a pena",
+    benefitsDescription: "O programa pode abrir a porta do primeiro emprego com experiencia real, aprendizado e chance de crescimento.",
+    companiesTitle: "Empresas com vagas para acompanhar",
+    companiesDescription: "Veja empresas que costumam abrir oportunidades e acompanhe as publicacoes mais recentes.",
     faqTitle: "Duvidas frequentes sobre Jovem Aprendiz",
-    faqDescription: "Perguntas comuns para ajudar quem esta comecando a procurar vaga.",
+    faqDescription: "Respostas curtas para ajudar na busca por vaga, curriculo e primeiro emprego.",
     finalCtaEyebrow: "Proximo passo",
     finalCtaTitle: "Entre pelas vagas ou continue pelo blog",
     finalCtaDescription: "Escolha o caminho que faz mais sentido agora: buscar vagas ou ler dicas para se preparar melhor.",
@@ -343,6 +386,18 @@ export const defaultSiteContent: SiteContent = {
       {
         question: "Quais empresas costumam contratar Jovem Aprendiz na minha cidade?",
         answer: "As paginas de cidade e empresa ajudam a descobrir onde aparecem mais vagas, quais companhias contratam com frequencia e quais links vale acompanhar primeiro."
+      },
+      {
+        question: "Onde encontrar vagas de Jovem Aprendiz perto de mim?",
+        answer: "Use a busca por cargo, estado e cidade para encontrar vagas mais proximas e depois acompanhe as paginas de empresa e o blog para se preparar melhor."
+      },
+      {
+        question: "O que colocar no curriculo para Jovem Aprendiz?",
+        answer: "O ideal e mostrar dados corretos, escolaridade, cursos, disponibilidade e atividades que demonstrem responsabilidade. O blog do portal traz orientacoes praticas para isso."
+      },
+      {
+        question: "Como se sair melhor na entrevista de Jovem Aprendiz?",
+        answer: "Vale estudar a vaga, treinar respostas simples e honestas, chegar no horario e mostrar vontade de aprender. Pequenos cuidados fazem muita diferenca."
       }
     ]
   },
@@ -419,49 +474,69 @@ export const defaultSiteContent: SiteContent = {
   },
   pages: {
     about: {
-      title: "Um portal feito para ajudar quem procura o primeiro emprego",
-      description: "Reunimos vagas, dicas e caminhos mais simples para quem quer encontrar oportunidades de Jovem Aprendiz no Brasil.",
+      title: "Um portal para organizar a busca por vagas de Jovem Aprendiz",
+      description: "O Jovem Aprendiz Vagas ajuda a reunir oportunidades, empresas e orientacoes praticas para quem esta entrando no mercado de trabalho.",
       contentHtml:
-        "<p>O Jovem Aprendiz Vagas foi criado para facilitar a busca por oportunidades de primeiro emprego. Reunimos vagas, cidades, empresas e dicas praticas para ajudar voce a encontrar o caminho certo.</p>",
-      seoTitle: "Sobre o Jovem Aprendiz Vagas",
-      seoDescription: "Conheca o portal Jovem Aprendiz Vagas e entenda como ele ajuda na busca pelo primeiro emprego."
+        "<p>O Jovem Aprendiz Vagas existe para facilitar uma etapa que costuma ser cansativa: encontrar oportunidades reais de primeiro emprego sem precisar se perder entre paginas confusas, links soltos e filtros que nao ajudam.</p><h2>O que o portal faz</h2><p>Nosso trabalho e reunir e organizar vagas de Jovem Aprendiz por cidade, estado e empresa, deixando a busca mais clara para quem quer entrar no mercado de trabalho com mais foco.</p><h2>Para quem o portal foi criado</h2><p>O portal foi pensado para jovens em busca da primeira oportunidade, familias que ajudam nesse processo e tambem empresas que querem aparecer de forma mais organizada para quem esta procurando vaga.</p><h2>Como a plataforma ajuda</h2><p>Aqui voce encontra listagens de vagas, paginas de empresas, hubs por localidade e conteudos do blog com orientacoes sobre curriculo, candidatura e entrevista. A ideia e economizar tempo e deixar o caminho mais simples.</p><h2>Nosso compromisso</h2><p>Queremos que o portal seja util de verdade: com leitura facil no celular, informacoes claras, navegacao objetiva e uma experiencia confiavel para quem esta comparando oportunidades.</p>",
+      seoTitle: "Sobre o portal Jovem Aprendiz Vagas",
+      seoDescription: "Entenda como o Jovem Aprendiz Vagas organiza oportunidades, empresas e conteudos para ajudar na busca pelo primeiro emprego."
     },
     contact: {
-      title: "Fale com a gente",
-      description: "Se voce encontrou algum problema no site ou quer enviar uma sugestao, use esta pagina como ponto de contato.",
+      title: "Fale com a equipe do portal",
+      description: "Use esta pagina para tirar duvidas, avisar sobre algum problema no site ou falar sobre vagas, empresas e conteudo publicado.",
       contentHtml:
-        "<p>Se voce encontrou algum erro, quer sugerir uma melhoria ou precisa falar com a equipe do portal, use os canais de contato informados nesta pagina.</p>",
+        "<p>Se voce encontrou um erro em alguma pagina, percebeu link quebrado, quer sugerir melhoria ou precisa falar com a equipe do portal, este e o melhor ponto de contato.</p><h2>Quando vale falar com a gente</h2><ul><li>Para avisar sobre informacoes desatualizadas em vagas ou empresas</li><li>Para relatar problema de navegacao, busca ou candidatura</li><li>Para sugerir novos conteudos do blog e temas que ajudem quem busca o primeiro emprego</li><li>Para assuntos institucionais, parcerias e atualizacao de dados de empresa</li></ul><h2>Como funciona o atendimento</h2><p>Os canais exibidos nesta pagina sao definidos nas configuracoes do portal. Quando houver e-mail, telefone ou WhatsApp cadastrados, eles aparecem aqui para facilitar o contato direto.</p>",
       seoTitle: "Contato | Jovem Aprendiz Vagas",
-      seoDescription: "Entre em contato com a equipe do Jovem Aprendiz Vagas."
+      seoDescription: "Veja como entrar em contato com a equipe do Jovem Aprendiz Vagas para suporte, correcao de informacoes e assuntos institucionais."
     },
     privacy: {
       title: "Politica de Privacidade",
-      description: "Saiba como os dados sao tratados no portal.",
+      description: "Entenda quais dados podem ser tratados no portal, em quais situacoes isso acontece e quais escolhas o usuario pode fazer.",
       contentHtml:
-        "<p>Esta pagina explica como o portal pode tratar dados de navegacao, formularios e contatos enviados pelos usuarios.</p>",
+        "<p>Esta Politica de Privacidade explica como o Jovem Aprendiz Vagas pode tratar dados pessoais e informacoes de navegacao durante o uso do portal.</p><h2>Quais dados podem ser coletados</h2><p>O portal pode tratar dados informados em contatos enviados voluntariamente, dados tecnicos de navegacao, preferencias de cookies e informacoes ligadas ao uso do admin quando houver acesso autenticado.</p><h2>Quando isso acontece</h2><p>Esse tratamento pode acontecer quando voce navega pelo site, utiliza a busca, interage com o banner de cookies, acessa paginas estrategicas, entra em contato pelos canais exibidos no portal ou, no caso da equipe interna, faz login no painel administrativo.</p><h2>Para que essas informacoes podem ser usadas</h2><ul><li>Manter o portal funcionando com seguranca</li><li>Melhorar paginas, busca, filtros e navegacao</li><li>Entender desempenho do site quando houver consentimento para medicao</li><li>Responder contatos enviados pelos canais do portal</li><li>Proteger o painel administrativo e registrar acoes internas basicas</li></ul><h2>Compartilhamento e terceiros</h2><p>O portal pode usar servicos de terceiros para medicao, verificacao e publicidade, como ferramentas do Google, sempre de acordo com as configuracoes ativas e com o consentimento aplicavel. As candidaturas podem levar o usuario para paginas externas da empresa anunciante ou da fonte da vaga.</p><h2>Armazenamento e seguranca</h2><p>Adotamos medidas tecnicas para proteger o acesso ao admin, reduzir exposicao desnecessaria de dados e limitar o tratamento ao que faz sentido para o funcionamento do portal. Ainda assim, nenhum ambiente online pode prometer risco zero.</p><h2>Direitos do usuario</h2><p>Voce pode pedir esclarecimentos sobre dados enviados voluntariamente, solicitar atualizacao de informacoes de contato e revisar suas preferencias de cookies a qualquer momento pelo controle exibido no site.</p>",
       seoTitle: "Politica de Privacidade | Jovem Aprendiz Vagas",
-      seoDescription: "Entenda como o Jovem Aprendiz Vagas trata privacidade e dados dos usuarios."
+      seoDescription: "Saiba quais dados podem ser tratados no portal, para que servem, quando isso acontece e como a privacidade do usuario e respeitada."
     },
     cookies: {
       title: "Politica de Cookies",
-      description: "Entenda como usamos cookies e como voce pode ajustar suas preferencias.",
+      description: "Veja quais cookies podem ser usados no portal, para que servem e como aceitar, recusar ou ajustar suas preferencias.",
       contentHtml:
-        "<p>Usamos cookies essenciais para o funcionamento do portal e, quando voce permite, cookies de medicao e publicidade para melhorar a experiencia e entender o desempenho das paginas.</p><p>Voce pode revisar suas preferencias a qualquer momento no banner de cookies.</p>",
+        "<p>O Jovem Aprendiz Vagas usa cookies e tecnologias semelhantes para manter o portal funcionando, lembrar escolhas de privacidade e, quando houver consentimento, apoiar medicao e publicidade.</p><h2>Cookies necessarios</h2><p>Sao os cookies ligados ao funcionamento basico do site, como seguranca, manutencao da sessao administrativa e armazenamento da escolha de consentimento. Eles nao podem ser desligados porque fazem parte da operacao essencial do portal.</p><h2>Cookies analiticos</h2><p>Quando a medicao estiver ativa e o usuario autorizar, esses cookies ajudam a entender quais paginas recebem mais acesso, quais buscas sao mais usadas e como melhorar a experiencia geral do portal.</p><h2>Cookies de marketing e publicidade</h2><p>Quando o portal usar publicidade e o usuario permitir, esses cookies podem apoiar a entrega e a medicao de anuncios. Se publicidade nao estiver ativa, essa categoria permanece apenas como estrutura preparada para uso futuro.</p><h2>Como gerenciar preferencias</h2><p>No primeiro acesso, o portal mostra um banner para aceitar, recusar ou personalizar as categorias opcionais. Depois da escolha, o controle continua disponivel para reabrir as preferencias quando voce quiser.</p><h2>Ferramentas de terceiros</h2><p>Quando configuradas, integracoes como Google Analytics, Tag Manager e AdSense so devem ser carregadas conforme as regras de consentimento definidas no portal.</p>",
       seoTitle: "Politica de Cookies | Jovem Aprendiz Vagas",
-      seoDescription: "Veja como o portal usa cookies essenciais, de medicao e de publicidade."
+      seoDescription: "Entenda como o portal trata cookies necessarios, analiticos e de publicidade, e veja como ajustar suas preferencias."
     },
     terms: {
       title: "Termos de Uso",
-      description: "Regras basicas para uso do portal.",
+      description: "Conheca as regras gerais de uso do portal, as responsabilidades do usuario e os limites de funcionamento da plataforma.",
       contentHtml:
-        "<p>Ao usar o portal, voce concorda com as regras de navegacao, uso das informacoes e responsabilidade sobre candidaturas enviadas em sites externos.</p>",
+        "<p>Estes Termos de Uso explicam as regras gerais para navegar, consultar vagas, acessar conteudos e utilizar os recursos do Jovem Aprendiz Vagas.</p><h2>Objetivo do portal</h2><p>O portal existe para reunir e organizar vagas de Jovem Aprendiz, empresas, cidades, estados e conteudos de apoio para quem busca o primeiro emprego.</p><h2>Uso permitido</h2><p>Voce pode usar o portal para pesquisar vagas, ler conteudos, comparar empresas e acompanhar paginas publicas de forma pessoal, informativa e licita.</p><h2>Responsabilidades do usuario</h2><ul><li>Usar informacoes verdadeiras quando houver envio voluntario de contato</li><li>Nao tentar acessar areas restritas sem autorizacao</li><li>Nao automatizar uso abusivo do site, nem copiar conteudo de forma indevida</li><li>Conferir as informacoes da vaga antes de enviar candidatura em site externo</li></ul><h2>Vagas e links externos</h2><p>O portal organiza oportunidades e pode direcionar o usuario para paginas de candidatura fora do dominio principal. O envio final da candidatura depende das regras e do funcionamento da empresa anunciante ou da fonte da vaga.</p><h2>Limites de responsabilidade</h2><p>Embora o portal trabalhe para manter as informacoes organizadas e claras, disponibilidade, prazos, salario, etapas de selecao e detalhes finais de candidatura podem mudar conforme a empresa ou a fonte original da vaga.</p><h2>Propriedade intelectual</h2><p>Marca, identidade visual, textos originais do portal, estrutura de navegacao e demais elementos proprios nao podem ser reproduzidos de forma indevida sem autorizacao.</p>",
       seoTitle: "Termos de Uso | Jovem Aprendiz Vagas",
-      seoDescription: "Leia os termos de uso do portal Jovem Aprendiz Vagas."
+      seoDescription: "Leia as regras gerais de uso do portal, entenda responsabilidades do usuario e veja como funcionam vagas, links externos e conteudos."
     }
   },
   footer: {
-    description: "Um portal feito para ajudar jovens a encontrar vagas e se preparar melhor para o primeiro emprego.",
-    copyrightText: "© 2026 Jovem Aprendiz Vagas. Informacoes para quem esta em busca do primeiro emprego."
+    navigationTitle: "Navegacao",
+    informationTitle: "Informacoes",
+    shortcutsTitle: "Atalhos uteis",
+    description: "Um portal feito para ajudar jovens a encontrar vagas, conhecer empresas e se preparar melhor para o primeiro emprego.",
+    copyrightText: "© 2026 Jovem Aprendiz Vagas. Informacoes para quem esta em busca do primeiro emprego.",
+    shortcuts: [
+      {
+        title: "Buscar por cidade e estado",
+        description: "Veja onde as oportunidades estao aparecendo mais perto de voce.",
+        iconKey: "compass"
+      },
+      {
+        title: "Acompanhar empresas",
+        description: "Descubra companhias que publicam vagas para Jovem Aprendiz com frequencia.",
+        iconKey: "handshake"
+      },
+      {
+        title: "Ler dicas de curriculo e entrevista",
+        description: "Use o blog para se preparar melhor antes de se candidatar.",
+        iconKey: "file-text"
+      }
+    ]
   }
 };
 
@@ -484,18 +559,18 @@ export const defaultSiteSettings: SiteSettings = {
     tiktok: ""
   },
   defaultOgAlt: "Jovem Aprendiz Vagas",
-  supportText: "Precisa de ajuda? Fale com a equipe do portal.",
+  supportText: "Use os canais desta pagina para relatar erros, pedir atualizacao de informacoes ou falar com a equipe responsavel pelo portal.",
   consentBanner: {
     bannerEnabled: true,
-    title: "Suas preferencias de privacidade",
+    title: "Seu uso do portal pode ser mais bem ajustado com suas preferencias",
     description:
-      "Usamos cookies essenciais para o portal funcionar e, com a sua permissao, cookies de medicao e publicidade para entender o desempenho das paginas e manter o site no ar.",
+      "Usamos cookies necessarios para o portal funcionar e, quando voce autoriza, recursos de medicao e publicidade para entender o desempenho das paginas e melhorar a experiencia.",
     policyHref: "/politica-de-cookies",
-    acceptLabel: "Aceitar tudo",
-    rejectLabel: "Recusar opcionais",
+    acceptLabel: "Aceitar",
+    rejectLabel: "Recusar",
     manageLabel: "Gerenciar preferencias",
-    analyticsLabel: "Permitir Analytics",
-    advertisingLabel: "Permitir publicidade"
+    analyticsLabel: "Cookies analiticos",
+    advertisingLabel: "Cookies de marketing"
   },
   google: {
     consentModeEnabled: true,

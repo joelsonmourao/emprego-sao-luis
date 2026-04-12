@@ -27,8 +27,8 @@ export async function SiteLogo({
       />
       {compact && withTagline ? (
         <div className="hidden min-w-0 sm:block">
-          <div className="text-[11px] font-semibold uppercase tracking-[0.32em] text-[var(--brand-cobalt)]">Primeiro emprego</div>
-          <div className="text-base font-black tracking-tight text-slate-950">{settings.siteName}</div>
+          <div className="text-[11px] font-semibold uppercase tracking-[0.32em] text-[var(--brand-orange)]">Primeiro emprego</div>
+          <div className="text-base font-black tracking-tight text-[var(--brand-navy)]">{settings.siteName}</div>
         </div>
       ) : null}
     </Link>

@@ -26,7 +26,7 @@ function ToggleField({
         <p className="text-sm font-semibold text-slate-950">{label}</p>
         <p className="mt-1 text-sm leading-6 text-slate-600">{description}</p>
       </div>
-      <input type="checkbox" checked={checked} onChange={(event) => onChange(event.target.checked)} className="mt-1 h-4 w-4 accent-[var(--brand-cobalt)]" />
+      <input type="checkbox" checked={checked} onChange={(event) => onChange(event.target.checked)} className="mt-1 h-4 w-4 accent-[var(--brand-blue)]" />
     </label>
   );
 }

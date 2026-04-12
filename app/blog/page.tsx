@@ -24,7 +24,7 @@ export default async function BlogPage() {
     <section className="mx-auto max-w-7xl space-y-8 px-4 py-14 sm:px-6 lg:px-8">
       <JsonLd data={buildBreadcrumbJsonLd([{ name: "Home", path: "/" }, { name: "Blog", path: "/blog" }])} />
       <Breadcrumbs items={[{ label: "Home", href: "/" }, { label: "Blog" }]} />
-      <div className="brand-page-hero rounded-[2.2rem] border border-slate-200 px-6 py-8 shadow-[0_35px_120px_-70px_rgba(34,73,245,0.45)] sm:px-8">
+      <div className="brand-page-hero rounded-[2.2rem] border border-slate-200 px-6 py-8 shadow-[0_35px_120px_-70px_rgba(26,43,76,0.22)] sm:px-8">
         <SectionHeading
           eyebrow="Blog"
           title="Dicas para curriculo, entrevista e primeiro emprego"
@@ -34,10 +34,17 @@ export default async function BlogPage() {
           <Button asChild size="lg">
             <Link href="/vagas">Ver vagas</Link>
           </Button>
-          <Button asChild variant="outline" size="lg" className="rounded-2xl border-[color:rgba(34,73,245,0.2)] text-[var(--brand-cobalt)]">
+          <Button asChild variant="outline" size="lg" className="rounded-2xl">
             <Link href="/empresas">Ver empresas</Link>
           </Button>
         </div>
+      </div>
+      <div className="brand-chip rounded-[2rem] p-6">
+        <SectionHeading
+          eyebrow="Para quem esta comecando"
+          title="Aprenda a se apresentar melhor antes de enviar o curriculo"
+          description="Os textos do blog ajudam a entender como montar curriculo, se sair melhor na entrevista e aproveitar as vagas de Jovem Aprendiz com mais preparo."
+        />
       </div>
       <div className="grid gap-6 lg:grid-cols-3">
         {posts.items.map((post) => (

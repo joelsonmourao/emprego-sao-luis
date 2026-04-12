@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
-import { headers } from "next/headers";
+import { cookies, headers } from "next/headers";
 import "./globals.css";
 
 import { SiteHeader } from "@/components/site-header";
@@ -12,6 +12,7 @@ import { buildOrganizationJsonLd, buildWebsiteJsonLd } from "@/lib/seo/json-ld";
 import { siteConfig } from "@/lib/constants";
 import { getSiteSettings } from "@/lib/site-settings";
 import { normalizeSearchConsoleVerification } from "@/lib/google";
+import { CONSENT_COOKIE_NAME } from "@/lib/consent";
 import { absoluteUrl } from "@/lib/utils";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -31,7 +32,7 @@ export async function generateMetadata(): Promise<Metadata> {
       apple: [settings.logoCompactUrl]
     },
     other: {
-      "theme-color": "#5850EC"
+      "theme-color": "#1A2B4C"
     },
     verification: settings.google.searchConsoleVerification
       ? {
@@ -67,6 +68,7 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
   const section = (await headers()).get("x-app-section");
   const isAdminSection = section === "admin";
   const settings = await getSiteSettings();
+  const initialConsentValue = (await cookies()).get(CONSENT_COOKIE_NAME)?.value ?? null;
 
   return (
     <html lang="pt-BR">
@@ -77,7 +79,7 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
         {isAdminSection ? null : <SiteHeader />}
         <main>{children}</main>
         {isAdminSection ? null : <SiteFooter />}
-        {isAdminSection ? null : <SiteIntegrations consentBanner={settings.consentBanner} google={settings.google} />}
+        {isAdminSection ? null : <SiteIntegrations consentBanner={settings.consentBanner} google={settings.google} initialConsentValue={initialConsentValue} />}
       </body>
     </html>
   );

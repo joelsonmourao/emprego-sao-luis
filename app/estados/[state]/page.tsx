@@ -70,7 +70,7 @@ export default async function StateDetailPage({ params }: { params: Promise<{ st
       <JsonLd data={buildFaqJsonLd(faq)} />
       <Breadcrumbs items={[{ label: "Home", href: "/" }, { label: "Estados", href: "/estados" }, { label: result.name }]} />
 
-      <div className="brand-panel rounded-[2.2rem] border border-slate-200 px-6 py-8 shadow-[0_35px_120px_-70px_rgba(34,73,245,0.45)] sm:px-8">
+      <div className="brand-panel rounded-[2.2rem] border border-slate-200 px-6 py-8 shadow-[0_35px_120px_-70px_rgba(26,43,76,0.22)] sm:px-8">
         <SectionHeading
           eyebrow={result.code}
           title={profile?.title || `Cidades com vagas de Jovem Aprendiz em ${result.name}`}
@@ -110,7 +110,7 @@ export default async function StateDetailPage({ params }: { params: Promise<{ st
             <h2 className="text-lg font-black text-slate-950">Empresas com vagas no estado</h2>
             <div className="mt-4 flex flex-wrap gap-3">
               {companies.filter((company) => company.stateSlug === result.slug).slice(0, 6).map((company) => (
-                <Link key={company.slug} href={`/empresas/${company.slug}`} className="rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition hover:text-[var(--brand-cobalt)]">
+                <Link key={company.slug} href={`/empresas/${company.slug}`} className="rounded-full border border-[color:rgba(26,43,76,0.1)] bg-white px-4 py-2 text-sm font-medium text-[var(--brand-text-secondary)] transition hover:border-[color:rgba(255,109,0,0.22)] hover:text-[var(--brand-orange)]">
                   {company.name}
                 </Link>
               ))}

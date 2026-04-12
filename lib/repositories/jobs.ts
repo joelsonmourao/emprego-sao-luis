@@ -253,7 +253,21 @@ export async function getAllActiveJobEntries() {
     where: { isActive: true },
     select: {
       slug: true,
-      updatedAt: true
+      title: true,
+      updatedAt: true,
+      city: {
+        select: {
+          slug: true,
+          name: true
+        }
+      },
+      state: {
+        select: {
+          slug: true,
+          name: true,
+          code: true
+        }
+      }
     },
     orderBy: [{ updatedAt: "desc" }]
   });

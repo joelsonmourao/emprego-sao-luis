@@ -22,11 +22,7 @@ export function AdminLoginForm() {
     handleSubmit,
     formState: { errors, isSubmitting }
   } = useForm<AdminLoginValues>({
-    resolver: zodResolver(adminLoginSchema),
-    defaultValues: {
-      email: "admin@jovemaprendizvagas.local",
-      password: "Admin@123456"
-    }
+    resolver: zodResolver(adminLoginSchema)
   });
 
   const onSubmit = handleSubmit(async (values) => {
@@ -63,14 +59,24 @@ export function AdminLoginForm() {
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-5 p-8">
-        <form className="space-y-5" onSubmit={onSubmit}>
+        <form className="space-y-5" onSubmit={onSubmit} autoComplete="on">
           <Field label="E-mail">
-            <Input type="email" {...register("email")} />
+            <Input
+              id="admin-email"
+              type="email"
+              autoComplete="email"
+              autoCapitalize="none"
+              autoCorrect="off"
+              inputMode="email"
+              spellCheck={false}
+              placeholder="voce@empresa.com"
+              {...register("email")}
+            />
           </Field>
           {errors.email ? <p className="text-sm text-rose-600">{errors.email.message}</p> : null}
 
           <Field label="Senha">
-            <Input type="password" {...register("password")} />
+            <Input id="admin-password" type="password" autoComplete="current-password" placeholder="Sua senha" {...register("password")} />
           </Field>
           {errors.password ? <p className="text-sm text-rose-600">{errors.password.message}</p> : null}
 

@@ -8,21 +8,6 @@
    - Environments: .env
 
  ✓ Starting...
- ✓ Compiled middleware in 197ms
- ✓ Ready in 1676ms
+ ✓ Compiled middleware in 201ms
+ ✓ Ready in 1624ms
  ○ Compiling / ...
- GET /ads.txt 200 in 2926ms
- GET /sitemap.xml 200 in 3111ms
- ✓ Compiled / in 3.2s
- GET /politica-de-cookies 200 in 4397ms
- GET /admin/login 200 in 4494ms
- GET / 200 in 4813ms
- ✓ Compiled /admin/analytics in 394ms
- GET /admin/analytics 200 in 958ms
- ✓ Compiled /icon.svg in 148ms
- GET /icon.svg 200 in 467ms
- GET /icon.svg 200 in 337ms
- ✓ Compiled /vagas/[slug] in 350ms
- GET /vagas/jovem-aprendiz-logistica-fortaleza-ce 200 in 1312ms
- GET /icon.svg 200 in 322ms
- GET /icon.svg 200 in 308ms

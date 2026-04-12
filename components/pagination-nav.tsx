@@ -16,7 +16,7 @@ export function PaginationNav({ page, totalPages, buildHref }: PaginationNavProp
   return (
     <nav aria-label="Paginacao" className="flex flex-wrap items-center justify-center gap-3">
       {page > 1 ? (
-        <Link href={buildHref(page - 1) as never} className="rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition hover:text-[var(--brand-cobalt)]">
+      <Link href={buildHref(page - 1) as never} className="rounded-full border border-[color:rgba(26,43,76,0.1)] bg-white px-4 py-2 text-sm font-medium text-[var(--brand-text-secondary)] transition hover:border-[color:rgba(255,109,0,0.22)] hover:text-[var(--brand-orange)]">
           Anterior
         </Link>
       ) : null}
@@ -28,8 +28,8 @@ export function PaginationNav({ page, totalPages, buildHref }: PaginationNavProp
           aria-current={pageNumber === page ? "page" : undefined}
           className={
             pageNumber === page
-              ? "rounded-full bg-[var(--brand-cobalt)] px-4 py-2 text-sm font-semibold text-white"
-              : "rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition hover:text-[var(--brand-cobalt)]"
+            ? "rounded-full bg-[var(--brand-navy)] px-4 py-2 text-sm font-semibold text-white"
+            : "rounded-full border border-[color:rgba(26,43,76,0.1)] bg-white px-4 py-2 text-sm font-medium text-[var(--brand-text-secondary)] transition hover:border-[color:rgba(255,109,0,0.22)] hover:text-[var(--brand-orange)]"
           }
         >
           {pageNumber}
@@ -37,7 +37,7 @@ export function PaginationNav({ page, totalPages, buildHref }: PaginationNavProp
       ))}
 
       {page < totalPages ? (
-        <Link href={buildHref(page + 1) as never} className="rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition hover:text-[var(--brand-cobalt)]">
+      <Link href={buildHref(page + 1) as never} className="rounded-full border border-[color:rgba(26,43,76,0.1)] bg-white px-4 py-2 text-sm font-medium text-[var(--brand-text-secondary)] transition hover:border-[color:rgba(255,109,0,0.22)] hover:text-[var(--brand-orange)]">
           Proxima
         </Link>
       ) : null}

@@ -117,7 +117,7 @@ export default async function CompanyDetailPage({
       <JsonLd data={buildFaqJsonLd(faq)} />
       <Breadcrumbs items={[{ label: "Home", href: "/" }, { label: "Empresas", href: "/empresas" }, { label: company.name }]} />
 
-      <div className="brand-panel rounded-[2.2rem] border border-slate-200 px-6 py-8 shadow-[0_35px_120px_-70px_rgba(34,73,245,0.45)] sm:px-8">
+      <div className="brand-panel rounded-[2.2rem] border border-slate-200 px-6 py-8 shadow-[0_35px_120px_-70px_rgba(26,43,76,0.22)] sm:px-8">
         <div className="space-y-4">
           {company.logoUrl ? (
             <div className="inline-flex items-center gap-3 rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 shadow-sm">
@@ -125,7 +125,7 @@ export default async function CompanyDetailPage({
               {company.name}
             </div>
           ) : null}
-          <p className="text-xs font-semibold uppercase tracking-[0.28em] text-[var(--brand-cobalt)]">Vagas por empresa</p>
+            <p className="text-xs font-semibold uppercase tracking-[0.28em] text-[var(--brand-orange)]">Vagas por empresa</p>
           <h1 className="text-3xl font-black tracking-tight text-slate-950 sm:text-5xl">{visibleTitle}</h1>
           <p className="max-w-4xl text-base leading-8 text-slate-600 sm:text-lg">{intro}</p>
           <div className="flex flex-wrap gap-3 text-sm text-slate-600">
@@ -133,17 +133,17 @@ export default async function CompanyDetailPage({
               {company.city.name}, {company.state.code}
             </span>
             {company.websiteUrl ? (
-              <a href={company.websiteUrl} target="_blank" rel="noreferrer" className="rounded-full border border-slate-200 bg-white px-4 py-2 font-semibold text-[var(--brand-cobalt)] shadow-sm transition hover:opacity-80">
+              <a href={company.websiteUrl} target="_blank" rel="noreferrer" className="rounded-full border border-[color:rgba(26,43,76,0.1)] bg-white px-4 py-2 font-semibold text-[var(--brand-blue)] shadow-sm transition hover:text-[var(--brand-orange)]">
                 Visitar site da empresa
               </a>
             ) : null}
           </div>
           <div className="flex flex-wrap items-center gap-3 text-sm">
             <span className="font-semibold text-slate-700">Ordenar por:</span>
-            <Link href={buildOrderHref("relevance") as never} className={parsed.order === "relevance" ? "rounded-full bg-[var(--brand-cobalt)] px-4 py-2 font-semibold text-white" : "rounded-full border border-slate-200 bg-white px-4 py-2 font-medium text-slate-700 transition hover:text-[var(--brand-cobalt)]"}>
+            <Link href={buildOrderHref("relevance") as never} className={parsed.order === "relevance" ? "rounded-full bg-[var(--brand-navy)] px-4 py-2 font-semibold text-white" : "rounded-full border border-[color:rgba(26,43,76,0.1)] bg-white px-4 py-2 font-medium text-[var(--brand-text-secondary)] transition hover:border-[color:rgba(255,109,0,0.22)] hover:text-[var(--brand-orange)]"}>
               Relevancia
             </Link>
-            <Link href={buildOrderHref("date") as never} className={parsed.order === "date" ? "rounded-full bg-[var(--brand-cobalt)] px-4 py-2 font-semibold text-white" : "rounded-full border border-slate-200 bg-white px-4 py-2 font-medium text-slate-700 transition hover:text-[var(--brand-cobalt)]"}>
+            <Link href={buildOrderHref("date") as never} className={parsed.order === "date" ? "rounded-full bg-[var(--brand-navy)] px-4 py-2 font-semibold text-white" : "rounded-full border border-[color:rgba(26,43,76,0.1)] bg-white px-4 py-2 font-medium text-[var(--brand-text-secondary)] transition hover:border-[color:rgba(255,109,0,0.22)] hover:text-[var(--brand-orange)]"}>
               Data
             </Link>
           </div>
@@ -176,7 +176,7 @@ export default async function CompanyDetailPage({
             <h2 className="text-lg font-black text-slate-950">Empresas relacionadas</h2>
             <div className="mt-4 flex flex-wrap gap-3">
               {relatedCompanies.map((item) => (
-                <Link key={item.slug} href={`/empresas/${item.slug}`} className="rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition hover:text-[var(--brand-cobalt)]">
+                <Link key={item.slug} href={`/empresas/${item.slug}`} className="rounded-full border border-[color:rgba(26,43,76,0.1)] bg-white px-4 py-2 text-sm font-medium text-[var(--brand-text-secondary)] transition hover:border-[color:rgba(255,109,0,0.22)] hover:text-[var(--brand-orange)]">
                   {item.name}
                 </Link>
               ))}

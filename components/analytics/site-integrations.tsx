@@ -30,6 +30,7 @@ type SiteIntegrationsProps = {
     adsensePublisherId: string;
     adsenseAutoAds: boolean;
   };
+  initialConsentValue: string | null;
 };
 
 type StoredConsent = {
@@ -52,11 +53,14 @@ function readConsent() {
   return parseConsentValue(cookie ?? null);
 }
 
-export function SiteIntegrations({ consentBanner, google }: SiteIntegrationsProps) {
+export function SiteIntegrations({ consentBanner, google, initialConsentValue }: SiteIntegrationsProps) {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const lastTrackedPathRef = useRef("");
-  const [consent, setConsent] = useState<StoredConsent | null>(null);
+  const [consent, setConsent] = useState<StoredConsent | null>(() => {
+    const parsed = parseConsentValue(initialConsentValue);
+    return parsed ? { analytics: parsed.analytics, advertising: parsed.advertising } : null;
+  });
 
   useEffect(() => {
     const nextConsent = readConsent();
@@ -105,7 +109,8 @@ export function SiteIntegrations({ consentBanner, google }: SiteIntegrationsProp
   }, [consentBanner.bannerEnabled, google.adsenseEnabled, google.analyticsEnabled, google.consentModeEnabled]);
 
   const hasOptionalIntegrations = google.analyticsEnabled || google.adsenseEnabled;
-  const consentRequired = google.consentModeEnabled && consentBanner.bannerEnabled && hasOptionalIntegrations;
+  const shouldRenderConsentBanner = consentBanner.bannerEnabled;
+  const consentRequired = google.consentModeEnabled && shouldRenderConsentBanner && hasOptionalIntegrations;
   const analyticsAllowed = google.analyticsEnabled && (consentRequired ? Boolean(consent?.analytics) : true);
   const advertisingAllowed = google.adsenseEnabled && (consentRequired ? Boolean(consent?.advertising) : true);
 
@@ -181,7 +186,7 @@ export function SiteIntegrations({ consentBanner, google }: SiteIntegrationsProp
         />
       ) : null}
 
-      {consentRequired ? <CookieConsentBanner config={consentBanner} /> : null}
+      {shouldRenderConsentBanner ? <CookieConsentBanner config={consentBanner} initialConsentValue={initialConsentValue} /> : null}
     </>
   );
 }

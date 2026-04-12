@@ -54,9 +54,11 @@ export function SiteContentForm({ initialValues }: { initialValues: SiteContent 
   const howItWorks = useFieldArray({ control, name: "home.howItWorksSteps" });
   const benefits = useFieldArray({ control, name: "home.benefits" });
   const careerCtas = useFieldArray({ control, name: "home.careerCtas" });
+  const heroHighlights = useFieldArray({ control, name: "home.heroHighlights" });
   const stateFaq = useFieldArray({ control, name: "hubContent.state.faq" });
   const cityFaq = useFieldArray({ control, name: "hubContent.city.faq" });
   const companyFaq = useFieldArray({ control, name: "hubContent.company.faq" });
+  const footerShortcuts = useFieldArray({ control, name: "footer.shortcuts" });
   const blockOrder = watch("home.blockOrder") ?? [...homeBlockKeys];
 
   function moveBlockOrder(from: number, to: number) {
@@ -326,7 +328,7 @@ export function SiteContentForm({ initialValues }: { initialValues: SiteContent 
             </Field>
           </div>
 
-          {[
+          {[ 
             ["home.quickJobsEyebrow", "Eyebrow do acesso rapido para vagas"],
             ["home.quickJobsTitle", "Titulo do acesso rapido para vagas"],
             ["home.quickJobsDescription", "Descricao do acesso rapido para vagas"],
@@ -337,6 +339,12 @@ export function SiteContentForm({ initialValues }: { initialValues: SiteContent 
             ["home.featuredDescription", "Descricao da secao de vagas"],
             ["home.blogTitle", "Titulo da secao de blog"],
             ["home.blogDescription", "Descricao da secao de blog"],
+            ["home.citiesTitle", "Titulo da secao de cidades"],
+            ["home.citiesDescription", "Descricao da secao de cidades"],
+            ["home.benefitsTitle", "Titulo da secao de beneficios"],
+            ["home.benefitsDescription", "Descricao da secao de beneficios"],
+            ["home.companiesTitle", "Titulo da secao de empresas"],
+            ["home.companiesDescription", "Descricao da secao de empresas"],
             ["home.faqTitle", "Titulo do FAQ"],
             ["home.faqDescription", "Descricao do FAQ"],
             ["home.finalCtaEyebrow", "Eyebrow do CTA final"],
@@ -347,6 +355,32 @@ export function SiteContentForm({ initialValues }: { initialValues: SiteContent 
               <Textarea {...register(name as never)} className="min-h-20" />
             </Field>
           ))}
+
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <h3 className="text-lg font-black text-slate-950">Cartoes logo abaixo do hero</h3>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => heroHighlights.append({ title: "", description: "", href: "/vagas", iconKey: "briefcase" })}
+              >
+                <Plus className="mr-2 h-4 w-4" />
+                Adicionar cartao
+              </Button>
+            </div>
+            {heroHighlights.fields.map((field, index) => (
+              <div key={field.id} className="grid gap-3 rounded-[1.5rem] border border-slate-200 p-4 lg:grid-cols-[1fr_1.5fr_1fr_160px_auto_auto]">
+                <Input {...register(`home.heroHighlights.${index}.title`)} placeholder="Titulo" />
+                <Input {...register(`home.heroHighlights.${index}.description`)} placeholder="Descricao" />
+                <Input {...register(`home.heroHighlights.${index}.href`)} placeholder="/vagas" />
+                <Input {...register(`home.heroHighlights.${index}.iconKey`)} placeholder="briefcase" />
+                <MoveButtons index={index} total={heroHighlights.fields.length} onMove={heroHighlights.move} />
+                <Button type="button" variant="outline" onClick={() => heroHighlights.remove(index)}>
+                  <Trash2 className="h-4 w-4" />
+                </Button>
+              </div>
+            ))}
+          </div>
 
           <div className="space-y-4">
             <div className="flex items-center justify-between">
@@ -484,12 +518,43 @@ export function SiteContentForm({ initialValues }: { initialValues: SiteContent 
 
           <div className="space-y-4 rounded-[1.5rem] border border-slate-200 p-5">
             <h3 className="text-lg font-black text-slate-950">Footer</h3>
+            <div className="grid gap-4 lg:grid-cols-3">
+              <Field label="Titulo da coluna de navegacao">
+                <Input {...register("footer.navigationTitle")} />
+              </Field>
+              <Field label="Titulo da coluna institucional">
+                <Input {...register("footer.informationTitle")} />
+              </Field>
+              <Field label="Titulo da coluna de atalhos">
+                <Input {...register("footer.shortcutsTitle")} />
+              </Field>
+            </div>
             <Field label="Descricao do footer">
               <Textarea {...register("footer.description")} className="min-h-24" />
             </Field>
             <Field label="Copyright">
               <Input {...register("footer.copyrightText")} />
             </Field>
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <h4 className="text-base font-black text-slate-950">Atalhos do footer</h4>
+                <Button type="button" variant="outline" onClick={() => footerShortcuts.append({ title: "", description: "", iconKey: "compass" })}>
+                  <Plus className="mr-2 h-4 w-4" />
+                  Adicionar atalho
+                </Button>
+              </div>
+              {footerShortcuts.fields.map((field, index) => (
+                <div key={field.id} className="grid gap-3 rounded-[1.5rem] border border-slate-200 p-4 lg:grid-cols-[1fr_1.5fr_160px_auto_auto]">
+                  <Input {...register(`footer.shortcuts.${index}.title`)} placeholder="Titulo" />
+                  <Input {...register(`footer.shortcuts.${index}.description`)} placeholder="Descricao" />
+                  <Input {...register(`footer.shortcuts.${index}.iconKey`)} placeholder="compass" />
+                  <MoveButtons index={index} total={footerShortcuts.fields.length} onMove={footerShortcuts.move} />
+                  <Button type="button" variant="outline" onClick={() => footerShortcuts.remove(index)}>
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </div>
+              ))}
+            </div>
           </div>
         </CardContent>
       </Card>

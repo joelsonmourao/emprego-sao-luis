@@ -10,14 +10,14 @@ export async function SiteHeader() {
   const siteContent = await getSiteContent();
 
   return (
-    <header className="sticky top-0 z-40 border-b border-slate-200/70 bg-white/92 backdrop-blur-xl">
-      <div className="border-b border-[color:rgba(88,80,236,0.1)] bg-[linear-gradient(90deg,rgba(238,242,255,1)_0%,rgba(248,241,255,1)_42%,rgba(255,247,236,1)_100%)]">
-        <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-2 text-xs font-medium text-slate-600 sm:px-6 lg:px-8">
+    <header className="sticky top-0 z-40 border-b border-[color:rgba(255,255,255,0.08)] bg-[var(--brand-navy)] text-white shadow-[0_18px_50px_-35px_rgba(26,43,76,0.7)] backdrop-blur-2xl">
+      <div className="border-b border-white/10 bg-[linear-gradient(90deg,rgba(26,43,76,0.98)_0%,rgba(34,56,99,0.98)_58%,rgba(47,111,237,0.92)_100%)]">
+        <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-2 text-xs font-medium text-white/78 sm:px-6 lg:px-8">
           <p className="inline-flex items-center gap-2">
-            <Sparkles className="h-4 w-4 text-[var(--brand-coral)]" />
+            <Sparkles className="h-4 w-4 text-[var(--brand-orange)]" />
             {siteContent.navigation.topBarText}
           </p>
-          <Link href={siteContent.navigation.topBarLinkHref as Route} className="hidden text-[var(--brand-cobalt)] md:inline-flex">
+          <Link href={siteContent.navigation.topBarLinkHref as Route} className="hidden text-white md:inline-flex hover:text-[var(--brand-orange)]">
             {siteContent.navigation.topBarLinkLabel}
           </Link>
         </div>
@@ -25,17 +25,17 @@ export async function SiteHeader() {
       <div className="mx-auto flex max-w-7xl items-center justify-between gap-6 px-4 py-4 sm:px-6 lg:px-8">
         <SiteLogo />
 
-        <nav className="hidden items-center gap-6 md:flex">
+        <nav className="hidden items-center gap-3 md:flex">
           {siteContent.navigation.main.map((item) => (
             <Link
               key={item.href}
               href={item.href as Route}
               className={
                 item.href === "/vagas"
-                  ? "rounded-full bg-[linear-gradient(135deg,rgba(88,80,236,0.14),rgba(124,58,237,0.08))] px-4 py-2 text-sm font-semibold text-[var(--brand-cobalt)] transition hover:opacity-90"
+                  ? "rounded-full bg-white px-4 py-2 text-sm font-semibold text-[var(--brand-navy)] transition hover:bg-[var(--brand-soft)]"
                   : item.href === "/blog"
-                    ? "rounded-full bg-[linear-gradient(135deg,rgba(255,107,87,0.12),rgba(255,215,94,0.16))] px-4 py-2 text-sm font-semibold text-[var(--brand-coral)] transition hover:opacity-90"
-                    : "text-sm font-medium text-slate-700 transition hover:text-[var(--brand-cobalt)]"
+                    ? "rounded-full border border-[rgba(255,109,0,0.28)] bg-[rgba(255,109,0,0.14)] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[rgba(255,109,0,0.2)]"
+                    : "rounded-full px-4 py-2 text-sm font-medium text-white/82 transition hover:bg-white/10 hover:text-white"
               }
             >
               {item.label}
@@ -43,14 +43,14 @@ export async function SiteHeader() {
           ))}
         </nav>
 
-        <Button asChild size="sm" className="gap-2 rounded-2xl shadow-[0_18px_42px_-26px_rgba(88,80,236,0.78)] hover:opacity-95">
+        <Button asChild size="sm" className="gap-2 rounded-2xl">
           <Link href={siteContent.navigation.headerCtaHref as Route}>
             {siteContent.navigation.headerCtaLabel}
             <ArrowRight className="h-4 w-4" />
           </Link>
         </Button>
       </div>
-      <div className="border-t border-[color:rgba(34,73,245,0.08)] md:hidden">
+      <div className="border-t border-white/10 md:hidden">
         <div className="mx-auto max-w-7xl overflow-x-auto px-4 py-3 sm:px-6">
           <div className="flex min-w-max items-center gap-3">
             {siteContent.navigation.main.map((item) => (
@@ -59,10 +59,10 @@ export async function SiteHeader() {
                 href={item.href as Route}
                 className={
                   item.href === "/vagas"
-                    ? "rounded-full bg-[linear-gradient(135deg,rgba(88,80,236,0.14),rgba(124,58,237,0.08))] px-4 py-2 text-sm font-semibold text-[var(--brand-cobalt)]"
+                    ? "rounded-full bg-white px-4 py-2 text-sm font-semibold text-[var(--brand-navy)]"
                     : item.href === "/blog"
-                      ? "rounded-full bg-[linear-gradient(135deg,rgba(255,107,87,0.12),rgba(255,215,94,0.16))] px-4 py-2 text-sm font-semibold text-[var(--brand-coral)]"
-                      : "rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700"
+                      ? "rounded-full border border-[rgba(255,109,0,0.28)] bg-[rgba(255,109,0,0.14)] px-4 py-2 text-sm font-semibold text-white"
+                      : "rounded-full border border-white/10 bg-white/6 px-4 py-2 text-sm font-medium text-white/82"
                 }
               >
                 {item.label}

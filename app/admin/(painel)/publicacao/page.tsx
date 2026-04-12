@@ -86,8 +86,8 @@ export default async function AdminPublicationPage() {
           <CardContent className="space-y-4 text-sm leading-7 text-slate-600">
             <ol className="space-y-3 list-decimal pl-5">
               <li>Defina o dominio final com HTTPS e atualize <code>NEXT_PUBLIC_SITE_URL</code>.</li>
-              <li>Revise integracoes em <Link href="/admin/integracoes" className="font-semibold text-[var(--brand-cobalt)]">/admin/integracoes</Link>.</li>
-              <li>Valide <a href="/robots.txt" target="_blank" rel="noreferrer" className="font-semibold text-[var(--brand-cobalt)]">robots.txt</a>, <a href="/sitemap.xml" target="_blank" rel="noreferrer" className="font-semibold text-[var(--brand-cobalt)]">sitemap.xml</a> e <a href="/ads.txt" target="_blank" rel="noreferrer" className="font-semibold text-[var(--brand-cobalt)]">ads.txt</a>.</li>
+              <li>Revise integracoes em <Link href="/admin/integracoes" className="font-semibold text-[var(--brand-blue)] hover:text-[var(--brand-orange)]">/admin/integracoes</Link>.</li>
+              <li>Valide <a href="/robots.txt" target="_blank" rel="noreferrer" className="font-semibold text-[var(--brand-blue)] hover:text-[var(--brand-orange)]">robots.txt</a>, <a href="/sitemap.xml" target="_blank" rel="noreferrer" className="font-semibold text-[var(--brand-blue)] hover:text-[var(--brand-orange)]">sitemap.xml</a> e <a href="/ads.txt" target="_blank" rel="noreferrer" className="font-semibold text-[var(--brand-blue)] hover:text-[var(--brand-orange)]">ads.txt</a>.</li>
               <li>Confirme o banner de cookies e o aceite em desktop e celular.</li>
               <li>Cadastre a propriedade no Search Console e envie o sitemap.</li>
               <li>Abra o painel de analytics para conferir se page views, buscas e cliques estao sendo coletados.</li>
