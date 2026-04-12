@@ -18,7 +18,7 @@ export function AdminLoginForm() {
   const nextPath = searchParams.get("next") || "/admin";
   const [serverError, setServerError] = useState("");
   
-  // Estado para controlar o travamento do autofill
+  // Estado para bloquear o preenchimento automático inicial
   const [isReadOnly, setIsReadOnly] = useState(true);
 
   const {
@@ -33,7 +33,7 @@ export function AdminLoginForm() {
     }
   });
 
-  // Remove o ReadOnly após 1 segundo ou ao interagir
+  // Libera os campos após 1 segundo como garantia
   useEffect(() => {
     const timer = setTimeout(() => setIsReadOnly(false), 1000);
     return () => clearTimeout(timer);
@@ -41,15 +41,19 @@ export function AdminLoginForm() {
 
   const onSubmit = handleSubmit(async (values) => {
     setServerError("");
+
     const response = await fetch("/api/admin/login", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json"
+      },
       body: JSON.stringify(values)
     });
 
     const result = (await response.json()) as { ok: boolean; error?: string };
+
     if (!response.ok || !result.ok) {
-      setServerError(result.error ?? "Acesso negado.");
+      setServerError(result.error ?? "Acesso negado. Verifique suas credenciais.");
       return;
     }
 
@@ -63,42 +67,48 @@ export function AdminLoginForm() {
         <div className="mb-4 inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-white/14">
           <ShieldCheck className="h-7 w-7" />
         </div>
-        <CardTitle className="text-3xl text-white">Autenticação</CardTitle>
+        <CardTitle className="text-3xl text-white">Painel de Acesso</CardTitle>
         <CardDescription className="max-w-xl text-sky-50/85">
-          Painel Administrativo - Identifique-se.
+          Identifique-se para gerir as vagas do portal.
         </CardDescription>
       </CardHeader>
 
       <CardContent className="p-8">
         <form className="space-y-6" onSubmit={onSubmit} noValidate>
           
-          {/* CAMPO DE ACESSO */}
-          <Field label="Usuário" htmlFor="access_control_point">
+          <Field label="Acesso Administrativo">
             <Input
-              id="access_control_point"
+              id="field-access-id"
               type="email"
               readOnly={isReadOnly}
               onFocus={() => setIsReadOnly(false)}
-              autoComplete="new-off" 
-              placeholder="Digite seu e-mail"
+              autoComplete="one-time-code"
+              autoCapitalize="none"
+              autoCorrect="off"
+              inputMode="email"
+              spellCheck={false}
+              placeholder="seu-email@dominio.com"
               {...register("email")}
             />
           </Field>
-          {errors.email && <p className="text-sm text-rose-600">{errors.email.message}</p>}
+          {errors.email && (
+            <p className="mt-1 text-sm text-rose-600">{errors.email.message}</p>
+          )}
 
-          {/* CAMPO DE CHAVE */}
-          <Field label="Senha" htmlFor="security_key_point">
+          <Field label="Chave de Segurança">
             <Input
-              id="security_key_point"
+              id="field-security-key"
               type="password"
               readOnly={isReadOnly}
               onFocus={() => setIsReadOnly(false)}
               autoComplete="new-password"
-              placeholder="Digite sua senha"
+              placeholder="Sua senha"
               {...register("password")}
             />
           </Field>
-          {errors.password && <p className="text-sm text-rose-600">{errors.password.message}</p>}
+          {errors.password && (
+            <p className="mt-1 text-sm text-rose-600">{errors.password.message}</p>
+          )}
 
           {serverError && (
             <div className="rounded-2xl bg-rose-50 px-4 py-3 text-sm text-rose-700 border border-rose-100">
@@ -106,8 +116,13 @@ export function AdminLoginForm() {
             </div>
           )}
 
-          <Button type="submit" size="lg" className="w-full h-12" disabled={isSubmitting}>
-            {isSubmitting ? "Verificando..." : "Entrar"}
+          <Button 
+            type="submit" 
+            size="lg" 
+            className="w-full h-12 text-base font-bold shadow-lg shadow-blue-500/20" 
+            disabled={isSubmitting}
+          >
+            {isSubmitting ? "Autenticando..." : "Entrar no Sistema"}
           </Button>
         </form>
       </CardContent>
