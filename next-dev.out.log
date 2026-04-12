@@ -30,3 +30,5 @@
  GET /termos-de-uso 200 in 739ms
  GET / 200 in 1057ms
  GET / 200 in 1159ms
+ ○ Compiling /_error ...
+ ✓ Compiled /_error in 1377ms

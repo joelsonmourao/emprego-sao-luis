@@ -2,22 +2,13 @@ import type { ReactNode } from "react";
 
 import { cn } from "@/lib/utils";
 
-type FieldProps = {
-  label: string;
-  hint?: string;
-  htmlFor?: string;
-  children: ReactNode;
-};
-
-export function Field({ label, hint, htmlFor, children }: FieldProps) {
+export function Field({ label, hint, children }: { label: string; hint?: string; children: ReactNode }) {
   return (
-    <div className="space-y-2">
-      <label htmlFor={htmlFor} className="block text-sm font-semibold text-slate-900">
-        {label}
-      </label>
+    <label className="block space-y-2">
+      <span className="text-sm font-semibold text-slate-900">{label}</span>
       {children}
       {hint ? <span className="block text-xs leading-5 text-slate-500">{hint}</span> : null}
-    </div>
+    </label>
   );
 }
 

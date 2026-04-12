@@ -1,0 +1,120 @@
+ ⨯ [Error: ENOENT: no such file or directory, open 'C:\Users\Joelson\Documents\Projeto sites\projeto-limpo\apps\jovem-aprendiz-vagas-next\.next\server\app\page\app-build-manifest.json'] {
+  errno: -4058,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: 'C:\\Users\\Joelson\\Documents\\Projeto sites\\projeto-limpo\\apps\\jovem-aprendiz-vagas-next\\.next\\server\\app\\page\\app-build-manifest.json'
+}
+ ⨯ [Error: ENOENT: no such file or directory, open 'C:\Users\Joelson\Documents\Projeto sites\projeto-limpo\apps\jovem-aprendiz-vagas-next\.next\static\development\_buildManifest.js.tmp.m2yxc0t8x5e'] {
+  errno: -4058,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: 'C:\\Users\\Joelson\\Documents\\Projeto sites\\projeto-limpo\\apps\\jovem-aprendiz-vagas-next\\.next\\static\\development\\_buildManifest.js.tmp.m2yxc0t8x5e'
+}
+[Error: ENOENT: no such file or directory, open 'C:\Users\Joelson\Documents\Projeto sites\projeto-limpo\apps\jovem-aprendiz-vagas-next\.next\server\app\page\app-build-manifest.json'] {
+  errno: -4058,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: 'C:\\Users\\Joelson\\Documents\\Projeto sites\\projeto-limpo\\apps\\jovem-aprendiz-vagas-next\\.next\\server\\app\\page\\app-build-manifest.json'
+}
+ ⨯ [Error: ENOENT: no such file or directory, open 'C:\Users\Joelson\Documents\Projeto sites\projeto-limpo\apps\jovem-aprendiz-vagas-next\.next\static\development\_buildManifest.js.tmp.m8x2uwfk3b'] {
+  errno: -4058,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: 'C:\\Users\\Joelson\\Documents\\Projeto sites\\projeto-limpo\\apps\\jovem-aprendiz-vagas-next\\.next\\static\\development\\_buildManifest.js.tmp.m8x2uwfk3b'
+}
+[Error: ENOENT: no such file or directory, open 'C:\Users\Joelson\Documents\Projeto sites\projeto-limpo\apps\jovem-aprendiz-vagas-next\.next\static\development\_buildManifest.js.tmp.q3szqbpnb6'] {
+  errno: -4058,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: 'C:\\Users\\Joelson\\Documents\\Projeto sites\\projeto-limpo\\apps\\jovem-aprendiz-vagas-next\\.next\\static\\development\\_buildManifest.js.tmp.q3szqbpnb6'
+}
+ ⨯ [Error: ENOENT: no such file or directory, open 'C:\Users\Joelson\Documents\Projeto sites\projeto-limpo\apps\jovem-aprendiz-vagas-next\.next\server\app\page\app-build-manifest.json'] {
+  errno: -4058,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: 'C:\\Users\\Joelson\\Documents\\Projeto sites\\projeto-limpo\\apps\\jovem-aprendiz-vagas-next\\.next\\server\\app\\page\\app-build-manifest.json'
+}
+ ⨯ [Error: ENOENT: no such file or directory, open 'C:\Users\Joelson\Documents\Projeto sites\projeto-limpo\apps\jovem-aprendiz-vagas-next\.next\static\development\_buildManifest.js.tmp.5vtd86qjy9n'] {
+  errno: -4058,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: 'C:\\Users\\Joelson\\Documents\\Projeto sites\\projeto-limpo\\apps\\jovem-aprendiz-vagas-next\\.next\\static\\development\\_buildManifest.js.tmp.5vtd86qjy9n'
+}
+[Error: ENOENT: no such file or directory, open 'C:\Users\Joelson\Documents\Projeto sites\projeto-limpo\apps\jovem-aprendiz-vagas-next\.next\server\app\page\app-build-manifest.json'] {
+  errno: -4058,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: 'C:\\Users\\Joelson\\Documents\\Projeto sites\\projeto-limpo\\apps\\jovem-aprendiz-vagas-next\\.next\\server\\app\\page\\app-build-manifest.json'
+}
+ ⨯ [Error: ENOENT: no such file or directory, open 'C:\Users\Joelson\Documents\Projeto sites\projeto-limpo\apps\jovem-aprendiz-vagas-next\.next\static\development\_buildManifest.js.tmp.mnzkguhvwc'] {
+  errno: -4058,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: 'C:\\Users\\Joelson\\Documents\\Projeto sites\\projeto-limpo\\apps\\jovem-aprendiz-vagas-next\\.next\\static\\development\\_buildManifest.js.tmp.mnzkguhvwc'
+}
+[Error: ENOENT: no such file or directory, open 'C:\Users\Joelson\Documents\Projeto sites\projeto-limpo\apps\jovem-aprendiz-vagas-next\.next\static\development\_buildManifest.js.tmp.nmcvgcxd4uk'] {
+  errno: -4058,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: 'C:\\Users\\Joelson\\Documents\\Projeto sites\\projeto-limpo\\apps\\jovem-aprendiz-vagas-next\\.next\\static\\development\\_buildManifest.js.tmp.nmcvgcxd4uk'
+}
+ ⨯ [Error: ENOENT: no such file or directory, open 'C:\Users\Joelson\Documents\Projeto sites\projeto-limpo\apps\jovem-aprendiz-vagas-next\.next\server\app\page\app-build-manifest.json'] {
+  errno: -4058,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: 'C:\\Users\\Joelson\\Documents\\Projeto sites\\projeto-limpo\\apps\\jovem-aprendiz-vagas-next\\.next\\server\\app\\page\\app-build-manifest.json'
+}
+ ⨯ [Error: ENOENT: no such file or directory, open 'C:\Users\Joelson\Documents\Projeto sites\projeto-limpo\apps\jovem-aprendiz-vagas-next\.next\static\development\_buildManifest.js.tmp.8ccykoh9bo4'] {
+  errno: -4058,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: 'C:\\Users\\Joelson\\Documents\\Projeto sites\\projeto-limpo\\apps\\jovem-aprendiz-vagas-next\\.next\\static\\development\\_buildManifest.js.tmp.8ccykoh9bo4'
+}
+[Error: ENOENT: no such file or directory, open 'C:\Users\Joelson\Documents\Projeto sites\projeto-limpo\apps\jovem-aprendiz-vagas-next\.next\server\app\page\app-build-manifest.json'] {
+  errno: -4058,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: 'C:\\Users\\Joelson\\Documents\\Projeto sites\\projeto-limpo\\apps\\jovem-aprendiz-vagas-next\\.next\\server\\app\\page\\app-build-manifest.json'
+}
+ ⨯ [Error: ENOENT: no such file or directory, open 'C:\Users\Joelson\Documents\Projeto sites\projeto-limpo\apps\jovem-aprendiz-vagas-next\.next\static\development\_buildManifest.js.tmp.9gjs9busuu6'] {
+  errno: -4058,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: 'C:\\Users\\Joelson\\Documents\\Projeto sites\\projeto-limpo\\apps\\jovem-aprendiz-vagas-next\\.next\\static\\development\\_buildManifest.js.tmp.9gjs9busuu6'
+}
+[Error: ENOENT: no such file or directory, open 'C:\Users\Joelson\Documents\Projeto sites\projeto-limpo\apps\jovem-aprendiz-vagas-next\.next\static\development\_buildManifest.js.tmp.s3aqtfgwde'] {
+  errno: -4058,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: 'C:\\Users\\Joelson\\Documents\\Projeto sites\\projeto-limpo\\apps\\jovem-aprendiz-vagas-next\\.next\\static\\development\\_buildManifest.js.tmp.s3aqtfgwde'
+}
+ ⨯ [Error: ENOENT: no such file or directory, open 'C:\Users\Joelson\Documents\Projeto sites\projeto-limpo\apps\jovem-aprendiz-vagas-next\.next\server\app\page\app-build-manifest.json'] {
+  errno: -4058,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: 'C:\\Users\\Joelson\\Documents\\Projeto sites\\projeto-limpo\\apps\\jovem-aprendiz-vagas-next\\.next\\server\\app\\page\\app-build-manifest.json'
+}
+ ⨯ [Error: ENOENT: no such file or directory, open 'C:\Users\Joelson\Documents\Projeto sites\projeto-limpo\apps\jovem-aprendiz-vagas-next\.next\static\development\_buildManifest.js.tmp.g8g8sxregls'] {
+  errno: -4058,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: 'C:\\Users\\Joelson\\Documents\\Projeto sites\\projeto-limpo\\apps\\jovem-aprendiz-vagas-next\\.next\\static\\development\\_buildManifest.js.tmp.g8g8sxregls'
+}
+[Error: ENOENT: no such file or directory, open 'C:\Users\Joelson\Documents\Projeto sites\projeto-limpo\apps\jovem-aprendiz-vagas-next\.next\server\app\page\app-build-manifest.json'] {
+  errno: -4058,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: 'C:\\Users\\Joelson\\Documents\\Projeto sites\\projeto-limpo\\apps\\jovem-aprendiz-vagas-next\\.next\\server\\app\\page\\app-build-manifest.json'
+}
+ ⨯ [Error: ENOENT: no such file or directory, open 'C:\Users\Joelson\Documents\Projeto sites\projeto-limpo\apps\jovem-aprendiz-vagas-next\.next\static\development\_buildManifest.js.tmp.k6wu9naubom'] {
+  errno: -4058,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: 'C:\\Users\\Joelson\\Documents\\Projeto sites\\projeto-limpo\\apps\\jovem-aprendiz-vagas-next\\.next\\static\\development\\_buildManifest.js.tmp.k6wu9naubom'
+}
+[Error: ENOENT: no such file or directory, open 'C:\Users\Joelson\Documents\Projeto sites\projeto-limpo\apps\jovem-aprendiz-vagas-next\.next\static\development\_buildManifest.js.tmp.lottknj5jz'] {
+  errno: -4058,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: 'C:\\Users\\Joelson\\Documents\\Projeto sites\\projeto-limpo\\apps\\jovem-aprendiz-vagas-next\\.next\\static\\development\\_buildManifest.js.tmp.lottknj5jz'
+}
