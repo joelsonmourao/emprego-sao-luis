@@ -1,0 +1,282 @@
+generator client {
+  provider = "prisma-client-js"
+  engineType = "binary"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum AdminRole {
+  ADMIN
+  EDITOR
+}
+
+enum EmploymentType {
+  APPRENTICESHIP
+  INTERNSHIP
+  TEMPORARY
+  PART_TIME
+  FULL_TIME
+}
+
+enum LocationType {
+  ONSITE
+  REMOTE
+  HYBRID
+}
+
+enum HubType {
+  STATE
+  CITY
+  COMPANY
+}
+
+enum AuditAction {
+  CREATE
+  UPDATE
+  DELETE
+  LOGIN
+  LOGOUT
+  IMPORT
+}
+
+model State {
+  id        String   @id @default(cuid())
+  code      String   @unique @db.VarChar(2)
+  name      String   @unique
+  slug      String   @unique
+  seoTitle  String?
+  seoIntro  String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  cities City[]
+  companies Company[]
+  jobs   Job[]
+}
+
+model City {
+  id        String   @id @default(cuid())
+  name      String
+  slug      String
+  seoTitle  String?
+  seoIntro  String?
+  stateId   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  state State @relation(fields: [stateId], references: [id], onDelete: Cascade)
+  companies Company[]
+  jobs  Job[]
+
+  @@unique([stateId, slug])
+  @@unique([stateId, name])
+}
+
+model Company {
+  id             String   @id @default(cuid())
+  name           String
+  slug           String   @unique
+  logoUrl        String?
+  websiteUrl     String?
+  summary        String?  @db.Text
+  descriptionHtml String? @db.Text
+  socialImageUrl String?
+  seoTitle       String?
+  seoDescription String?
+  isActive       Boolean  @default(true)
+  featured       Boolean  @default(false)
+  stateId        String
+  cityId         String
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  state State @relation(fields: [stateId], references: [id], onDelete: Restrict)
+  city  City  @relation(fields: [cityId], references: [id], onDelete: Restrict)
+  jobs  Job[]
+
+  @@index([isActive, updatedAt(sort: Desc)])
+  @@index([stateId, cityId, isActive])
+  @@index([featured, isActive])
+}
+
+model Job {
+  id                String         @id @default(cuid())
+  externalId        String?        @unique
+  title             String
+  slug              String         @unique
+  companyId         String?
+  companyName       String
+  companyLogoUrl    String?
+  companyWebsiteUrl String?
+  heroImageUrl      String?
+  summary           String         @db.Text
+  descriptionHtml   String         @db.Text
+  responsibilities  Json?
+  requirements      Json?
+  benefits          Json?
+  salaryMin         Int?
+  salaryMax         Int?
+  salaryCurrency    String         @default("BRL")
+  employmentType    EmploymentType @default(APPRENTICESHIP)
+  workHours         String?
+  publishedAt       DateTime
+  updatedAt         DateTime       @updatedAt
+  expiresAt         DateTime?
+  applyUrl          String
+  isActive          Boolean        @default(true)
+  sourceName        String?
+  sourceUrl         String?
+  locationType      LocationType   @default(ONSITE)
+  seoTitle          String?
+  seoDescription    String?
+  featured          Boolean        @default(false)
+  stateId           String
+  cityId            String
+  createdAt         DateTime       @default(now())
+
+  state State @relation(fields: [stateId], references: [id], onDelete: Restrict)
+  city  City  @relation(fields: [cityId], references: [id], onDelete: Restrict)
+  company Company? @relation(fields: [companyId], references: [id], onDelete: SetNull)
+
+  @@index([slug])
+  @@index([isActive, publishedAt(sort: Desc)])
+  @@index([stateId, cityId, isActive])
+  @@index([companyId, isActive])
+}
+
+model BlogCategory {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  slug      String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  posts BlogPost[]
+}
+
+model BlogPost {
+  id             String   @id @default(cuid())
+  title          String
+  slug           String   @unique
+  excerpt        String   @db.Text
+  contentHtml    String   @db.Text
+  coverImageUrl  String?
+  seoTitle       String?
+  seoDescription String?
+  isPublished    Boolean  @default(true)
+  publishedAt    DateTime
+  updatedAt      DateTime @updatedAt
+  categoryId     String
+
+  category BlogCategory @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+
+  @@index([slug])
+  @@index([isPublished, publishedAt(sort: Desc)])
+}
+
+model SiteSetting {
+  id           String   @id @default(cuid())
+  key          String   @unique
+  value        Json
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model HubProfile {
+  id             String   @id @default(cuid())
+  type           HubType
+  slug           String
+  title          String?
+  intro          String?
+  contentHtml    String?
+  seoTitle       String?
+  seoDescription String?
+  canonicalUrl   String?
+  socialImageUrl String?
+  noIndex        Boolean  @default(false)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@unique([type, slug])
+  @@index([type, updatedAt(sort: Desc)])
+}
+
+model MediaAsset {
+  id           String   @id @default(cuid())
+  originalName String
+  fileName     String
+  mimeType     String
+  size         Int
+  url          String   @unique
+  altText      String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@index([createdAt(sort: Desc)])
+}
+
+model AdminUser {
+  id           String    @id @default(cuid())
+  name         String
+  email        String    @unique
+  passwordHash String
+  role         AdminRole @default(ADMIN)
+  isActive     Boolean   @default(true)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  auditLogs AuditLog[]
+
+  @@index([email, isActive])
+}
+
+model AuditLog {
+  id          String      @id @default(cuid())
+  actorId     String?
+  actorName   String?
+  actorEmail  String?
+  actorRole   AdminRole?
+  action      AuditAction
+  entityType  String
+  entityId    String?
+  entityLabel String?
+  summary     String?
+  before      Json?
+  after       Json?
+  createdAt   DateTime    @default(now())
+
+  actor AdminUser? @relation(fields: [actorId], references: [id], onDelete: SetNull)
+
+  @@index([actorId])
+  @@index([entityType, createdAt(sort: Desc)])
+  @@index([createdAt(sort: Desc)])
+}
+
+model AnalyticsEvent {
+  id          String   @id @default(cuid())
+  eventName   String
+  path        String
+  title       String?
+  referrer    String?
+  referrerHost String?
+  source      String?
+  medium      String?
+  campaign    String?
+  deviceType  String?
+  browser     String?
+  os          String?
+  entityType  String?
+  entityId    String?
+  entitySlug  String?
+  metadata    Json?
+  createdAt   DateTime @default(now())
+
+  @@index([eventName, createdAt(sort: Desc)])
+  @@index([path, createdAt(sort: Desc)])
+  @@index([entityType, entitySlug, createdAt(sort: Desc)])
+  @@index([source, createdAt(sort: Desc)])
+  @@index([deviceType, createdAt(sort: Desc)])
+}

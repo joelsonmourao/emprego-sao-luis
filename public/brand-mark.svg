@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" fill="none">
+  <defs>
+    <linearGradient id="brandMarkBg" x1="16" y1="14" x2="116" y2="116" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#2249F5"/>
+      <stop offset="0.45" stop-color="#1098F7"/>
+      <stop offset="1" stop-color="#FF6B57"/>
+    </linearGradient>
+    <linearGradient id="brandMarkAccent" x1="42" y1="42" x2="96" y2="92" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFF2A6"/>
+      <stop offset="1" stop-color="#FFE067"/>
+    </linearGradient>
+  </defs>
+  <rect width="128" height="128" rx="34" fill="url(#brandMarkBg)"/>
+  <path d="M31 38C31 33.0294 35.0294 29 40 29H61.5C80.0015 29 95 43.9985 95 62.5V71.5C95 90.0015 80.0015 105 61.5 105H53C48.5817 105 45 101.418 45 97V89H58.5C73.688 89 86 76.688 86 61.5C86 46.3122 73.688 34 58.5 34H47V93.5C47 97.0899 44.0899 100 40.5 100C36.9101 100 34 97.0899 34 93.5V41C34 39.3431 32.6569 38 31 38Z" fill="white"/>
+  <path d="M72.5 36C87.6878 36 100 48.3122 100 63.5C100 78.6878 87.6878 91 72.5 91H63V78H72.5C80.5081 78 87 71.5081 87 63.5C87 55.4919 80.5081 49 72.5 49H63V36H72.5Z" fill="url(#brandMarkAccent)"/>
+  <circle cx="92" cy="34" r="8" fill="#FFF4B8"/>
+</svg>

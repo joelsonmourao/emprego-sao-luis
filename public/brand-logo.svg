@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 620 160" fill="none">
+  <defs>
+    <linearGradient id="brandLogoBg" x1="18" y1="14" x2="148" y2="144" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#2249F5"/>
+      <stop offset="0.45" stop-color="#1098F7"/>
+      <stop offset="1" stop-color="#FF6B57"/>
+    </linearGradient>
+    <linearGradient id="brandLogoText" x1="280" y1="48" x2="470" y2="130" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#2249F5"/>
+      <stop offset="0.58" stop-color="#1098F7"/>
+      <stop offset="1" stop-color="#FF6B57"/>
+    </linearGradient>
+    <linearGradient id="brandLogoAccent" x1="52" y1="46" x2="120" y2="100" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFF2A6"/>
+      <stop offset="1" stop-color="#FFE067"/>
+    </linearGradient>
+  </defs>
+  <rect x="14" y="16" width="130" height="130" rx="38" fill="url(#brandLogoBg)"/>
+  <path d="M42 49C42 44.0294 46.0294 40 51 40H72.5C91.0015 40 106 54.9985 106 73.5V82.5C106 101.001 91.0015 116 72.5 116H64C59.5817 116 56 112.418 56 108V100H69.5C84.688 100 97 87.688 97 72.5C97 57.3122 84.688 45 69.5 45H58V104.5C58 108.09 55.0899 111 51.5 111C47.9101 111 45 108.09 45 104.5V52C45 50.3431 43.6569 49 42 49Z" fill="white"/>
+  <path d="M83.5 47C98.6878 47 111 59.3122 111 74.5C111 89.6878 98.6878 102 83.5 102H74V89H83.5C91.5081 89 98 82.5081 98 74.5C98 66.4919 91.5081 60 83.5 60H74V47H83.5Z" fill="url(#brandLogoAccent)"/>
+  <circle cx="103" cy="45" r="8" fill="#FFF4B8"/>
+  <text x="178" y="64" fill="#0F172A" font-family="Aptos, Segoe UI, Arial, sans-serif" font-size="26" font-weight="700" letter-spacing="8">CARREIRA INICIAL</text>
+  <text x="176" y="112" fill="#0F172A" font-family="Aptos Display, Segoe UI, Arial, sans-serif" font-size="58" font-weight="900">JOVEM</text>
+  <text x="385" y="112" fill="url(#brandLogoText)" font-family="Aptos Display, Segoe UI, Arial, sans-serif" font-size="58" font-weight="900">APRENDIZ</text>
+  <text x="178" y="146" fill="#334155" font-family="Aptos, Segoe UI, Arial, sans-serif" font-size="28" font-weight="700" letter-spacing="6">VAGAS</text>
+</svg>

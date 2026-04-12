@@ -1,0 +1,16 @@
+{
+    "category":  "Financeiro",
+    "benefits":  "Vale-transporte",
+    "state":  "MA",
+    "isActive":  "sim",
+    "title":  "Jovem Aprendiz Financeiro",
+    "company":  "Empresa Teste",
+    "salary":  "820",
+    "description":  "Atue com apoio financeiro, arquivo e controle de planilhas com supervisão diária.",
+    "seoDescription":  "Vaga de Jovem Aprendiz Financeiro em São Luís, MA",
+    "slug":  "jovem-aprendiz-financeiro-sao-luis-ma",
+    "requirements":  "Ensino médio cursando",
+    "city":  "São Luís",
+    "applyUrl":  "https://example.com/teste",
+    "seoTitle":  "Jovem Aprendiz Financeiro em São Luís, MA"
+}
