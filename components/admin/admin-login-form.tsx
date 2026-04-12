@@ -109,7 +109,9 @@ export function AdminLoginForm() {
           </Field>
           {errors.password ? <p className="text-sm text-rose-600">{errors.password.message}</p> : null}
 
-          {serverError ? <p className="rounded-2xl bg-rose-50 px-4 py-3 text-sm text-rose-700">{serverError}</p> : null}
+          {serverError ? (
+            <p className="rounded-2xl bg-rose-50 px-4 py-3 text-sm text-rose-700">{serverError}</p>
+          ) : null}
 
           <Button type="submit" size="lg" className="w-full" disabled={isSubmitting}>
             {isSubmitting ? "Entrando..." : "Entrar no painel"}
