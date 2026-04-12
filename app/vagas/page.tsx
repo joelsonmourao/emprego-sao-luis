@@ -53,6 +53,7 @@ export async function generateMetadata({
 
   const selectedState = states.find((state) => state.slug === parsed.estado);
   const selectedCity = selectedState?.cities.find((city) => city.slug === parsed.cidade);
+  
   const indexableSearch = isStrategicJobsSearchIndexable({
     total: jobs.total,
     query: parsed.q,
@@ -88,7 +89,9 @@ export async function generateMetadata({
       order: parsed.order,
       page: parsed.page
     }),
-    noIndex: !indexableSearch
+    // CORREÇÃO: Se houver estado ou cidade, forçamos a indexação (false para noIndex).
+    // Se quiser liberar para TUDO, basta colocar noIndex: false
+    noIndex: (parsed.estado || parsed.cidade) ? false : !indexableSearch
   });
 }
 
@@ -124,6 +127,7 @@ export default async function JobsPage({
   const selectedState = states.find((state) => state.slug === parsed.estado);
   const selectedCity = selectedState?.cities.find((city) => city.slug === parsed.cidade);
   const selectedCompany = companies.find((company) => company.slug === parsed.empresa);
+  
   const heading = buildJobsListingHeading({
     total: jobs.total,
     query: parsed.q,
@@ -132,6 +136,7 @@ export default async function JobsPage({
     stateCode: selectedState?.code,
     companyName: selectedCompany?.name
   });
+  
   const intro = buildJobsListingIntro({
     total: jobs.total,
     query: parsed.q,
@@ -140,6 +145,7 @@ export default async function JobsPage({
     stateCode: selectedState?.code,
     companyName: selectedCompany?.name
   });
+  
   const faqValues = { totalJobs: jobs.total };
   const faq = renderFaqTemplate(siteContent.faq.home, faqValues);
   const faqTitle = renderTemplate(siteContent.home.faqTitle, faqValues);
@@ -179,8 +185,8 @@ export default async function JobsPage({
           <p className="text-xs font-semibold uppercase tracking-[0.28em] text-[var(--brand-orange)]">
             {parsed.q ? "Busca filtrada" : "Vagas de Jovem Aprendiz"}
           </p>
-            <h1 className="text-3xl font-black tracking-tight text-[var(--brand-navy)] sm:text-5xl">{heading}</h1>
-            <p className="max-w-4xl text-base leading-8 text-[var(--brand-text-secondary)] sm:text-lg">{intro}</p>
+          <h1 className="text-3xl font-black tracking-tight text-[var(--brand-navy)] sm:text-5xl">{heading}</h1>
+          <p className="max-w-4xl text-base leading-8 text-[var(--brand-text-secondary)] sm:text-lg">{intro}</p>
           <div className="flex flex-wrap items-center gap-3 text-sm">
             <span className="font-semibold text-[var(--brand-text-secondary)]">Ordenar por:</span>
             <Link
@@ -230,14 +236,14 @@ export default async function JobsPage({
           <h2 className="text-lg font-black text-slate-950">Empresas com vagas recentes</h2>
           <div className="mt-4 flex flex-wrap gap-3">
             {companies.slice(0, 8).map((company) => (
-                <Link key={company.slug} href={`/empresas/${company.slug}`} className="rounded-full border border-[color:rgba(26,43,76,0.1)] bg-white px-4 py-2 text-sm font-medium text-[var(--brand-text-secondary)] transition hover:border-[color:rgba(255,109,0,0.22)] hover:text-[var(--brand-orange)]">
+              <Link key={company.slug} href={`/empresas/${company.slug}`} className="rounded-full border border-[color:rgba(26,43,76,0.1)] bg-white px-4 py-2 text-sm font-medium text-[var(--brand-text-secondary)] transition hover:border-[color:rgba(255,109,0,0.22)] hover:text-[var(--brand-orange)]">
                 {company.name}
               </Link>
             ))}
           </div>
         </div>
 
-          <div className="brand-panel rounded-[2rem] border border-slate-200 p-8 shadow-[0_25px_80px_-50px_rgba(26,43,76,0.22)]">
+        <div className="brand-panel rounded-[2rem] border border-slate-200 p-8 shadow-[0_25px_80px_-50px_rgba(26,43,76,0.22)]">
           <SectionHeading
             eyebrow="Continue a busca"
             title="Use cidade, estado e empresa para encontrar uma vaga com mais foco"
