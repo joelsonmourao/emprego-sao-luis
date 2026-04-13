@@ -313,12 +313,12 @@ async function main() {
   }
 
   await prisma.adminUser.upsert({
-    where: { email: env.ADMIN_LOGIN_USER.toLowerCase() },
-    update: { name: "Administrador", passwordHash: await hashPassword(env.ADMIN_SECRET_KEY), isActive: true },
+    where: { email: (env.ADMIN_LOGIN_USER || "").toLowerCase() },
+    update: { name: "Administrador", passwordHash: await hashPassword(env.ADMIN_SECRET_KEY || ""), isActive: true },
     create: {
       name: "Administrador",
-      email: env.ADMIN_LOGIN_USER.toLowerCase(),
-      passwordHash: await hashPassword(env.ADMIN_SECRET_KEY),
+      email: (env.ADMIN_LOGIN_USER || "").toLowerCase(),
+      passwordHash: await hashPassword(env.ADMIN_SECRET_KEY || ""),
       isActive: true
     }
   });
