@@ -19,13 +19,18 @@ export function AdminLoginForm() {
   const [serverError, setServerError] = useState("");
   const [isLocked, setIsLocked] = useState(true);
 
-  const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm<AdminLoginValues>({
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting }
+  } = useForm<AdminLoginValues>({
     resolver: zodResolver(adminLoginSchema),
     defaultValues: { email: "", password: "" }
   });
 
+  // Pequeno delay para destravar os campos, confundindo scripts de preenchimento
   useEffect(() => {
-    const timer = setTimeout(() => setIsLocked(false), 1200);
+    const timer = setTimeout(() => setIsLocked(false), 1000);
     return () => clearTimeout(timer);
   }, []);
 
@@ -36,7 +41,8 @@ export function AdminLoginForm() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(values)
     });
-    const result = await response.json() as { ok: boolean; error?: string };
+
+    const result = (await response.json()) as { ok: boolean; error?: string };
     if (!response.ok || !result.ok) {
       setServerError(result.error ?? "Acesso negado.");
       return;
@@ -51,51 +57,55 @@ export function AdminLoginForm() {
         <div className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-xl bg-white/10">
           <ShieldCheck className="h-6 w-6" />
         </div>
-        <CardTitle className="text-2xl font-bold">Portal Administrativo</CardTitle>
+        <CardTitle className="text-2xl font-bold">Portal de Gestão</CardTitle>
+        <CardDescription className="text-white/70">Identifique-se para continuar</CardDescription>
       </CardHeader>
 
       <CardContent className="p-8">
-        <form onSubmit={onSubmit} noValidate autoComplete="new-password" title="login-area">
+        {/* Adicionamos nomes aleatórios no form e autoComplete "new-password" que é mais forte que "off" */}
+        <form className="space-y-6" onSubmit={onSubmit} noValidate autoComplete="new-password">
           
-          {/* O Chrome vai focar nesses campos e preenchê-los, deixando os de baixo limpos */}
-          <input type="text" name="chrome-trap-1" style={{ display: 'none' }} tabIndex={-1} />
-          <input type="password" name="chrome-trap-2" style={{ display: 'none' }} tabIndex={-1} />
+          {/* Inputs falsos para o Chrome preencher por engano */}
+          <input type="text" name="prevent_autofill" style={{ display: 'none' }} tabIndex={-1} />
+          <input type="password" name="password_fake" style={{ display: 'none' }} tabIndex={-1} />
 
-          <div className="flex flex-col gap-6">
-            <Field label="Identificação do Usuário">
-              <Input
-                {...register("email")}
-                type="text"
-                autoComplete="off"
-                readOnly={isLocked}
-                onFocus={(e) => (e.target.readOnly = false)}
-                placeholder="Insira seu identificador"
-                className="bg-slate-50/50"
-              />
-            </Field>
+          <Field label="Identificador">
+            <Input
+              {...register("email")}
+              id="auth_user_field"
+              name="not_email_field" // Forçamos um nome que não seja "email"
+              type="text"            // Mudamos para text para evitar gatilhos
+              readOnly={isLocked}
+              onFocus={(e) => (e.target.readOnly = false)}
+              autoComplete="off"
+              placeholder="Digite seu e-mail ou usuário"
+            />
+          </Field>
+          {errors.email && <p className="text-sm text-rose-600">{errors.email.message}</p>}
 
-            <Field label="Senha de Acesso">
-              <Input
-                {...register("password")}
-                type="password"
-                autoComplete="new-password"
-                readOnly={isLocked}
-                onFocus={(e) => (e.target.readOnly = false)}
-                placeholder="••••••••"
-                className="bg-slate-50/50"
-              />
-            </Field>
+          <Field label="Chave de Acesso">
+            <Input
+              {...register("password")}
+              id="auth_pass_field"
+              name="not_password_field" // Forçamos um nome que não seja "password"
+              type="password"
+              readOnly={isLocked}
+              onFocus={(e) => (e.target.readOnly = false)}
+              autoComplete="new-password"
+              placeholder="Digite sua senha secreta"
+            />
+          </Field>
+          {errors.password && <p className="text-sm text-rose-600">{errors.password.message}</p>}
 
-            {serverError && (
-              <div className="p-3 text-sm text-red-600 bg-red-50 rounded-lg border border-red-100">
-                {serverError}
-              </div>
-            )}
+          {serverError && (
+            <div className="rounded-2xl bg-rose-50 px-4 py-3 text-sm text-rose-700 border border-rose-100">
+              {serverError}
+            </div>
+          )}
 
-            <Button type="submit" size="lg" className="w-full h-12 text-base font-semibold" disabled={isSubmitting}>
-              {isSubmitting ? "Verificando..." : "Entrar no Sistema"}
-            </Button>
-          </div>
+          <Button type="submit" size="lg" className="w-full h-12 font-bold" disabled={isSubmitting}>
+            {isSubmitting ? "Autenticando..." : "Entrar no Painel"}
+          </Button>
         </form>
       </CardContent>
     </Card>
