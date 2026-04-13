@@ -18,8 +18,9 @@ export function AdminLoginForm() {
   const nextPath = searchParams.get("next") || "/admin";
   const [serverError, setServerError] = useState("");
   
-  // Bloqueio inicial rígido
-  const [isLocked, setIsLocked] = useState(true);
+  // Estado para controlar o tipo do campo de senha dinamicamente
+  const [passType, setPassType] = useState<"text" | "password">("text");
+  const [isReady, setIsReady] = useState(false);
 
   const {
     register,
@@ -27,16 +28,11 @@ export function AdminLoginForm() {
     formState: { errors, isSubmitting }
   } = useForm<AdminLoginValues>({
     resolver: zodResolver(adminLoginSchema),
-    defaultValues: {
-      email: "",
-      password: ""
-    }
+    defaultValues: { email: "", password: "" }
   });
 
   useEffect(() => {
-    // Só libera a edição após a página estar totalmente carregada
-    const timer = setTimeout(() => setIsLocked(false), 800);
-    return () => clearTimeout(timer);
+    setIsReady(true);
   }, []);
 
   const onSubmit = handleSubmit(async (values) => {
@@ -56,52 +52,50 @@ export function AdminLoginForm() {
     router.refresh();
   });
 
+  if (!isReady) return null;
+
   return (
     <Card className="overflow-hidden rounded-[2rem] border-slate-200 shadow-[0_35px_120px_-55px_rgba(14,116,144,0.45)]">
       <CardHeader className="bg-[linear-gradient(135deg,#0f172a_0%,#1d4ed8_52%,#06b6d4_100%)] text-white">
         <div className="mb-4 inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-white/14">
           <ShieldCheck className="h-7 w-7" />
         </div>
-        <CardTitle className="text-3xl text-white">Painel de Acesso</CardTitle>
+        <CardTitle className="text-3xl text-white">Acesso Restrito</CardTitle>
         <CardDescription className="max-w-xl text-sky-50/85">
-          Área restrita. Digite suas credenciais para gerenciar o portal.
+          Área de gestão do portal. Digite suas credenciais.
         </CardDescription>
       </CardHeader>
 
       <CardContent className="p-8">
-        {/* Usando autocomplete="off" no form e campos específicos */}
+        {/* Desativando autocomplete em todos os níveis possíveis */}
         <form className="space-y-6" onSubmit={onSubmit} noValidate autoComplete="off">
           
-          {/* Input invisível para enganar robôs de preenchimento do Chrome */}
-          <input type="text" style={{ display: 'none' }} tabIndex={-1} />
-          <input type="password" style={{ display: 'none' }} tabIndex={-1} />
+          {/* Honeypots: Inputs falsos para o Chrome preencher e nos deixar em paz */}
+          <div style={{ opacity: 0, position: 'absolute', height: 0, zIndex: -1 }}>
+            <input type="text" name="email" tabIndex={-1} />
+            <input type="password" name="password" tabIndex={-1} />
+          </div>
 
           <Field label="Identificação">
             <Input
               {...register("email")}
-              id="auth_user_field"
-              name="random_user_name" // Nome aleatório para o Chrome não reconhecer
-              type={isLocked ? "text" : "email"}
-              readOnly={isLocked}
-              onFocus={(e) => e.target.readOnly = false}
-              placeholder="Digite seu e-mail"
+              id="user_internal_id"
+              type="text" // Usamos text para o e-mail também
               autoComplete="off"
-              className="bg-white"
+              inputMode="email"
+              placeholder="E-mail cadastrado"
             />
           </Field>
           {errors.email && <p className="text-sm text-rose-600">{errors.email.message}</p>}
 
-          <Field label="Chave">
+          <Field label="Chave de Segurança">
             <Input
               {...register("password")}
-              id="auth_key_field"
-              name="random_password_name" // Nome aleatório
-              type="password"
-              readOnly={isLocked}
-              onFocus={(e) => e.target.readOnly = false}
-              placeholder="Sua senha"
+              id="pass_internal_id"
+              type={passType}
+              onFocus={() => setPassType("password")} // Só vira password quando clica
               autoComplete="new-password"
-              className="bg-white"
+              placeholder="Sua senha secreta"
             />
           </Field>
           {errors.password && <p className="text-sm text-rose-600">{errors.password.message}</p>}
@@ -113,7 +107,7 @@ export function AdminLoginForm() {
           )}
 
           <Button type="submit" size="lg" className="w-full h-12 font-bold" disabled={isSubmitting}>
-            {isSubmitting ? "Autenticando..." : "Entrar"}
+            {isSubmitting ? "Autenticando..." : "Entrar no Painel"}
           </Button>
         </form>
       </CardContent>
