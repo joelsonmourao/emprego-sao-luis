@@ -18,8 +18,8 @@ export function AdminLoginForm() {
   const nextPath = searchParams.get("next") || "/admin";
   const [serverError, setServerError] = useState("");
   
-  // Estado para bloquear o preenchimento automático inicial
-  const [isReadOnly, setIsReadOnly] = useState(true);
+  // Bloqueio inicial rígido
+  const [isLocked, setIsLocked] = useState(true);
 
   const {
     register,
@@ -33,30 +33,25 @@ export function AdminLoginForm() {
     }
   });
 
-  // Libera os campos após 1 segundo como garantia
   useEffect(() => {
-    const timer = setTimeout(() => setIsReadOnly(false), 1000);
+    // Só libera a edição após a página estar totalmente carregada
+    const timer = setTimeout(() => setIsLocked(false), 800);
     return () => clearTimeout(timer);
   }, []);
 
   const onSubmit = handleSubmit(async (values) => {
     setServerError("");
-
     const response = await fetch("/api/admin/login", {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify(values)
     });
 
     const result = (await response.json()) as { ok: boolean; error?: string };
-
     if (!response.ok || !result.ok) {
-      setServerError(result.error ?? "Acesso negado. Verifique suas credenciais.");
+      setServerError(result.error ?? "Acesso negado.");
       return;
     }
-
     router.push(nextPath as Route);
     router.refresh();
   });
@@ -69,46 +64,47 @@ export function AdminLoginForm() {
         </div>
         <CardTitle className="text-3xl text-white">Painel de Acesso</CardTitle>
         <CardDescription className="max-w-xl text-sky-50/85">
-          Identifique-se para gerir as vagas do portal.
+          Área restrita. Digite suas credenciais para gerenciar o portal.
         </CardDescription>
       </CardHeader>
 
       <CardContent className="p-8">
-        <form className="space-y-6" onSubmit={onSubmit} noValidate>
+        {/* Usando autocomplete="off" no form e campos específicos */}
+        <form className="space-y-6" onSubmit={onSubmit} noValidate autoComplete="off">
           
-          <Field label="Acesso Administrativo">
-            <Input
-              id="field-access-id"
-              type="email"
-              readOnly={isReadOnly}
-              onFocus={() => setIsReadOnly(false)}
-              autoComplete="one-time-code"
-              autoCapitalize="none"
-              autoCorrect="off"
-              inputMode="email"
-              spellCheck={false}
-              placeholder="seu-email@dominio.com"
-              {...register("email")}
-            />
-          </Field>
-          {errors.email && (
-            <p className="mt-1 text-sm text-rose-600">{errors.email.message}</p>
-          )}
+          {/* Input invisível para enganar robôs de preenchimento do Chrome */}
+          <input type="text" style={{ display: 'none' }} tabIndex={-1} />
+          <input type="password" style={{ display: 'none' }} tabIndex={-1} />
 
-          <Field label="Chave de Segurança">
+          <Field label="Identificação">
             <Input
-              id="field-security-key"
-              type="password"
-              readOnly={isReadOnly}
-              onFocus={() => setIsReadOnly(false)}
-              autoComplete="new-password"
-              placeholder="Sua senha"
-              {...register("password")}
+              {...register("email")}
+              id="auth_user_field"
+              name="random_user_name" // Nome aleatório para o Chrome não reconhecer
+              type={isLocked ? "text" : "email"}
+              readOnly={isLocked}
+              onFocus={(e) => e.target.readOnly = false}
+              placeholder="Digite seu e-mail"
+              autoComplete="off"
+              className="bg-white"
             />
           </Field>
-          {errors.password && (
-            <p className="mt-1 text-sm text-rose-600">{errors.password.message}</p>
-          )}
+          {errors.email && <p className="text-sm text-rose-600">{errors.email.message}</p>}
+
+          <Field label="Chave">
+            <Input
+              {...register("password")}
+              id="auth_key_field"
+              name="random_password_name" // Nome aleatório
+              type="password"
+              readOnly={isLocked}
+              onFocus={(e) => e.target.readOnly = false}
+              placeholder="Sua senha"
+              autoComplete="new-password"
+              className="bg-white"
+            />
+          </Field>
+          {errors.password && <p className="text-sm text-rose-600">{errors.password.message}</p>}
 
           {serverError && (
             <div className="rounded-2xl bg-rose-50 px-4 py-3 text-sm text-rose-700 border border-rose-100">
@@ -116,13 +112,8 @@ export function AdminLoginForm() {
             </div>
           )}
 
-          <Button 
-            type="submit" 
-            size="lg" 
-            className="w-full h-12 text-base font-bold shadow-lg shadow-blue-500/20" 
-            disabled={isSubmitting}
-          >
-            {isSubmitting ? "Autenticando..." : "Entrar no Sistema"}
+          <Button type="submit" size="lg" className="w-full h-12 font-bold" disabled={isSubmitting}>
+            {isSubmitting ? "Autenticando..." : "Entrar"}
           </Button>
         </form>
       </CardContent>
