@@ -22,11 +22,24 @@ export function AdminLoginForm() {
   const {
     register,
     handleSubmit,
+    reset,
     formState: { errors, isSubmitting }
   } = useForm<AdminLoginValues>({
     resolver: zodResolver(adminLoginSchema),
     defaultValues: { login_user: "", secret_key: "" }
   });
+
+  // Reset form on mount to ensure clean state
+  useEffect(() => {
+    reset({ login_user: "", secret_key: "" });
+    
+    // Additional cleanup to remove any browser-stored values
+    const timer = setTimeout(() => {
+      reset({ login_user: "", secret_key: "" });
+    }, 100);
+    
+    return () => clearTimeout(timer);
+  }, [reset]);
 
   // Pequeno delay para destravar os campos, confundindo scripts de preenchimento
   useEffect(() => {
@@ -68,16 +81,21 @@ export function AdminLoginForm() {
           {/* Inputs falsos para o Chrome preencher por engano */}
           <input type="text" name="prevent_autofill" style={{ display: 'none' }} tabIndex={-1} />
           <input type="password" name="password_fake" style={{ display: 'none' }} tabIndex={-1} />
+          <input type="email" name="email_fake" style={{ display: 'none' }} tabIndex={-1} />
+          <input type="text" name="username_fake" style={{ display: 'none' }} tabIndex={-1} />
 
           <Field label="Identificador">
             <Input
               {...register("login_user")}
               id="auth_user_field"
               name="login_user"
-              type="text"            // Mudamos para text para evitar gatilhos
+              type="text"
               readOnly={isLocked}
               onFocus={(e) => (e.target.readOnly = false)}
               autoComplete="off"
+              autoCorrect="off"
+              autoCapitalize="off"
+              spellCheck="false"
               placeholder="Digite seu e-mail ou usuário"
             />
           </Field>
@@ -92,6 +110,9 @@ export function AdminLoginForm() {
               readOnly={isLocked}
               onFocus={(e) => (e.target.readOnly = false)}
               autoComplete="new-password"
+              autoCorrect="off"
+              autoCapitalize="off"
+              spellCheck="false"
               placeholder="Digite sua senha secreta"
             />
           </Field>
