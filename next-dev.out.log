@@ -32,3 +32,5 @@
  GET / 200 in 1159ms
  ○ Compiling /_error ...
  ✓ Compiled /_error in 1377ms
+ ✓ Compiled middleware in 57ms
+ ✓ Compiled in 1ms

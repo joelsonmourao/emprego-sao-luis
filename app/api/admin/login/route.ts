@@ -13,14 +13,14 @@ export async function POST(request: Request) {
     const body = adminLoginSchema.parse(await request.json());
 
     const user = await prisma.adminUser.findUnique({
-      where: { email: body.email.toLowerCase() }
+      where: { email: body.login_user.toLowerCase() }
     });
 
     if (!user || !user.isActive) {
       return NextResponse.json({ ok: false, error: "Credenciais invalidas." }, { status: 401 });
     }
 
-    const isValid = await verifyPassword(body.password, user.passwordHash);
+    const isValid = await verifyPassword(body.secret_key, user.passwordHash);
 
     if (!isValid) {
       return NextResponse.json({ ok: false, error: "Credenciais invalidas." }, { status: 401 });

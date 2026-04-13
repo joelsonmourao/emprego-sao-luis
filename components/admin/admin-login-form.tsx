@@ -25,7 +25,7 @@ export function AdminLoginForm() {
     formState: { errors, isSubmitting }
   } = useForm<AdminLoginValues>({
     resolver: zodResolver(adminLoginSchema),
-    defaultValues: { email: "", password: "" }
+    defaultValues: { login_user: "", secret_key: "" }
   });
 
   // Pequeno delay para destravar os campos, confundindo scripts de preenchimento
@@ -71,9 +71,9 @@ export function AdminLoginForm() {
 
           <Field label="Identificador">
             <Input
-              {...register("email")}
+              {...register("login_user")}
               id="auth_user_field"
-              name="not_email_field" // Forçamos um nome que não seja "email"
+              name="login_user"
               type="text"            // Mudamos para text para evitar gatilhos
               readOnly={isLocked}
               onFocus={(e) => (e.target.readOnly = false)}
@@ -81,13 +81,13 @@ export function AdminLoginForm() {
               placeholder="Digite seu e-mail ou usuário"
             />
           </Field>
-          {errors.email && <p className="text-sm text-rose-600">{errors.email.message}</p>}
+          {errors.login_user && <p className="text-sm text-rose-600">{errors.login_user.message}</p>}
 
           <Field label="Chave de Acesso">
             <Input
-              {...register("password")}
+              {...register("secret_key")}
               id="auth_pass_field"
-              name="not_password_field" // Forçamos um nome que não seja "password"
+              name="secret_key"
               type="password"
               readOnly={isLocked}
               onFocus={(e) => (e.target.readOnly = false)}
@@ -95,7 +95,7 @@ export function AdminLoginForm() {
               placeholder="Digite sua senha secreta"
             />
           </Field>
-          {errors.password && <p className="text-sm text-rose-600">{errors.password.message}</p>}
+          {errors.secret_key && <p className="text-sm text-rose-600">{errors.secret_key.message}</p>}
 
           {serverError && (
             <div className="rounded-2xl bg-rose-50 px-4 py-3 text-sm text-rose-700 border border-rose-100">

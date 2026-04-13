@@ -312,16 +312,18 @@ async function main() {
     });
   }
 
-  await prisma.adminUser.upsert({
-    where: { email: env.ADMIN_EMAIL.toLowerCase() },
-    update: { name: "Administrador", passwordHash: await hashPassword(env.ADMIN_PASSWORD), isActive: true },
-    create: {
-      name: "Administrador",
-      email: env.ADMIN_EMAIL.toLowerCase(),
-      passwordHash: await hashPassword(env.ADMIN_PASSWORD),
-      isActive: true
-    }
-  });
+  if (env.ADMIN_LOGIN_USER && env.ADMIN_SECRET_KEY) {
+    await prisma.adminUser.upsert({
+      where: { email: env.ADMIN_LOGIN_USER.toLowerCase() },
+      update: { name: "Administrador", passwordHash: await hashPassword(env.ADMIN_SECRET_KEY), isActive: true },
+      create: {
+        name: "Administrador",
+        email: env.ADMIN_LOGIN_USER.toLowerCase(),
+        passwordHash: await hashPassword(env.ADMIN_SECRET_KEY),
+        isActive: true
+      }
+    });
+  }
 
   const siteContentSetting = await prisma.siteSetting.findUnique({ where: { key: "site_content" } });
   if (!siteContentSetting) {
