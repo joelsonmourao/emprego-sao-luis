@@ -17,10 +17,7 @@ export function AdminLoginForm() {
   const searchParams = useSearchParams();
   const nextPath = searchParams.get("next") || "/admin";
   const [serverError, setServerError] = useState("");
-  
-  // Estado para controlar o tipo do campo de senha dinamicamente
-  const [passType, setPassType] = useState<"text" | "password">("text");
-  const [isReady, setIsReady] = useState(false);
+  const [isLocked, setIsLocked] = useState(true);
 
   const {
     register,
@@ -32,7 +29,8 @@ export function AdminLoginForm() {
   });
 
   useEffect(() => {
-    setIsReady(true);
+    const timer = setTimeout(() => setIsLocked(false), 1000);
+    return () => clearTimeout(timer);
   }, []);
 
   const onSubmit = handleSubmit(async (values) => {
@@ -52,62 +50,58 @@ export function AdminLoginForm() {
     router.refresh();
   });
 
-  if (!isReady) return null;
-
   return (
     <Card className="overflow-hidden rounded-[2rem] border-slate-200 shadow-[0_35px_120px_-55px_rgba(14,116,144,0.45)]">
       <CardHeader className="bg-[linear-gradient(135deg,#0f172a_0%,#1d4ed8_52%,#06b6d4_100%)] text-white">
         <div className="mb-4 inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-white/14">
           <ShieldCheck className="h-7 w-7" />
         </div>
-        <CardTitle className="text-3xl text-white">Acesso Restrito</CardTitle>
-        <CardDescription className="max-w-xl text-sky-50/85">
-          Área de gestão do portal. Digite suas credenciais.
-        </CardDescription>
+        <CardTitle className="text-3xl text-white">Painel</CardTitle>
       </CardHeader>
 
       <CardContent className="p-8">
-        {/* Desativando autocomplete em todos os níveis possíveis */}
         <form className="space-y-6" onSubmit={onSubmit} noValidate autoComplete="off">
           
-          {/* Honeypots: Inputs falsos para o Chrome preencher e nos deixar em paz */}
+          {/* Honeypots alterados para nomes genéricos */}
           <div style={{ opacity: 0, position: 'absolute', height: 0, zIndex: -1 }}>
-            <input type="text" name="email" tabIndex={-1} />
-            <input type="password" name="password" tabIndex={-1} />
+            <input type="text" name="field_abc_123" tabIndex={-1} />
+            <input type="password" name="field_xyz_789" tabIndex={-1} />
           </div>
 
-          <Field label="Identificação">
+          <Field label="Acesso">
             <Input
               {...register("email")}
-              id="user_internal_id"
-              type="text" // Usamos text para o e-mail também
+              id="id_unique_user"
+              name="not_an_email"
+              type="text"
+              readOnly={isLocked}
+              onFocus={(e) => (e.target.readOnly = false)}
               autoComplete="off"
-              inputMode="email"
-              placeholder="E-mail cadastrado"
+              placeholder="Identificador"
             />
           </Field>
-          {errors.email && <p className="text-sm text-rose-600">{errors.email.message}</p>}
 
-          <Field label="Chave de Segurança">
+          <Field label="Chave">
             <Input
               {...register("password")}
-              id="pass_internal_id"
-              type={passType}
-              onFocus={() => setPassType("password")} // Só vira password quando clica
+              id="id_unique_pass"
+              name="not_a_password"
+              type="password"
+              readOnly={isLocked}
+              onFocus={(e) => (e.target.readOnly = false)}
               autoComplete="new-password"
-              placeholder="Sua senha secreta"
+              placeholder="Código de acesso"
             />
           </Field>
-          {errors.password && <p className="text-sm text-rose-600">{errors.password.message}</p>}
 
           {serverError && (
-            <div className="rounded-2xl bg-rose-50 px-4 py-3 text-sm text-rose-700 border border-rose-100">
+            <div className="rounded-2xl bg-rose-50 px-4 py-3 text-sm text-rose-700">
               {serverError}
             </div>
           )}
 
-          <Button type="submit" size="lg" className="w-full h-12 font-bold" disabled={isSubmitting}>
-            {isSubmitting ? "Autenticando..." : "Entrar no Painel"}
+          <Button type="submit" size="lg" className="w-full h-12" disabled={isSubmitting}>
+            {isSubmitting ? "..." : "Entrar"}
           </Button>
         </form>
       </CardContent>
