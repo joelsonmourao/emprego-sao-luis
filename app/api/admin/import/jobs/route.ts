@@ -19,10 +19,15 @@ async function resolveStateAndCityFromNames(stateName: string, cityName: string)
     throw new Error(`Estado nao encontrado para "${stateName}".`);
   }
 
+  const citySlug = normalizeSlug(cityName);
+  
   let city = await prisma.city.findFirst({
     where: {
       stateId: state.id,
-      name: { equals: cityName.trim(), mode: "insensitive" }
+      OR: [
+        { name: { equals: cityName.trim(), mode: "insensitive" } },
+        { slug: citySlug }
+      ]
     }
   });
 
@@ -31,7 +36,7 @@ async function resolveStateAndCityFromNames(stateName: string, cityName: string)
       data: {
         stateId: state.id,
         name: cityName.trim(),
-        slug: normalizeSlug(cityName),
+        slug: citySlug,
         seoTitle: `Vagas de Jovem Aprendiz em ${cityName.trim()}`,
         seoIntro: `Veja vagas de Jovem Aprendiz em ${cityName.trim()}, ${state.code}.`
       }
