@@ -164,20 +164,22 @@ export async function POST(request: Request) {
         const data = {
           title: row.title.trim(),
           slug: uniqueSlug,
-          companyId: company.id,
+          // Campos obrigatórios do schema
           companyName: company.name,
           companyLogoUrl: company.logoUrl,
           companyWebsiteUrl: company.websiteUrl,
+          // Relacionamentos corretos do Prisma
+          companyId: company.id,
           summary: row.summary.trim(),
           descriptionHtml: row.descriptionHtml.includes("<") ? row.descriptionHtml.trim() : plainTextToHtml(row.descriptionHtml.trim()),
           requirements: normalizeLines(row.requirementsText),
           benefits: normalizeLines(row.benefitsText ?? ""),
-          salaryMin: row.salaryMin ? Math.round(row.salaryMin) : null, // Salvar valor bruto em centavos
-          salaryMax: row.salaryMax ? Math.round(row.salaryMax) : null, // Salvar valor bruto em centavos
+          salaryMin: row.salaryMin ? Math.round(row.salaryMin) : null,
+          salaryMax: row.salaryMax ? Math.round(row.salaryMax) : null,
           employmentType: mappedEmploymentType as EmploymentType,
           workHours: row.workHours?.trim() || null,
           expiresAt: parseOptionalDate(row.expiresAt),
-          validThrough: row.validThrough ? new Date(row.validThrough).toISOString() : null, // Forçar conversão para Postgres
+          validThrough: row.validThrough ? new Date(row.validThrough) : null,
           applyUrl: row.applyUrl,
           isActive: row.isActive,
           sourceName: row.sourceName?.trim() || null,
@@ -188,6 +190,7 @@ export async function POST(request: Request) {
           featured: row.featured,
           externalId: row.externalId?.trim() || null,
           publishedAt: existing?.publishedAt ?? parseOptionalDate(row.publishedAt) ?? new Date(),
+          // Relacionamentos
           stateId: state.id,
           cityId: city.id
         };

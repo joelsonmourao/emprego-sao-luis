@@ -125,6 +125,7 @@ model Job {
   publishedAt       DateTime
   updatedAt         DateTime       @updatedAt
   expiresAt         DateTime?
+  validThrough      DateTime?
   applyUrl          String
   isActive          Boolean        @default(true)
   sourceName        String?
