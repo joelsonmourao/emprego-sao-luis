@@ -115,11 +115,12 @@ export async function POST(request: Request) {
           descriptionHtml: row.descriptionHtml.includes("<") ? row.descriptionHtml.trim() : plainTextToHtml(row.descriptionHtml.trim()),
           requirements: normalizeLines(row.requirementsText),
           benefits: normalizeLines(row.benefitsText ?? ""),
-          salaryMin: row.salaryMin ? Math.round(row.salaryMin * 100) : null, // Converter para centavos
-          salaryMax: row.salaryMax ? Math.round(row.salaryMax * 100) : null, // Converter para centavos
+          salaryMin: row.salaryMin ? Math.round(row.salaryMin) : null, // Salvar valor bruto em centavos
+          salaryMax: row.salaryMax ? Math.round(row.salaryMax) : null, // Salvar valor bruto em centavos
           employmentType: mappedEmploymentType as EmploymentType,
           workHours: row.workHours?.trim() || null,
           expiresAt: parseOptionalDate(row.expiresAt),
+          validThrough: parseOptionalDate(row.validThrough), // Adicionar suporte a validThrough
           applyUrl: row.applyUrl,
           isActive: row.isActive,
           sourceName: row.sourceName?.trim() || null,

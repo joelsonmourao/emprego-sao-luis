@@ -34,6 +34,7 @@ const aliases: Record<string, string> = {
   jornada: "workHours",
   publishedat: "publishedAt",
   expiresat: "expiresAt",
+  validthrough: "validThrough",
   applyurl: "applyUrl",
   isactive: "isActive",
   active: "isActive",
