@@ -168,8 +168,16 @@ export async function POST(request: Request) {
           companyName: company.name,
           companyLogoUrl: company.logoUrl,
           companyWebsiteUrl: company.websiteUrl,
-          // Relacionamentos corretos do Prisma
-          companyId: company.id,
+          // Relacionamentos do Prisma usando connect
+          company: {
+            connect: { id: company.id }
+          },
+          state: {
+            connect: { id: state.id }
+          },
+          city: {
+            connect: { id: city.id }
+          },
           summary: row.summary.trim(),
           descriptionHtml: row.descriptionHtml.includes("<") ? row.descriptionHtml.trim() : plainTextToHtml(row.descriptionHtml.trim()),
           requirements: normalizeLines(row.requirementsText),
@@ -189,10 +197,7 @@ export async function POST(request: Request) {
           seoDescription: row.seoDescription.trim(),
           featured: row.featured,
           externalId: row.externalId?.trim() || null,
-          publishedAt: existing?.publishedAt ?? parseOptionalDate(row.publishedAt) ?? new Date(),
-          // Relacionamentos
-          stateId: state.id,
-          cityId: city.id
+          publishedAt: existing?.publishedAt ?? parseOptionalDate(row.publishedAt) ?? new Date()
         };
 
         console.log('Dados preparados para salvar:', JSON.stringify(data, null, 2));
