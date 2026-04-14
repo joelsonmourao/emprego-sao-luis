@@ -76,62 +76,75 @@ export async function POST(request: Request) {
 
     const imported: string[] = [];
     const updated: string[] = [];
+    const errors: string[] = [];
 
-    for (const row of payload.rows) {
-      const { state, city } = await resolveStateAndCityFromNames(row.stateName, row.cityName);
-      const company = await resolveCompany(row.companyName, state.id, city.id, row.summary);
+    for (const [index, row] of payload.rows.entries()) {
+      try {
+        const { state, city } = await resolveStateAndCityFromNames(row.stateName, row.cityName);
+        const company = await resolveCompany(row.companyName, state.id, city.id, row.summary);
 
-      const existing = await prisma.job.findFirst({
-        where: {
-          OR: [{ slug: normalizeSlug(row.slug || row.title) }, ...(row.externalId ? [{ externalId: row.externalId.trim() }] : [])]
-        },
-        select: {
-          id: true,
-          publishedAt: true
+        const existing = await prisma.job.findFirst({
+          where: {
+            OR: [{ slug: normalizeSlug(row.slug || row.title) }, ...(row.externalId ? [{ externalId: row.externalId.trim() }] : [])]
+          },
+          select: {
+            id: true,
+            publishedAt: true
+          }
+        });
+
+        // employmentType já vem validado pelo schema como APPRENTICESHIP, INTERNSHIP, etc.
+        const mappedEmploymentType = row.employmentType;
+
+        const data = {
+          title: row.title.trim(),
+          slug: normalizeSlug(row.slug || row.title),
+          companyId: company.id,
+          companyName: company.name,
+          companyLogoUrl: company.logoUrl,
+          companyWebsiteUrl: company.websiteUrl,
+          summary: row.summary.trim(),
+          descriptionHtml: row.descriptionHtml.includes("<") ? row.descriptionHtml.trim() : plainTextToHtml(row.descriptionHtml.trim()),
+          requirements: normalizeLines(row.requirementsText),
+          benefits: normalizeLines(row.benefitsText ?? ""),
+          salaryMin: row.salaryMin ? Math.round(row.salaryMin * 100) : null, // Converter para centavos
+          salaryMax: row.salaryMax ? Math.round(row.salaryMax * 100) : null, // Converter para centavos
+          employmentType: mappedEmploymentType as EmploymentType,
+          workHours: row.workHours?.trim() || null,
+          expiresAt: parseOptionalDate(row.expiresAt),
+          applyUrl: row.applyUrl,
+          isActive: row.isActive,
+          sourceName: row.sourceName?.trim() || null,
+          sourceUrl: row.sourceUrl?.trim() || null,
+          locationType: row.locationType as LocationType,
+          seoTitle: row.seoTitle.trim(),
+          seoDescription: row.seoDescription.trim(),
+          featured: row.featured,
+          externalId: row.externalId?.trim() || null,
+          publishedAt: existing?.publishedAt ?? parseOptionalDate(row.publishedAt) ?? new Date(),
+          stateId: state.id,
+          cityId: city.id
+        };
+
+        if (existing) {
+          await prisma.job.update({
+            where: { id: existing.id },
+            data: {
+              ...data,
+              updatedAt: new Date() // Garantir updatedAt seja atualizado
+            }
+          });
+          updated.push(data.slug);
+        } else {
+          await prisma.job.create({
+            data
+          });
+          imported.push(data.slug);
         }
-      });
-
-      const data = {
-        title: row.title.trim(),
-        slug: normalizeSlug(row.slug || row.title),
-        companyId: company.id,
-        companyName: company.name,
-        companyLogoUrl: company.logoUrl,
-        companyWebsiteUrl: company.websiteUrl,
-        summary: row.summary.trim(),
-        descriptionHtml: row.descriptionHtml.includes("<") ? row.descriptionHtml.trim() : plainTextToHtml(row.descriptionHtml.trim()),
-        requirements: normalizeLines(row.requirementsText),
-        benefits: normalizeLines(row.benefitsText ?? ""),
-        salaryMin: row.salaryMin ?? null,
-        salaryMax: row.salaryMax ?? null,
-        employmentType: row.employmentType as EmploymentType,
-        workHours: row.workHours?.trim() || null,
-        expiresAt: parseOptionalDate(row.expiresAt),
-        applyUrl: row.applyUrl,
-        isActive: row.isActive,
-        sourceName: row.sourceName?.trim() || null,
-        sourceUrl: row.sourceUrl?.trim() || null,
-        locationType: row.locationType as LocationType,
-        seoTitle: row.seoTitle.trim(),
-        seoDescription: row.seoDescription.trim(),
-        featured: row.featured,
-        externalId: row.externalId?.trim() || null,
-        publishedAt: existing?.publishedAt ?? parseOptionalDate(row.publishedAt) ?? new Date(),
-        stateId: state.id,
-        cityId: city.id
-      };
-
-      if (existing) {
-        await prisma.job.update({
-          where: { id: existing.id },
-          data
-        });
-        updated.push(data.slug);
-      } else {
-        await prisma.job.create({
-          data
-        });
-        imported.push(data.slug);
+      } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : 'Erro desconhecido';
+        errors.push(`Linha ${index + 1}: ${errorMessage}`);
+        console.error(`Erro na linha ${index + 1} (${row.title}):`, error);
       }
     }
 
@@ -155,8 +168,10 @@ export async function POST(request: Request) {
       ok: true,
       importedCount: imported.length,
       updatedCount: updated.length,
+      errorCount: errors.length,
       imported,
-      updated
+      updated,
+      errors
     });
   } catch (error) {
     const message = error instanceof Error ? error.message : "Nao foi possivel importar a planilha.";
