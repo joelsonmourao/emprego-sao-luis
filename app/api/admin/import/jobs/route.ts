@@ -89,6 +89,13 @@ async function resolveCompany(companyName: string, stateId: string, cityId: stri
 }
 
 export async function POST(request: Request) {
+  // Adicionar headers CORS para Vercel
+  const headers = {
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Methods': 'POST, OPTIONS',
+    'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+  };
+
   try {
     const session = await requireApiRole("EDITOR");
     const payload = importJobsPayloadSchema.parse(await request.json());
@@ -170,7 +177,7 @@ export async function POST(request: Request) {
           employmentType: mappedEmploymentType as EmploymentType,
           workHours: row.workHours?.trim() || null,
           expiresAt: parseOptionalDate(row.expiresAt),
-          validThrough: parseOptionalDate(row.validThrough), // Adicionar suporte a validThrough
+          validThrough: row.validThrough ? new Date(row.validThrough).toISOString() : null, // Forçar conversão para Postgres
           applyUrl: row.applyUrl,
           isActive: row.isActive,
           sourceName: row.sourceName?.trim() || null,
@@ -309,9 +316,26 @@ export async function POST(request: Request) {
     console.log('=== RESPOSTA FINAL DA IMPORTAÇÃO ===');
     console.log(JSON.stringify(response, null, 2));
 
-    return NextResponse.json(response);
+    return NextResponse.json(response, { headers });
   } catch (error) {
     const message = error instanceof Error ? error.message : "Nao foi possivel importar a planilha.";
-    return NextResponse.json({ ok: false, error: message }, { status: 400 });
+    
+    // Capturar erro detalhado do Prisma para depuração
+    const detailedError = {
+      ok: false,
+      error: message,
+      details: error instanceof Error ? error.stack : null,
+      timestamp: new Date().toISOString(),
+      debug: {
+        errorMessage: message,
+        errorType: error instanceof Error ? error.constructor.name : 'Unknown',
+        isPrismaError: error instanceof Error && error.message.includes('Prisma'),
+        fullError: error
+      }
+    };
+    
+    console.error('ERRO DETALHADO DA IMPORTAÇÃO:', detailedError);
+    
+    return NextResponse.json(detailedError, { status: 400, headers });
   }
 }

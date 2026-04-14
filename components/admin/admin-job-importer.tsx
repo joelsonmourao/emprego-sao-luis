@@ -144,27 +144,56 @@ export function AdminJobImporter() {
     setIsImporting(true);
     setResultMessage("");
 
-    const response = await fetch("/api/admin/import/jobs", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ rows: validRows })
-    });
+    try {
+      const response = await fetch("/api/admin/import/jobs", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ rows: validRows })
+      });
 
-    const result = (await response.json()) as {
-      ok: boolean;
-      error?: string;
-      importedCount?: number;
-      updatedCount?: number;
-    };
+      const result = await response.json();
 
-    if (!response.ok || !result.ok) {
-      setResultMessage(result.error ?? "Nao foi possivel importar a planilha.");
+      if (!response.ok || !result.ok) {
+        // Mostrar erro detalhado do Prisma/Backend
+        const errorMessage = result.error || result.details || "Nao foi possivel importar a planilha.";
+        setResultMessage(`ERRO: ${errorMessage}`);
+        
+        // Se houver erros específicos, mostrar no console
+        if (result.debug?.errorDetails && result.debug.errorDetails.length > 0) {
+          console.error("Erros da importação:", result.debug.errorDetails);
+        }
+        setIsImporting(false);
+        return;
+      }
+
+      // Resposta de sucesso com detalhes
+      const summary = result.summary || {};
+      const successRate = summary.successRate || 0;
+      
+      let message = `Importação concluída: ${summary.importedCount || 0} nova(s) vaga(s) e ${summary.updatedCount || 0} atualizada(s).`;
+      
+      if (successRate < 100 && summary.errorCount > 0) {
+        message += ` (${summary.errorCount} erro(s) - Taxa de sucesso: ${successRate}%)`;
+        
+        // Mostrar erros específicos se houver
+        if (result.results?.errors && result.results.errors.length > 0) {
+          const errorDetails = result.results.errors.map((e: any) => `Linha ${e.line}: ${e.message}`).join('; ');
+          console.error("Detalhes dos erros:", errorDetails);
+          message += ` Verifique o console para detalhes.`;
+        }
+      }
+      
+      setResultMessage(message);
+      
+      // Log detalhado para depuração
+      console.log("Resultado da importação:", result);
+      
+    } catch (error) {
+      console.error("Erro na requisição de importação:", error);
+      setResultMessage(`ERRO DE REDE: ${error instanceof Error ? error.message : 'Falha na comunicação com o servidor'}`);
+    } finally {
       setIsImporting(false);
-      return;
     }
-
-    setResultMessage(`Importacao concluida: ${result.importedCount ?? 0} nova(s) vaga(s) e ${result.updatedCount ?? 0} atualizada(s).`);
-    setIsImporting(false);
   }
 
   return (
