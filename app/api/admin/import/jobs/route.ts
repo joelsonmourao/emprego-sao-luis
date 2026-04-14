@@ -81,7 +81,26 @@ export async function POST(request: Request) {
     for (const [index, row] of payload.rows.entries()) {
       try {
         const { state, city } = await resolveStateAndCityFromNames(row.stateName, row.cityName);
+        
+        // Verificar se state e city foram encontrados
+        if (!state) {
+          console.error(`ERRO: Estado não encontrado para "${row.stateName}" na linha ${index + 1}`);
+          throw new Error(`Estado não encontrado: ${row.stateName}`);
+        }
+        if (!city) {
+          console.error(`ERRO: Cidade não encontrada para "${row.cityName}" no estado ${state.name} na linha ${index + 1}`);
+          throw new Error(`Cidade não encontrada: ${row.cityName}`);
+        }
+        
         const company = await resolveCompany(row.companyName, state.id, city.id, row.summary);
+        
+        // Verificar se company foi encontrada
+        if (!company) {
+          console.error(`ERRO: Empresa não encontrada/criada para "${row.companyName}" na linha ${index + 1}`);
+          throw new Error(`Empresa não encontrada: ${row.companyName}`);
+        }
+        
+        console.log(`SUCESSO: Associações encontradas - Estado: ${state.name}, Cidade: ${city.name}, Empresa: ${company.name}`);
 
         const existing = await prisma.job.findFirst({
           where: {
@@ -159,8 +178,58 @@ export async function POST(request: Request) {
       } catch (error) {
         const errorMessage = error instanceof Error ? error.message : 'Erro desconhecido';
         errors.push(`Linha ${index + 1}: ${errorMessage}`);
-        console.error(`Erro na linha ${index + 1} (${row.title}):`, error);
+        
+        // Log detalhado do erro do Prisma
+        console.error(`=== ERRO DETALHADO AO SALVAR LINHA ${index + 1} ===`);
+        console.error(`Título da vaga: ${row.title}`);
+        console.error(`Mensagem de erro: ${errorMessage}`);
+        console.error(`Erro completo:`, error);
+        
+        // Verificar se é erro de Prisma
+        if (error instanceof Error && error.message.includes('Prisma')) {
+          console.error('ERRO DO PRISMA DETECTADO - Possíveis causas:');
+          console.error('1. Chave estrangeira inválida (stateId, cityId, companyId)');
+          console.error('2. Campo obrigatório faltando');
+          console.error('3. Restrição única violada (slug)');
+          console.error('4. Tipo de dado inválido');
+        }
+        
+        // Verificar dados que estavam sendo processados
+        console.error(`Dados processados até o erro:`, {
+          title: row.title,
+          stateName: row.stateName,
+          cityName: row.cityName,
+          companyName: row.companyName,
+          slug: normalizeSlug(row.slug || row.title)
+        });
       }
+    }
+
+    // Log final do resultado
+    console.log(`=== RESUMO DA IMPORTAÇÃO ===`);
+    console.log(`Total de linhas processadas: ${payload.rows.length}`);
+    console.log(`Vagas importadas: ${imported.length}`);
+    console.log(`Vagas atualizadas: ${updated.length}`);
+    console.log(`Erros: ${errors.length}`);
+    
+    if (imported.length > 0) {
+      console.log(`Slugs importados: ${imported.join(', ')}`);
+    }
+    if (updated.length > 0) {
+      console.log(`Slugs atualizados: ${updated.join(', ')}`);
+    }
+    if (errors.length > 0) {
+      console.log(`Erros encontrados: ${errors.join('; ')}`);
+    }
+    
+    // Verificação crítica: se não houve erros mas também não importou nada
+    if (errors.length === 0 && imported.length === 0 && updated.length === 0) {
+      console.error('!!! ATENÇÃO: Nenhuma vaga foi importada/atualizada, mas também não houve erros !!!');
+      console.error('Possíveis causas:');
+      console.error('1. Operações Prisma não estão sendo executadas (await faltando)');
+      console.error('2. Todas as vagas já existem e não estão sendo atualizadas');
+      console.error('3. Falha silenciosa no prisma.job.create/update');
+      console.error('4. Transação não sendo commitada');
     }
 
     await writeAuditLog({
