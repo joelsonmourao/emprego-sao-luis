@@ -9,14 +9,25 @@ import { importJobsPayloadSchema } from "@/lib/schemas/job-import";
 
 async function resolveStateAndCityFromNames(stateName: string, cityName: string) {
   const trimmedState = stateName.trim();
-  const state = await prisma.state.findFirst({
+  let state = await prisma.state.findFirst({
     where: {
       OR: [{ code: { equals: trimmedState, mode: "insensitive" } }, { name: { equals: trimmedState, mode: "insensitive" } }]
     }
   });
 
+  // Criar estado automaticamente se não existir
   if (!state) {
-    throw new Error(`Estado nao encontrado para "${stateName}".`);
+    console.log(`Criando estado automaticamente: ${trimmedState}`);
+    state = await prisma.state.create({
+      data: {
+        code: trimmedState.slice(0, 2).toUpperCase(),
+        name: trimmedState,
+        slug: normalizeSlug(trimmedState),
+        seoTitle: `Vagas de Jovem Aprendiz em ${trimmedState}`,
+        seoIntro: `Veja todas as vagas de Jovem Aprendiz disponíveis em ${trimmedState}.`
+      }
+    });
+    console.log(`Estado criado com sucesso: ${state.name}`);
   }
 
   const citySlug = normalizeSlug(cityName);
@@ -32,6 +43,7 @@ async function resolveStateAndCityFromNames(stateName: string, cityName: string)
   });
 
   if (!city) {
+    console.log(`Criando cidade automaticamente: ${cityName.trim()} no estado ${state.name}`);
     city = await prisma.city.create({
       data: {
         stateId: state.id,
@@ -41,6 +53,7 @@ async function resolveStateAndCityFromNames(stateName: string, cityName: string)
         seoIntro: `Veja vagas de Jovem Aprendiz em ${cityName.trim()}, ${state.code}.`
       }
     });
+    console.log(`Cidade criada com sucesso: ${city.name}`);
   }
 
   return { state, city };
@@ -54,9 +67,13 @@ async function resolveCompany(companyName: string, stateId: string, cityId: stri
     }
   });
 
-  if (existing) return existing;
+  if (existing) {
+    console.log(`Empresa encontrada: ${existing.name}`);
+    return existing;
+  }
 
-  return prisma.company.create({
+  console.log(`Criando empresa automaticamente: ${companyName.trim()}`);
+  const company = await prisma.company.create({
     data: {
       name: companyName.trim(),
       slug,
@@ -67,6 +84,8 @@ async function resolveCompany(companyName: string, stateId: string, cityId: stri
       cityId
     }
   });
+  console.log(`Empresa criada com sucesso: ${company.name}`);
+  return company;
 }
 
 export async function POST(request: Request) {
@@ -81,26 +100,9 @@ export async function POST(request: Request) {
     for (const [index, row] of payload.rows.entries()) {
       try {
         const { state, city } = await resolveStateAndCityFromNames(row.stateName, row.cityName);
-        
-        // Verificar se state e city foram encontrados
-        if (!state) {
-          console.error(`ERRO: Estado não encontrado para "${row.stateName}" na linha ${index + 1}`);
-          throw new Error(`Estado não encontrado: ${row.stateName}`);
-        }
-        if (!city) {
-          console.error(`ERRO: Cidade não encontrada para "${row.cityName}" no estado ${state.name} na linha ${index + 1}`);
-          throw new Error(`Cidade não encontrada: ${row.cityName}`);
-        }
-        
         const company = await resolveCompany(row.companyName, state.id, city.id, row.summary);
         
-        // Verificar se company foi encontrada
-        if (!company) {
-          console.error(`ERRO: Empresa não encontrada/criada para "${row.companyName}" na linha ${index + 1}`);
-          throw new Error(`Empresa não encontrada: ${row.companyName}`);
-        }
-        
-        console.log(`SUCESSO: Associações encontradas - Estado: ${state.name}, Cidade: ${city.name}, Empresa: ${company.name}`);
+        console.log(`SUCESSO: Associações resolvidas - Estado: ${state.name}, Cidade: ${city.name}, Empresa: ${company.name}`);
 
         const existing = await prisma.job.findFirst({
           where: {
@@ -108,7 +110,8 @@ export async function POST(request: Request) {
           },
           select: {
             id: true,
-            publishedAt: true
+            publishedAt: true,
+            slug: true // Adicionar slug para verificação de conflito
           }
         });
 
@@ -123,9 +126,37 @@ export async function POST(request: Request) {
         console.log('Empresa:', company);
         console.log('Vaga existente:', !!existing);
 
+        // Gerar slug único com número aleatório se houver conflito
+        let baseSlug = normalizeSlug(row.slug || row.title);
+        let uniqueSlug = baseSlug;
+        let slugAttempts = 0;
+        const maxAttempts = 10;
+        
+        while (slugAttempts < maxAttempts) {
+          const slugCheck = await prisma.job.findFirst({
+            where: { slug: uniqueSlug },
+            select: { id: true }
+          });
+          
+          if (!slugCheck || (existing && existing.slug === uniqueSlug)) {
+            break; // Slug está disponível ou é o mesmo registro existente
+          }
+          
+          // Adicionar sufixo aleatório
+          const randomSuffix = Math.floor(Math.random() * 10000);
+          uniqueSlug = `${baseSlug}-${randomSuffix}`;
+          slugAttempts++;
+        }
+        
+        if (slugAttempts >= maxAttempts) {
+          throw new Error(`Não foi possível gerar slug único para: ${baseSlug}`);
+        }
+        
+        console.log(`Slug gerado: ${uniqueSlug}${uniqueSlug !== baseSlug ? ' (com sufixo)' : ''}`);
+
         const data = {
           title: row.title.trim(),
-          slug: normalizeSlug(row.slug || row.title),
+          slug: uniqueSlug,
           companyId: company.id,
           companyName: company.name,
           companyLogoUrl: company.logoUrl,
@@ -248,15 +279,37 @@ export async function POST(request: Request) {
       }
     });
 
-    return NextResponse.json({
+    // Resposta detalhada para depuração no navegador
+    const response = {
       ok: true,
-      importedCount: imported.length,
-      updatedCount: updated.length,
-      errorCount: errors.length,
-      imported,
-      updated,
-      errors
-    });
+      summary: {
+        totalRows: payload.rows.length,
+        importedCount: imported.length,
+        updatedCount: updated.length,
+        errorCount: errors.length,
+        successRate: payload.rows.length > 0 ? Math.round(((imported.length + updated.length) / payload.rows.length) * 100) : 0
+      },
+      results: {
+        imported: imported.map((slug, i) => ({ slug, status: 'imported' })),
+        updated: updated.map((slug, i) => ({ slug, status: 'updated' })),
+        errors: errors.map((error, i) => ({ 
+          line: error.split(':')[0], 
+          message: error.split(':').slice(1).join(':').trim(),
+          fullError: error 
+        }))
+      },
+      debug: {
+        processedSlugs: [...imported, ...updated],
+        errorDetails: errors.length > 0 ? errors : ['Nenhum erro detectado'],
+        timestamp: new Date().toISOString()
+      }
+    };
+
+    // Log detalhado no console para depuração
+    console.log('=== RESPOSTA FINAL DA IMPORTAÇÃO ===');
+    console.log(JSON.stringify(response, null, 2));
+
+    return NextResponse.json(response);
   } catch (error) {
     const message = error instanceof Error ? error.message : "Nao foi possivel importar a planilha.";
     return NextResponse.json({ ok: false, error: message }, { status: 400 });
