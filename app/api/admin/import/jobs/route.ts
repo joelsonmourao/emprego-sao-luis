@@ -96,6 +96,14 @@ export async function POST(request: Request) {
         // employmentType já vem validado pelo schema como APPRENTICESHIP, INTERNSHIP, etc.
         const mappedEmploymentType = row.employmentType;
 
+        // Log de depuração para cada vaga
+        console.log(`=== PROCESSANDO VAGA ${index + 1} ===`);
+        console.log('Dados brutos da planilha:', JSON.stringify(row, null, 2));
+        console.log('Estado:', state);
+        console.log('Cidade:', city);
+        console.log('Empresa:', company);
+        console.log('Vaga existente:', !!existing);
+
         const data = {
           title: row.title.trim(),
           slug: normalizeSlug(row.slug || row.title),
@@ -126,7 +134,10 @@ export async function POST(request: Request) {
           cityId: city.id
         };
 
+        console.log('Dados preparados para salvar:', JSON.stringify(data, null, 2));
+
         if (existing) {
+          console.log(`ATUALIZANDO vaga existente: ${data.slug}`);
           await prisma.job.update({
             where: { id: existing.id },
             data: {
@@ -134,11 +145,14 @@ export async function POST(request: Request) {
               updatedAt: new Date() // Garantir updatedAt seja atualizado
             }
           });
+          console.log(`Vaga atualizada com sucesso: ${data.slug}`);
           updated.push(data.slug);
         } else {
+          console.log(`CRIANDO nova vaga: ${data.slug}`);
           await prisma.job.create({
             data
           });
+          console.log(`Vaga criada com sucesso: ${data.slug}`);
           imported.push(data.slug);
         }
       } catch (error) {
