@@ -7,27 +7,52 @@ import { requireApiRole } from "@/lib/authz";
 import { prisma } from "@/lib/db";
 import { importJobsPayloadSchema } from "@/lib/schemas/job-import";
 
-// Função para calcular validThrough baseado em número de meses
+// Função para calcular validThrough baseado em número de meses ou data direta
 function calculateValidThrough(validThroughValue: string | number | null | undefined): Date | null {
   if (!validThroughValue) return null;
   
-  // Converter para número
-  const monthsToAdd = Number(validThroughValue);
-  
-  // Verificar se é um número válido
-  if (isNaN(monthsToAdd) || monthsToAdd <= 0) {
-    console.log(`Valor inválido para validThrough: ${validThroughValue}, usando null`);
-    return null;
+  // Se for número, tratar como quantidade de meses
+  if (typeof validThroughValue === 'number') {
+    const monthsToAdd = validThroughValue;
+    
+    if (monthsToAdd <= 0) {
+      console.log(`Valor inválido para validThrough (meses): ${monthsToAdd}, usando null`);
+      return null;
+    }
+    
+    // Calcular data atual + meses
+    const today = new Date();
+    const futureDate = new Date(today);
+    futureDate.setMonth(today.getMonth() + monthsToAdd);
+    
+    console.log(`validThrough: ${monthsToAdd} meses a partir de hoje = ${futureDate.toISOString().split('T')[0]}`);
+    return futureDate;
   }
   
-  // Calcular data atual + meses
-  const today = new Date();
-  const futureDate = new Date(today);
-  futureDate.setMonth(today.getMonth() + monthsToAdd);
+  // Se for string, tentar converter como data primeiro
+  const stringValue = String(validThroughValue).trim();
+  if (!stringValue) return null;
   
-  console.log(`validThrough: ${monthsToAdd} meses a partir de hoje = ${futureDate.toISOString().split('T')[0]}`);
+  // Tentar parse como data (formato ISO ou DD/MM/YYYY)
+  const dateValue = new Date(stringValue);
+  if (!isNaN(dateValue.getTime())) {
+    console.log(`validThrough: data direta da planilha = ${dateValue.toISOString().split('T')[0]}`);
+    return dateValue;
+  }
   
-  return futureDate;
+  // Se não for data, tentar converter como número de meses
+  const monthsToAdd = Number(stringValue);
+  if (!isNaN(monthsToAdd) && monthsToAdd > 0) {
+    const today = new Date();
+    const futureDate = new Date(today);
+    futureDate.setMonth(today.getMonth() + monthsToAdd);
+    
+    console.log(`validThrough: ${stringValue} meses a partir de hoje = ${futureDate.toISOString().split('T')[0]}`);
+    return futureDate;
+  }
+  
+  console.log(`Valor inválido para validThrough: ${validThroughValue}, usando null`);
+  return null;
 }
 
 async function resolveStateAndCityFromNames(stateName: string, cityName: string) {

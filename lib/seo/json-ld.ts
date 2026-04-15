@@ -587,7 +587,8 @@ export function buildJobPostingJsonLd(job: {
     description,
     datePosted: job.publishedAt,
     dateModified: job.updatedAt ?? job.publishedAt,
-    validThrough: job.validThrough ?? job.expiresAt ?? undefined,
+    validThrough: (job.validThrough && new Date(job.validThrough).getTime() > 0) ? job.validThrough : 
+                          (job.expiresAt && new Date(job.expiresAt).getTime() > 0) ? job.expiresAt : undefined,
     employmentType: job.employmentType,
     hiringOrganization: {
       "@type": "Organization",
@@ -618,14 +619,15 @@ export function buildJobPostingJsonLd(job: {
           }
         : undefined,
     baseSalary:
-      job.salaryMin || job.salaryMax
+      (typeof job.salaryMin === 'number' && job.salaryMin > 0) || 
+      (typeof job.salaryMax === 'number' && job.salaryMax > 0)
         ? {
             "@type": "MonetaryAmount",
             currency: "BRL",
             value: {
               "@type": "QuantitativeValue",
-              minValue: job.salaryMin ?? undefined,
-              maxValue: job.salaryMax ?? undefined,
+              minValue: (typeof job.salaryMin === 'number' && job.salaryMin > 0) ? job.salaryMin : undefined,
+              maxValue: (typeof job.salaryMax === 'number' && job.salaryMax > 0) ? job.salaryMax : undefined,
               unitText: "MONTH"
             }
           }
