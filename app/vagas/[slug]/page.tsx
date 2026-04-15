@@ -125,15 +125,18 @@ export default async function JobDetailPage({ params }: { params: Promise<{ slug
                   Salário: Não informado
                 </span>
               )}
-              {(job.expiresAt || job.validThrough) ? (
-                <span className="rounded-full border border-[color:rgba(26,43,76,0.1)] bg-white px-4 py-2 text-sm font-medium text-[var(--brand-text-secondary)]">
-                  Validade: {formatDate(job.validThrough || job.expiresAt)!}
-                </span>
-              ) : (
-                <span className="rounded-full border border-[color:rgba(26,43,76,0.1)] bg-white px-4 py-2 text-sm font-medium text-[var(--brand-text-secondary)]">
-                  Validade: Não informada
-                </span>
-              )}
+              {(() => {
+                const validityDate = job.validThrough ?? job.expiresAt;
+                return validityDate ? (
+                  <span className="rounded-full border border-[color:rgba(26,43,76,0.1)] bg-white px-4 py-2 text-sm font-medium text-[var(--brand-text-secondary)]">
+                    Validade: {formatDate(validityDate)}
+                  </span>
+                ) : (
+                  <span className="rounded-full border border-[color:rgba(26,43,76,0.1)] bg-white px-4 py-2 text-sm font-medium text-[var(--brand-text-secondary)]">
+                    Validade: Não informada
+                  </span>
+                );
+              })()}
             </div>
           </div>
           {job.heroImageUrl ? (
