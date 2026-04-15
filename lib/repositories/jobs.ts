@@ -7,7 +7,8 @@ import { slugify } from "@/lib/utils";
 const jobInclude = {
   city: true,
   state: true,
-  company: true
+  company: true,
+  validThrough: true
 } satisfies Prisma.JobInclude;
 
 export async function getFeaturedJobs() {

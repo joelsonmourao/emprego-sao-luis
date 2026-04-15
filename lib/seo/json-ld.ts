@@ -567,6 +567,7 @@ export function buildJobPostingJsonLd(job: {
   publishedAt: string;
   updatedAt?: string;
   expiresAt: string | null;
+  validThrough?: string | null;
   applyUrl: string;
   locationType: "ONSITE" | "REMOTE" | "HYBRID";
   employmentType: string;
@@ -586,7 +587,7 @@ export function buildJobPostingJsonLd(job: {
     description,
     datePosted: job.publishedAt,
     dateModified: job.updatedAt ?? job.publishedAt,
-    validThrough: job.expiresAt ?? undefined,
+    validThrough: job.validThrough ?? job.expiresAt ?? undefined,
     employmentType: job.employmentType,
     hiringOrganization: {
       "@type": "Organization",
@@ -659,6 +660,7 @@ export async function buildJobPostingJsonLdAsync(job: {
   publishedAt: string;
   updatedAt?: string;
   expiresAt: string | null;
+  validThrough?: string | null;
   applyUrl: string;
   locationType: "ONSITE" | "REMOTE" | "HYBRID";
   employmentType: string;
@@ -681,7 +683,7 @@ export async function buildJobPostingJsonLdAsync(job: {
     description,
     datePosted: job.publishedAt,
     dateModified: job.updatedAt ?? job.publishedAt,
-    validThrough: job.expiresAt ?? undefined,
+    validThrough: job.validThrough ?? job.expiresAt ?? undefined,
     employmentType: job.employmentType,
     hiringOrganization: {
       "@type": "Organization",
