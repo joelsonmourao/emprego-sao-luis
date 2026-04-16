@@ -33,6 +33,20 @@ function processValidThrough(validThroughValue: string | undefined | null): Date
   return null;
 }
 
+// Função para processar validThroughMonths (número de meses do selector)
+function processValidThroughMonths(validThroughMonths: number | null | undefined): Date | null {
+  if (!validThroughMonths || validThroughMonths < 1 || validThroughMonths > 24) {
+    return null;
+  }
+  
+  const today = new Date();
+  const futureDate = new Date(today);
+  futureDate.setMonth(today.getMonth() + validThroughMonths);
+  
+  console.log(`validThroughMonths: ${validThroughMonths} meses a partir de hoje = ${futureDate.toISOString().split('T')[0]}`);
+  return futureDate;
+}
+
 export async function getStateAndCityBySlug(stateSlug: string, citySlug: string) {
   const state = await prisma.state.findUnique({
     where: { slug: stateSlug },
@@ -177,7 +191,7 @@ export async function upsertJobFromForm(input: unknown, existingId?: string) {
     employmentType: parsed.employmentType as EmploymentType,
     workHours: parsed.workHours?.trim() || null,
     expiresAt: parseOptionalDate(parsed.expiresAt),
-    validThrough: processValidThrough(parsed.validThrough),
+    validThrough: processValidThroughMonths(parsed.validThroughMonths) ?? processValidThrough(parsed.validThrough),
     applyUrl: parsed.applyUrl,
     isActive: parsed.isActive,
     locationType: parsed.locationType as LocationType,

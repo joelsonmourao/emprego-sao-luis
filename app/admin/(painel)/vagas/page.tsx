@@ -66,9 +66,14 @@ export default async function AdminJobsPage({ searchParams }: AdminJobsPageProps
     <div className="grid gap-6">
       <div className="flex items-center justify-between gap-4">
         <p className="text-sm text-slate-600">Gerencie o ciclo de vida das vagas, do cadastro manual ate a ativacao.</p>
-        <Button asChild>
-          <Link href="/admin/vagas/nova">Nova vaga</Link>
-        </Button>
+        <div className="flex gap-3">
+          <Button asChild variant="outline">
+            <a href="/api/admin/jobs/export">Exportar CSV</a>
+          </Button>
+          <Button asChild>
+            <Link href="/admin/vagas/nova">Nova vaga</Link>
+          </Button>
+        </div>
       </div>
 
       <form className="flex flex-wrap gap-3 rounded-[2rem] border border-slate-200 bg-white/90 p-4">
