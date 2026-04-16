@@ -289,10 +289,19 @@ export function JobAdminForm({
             <Field label="Expira em">
               <Input type="date" {...register("expiresAt")} />
             </Field>
+            <Field label="Validade (opcional)" hint="Data limite ou número de meses a partir de hoje">
+              <Input 
+                type="text" 
+                {...register("validThrough")} 
+                placeholder="2026-06-15 ou 3 (meses)"
+              />
+            </Field>
             <label className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-medium text-slate-700">
               <input type="checkbox" className="h-4 w-4" {...register("featured")} />
               Destacar na home
             </label>
+          </div>
+          <div className="grid gap-6 lg:grid-cols-2">
             <label className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-medium text-slate-700">
               <input type="checkbox" className="h-4 w-4" {...register("isActive")} />
               Vaga ativa

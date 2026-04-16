@@ -16,7 +16,7 @@ export const importedJobRowSchema = z.object({
   workHours: z.string().optional().default(""),
   publishedAt: z.string().optional().default(""),
   expiresAt: z.string().optional().default(""),
-  validThrough: z.union([z.string(), z.number()]).optional().default(""),
+  validThrough: z.string().optional().default(""),
   applyUrl: z.string().url("URL de candidatura invalida."),
   isActive: z.boolean().default(true),
   sourceName: z.string().optional().default(""),

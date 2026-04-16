@@ -29,26 +29,39 @@ function calculateValidThrough(validThroughValue: string | number | null | undef
     return futureDate;
   }
   
-  // Se for string, tentar converter como data primeiro
-  const stringValue = String(validThroughValue).trim();
+  // Se for string, limpar e processar
+  let stringValue = String(validThroughValue);
+  
+  // Limpar o valor: remover apóstrofos, aspas e espaços extras
+  stringValue = stringValue
+    .replace(/^['"]+|['"]+$/g, '') // Remover apóstrofos e aspas do início e fim
+    .trim(); // Remover espaços extras
+  
   if (!stringValue) return null;
   
-  // Tentar parse como data (formato ISO ou DD/MM/YYYY)
-  const dateValue = new Date(stringValue);
-  if (!isNaN(dateValue.getTime())) {
-    console.log(`validThrough: data direta da planilha = ${dateValue.toISOString().split('T')[0]}`);
-    return dateValue;
-  }
+  console.log(`validThrough: valor limpo da planilha = "${stringValue}"`);
   
-  // Se não for data, tentar converter como número de meses
+  // Tentar converter como número de meses PRIMEIRO (para valores como "3", "6", etc.)
   const monthsToAdd = Number(stringValue);
-  if (!isNaN(monthsToAdd) && monthsToAdd > 0) {
+  if (!isNaN(monthsToAdd) && monthsToAdd > 0 && monthsToAdd < 1000) {
+    // Se for um número pequeno (menos de 1000), tratar como meses
     const today = new Date();
     const futureDate = new Date(today);
     futureDate.setMonth(today.getMonth() + monthsToAdd);
     
     console.log(`validThrough: ${stringValue} meses a partir de hoje = ${futureDate.toISOString().split('T')[0]}`);
     return futureDate;
+  }
+  
+  // Se não for meses, tentar parse como data (formato ISO ou DD/MM/YYYY)
+  const dateValue = new Date(stringValue);
+  if (!isNaN(dateValue.getTime())) {
+    // Verificar se a data é razoável (não uma data inválida como 2001-03-01)
+    const year = dateValue.getFullYear();
+    if (year >= 2020 && year <= 2100) {
+      console.log(`validThrough: data direta da planilha = ${dateValue.toISOString().split('T')[0]}`);
+      return dateValue;
+    }
   }
   
   console.log(`Valor inválido para validThrough: ${validThroughValue}, usando null`);

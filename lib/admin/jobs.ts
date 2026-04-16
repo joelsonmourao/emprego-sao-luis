@@ -4,6 +4,35 @@ import { prisma } from "@/lib/db";
 import { jobFormSchema, type JobFormValues } from "@/lib/schemas/job-form";
 import { normalizeLines, normalizeSlug, parseOptionalDate, plainTextToHtml, sanitizeHtml } from "@/lib/admin/content";
 
+// Função para processar validThrough (data ou meses)
+function processValidThrough(validThroughValue: string | undefined | null): Date | null {
+  if (!validThroughValue || validThroughValue.trim() === "") {
+    return null;
+  }
+  
+  const trimmed = validThroughValue.trim();
+  
+  // Tentar parse como data (formato ISO ou DD/MM/YYYY)
+  const dateValue = new Date(trimmed);
+  if (!isNaN(dateValue.getTime())) {
+    console.log(`validThrough: data direta = ${dateValue.toISOString().split('T')[0]}`);
+    return dateValue;
+  }
+  
+  // Tentar parse como número de meses
+  const monthsToAdd = Number(trimmed);
+  if (!isNaN(monthsToAdd) && monthsToAdd > 0) {
+    const today = new Date();
+    const futureDate = new Date(today);
+    futureDate.setMonth(today.getMonth() + monthsToAdd);
+    console.log(`validThrough: ${monthsToAdd} meses a partir de hoje = ${futureDate.toISOString().split('T')[0]}`);
+    return futureDate;
+  }
+  
+  console.log(`validThrough: valor inválido "${validThroughValue}", usando null`);
+  return null;
+}
+
 export async function getStateAndCityBySlug(stateSlug: string, citySlug: string) {
   const state = await prisma.state.findUnique({
     where: { slug: stateSlug },
@@ -148,6 +177,7 @@ export async function upsertJobFromForm(input: unknown, existingId?: string) {
     employmentType: parsed.employmentType as EmploymentType,
     workHours: parsed.workHours?.trim() || null,
     expiresAt: parseOptionalDate(parsed.expiresAt),
+    validThrough: processValidThrough(parsed.validThrough),
     applyUrl: parsed.applyUrl,
     isActive: parsed.isActive,
     locationType: parsed.locationType as LocationType,
