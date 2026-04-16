@@ -60,11 +60,11 @@ export function AdminHubProfileForm({
 
     const result = (await response.json()) as { ok: boolean; error?: string };
     if (!response.ok || !result.ok) {
-      setServerMessage(result.error ?? "Nao foi possivel salvar o hub.");
+      setServerMessage(result.error ?? "Nao foi possivel salvar o perfil SEO.");
       return;
     }
 
-    setServerMessage("Hub salvo com sucesso.");
+    setServerMessage("Perfil SEO salvo com sucesso.");
     router.refresh();
   }
 
@@ -73,22 +73,26 @@ export function AdminHubProfileForm({
       <Card className="rounded-[2rem] border-slate-200 bg-white/95">
         <CardHeader>
           <CardTitle>{label}</CardTitle>
+          <p className="text-sm text-slate-600">
+            O nome da cidade, estado ou empresa continua vindo do cadastro principal. Este perfil so complementa SEO,
+            introducao, canonical e conteudo editorial da pagina.
+          </p>
         </CardHeader>
         <CardContent className="grid gap-6">
           <div className="grid gap-6 lg:grid-cols-2">
-            <Field label="Titulo visivel do hub">
-              <Input {...register("title")} />
+            <Field label="Titulo complementar da pagina">
+              <Input {...register("title")} placeholder="Opcional. Se ficar vazio, o portal usa o titulo automatico." />
             </Field>
             <Field label="SEO title">
-              <Input {...register("seoTitle")} />
+              <Input {...register("seoTitle")} placeholder="Opcional. Se ficar vazio, o portal gera automaticamente." />
             </Field>
           </div>
           <div className="grid gap-6 lg:grid-cols-2">
-            <Field label="Introducao curta">
+            <Field label="Introducao complementar">
               <Textarea {...register("intro")} className="min-h-24" />
             </Field>
             <Field label="SEO description">
-              <Textarea {...register("seoDescription")} className="min-h-24" />
+              <Textarea {...register("seoDescription")} className="min-h-24" placeholder="Opcional. Se ficar vazio, o portal gera automaticamente." />
             </Field>
           </div>
           <div className="grid gap-6 lg:grid-cols-2">
@@ -114,7 +118,12 @@ export function AdminHubProfileForm({
               control={control}
               name="contentHtml"
               render={({ field }) => (
-                <RichTextEditor value={field.value ?? ""} onChange={field.onChange} placeholder="Adicione um texto util para essa pagina." minHeight={260} />
+                <RichTextEditor
+                  value={field.value ?? ""}
+                  onChange={field.onChange}
+                  placeholder="Adicione um texto complementar para aprofundar a pagina sem trocar o nome do item principal."
+                  minHeight={260}
+                />
               )}
             />
           </Field>
@@ -127,7 +136,7 @@ export function AdminHubProfileForm({
 
           <div className="flex gap-3">
             <Button type="submit" size="lg" disabled={isSubmitting}>
-              {isSubmitting ? "Salvando..." : "Salvar hub"}
+              {isSubmitting ? "Salvando..." : "Salvar perfil SEO"}
             </Button>
           </div>
         </CardContent>

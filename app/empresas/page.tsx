@@ -4,30 +4,36 @@ import { Building2 } from "lucide-react";
 import { Breadcrumbs } from "@/components/breadcrumbs";
 import { JsonLd } from "@/components/json-ld";
 import { SectionHeading } from "@/components/section-heading";
+import { buildCollectionPageJsonLd, buildCompaniesIndexSeo } from "@/lib/hub-seo";
 import { buildSiteMetadata } from "@/lib/seo/metadata";
 import { buildBreadcrumbJsonLd } from "@/lib/seo/json-ld";
 import { getCompanyHubs } from "@/lib/repositories/jobs";
 
 export async function generateMetadata() {
+  const companies = await getCompanyHubs();
+  const seo = buildCompaniesIndexSeo({ total: companies.length, pathname: "/empresas" });
+
   return buildSiteMetadata({
-    title: "Empresas que contratam jovem aprendiz",
-    description: "Veja empresas que costumam abrir vagas de Jovem Aprendiz.",
+    title: seo.title,
+    description: seo.description,
     pathname: "/empresas"
   });
 }
 
 export default async function CompaniesPage() {
   const companies = await getCompanyHubs();
+  const seo = buildCompaniesIndexSeo({ total: companies.length, pathname: "/empresas" });
 
   return (
     <section className="mx-auto max-w-7xl space-y-8 px-4 py-14 sm:px-6 lg:px-8">
       <JsonLd data={buildBreadcrumbJsonLd([{ name: "Home", path: "/" }, { name: "Empresas", path: "/empresas" }])} />
+      <JsonLd data={buildCollectionPageJsonLd({ name: seo.h1, description: seo.description, path: "/empresas" })} />
       <Breadcrumbs items={[{ label: "Home", href: "/" }, { label: "Empresas" }]} />
       <div className="brand-page-hero rounded-[2.2rem] border border-slate-200 px-6 py-8 shadow-[0_35px_120px_-70px_rgba(26,43,76,0.22)] sm:px-8">
         <SectionHeading
           eyebrow="Empresas"
-          title="Empresas que costumam abrir vagas para jovens"
-          description="Use esta lista para descobrir empresas e ver as vagas ligadas a cada uma delas."
+          title={seo.h1}
+          description={seo.intro}
         />
       </div>
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">

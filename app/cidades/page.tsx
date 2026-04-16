@@ -4,30 +4,36 @@ import { MapPinned } from "lucide-react";
 import { Breadcrumbs } from "@/components/breadcrumbs";
 import { JsonLd } from "@/components/json-ld";
 import { SectionHeading } from "@/components/section-heading";
+import { buildCitiesIndexSeo, buildCollectionPageJsonLd } from "@/lib/hub-seo";
 import { buildSiteMetadata } from "@/lib/seo/metadata";
 import { buildBreadcrumbJsonLd } from "@/lib/seo/json-ld";
 import { getCities } from "@/lib/repositories/geo";
 
 export async function generateMetadata() {
+  const cities = await getCities();
+  const seo = buildCitiesIndexSeo({ total: cities.length, pathname: "/cidades" });
+
   return buildSiteMetadata({
-    title: "Cidades com vagas de Jovem Aprendiz",
-    description: "Escolha a cidade para ver vagas de Jovem Aprendiz mais perto de voce.",
+    title: seo.title,
+    description: seo.description,
     pathname: "/cidades"
   });
 }
 
 export default async function CitiesPage() {
   const cities = await getCities();
+  const seo = buildCitiesIndexSeo({ total: cities.length, pathname: "/cidades" });
 
   return (
     <section className="mx-auto max-w-7xl space-y-8 px-4 py-14 sm:px-6 lg:px-8">
       <JsonLd data={buildBreadcrumbJsonLd([{ name: "Home", path: "/" }, { name: "Cidades", path: "/cidades" }])} />
+      <JsonLd data={buildCollectionPageJsonLd({ name: seo.h1, description: seo.description, path: "/cidades" })} />
       <Breadcrumbs items={[{ label: "Home", href: "/" }, { label: "Cidades" }]} />
       <div className="brand-page-hero rounded-[2.2rem] border border-slate-200 px-6 py-8 shadow-[0_35px_120px_-70px_rgba(26,43,76,0.22)] sm:px-8">
         <SectionHeading
           eyebrow="Cidades"
-          title="Cidades com vagas abertas"
-          description="Escolha a cidade para ver as vagas que estao mais perto de voce."
+          title={seo.h1}
+          description={seo.intro}
         />
       </div>
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">

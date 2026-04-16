@@ -7,6 +7,7 @@ import { Breadcrumbs } from "@/components/breadcrumbs";
 import { FaqList } from "@/components/faq-list";
 import { JsonLd } from "@/components/json-ld";
 import { SectionHeading } from "@/components/section-heading";
+import { buildCollectionPageJsonLd, buildStateDirectorySeo } from "@/lib/hub-seo";
 import { sanitizeRichTextHtml } from "@/lib/rich-text";
 import { buildSiteMetadata } from "@/lib/seo/metadata";
 import { buildBreadcrumbJsonLd, buildFaqJsonLd } from "@/lib/seo/json-ld";
@@ -31,12 +32,23 @@ export async function generateMetadata({ params }: { params: Promise<{ state: st
     });
   }
 
+  const seo = buildStateDirectorySeo({
+    stateName: result.name,
+    stateCode: result.code,
+    totalJobs: result._count.jobs,
+    cityCount: result.cities.length,
+    pathname: `/estados/${result.slug}`,
+    seoTitle: profile?.seoTitle || result.seoTitle,
+    seoDescription: profile?.seoDescription || result.seoIntro,
+    canonicalUrl: profile?.canonicalUrl
+  });
+
   return buildSiteMetadata({
-    title: profile?.seoTitle || result.seoTitle || `Cidades com vagas de Jovem Aprendiz em ${result.name}`,
-    description: profile?.seoDescription || result.seoIntro || `Explore cidades com vagas de Jovem Aprendiz em ${result.name}.`,
+    title: seo.title,
+    description: seo.description,
     pathname: `/estados/${result.slug}`,
     noIndex: profile?.noIndex || false,
-    canonicalUrl: profile?.canonicalUrl || undefined,
+    canonicalUrl: seo.canonicalUrl || undefined,
     socialImageUrl: profile?.socialImageUrl || undefined
   });
 }
@@ -63,18 +75,29 @@ export default async function StateDetailPage({ params }: { params: Promise<{ st
   const faq = renderFaqTemplate(siteContent.hubContent.state.faq, templateValues);
   const faqTitle = renderTemplate(siteContent.hubContent.state.faqTitle, templateValues);
   const faqDescription = renderTemplate(siteContent.hubContent.state.faqDescription, templateValues);
+  const seo = buildStateDirectorySeo({
+    stateName: result.name,
+    stateCode: result.code,
+    totalJobs: result._count.jobs,
+    cityCount: result.cities.length,
+    pathname: `/estados/${result.slug}`,
+    seoTitle: profile?.seoTitle || result.seoTitle,
+    seoDescription: profile?.seoDescription || result.seoIntro,
+    canonicalUrl: profile?.canonicalUrl
+  });
 
   return (
     <section className="mx-auto max-w-7xl space-y-10 px-4 py-14 sm:px-6 lg:px-8">
       <JsonLd data={buildBreadcrumbJsonLd([{ name: "Home", path: "/" }, { name: "Estados", path: "/estados" }, { name: result.name, path: `/estados/${result.slug}` }])} />
       <JsonLd data={buildFaqJsonLd(faq)} />
+      <JsonLd data={buildCollectionPageJsonLd({ name: seo.h1, description: seo.description, path: `/estados/${result.slug}` })} />
       <Breadcrumbs items={[{ label: "Home", href: "/" }, { label: "Estados", href: "/estados" }, { label: result.name }]} />
 
       <div className="brand-panel rounded-[2.2rem] border border-slate-200 px-6 py-8 shadow-[0_35px_120px_-70px_rgba(26,43,76,0.22)] sm:px-8">
         <SectionHeading
           eyebrow={result.code}
-          title={profile?.title || `Cidades com vagas de Jovem Aprendiz em ${result.name}`}
-          description={profile?.intro || result.seoIntro || renderTemplate(siteContent.hubContent.state.introTemplate, templateValues)}
+          title={seo.h1}
+          description={profile?.intro || seo.intro || renderTemplate(siteContent.hubContent.state.introTemplate, templateValues)}
         />
       </div>
 

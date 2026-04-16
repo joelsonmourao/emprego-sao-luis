@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { HubType } from "@prisma/client";
 
 import { prisma } from "@/lib/db";
 import { getCompanyHubs } from "@/lib/repositories/jobs";
@@ -12,6 +11,12 @@ type HubCard = {
   label: string;
   subtitle: string;
 };
+
+const typeLabels = {
+  state: "Perfil SEO do estado",
+  city: "Perfil SEO da cidade",
+  company: "Perfil SEO da empresa"
+} as const;
 
 export default async function AdminHubsPage({
   searchParams
@@ -34,7 +39,7 @@ export default async function AdminHubsPage({
       type: "state" as const,
       slug: item.slug,
       label: item.name,
-      subtitle: `Estado • ${profileSet.has(`STATE:${item.slug}`) ? "Personalizado" : "Padrao"}`
+      subtitle: `${typeLabels.state} - ${profileSet.has(`STATE:${item.slug}`) ? "Personalizado" : "Automatico"}`
     })),
     ...cities.map((item) => {
       const slugKey = `${item.state.slug}__${item.slug}`;
@@ -42,14 +47,14 @@ export default async function AdminHubsPage({
         type: "city" as const,
         slug: slugKey,
         label: `${item.name}, ${item.state.code}`,
-        subtitle: `Cidade • ${profileSet.has(`CITY:${slugKey}`) ? "Personalizado" : "Padrao"}`
+        subtitle: `${typeLabels.city} - ${profileSet.has(`CITY:${slugKey}`) ? "Personalizado" : "Automatico"}`
       };
     }),
     ...companies.map((item) => ({
       type: "company" as const,
       slug: item.slug,
       label: item.name,
-      subtitle: `Empresa • ${profileSet.has(`COMPANY:${item.slug}`) ? "Personalizado" : "Padrao"}`
+      subtitle: `${typeLabels.company} - ${profileSet.has(`COMPANY:${item.slug}`) ? "Personalizado" : "Automatico"}`
     }))
   ].filter((item) => !q || `${item.label} ${item.subtitle}`.toLowerCase().includes(q));
 
@@ -57,7 +62,7 @@ export default async function AdminHubsPage({
     <div className="grid gap-6">
       <Card className="rounded-[2rem] border-slate-200 bg-white/95">
         <CardHeader>
-          <CardTitle>Hubs publicos</CardTitle>
+          <CardTitle>Perfis de SEO por estado, cidade e empresa</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <form className="flex flex-wrap gap-3">

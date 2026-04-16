@@ -9,7 +9,7 @@ import { JobCard } from "@/components/job-card";
 import { JsonLd } from "@/components/json-ld";
 import { PaginationNav } from "@/components/pagination-nav";
 import { SectionHeading } from "@/components/section-heading";
-import { buildJobsListingDescription, buildJobsListingHeading, buildJobsListingIntro, buildJobsListingMetaTitle } from "@/lib/listing";
+import { buildCollectionPageJsonLd, buildStateJobsSeo } from "@/lib/hub-seo";
 import { sanitizeRichTextHtml } from "@/lib/rich-text";
 import { buildSiteMetadata } from "@/lib/seo/metadata";
 import { buildBreadcrumbJsonLd, buildFaqJsonLd } from "@/lib/seo/json-ld";
@@ -47,13 +47,22 @@ export async function generateMetadata({
   }
 
   const jobs = await getJobsList({ stateSlug: state, order: parsed.order, page: parsed.page });
+  const seo = buildStateJobsSeo({
+    stateName: result.name,
+    stateCode: result.code,
+    totalJobs: jobs.total,
+    pathname: `/vagas/estado/${result.slug}`,
+    seoTitle: profile?.seoTitle,
+    seoDescription: profile?.seoDescription,
+    canonicalUrl: profile?.canonicalUrl
+  });
 
   return buildSiteMetadata({
-    title: profile?.seoTitle || buildJobsListingMetaTitle({ total: jobs.total, stateName: result.name }),
-    description: profile?.seoDescription || buildJobsListingDescription({ total: jobs.total, stateName: result.name }),
+    title: seo.title,
+    description: seo.description,
     pathname: `/vagas/estado/${result.slug}`,
     noIndex: profile?.noIndex || parsed.page > 1,
-    canonicalUrl: profile?.canonicalUrl || undefined,
+    canonicalUrl: seo.canonicalUrl || undefined,
     socialImageUrl: profile?.socialImageUrl || undefined
   });
 }
@@ -92,11 +101,16 @@ export default async function JobsByStatePage({
   const faq = renderFaqTemplate(siteContent.hubContent.state.faq, templateValues);
   const faqTitle = renderTemplate(siteContent.hubContent.state.faqTitle, templateValues);
   const faqDescription = renderTemplate(siteContent.hubContent.state.faqDescription, templateValues);
-  const heading = profile?.title || buildJobsListingHeading({ total: jobs.total, stateName: stateData.name });
-  const intro =
-    profile?.intro ||
-    renderTemplate(siteContent.hubContent.state.introTemplate, templateValues) ||
-    buildJobsListingIntro({ total: jobs.total, stateName: stateData.name });
+  const seo = buildStateJobsSeo({
+    stateName: stateData.name,
+    stateCode: stateData.code,
+    totalJobs: jobs.total,
+    pathname: `/vagas/estado/${stateData.slug}`,
+    seoTitle: profile?.seoTitle,
+    seoDescription: profile?.seoDescription,
+    canonicalUrl: profile?.canonicalUrl
+  });
+  const intro = profile?.intro || seo.intro || renderTemplate(siteContent.hubContent.state.introTemplate, templateValues);
 
   const buildPageHref = (pageNumber: number) => {
     const params = new URLSearchParams();
@@ -112,12 +126,13 @@ export default async function JobsByStatePage({
     <section className="mx-auto max-w-7xl space-y-10 px-4 py-14 sm:px-6 lg:px-8">
       <JsonLd data={buildBreadcrumbJsonLd([{ name: "Home", path: "/" }, { name: "Vagas", path: "/vagas" }, { name: stateData.name, path: `/vagas/estado/${stateData.slug}` }])} />
       <JsonLd data={buildFaqJsonLd(faq)} />
+      <JsonLd data={buildCollectionPageJsonLd({ name: seo.h1, description: seo.description, path: `/vagas/estado/${stateData.slug}` })} />
       <Breadcrumbs items={[{ label: "Home", href: "/" }, { label: "Vagas", href: "/vagas" }, { label: stateData.name }]} />
 
       <div className="brand-panel rounded-[2.2rem] border border-slate-200 px-6 py-8 shadow-[0_35px_120px_-70px_rgba(26,43,76,0.22)] sm:px-8">
         <div className="space-y-4">
           <p className="text-xs font-semibold uppercase tracking-[0.28em] text-[var(--brand-orange)]">Vagas por estado</p>
-          <h1 className="text-3xl font-black tracking-tight text-[var(--brand-navy)] sm:text-5xl">{heading}</h1>
+          <h1 className="text-3xl font-black tracking-tight text-[var(--brand-navy)] sm:text-5xl">{seo.h1}</h1>
           <p className="max-w-4xl text-base leading-8 text-[var(--brand-text-secondary)] sm:text-lg">{intro}</p>
           <div className="flex flex-wrap items-center gap-3 text-sm">
             <span className="font-semibold text-[var(--brand-text-secondary)]">Ordenar por:</span>

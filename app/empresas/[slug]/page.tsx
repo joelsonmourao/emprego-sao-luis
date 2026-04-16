@@ -9,7 +9,7 @@ import { JobCard } from "@/components/job-card";
 import { JsonLd } from "@/components/json-ld";
 import { PaginationNav } from "@/components/pagination-nav";
 import { SectionHeading } from "@/components/section-heading";
-import { buildJobsListingDescription, buildJobsListingHeading, buildJobsListingIntro, buildJobsListingMetaTitle } from "@/lib/listing";
+import { buildCollectionPageJsonLd, buildCompanyJobsSeo } from "@/lib/hub-seo";
 import { sanitizeRichTextHtml } from "@/lib/rich-text";
 import { buildSiteMetadata } from "@/lib/seo/metadata";
 import { buildBreadcrumbJsonLd, buildFaqJsonLd } from "@/lib/seo/json-ld";
@@ -46,13 +46,23 @@ export async function generateMetadata({
   }
 
   const jobs = await getJobsList({ page: parsed.page, companySlug: company.slug, order: parsed.order });
+  const seo = buildCompanyJobsSeo({
+    companyName: company.name,
+    cityName: company.city.name,
+    stateCode: company.state.code,
+    totalJobs: jobs.total,
+    pathname: `/empresas/${company.slug}`,
+    seoTitle: profile?.seoTitle,
+    seoDescription: profile?.seoDescription,
+    canonicalUrl: profile?.canonicalUrl
+  });
 
   return buildSiteMetadata({
-    title: profile?.seoTitle || buildJobsListingMetaTitle({ total: jobs.total, companyName: company.name }),
-    description: profile?.seoDescription || buildJobsListingDescription({ total: jobs.total, companyName: company.name }),
+    title: seo.title,
+    description: seo.description,
     pathname: `/empresas/${company.slug}`,
     noIndex: profile?.noIndex || parsed.page > 1,
-    canonicalUrl: profile?.canonicalUrl || undefined,
+    canonicalUrl: seo.canonicalUrl || undefined,
     socialImageUrl: profile?.socialImageUrl || undefined
   });
 }
@@ -94,12 +104,17 @@ export default async function CompanyDetailPage({
   const faqTitle = renderTemplate(siteContent.hubContent.company.faqTitle, templateValues);
   const faqDescription = renderTemplate(siteContent.hubContent.company.faqDescription, templateValues);
   const relatedCompanies = allCompanies.filter((item) => item.slug !== company.slug).slice(0, 6);
-  const heading = buildJobsListingHeading({ total: companyJobs.total, companyName: company.name });
-  const intro =
-    profile?.intro ||
-    renderTemplate(siteContent.hubContent.company.introTemplate, templateValues) ||
-    buildJobsListingIntro({ total: companyJobs.total, companyName: company.name });
-  const visibleTitle = profile?.title || heading;
+  const seo = buildCompanyJobsSeo({
+    companyName: company.name,
+    cityName: company.city.name,
+    stateCode: company.state.code,
+    totalJobs: companyJobs.total,
+    pathname: `/empresas/${company.slug}`,
+    seoTitle: profile?.seoTitle,
+    seoDescription: profile?.seoDescription,
+    canonicalUrl: profile?.canonicalUrl
+  });
+  const intro = profile?.intro || renderTemplate(siteContent.hubContent.company.introTemplate, templateValues) || seo.intro;
 
   const buildPageHref = (pageNumber: number) => {
     const params = new URLSearchParams();
@@ -115,6 +130,7 @@ export default async function CompanyDetailPage({
     <section className="mx-auto max-w-7xl space-y-10 px-4 py-14 sm:px-6 lg:px-8">
       <JsonLd data={buildBreadcrumbJsonLd([{ name: "Home", path: "/" }, { name: "Empresas", path: "/empresas" }, { name: company.name, path: `/empresas/${company.slug}` }])} />
       <JsonLd data={buildFaqJsonLd(faq)} />
+      <JsonLd data={buildCollectionPageJsonLd({ name: seo.h1, description: seo.description, path: `/empresas/${company.slug}` })} />
       <Breadcrumbs items={[{ label: "Home", href: "/" }, { label: "Empresas", href: "/empresas" }, { label: company.name }]} />
 
       <div className="brand-panel rounded-[2.2rem] border border-slate-200 px-6 py-8 shadow-[0_35px_120px_-70px_rgba(26,43,76,0.22)] sm:px-8">
@@ -126,7 +142,7 @@ export default async function CompanyDetailPage({
             </div>
           ) : null}
             <p className="text-xs font-semibold uppercase tracking-[0.28em] text-[var(--brand-orange)]">Vagas por empresa</p>
-          <h1 className="text-3xl font-black tracking-tight text-slate-950 sm:text-5xl">{visibleTitle}</h1>
+          <h1 className="text-3xl font-black tracking-tight text-slate-950 sm:text-5xl">{seo.h1}</h1>
           <p className="max-w-4xl text-base leading-8 text-slate-600 sm:text-lg">{intro}</p>
           <div className="flex flex-wrap gap-3 text-sm text-slate-600">
             <span className="rounded-full bg-white px-4 py-2 shadow-sm">

@@ -12,6 +12,12 @@ const typeMap = {
   company: "COMPANY"
 } as const;
 
+const typeLabels = {
+  state: "estado",
+  city: "cidade",
+  company: "empresa"
+} as const;
+
 async function getHubLabel(type: keyof typeof typeMap, slug: string) {
   if (type === "state") {
     const state = await prisma.state.findUnique({ where: { slug } });
@@ -50,7 +56,7 @@ export default async function AdminHubEditPage({
     <AdminHubProfileForm
       type={type}
       slug={slug}
-      label={`Editar ${label}`}
+      label={`Perfil SEO de ${typeLabels[type]}: ${label}`}
       initialValues={{
         title: profile?.title ?? "",
         intro: profile?.intro ?? "",
