@@ -1,10 +1,9 @@
 import { AuditAction } from "@prisma/client";
 import { NextResponse } from "next/server";
 
-import { upsertJobFromForm } from "@/lib/admin/jobs";
+import { deleteJob, upsertJobFromForm } from "@/lib/admin/jobs";
 import { writeAuditLog } from "@/lib/audit";
 import { requireApiRole } from "@/lib/authz";
-import { prisma } from "@/lib/db";
 
 type Context = {
   params: Promise<{ id: string }>;
@@ -41,10 +40,7 @@ export async function DELETE(_request: Request, context: Context) {
   try {
     const session = await requireApiRole("ADMIN");
     const { id } = await context.params;
-    const job = await prisma.job.findUnique({ where: { id }, select: { id: true, title: true, slug: true } });
-    await prisma.job.delete({
-      where: { id }
-    });
+    const job = await deleteJob(id);
 
     await writeAuditLog({
       actorId: session.sub,
@@ -54,9 +50,9 @@ export async function DELETE(_request: Request, context: Context) {
       action: AuditAction.DELETE,
       entityType: "job",
       entityId: id,
-      entityLabel: job?.title,
+      entityLabel: job.title,
       summary: "Vaga excluida",
-      before: job ?? { id }
+      before: job
     });
 
     return NextResponse.json({ ok: true });

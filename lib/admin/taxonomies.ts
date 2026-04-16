@@ -75,7 +75,7 @@ export async function deleteState(id: string) {
     where: { id },
     include: {
       _count: {
-        select: { cities: true, jobs: true }
+        select: { cities: true, jobs: true, companies: true }
       }
     }
   });
@@ -84,11 +84,13 @@ export async function deleteState(id: string) {
     throw new Error("Estado nao encontrado.");
   }
 
-  if (state._count.jobs > 0 || state._count.cities > 0) {
-    throw new Error("Remova primeiro as cidades e vagas ligadas a este estado antes de excluir.");
+  if (state._count.jobs > 0 || state._count.cities > 0 || state._count.companies > 0) {
+    throw new Error("Remova primeiro as cidades, empresas e vagas ligadas a este estado antes de excluir.");
   }
 
   await prisma.state.delete({ where: { id } });
+
+  return state;
 }
 
 export async function createCity(input: CityAdminInput) {
@@ -119,7 +121,7 @@ export async function deleteCity(id: string) {
     where: { id },
     include: {
       _count: {
-        select: { jobs: true }
+        select: { jobs: true, companies: true }
       }
     }
   });
@@ -128,11 +130,13 @@ export async function deleteCity(id: string) {
     throw new Error("Cidade nao encontrada.");
   }
 
-  if (city._count.jobs > 0) {
-    throw new Error("Existem vagas ligadas a esta cidade. Ajuste ou desative as vagas antes de excluir.");
+  if (city._count.jobs > 0 || city._count.companies > 0) {
+    throw new Error("Existem vagas ou empresas ligadas a esta cidade. Ajuste os vinculos antes de excluir.");
   }
 
   await prisma.city.delete({ where: { id } });
+
+  return city;
 }
 
 export async function createTaxonomyEntry(resource: TaxonomyResource, input: unknown) {
@@ -160,4 +164,28 @@ export async function deleteTaxonomyEntry(resource: TaxonomyResource, id: string
     case "cities":
       return deleteCity(id);
   }
+}
+
+export async function bulkDeleteTaxonomyEntries(resource: TaxonomyResource, ids: string[]) {
+  const uniqueIds = [...new Set(ids.filter(Boolean))];
+  const results: Array<{ id: string; name?: string | null; deleted: boolean; error?: string }> = [];
+
+  for (const id of uniqueIds) {
+    try {
+      const item = await deleteTaxonomyEntry(resource, id);
+      results.push({
+        id,
+        name: item.name,
+        deleted: true
+      });
+    } catch (error) {
+      results.push({
+        id,
+        deleted: false,
+        error: error instanceof Error ? error.message : "Nao foi possivel excluir."
+      });
+    }
+  }
+
+  return results;
 }

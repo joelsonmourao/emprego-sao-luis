@@ -99,4 +99,30 @@ export async function deleteCompany(companyId: string) {
   await prisma.company.delete({
     where: { id: companyId }
   });
+
+  return company;
+}
+
+export async function bulkDeleteCompanies(companyIds: string[]) {
+  const uniqueIds = [...new Set(companyIds.filter(Boolean))];
+  const results: Array<{ id: string; name?: string | null; deleted: boolean; error?: string }> = [];
+
+  for (const id of uniqueIds) {
+    try {
+      const company = await deleteCompany(id);
+      results.push({
+        id,
+        name: company.name,
+        deleted: true
+      });
+    } catch (error) {
+      results.push({
+        id,
+        deleted: false,
+        error: error instanceof Error ? error.message : "Nao foi possivel excluir a empresa."
+      });
+    }
+  }
+
+  return results;
 }

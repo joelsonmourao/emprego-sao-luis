@@ -229,3 +229,44 @@ export type AdminImportJobInput = JobFormValues & {
   sourceUrl?: string;
   externalId?: string;
 };
+
+export async function deleteJob(jobId: string) {
+  const job = await prisma.job.findUnique({
+    where: { id: jobId },
+    select: { id: true, title: true, slug: true }
+  });
+
+  if (!job) {
+    throw new Error("Vaga nao encontrada.");
+  }
+
+  await prisma.job.delete({
+    where: { id: jobId }
+  });
+
+  return job;
+}
+
+export async function bulkDeleteJobs(jobIds: string[]) {
+  const uniqueIds = [...new Set(jobIds.filter(Boolean))];
+  const results: Array<{ id: string; title?: string | null; deleted: boolean; error?: string }> = [];
+
+  for (const id of uniqueIds) {
+    try {
+      const job = await deleteJob(id);
+      results.push({
+        id,
+        title: job.title,
+        deleted: true
+      });
+    } catch (error) {
+      results.push({
+        id,
+        deleted: false,
+        error: error instanceof Error ? error.message : "Nao foi possivel excluir a vaga."
+      });
+    }
+  }
+
+  return results;
+}

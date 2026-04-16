@@ -44,6 +44,8 @@ export async function DELETE(
     const session = await requireApiRole("ADMIN");
     const { resource, id } = await context.params;
     const parsedResource = taxonomyResourceSchema.parse(resource);
+    const item = await deleteTaxonomyEntry(parsedResource, id);
+
     await writeAuditLog({
       actorId: session.sub,
       actorName: session.name,
@@ -52,9 +54,10 @@ export async function DELETE(
       action: AuditAction.DELETE,
       entityType: parsedResource,
       entityId: id,
-      summary: `${parsedResource === "states" ? "Estado" : "Cidade"} excluido`
+      entityLabel: item.name,
+      summary: `${parsedResource === "states" ? "Estado" : "Cidade"} excluido`,
+      before: item
     });
-    await deleteTaxonomyEntry(parsedResource, id);
 
     return NextResponse.json({ ok: true });
   } catch (error) {

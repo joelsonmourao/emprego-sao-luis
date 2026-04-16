@@ -50,6 +50,13 @@ type CityForm = {
   seoIntro: string;
 };
 
+type BulkDeleteResponse = {
+  ok: boolean;
+  error?: string;
+  deletedCount?: number;
+  errors?: Array<{ id: string; error: string }>;
+};
+
 const emptyStateForm: StateForm = { name: "", code: "", slug: "", seoTitle: "", seoIntro: "" };
 const emptyCityForm: CityForm = { name: "", slug: "", stateId: "", seoTitle: "", seoIntro: "" };
 
@@ -63,6 +70,8 @@ export function AdminStructureManager({
   const router = useRouter();
   const [stateQuery, setStateQuery] = useState("");
   const [cityQuery, setCityQuery] = useState("");
+  const [selectedStateIds, setSelectedStateIds] = useState<string[]>([]);
+  const [selectedCityIds, setSelectedCityIds] = useState<string[]>([]);
   const [editingStateId, setEditingStateId] = useState<string | null>(null);
   const [editingCityId, setEditingCityId] = useState<string | null>(null);
   const [newState, setNewState] = useState<StateForm>(emptyStateForm);
@@ -83,6 +92,25 @@ export function AdminStructureManager({
     if (!normalized) return initialCities;
     return initialCities.filter((item) => `${item.name} ${item.slug} ${item.stateName} ${item.stateCode}`.toLowerCase().includes(normalized));
   }, [initialCities, cityQuery]);
+
+  const allVisibleStatesSelected = visibleStates.length > 0 && visibleStates.every((item) => selectedStateIds.includes(item.id));
+  const allVisibleCitiesSelected = visibleCities.length > 0 && visibleCities.every((item) => selectedCityIds.includes(item.id));
+
+  function toggleStateSelection(stateId: string, checked: boolean) {
+    setSelectedStateIds((current) => (checked ? [...new Set([...current, stateId])] : current.filter((id) => id !== stateId)));
+  }
+
+  function toggleCitySelection(cityId: string, checked: boolean) {
+    setSelectedCityIds((current) => (checked ? [...new Set([...current, cityId])] : current.filter((id) => id !== cityId)));
+  }
+
+  function toggleAllStates(checked: boolean) {
+    setSelectedStateIds(checked ? visibleStates.map((item) => item.id) : []);
+  }
+
+  function toggleAllCities(checked: boolean) {
+    setSelectedCityIds(checked ? visibleCities.map((item) => item.id) : []);
+  }
 
   async function submit(resource: "states" | "cities", payload: unknown, id?: string) {
     setBusyKey(`${resource}:${id ?? "new"}`);
@@ -123,7 +151,56 @@ export function AdminStructureManager({
       return;
     }
 
+    if (resource === "states") {
+      setSelectedStateIds((current) => current.filter((itemId) => itemId !== id));
+    } else {
+      setSelectedCityIds((current) => current.filter((itemId) => itemId !== id));
+    }
+
     setMessage("Item removido com sucesso.");
+    router.refresh();
+  }
+
+  async function bulkRemove(resource: "states" | "cities") {
+    const selectedIds = resource === "states" ? selectedStateIds : selectedCityIds;
+    if (!selectedIds.length) return;
+
+    const label = resource === "states" ? "estado(s)" : "cidade(s)";
+    const confirmed = window.confirm(
+      `Deseja excluir ${selectedIds.length} ${label} selecionado(s)? A exclusao so sera feita quando nao houver vinculos que bloqueiem a operacao.`
+    );
+    if (!confirmed) return;
+
+    setBusyKey(`${resource}:bulk-delete`);
+    setMessage("");
+
+    const response = await fetch("/api/admin/bulk-delete", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ resource, ids: selectedIds })
+    });
+
+    const result = (await response.json()) as BulkDeleteResponse;
+    setBusyKey(null);
+
+    if (!response.ok || !result.ok) {
+      setMessage(result.error ?? "Nao foi possivel excluir os itens selecionados.");
+      return;
+    }
+
+    if (resource === "states") {
+      setSelectedStateIds([]);
+    } else {
+      setSelectedCityIds([]);
+    }
+
+    const deletedCount = result.deletedCount ?? 0;
+    const errorCount = result.errors?.length ?? 0;
+    setMessage(
+      errorCount
+        ? `${deletedCount} ${label} removido(s). ${errorCount} item(ns) nao puderam ser excluidos por causa de vinculos ativos.`
+        : `${deletedCount} ${label} removido(s) com sucesso.`
+    );
     router.refresh();
   }
 
@@ -164,6 +241,26 @@ export function AdminStructureManager({
 
           <Input value={stateQuery} onChange={(event) => setStateQuery(event.target.value)} placeholder="Buscar estado por nome, sigla ou slug" className="max-w-md" />
 
+          <div className="flex flex-wrap items-center justify-between gap-3 rounded-[1.25rem] border border-slate-200 bg-white px-4 py-3 text-sm text-slate-600">
+            <label className="inline-flex items-center gap-2">
+              <input
+                type="checkbox"
+                checked={allVisibleStatesSelected}
+                onChange={(event) => toggleAllStates(event.target.checked)}
+                aria-label="Selecionar todos os estados visiveis"
+                className="h-4 w-4 rounded border-slate-300 text-[var(--brand-orange)] focus:ring-[var(--brand-blue)]"
+              />
+              <span>Selecionar todos os estados visiveis</span>
+            </label>
+            <div className="flex flex-wrap items-center gap-3">
+              <span>{selectedStateIds.length} selecionado(s)</span>
+              <Button type="button" size="sm" variant="outline" disabled={!selectedStateIds.length || busyKey === "states:bulk-delete"} onClick={() => bulkRemove("states")}>
+                <Trash2 className="mr-2 h-4 w-4" />
+                Excluir selecionados
+              </Button>
+            </div>
+          </div>
+
           <div className="grid gap-4">
             {visibleStates.map((item) => {
               const form = draftStates[item.id] ?? emptyStateForm;
@@ -171,9 +268,18 @@ export function AdminStructureManager({
               return (
                 <div key={item.id} className="rounded-[1.5rem] border border-slate-200 bg-slate-50 p-5">
                   <div className="flex flex-wrap items-start justify-between gap-4">
-                    <div>
-                      <p className="text-lg font-black text-slate-950">{item.name} ({item.code})</p>
-                      <p className="mt-2 text-sm text-slate-600">Slug: {item.slug} • {item.cityCount} cidade(s) • {item.jobCount} vaga(s)</p>
+                    <div className="flex items-start gap-3">
+                      <input
+                        type="checkbox"
+                        checked={selectedStateIds.includes(item.id)}
+                        onChange={(event) => toggleStateSelection(item.id, event.target.checked)}
+                        aria-label={`Selecionar estado ${item.name}`}
+                        className="mt-1 h-4 w-4 rounded border-slate-300 text-[var(--brand-orange)] focus:ring-[var(--brand-blue)]"
+                      />
+                      <div>
+                        <p className="text-lg font-black text-slate-950">{item.name} ({item.code})</p>
+                        <p className="mt-2 text-sm text-slate-600">Slug: {item.slug} • {item.cityCount} cidade(s) • {item.jobCount} vaga(s)</p>
+                      </div>
                     </div>
                     <div className="flex flex-wrap gap-2">
                       <Button type="button" size="sm" variant="outline" onClick={() => {
@@ -189,7 +295,7 @@ export function AdminStructureManager({
                           Hub
                         </Link>
                       </Button>
-                      <Button type="button" size="sm" variant="outline" disabled={busyKey === `states:delete:${item.id}`} onClick={() => remove("states", item.id)}>
+                      <Button type="button" size="sm" variant="outline" disabled={busyKey === `states:delete:${item.id}` || busyKey === "states:bulk-delete"} onClick={() => remove("states", item.id)}>
                         <Trash2 className="mr-2 h-4 w-4" />
                         Excluir
                       </Button>
@@ -251,6 +357,26 @@ export function AdminStructureManager({
 
           <Input value={cityQuery} onChange={(event) => setCityQuery(event.target.value)} placeholder="Buscar cidade por nome, estado ou slug" className="max-w-md" />
 
+          <div className="flex flex-wrap items-center justify-between gap-3 rounded-[1.25rem] border border-slate-200 bg-white px-4 py-3 text-sm text-slate-600">
+            <label className="inline-flex items-center gap-2">
+              <input
+                type="checkbox"
+                checked={allVisibleCitiesSelected}
+                onChange={(event) => toggleAllCities(event.target.checked)}
+                aria-label="Selecionar todas as cidades visiveis"
+                className="h-4 w-4 rounded border-slate-300 text-[var(--brand-orange)] focus:ring-[var(--brand-blue)]"
+              />
+              <span>Selecionar todas as cidades visiveis</span>
+            </label>
+            <div className="flex flex-wrap items-center gap-3">
+              <span>{selectedCityIds.length} selecionado(s)</span>
+              <Button type="button" size="sm" variant="outline" disabled={!selectedCityIds.length || busyKey === "cities:bulk-delete"} onClick={() => bulkRemove("cities")}>
+                <Trash2 className="mr-2 h-4 w-4" />
+                Excluir selecionadas
+              </Button>
+            </div>
+          </div>
+
           <div className="grid gap-4">
             {visibleCities.map((item) => {
               const form = draftCities[item.id] ?? emptyCityForm;
@@ -258,9 +384,18 @@ export function AdminStructureManager({
               return (
                 <div key={item.id} className="rounded-[1.5rem] border border-slate-200 bg-slate-50 p-5">
                   <div className="flex flex-wrap items-start justify-between gap-4">
-                    <div>
-                      <p className="text-lg font-black text-slate-950">{item.name}, {item.stateCode}</p>
-                      <p className="mt-2 text-sm text-slate-600">Slug: {item.slug} • {item.jobCount} vaga(s)</p>
+                    <div className="flex items-start gap-3">
+                      <input
+                        type="checkbox"
+                        checked={selectedCityIds.includes(item.id)}
+                        onChange={(event) => toggleCitySelection(item.id, event.target.checked)}
+                        aria-label={`Selecionar cidade ${item.name}`}
+                        className="mt-1 h-4 w-4 rounded border-slate-300 text-[var(--brand-orange)] focus:ring-[var(--brand-blue)]"
+                      />
+                      <div>
+                        <p className="text-lg font-black text-slate-950">{item.name}, {item.stateCode}</p>
+                        <p className="mt-2 text-sm text-slate-600">Slug: {item.slug} • {item.jobCount} vaga(s)</p>
+                      </div>
                     </div>
                     <div className="flex flex-wrap gap-2">
                       <Button type="button" size="sm" variant="outline" onClick={() => {
@@ -276,7 +411,7 @@ export function AdminStructureManager({
                           Hub
                         </Link>
                       </Button>
-                      <Button type="button" size="sm" variant="outline" disabled={busyKey === `cities:delete:${item.id}`} onClick={() => remove("cities", item.id)}>
+                      <Button type="button" size="sm" variant="outline" disabled={busyKey === `cities:delete:${item.id}` || busyKey === "cities:bulk-delete"} onClick={() => remove("cities", item.id)}>
                         <Trash2 className="mr-2 h-4 w-4" />
                         Excluir
                       </Button>
