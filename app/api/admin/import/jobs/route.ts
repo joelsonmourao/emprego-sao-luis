@@ -7,6 +7,20 @@ import { requireApiRole } from "@/lib/authz";
 import { prisma } from "@/lib/db";
 import { importJobsPayloadSchema } from "@/lib/schemas/job-import";
 
+// Função para processar validThroughMonths (número de meses da planilha)
+function processValidThroughMonths(validThroughMonths: number | null | undefined): Date | null {
+  if (!validThroughMonths || validThroughMonths < 1 || validThroughMonths > 24) {
+    return null;
+  }
+  
+  const today = new Date();
+  const futureDate = new Date(today);
+  futureDate.setMonth(today.getMonth() + validThroughMonths);
+  
+  console.log(`validThroughMonths: ${validThroughMonths} meses a partir de hoje = ${futureDate.toISOString().split('T')[0]}`);
+  return futureDate;
+}
+
 // Função para calcular validThrough baseado em número de meses ou data direta
 function calculateValidThrough(validThroughValue: string | number | null | undefined): Date | null {
   if (!validThroughValue) return null;
@@ -248,7 +262,7 @@ export async function POST(request: Request) {
           employmentType: mappedEmploymentType as EmploymentType,
           workHours: row.workHours?.trim() || null,
           expiresAt: parseOptionalDate(row.expiresAt),
-          validThrough: calculateValidThrough(row.validThrough),
+          validThrough: processValidThroughMonths(row.validThroughMonths) ?? calculateValidThrough(row.validThrough),
           applyUrl: row.applyUrl,
           isActive: row.isActive,
           sourceName: row.sourceName?.trim() || null,

@@ -17,6 +17,11 @@ export const importedJobRowSchema = z.object({
   publishedAt: z.string().optional().default(""),
   expiresAt: z.string().optional().default(""),
   validThrough: z.string().optional().default(""),
+  validThroughMonths: z.preprocess((val) => {
+    if (val === "" || val === null || val === undefined) return null;
+    const num = Number(val);
+    return isNaN(num) ? null : num;
+  }, z.number().nullable().optional()),
   applyUrl: z.string().url("URL de candidatura invalida."),
   isActive: z.boolean().default(true),
   sourceName: z.string().optional().default(""),

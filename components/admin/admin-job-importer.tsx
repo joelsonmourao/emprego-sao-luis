@@ -111,6 +111,8 @@ export function AdminJobImporter() {
         workHours: String(normalized.workHours ?? "").trim(),
         publishedAt: String(normalized.publishedAt ?? "").trim(),
         expiresAt: String(normalized.expiresAt ?? "").trim(),
+        validThrough: String(normalized.validThrough ?? "").trim(),
+        validThroughMonths: parseOptionalNumber(normalized.validThroughMonths),
         applyUrl: String(normalized.applyUrl ?? "").trim(),
         isActive: parseBooleanLike(normalized.isActive ?? true),
         sourceName: String(normalized.sourceName ?? "").trim(),
