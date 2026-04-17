@@ -24,16 +24,20 @@ export function getSiteOrigin() {
   const publicSiteUrl = normalizeOrigin(process.env.NEXT_PUBLIC_SITE_URL);
   const isProduction = process.env.NODE_ENV === "production";
 
-  if (siteUrl) {
+  if (isProduction) {
+    if (!siteUrl) {
+      throw new Error("SITE_URL precisa estar configurada em producao para gerar URLs publicas de SEO.");
+    }
+
     return siteUrl;
   }
 
-  if (!isProduction && publicSiteUrl) {
+  if (publicSiteUrl) {
     return publicSiteUrl;
   }
 
-  if (isProduction && publicSiteUrl && !isLocalOrigin(publicSiteUrl) && !publicSiteUrl.includes("vercel.app")) {
-    return publicSiteUrl;
+  if (siteUrl && isLocalOrigin(siteUrl)) {
+    return siteUrl;
   }
 
   return "http://localhost:3000";
