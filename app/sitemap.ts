@@ -6,10 +6,6 @@ import { getAllPublishedPostEntries } from "@/lib/repositories/blog";
 import { getAllActiveJobEntries, getCompanyEntries } from "@/lib/repositories/jobs";
 import { getCities, getStates } from "@/lib/repositories/geo";
 
-function normalizeQueryForSitemap(title: string) {
-  return title.trim().replace(/\s+/g, " ").replace(/^jovem aprendiz\s+/i, "").replace(/^em\s+/i, "");
-}
-
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const [jobs, posts, states, cities, companies] = await Promise.all([
     getAllActiveJobEntries(),
@@ -18,25 +14,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     getCities(),
     getCompanyEntries()
   ]);
-  const strategicSearchUrls = new Map<string, Date>();
-
-  jobs.forEach((job) => {
-    const query = normalizeQueryForSitemap(job.title);
-    if (query.length < 2 || query.length > 80) return;
-
-    const cityParams = new URLSearchParams({
-      q: query,
-      estado: job.state.slug,
-      cidade: job.city.slug
-    });
-    strategicSearchUrls.set(absoluteUrl(`/vagas?${cityParams.toString()}`), job.updatedAt);
-
-    const stateParams = new URLSearchParams({
-      q: query,
-      estado: job.state.slug
-    });
-    strategicSearchUrls.set(absoluteUrl(`/vagas?${stateParams.toString()}`), job.updatedAt);
-  });
 
   return [
     ...staticPages.map((path) => ({ url: absoluteUrl(path), lastModified: new Date() })),
@@ -50,7 +27,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       url: absoluteUrl(`/vagas/estado/${city.state.slug}/${city.slug}`),
       lastModified: city.updatedAt
     })),
-    ...companies.map((company) => ({ url: absoluteUrl(`/empresas/${company.slug}`), lastModified: company.updatedAt })),
-    ...Array.from(strategicSearchUrls.entries()).map(([url, lastModified]) => ({ url, lastModified }))
+    ...companies.map((company) => ({ url: absoluteUrl(`/empresas/${company.slug}`), lastModified: company.updatedAt }))
   ];
 }
