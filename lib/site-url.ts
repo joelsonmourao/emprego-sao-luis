@@ -15,12 +15,28 @@ function normalizeOrigin(value?: string | null) {
   }
 }
 
+function isLocalOrigin(value: string) {
+  return value.includes("localhost") || value.includes("127.0.0.1");
+}
+
 export function getSiteOrigin() {
-  return (
-    normalizeOrigin(process.env.SITE_URL) ??
-    normalizeOrigin(process.env.NEXT_PUBLIC_SITE_URL) ??
-    "http://localhost:3000"
-  );
+  const siteUrl = normalizeOrigin(process.env.SITE_URL);
+  const publicSiteUrl = normalizeOrigin(process.env.NEXT_PUBLIC_SITE_URL);
+  const isProduction = process.env.NODE_ENV === "production";
+
+  if (siteUrl) {
+    return siteUrl;
+  }
+
+  if (!isProduction && publicSiteUrl) {
+    return publicSiteUrl;
+  }
+
+  if (isProduction && publicSiteUrl && !isLocalOrigin(publicSiteUrl) && !publicSiteUrl.includes("vercel.app")) {
+    return publicSiteUrl;
+  }
+
+  return "http://localhost:3000";
 }
 
 export function getSiteUrl(pathname = "/") {

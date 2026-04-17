@@ -2,6 +2,7 @@ import { z } from "zod";
 
 const envSchema = z.object({
   DATABASE_URL: z.string().min(1),
+  SITE_URL: z.string().url().optional(),
   NEXT_PUBLIC_SITE_URL: z.string().url().default("http://localhost:3000"),
   AUTH_SECRET: z.string().min(16),
   ADMIN_LOGIN_USER: z.string().email().optional(),
@@ -10,6 +11,7 @@ const envSchema = z.object({
 
 export const env = envSchema.parse({
   DATABASE_URL: process.env.DATABASE_URL,
+  SITE_URL: process.env.SITE_URL,
   NEXT_PUBLIC_SITE_URL: process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000",
   AUTH_SECRET: process.env.AUTH_SECRET ?? "dev-only-change-this-secret-key",
   ADMIN_LOGIN_USER: process.env.ADMIN_LOGIN_USER,

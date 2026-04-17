@@ -139,7 +139,7 @@ ADMIN_SECRET_KEY="defina-uma-senha-admin-forte"
 ## Checklist de publicacao
 
 1. Ajustar `SITE_URL` para o dominio final com `https`
-2. Manter `NEXT_PUBLIC_SITE_URL` apenas para ambiente local ou preview, quando fizer sentido
+2. Manter `SITE_URL` como URL canonica de producao e usar `NEXT_PUBLIC_SITE_URL` apenas para ambiente local ou preview, quando fizer sentido
 2. Gerar um `AUTH_SECRET` forte
 3. Subir o banco PostgreSQL
 4. Rodar `prisma generate` e `prisma db push`

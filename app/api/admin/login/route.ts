@@ -4,8 +4,8 @@ import { AuditAction } from "@prisma/client";
 
 import { writeAuditLog } from "@/lib/audit";
 import { prisma } from "@/lib/db";
-import { env } from "@/lib/env";
 import { ADMIN_AUTH_COOKIE, createAdminSessionToken, verifyPassword } from "@/lib/auth";
+import { getSiteOrigin } from "@/lib/site-url";
 import { adminLoginSchema } from "@/lib/schemas/admin-auth";
 
 export async function POST(request: Request) {
@@ -37,7 +37,7 @@ export async function POST(request: Request) {
     cookieStore.set(ADMIN_AUTH_COOKIE, token, {
       httpOnly: true,
       sameSite: "lax",
-      secure: env.NEXT_PUBLIC_SITE_URL.startsWith("https://"),
+      secure: getSiteOrigin().startsWith("https://"),
       path: "/",
       maxAge: 60 * 60 * 24 * 7,
       priority: "high"

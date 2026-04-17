@@ -67,7 +67,7 @@ export default async function AdminPublicationPage() {
             <CardDescription>Checklist tecnico para staging e dominio final.</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            <StatusRow label="URL publica configurada" ok={!readiness.isLocal} hint={`URL atual: ${readiness.siteUrl}`} />
+            <StatusRow label="URL publica configurada" ok={readiness.hasCanonicalSiteUrl && !readiness.isLocal} hint={`URL atual: ${readiness.siteUrl}`} />
             <StatusRow label="HTTPS pronto" ok={readiness.isHttps} hint="Login, cookies seguros e integracoes Google ficam corretos em dominio com HTTPS." />
             <StatusRow label="AUTH_SECRET forte" ok={readiness.hasStrongAuthSecret} hint="Troque o segredo padrao por uma chave longa e unica antes de publicar." />
             <StatusRow label="Banner de cookies ativo" ok={readiness.consentEnabled} hint="O consentimento aparece antes de liberar Analytics e publicidade." />
@@ -85,7 +85,7 @@ export default async function AdminPublicationPage() {
           </CardHeader>
           <CardContent className="space-y-4 text-sm leading-7 text-slate-600">
             <ol className="space-y-3 list-decimal pl-5">
-              <li>Defina o dominio final com HTTPS e atualize <code>NEXT_PUBLIC_SITE_URL</code>.</li>
+              <li>Defina o dominio final com HTTPS em <code>SITE_URL</code>. Use <code>NEXT_PUBLIC_SITE_URL</code> apenas para local ou preview, se precisar.</li>
               <li>Revise integracoes em <Link href="/admin/integracoes" className="font-semibold text-[var(--brand-blue)] hover:text-[var(--brand-orange)]">/admin/integracoes</Link>.</li>
               <li>Valide <a href="/robots.txt" target="_blank" rel="noreferrer" className="font-semibold text-[var(--brand-blue)] hover:text-[var(--brand-orange)]">robots.txt</a>, <a href="/sitemap.xml" target="_blank" rel="noreferrer" className="font-semibold text-[var(--brand-blue)] hover:text-[var(--brand-orange)]">sitemap.xml</a> e <a href="/ads.txt" target="_blank" rel="noreferrer" className="font-semibold text-[var(--brand-blue)] hover:text-[var(--brand-orange)]">ads.txt</a>.</li>
               <li>Confirme o banner de cookies e o aceite em desktop e celular.</li>

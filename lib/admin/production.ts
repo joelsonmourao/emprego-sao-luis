@@ -1,12 +1,14 @@
 import { env } from "@/lib/env";
 import { getEditableSiteSettings } from "@/lib/admin/site";
 import { normalizeAdsensePublisherId, normalizeSearchConsoleVerification } from "@/lib/google";
+import { getSiteOrigin } from "@/lib/site-url";
 
 export async function getProductionReadiness() {
   const settings = await getEditableSiteSettings();
-  const siteUrl = env.NEXT_PUBLIC_SITE_URL;
+  const siteUrl = getSiteOrigin();
   const isLocal = siteUrl.includes("localhost") || siteUrl.includes("127.0.0.1");
   const isHttps = siteUrl.startsWith("https://");
+  const hasCanonicalSiteUrl = Boolean(env.SITE_URL?.trim());
   const gaConfigured = Boolean(settings.google.ga4MeasurementId.trim());
   const gtmConfigured = Boolean(settings.google.gtmContainerId.trim());
   const searchConsoleConfigured = Boolean(normalizeSearchConsoleVerification(settings.google.searchConsoleVerification));
@@ -17,6 +19,7 @@ export async function getProductionReadiness() {
     siteUrl,
     isLocal,
     isHttps,
+    hasCanonicalSiteUrl,
     hasStrongAuthSecret: env.AUTH_SECRET.length >= 24 && !env.AUTH_SECRET.includes("dev-only"),
     consentEnabled: settings.consentBanner.bannerEnabled,
     googleConsentMode: settings.google.consentModeEnabled,
@@ -34,4 +37,3 @@ export async function getProductionReadiness() {
     settings
   };
 }
-
