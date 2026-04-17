@@ -25,6 +25,13 @@ type BulkDeleteResponse = {
   deletedCount?: number;
   deletedIds?: string[];
   errors?: Array<{ id: string; error: string }>;
+  totals?: {
+    jobsDeleted: number;
+    companiesDeleted: number;
+    citiesDeleted: number;
+    statesDeleted: number;
+    hubProfilesDeleted: number;
+  };
 };
 
 export function AdminJobsTable({ jobs }: { jobs: JobRow[] }) {
@@ -84,7 +91,9 @@ export function AdminJobsTable({ jobs }: { jobs: JobRow[] }) {
   async function bulkDelete() {
     if (!selectedCount) return;
 
-    const confirmed = window.confirm(`Deseja excluir ${selectedCount} vaga(s) selecionada(s)? Essa acao nao pode ser desfeita.`);
+    const confirmed = window.confirm(
+      `Deseja excluir ${selectedCount} vaga(s) selecionada(s)? Essa acao remove permanentemente as vagas escolhidas.`
+    );
     if (!confirmed) return;
 
     setBusyId("bulk-delete");
@@ -107,10 +116,11 @@ export function AdminJobsTable({ jobs }: { jobs: JobRow[] }) {
     setSelectedIds([]);
     const deletedCount = result.deletedCount ?? 0;
     const errorCount = result.errors?.length ?? 0;
+    const deletedJobs = result.totals?.jobsDeleted ?? deletedCount;
     setFeedback(
       errorCount
-        ? `${deletedCount} vaga(s) removida(s). ${errorCount} item(ns) nao puderam ser excluidos.`
-        : `${deletedCount} vaga(s) removida(s) com sucesso.`
+        ? `${deletedCount} vaga(s) removida(s). Total apagado nesta operacao: ${deletedJobs} vaga(s). ${errorCount} item(ns) apresentaram erro.`
+        : `${deletedCount} vaga(s) removida(s) com sucesso. Total apagado nesta operacao: ${deletedJobs} vaga(s).`
     );
     router.refresh();
   }

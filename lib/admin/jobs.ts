@@ -244,12 +244,33 @@ export async function deleteJob(jobId: string) {
     where: { id: jobId }
   });
 
-  return job;
+  return {
+    ...job,
+    summary: {
+      jobsDeleted: 1,
+      companiesDeleted: 0,
+      citiesDeleted: 0,
+      statesDeleted: 0,
+      hubProfilesDeleted: 0
+    }
+  };
 }
 
 export async function bulkDeleteJobs(jobIds: string[]) {
   const uniqueIds = [...new Set(jobIds.filter(Boolean))];
-  const results: Array<{ id: string; title?: string | null; deleted: boolean; error?: string }> = [];
+  const results: Array<{
+    id: string;
+    title?: string | null;
+    deleted: boolean;
+    error?: string;
+    summary?: {
+      jobsDeleted: number;
+      companiesDeleted: number;
+      citiesDeleted: number;
+      statesDeleted: number;
+      hubProfilesDeleted: number;
+    };
+  }> = [];
 
   for (const id of uniqueIds) {
     try {
@@ -257,7 +278,8 @@ export async function bulkDeleteJobs(jobIds: string[]) {
       results.push({
         id,
         title: job.title,
-        deleted: true
+        deleted: true,
+        summary: job.summary
       });
     } catch (error) {
       results.push({

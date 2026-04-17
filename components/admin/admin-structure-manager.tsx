@@ -55,6 +55,13 @@ type BulkDeleteResponse = {
   error?: string;
   deletedCount?: number;
   errors?: Array<{ id: string; error: string }>;
+  totals?: {
+    jobsDeleted: number;
+    companiesDeleted: number;
+    citiesDeleted: number;
+    statesDeleted: number;
+    hubProfilesDeleted: number;
+  };
 };
 
 const emptyStateForm: StateForm = { name: "", code: "", slug: "", seoTitle: "", seoIntro: "" };
@@ -167,7 +174,9 @@ export function AdminStructureManager({
 
     const label = resource === "states" ? "estado(s)" : "cidade(s)";
     const confirmed = window.confirm(
-      `Deseja excluir ${selectedIds.length} ${label} selecionado(s)? A exclusao so sera feita quando nao houver vinculos que bloqueiem a operacao.`
+      resource === "states"
+        ? `Deseja excluir ${selectedIds.length} ${label} selecionado(s)? Cidades, empresas, vagas e perfis SEO ligados a esses estados tambem serao removidos.`
+        : `Deseja excluir ${selectedIds.length} ${label} selecionada(s)? Empresas, vagas e perfis SEO ligados a essas cidades tambem serao removidos.`
     );
     if (!confirmed) return;
 
@@ -196,10 +205,15 @@ export function AdminStructureManager({
 
     const deletedCount = result.deletedCount ?? 0;
     const errorCount = result.errors?.length ?? 0;
+    const deletedJobs = result.totals?.jobsDeleted ?? 0;
+    const deletedCompanies = result.totals?.companiesDeleted ?? 0;
+    const deletedCities = result.totals?.citiesDeleted ?? 0;
+    const deletedStates = result.totals?.statesDeleted ?? 0;
+    const deletedProfiles = result.totals?.hubProfilesDeleted ?? 0;
     setMessage(
       errorCount
-        ? `${deletedCount} ${label} removido(s). ${errorCount} item(ns) nao puderam ser excluidos por causa de vinculos ativos.`
-        : `${deletedCount} ${label} removido(s) com sucesso.`
+        ? `${deletedCount} ${label} removido(s). Dependencias apagadas: ${deletedStates} estado(s), ${deletedCities} cidade(s), ${deletedCompanies} empresa(s), ${deletedJobs} vaga(s) e ${deletedProfiles} perfil(is) SEO. ${errorCount} item(ns) apresentaram erro.`
+        : `${deletedCount} ${label} removido(s) com sucesso. Dependencias apagadas: ${deletedStates} estado(s), ${deletedCities} cidade(s), ${deletedCompanies} empresa(s), ${deletedJobs} vaga(s) e ${deletedProfiles} perfil(is) SEO.`
     );
     router.refresh();
   }

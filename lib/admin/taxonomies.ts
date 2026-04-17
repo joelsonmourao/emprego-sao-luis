@@ -1,4 +1,4 @@
-import { Prisma } from "@prisma/client";
+import { HubType, Prisma } from "@prisma/client";
 
 import { prisma } from "@/lib/db";
 import { normalizeSlug } from "@/lib/admin/content";
@@ -71,26 +71,82 @@ export async function updateState(id: string, input: StateAdminInput) {
 }
 
 export async function deleteState(id: string) {
-  const state = await prisma.state.findUnique({
-    where: { id },
-    include: {
-      _count: {
-        select: { cities: true, jobs: true, companies: true }
+  return prisma.$transaction(async (tx) => {
+    const state = await tx.state.findUnique({
+      where: { id },
+      select: {
+        id: true,
+        name: true,
+        slug: true,
+        cities: {
+          select: {
+            id: true,
+            slug: true
+          }
+        },
+        companies: {
+          select: {
+            id: true,
+            slug: true
+          }
+        }
       }
+    });
+
+    if (!state) {
+      throw new Error("Estado nao encontrado.");
     }
+
+    const deletedJobs = await tx.job.deleteMany({
+      where: { stateId: id }
+    });
+
+    const companySlugs = state.companies.map((item) => item.slug);
+    const cityHubSlugs = state.cities.map((item) => `${state.slug}__${item.slug}`);
+
+    const deletedCompanyHubProfiles = companySlugs.length
+      ? await tx.hubProfile.deleteMany({
+          where: {
+            type: HubType.COMPANY,
+            slug: { in: companySlugs }
+          }
+        })
+      : { count: 0 };
+
+    await tx.company.deleteMany({
+      where: { stateId: id }
+    });
+
+    const deletedCityHubProfiles = cityHubSlugs.length
+      ? await tx.hubProfile.deleteMany({
+          where: {
+            type: HubType.CITY,
+            slug: { in: cityHubSlugs }
+          }
+        })
+      : { count: 0 };
+
+    const deletedStateHubProfiles = await tx.hubProfile.deleteMany({
+      where: {
+        type: HubType.STATE,
+        slug: state.slug
+      }
+    });
+
+    await tx.state.delete({ where: { id } });
+
+    return {
+      id: state.id,
+      name: state.name,
+      summary: {
+        jobsDeleted: deletedJobs.count,
+        companiesDeleted: state.companies.length,
+        citiesDeleted: state.cities.length,
+        statesDeleted: 1,
+        hubProfilesDeleted: deletedCompanyHubProfiles.count + deletedCityHubProfiles.count + deletedStateHubProfiles.count
+      }
+    };
   });
-
-  if (!state) {
-    throw new Error("Estado nao encontrado.");
-  }
-
-  if (state._count.jobs > 0 || state._count.cities > 0 || state._count.companies > 0) {
-    throw new Error("Remova primeiro as cidades, empresas e vagas ligadas a este estado antes de excluir.");
-  }
-
-  await prisma.state.delete({ where: { id } });
-
-  return state;
 }
 
 export async function createCity(input: CityAdminInput) {
@@ -117,26 +173,71 @@ export async function updateCity(id: string, input: CityAdminInput) {
 }
 
 export async function deleteCity(id: string) {
-  const city = await prisma.city.findUnique({
-    where: { id },
-    include: {
-      _count: {
-        select: { jobs: true, companies: true }
+  return prisma.$transaction(async (tx) => {
+    const city = await tx.city.findUnique({
+      where: { id },
+      select: {
+        id: true,
+        name: true,
+        slug: true,
+        state: {
+          select: {
+            slug: true
+          }
+        },
+        companies: {
+          select: {
+            id: true,
+            slug: true
+          }
+        }
       }
+    });
+
+    if (!city) {
+      throw new Error("Cidade nao encontrada.");
     }
+
+    const deletedJobs = await tx.job.deleteMany({
+      where: { cityId: id }
+    });
+
+    const companySlugs = city.companies.map((item) => item.slug);
+
+    const deletedCompanyHubProfiles = companySlugs.length
+      ? await tx.hubProfile.deleteMany({
+          where: {
+            type: HubType.COMPANY,
+            slug: { in: companySlugs }
+          }
+        })
+      : { count: 0 };
+
+    await tx.company.deleteMany({
+      where: { cityId: id }
+    });
+
+    const deletedCityHubProfiles = await tx.hubProfile.deleteMany({
+      where: {
+        type: HubType.CITY,
+        slug: `${city.state.slug}__${city.slug}`
+      }
+    });
+
+    await tx.city.delete({ where: { id } });
+
+    return {
+      id: city.id,
+      name: city.name,
+      summary: {
+        jobsDeleted: deletedJobs.count,
+        companiesDeleted: city.companies.length,
+        citiesDeleted: 1,
+        statesDeleted: 0,
+        hubProfilesDeleted: deletedCompanyHubProfiles.count + deletedCityHubProfiles.count
+      }
+    };
   });
-
-  if (!city) {
-    throw new Error("Cidade nao encontrada.");
-  }
-
-  if (city._count.jobs > 0 || city._count.companies > 0) {
-    throw new Error("Existem vagas ou empresas ligadas a esta cidade. Ajuste os vinculos antes de excluir.");
-  }
-
-  await prisma.city.delete({ where: { id } });
-
-  return city;
 }
 
 export async function createTaxonomyEntry(resource: TaxonomyResource, input: unknown) {
@@ -168,7 +269,19 @@ export async function deleteTaxonomyEntry(resource: TaxonomyResource, id: string
 
 export async function bulkDeleteTaxonomyEntries(resource: TaxonomyResource, ids: string[]) {
   const uniqueIds = [...new Set(ids.filter(Boolean))];
-  const results: Array<{ id: string; name?: string | null; deleted: boolean; error?: string }> = [];
+  const results: Array<{
+    id: string;
+    name?: string | null;
+    deleted: boolean;
+    error?: string;
+    summary?: {
+      jobsDeleted: number;
+      companiesDeleted: number;
+      citiesDeleted: number;
+      statesDeleted: number;
+      hubProfilesDeleted: number;
+    };
+  }> = [];
 
   for (const id of uniqueIds) {
     try {
@@ -176,7 +289,8 @@ export async function bulkDeleteTaxonomyEntries(resource: TaxonomyResource, ids:
       results.push({
         id,
         name: item.name,
-        deleted: true
+        deleted: true,
+        summary: item.summary
       });
     } catch (error) {
       results.push({

@@ -25,6 +25,23 @@ export async function POST(request: Request) {
       id: item.id,
       error: item.error ?? "Nao foi possivel excluir."
     }));
+    const totals = deletedItems.reduce(
+      (accumulator, item) => {
+        accumulator.jobsDeleted += item.summary?.jobsDeleted ?? 0;
+        accumulator.companiesDeleted += item.summary?.companiesDeleted ?? 0;
+        accumulator.citiesDeleted += item.summary?.citiesDeleted ?? 0;
+        accumulator.statesDeleted += item.summary?.statesDeleted ?? 0;
+        accumulator.hubProfilesDeleted += item.summary?.hubProfilesDeleted ?? 0;
+        return accumulator;
+      },
+      {
+        jobsDeleted: 0,
+        companiesDeleted: 0,
+        citiesDeleted: 0,
+        statesDeleted: 0,
+        hubProfilesDeleted: 0
+      }
+    );
 
     for (const item of deletedItems) {
       const label = "title" in item ? item.title : "name" in item ? item.name : null;
@@ -45,7 +62,8 @@ export async function POST(request: Request) {
       ok: true,
       deletedCount: deletedItems.length,
       deletedIds: deletedItems.map((item) => item.id),
-      errors
+      errors,
+      totals
     });
   } catch (error) {
     const message = error instanceof Error ? error.message : "Nao foi possivel excluir os itens selecionados.";

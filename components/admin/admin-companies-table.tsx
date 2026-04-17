@@ -25,6 +25,13 @@ type BulkDeleteResponse = {
   deletedCount?: number;
   deletedIds?: string[];
   errors?: Array<{ id: string; error: string }>;
+  totals?: {
+    jobsDeleted: number;
+    companiesDeleted: number;
+    citiesDeleted: number;
+    statesDeleted: number;
+    hubProfilesDeleted: number;
+  };
 };
 
 export function AdminCompaniesTable({ companies }: { companies: CompanyRow[] }) {
@@ -79,7 +86,9 @@ export function AdminCompaniesTable({ companies }: { companies: CompanyRow[] }) 
   async function bulkDelete() {
     if (!selectedCount) return;
 
-    const confirmed = window.confirm(`Deseja excluir ${selectedCount} empresa(s) selecionada(s)? A exclusao so vai ocorrer quando nao houver vagas vinculadas.`);
+    const confirmed = window.confirm(
+      `Deseja excluir ${selectedCount} empresa(s) selecionada(s)? As vagas vinculadas a essas empresas tambem serao removidas.`
+    );
     if (!confirmed) return;
 
     setBusyId("bulk-delete");
@@ -102,10 +111,12 @@ export function AdminCompaniesTable({ companies }: { companies: CompanyRow[] }) 
     setSelectedIds([]);
     const deletedCount = result.deletedCount ?? 0;
     const errorCount = result.errors?.length ?? 0;
+    const deletedJobs = result.totals?.jobsDeleted ?? 0;
+    const deletedProfiles = result.totals?.hubProfilesDeleted ?? 0;
     setFeedback(
       errorCount
-        ? `${deletedCount} empresa(s) removida(s). ${errorCount} item(ns) nao puderam ser excluidos por vinculos ativos.`
-        : `${deletedCount} empresa(s) removida(s) com sucesso.`
+        ? `${deletedCount} empresa(s) removida(s), ${deletedJobs} vaga(s) vinculada(s) apagada(s) e ${deletedProfiles} perfil(is) SEO removido(s). ${errorCount} item(ns) apresentaram erro.`
+        : `${deletedCount} empresa(s) removida(s) com sucesso, junto com ${deletedJobs} vaga(s) vinculada(s) e ${deletedProfiles} perfil(is) SEO.`
     );
     router.refresh();
   }

@@ -1,4 +1,4 @@
-import { Prisma } from "@prisma/client";
+import { HubType, Prisma } from "@prisma/client";
 
 import { prisma } from "@/lib/db";
 import { companyFormSchema, type CompanyFormInput } from "@/lib/schemas/company-form";
@@ -77,35 +77,59 @@ export async function upsertCompanyFromForm(input: CompanyFormInput, companyId?:
 }
 
 export async function deleteCompany(companyId: string) {
-  const company = await prisma.company.findUnique({
-    where: { id: companyId },
-    include: {
-      _count: {
-        select: {
-          jobs: true
-        }
-      }
+  return prisma.$transaction(async (tx) => {
+    const company = await tx.company.findUnique({
+      where: { id: companyId },
+      select: { id: true, name: true, slug: true }
+    });
+
+    if (!company) {
+      throw new Error("Empresa nao encontrada.");
     }
+
+    const deletedJobs = await tx.job.deleteMany({
+      where: { companyId }
+    });
+
+    const deletedHubProfiles = await tx.hubProfile.deleteMany({
+      where: {
+        type: HubType.COMPANY,
+        slug: company.slug
+      }
+    });
+
+    await tx.company.delete({
+      where: { id: companyId }
+    });
+
+    return {
+      ...company,
+      summary: {
+        jobsDeleted: deletedJobs.count,
+        companiesDeleted: 1,
+        citiesDeleted: 0,
+        statesDeleted: 0,
+        hubProfilesDeleted: deletedHubProfiles.count
+      }
+    };
   });
-
-  if (!company) {
-    throw new Error("Empresa nao encontrada.");
-  }
-
-  if (company._count.jobs > 0) {
-    throw new Error("Existem vagas ligadas a esta empresa. Ajuste as vagas antes de excluir.");
-  }
-
-  await prisma.company.delete({
-    where: { id: companyId }
-  });
-
-  return company;
 }
 
 export async function bulkDeleteCompanies(companyIds: string[]) {
   const uniqueIds = [...new Set(companyIds.filter(Boolean))];
-  const results: Array<{ id: string; name?: string | null; deleted: boolean; error?: string }> = [];
+  const results: Array<{
+    id: string;
+    name?: string | null;
+    deleted: boolean;
+    error?: string;
+    summary?: {
+      jobsDeleted: number;
+      companiesDeleted: number;
+      citiesDeleted: number;
+      statesDeleted: number;
+      hubProfilesDeleted: number;
+    };
+  }> = [];
 
   for (const id of uniqueIds) {
     try {
@@ -113,7 +137,8 @@ export async function bulkDeleteCompanies(companyIds: string[]) {
       results.push({
         id,
         name: company.name,
-        deleted: true
+        deleted: true,
+        summary: company.summary
       });
     } catch (error) {
       results.push({
