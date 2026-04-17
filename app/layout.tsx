@@ -14,12 +14,13 @@ import { getSiteSettings } from "@/lib/site-settings";
 import { normalizeSearchConsoleVerification } from "@/lib/google";
 import { CONSENT_COOKIE_NAME } from "@/lib/consent";
 import { absoluteUrl } from "@/lib/utils";
+import { getSiteOrigin } from "@/lib/site-url";
 
 export async function generateMetadata(): Promise<Metadata> {
   const settings = await getSiteSettings();
 
   return {
-    metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000"),
+    metadataBase: new URL(getSiteOrigin()),
     title: {
       default: `${settings.siteName} | Vagas e dicas para o primeiro emprego`,
       template: `%s | ${settings.siteName}`

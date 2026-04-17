@@ -16,7 +16,7 @@ Portal de vagas para Jovem Aprendiz com:
 ## Rodando localmente
 
 1. Copie `.env.example` para `.env`
-2. Ajuste `DATABASE_URL`, `NEXT_PUBLIC_SITE_URL` e `AUTH_SECRET`
+2. Ajuste `DATABASE_URL`, `SITE_URL`, `NEXT_PUBLIC_SITE_URL` e `AUTH_SECRET`
 3. Rode:
 
 ```bash
@@ -120,6 +120,7 @@ Arquivo `.env.example`:
 
 ```env
 DATABASE_URL="postgresql://postgres:postgres@localhost:5432/jovem_aprendiz_vagas?schema=jovem_aprendiz_vagas"
+SITE_URL="https://www.seu-dominio.com"
 NEXT_PUBLIC_SITE_URL="http://localhost:3000"
 AUTH_SECRET="troque-esta-chave-por-uma-segura"
 ADMIN_LOGIN_USER="defina-um-email-admin@seudominio.com"
@@ -137,7 +138,8 @@ ADMIN_SECRET_KEY="defina-uma-senha-admin-forte"
 
 ## Checklist de publicacao
 
-1. Ajustar `NEXT_PUBLIC_SITE_URL` para o dominio final com `https`
+1. Ajustar `SITE_URL` para o dominio final com `https`
+2. Manter `NEXT_PUBLIC_SITE_URL` apenas para ambiente local ou preview, quando fizer sentido
 2. Gerar um `AUTH_SECRET` forte
 3. Subir o banco PostgreSQL
 4. Rodar `prisma generate` e `prisma db push`
