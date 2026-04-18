@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
+import { AdSlot } from "@/components/ad-slot";
 import { TrackedExternalLink } from "@/components/analytics/tracked-external-link";
 import { BlogCard } from "@/components/blog-card";
 import { Breadcrumbs } from "@/components/breadcrumbs";
@@ -14,6 +15,7 @@ import { buildBreadcrumbJsonLd, buildJobPostingJsonLd } from "@/lib/seo/json-ld"
 import { getRelatedPosts } from "@/lib/repositories/blog";
 import { getJobBySlug, getRelatedJobs } from "@/lib/repositories/jobs";
 import { formatDate } from "@/lib/utils";
+import { getSiteSettings } from "@/lib/site-settings";
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
@@ -44,7 +46,7 @@ export default async function JobDetailPage({ params }: { params: Promise<{ slug
     notFound();
   }
 
-  const [relatedJobs, relatedPosts] = await Promise.all([
+  const [relatedJobs, relatedPosts, settings] = await Promise.all([
     getRelatedJobs({
       excludeSlug: job.slug,
       citySlug: job.city.slug,
@@ -52,11 +54,12 @@ export default async function JobDetailPage({ params }: { params: Promise<{ slug
       companySlug: job.company?.slug,
       limit: 3
     }),
-    getRelatedPosts({ limit: 3 })
+    getRelatedPosts({ limit: 3 }),
+    getSiteSettings()
   ]);
 
   return (
-    <section className="mx-auto max-w-7xl space-y-8 px-4 py-10 sm:px-6 sm:py-14 lg:px-8">
+    <section className="mx-auto max-w-7xl space-y-6 px-4 py-6 sm:px-6 sm:py-8 sm:space-y-8 lg:px-8 lg:py-10">
       <JsonLd data={buildBreadcrumbJsonLd([{ name: "Home", path: "/" }, { name: "Vagas", path: "/vagas" }, { name: job.title, path: `/vagas/${job.slug}` }])} />
       <JsonLd
         data={buildJobPostingJsonLd({
@@ -88,12 +91,12 @@ export default async function JobDetailPage({ params }: { params: Promise<{ slug
 
       <Breadcrumbs items={[{ label: "Home", href: "/" }, { label: "Vagas", href: "/vagas" }, { label: job.title }]} />
 
-      <div className="brand-page-hero rounded-[2rem] border border-slate-200 px-4 py-6 shadow-[0_35px_120px_-70px_rgba(26,43,76,0.22)] sm:rounded-[2.2rem] sm:px-8 sm:py-8">
-        <div className={`grid gap-6 ${job.heroImageUrl ? "lg:grid-cols-[1.15fr_0.85fr]" : "grid-cols-1"}`}>
-          <div className="min-w-0 space-y-5">
+      <div className="brand-page-hero rounded-[1.5rem] border border-slate-200 px-4 py-5 shadow-[0_35px_120px_-70px_rgba(26,43,76,0.22)] sm:rounded-[2rem] sm:px-5 sm:py-6 sm:rounded-[2.2rem] sm:px-8 sm:py-8">
+        <div className={`grid gap-4 ${job.heroImageUrl ? "lg:grid-cols-[1.15fr_0.85fr]" : "grid-cols-1"} sm:gap-6`}>
+          <div className="min-w-0 space-y-4 sm:space-y-5">
             {job.company?.logoUrl || job.companyLogoUrl ? (
-                <div className="inline-flex max-w-full items-center gap-3 rounded-full border border-[color:rgba(26,43,76,0.1)] bg-white px-3 py-1.5 text-xs font-semibold text-[var(--brand-text-secondary)] shadow-sm sm:px-4 sm:py-2 sm:text-sm">
-                 <img src={job.company?.logoUrl ?? job.companyLogoUrl ?? ""} alt={job.companyName} className="h-9 w-9 rounded-2xl border border-[color:rgba(26,43,76,0.1)] bg-white object-cover p-1 sm:h-10 sm:w-10" />
+                <div className="inline-flex max-w-full items-center gap-2.5 rounded-full border border-[color:rgba(26,43,76,0.1)] bg-white px-2.5 py-1 text-[10px] font-semibold text-[var(--brand-text-secondary)] shadow-sm sm:gap-3 sm:px-3 sm:py-1.5 sm:text-xs">
+                 <img src={job.company?.logoUrl ?? job.companyLogoUrl ?? ""} alt={job.companyName} className="h-7 w-7 rounded-2xl border border-[color:rgba(26,43,76,0.1)] bg-white object-cover p-1 sm:h-9 sm:w-9" />
                  <span className="truncate">{job.companyName}</span>
               </div>
             ) : null}
@@ -102,17 +105,17 @@ export default async function JobDetailPage({ params }: { params: Promise<{ slug
               title={job.title}
               description={`${job.companyName} • publicada em ${formatDate(job.publishedAt)} • candidatura no link oficial da empresa`}
             />
-            <div className="flex flex-wrap gap-2.5 sm:gap-3">
+            <div className="flex flex-wrap gap-2 sm:gap-2.5 sm:gap-3">
               {job.locationType ? (
-                <span className="rounded-full border border-[color:rgba(26,43,76,0.1)] bg-white px-3 py-1.5 text-xs font-medium text-[var(--brand-text-secondary)] sm:px-4 sm:py-2 sm:text-sm">
+                <span className="rounded-full border border-[color:rgba(26,43,76,0.1)] bg-white px-2.5 py-1 text-[10px] font-medium text-[var(--brand-text-secondary)] sm:px-3 sm:py-1.5 sm:text-xs">
                   {job.locationType === "REMOTE" ? "Remoto" : job.locationType === "HYBRID" ? "Hibrido" : "Presencial"}
                 </span>
               ) : null}
               {job.workHours ? (
-                <span className="rounded-full border border-[color:rgba(26,43,76,0.1)] bg-white px-3 py-1.5 text-xs font-medium text-[var(--brand-text-secondary)] sm:px-4 sm:py-2 sm:text-sm">{job.workHours}</span>
+                <span className="rounded-full border border-[color:rgba(26,43,76,0.1)] bg-white px-2.5 py-1 text-[10px] font-medium text-[var(--brand-text-secondary)] sm:px-3 sm:py-1.5 sm:text-xs">{job.workHours}</span>
               ) : null}
               {(job.salaryMin || job.salaryMax) ? (
-                <span className="rounded-full border border-[color:rgba(26,43,76,0.1)] bg-white px-3 py-1.5 text-xs font-medium text-[var(--brand-text-secondary)] sm:px-4 sm:py-2 sm:text-sm">
+                <span className="rounded-full border border-[color:rgba(26,43,76,0.1)] bg-white px-2.5 py-1 text-[10px] font-medium text-[var(--brand-text-secondary)] sm:px-3 sm:py-1.5 sm:text-xs">
                   {job.salaryMin && job.salaryMax 
                     ? `R$ ${job.salaryMin.toLocaleString('pt-BR')} - R$ ${job.salaryMax.toLocaleString('pt-BR')}`
                     : job.salaryMin 
@@ -121,18 +124,18 @@ export default async function JobDetailPage({ params }: { params: Promise<{ slug
                   }
                 </span>
               ) : (
-                <span className="rounded-full border border-[color:rgba(26,43,76,0.1)] bg-white px-3 py-1.5 text-xs font-medium text-[var(--brand-text-secondary)] sm:px-4 sm:py-2 sm:text-sm">
+                <span className="rounded-full border border-[color:rgba(26,43,76,0.1)] bg-white px-2.5 py-1 text-[10px] font-medium text-[var(--brand-text-secondary)] sm:px-3 sm:py-1.5 sm:text-xs">
                   Salário: Não informado
                 </span>
               )}
               {(() => {
                 const validityDate = job.validThrough ?? job.expiresAt;
                 return validityDate ? (
-                  <span className="rounded-full border border-[color:rgba(26,43,76,0.1)] bg-white px-3 py-1.5 text-xs font-medium text-[var(--brand-text-secondary)] sm:px-4 sm:py-2 sm:text-sm">
+                  <span className="rounded-full border border-[color:rgba(26,43,76,0.1)] bg-white px-2.5 py-1 text-[10px] font-medium text-[var(--brand-text-secondary)] sm:px-3 sm:py-1.5 sm:text-xs">
                     Validade: {formatDate(validityDate)}
                   </span>
                 ) : (
-                  <span className="rounded-full border border-[color:rgba(26,43,76,0.1)] bg-white px-3 py-1.5 text-xs font-medium text-[var(--brand-text-secondary)] sm:px-4 sm:py-2 sm:text-sm">
+                  <span className="rounded-full border border-[color:rgba(26,43,76,0.1)] bg-white px-2.5 py-1 text-[10px] font-medium text-[var(--brand-text-secondary)] sm:px-3 sm:py-1.5 sm:text-xs">
                     Validade: Não informada
                   </span>
                 );
@@ -140,34 +143,45 @@ export default async function JobDetailPage({ params }: { params: Promise<{ slug
             </div>
           </div>
           {job.heroImageUrl ? (
-            <div className="overflow-hidden rounded-[2rem] border border-slate-200 bg-white/70 shadow-sm">
-              <img src={job.heroImageUrl} alt={job.title} className="h-full max-h-[280px] w-full object-cover" />
+            <div className="overflow-hidden rounded-[1.5rem] border border-slate-200 bg-white/70 shadow-sm sm:rounded-[2rem]">
+              <img src={job.heroImageUrl} alt={job.title} className="h-full max-h-[200px] w-full object-cover sm:max-h-[280px]" />
             </div>
           ) : null}
         </div>
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-[1.08fr_0.92fr]">
-        <div className="space-y-6">
-          <div className="rounded-[1.8rem] border border-slate-200 bg-white p-5 shadow-sm sm:rounded-3xl sm:p-8">
-             <p className="mb-5 rounded-[1.25rem] bg-[var(--brand-soft)] px-4 py-4 text-[15px] leading-7 text-[var(--brand-text-secondary)] sm:mb-6 sm:rounded-[1.5rem] sm:px-5 sm:text-base sm:leading-8">
+      <div className="grid gap-4 sm:gap-6 lg:grid-cols-[1.08fr_0.92fr]">
+        <div className="space-y-4 sm:space-y-6">
+          <div className="rounded-[1.5rem] border border-slate-200 bg-white p-4 shadow-sm sm:rounded-[1.8rem] sm:p-5 sm:rounded-3xl sm:p-8">
+             <p className="mb-4 rounded-[1.25rem] bg-[var(--brand-soft)] px-3 py-3 text-[14px] leading-6 text-[var(--brand-text-secondary)] sm:mb-5 sm:rounded-[1.5rem] sm:px-4 sm:py-4 sm:text-[15px] sm:leading-7 sm:text-base sm:leading-8">
               {job.summary}
             </p>
             <div className="prose-content text-slate-700" dangerouslySetInnerHTML={{ __html: sanitizeRichTextHtml(job.descriptionHtml) }} />
           </div>
 
-          <div className="grid gap-5 md:grid-cols-2">
-            <div className="rounded-[1.8rem] border border-slate-200 bg-white p-5 shadow-sm sm:rounded-3xl sm:p-6">
-              <h2 className="text-xl font-semibold text-[var(--brand-navy)]">Requisitos</h2>
-              <ul className="mt-4 space-y-3 text-sm leading-6 text-[var(--brand-text-secondary)]">
+          {settings.google.adsenseEnabled && settings.google.adsensePublisherId ? (
+            <div className="my-4 sm:my-6">
+              <AdSlot
+                publisherId={settings.google.adsensePublisherId}
+                slot="5678901234"
+                format="auto"
+                fullWidthResponsive={true}
+              />
+            </div>
+          ) : null}
+
+          <div className="grid gap-4 md:grid-cols-2 sm:gap-5">
+            <div className="rounded-[1.5rem] border border-slate-200 bg-white p-4 shadow-sm sm:rounded-[1.8rem] sm:p-5 sm:rounded-3xl sm:p-6">
+              <h2 className="text-lg font-semibold text-[var(--brand-navy)] sm:text-xl">Requisitos</h2>
+              <ul className="mt-3 space-y-2 text-sm leading-6 text-[var(--brand-text-secondary)] sm:mt-4 sm:space-y-3">
                 {(Array.isArray(job.requirements) ? job.requirements : []).map((item: unknown, index: number) => (
                   <li key={`${item}-${index}`}>- {String(item)}</li>
                 ))}
               </ul>
             </div>
-            <div className="rounded-[1.8rem] border border-slate-200 bg-white p-5 shadow-sm sm:rounded-3xl sm:p-6">
-              <h2 className="text-xl font-semibold text-[var(--brand-navy)]">Beneficios</h2>
-              <ul className="mt-4 space-y-3 text-sm leading-6 text-[var(--brand-text-secondary)]">
+            <div className="rounded-[1.5rem] border border-slate-200 bg-white p-4 shadow-sm sm:rounded-[1.8rem] sm:p-5 sm:rounded-3xl sm:p-6">
+              <h2 className="text-lg font-semibold text-[var(--brand-navy)] sm:text-xl">Beneficios</h2>
+              <ul className="mt-3 space-y-2 text-sm leading-6 text-[var(--brand-text-secondary)] sm:mt-4 sm:space-y-3">
                 {(Array.isArray(job.benefits) ? job.benefits : []).map((item: unknown, index: number) => (
                   <li key={`${item}-${index}`}>- {String(item)}</li>
                 ))}
@@ -175,22 +189,22 @@ export default async function JobDetailPage({ params }: { params: Promise<{ slug
             </div>
           </div>
 
-          <div className="brand-panel rounded-[1.8rem] border border-slate-200 p-6 shadow-[0_25px_80px_-50px_rgba(26,43,76,0.2)] sm:rounded-[2rem] sm:p-8">
-            <h2 className="text-2xl font-black text-[var(--brand-navy)]">Veja mais vagas parecidas</h2>
-            <p className="mt-3 text-base leading-8 text-[var(--brand-text-secondary)]">
+          <div className="brand-panel rounded-[1.5rem] border border-slate-200 p-4 shadow-[0_25px_80px_-50px_rgba(26,43,76,0.2)] sm:rounded-[1.8rem] sm:p-6 sm:rounded-[2rem] sm:p-8">
+            <h2 className="text-xl font-black text-[var(--brand-navy)] leading-tight sm:text-2xl">Veja mais vagas parecidas</h2>
+            <p className="mt-2 text-sm leading-6 text-[var(--brand-text-secondary)] sm:mt-3 sm:text-base sm:leading-8">
               Se esta oportunidade chamou a sua atencao, aproveite para ver outras vagas em {job.city.name} e mais oportunidades ligadas a empresas parecidas.
             </p>
-            <div className="mt-5 flex flex-wrap gap-3">
+            <div className="mt-4 flex flex-wrap gap-2 sm:mt-5 sm:gap-3">
               <Link
                 href={`/vagas/estado/${job.state.slug}/${job.city.slug}`}
-                className="rounded-full border border-[color:rgba(26,43,76,0.1)] bg-white px-4 py-2 text-sm font-medium text-[var(--brand-text-secondary)] transition hover:border-[color:rgba(255,109,0,0.24)] hover:text-[var(--brand-orange)]"
+                className="rounded-full border border-[color:rgba(26,43,76,0.1)] bg-white px-3 py-1.5 text-xs font-medium text-[var(--brand-text-secondary)] transition hover:border-[color:rgba(255,109,0,0.24)] hover:text-[var(--brand-orange)] sm:px-4 sm:py-2 sm:text-sm"
               >
                 Mais vagas em {job.city.name}
               </Link>
               {job.company?.slug ? (
                 <Link
                   href={`/empresas/${job.company.slug}`}
-                  className="rounded-full border border-[color:rgba(26,43,76,0.1)] bg-white px-4 py-2 text-sm font-medium text-[var(--brand-text-secondary)] transition hover:border-[color:rgba(255,109,0,0.24)] hover:text-[var(--brand-orange)]"
+                  className="rounded-full border border-[color:rgba(26,43,76,0.1)] bg-white px-3 py-1.5 text-xs font-medium text-[var(--brand-text-secondary)] transition hover:border-[color:rgba(255,109,0,0.24)] hover:text-[var(--brand-orange)] sm:px-4 sm:py-2 sm:text-sm"
                 >
                   Mais vagas da {job.company.name}
                 </Link>
@@ -199,11 +213,11 @@ export default async function JobDetailPage({ params }: { params: Promise<{ slug
           </div>
         </div>
 
-        <aside className="space-y-6">
-          <div className="brand-soft-panel rounded-[1.8rem] border border-slate-200 p-5 shadow-[0_28px_100px_-60px_rgba(26,43,76,0.18)] sm:rounded-[2rem] sm:p-6">
-            <h2 className="text-2xl font-black text-[var(--brand-navy)]">Candidatura</h2>
-            <p className="mt-3 text-sm leading-7 text-[var(--brand-text-secondary)]">Leia os requisitos com calma, atualize o curriculo e envie sua candidatura pelo link oficial da empresa.</p>
-            <Button asChild size="lg" className="mt-5 w-full rounded-2xl">
+        <aside className="space-y-4 sm:space-y-6">
+          <div className="brand-soft-panel rounded-[1.5rem] border border-slate-200 p-4 shadow-[0_28px_100px_-60px_rgba(26,43,76,0.18)] sm:rounded-[1.8rem] sm:p-5 sm:rounded-[2rem] sm:p-6">
+            <h2 className="text-xl font-black text-[var(--brand-navy)] leading-tight sm:text-2xl">Candidatura</h2>
+            <p className="mt-2 text-sm leading-6 text-[var(--brand-text-secondary)] sm:mt-3 sm:leading-7">Leia os requisitos com calma, atualize o curriculo e envie sua candidatura pelo link oficial da empresa.</p>
+            <Button asChild size="lg" className="mt-4 w-full rounded-2xl sm:mt-5">
               <TrackedExternalLink href={job.applyUrl} target="_blank" rel="noreferrer" eventName="apply_click" entityType="job" entitySlug={job.slug}>
                 Candidatar-se
               </TrackedExternalLink>
@@ -216,15 +230,24 @@ export default async function JobDetailPage({ params }: { params: Promise<{ slug
                 eventName="company_site_click"
                 entityType="company"
                 entitySlug={job.company?.slug ?? job.slug}
-                className="mt-4 inline-flex text-sm font-semibold text-[var(--brand-blue)] transition hover:text-[var(--brand-orange)]"
+                className="mt-3 inline-flex text-sm font-semibold text-[var(--brand-blue)] transition hover:text-[var(--brand-orange)] sm:mt-4"
               >
                 Conhecer a empresa
               </TrackedExternalLink>
             ) : null}
           </div>
 
-          <div className="space-y-4">
-            <h2 className="text-lg font-black text-[var(--brand-navy)]">Vagas relacionadas</h2>
+          {settings.google.adsenseEnabled && settings.google.adsensePublisherId ? (
+            <AdSlot
+              publisherId={settings.google.adsensePublisherId}
+              slot="6789012345"
+              format="rectangle"
+              fullWidthResponsive={true}
+            />
+          ) : null}
+
+          <div className="space-y-3 sm:space-y-4">
+            <h2 className="text-base font-black text-[var(--brand-navy)] sm:text-lg">Vagas relacionadas</h2>
             {relatedJobs.map((relatedJob) => (
               <JobCard key={relatedJob.id} job={relatedJob} />
             ))}
