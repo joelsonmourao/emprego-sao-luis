@@ -76,7 +76,7 @@ export function JobSearchForm({
           : "rounded-[1.85rem] border border-white/60 bg-white/99 p-3.5 shadow-[0_30px_100px_-35px_rgba(26,43,76,0.24)] sm:rounded-[2.15rem] sm:p-4"
       }
     >
-      <div className="grid gap-2.5 xl:grid-cols-[1.8fr_1fr_1fr_auto]">
+      <div className="grid gap-2.5 grid-cols-1 lg:grid-cols-[1.8fr_1fr_1fr_auto]">
         <label className="flex items-center gap-3 rounded-[1.15rem] border border-[var(--brand-line)] bg-[linear-gradient(180deg,rgba(255,255,255,0.99),rgba(244,247,246,0.98))] px-4 sm:rounded-2xl">
           <span className="sr-only">Cargo, empresa ou palavra-chave</span>
           <Search className="h-5 w-5 text-[var(--brand-orange)]" />

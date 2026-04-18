@@ -28,6 +28,8 @@ export function AdSlot({
   const initializedRef = useRef(false);
 
   useEffect(() => {
+    console.log('AdSlot montado');
+    
     if (!publisherId || !slot || initializedRef.current) {
       console.log("[AdSense] Skipping: publisherId or slot missing or already initialized", { publisherId, slot, initialized: initializedRef.current });
       return;
