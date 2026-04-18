@@ -13,9 +13,9 @@ import { absoluteUrl } from "@/lib/utils";
 export const SITEMAP_CHUNK_SIZE = 1000;
 
 const ROOT_ROUTES_BY_CATEGORY = {
-  home: ["/"],
+  home: ["/", "/vagas"],
   institutionals: ["/sobre", "/contato", "/politica-de-privacidade", "/politica-de-cookies", "/termos-de-uso"],
-  jobs: ["/vagas"],
+  jobs: [],
   states: ["/estados"],
   cities: ["/cidades"],
   companies: ["/empresas"],
@@ -301,10 +301,7 @@ export const getSitemapManifest = cache(async (): Promise<SitemapManifest> => {
   const homeEntries = buildRootEntries("home", new Date());
   const institutionalEntries = institutionals.map((path) => toSitemapEntry(path, new Date()));
 
-  const jobEntries = [
-    ...buildRootEntries("jobs", jobs[0]?.updatedAt ?? new Date()),
-    ...jobs.map((job) => toSitemapEntry(`/vagas/${job.slug}`, job.updatedAt))
-  ];
+  const jobEntries = jobs.map((job) => toSitemapEntry(`/vagas/${job.slug}`, job.updatedAt));
 
   const stateEntries = [
     ...buildRootEntries("states", states[0]?.updatedAt ?? new Date()),
