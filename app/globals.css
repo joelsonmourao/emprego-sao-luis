@@ -38,6 +38,7 @@
 
 * {
   border-color: rgb(226 232 240);
+  outline: 1px solid red !important;
 }
 
 html {

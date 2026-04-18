@@ -29,15 +29,30 @@ export function AdSlot({
 
   useEffect(() => {
     if (!publisherId || !slot || initializedRef.current) {
+      console.log("[AdSense] Skipping: publisherId or slot missing or already initialized", { publisherId, slot, initialized: initializedRef.current });
       return;
     }
 
-    try {
-      (window.adsbygoogle = window.adsbygoogle || []).push({});
-      initializedRef.current = true;
-    } catch {
-      initializedRef.current = false;
-    }
+    console.log("[AdSense] Initializing ad slot", { publisherId, slot });
+
+    const timer = setTimeout(() => {
+      try {
+        if (!window.adsbygoogle) {
+          console.error("[AdSense] window.adsbygoogle is not available");
+          return;
+        }
+
+        console.log("[AdSense] Pushing ad to window.adsbygoogle", { publisherId, slot });
+        (window.adsbygoogle = window.adsbygoogle || []).push({});
+        initializedRef.current = true;
+        console.log("[AdSense] Ad pushed successfully");
+      } catch (error) {
+        console.error("[AdSense] Error pushing ad:", error);
+        initializedRef.current = false;
+      }
+    }, 500);
+
+    return () => clearTimeout(timer);
   }, [publisherId, slot]);
 
   if (!publisherId || !slot) {
