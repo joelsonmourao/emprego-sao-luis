@@ -2,6 +2,11 @@
 > @workspace/jovem-aprendiz-vagas-next@0.1.0 dev C:\Users\Joelson\Documents\Projeto sites\projeto-limpo\apps\jovem-aprendiz-vagas-next
 > next dev --turbopack
 
- ELIFECYCLE  Command failed with exit code 1.
+   ▲ Next.js 15.5.15 (Turbopack)
+   - Local:        http://localhost:3000
+   - Network:      http://192.168.100.23:3000
+   - Environments: .env.local, .env
 
-C:\Users\Joelson\Documents\Projeto sites\projeto-limpo\apps\jovem-aprendiz-vagas-next>
+ ✓ Starting...
+ ✓ Compiled middleware in 210ms
+ ✓ Ready in 2.2s
