@@ -1,5 +1,5 @@
 export function normalizeAdsensePublisherId(value?: string | null) {
-  const trimmed = (value ?? "").trim();
+  const trimmed = (value ?? "").trim().replace(/[^\w-]/g, "");
 
   if (!trimmed) {
     return "";
