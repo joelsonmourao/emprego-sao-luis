@@ -8,9 +8,9 @@ import {
   CONSENT_COOKIE_NAME,
   CONSENT_EVENT_NAME,
   buildConsentPreferences,
+  buildConsentCookieString,
   defaultConsentPreferences,
-  parseConsentValue,
-  serializeConsentValue
+  parseConsentValue
 } from "@/lib/consent";
 import { Button } from "@/components/ui/button";
 
@@ -40,8 +40,10 @@ function readConsentCookie() {
 
 function persistConsent(analytics: boolean, advertising: boolean) {
   const nextConsent = buildConsentPreferences({ analytics, advertising });
-  const secureFlag = typeof window !== "undefined" && window.location.protocol === "https:" ? "; Secure" : "";
-  document.cookie = `${CONSENT_COOKIE_NAME}=${serializeConsentValue(nextConsent)}; Path=/; Max-Age=${60 * 60 * 24 * 180}; SameSite=Lax${secureFlag}`;
+  document.cookie = buildConsentCookieString(nextConsent, {
+    hostname: typeof window !== "undefined" ? window.location.hostname : undefined,
+    secure: typeof window !== "undefined" && window.location.protocol === "https:"
+  });
   window.__javUpdateConsent?.({ analytics, advertising });
   window.dispatchEvent(new CustomEvent(CONSENT_EVENT_NAME, { detail: nextConsent }));
   return nextConsent;

@@ -37,6 +37,39 @@ export function serializeConsentValue(value: ConsentPreferences) {
   return encodeURIComponent(JSON.stringify(value));
 }
 
+function isLocalHostname(hostname: string) {
+  return (
+    hostname === "localhost" ||
+    hostname === "127.0.0.1" ||
+    hostname === "::1" ||
+    /^\d+\.\d+\.\d+\.\d+$/.test(hostname)
+  );
+}
+
+export function getConsentCookieDomain(hostname?: string | null) {
+  const normalized = hostname?.trim().toLowerCase();
+
+  if (!normalized || isLocalHostname(normalized) || !normalized.includes(".")) {
+    return null;
+  }
+
+  if (normalized.endsWith(".com.br")) {
+    const parts = normalized.split(".");
+    return parts.slice(-3).join(".");
+  }
+
+  const parts = normalized.split(".");
+  return parts.slice(-2).join(".");
+}
+
+export function buildConsentCookieString(value: ConsentPreferences, options?: { hostname?: string | null; secure?: boolean }) {
+  const domain = getConsentCookieDomain(options?.hostname);
+  const secureFlag = options?.secure ? "; Secure" : "";
+  const domainFlag = domain ? `; Domain=${domain}` : "";
+
+  return `${CONSENT_COOKIE_NAME}=${serializeConsentValue(value)}; Path=/; Max-Age=${60 * 60 * 24 * 180}; SameSite=Lax${domainFlag}${secureFlag}`;
+}
+
 export function buildConsentPreferences(input: Pick<ConsentPreferences, "analytics" | "advertising">): ConsentPreferences {
   return {
     necessary: true,
@@ -57,4 +90,3 @@ export function getGoogleConsentState(value: ConsentPreferences | null) {
     ad_personalization: adsGranted ? "granted" : "denied"
   } as const;
 }
-

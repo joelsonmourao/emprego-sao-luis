@@ -6,7 +6,7 @@ import { usePathname, useSearchParams } from "next/navigation";
 
 import { CookieConsentBanner } from "@/components/consent/cookie-consent-banner";
 import { trackPortalEvent } from "@/lib/analytics/client";
-import { CONSENT_COOKIE_NAME, CONSENT_EVENT_NAME, buildConsentPreferences, parseConsentValue, serializeConsentValue } from "@/lib/consent";
+import { CONSENT_COOKIE_NAME, CONSENT_EVENT_NAME, buildConsentCookieString, buildConsentPreferences, parseConsentValue } from "@/lib/consent";
 import { normalizeAdsensePublisherId } from "@/lib/google";
 
 type SiteIntegrationsProps = {
@@ -96,7 +96,10 @@ export function SiteIntegrations({ consentBanner, google, initialConsentValue }:
         analytics: google.analyticsEnabled,
         advertising: google.adsenseEnabled
       });
-      document.cookie = `${CONSENT_COOKIE_NAME}=${serializeConsentValue(fallbackConsent)}; Path=/; Max-Age=${60 * 60 * 24 * 180}; SameSite=Lax`;
+      document.cookie = buildConsentCookieString(fallbackConsent, {
+        hostname: typeof window !== "undefined" ? window.location.hostname : undefined,
+        secure: typeof window !== "undefined" && window.location.protocol === "https:"
+      });
       setConsent({
         analytics: fallbackConsent.analytics,
         advertising: fallbackConsent.advertising
