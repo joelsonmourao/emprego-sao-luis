@@ -147,6 +147,7 @@ export function SiteIntegrations({ consentBanner, google, initialConsentValue }:
   const shouldLoadGtm = analyticsAllowed && Boolean(google.gtmContainerId);
   const normalizedPublisherId = normalizeAdsensePublisherId(google.adsensePublisherId);
   const shouldLoadAdsense = advertisingAllowed && google.adsenseAutoAds && Boolean(normalizedPublisherId);
+  const shouldLoadAdsenseBase = advertisingAllowed && Boolean(normalizedPublisherId);
 
   return (
     <>
@@ -177,6 +178,16 @@ export function SiteIntegrations({ consentBanner, google, initialConsentValue }:
             })(window,document,'script','dataLayer','${google.gtmContainerId}');
           `}
         </Script>
+      ) : null}
+
+      {shouldLoadAdsenseBase ? (
+        <Script
+          id="adsense-base"
+          async
+          strategy="afterInteractive"
+          crossOrigin="anonymous"
+          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"
+        />
       ) : null}
 
       {shouldLoadAdsense ? (

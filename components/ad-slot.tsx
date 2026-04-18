@@ -53,7 +53,7 @@ export function AdSlot({
     >
       <div className="px-3 pb-2 pt-1 text-[10px] font-semibold uppercase tracking-[0.26em] text-slate-400">Publicidade</div>
       <ins
-        className="adsbygoogle block min-h-[120px] w-full"
+        className="adsbygoogle block min-h-[250px] w-full"
         style={{ display: "block" }}
         data-ad-client={publisherId}
         data-ad-slot={slot}

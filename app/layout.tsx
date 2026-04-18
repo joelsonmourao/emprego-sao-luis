@@ -79,7 +79,7 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
 
   return (
     <html lang="pt-BR">
-      <body className="min-h-screen antialiased">
+      <body className="min-h-screen antialiased overflow-x-hidden">
         <ConsentBootstrap />
         <JsonLd data={buildOrganizationJsonLd({ name: settings.legalName || settings.siteName, logoUrl: settings.logoUrl })} />
         <JsonLd data={buildWebsiteJsonLd({ name: settings.siteName })} />
