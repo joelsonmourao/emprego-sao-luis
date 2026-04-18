@@ -64,6 +64,16 @@ export async function generateMetadata({
     page: parsed.page
   });
 
+  const isBaseListing =
+    !parsed.q &&
+    !parsed.estado &&
+    !parsed.cidade &&
+    !parsed.empresa &&
+    (parsed.page ?? 1) === 1 &&
+    (parsed.order ?? "relevance") === "relevance";
+
+  const isDuplicatedHubFilter = !parsed.q && Boolean(parsed.estado || parsed.cidade || parsed.empresa);
+
   return buildSiteMetadata({
     title: buildJobsListingMetaTitle({
       total: jobs.total,
@@ -91,7 +101,7 @@ export async function generateMetadata({
     }),
     // CORREÇÃO: Se houver estado ou cidade, forçamos a indexação (false para noIndex).
     // Se quiser liberar para TUDO, basta colocar noIndex: false
-    noIndex: (parsed.estado || parsed.cidade) ? false : !indexableSearch
+    noIndex: isBaseListing ? false : isDuplicatedHubFilter ? true : !indexableSearch
   });
 }
 

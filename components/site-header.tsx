@@ -13,17 +13,17 @@ export async function SiteHeader() {
     <header className="sticky top-0 z-40 border-b border-[color:rgba(255,255,255,0.08)] bg-[var(--brand-navy)] text-white shadow-[0_18px_50px_-35px_rgba(26,43,76,0.7)] backdrop-blur-2xl">
       <div className="border-b border-white/10 bg-[linear-gradient(90deg,rgba(26,43,76,0.98)_0%,rgba(34,56,99,0.98)_58%,rgba(47,111,237,0.92)_100%)]">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-2 text-xs font-medium text-white/78 sm:px-6 lg:px-8">
-          <p className="inline-flex items-center gap-2">
+          <p className="flex min-w-0 items-center gap-2 leading-5">
             <Sparkles className="h-4 w-4 text-[var(--brand-orange)]" />
-            {siteContent.navigation.topBarText}
+            <span className="line-clamp-2 sm:line-clamp-1">{siteContent.navigation.topBarText}</span>
           </p>
           <Link href={siteContent.navigation.topBarLinkHref as Route} className="hidden text-white md:inline-flex hover:text-[var(--brand-orange)]">
             {siteContent.navigation.topBarLinkLabel}
           </Link>
         </div>
       </div>
-      <div className="mx-auto flex max-w-7xl items-center justify-between gap-6 px-4 py-4 sm:px-6 lg:px-8">
-        <SiteLogo />
+      <div className="mx-auto flex max-w-7xl items-center justify-between gap-3 px-4 py-4 sm:gap-6 sm:px-6 lg:px-8">
+        <SiteLogo className="min-w-0 flex-1" />
 
         <nav className="hidden items-center gap-3 md:flex">
           {siteContent.navigation.main.map((item) => (
@@ -43,16 +43,16 @@ export async function SiteHeader() {
           ))}
         </nav>
 
-        <Button asChild size="sm" className="gap-2 rounded-2xl">
+        <Button asChild size="sm" className="max-w-[10.5rem] gap-2 rounded-2xl px-3 text-xs sm:max-w-none sm:px-4 sm:text-sm">
           <Link href={siteContent.navigation.headerCtaHref as Route}>
-            {siteContent.navigation.headerCtaLabel}
+            <span className="truncate">{siteContent.navigation.headerCtaLabel}</span>
             <ArrowRight className="h-4 w-4" />
           </Link>
         </Button>
       </div>
       <div className="border-t border-white/10 md:hidden">
         <div className="mx-auto max-w-7xl overflow-x-auto px-4 py-3 sm:px-6">
-          <div className="flex min-w-max items-center gap-3">
+          <div className="flex w-max min-w-full items-center gap-3 pr-1">
             {siteContent.navigation.main.map((item) => (
               <Link
                 key={item.href}

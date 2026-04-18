@@ -23,7 +23,7 @@ export async function SiteLogo({
         width={compact ? 52 : 260}
         height={compact ? 52 : 68}
         priority
-        className={compact ? "h-12 w-12" : "h-14 w-auto"}
+        className={compact ? "h-12 w-12" : "h-11 w-auto sm:h-14"}
       />
       {compact && withTagline ? (
         <div className="hidden min-w-0 sm:block">

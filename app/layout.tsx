@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import type { ReactNode } from "react";
 import { cookies, headers } from "next/headers";
 import "./globals.css";
@@ -15,6 +15,12 @@ import { normalizeSearchConsoleVerification } from "@/lib/google";
 import { CONSENT_COOKIE_NAME } from "@/lib/consent";
 import { absoluteUrl } from "@/lib/utils";
 import { getSiteOrigin } from "@/lib/site-url";
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover"
+};
 
 export async function generateMetadata(): Promise<Metadata> {
   const settings = await getSiteSettings();

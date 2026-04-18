@@ -41,16 +41,36 @@
 }
 
 html {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: clip;
   scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
 }
 
 body {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
   background:
     radial-gradient(circle at top, rgb(47 111 237 / 0.08), transparent 28%),
     radial-gradient(circle at right top, rgb(255 109 0 / 0.08), transparent 22%),
     linear-gradient(180deg, #ffffff 0%, #f4f7f6 60%, #ffffff 100%);
   color: #1a2b4c;
   font-family: "Aptos", "Trebuchet MS", "Segoe UI", sans-serif;
+}
+
+main {
+  width: 100%;
+  max-width: 100%;
+}
+
+img,
+svg,
+video,
+canvas,
+iframe {
+  max-width: 100%;
 }
 
 h1,
