@@ -314,14 +314,14 @@ export default async function HomePage() {
       <JsonLd data={buildFaqJsonLd(siteContent.faq.home)} />
       <section className="relative overflow-hidden border-b border-slate-200 bg-[linear-gradient(135deg,#1a2b4c_0%,#21406e_34%,#2f6fed_76%,#ff6d00_100%)] text-white">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_18%_20%,rgba(255,255,255,0.16),transparent_16%),radial-gradient(circle_at_88%_14%,rgba(255,179,71,0.16),transparent_14%),radial-gradient(circle_at_72%_80%,rgba(255,255,255,0.12),transparent_18%)]" />
-        <div className="mx-auto grid max-w-7xl gap-10 px-4 py-18 sm:px-6 lg:grid-cols-[1.1fr_0.9fr] lg:px-8 lg:py-22">
+        <div className="mx-auto grid max-w-7xl gap-8 px-4 py-14 sm:px-6 sm:py-18 lg:grid-cols-[1.1fr_0.9fr] lg:px-8 lg:py-22">
           <div className="relative space-y-8">
-            <div className="inline-flex rounded-full border border-white/18 bg-white/10 px-4 py-2 text-xs font-semibold uppercase tracking-[0.28em] text-orange-50">
+            <div className="inline-flex rounded-full border border-white/18 bg-white/10 px-3 py-2 text-[10px] font-semibold uppercase tracking-[0.24em] text-orange-50 sm:px-4 sm:text-xs sm:tracking-[0.28em]">
               {siteContent.home.heroBadge}
             </div>
             <div className="space-y-5">
-              <h1 className="max-w-4xl text-5xl font-black tracking-tight sm:text-6xl xl:text-7xl">{siteContent.home.heroTitle}</h1>
-              <p className="max-w-3xl text-lg leading-8 text-white/86">{siteContent.home.heroDescription}</p>
+              <h1 className="max-w-4xl text-3xl font-black tracking-tight sm:text-5xl xl:text-7xl">{siteContent.home.heroTitle}</h1>
+              <p className="max-w-3xl text-base leading-7 text-white/86 sm:text-lg sm:leading-8">{siteContent.home.heroDescription}</p>
             </div>
 
             <JobSearchForm
@@ -333,7 +333,7 @@ export default async function HomePage() {
               footerLinkLabel="Abrir todas as vagas"
             />
 
-            <div className="flex flex-wrap gap-4">
+            <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:gap-4">
               <Button asChild size="lg" className="gap-2">
                 <Link href={siteContent.home.primaryButton.href as Route}>
                   {siteContent.home.primaryButton.label}

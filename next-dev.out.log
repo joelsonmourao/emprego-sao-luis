@@ -1,0 +1,57 @@
+
+> @workspace/jovem-aprendiz-vagas-next@0.1.0 dev C:\Users\Joelson\Documents\Projeto sites\projeto-limpo\apps\jovem-aprendiz-vagas-next
+> next dev --turbopack
+
+   ▲ Next.js 15.5.15 (Turbopack)
+   - Local:        http://localhost:3000
+   - Network:      http://192.168.100.22:3000
+   - Environments: .env.local, .env
+
+ ✓ Starting...
+ ✓ Compiled middleware in 211ms
+ ✓ Ready in 2.1s
+ ○ Compiling / ...
+ ✓ Compiled / in 2.9s
+ GET / 200 in 5466ms
+ GET / 200 in 1303ms
+ GET / 200 in 1101ms
+ ✓ Compiled /vagas in 363ms
+ GET /vagas 200 in 2112ms
+ ✓ Compiled /vagas/[slug] in 314ms
+ GET /vagas/aprendiz-hmb-recife 200 in 2344ms
+ ✓ Compiled middleware in 11ms
+ ✓ Compiled in 84ms
+ ✓ Compiled in 125ms
+ ✓ Compiled in 109ms
+ ✓ Compiled in 110ms
+ ✓ Compiled / in 135ms
+ GET / 200 in 1410ms
+ GET /vagas/aprendiz-administrativo-saude-ma-slz-51 404 in 1428ms
+ GET / 200 in 1107ms
+ GET / 200 in 1587ms
+ ✓ Compiled /vagas in 107ms
+ GET /vagas 200 in 1767ms
+ GET /vagas/aprendiz-area-de-gente-rh 200 in 1593ms
+ GET / 200 in 1243ms
+ GET /vagas/aprendiz-area-de-gente-rh 200 in 1804ms
+ GET / 200 in 1925ms
+ GET /vagas/aprendiz-area-de-gente-rh 200 in 1425ms
+ GET / 200 in 1638ms
+ GET / 200 in 1625ms
+ GET / 200 in 1803ms
+ ✓ Compiled /icon.svg in 439ms
+ GET /vagas 200 in 1644ms
+ GET /icon.svg 200 in 106ms
+ GET /vagas/aprendiz-area-de-gente-rh 200 in 1423ms
+ GET /icon.svg 200 in 135ms
+ ✓ Compiled in 109ms
+ ✓ Compiled /vagas in 364ms
+ GET /vagas/aprendiz-area-de-gente-rh 200 in 4417ms
+ GET /vagas 200 in 4714ms
+ GET / 200 in 4527ms
+ ✓ Compiled in 102ms
+ ✓ Compiled in 88ms
+ ✓ Compiled in 75ms
+ ✓ Compiled /vagas/[slug] in 106ms
+ GET /vagas/aprendiz-area-de-gente-rh 200 in 2422ms
+ GET /icon.svg 200 in 209ms

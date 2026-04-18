@@ -88,13 +88,13 @@ export default async function JobDetailPage({ params }: { params: Promise<{ slug
 
       <Breadcrumbs items={[{ label: "Home", href: "/" }, { label: "Vagas", href: "/vagas" }, { label: job.title }]} />
 
-      <div className="brand-page-hero rounded-[2.2rem] border border-slate-200 px-6 py-8 shadow-[0_35px_120px_-70px_rgba(26,43,76,0.22)] sm:px-8">
+      <div className="brand-page-hero rounded-[2.2rem] border border-slate-200 px-5 py-8 shadow-[0_35px_120px_-70px_rgba(26,43,76,0.22)] sm:px-8">
         <div className={`grid gap-6 ${job.heroImageUrl ? "lg:grid-cols-[1.15fr_0.85fr]" : "grid-cols-1"}`}>
-          <div className="space-y-5">
+          <div className="min-w-0 space-y-5">
             {job.company?.logoUrl || job.companyLogoUrl ? (
-                <div className="inline-flex items-center gap-3 rounded-full border border-[color:rgba(26,43,76,0.1)] bg-white px-4 py-2 text-sm font-semibold text-[var(--brand-text-secondary)] shadow-sm">
+                <div className="inline-flex max-w-full items-center gap-3 rounded-full border border-[color:rgba(26,43,76,0.1)] bg-white px-4 py-2 text-sm font-semibold text-[var(--brand-text-secondary)] shadow-sm">
                  <img src={job.company?.logoUrl ?? job.companyLogoUrl ?? ""} alt={job.companyName} className="h-10 w-10 rounded-2xl border border-[color:rgba(26,43,76,0.1)] bg-white object-cover p-1" />
-                {job.companyName}
+                 <span className="truncate">{job.companyName}</span>
               </div>
             ) : null}
             <SectionHeading
