@@ -1,4 +1,4 @@
-function normalizeOrigin(value?: string | null) {
+export function normalizeOrigin(value?: string | null) {
   const trimmed = value?.trim();
   if (!trimmed) return null;
 
@@ -6,6 +6,9 @@ function normalizeOrigin(value?: string | null) {
 
   try {
     const url = new URL(withProtocol);
+    if (/^www\./i.test(url.hostname)) {
+      url.hostname = url.hostname.replace(/^www\./i, "");
+    }
     url.pathname = "";
     url.search = "";
     url.hash = "";

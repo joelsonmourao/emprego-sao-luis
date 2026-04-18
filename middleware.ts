@@ -5,12 +5,20 @@ import { ADMIN_AUTH_COOKIE, verifyAdminSessionToken } from "@/lib/auth-token";
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
+  const hostname = request.nextUrl.hostname.toLowerCase();
   const isAdminPage = pathname.startsWith("/admin");
   const isAdminApi = pathname.startsWith("/api/admin");
   const isLoginPage = pathname === "/admin/login";
   const isLoginApi = pathname === "/api/admin/login";
   const requestHeaders = new Headers(request.headers);
   requestHeaders.set("x-app-section", isAdminPage || isAdminApi ? "admin" : "public");
+
+  if (hostname === "www.slzcontent.com.br") {
+    const canonicalUrl = request.nextUrl.clone();
+    canonicalUrl.hostname = "slzcontent.com.br";
+    canonicalUrl.protocol = "https:";
+    return NextResponse.redirect(canonicalUrl, 301);
+  }
 
   if (isAdminPage || isAdminApi) {
     const token = request.cookies.get(ADMIN_AUTH_COOKIE)?.value;
