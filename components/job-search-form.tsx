@@ -72,12 +72,12 @@ export function JobSearchForm({
       }}
       className={
         compact
-          ? "rounded-[2rem] border border-[var(--brand-line)] bg-white/98 p-4 shadow-[0_24px_70px_-40px_rgba(26,43,76,0.18)]"
-          : "rounded-[2.15rem] border border-white/60 bg-white/99 p-4 shadow-[0_30px_100px_-35px_rgba(26,43,76,0.24)]"
+          ? "rounded-[1.7rem] border border-[var(--brand-line)] bg-white/98 p-3.5 shadow-[0_24px_70px_-40px_rgba(26,43,76,0.18)] sm:rounded-[2rem] sm:p-4"
+          : "rounded-[1.85rem] border border-white/60 bg-white/99 p-3.5 shadow-[0_30px_100px_-35px_rgba(26,43,76,0.24)] sm:rounded-[2.15rem] sm:p-4"
       }
     >
-      <div className="grid gap-3 xl:grid-cols-[1.8fr_1fr_1fr_auto]">
-        <label className="flex items-center gap-3 rounded-2xl border border-[var(--brand-line)] bg-[linear-gradient(180deg,rgba(255,255,255,0.99),rgba(244,247,246,0.98))] px-4">
+      <div className="grid gap-2.5 xl:grid-cols-[1.8fr_1fr_1fr_auto]">
+        <label className="flex items-center gap-3 rounded-[1.15rem] border border-[var(--brand-line)] bg-[linear-gradient(180deg,rgba(255,255,255,0.99),rgba(244,247,246,0.98))] px-4 sm:rounded-2xl">
           <span className="sr-only">Cargo, empresa ou palavra-chave</span>
           <Search className="h-5 w-5 text-[var(--brand-orange)]" />
           <input
@@ -85,11 +85,11 @@ export function JobSearchForm({
             defaultValue={initialQuery}
             placeholder="Cargo, empresa ou palavra-chave"
             aria-label="Cargo, empresa ou palavra-chave"
-            className="h-12 w-full bg-transparent text-sm text-[var(--brand-navy)] outline-none placeholder:text-[var(--brand-text-secondary)]"
+            className="h-11 w-full bg-transparent text-sm text-[var(--brand-navy)] outline-none placeholder:text-[var(--brand-text-secondary)] sm:h-12"
           />
         </label>
 
-        <label className="flex items-center gap-3 rounded-2xl border border-[var(--brand-line)] bg-[linear-gradient(180deg,rgba(255,255,255,0.99),rgba(244,247,246,0.98))] px-4">
+        <label className="flex items-center gap-3 rounded-[1.15rem] border border-[var(--brand-line)] bg-[linear-gradient(180deg,rgba(255,255,255,0.99),rgba(244,247,246,0.98))] px-4 sm:rounded-2xl">
           <span className="sr-only">Estado</span>
           <MapPinned className="h-5 w-5 text-[var(--brand-blue)]" />
           <select
@@ -97,7 +97,7 @@ export function JobSearchForm({
             value={selectedState}
             onChange={(event) => setSelectedState(event.target.value)}
             aria-label="Estado"
-            className="h-12 w-full bg-transparent text-sm text-[var(--brand-navy)] outline-none"
+            className="h-11 w-full bg-transparent text-sm text-[var(--brand-navy)] outline-none sm:h-12"
           >
             <option value="">Todos os estados</option>
             {states.map((state) => (
@@ -108,7 +108,7 @@ export function JobSearchForm({
           </select>
         </label>
 
-        <label className="flex items-center gap-3 rounded-2xl border border-[var(--brand-line)] bg-[linear-gradient(180deg,rgba(255,255,255,0.99),rgba(244,247,246,0.98))] px-4">
+        <label className="flex items-center gap-3 rounded-[1.15rem] border border-[var(--brand-line)] bg-[linear-gradient(180deg,rgba(255,255,255,0.99),rgba(244,247,246,0.98))] px-4 sm:rounded-2xl">
           <span className="sr-only">Cidade</span>
           <MapPinned className="h-5 w-5 text-[var(--brand-blue)]" />
           <select
@@ -116,7 +116,7 @@ export function JobSearchForm({
             value={selectedCity}
             onChange={(event) => setSelectedCity(event.target.value)}
             aria-label="Cidade"
-            className="h-12 w-full bg-transparent text-sm text-[var(--brand-navy)] outline-none"
+            className="h-11 w-full bg-transparent text-sm text-[var(--brand-navy)] outline-none sm:h-12"
           >
             <option value="">Todas as cidades</option>
             {availableCities.map((city) => (
@@ -127,13 +127,13 @@ export function JobSearchForm({
           </select>
         </label>
 
-        <Button type="submit" className="h-12 rounded-2xl">
+        <Button type="submit" className="h-11 rounded-[1.15rem] sm:h-12 sm:rounded-2xl">
           {submitLabel}
         </Button>
       </div>
 
-      <div className="mt-4 flex flex-col gap-3 text-xs text-[var(--brand-text-secondary)] md:flex-row md:items-center md:justify-between">
-        <p className="inline-flex items-center gap-2">
+      <div className="mt-3 flex flex-col gap-2 text-[11px] text-[var(--brand-text-secondary)] md:mt-4 md:flex-row md:items-center md:justify-between md:text-xs">
+        <p className="inline-flex items-start gap-2 leading-5">
           <SlidersHorizontal className="h-4 w-4 text-[var(--brand-orange)]" />
           {helperText}
         </p>

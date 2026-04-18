@@ -11,7 +11,6 @@ import {
   TrendingUp
 } from "lucide-react";
 
-import { AdSlot } from "@/components/ad-slot";
 import { BlogCard } from "@/components/blog-card";
 import { FaqList } from "@/components/faq-list";
 import { JobCard } from "@/components/job-card";
@@ -119,7 +118,7 @@ export default async function HomePage() {
       </section>
     ),
     featuredJobs: (
-      <section className="mx-auto grid max-w-7xl gap-8 px-4 py-8 sm:px-6 lg:grid-cols-[1fr_320px] lg:px-8">
+      <section className="mx-auto grid max-w-7xl gap-6 px-4 py-8 sm:px-6 lg:grid-cols-[1fr_320px] lg:px-8">
         <div className="space-y-8">
           <SectionHeading eyebrow="Vagas em destaque" title={siteContent.home.featuredTitle} description={siteContent.home.featuredDescription} />
           <div className="grid gap-6 lg:grid-cols-2">
@@ -138,7 +137,6 @@ export default async function HomePage() {
         </div>
 
         <aside className="space-y-6">
-          <AdSlot className="min-h-64 rounded-[2rem]" label="Espaco AdSense 300x600" />
           <div className="brand-chip rounded-[2rem] p-6">
             <h2 className="text-lg font-black text-[var(--brand-navy)]">Estados em destaque</h2>
             <div className="mt-4 flex flex-wrap gap-3">
@@ -149,6 +147,23 @@ export default async function HomePage() {
                   className="rounded-full border border-[color:rgba(26,43,76,0.1)] bg-white px-4 py-2 text-sm font-medium text-[var(--brand-text-secondary)] transition hover:border-[color:rgba(255,109,0,0.26)] hover:text-[var(--brand-orange)]"
                 >
                   {state.name} ({state._count.jobs})
+                </Link>
+              ))}
+            </div>
+          </div>
+          <div className="brand-panel rounded-[2rem] border border-slate-200 p-6 shadow-[0_25px_80px_-50px_rgba(26,43,76,0.2)]">
+            <h2 className="text-lg font-black text-[var(--brand-navy)]">Cidades que estao puxando novas vagas</h2>
+            <p className="mt-2 text-sm leading-7 text-[var(--brand-text-secondary)]">
+              Explore cidades com movimentacao recente para encontrar oportunidades mais perto da sua rotina.
+            </p>
+            <div className="mt-4 flex flex-wrap gap-3">
+              {cities.slice(0, 6).map((city) => (
+                <Link
+                  key={city.id}
+                  href={`/vagas/estado/${city.state.slug}/${city.slug}`}
+                  className="rounded-full border border-[color:rgba(26,43,76,0.1)] bg-white px-4 py-2 text-sm font-medium text-[var(--brand-text-secondary)] transition hover:border-[color:rgba(255,109,0,0.26)] hover:text-[var(--brand-orange)]"
+                >
+                  {city.name}, {city.state.code}
                 </Link>
               ))}
             </div>
@@ -276,7 +291,23 @@ export default async function HomePage() {
             </div>
           </div>
 
-          <AdSlot className="min-h-44 rounded-[2rem]" label="Espaco AdSense horizontal" />
+          <div className="brand-dark-panel rounded-[2rem] p-7 text-white shadow-[0_30px_100px_-50px_rgba(26,43,76,0.78)]">
+            <h2 className="text-xl font-black">Oportunidades por cidade ajudam a filtrar mais rapido</h2>
+            <p className="mt-3 text-sm leading-7 text-white/84">
+              Quando voce entra por cidade ou empresa, a navegacao fica menos genérica e o portal mostra oportunidades mais perto do seu contexto.
+            </p>
+            <div className="mt-5 flex flex-wrap gap-3">
+              {cities.slice(0, 5).map((city) => (
+                <Link
+                  key={city.id}
+                  href={`/vagas/estado/${city.state.slug}/${city.slug}`}
+                  className="rounded-full border border-white/18 bg-white/10 px-4 py-2 text-sm font-medium text-white transition hover:bg-white/16"
+                >
+                  {city.name}
+                </Link>
+              ))}
+            </div>
+          </div>
         </div>
       </section>
     ),
@@ -314,14 +345,14 @@ export default async function HomePage() {
       <JsonLd data={buildFaqJsonLd(siteContent.faq.home)} />
       <section className="relative overflow-hidden border-b border-slate-200 bg-[linear-gradient(135deg,#1a2b4c_0%,#21406e_34%,#2f6fed_76%,#ff6d00_100%)] text-white">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_18%_20%,rgba(255,255,255,0.16),transparent_16%),radial-gradient(circle_at_88%_14%,rgba(255,179,71,0.16),transparent_14%),radial-gradient(circle_at_72%_80%,rgba(255,255,255,0.12),transparent_18%)]" />
-        <div className="mx-auto grid max-w-7xl gap-8 px-4 py-14 sm:px-6 sm:py-18 lg:grid-cols-[1.1fr_0.9fr] lg:px-8 lg:py-22">
-          <div className="relative space-y-8">
-            <div className="inline-flex rounded-full border border-white/18 bg-white/10 px-3 py-2 text-[10px] font-semibold uppercase tracking-[0.24em] text-orange-50 sm:px-4 sm:text-xs sm:tracking-[0.28em]">
+        <div className="mx-auto grid max-w-7xl gap-6 px-4 py-10 sm:px-6 sm:py-16 lg:grid-cols-[1.08fr_0.92fr] lg:px-8 lg:py-22">
+          <div className="relative space-y-6">
+            <div className="inline-flex rounded-full border border-white/18 bg-white/10 px-3 py-1.5 text-[10px] font-semibold uppercase tracking-[0.22em] text-orange-50 sm:px-4 sm:py-2 sm:text-xs sm:tracking-[0.28em]">
               {siteContent.home.heroBadge}
             </div>
-            <div className="space-y-5">
-              <h1 className="max-w-4xl text-3xl font-black tracking-tight sm:text-5xl xl:text-7xl">{siteContent.home.heroTitle}</h1>
-              <p className="max-w-3xl text-base leading-7 text-white/86 sm:text-lg sm:leading-8">{siteContent.home.heroDescription}</p>
+            <div className="space-y-4">
+              <h1 className="max-w-4xl text-[2.15rem] font-black tracking-tight leading-[1.05] sm:text-5xl xl:text-7xl">{siteContent.home.heroTitle}</h1>
+              <p className="max-w-3xl text-[15px] leading-7 text-white/86 sm:text-lg sm:leading-8">{siteContent.home.heroDescription}</p>
             </div>
 
             <JobSearchForm
@@ -347,8 +378,8 @@ export default async function HomePage() {
           </div>
 
           <div className="relative">
-            <div className="mesh-surface rounded-[2.5rem] border border-white/20 p-6 shadow-[0_40px_120px_-50px_rgba(26,43,76,0.72)]">
-              <div className="grid gap-4 sm:grid-cols-2">
+            <div className="mesh-surface rounded-[2rem] border border-white/20 p-4 shadow-[0_40px_120px_-50px_rgba(26,43,76,0.72)] sm:rounded-[2.5rem] sm:p-6">
+              <div className="grid gap-3 sm:grid-cols-2 sm:gap-4">
                 {siteContent.home.heroHighlights.slice(0, 4).map((item, index) => {
                   const Icon = iconMap[item.iconKey as keyof typeof iconMap] ?? BriefcaseBusiness;
                   const featured = index === 1;
@@ -359,12 +390,12 @@ export default async function HomePage() {
                       href={item.href as Route}
                       className={
                         featured
-                          ? "rounded-[1.75rem] bg-[linear-gradient(145deg,#1a2b4c_0%,#21406e_54%,#2f6fed_100%)] p-5 text-white shadow-[0_20px_50px_-30px_rgba(26,43,76,0.72)] transition hover:-translate-y-1"
-                          : "rounded-[1.75rem] bg-white p-5 text-[var(--brand-navy)] shadow-sm transition hover:-translate-y-1"
+                          ? "rounded-[1.5rem] bg-[linear-gradient(145deg,#1a2b4c_0%,#21406e_54%,#2f6fed_100%)] p-4 text-white shadow-[0_20px_50px_-30px_rgba(26,43,76,0.72)] transition hover:-translate-y-1 sm:rounded-[1.75rem] sm:p-5"
+                          : "rounded-[1.5rem] bg-white p-4 text-[var(--brand-navy)] shadow-sm transition hover:-translate-y-1 sm:rounded-[1.75rem] sm:p-5"
                       }
                     >
                       <Icon className={`h-8 w-8 ${featured ? "text-[var(--brand-orange)]" : "text-[var(--brand-blue)]"}`} />
-                      <h2 className="mt-4 text-xl font-black">{item.title}</h2>
+                      <h2 className="mt-3 text-lg font-black leading-tight sm:mt-4 sm:text-xl">{item.title}</h2>
                       <p className={`mt-2 text-sm leading-6 ${featured ? "text-white/84" : "text-[var(--brand-text-secondary)]"}`}>{item.description}</p>
                     </Link>
                   );

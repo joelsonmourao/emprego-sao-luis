@@ -4,6 +4,8 @@ import path from "node:path";
 
 const EDGE_PATH = "C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe";
 const OUTPUT_DIR = path.resolve(process.cwd(), "..", "..", "artifacts", "frontend-audit");
+const BASE_URL = process.env.FRONTEND_AUDIT_BASE_URL ?? "https://slzcontent.com.br";
+const DEBUG_PORT = Number(process.env.FRONTEND_AUDIT_PORT ?? "9333");
 
 async function ensureDir(dir) {
   await fs.mkdir(dir, { recursive: true });
@@ -178,10 +180,34 @@ async function captureScenario(client, options) {
       adsScriptPresent: Boolean(document.querySelector('script[src*="adsbygoogle.js"]')),
       adsFrames: document.querySelectorAll('iframe[src*="googleads"], iframe[id*="google_ads"], iframe[data-google-container-id]').length,
       adsPlaceholders: [...document.querySelectorAll('div')].filter((node) => node.textContent?.includes('Espaco AdSense')).length,
-      adsIns: document.querySelectorAll('ins.adsbygoogle').length
+      adsIns: document.querySelectorAll('ins.adsbygoogle').length,
+      visibleAdFrames: [...document.querySelectorAll('iframe[src*="googleads"], iframe[id*="google_ads"], iframe[data-google-container-id]')]
+        .map((node) => {
+          const rect = node.getBoundingClientRect();
+          return {
+            top: rect.top + window.scrollY,
+            left: rect.left + window.scrollX,
+            width: rect.width,
+            height: rect.height
+          };
+        })
+        .filter((rect) => rect.width > 20 && rect.height > 20)
     }))()`,
     returnByValue: true
   });
+
+  const firstVisibleAd = metrics.result.value.visibleAdFrames?.[0];
+  if (firstVisibleAd) {
+    await client.send("Runtime.evaluate", {
+      expression: `window.scrollTo({ top: ${Math.max(0, Math.floor(firstVisibleAd.top) - 24)}, behavior: 'instant' });`
+    });
+    await delay(1500);
+    const adScreenshot = await client.send("Page.captureScreenshot", {
+      format: "png",
+      fromSurface: true
+    });
+    await fs.writeFile(path.join(OUTPUT_DIR, `${name}-ad.png`), Buffer.from(adScreenshot.data, "base64"));
+  }
 
   const screenshot = await client.send("Page.captureScreenshot", {
     format: "png",
@@ -209,7 +235,7 @@ async function captureScenario(client, options) {
 
 async function main() {
   await ensureDir(OUTPUT_DIR);
-  const port = 9222;
+  const port = DEBUG_PORT;
   const proc = await launchEdge(port);
 
   try {
@@ -222,12 +248,12 @@ async function main() {
     await client.send("Network.enable");
 
     const scenarios = [
-      { name: "home-no-consent", url: "https://slzcontent.com.br/", width: 390, height: 844 },
-      { name: "home-consent", url: "https://slzcontent.com.br/", width: 390, height: 844, acceptConsent: true },
-      { name: "job-consent", url: "https://slzcontent.com.br/vagas/aprendiz-area-de-gente-rh", width: 390, height: 844, acceptConsent: true },
-      { name: "home-360", url: "https://slzcontent.com.br/", width: 360, height: 800 },
-      { name: "jobs-390", url: "https://slzcontent.com.br/vagas", width: 390, height: 844 },
-      { name: "job-390", url: "https://slzcontent.com.br/vagas/aprendiz-area-de-gente-rh", width: 390, height: 844 }
+      { name: "home-no-consent", url: `${BASE_URL}/`, width: 390, height: 844 },
+      { name: "home-consent", url: `${BASE_URL}/`, width: 390, height: 844, acceptConsent: true },
+      { name: "job-consent", url: `${BASE_URL}/vagas/aprendiz-area-de-gente-rh`, width: 390, height: 844, acceptConsent: true },
+      { name: "home-360", url: `${BASE_URL}/`, width: 360, height: 800 },
+      { name: "jobs-390", url: `${BASE_URL}/vagas`, width: 390, height: 844 },
+      { name: "job-390", url: `${BASE_URL}/vagas/aprendiz-area-de-gente-rh`, width: 390, height: 844 }
     ];
 
     const results = [];

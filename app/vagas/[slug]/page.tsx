@@ -56,7 +56,7 @@ export default async function JobDetailPage({ params }: { params: Promise<{ slug
   ]);
 
   return (
-    <section className="mx-auto max-w-7xl space-y-10 px-4 py-14 sm:px-6 lg:px-8">
+    <section className="mx-auto max-w-7xl space-y-8 px-4 py-10 sm:px-6 sm:py-14 lg:px-8">
       <JsonLd data={buildBreadcrumbJsonLd([{ name: "Home", path: "/" }, { name: "Vagas", path: "/vagas" }, { name: job.title, path: `/vagas/${job.slug}` }])} />
       <JsonLd
         data={buildJobPostingJsonLd({
@@ -88,12 +88,12 @@ export default async function JobDetailPage({ params }: { params: Promise<{ slug
 
       <Breadcrumbs items={[{ label: "Home", href: "/" }, { label: "Vagas", href: "/vagas" }, { label: job.title }]} />
 
-      <div className="brand-page-hero rounded-[2.2rem] border border-slate-200 px-5 py-8 shadow-[0_35px_120px_-70px_rgba(26,43,76,0.22)] sm:px-8">
+      <div className="brand-page-hero rounded-[2rem] border border-slate-200 px-4 py-6 shadow-[0_35px_120px_-70px_rgba(26,43,76,0.22)] sm:rounded-[2.2rem] sm:px-8 sm:py-8">
         <div className={`grid gap-6 ${job.heroImageUrl ? "lg:grid-cols-[1.15fr_0.85fr]" : "grid-cols-1"}`}>
           <div className="min-w-0 space-y-5">
             {job.company?.logoUrl || job.companyLogoUrl ? (
-                <div className="inline-flex max-w-full items-center gap-3 rounded-full border border-[color:rgba(26,43,76,0.1)] bg-white px-4 py-2 text-sm font-semibold text-[var(--brand-text-secondary)] shadow-sm">
-                 <img src={job.company?.logoUrl ?? job.companyLogoUrl ?? ""} alt={job.companyName} className="h-10 w-10 rounded-2xl border border-[color:rgba(26,43,76,0.1)] bg-white object-cover p-1" />
+                <div className="inline-flex max-w-full items-center gap-3 rounded-full border border-[color:rgba(26,43,76,0.1)] bg-white px-3 py-1.5 text-xs font-semibold text-[var(--brand-text-secondary)] shadow-sm sm:px-4 sm:py-2 sm:text-sm">
+                 <img src={job.company?.logoUrl ?? job.companyLogoUrl ?? ""} alt={job.companyName} className="h-9 w-9 rounded-2xl border border-[color:rgba(26,43,76,0.1)] bg-white object-cover p-1 sm:h-10 sm:w-10" />
                  <span className="truncate">{job.companyName}</span>
               </div>
             ) : null}
@@ -102,17 +102,17 @@ export default async function JobDetailPage({ params }: { params: Promise<{ slug
               title={job.title}
               description={`${job.companyName} • publicada em ${formatDate(job.publishedAt)} • candidatura no link oficial da empresa`}
             />
-            <div className="flex flex-wrap gap-3">
+            <div className="flex flex-wrap gap-2.5 sm:gap-3">
               {job.locationType ? (
-                <span className="rounded-full border border-[color:rgba(26,43,76,0.1)] bg-white px-4 py-2 text-sm font-medium text-[var(--brand-text-secondary)]">
+                <span className="rounded-full border border-[color:rgba(26,43,76,0.1)] bg-white px-3 py-1.5 text-xs font-medium text-[var(--brand-text-secondary)] sm:px-4 sm:py-2 sm:text-sm">
                   {job.locationType === "REMOTE" ? "Remoto" : job.locationType === "HYBRID" ? "Hibrido" : "Presencial"}
                 </span>
               ) : null}
               {job.workHours ? (
-                <span className="rounded-full border border-[color:rgba(26,43,76,0.1)] bg-white px-4 py-2 text-sm font-medium text-[var(--brand-text-secondary)]">{job.workHours}</span>
+                <span className="rounded-full border border-[color:rgba(26,43,76,0.1)] bg-white px-3 py-1.5 text-xs font-medium text-[var(--brand-text-secondary)] sm:px-4 sm:py-2 sm:text-sm">{job.workHours}</span>
               ) : null}
               {(job.salaryMin || job.salaryMax) ? (
-                <span className="rounded-full border border-[color:rgba(26,43,76,0.1)] bg-white px-4 py-2 text-sm font-medium text-[var(--brand-text-secondary)]">
+                <span className="rounded-full border border-[color:rgba(26,43,76,0.1)] bg-white px-3 py-1.5 text-xs font-medium text-[var(--brand-text-secondary)] sm:px-4 sm:py-2 sm:text-sm">
                   {job.salaryMin && job.salaryMax 
                     ? `R$ ${job.salaryMin.toLocaleString('pt-BR')} - R$ ${job.salaryMax.toLocaleString('pt-BR')}`
                     : job.salaryMin 
@@ -121,18 +121,18 @@ export default async function JobDetailPage({ params }: { params: Promise<{ slug
                   }
                 </span>
               ) : (
-                <span className="rounded-full border border-[color:rgba(26,43,76,0.1)] bg-white px-4 py-2 text-sm font-medium text-[var(--brand-text-secondary)]">
+                <span className="rounded-full border border-[color:rgba(26,43,76,0.1)] bg-white px-3 py-1.5 text-xs font-medium text-[var(--brand-text-secondary)] sm:px-4 sm:py-2 sm:text-sm">
                   Salário: Não informado
                 </span>
               )}
               {(() => {
                 const validityDate = job.validThrough ?? job.expiresAt;
                 return validityDate ? (
-                  <span className="rounded-full border border-[color:rgba(26,43,76,0.1)] bg-white px-4 py-2 text-sm font-medium text-[var(--brand-text-secondary)]">
+                  <span className="rounded-full border border-[color:rgba(26,43,76,0.1)] bg-white px-3 py-1.5 text-xs font-medium text-[var(--brand-text-secondary)] sm:px-4 sm:py-2 sm:text-sm">
                     Validade: {formatDate(validityDate)}
                   </span>
                 ) : (
-                  <span className="rounded-full border border-[color:rgba(26,43,76,0.1)] bg-white px-4 py-2 text-sm font-medium text-[var(--brand-text-secondary)]">
+                  <span className="rounded-full border border-[color:rgba(26,43,76,0.1)] bg-white px-3 py-1.5 text-xs font-medium text-[var(--brand-text-secondary)] sm:px-4 sm:py-2 sm:text-sm">
                     Validade: Não informada
                   </span>
                 );
@@ -147,17 +147,17 @@ export default async function JobDetailPage({ params }: { params: Promise<{ slug
         </div>
       </div>
 
-      <div className="grid gap-8 lg:grid-cols-[1.1fr_0.9fr]">
+      <div className="grid gap-6 lg:grid-cols-[1.08fr_0.92fr]">
         <div className="space-y-6">
-          <div className="rounded-3xl border border-slate-200 bg-white p-8 shadow-sm">
-             <p className="mb-6 rounded-[1.5rem] bg-[var(--brand-soft)] px-5 py-4 text-base leading-8 text-[var(--brand-text-secondary)]">
+          <div className="rounded-[1.8rem] border border-slate-200 bg-white p-5 shadow-sm sm:rounded-3xl sm:p-8">
+             <p className="mb-5 rounded-[1.25rem] bg-[var(--brand-soft)] px-4 py-4 text-[15px] leading-7 text-[var(--brand-text-secondary)] sm:mb-6 sm:rounded-[1.5rem] sm:px-5 sm:text-base sm:leading-8">
               {job.summary}
             </p>
             <div className="prose-content text-slate-700" dangerouslySetInnerHTML={{ __html: sanitizeRichTextHtml(job.descriptionHtml) }} />
           </div>
 
-          <div className="grid gap-6 md:grid-cols-2">
-            <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+          <div className="grid gap-5 md:grid-cols-2">
+            <div className="rounded-[1.8rem] border border-slate-200 bg-white p-5 shadow-sm sm:rounded-3xl sm:p-6">
               <h2 className="text-xl font-semibold text-[var(--brand-navy)]">Requisitos</h2>
               <ul className="mt-4 space-y-3 text-sm leading-6 text-[var(--brand-text-secondary)]">
                 {(Array.isArray(job.requirements) ? job.requirements : []).map((item: unknown, index: number) => (
@@ -165,7 +165,7 @@ export default async function JobDetailPage({ params }: { params: Promise<{ slug
                 ))}
               </ul>
             </div>
-            <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div className="rounded-[1.8rem] border border-slate-200 bg-white p-5 shadow-sm sm:rounded-3xl sm:p-6">
               <h2 className="text-xl font-semibold text-[var(--brand-navy)]">Beneficios</h2>
               <ul className="mt-4 space-y-3 text-sm leading-6 text-[var(--brand-text-secondary)]">
                 {(Array.isArray(job.benefits) ? job.benefits : []).map((item: unknown, index: number) => (
@@ -175,7 +175,7 @@ export default async function JobDetailPage({ params }: { params: Promise<{ slug
             </div>
           </div>
 
-          <div className="brand-panel rounded-[2rem] border border-slate-200 p-8 shadow-[0_25px_80px_-50px_rgba(26,43,76,0.2)]">
+          <div className="brand-panel rounded-[1.8rem] border border-slate-200 p-6 shadow-[0_25px_80px_-50px_rgba(26,43,76,0.2)] sm:rounded-[2rem] sm:p-8">
             <h2 className="text-2xl font-black text-[var(--brand-navy)]">Veja mais vagas parecidas</h2>
             <p className="mt-3 text-base leading-8 text-[var(--brand-text-secondary)]">
               Se esta oportunidade chamou a sua atencao, aproveite para ver outras vagas em {job.city.name} e mais oportunidades ligadas a empresas parecidas.
@@ -200,7 +200,7 @@ export default async function JobDetailPage({ params }: { params: Promise<{ slug
         </div>
 
         <aside className="space-y-6">
-          <div className="brand-soft-panel rounded-[2rem] border border-slate-200 p-6 shadow-[0_28px_100px_-60px_rgba(26,43,76,0.18)]">
+          <div className="brand-soft-panel rounded-[1.8rem] border border-slate-200 p-5 shadow-[0_28px_100px_-60px_rgba(26,43,76,0.18)] sm:rounded-[2rem] sm:p-6">
             <h2 className="text-2xl font-black text-[var(--brand-navy)]">Candidatura</h2>
             <p className="mt-3 text-sm leading-7 text-[var(--brand-text-secondary)]">Leia os requisitos com calma, atualize o curriculo e envie sua candidatura pelo link oficial da empresa.</p>
             <Button asChild size="lg" className="mt-5 w-full rounded-2xl">
