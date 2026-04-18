@@ -72,7 +72,9 @@ export async function generateMetadata({
     (parsed.page ?? 1) === 1 &&
     (parsed.order ?? "relevance") === "relevance";
 
-  const isDuplicatedHubFilter = !parsed.q && Boolean(parsed.estado || parsed.cidade || parsed.empresa);
+  const isDuplicatedHubFilter =
+    !parsed.q &&
+    (Boolean(parsed.empresa) || (Boolean(parsed.estado) && !parsed.cidade));
 
   return buildSiteMetadata({
     title: buildJobsListingMetaTitle({

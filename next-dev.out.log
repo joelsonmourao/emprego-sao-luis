@@ -2,35 +2,6 @@
 > @workspace/jovem-aprendiz-vagas-next@0.1.0 dev C:\Users\Joelson\Documents\Projeto sites\projeto-limpo\apps\jovem-aprendiz-vagas-next
 > next dev --turbopack
 
-   ▲ Next.js 15.5.15 (Turbopack)
-   - Local:        http://localhost:3000
-   - Network:      http://192.168.100.23:3000
-   - Environments: .env.local, .env
+ ELIFECYCLE  Command failed with exit code 1.
 
- ✓ Starting...
- ✓ Compiled middleware in 247ms
- ✓ Ready in 2.2s
- ○ Compiling /sitemap.xml ...
- ✓ Compiled /sitemap.xml in 1710ms
- GET /robots.txt 200 in 2324ms
- GET /sitemap.xml 200 in 3777ms
- GET /sitemaps/listings-1.xml 200 in 3940ms
- GET /sitemaps/listings-1.xml 200 in 850ms
- GET /sitemaps/listings-1.xml 200 in 840ms
- GET /sitemaps/listings-1.xml 200 in 789ms
- ○ Compiling / ...
- GET /sitemap.xml 200 in 946ms
- GET /sitemaps/home-1.xml 200 in 727ms
- GET /sitemaps/institutionals-1.xml 200 in 1105ms
- ✓ Compiled / in 3s
- GET / 200 in 4037ms
- GET /sitemaps/jobs-1.xml 200 in 1493ms
- GET /vagas/atendente-de-restaurante-graca-salvador-ba-2026-04-16t23-39-13-255z 404 in 2282ms
- GET /sitemaps/states-1.xml 200 in 606ms
- GET /sitemaps/cities-1.xml 200 in 705ms
- GET /sitemaps/companies-1.xml 200 in 836ms
- GET /sitemaps/blog-1.xml 200 in 682ms
- GET /sitemaps/listings-1.xml 200 in 659ms
- GET / 200 in 1166ms
- GET /sitemaps/jobs-1.xml 200 in 1167ms
- GET /vagas/aprendiz-area-de-gente-rh 200 in 1574ms
+C:\Users\Joelson\Documents\Projeto sites\projeto-limpo\apps\jovem-aprendiz-vagas-next>

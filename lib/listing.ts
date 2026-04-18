@@ -119,19 +119,25 @@ type JobsSearchIndexingInput = {
 export function isStrategicJobsSearchIndexable(input: JobsSearchIndexingInput) {
   const query = normalizeQuery(input.query);
   const hasQuery = query.length >= 2;
-  const hasLocation = Boolean(input.stateSlug || input.citySlug);
+  const hasCity = Boolean(input.citySlug);
   const hasValidCityContext = !input.citySlug || Boolean(input.stateSlug);
   const hasCompany = Boolean(input.companySlug);
   const firstPage = (input.page ?? 1) === 1;
   const relevanceOrder = (input.order ?? "relevance") === "relevance";
 
-  return input.total > 0 && firstPage && relevanceOrder && hasQuery && hasLocation && hasValidCityContext && !hasCompany;
+  return input.total > 0 && firstPage && relevanceOrder && hasCity && hasValidCityContext && !hasCompany && (!query || hasQuery);
 }
 
 export function buildJobsSearchCanonicalPath(input: JobsSearchIndexingInput) {
   const params = new URLSearchParams();
   const query = normalizeQuery(input.query);
   const isIndexable = isStrategicJobsSearchIndexable(input);
+
+  if (!query && input.stateSlug && input.citySlug && isIndexable) {
+    params.set("estado", input.stateSlug);
+    params.set("cidade", input.citySlug);
+    return `/vagas?${params.toString()}`;
+  }
 
   if (!query && input.stateSlug && input.citySlug) {
     return `/vagas/estado/${input.stateSlug}/${input.citySlug}`;

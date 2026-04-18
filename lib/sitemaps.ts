@@ -201,8 +201,8 @@ function buildRootEntries(category: Exclude<SitemapCategory, "listings">, lastmo
 function buildStrategicListingEntries(
   jobs: Awaited<ReturnType<typeof getAllActiveJobEntries>>
 ): SitemapUrlEntry[] {
-  const stateCounts = new Map<string, { total: number; lastmod?: string }>();
   const cityCounts = new Map<string, { total: number; stateSlug: string; citySlug: string; lastmod?: string }>();
+  const cityBaseCounts = new Map<string, { total: number; stateSlug: string; citySlug: string; lastmod?: string }>();
 
   for (const job of jobs) {
     const query = deriveStrategicJobQuery({
@@ -216,14 +216,9 @@ function buildStrategicListingEntries(
       continue;
     }
 
-    const stateKey = `${query}__${job.state.slug}`;
     const cityKey = `${query}__${job.state.slug}__${job.city.slug}`;
+    const cityBaseKey = `${job.state.slug}__${job.city.slug}`;
     const lastmod = normalizeDate(job.updatedAt);
-
-    const stateEntry = stateCounts.get(stateKey) ?? { total: 0, lastmod };
-    stateEntry.total += 1;
-    stateEntry.lastmod = !stateEntry.lastmod || (lastmod && lastmod > stateEntry.lastmod) ? lastmod : stateEntry.lastmod;
-    stateCounts.set(stateKey, stateEntry);
 
     const cityEntry = cityCounts.get(cityKey) ?? {
       total: 0,
@@ -234,20 +229,29 @@ function buildStrategicListingEntries(
     cityEntry.total += 1;
     cityEntry.lastmod = !cityEntry.lastmod || (lastmod && lastmod > cityEntry.lastmod) ? lastmod : cityEntry.lastmod;
     cityCounts.set(cityKey, cityEntry);
+
+    const cityBaseEntry = cityBaseCounts.get(cityBaseKey) ?? {
+      total: 0,
+      stateSlug: job.state.slug,
+      citySlug: job.city.slug,
+      lastmod
+    };
+    cityBaseEntry.total += 1;
+    cityBaseEntry.lastmod = !cityBaseEntry.lastmod || (lastmod && lastmod > cityBaseEntry.lastmod) ? lastmod : cityBaseEntry.lastmod;
+    cityBaseCounts.set(cityBaseKey, cityBaseEntry);
   }
 
   const entries = new Map<string, SitemapUrlEntry>();
 
-  for (const [key, data] of stateCounts.entries()) {
-    if (data.total < 2) {
+  for (const data of cityBaseCounts.values()) {
+    if (data.total < 1) {
       continue;
     }
 
-    const [query, stateSlug] = key.split("__");
     const path = buildJobsSearchCanonicalPath({
       total: data.total,
-      query,
-      stateSlug,
+      stateSlug: data.stateSlug,
+      citySlug: data.citySlug,
       order: "relevance",
       page: 1
     });
@@ -256,18 +260,16 @@ function buildStrategicListingEntries(
   }
 
   for (const [key, data] of cityCounts.entries()) {
-    const [query, stateSlug, citySlug] = key.split("__");
-    const stateAggregate = stateCounts.get(`${query}__${stateSlug}`);
-
-    if (data.total < 1 || !stateAggregate || stateAggregate.total < 2) {
+    const [query] = key.split("__");
+    if (data.total < 1) {
       continue;
     }
 
     const path = buildJobsSearchCanonicalPath({
       total: data.total,
       query,
-      stateSlug,
-      citySlug,
+      stateSlug: data.stateSlug,
+      citySlug: data.citySlug,
       order: "relevance",
       page: 1
     });
