@@ -57,6 +57,25 @@ type ParsedPreview = {
   data?: ImportedJobRow;
 };
 
+type ImportApiResponse = {
+  ok: boolean;
+  error?: string;
+  summary?: {
+    totalRows: number;
+    importedCount: number;
+    updatedCount: number;
+    errorCount: number;
+    successRate: number;
+    durationMs?: number;
+  };
+  results?: {
+    errors?: Array<{ line: string | number; message: string; fullError?: string }>;
+  };
+  debug?: {
+    errorDetails?: string[];
+  };
+};
+
 function normalizeHeader(header: string) {
   return header
     .trim()
@@ -66,13 +85,46 @@ function normalizeHeader(header: string) {
     .replace(/[^a-z0-9]+/g, "");
 }
 
+async function parseImportResponse(response: Response): Promise<ImportApiResponse> {
+  const contentType = response.headers.get("content-type") ?? "";
+  const body = await response.text();
+
+  if (!body.trim()) {
+    return {
+      ok: false,
+      error: response.ok
+        ? "O servidor retornou uma resposta vazia para a importacao."
+        : `O servidor respondeu ${response.status} sem um corpo legivel.`
+    };
+  }
+
+  if (contentType.includes("application/json")) {
+    try {
+      return JSON.parse(body) as ImportApiResponse;
+    } catch {
+      return {
+        ok: false,
+        error: "O servidor respondeu com JSON invalido durante a importacao."
+      };
+    }
+  }
+
+  return {
+    ok: false,
+    error: `O servidor respondeu com formato inesperado (${contentType || "texto"}): ${body.slice(0, 240)}`
+  };
+}
+
 export function AdminJobImporter() {
   const [rows, setRows] = useState<ParsedPreview[]>([]);
   const [fileName, setFileName] = useState("");
   const [resultMessage, setResultMessage] = useState("");
   const [isImporting, setIsImporting] = useState(false);
 
-  const validRows = useMemo(() => rows.filter((row) => row.valid && row.data).map((row) => row.data as ImportedJobRow), [rows]);
+  const validRows = useMemo(
+    () => rows.filter((row) => row.valid && row.data).map((row) => row.data as ImportedJobRow),
+    [rows]
+  );
   const invalidRows = rows.filter((row) => !row.valid);
 
   async function handleFileChange(event: React.ChangeEvent<HTMLInputElement>) {
@@ -153,46 +205,49 @@ export function AdminJobImporter() {
         body: JSON.stringify({ rows: validRows })
       });
 
-      const result = await response.json();
+      const result = await parseImportResponse(response);
 
       if (!response.ok || !result.ok) {
-        // Mostrar erro detalhado do Prisma/Backend
-        const errorMessage = result.error || result.details || "Nao foi possivel importar a planilha.";
+        const errorMessage = result.error || "Nao foi possivel importar a planilha.";
         setResultMessage(`ERRO: ${errorMessage}`);
-        
-        // Se houver erros específicos, mostrar no console
-        if (result.debug?.errorDetails && result.debug.errorDetails.length > 0) {
-          console.error("Erros da importação:", result.debug.errorDetails);
+
+        if (result.debug?.errorDetails?.length) {
+          console.error("Erros da importacao:", result.debug.errorDetails);
         }
-        setIsImporting(false);
         return;
       }
 
-      // Resposta de sucesso com detalhes
-      const summary = result.summary || {};
-      const successRate = summary.successRate || 0;
-      
-      let message = `Importação concluída: ${summary.importedCount || 0} nova(s) vaga(s) e ${summary.updatedCount || 0} atualizada(s).`;
-      
-      if (successRate < 100 && summary.errorCount > 0) {
-        message += ` (${summary.errorCount} erro(s) - Taxa de sucesso: ${successRate}%)`;
-        
-        // Mostrar erros específicos se houver
-        if (result.results?.errors && result.results.errors.length > 0) {
-          const errorDetails = result.results.errors.map((e: any) => `Linha ${e.line}: ${e.message}`).join('; ');
-          console.error("Detalhes dos erros:", errorDetails);
-          message += ` Verifique o console para detalhes.`;
-        }
+      const summary = result.summary ?? {
+        totalRows: validRows.length,
+        importedCount: 0,
+        updatedCount: 0,
+        errorCount: 0,
+        successRate: 0
+      };
+
+      let message = `Importacao concluida: ${summary.importedCount} nova(s) vaga(s) e ${summary.updatedCount} atualizada(s).`;
+
+      if (summary.errorCount > 0) {
+        message += ` ${summary.errorCount} linha(s) falharam.`;
       }
-      
+
+      if (summary.durationMs) {
+        message += ` Tempo total: ${(summary.durationMs / 1000).toFixed(1)}s.`;
+      }
+
+      if (result.results?.errors?.length) {
+        console.error(
+          "Detalhes dos erros:",
+          result.results.errors.map((error) => `Linha ${error.line}: ${error.message}`).join("; ")
+        );
+        message += " Verifique o console para detalhes.";
+      }
+
       setResultMessage(message);
-      
-      // Log detalhado para depuração
-      console.log("Resultado da importação:", result);
-      
+      console.log("Resultado da importacao:", result);
     } catch (error) {
-      console.error("Erro na requisição de importação:", error);
-      setResultMessage(`ERRO DE REDE: ${error instanceof Error ? error.message : 'Falha na comunicação com o servidor'}`);
+      console.error("Erro na requisicao de importacao:", error);
+      setResultMessage(`ERRO DE REDE: ${error instanceof Error ? error.message : "Falha na comunicacao com o servidor."}`);
     } finally {
       setIsImporting(false);
     }
@@ -257,7 +312,11 @@ export function AdminJobImporter() {
                       <p className="text-sm font-semibold text-slate-950">Linha {row.index}</p>
                       <p className="text-xs text-slate-500">{row.data?.title ?? "Linha com erro de validacao"}</p>
                     </div>
-                    <span className={`inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-semibold ${row.valid ? "bg-emerald-50 text-emerald-700" : "bg-rose-50 text-rose-700"}`}>
+                    <span
+                      className={`inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-semibold ${
+                        row.valid ? "bg-emerald-50 text-emerald-700" : "bg-rose-50 text-rose-700"
+                      }`}
+                    >
                       {row.valid ? <CheckCircle2 className="h-4 w-4" /> : <AlertTriangle className="h-4 w-4" />}
                       {row.valid ? "Valida" : "Invalida"}
                     </span>

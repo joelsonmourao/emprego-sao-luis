@@ -1,357 +1,536 @@
-import { AuditAction, EmploymentType, LocationType } from "@prisma/client";
+import { AuditAction, EmploymentType, LocationType, type City, type Company, type Job, type State } from "@prisma/client";
 import { NextResponse } from "next/server";
 
 import { normalizeLines, normalizeSlug, parseOptionalDate, plainTextToHtml } from "@/lib/admin/content";
 import { writeAuditLog } from "@/lib/audit";
 import { requireApiRole } from "@/lib/authz";
 import { prisma } from "@/lib/db";
-import { importJobsPayloadSchema } from "@/lib/schemas/job-import";
+import { importJobsPayloadSchema, type ImportedJobRow } from "@/lib/schemas/job-import";
 
-// Função para processar validThroughMonths (número de meses da planilha)
-function processValidThroughMonths(validThroughMonths: number | null | undefined): Date | null {
+const RESPONSE_HEADERS = {
+  "Cache-Control": "no-store"
+};
+
+const IMPORT_BATCH_SIZE = 100;
+
+type ImportIssue = {
+  line: number;
+  title: string;
+  message: string;
+};
+
+type ImportContext = {
+  statesByName: Map<string, State>;
+  statesByCode: Map<string, State>;
+  citiesByStateAndName: Map<string, City>;
+  citiesByStateAndSlug: Map<string, City>;
+  companiesBySlug: Map<string, Company>;
+  companiesByName: Map<string, Company>;
+  jobsByExternalId: Map<string, Pick<Job, "id" | "slug" | "publishedAt" | "externalId">>;
+  jobsBySlug: Map<string, Pick<Job, "id" | "slug" | "publishedAt" | "externalId">>;
+  usedJobSlugs: Set<string>;
+  issues: ImportIssue[];
+  imported: string[];
+  updated: string[];
+};
+
+function normalizeKey(input: string) {
+  return input
+    .trim()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase();
+}
+
+function chunkArray<T>(items: T[], size: number) {
+  const chunks: T[][] = [];
+
+  for (let index = 0; index < items.length; index += size) {
+    chunks.push(items.slice(index, index + size));
+  }
+
+  return chunks;
+}
+
+function buildJsonError(status: number, message: string, details?: Record<string, unknown>) {
+  return NextResponse.json(
+    {
+      ok: false,
+      error: message,
+      ...details
+    },
+    {
+      status,
+      headers: RESPONSE_HEADERS
+    }
+  );
+}
+
+function processValidThroughMonths(validThroughMonths: number | null | undefined) {
   if (!validThroughMonths || validThroughMonths < 1 || validThroughMonths > 24) {
     return null;
   }
-  
+
   const today = new Date();
   const futureDate = new Date(today);
   futureDate.setMonth(today.getMonth() + validThroughMonths);
-  
-  console.log(`validThroughMonths: ${validThroughMonths} meses a partir de hoje = ${futureDate.toISOString().split('T')[0]}`);
   return futureDate;
 }
 
-// Função para calcular validThrough baseado em número de meses ou data direta
-function calculateValidThrough(validThroughValue: string | number | null | undefined): Date | null {
+function calculateValidThrough(validThroughValue: string | number | null | undefined) {
   if (!validThroughValue) return null;
-  
-  // Se for número, tratar como quantidade de meses
-  if (typeof validThroughValue === 'number') {
-    const monthsToAdd = validThroughValue;
-    
-    if (monthsToAdd <= 0) {
-      console.log(`Valor inválido para validThrough (meses): ${monthsToAdd}, usando null`);
-      return null;
-    }
-    
-    // Calcular data atual + meses
-    const today = new Date();
-    const futureDate = new Date(today);
-    futureDate.setMonth(today.getMonth() + monthsToAdd);
-    
-    console.log(`validThrough: ${monthsToAdd} meses a partir de hoje = ${futureDate.toISOString().split('T')[0]}`);
-    return futureDate;
+
+  if (typeof validThroughValue === "number") {
+    return processValidThroughMonths(validThroughValue);
   }
-  
-  // Se for string, limpar e processar
-  let stringValue = String(validThroughValue);
-  
-  // Limpar o valor: remover apóstrofos, aspas e espaços extras
-  stringValue = stringValue
-    .replace(/^['"]+|['"]+$/g, '') // Remover apóstrofos e aspas do início e fim
-    .trim(); // Remover espaços extras
-  
-  if (!stringValue) return null;
-  
-  console.log(`validThrough: valor limpo da planilha = "${stringValue}"`);
-  
-  // Tentar converter como número de meses PRIMEIRO (para valores como "3", "6", etc.)
-  const monthsToAdd = Number(stringValue);
-  if (!isNaN(monthsToAdd) && monthsToAdd > 0 && monthsToAdd < 1000) {
-    // Se for um número pequeno (menos de 1000), tratar como meses
-    const today = new Date();
-    const futureDate = new Date(today);
-    futureDate.setMonth(today.getMonth() + monthsToAdd);
-    
-    console.log(`validThrough: ${stringValue} meses a partir de hoje = ${futureDate.toISOString().split('T')[0]}`);
-    return futureDate;
+
+  const normalized = String(validThroughValue).replace(/^['"]+|['"]+$/g, "").trim();
+  if (!normalized) return null;
+
+  const numericMonths = Number(normalized);
+  if (!Number.isNaN(numericMonths) && numericMonths > 0 && numericMonths < 1000) {
+    return processValidThroughMonths(numericMonths);
   }
-  
-  // Se não for meses, tentar parse como data (formato ISO ou DD/MM/YYYY)
-  const dateValue = new Date(stringValue);
-  if (!isNaN(dateValue.getTime())) {
-    // Verificar se a data é razoável (não uma data inválida como 2001-03-01)
-    const year = dateValue.getFullYear();
-    if (year >= 2020 && year <= 2100) {
-      console.log(`validThrough: data direta da planilha = ${dateValue.toISOString().split('T')[0]}`);
-      return dateValue;
-    }
-  }
-  
-  console.log(`Valor inválido para validThrough: ${validThroughValue}, usando null`);
-  return null;
+
+  const parsedDate = new Date(normalized);
+  if (Number.isNaN(parsedDate.getTime())) return null;
+
+  const year = parsedDate.getFullYear();
+  return year >= 2020 && year <= 2100 ? parsedDate : null;
 }
 
-async function resolveStateAndCityFromNames(stateName: string, cityName: string) {
-  const trimmedState = stateName.trim();
-  let state = await prisma.state.findFirst({
-    where: {
-      OR: [{ code: { equals: trimmedState, mode: "insensitive" } }, { name: { equals: trimmedState, mode: "insensitive" } }]
-    }
-  });
+function stateCodeFromName(stateName: string) {
+  const trimmed = stateName.trim();
+  if (trimmed.length <= 2) return trimmed.toUpperCase();
 
-  // Criar estado automaticamente se não existir
-  if (!state) {
-    console.log(`Criando estado automaticamente: ${trimmedState}`);
-    state = await prisma.state.create({
-      data: {
-        code: trimmedState.slice(0, 2).toUpperCase(),
-        name: trimmedState,
-        slug: normalizeSlug(trimmedState),
-        seoTitle: `Vagas de Jovem Aprendiz em ${trimmedState}`,
-        seoIntro: `Veja todas as vagas de Jovem Aprendiz disponíveis em ${trimmedState}.`
-      }
-    });
-    console.log(`Estado criado com sucesso: ${state.name}`);
+  const slug = normalizeSlug(trimmed).replace(/[^a-z]/g, "");
+  return slug.slice(0, 2).toUpperCase() || trimmed.slice(0, 2).toUpperCase();
+}
+
+function buildCityKey(stateId: string, value: string) {
+  return `${stateId}::${normalizeKey(value)}`;
+}
+
+function buildCompanyNameKey(value: string) {
+  return normalizeKey(value);
+}
+
+function buildStateMaps(states: State[]) {
+  const byName = new Map<string, State>();
+  const byCode = new Map<string, State>();
+
+  for (const state of states) {
+    byName.set(normalizeKey(state.name), state);
+    byCode.set(normalizeKey(state.code), state);
   }
 
-  const citySlug = normalizeSlug(cityName);
-  
-  let city = await prisma.city.findFirst({
+  return { byName, byCode };
+}
+
+function buildCityMaps(cities: City[]) {
+  const byStateAndName = new Map<string, City>();
+  const byStateAndSlug = new Map<string, City>();
+
+  for (const city of cities) {
+    byStateAndName.set(buildCityKey(city.stateId, city.name), city);
+    byStateAndSlug.set(buildCityKey(city.stateId, city.slug), city);
+  }
+
+  return { byStateAndName, byStateAndSlug };
+}
+
+function buildCompanyMaps(companies: Company[]) {
+  const bySlug = new Map<string, Company>();
+  const byName = new Map<string, Company>();
+
+  for (const company of companies) {
+    bySlug.set(company.slug, company);
+    byName.set(buildCompanyNameKey(company.name), company);
+  }
+
+  return { bySlug, byName };
+}
+
+function buildJobMaps(jobs: Array<Pick<Job, "id" | "slug" | "publishedAt" | "externalId">>) {
+  const byExternalId = new Map<string, Pick<Job, "id" | "slug" | "publishedAt" | "externalId">>();
+  const bySlug = new Map<string, Pick<Job, "id" | "slug" | "publishedAt" | "externalId">>();
+  const usedSlugs = new Set<string>();
+
+  for (const job of jobs) {
+    bySlug.set(job.slug, job);
+    usedSlugs.add(job.slug);
+    if (job.externalId) {
+      byExternalId.set(job.externalId, job);
+    }
+  }
+
+  return { byExternalId, bySlug, usedSlugs };
+}
+
+function ensureUniqueJobSlug(baseSlug: string, usedSlugs: Set<string>, currentSlug?: string) {
+  let candidate = baseSlug || `vaga-${Date.now()}`;
+
+  if (currentSlug && candidate === currentSlug) {
+    usedSlugs.add(candidate);
+    return candidate;
+  }
+
+  if (!usedSlugs.has(candidate)) {
+    usedSlugs.add(candidate);
+    return candidate;
+  }
+
+  let suffix = 2;
+  while (usedSlugs.has(`${candidate}-${suffix}`)) {
+    suffix += 1;
+  }
+
+  const unique = `${candidate}-${suffix}`;
+  usedSlugs.add(unique);
+  return unique;
+}
+
+async function ensureStates(rows: ImportedJobRow[]) {
+  const existingStates = await prisma.state.findMany();
+  const maps = buildStateMaps(existingStates);
+
+  const missingStates = new Map<string, { name: string; code: string; slug: string }>();
+
+  for (const row of rows) {
+    const stateName = row.stateName.trim();
+    const lookupByName = maps.byName.get(normalizeKey(stateName));
+    const lookupByCode = maps.byCode.get(normalizeKey(stateName));
+    if (lookupByName || lookupByCode) continue;
+
+    const code = stateCodeFromName(stateName);
+    const codeConflict = existingStates.find((state) => state.code === code && normalizeKey(state.name) !== normalizeKey(stateName));
+    if (codeConflict) {
+      continue;
+    }
+
+    missingStates.set(normalizeKey(stateName), {
+      name: stateName,
+      code,
+      slug: normalizeSlug(stateName)
+    });
+  }
+
+  for (const state of missingStates.values()) {
+    const created = await prisma.state.create({
+      data: {
+        code: state.code,
+        name: state.name,
+        slug: state.slug,
+        seoTitle: `Vagas de Jovem Aprendiz em ${state.name}`,
+        seoIntro: `Veja todas as vagas de Jovem Aprendiz disponiveis em ${state.name}.`
+      }
+    });
+
+    existingStates.push(created);
+    maps.byName.set(normalizeKey(created.name), created);
+    maps.byCode.set(normalizeKey(created.code), created);
+  }
+
+  return {
+    states: existingStates,
+    statesByName: maps.byName,
+    statesByCode: maps.byCode
+  };
+}
+
+async function ensureCities(rows: ImportedJobRow[], statesByName: Map<string, State>, statesByCode: Map<string, State>) {
+  const states = new Map<string, State>();
+
+  for (const row of rows) {
+    const state = statesByName.get(normalizeKey(row.stateName)) ?? statesByCode.get(normalizeKey(row.stateName));
+    if (state) {
+      states.set(state.id, state);
+    }
+  }
+
+  const existingCities = await prisma.city.findMany({
     where: {
-      stateId: state.id,
+      stateId: { in: Array.from(states.keys()) }
+    }
+  });
+  const maps = buildCityMaps(existingCities);
+
+  for (const row of rows) {
+    const state = statesByName.get(normalizeKey(row.stateName)) ?? statesByCode.get(normalizeKey(row.stateName));
+    if (!state) continue;
+
+    const cityName = row.cityName.trim();
+    const slug = normalizeSlug(cityName);
+    if (maps.byStateAndName.has(buildCityKey(state.id, cityName)) || maps.byStateAndSlug.has(buildCityKey(state.id, slug))) {
+      continue;
+    }
+
+    const created = await prisma.city.create({
+      data: {
+        stateId: state.id,
+        name: cityName,
+        slug,
+        seoTitle: `Vagas de Jovem Aprendiz em ${cityName}`,
+        seoIntro: `Veja vagas de Jovem Aprendiz em ${cityName}, ${state.code}.`
+      }
+    });
+
+    existingCities.push(created);
+    maps.byStateAndName.set(buildCityKey(created.stateId, created.name), created);
+    maps.byStateAndSlug.set(buildCityKey(created.stateId, created.slug), created);
+  }
+
+  return {
+    citiesByStateAndName: maps.byStateAndName,
+    citiesByStateAndSlug: maps.byStateAndSlug
+  };
+}
+
+async function ensureCompanies(
+  rows: ImportedJobRow[],
+  statesByName: Map<string, State>,
+  statesByCode: Map<string, State>,
+  citiesByStateAndName: Map<string, City>,
+  citiesByStateAndSlug: Map<string, City>
+) {
+  const requestedSlugs = Array.from(new Set(rows.map((row) => normalizeSlug(row.companyName))));
+  const requestedNames = Array.from(new Set(rows.map((row) => row.companyName.trim())));
+
+  const companies = await prisma.company.findMany({
+    where: {
       OR: [
-        { name: { equals: cityName.trim(), mode: "insensitive" } },
-        { slug: citySlug }
+        { slug: { in: requestedSlugs } },
+        ...requestedNames.map((name) => ({
+          name: { equals: name, mode: "insensitive" as const }
+        }))
       ]
     }
   });
+  const maps = buildCompanyMaps(companies);
 
-  if (!city) {
-    console.log(`Criando cidade automaticamente: ${cityName.trim()} no estado ${state.name}`);
-    city = await prisma.city.create({
+  for (const row of rows) {
+    const slug = normalizeSlug(row.companyName);
+    const nameKey = buildCompanyNameKey(row.companyName);
+    if (maps.bySlug.has(slug) || maps.byName.has(nameKey)) continue;
+
+    const state = statesByName.get(normalizeKey(row.stateName)) ?? statesByCode.get(normalizeKey(row.stateName));
+    if (!state) continue;
+
+    const city =
+      citiesByStateAndName.get(buildCityKey(state.id, row.cityName)) ??
+      citiesByStateAndSlug.get(buildCityKey(state.id, normalizeSlug(row.cityName)));
+
+    if (!city) continue;
+
+    const created = await prisma.company.create({
       data: {
+        name: row.companyName.trim(),
+        slug,
+        summary: row.summary.trim() || `${row.companyName.trim()} com vagas de Jovem Aprendiz publicadas no portal.`,
+        isActive: true,
+        featured: false,
         stateId: state.id,
-        name: cityName.trim(),
-        slug: citySlug,
-        seoTitle: `Vagas de Jovem Aprendiz em ${cityName.trim()}`,
-        seoIntro: `Veja vagas de Jovem Aprendiz em ${cityName.trim()}, ${state.code}.`
+        cityId: city.id
       }
     });
-    console.log(`Cidade criada com sucesso: ${city.name}`);
+
+    maps.bySlug.set(created.slug, created);
+    maps.byName.set(buildCompanyNameKey(created.name), created);
   }
 
-  return { state, city };
+  return {
+    companiesBySlug: maps.bySlug,
+    companiesByName: maps.byName
+  };
 }
 
-async function resolveCompany(companyName: string, stateId: string, cityId: string, summary?: string) {
-  const slug = normalizeSlug(companyName);
-  const existing = await prisma.company.findFirst({
+async function buildImportContext(rows: ImportedJobRow[]): Promise<ImportContext> {
+  const { statesByName, statesByCode } = await ensureStates(rows);
+  const { citiesByStateAndName, citiesByStateAndSlug } = await ensureCities(rows, statesByName, statesByCode);
+  const { companiesBySlug, companiesByName } = await ensureCompanies(
+    rows,
+    statesByName,
+    statesByCode,
+    citiesByStateAndName,
+    citiesByStateAndSlug
+  );
+
+  const requestedBaseSlugs = Array.from(new Set(rows.map((row) => normalizeSlug(row.slug || row.title))));
+  const requestedExternalIds = Array.from(new Set(rows.map((row) => row.externalId?.trim()).filter(Boolean))) as string[];
+  const existingJobs = await prisma.job.findMany({
     where: {
-      OR: [{ slug }, { name: { equals: companyName.trim(), mode: "insensitive" } }]
+      OR: [{ slug: { in: requestedBaseSlugs } }, ...(requestedExternalIds.length ? [{ externalId: { in: requestedExternalIds } }] : [])]
+    },
+    select: {
+      id: true,
+      slug: true,
+      publishedAt: true,
+      externalId: true
     }
   });
+  const { byExternalId, bySlug, usedSlugs } = buildJobMaps(existingJobs);
 
-  if (existing) {
-    console.log(`Empresa encontrada: ${existing.name}`);
-    return existing;
+  const context: ImportContext = {
+    statesByName,
+    statesByCode,
+    citiesByStateAndName,
+    citiesByStateAndSlug,
+    companiesBySlug,
+    companiesByName,
+    jobsByExternalId: byExternalId,
+    jobsBySlug: bySlug,
+    usedJobSlugs: usedSlugs,
+    issues: [],
+    imported: [],
+    updated: []
+  };
+
+  return context;
+}
+
+function resolveState(context: ImportContext, row: ImportedJobRow) {
+  return context.statesByName.get(normalizeKey(row.stateName)) ?? context.statesByCode.get(normalizeKey(row.stateName)) ?? null;
+}
+
+function resolveCity(context: ImportContext, stateId: string, row: ImportedJobRow) {
+  return (
+    context.citiesByStateAndName.get(buildCityKey(stateId, row.cityName)) ??
+    context.citiesByStateAndSlug.get(buildCityKey(stateId, normalizeSlug(row.cityName))) ??
+    null
+  );
+}
+
+function resolveCompany(context: ImportContext, row: ImportedJobRow) {
+  return context.companiesBySlug.get(normalizeSlug(row.companyName)) ?? context.companiesByName.get(buildCompanyNameKey(row.companyName)) ?? null;
+}
+
+function buildJobData(row: ImportedJobRow, state: State, city: City, company: Company, slug: string, existing?: Pick<Job, "publishedAt">) {
+  return {
+    title: row.title.trim(),
+    slug,
+    companyName: company.name,
+    companyLogoUrl: company.logoUrl,
+    companyWebsiteUrl: company.websiteUrl,
+    summary: row.summary.trim(),
+    descriptionHtml: row.descriptionHtml.includes("<") ? row.descriptionHtml.trim() : plainTextToHtml(row.descriptionHtml.trim()),
+    requirements: normalizeLines(row.requirementsText),
+    benefits: normalizeLines(row.benefitsText ?? ""),
+    salaryMin: row.salaryMin ? Math.round(row.salaryMin) : null,
+    salaryMax: row.salaryMax ? Math.round(row.salaryMax) : null,
+    employmentType: row.employmentType as EmploymentType,
+    workHours: row.workHours?.trim() || null,
+    expiresAt: parseOptionalDate(row.expiresAt),
+    validThrough: processValidThroughMonths(row.validThroughMonths) ?? calculateValidThrough(row.validThrough),
+    applyUrl: row.applyUrl,
+    isActive: row.isActive,
+    sourceName: row.sourceName?.trim() || null,
+    sourceUrl: row.sourceUrl?.trim() || null,
+    locationType: row.locationType as LocationType,
+    seoTitle: row.seoTitle.trim(),
+    seoDescription: row.seoDescription.trim(),
+    featured: row.featured,
+    externalId: row.externalId?.trim() || null,
+    publishedAt: existing?.publishedAt ?? parseOptionalDate(row.publishedAt) ?? new Date(),
+    companyId: company.id,
+    stateId: state.id,
+    cityId: city.id
+  };
+}
+
+async function processRows(rows: ImportedJobRow[], context: ImportContext) {
+  const operations: Array<ReturnType<typeof prisma.job.create> | ReturnType<typeof prisma.job.update>> = [];
+
+  for (const [index, row] of rows.entries()) {
+    const line = index + 2;
+
+    try {
+      const state = resolveState(context, row);
+      if (!state) {
+        throw new Error(`Estado nao encontrado para "${row.stateName}".`);
+      }
+
+      const city = resolveCity(context, state.id, row);
+      if (!city) {
+        throw new Error(`Cidade nao encontrada para "${row.cityName}".`);
+      }
+
+      const company = resolveCompany(context, row);
+      if (!company) {
+        throw new Error(`Empresa nao encontrada para "${row.companyName}".`);
+      }
+
+      const externalId = row.externalId?.trim() || null;
+      const baseSlug = normalizeSlug(row.slug || row.title);
+      const existing = (externalId ? context.jobsByExternalId.get(externalId) : null) ?? context.jobsBySlug.get(baseSlug) ?? null;
+      const uniqueSlug = ensureUniqueJobSlug(baseSlug, context.usedJobSlugs, existing?.slug);
+      const data = buildJobData(row, state, city, company, uniqueSlug, existing ?? undefined);
+
+      if (existing) {
+        operations.push(
+          prisma.job.update({
+            where: { id: existing.id },
+            data
+          })
+        );
+
+        context.jobsBySlug.set(uniqueSlug, {
+          id: existing.id,
+          slug: uniqueSlug,
+          publishedAt: data.publishedAt,
+          externalId
+        });
+        if (externalId) {
+          context.jobsByExternalId.set(externalId, {
+            id: existing.id,
+            slug: uniqueSlug,
+            publishedAt: data.publishedAt,
+            externalId
+          });
+        }
+        context.updated.push(uniqueSlug);
+      } else {
+        operations.push(
+          prisma.job.create({
+            data
+          })
+        );
+        context.imported.push(uniqueSlug);
+      }
+    } catch (error) {
+      context.issues.push({
+        line,
+        title: row.title,
+        message: error instanceof Error ? error.message : "Erro desconhecido ao processar a linha."
+      });
+    }
   }
 
-  console.log(`Criando empresa automaticamente: ${companyName.trim()}`);
-  const company = await prisma.company.create({
-    data: {
-      name: companyName.trim(),
-      slug,
-      summary: summary?.trim() || `${companyName.trim()} com vagas de Jovem Aprendiz publicadas no portal.`,
-      isActive: true,
-      featured: false,
-      stateId,
-      cityId
-    }
-  });
-  console.log(`Empresa criada com sucesso: ${company.name}`);
-  return company;
+  for (const batch of chunkArray(operations, IMPORT_BATCH_SIZE)) {
+    if (!batch.length) continue;
+    await prisma.$transaction(batch);
+  }
 }
 
 export async function POST(request: Request) {
-  // Adicionar headers CORS para Vercel
-  const headers = {
-    'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Methods': 'POST, OPTIONS',
-    'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-  };
+  const startedAt = Date.now();
 
   try {
     const session = await requireApiRole("EDITOR");
-    const payload = importJobsPayloadSchema.parse(await request.json());
 
-    const imported: string[] = [];
-    const updated: string[] = [];
-    const errors: string[] = [];
-
-    for (const [index, row] of payload.rows.entries()) {
-      try {
-        const { state, city } = await resolveStateAndCityFromNames(row.stateName, row.cityName);
-        const company = await resolveCompany(row.companyName, state.id, city.id, row.summary);
-        
-        console.log(`SUCESSO: Associações resolvidas - Estado: ${state.name}, Cidade: ${city.name}, Empresa: ${company.name}`);
-
-        const existing = await prisma.job.findFirst({
-          where: {
-            OR: [{ slug: normalizeSlug(row.slug || row.title) }, ...(row.externalId ? [{ externalId: row.externalId.trim() }] : [])]
-          },
-          select: {
-            id: true,
-            publishedAt: true,
-            slug: true // Adicionar slug para verificação de conflito
-          }
-        });
-
-        // employmentType já vem validado pelo schema como APPRENTICESHIP, INTERNSHIP, etc.
-        const mappedEmploymentType = row.employmentType;
-
-        // Log de depuração para cada vaga
-        console.log(`=== PROCESSANDO VAGA ${index + 1} ===`);
-        console.log('Dados brutos da planilha:', JSON.stringify(row, null, 2));
-        console.log('Estado:', state);
-        console.log('Cidade:', city);
-        console.log('Empresa:', company);
-        console.log('Vaga existente:', !!existing);
-
-        // Gerar slug único com número aleatório se houver conflito
-        let baseSlug = normalizeSlug(row.slug || row.title);
-        let uniqueSlug = baseSlug;
-        let slugAttempts = 0;
-        const maxAttempts = 10;
-        
-        while (slugAttempts < maxAttempts) {
-          const slugCheck = await prisma.job.findFirst({
-            where: { slug: uniqueSlug },
-            select: { id: true }
-          });
-          
-          if (!slugCheck || (existing && existing.slug === uniqueSlug)) {
-            break; // Slug está disponível ou é o mesmo registro existente
-          }
-          
-          // Adicionar sufixo aleatório
-          const randomSuffix = Math.floor(Math.random() * 10000);
-          uniqueSlug = `${baseSlug}-${randomSuffix}`;
-          slugAttempts++;
-        }
-        
-        if (slugAttempts >= maxAttempts) {
-          throw new Error(`Não foi possível gerar slug único para: ${baseSlug}`);
-        }
-        
-        console.log(`Slug gerado: ${uniqueSlug}${uniqueSlug !== baseSlug ? ' (com sufixo)' : ''}`);
-
-        const data = {
-          title: row.title.trim(),
-          slug: uniqueSlug,
-          // Campos obrigatórios do schema
-          companyName: company.name,
-          companyLogoUrl: company.logoUrl,
-          companyWebsiteUrl: company.websiteUrl,
-          // Relacionamentos do Prisma usando connect
-          company: {
-            connect: { id: company.id }
-          },
-          state: {
-            connect: { id: state.id }
-          },
-          city: {
-            connect: { id: city.id }
-          },
-          summary: row.summary.trim(),
-          descriptionHtml: row.descriptionHtml.includes("<") ? row.descriptionHtml.trim() : plainTextToHtml(row.descriptionHtml.trim()),
-          requirements: normalizeLines(row.requirementsText),
-          benefits: normalizeLines(row.benefitsText ?? ""),
-          salaryMin: row.salaryMin ? Math.round(row.salaryMin) : null,
-          salaryMax: row.salaryMax ? Math.round(row.salaryMax) : null,
-          employmentType: mappedEmploymentType as EmploymentType,
-          workHours: row.workHours?.trim() || null,
-          expiresAt: parseOptionalDate(row.expiresAt),
-          validThrough: processValidThroughMonths(row.validThroughMonths) ?? calculateValidThrough(row.validThrough),
-          applyUrl: row.applyUrl,
-          isActive: row.isActive,
-          sourceName: row.sourceName?.trim() || null,
-          sourceUrl: row.sourceUrl?.trim() || null,
-          locationType: row.locationType as LocationType,
-          seoTitle: row.seoTitle.trim(),
-          seoDescription: row.seoDescription.trim(),
-          featured: row.featured,
-          externalId: row.externalId?.trim() || null,
-          publishedAt: existing?.publishedAt ?? parseOptionalDate(row.publishedAt) ?? new Date()
-        };
-
-        console.log('Dados preparados para salvar:', JSON.stringify(data, null, 2));
-
-        if (existing) {
-          console.log(`ATUALIZANDO vaga existente: ${data.slug}`);
-          await prisma.job.update({
-            where: { id: existing.id },
-            data: {
-              ...data,
-              updatedAt: new Date() // Garantir updatedAt seja atualizado
-            }
-          });
-          console.log(`Vaga atualizada com sucesso: ${data.slug}`);
-          updated.push(data.slug);
-        } else {
-          console.log(`CRIANDO nova vaga: ${data.slug}`);
-          await prisma.job.create({
-            data
-          });
-          console.log(`Vaga criada com sucesso: ${data.slug}`);
-          imported.push(data.slug);
-        }
-      } catch (error) {
-        const errorMessage = error instanceof Error ? error.message : 'Erro desconhecido';
-        errors.push(`Linha ${index + 1}: ${errorMessage}`);
-        
-        // Log detalhado do erro do Prisma
-        console.error(`=== ERRO DETALHADO AO SALVAR LINHA ${index + 1} ===`);
-        console.error(`Título da vaga: ${row.title}`);
-        console.error(`Mensagem de erro: ${errorMessage}`);
-        console.error(`Erro completo:`, error);
-        
-        // Verificar se é erro de Prisma
-        if (error instanceof Error && error.message.includes('Prisma')) {
-          console.error('ERRO DO PRISMA DETECTADO - Possíveis causas:');
-          console.error('1. Chave estrangeira inválida (stateId, cityId, companyId)');
-          console.error('2. Campo obrigatório faltando');
-          console.error('3. Restrição única violada (slug)');
-          console.error('4. Tipo de dado inválido');
-        }
-        
-        // Verificar dados que estavam sendo processados
-        console.error(`Dados processados até o erro:`, {
-          title: row.title,
-          stateName: row.stateName,
-          cityName: row.cityName,
-          companyName: row.companyName,
-          slug: normalizeSlug(row.slug || row.title)
-        });
-      }
+    let rawBody: unknown;
+    try {
+      rawBody = await request.json();
+    } catch {
+      return buildJsonError(400, "A API de importacao recebeu um corpo invalido. Envie JSON com a lista de linhas.");
     }
 
-    // Log final do resultado
-    console.log(`=== RESUMO DA IMPORTAÇÃO ===`);
-    console.log(`Total de linhas processadas: ${payload.rows.length}`);
-    console.log(`Vagas importadas: ${imported.length}`);
-    console.log(`Vagas atualizadas: ${updated.length}`);
-    console.log(`Erros: ${errors.length}`);
-    
-    if (imported.length > 0) {
-      console.log(`Slugs importados: ${imported.join(', ')}`);
+    const payload = importJobsPayloadSchema.parse(rawBody);
+    if (!payload.rows.length) {
+      return buildJsonError(400, "Nenhuma linha valida foi enviada para importacao.");
     }
-    if (updated.length > 0) {
-      console.log(`Slugs atualizados: ${updated.join(', ')}`);
-    }
-    if (errors.length > 0) {
-      console.log(`Erros encontrados: ${errors.join('; ')}`);
-    }
-    
-    // Verificação crítica: se não houve erros mas também não importou nada
-    if (errors.length === 0 && imported.length === 0 && updated.length === 0) {
-      console.error('!!! ATENÇÃO: Nenhuma vaga foi importada/atualizada, mas também não houve erros !!!');
-      console.error('Possíveis causas:');
-      console.error('1. Operações Prisma não estão sendo executadas (await faltando)');
-      console.error('2. Todas as vagas já existem e não estão sendo atualizadas');
-      console.error('3. Falha silenciosa no prisma.job.create/update');
-      console.error('4. Transação não sendo commitada');
-    }
+
+    const context = await buildImportContext(payload.rows);
+    await processRows(payload.rows, context);
 
     await writeAuditLog({
       actorId: session.sub,
@@ -362,63 +541,54 @@ export async function POST(request: Request) {
       entityType: "job-import",
       summary: "Importacao de vagas por planilha",
       after: {
-        importedCount: imported.length,
-        updatedCount: updated.length,
-        imported,
-        updated
+        importedCount: context.imported.length,
+        updatedCount: context.updated.length,
+        errorCount: context.issues.length,
+        imported: context.imported,
+        updated: context.updated
       }
     });
 
-    // Resposta detalhada para depuração no navegador
-    const response = {
-      ok: true,
-      summary: {
-        totalRows: payload.rows.length,
-        importedCount: imported.length,
-        updatedCount: updated.length,
-        errorCount: errors.length,
-        successRate: payload.rows.length > 0 ? Math.round(((imported.length + updated.length) / payload.rows.length) * 100) : 0
+    const durationMs = Date.now() - startedAt;
+
+    return NextResponse.json(
+      {
+        ok: true,
+        summary: {
+          totalRows: payload.rows.length,
+          importedCount: context.imported.length,
+          updatedCount: context.updated.length,
+          errorCount: context.issues.length,
+          successRate: Math.round(((context.imported.length + context.updated.length) / payload.rows.length) * 100),
+          durationMs
+        },
+        results: {
+          imported: context.imported.map((slug) => ({ slug, status: "imported" })),
+          updated: context.updated.map((slug) => ({ slug, status: "updated" })),
+          errors: context.issues.map((issue) => ({
+            line: issue.line,
+            message: issue.message,
+            fullError: `${issue.title}: ${issue.message}`
+          }))
+        },
+        debug: {
+          errorDetails: context.issues.map((issue) => `Linha ${issue.line}: ${issue.message}`)
+        }
       },
-      results: {
-        imported: imported.map((slug, i) => ({ slug, status: 'imported' })),
-        updated: updated.map((slug, i) => ({ slug, status: 'updated' })),
-        errors: errors.map((error, i) => ({ 
-          line: error.split(':')[0], 
-          message: error.split(':').slice(1).join(':').trim(),
-          fullError: error 
-        }))
-      },
-      debug: {
-        processedSlugs: [...imported, ...updated],
-        errorDetails: errors.length > 0 ? errors : ['Nenhum erro detectado'],
-        timestamp: new Date().toISOString()
+      {
+        headers: RESPONSE_HEADERS
       }
-    };
-
-    // Log detalhado no console para depuração
-    console.log('=== RESPOSTA FINAL DA IMPORTAÇÃO ===');
-    console.log(JSON.stringify(response, null, 2));
-
-    return NextResponse.json(response, { headers });
+    );
   } catch (error) {
+    console.error("Erro na importacao de vagas:", error);
+
     const message = error instanceof Error ? error.message : "Nao foi possivel importar a planilha.";
-    
-    // Capturar erro detalhado do Prisma para depuração
-    const detailedError = {
-      ok: false,
-      error: message,
-      details: error instanceof Error ? error.stack : null,
-      timestamp: new Date().toISOString(),
+
+    return buildJsonError(400, message, {
       debug: {
-        errorMessage: message,
-        errorType: error instanceof Error ? error.constructor.name : 'Unknown',
-        isPrismaError: error instanceof Error && error.message.includes('Prisma'),
-        fullError: error
+        errorType: error instanceof Error ? error.constructor.name : "UnknownError",
+        stack: error instanceof Error ? error.stack : null
       }
-    };
-    
-    console.error('ERRO DETALHADO DA IMPORTAÇÃO:', detailedError);
-    
-    return NextResponse.json(detailedError, { status: 400, headers });
+    });
   }
 }
