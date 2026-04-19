@@ -16,6 +16,14 @@
   --radius-3xl: 2rem;
 }
 
+html, body {
+  overflow-x: hidden !important;
+  position: relative;
+  width: 100vw !important;
+  margin: 0;
+  padding: 0;
+}
+
 :root {
   --brand-navy: #1a2b4c;
   --brand-blue: #2f6fed;
