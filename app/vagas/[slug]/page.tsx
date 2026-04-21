@@ -84,6 +84,7 @@ export default async function JobDetailPage({ params }: { params: Promise<{ slug
           companyLogoUrl: job.company?.logoUrl ?? job.companyLogoUrl,
           cityName: job.city.name,
           stateCode: job.state.code,
+          stateName: job.state.name,
           publishedAt: job.publishedAt.toISOString(),
           expiresAt: job.expiresAt?.toISOString() ?? null,
           validThrough: job.validThrough?.toISOString() ?? null,

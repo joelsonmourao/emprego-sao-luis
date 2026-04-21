@@ -64,6 +64,7 @@ type JobPostingInput = {
   companyLogoUrl?: string | null;
   cityName: string;
   stateCode: string;
+  stateName: string;
   publishedAt: string;
   expiresAt: string | null;
   validThrough?: string | null;
@@ -102,31 +103,16 @@ function buildSalaryBlock(job: JobPostingInput) {
 }
 
 function buildJobLocation(job: JobPostingInput) {
-  const address: Record<string, unknown> = {
-    "@type": "PostalAddress"
-  };
-
-  if (job.streetAddress) {
-    address.streetAddress = job.streetAddress;
-  }
-
-  if (job.postalCode) {
-    address.postalCode = job.postalCode;
-  }
-
-  if (job.cityName) {
-    address.addressLocality = job.cityName;
-  }
-
-  if (job.stateCode) {
-    address.addressRegion = job.stateCode;
-  }
-
-  address.addressCountry = job.countryCode ?? "BR";
-
   return {
     "@type": "Place",
-    address
+    address: {
+      "@type": "PostalAddress",
+      streetAddress: job.streetAddress ?? "Indefinido",
+      postalCode: job.postalCode ?? "Indefinido",
+      addressLocality: `${job.cityName}, ${job.stateName}`,
+      addressRegion: `${job.cityName}, ${job.stateName}`,
+      addressCountry: job.countryCode ?? "BR"
+    }
   };
 }
 
@@ -140,20 +126,6 @@ export function buildJobPostingJsonLd(job: JobPostingInput) {
     "@context": "https://schema.org",
     "@type": "JobPosting",
     datePosted: normalizeIsoDate(job.publishedAt),
-    title: job.title,
-    description,
-    employmentType: job.employmentType,
-    hiringOrganization: {
-      "@type": "Organization",
-      name: job.companyName,
-      ...(job.companyLogoUrl ? { logo: absoluteUrl(job.companyLogoUrl) } : {})
-    },
-    identifier: {
-      "@type": "PropertyValue",
-      name: job.companyName,
-      value: job.externalId || job.id || job.slug
-    },
-    jobLocation: buildJobLocation(job)
   };
 
   const validThrough = normalizeIsoDate(job.validThrough ?? job.expiresAt);
@@ -165,6 +137,21 @@ export function buildJobPostingJsonLd(job: JobPostingInput) {
   if (baseSalary) {
     data.baseSalary = baseSalary;
   }
+
+  data.title = job.title;
+  data.description = description;
+  data.employmentType = job.employmentType;
+  data.hiringOrganization = {
+    "@type": "Organization",
+    name: job.companyName,
+    ...(job.companyLogoUrl ? { logo: absoluteUrl(job.companyLogoUrl) } : {})
+  };
+  data.identifier = {
+    "@type": "PropertyValue",
+    name: job.companyName,
+    value: absoluteUrl(`/vagas/${job.slug}`)
+  };
+  data.jobLocation = buildJobLocation(job);
 
   return data;
 }

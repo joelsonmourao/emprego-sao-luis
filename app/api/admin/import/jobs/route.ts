@@ -438,7 +438,9 @@ function buildJobData(row: ImportedJobRow, state: State, city: City, company: Co
 }
 
 async function processRows(rows: ImportedJobRow[], context: ImportContext) {
-  const operations: Array<ReturnType<typeof prisma.job.create> | ReturnType<typeof prisma.job.update>> = [];
+  const operations: Array<
+    ReturnType<typeof prisma.job.create> | ReturnType<typeof prisma.job.update> | ReturnType<typeof prisma.job.upsert>
+  > = [];
 
   for (const [index, row] of rows.entries()) {
     const line = index + 2;
@@ -465,36 +467,58 @@ async function processRows(rows: ImportedJobRow[], context: ImportContext) {
       const uniqueSlug = ensureUniqueJobSlug(baseSlug, context.usedJobSlugs, existing?.slug);
       const data = buildJobData(row, state, city, company, uniqueSlug, existing ?? undefined);
 
-      if (existing) {
+      if (externalId) {
+        const alreadyKnown = context.jobsByExternalId.has(externalId);
+        const trackedId = existing?.id ?? `pending:${externalId}`;
+
         operations.push(
-          prisma.job.update({
-            where: { id: existing.id },
-            data
+          prisma.job.upsert({
+            where: { externalId },
+            create: data,
+            update: data
           })
         );
 
-        context.jobsBySlug.set(uniqueSlug, {
-          id: existing.id,
+        context.jobsByExternalId.set(externalId, {
+          id: trackedId,
           slug: uniqueSlug,
           publishedAt: data.publishedAt,
           externalId
         });
-        if (externalId) {
-          context.jobsByExternalId.set(externalId, {
-            id: existing.id,
-            slug: uniqueSlug,
-            publishedAt: data.publishedAt,
-            externalId
-          });
+        context.jobsBySlug.set(uniqueSlug, {
+          id: trackedId,
+          slug: uniqueSlug,
+          publishedAt: data.publishedAt,
+          externalId
+        });
+
+        if (alreadyKnown) {
+          context.updated.push(uniqueSlug);
+        } else {
+          context.imported.push(uniqueSlug);
         }
-        context.updated.push(uniqueSlug);
       } else {
+        const alreadyKnownBySlug = context.jobsBySlug.has(baseSlug);
+
         operations.push(
-          prisma.job.create({
-            data
+          prisma.job.upsert({
+            where: { slug: existing?.slug ?? uniqueSlug },
+            create: data,
+            update: data
           })
         );
-        context.imported.push(uniqueSlug);
+
+        context.jobsBySlug.set(uniqueSlug, {
+          id: `pending:${uniqueSlug}`,
+          slug: uniqueSlug,
+          publishedAt: data.publishedAt,
+          externalId
+        });
+        if (alreadyKnownBySlug) {
+          context.updated.push(uniqueSlug);
+        } else {
+          context.imported.push(uniqueSlug);
+        }
       }
     } catch (error) {
       context.issues.push({
