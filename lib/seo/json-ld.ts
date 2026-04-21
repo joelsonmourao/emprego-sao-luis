@@ -144,7 +144,7 @@ export function buildJobPostingJsonLd(job: JobPostingInput) {
   data.hiringOrganization = {
     "@type": "Organization",
     name: job.companyName,
-    logo: absoluteUrl(job.companyLogoUrl ?? "/brand-logo.svg")
+    logo: absoluteUrl(job.companyLogoUrl ?? "/brand-mark.svg")
   };
   data.identifier = {
     "@type": "PropertyValue",
