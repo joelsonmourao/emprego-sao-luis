@@ -2,7 +2,7 @@ import { z } from "zod";
 
 export const importedJobRowSchema = z.object({
   title: z.string().min(5, "Titulo obrigatorio."),
-  slug: z.string().optional().default(""),
+  slug: z.preprocess((value) => (value === null || value === undefined ? "" : String(value)), z.string()).optional().default(""),
   companyName: z.string().min(2, "Empresa obrigatoria."),
   cityName: z.string().min(2, "Cidade obrigatoria."),
   stateName: z.string().min(2, "Estado obrigatorio."),

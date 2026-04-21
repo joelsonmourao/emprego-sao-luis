@@ -355,11 +355,14 @@ async function buildImportContext(rows: ImportedJobRow[]): Promise<ImportContext
     citiesByStateAndSlug
   );
 
-  const requestedBaseSlugs = Array.from(new Set(rows.map((row) => normalizeSlug(row.slug || row.title))));
+  const requestedBaseSlugs = Array.from(new Set(rows.map((row) => normalizeSlug(row.slug || row.title)).filter(Boolean)));
   const requestedExternalIds = Array.from(new Set(rows.map((row) => row.externalId?.trim()).filter(Boolean))) as string[];
   const existingJobs = await prisma.job.findMany({
     where: {
-      OR: [{ slug: { in: requestedBaseSlugs } }, ...(requestedExternalIds.length ? [{ externalId: { in: requestedExternalIds } }] : [])]
+      OR: [
+        ...(requestedBaseSlugs.length ? requestedBaseSlugs.map((slug) => ({ slug: { startsWith: slug } })) : []),
+        ...(requestedExternalIds.length ? [{ externalId: { in: requestedExternalIds } }] : [])
+      ]
     },
     select: {
       id: true,
@@ -463,13 +466,16 @@ async function processRows(rows: ImportedJobRow[], context: ImportContext) {
 
       const externalId = row.externalId?.trim() || null;
       const baseSlug = normalizeSlug(row.slug || row.title);
-      const existing = (externalId ? context.jobsByExternalId.get(externalId) : null) ?? context.jobsBySlug.get(baseSlug) ?? null;
-      const uniqueSlug = ensureUniqueJobSlug(baseSlug, context.usedJobSlugs, existing?.slug);
+      const existingByExternalId = externalId ? context.jobsByExternalId.get(externalId) ?? null : null;
+      const existingBySlug = context.jobsBySlug.get(baseSlug) ?? null;
+      const existing = existingByExternalId ?? (!externalId ? existingBySlug : null);
+      const keepCurrentSlug = existingByExternalId?.slug ?? (!externalId ? existingBySlug?.slug : undefined);
+      const uniqueSlug = ensureUniqueJobSlug(baseSlug, context.usedJobSlugs, keepCurrentSlug);
       const data = buildJobData(row, state, city, company, uniqueSlug, existing ?? undefined);
 
       if (externalId) {
         const alreadyKnown = context.jobsByExternalId.has(externalId);
-        const trackedId = existing?.id ?? `pending:${externalId}`;
+        const trackedId = existingByExternalId?.id ?? `pending:${externalId}`;
 
         operations.push(
           prisma.job.upsert({
