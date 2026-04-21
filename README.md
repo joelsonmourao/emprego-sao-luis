@@ -120,12 +120,113 @@ Arquivo `.env.example`:
 
 ```env
 DATABASE_URL="postgresql://postgres:postgres@localhost:5432/jovem_aprendiz_vagas?schema=jovem_aprendiz_vagas"
-SITE_URL="https://www.seu-dominio.com"
+SITE_URL="https://slzcontent.com.br"
 NEXT_PUBLIC_SITE_URL="http://localhost:3000"
+SITE_TIME_ZONE="America/Sao_Paulo"
 AUTH_SECRET="troque-esta-chave-por-uma-segura"
 ADMIN_LOGIN_USER="defina-um-email-admin@seudominio.com"
 ADMIN_SECRET_KEY="defina-uma-senha-admin-forte"
+SCHEDULED_JOBS_SPREADSHEET_PATH="C:\\caminho\\para\\sua\\planilha.xlsx"
+SCHEDULED_JOBS_SHEET_NAME="Sheet1"
+SCHEDULED_JOBS_LOG_DIR="C:\\caminho\\para\\logs"
+GOOGLE_INDEXING_SERVICE_ACCOUNT_FILE="C:\\caminho\\fora-do-repo\\google-indexing-service-account.json"
+GOOGLE_INDEXING_SERVICE_ACCOUNT_JSON=""
+CRON_SECRET="defina-um-token-secreto-para-cron"
 ```
+
+## Publicacao agendada por planilha
+
+O projeto agora suporta publicacao agendada de vagas a partir de uma planilha Excel, usando o horario do Brasil.
+
+Timezone usada:
+
+- `America/Sao_Paulo`
+
+Colunas lidas e atualizadas na planilha:
+
+- `scheduledAt`
+- `publishStatus`
+- `publishedUrl`
+- `publishedAt`
+- `googleIndexingStatus`
+- `googleIndexedAt`
+- `googleIndexingMessage`
+
+Fluxo de status:
+
+- `AGUARDANDO_AGENDAMENTO`
+- `AGENDADA`
+- `PUBLICANDO`
+- `PUBLICADA`
+- `INDEXANDO_GOOGLE`
+- `OK`
+- `ERRO`
+
+### Execucao manual/local
+
+```bash
+pnpm run jobs:schedule:process -- --file="C:\\caminho\\para\\planilha.xlsx"
+```
+
+Opcoes:
+
+- `--file=...`
+- `--sheet=...`
+- `--log-dir=...`
+
+O processo:
+
+1. le a planilha
+2. encontra linhas vencidas em `scheduledAt`
+3. publica ou atualiza a vaga no banco
+4. grava a URL final em `publishedUrl`
+5. chama a Google Indexing API com a URL do seu dominio
+6. salva o status de publicacao e indexacao na propria planilha
+7. gera log `.jsonl` separado
+
+### Execucao automatica
+
+Para automacao sem acao manual depois do agendamento, existem dois caminhos:
+
+1. local/servidor proprio:
+   - agende `pnpm run jobs:schedule:process` no Agendador de Tarefas do Windows ou cron
+2. Vercel:
+   - o projeto ja inclui `vercel.json` com cron para `/api/internal/scheduled-jobs`
+   - configure `CRON_SECRET`
+   - configure `SCHEDULED_JOBS_SPREADSHEET_PATH`
+
+Observacao importante:
+
+- se a sua planilha estiver so no seu computador local, a Vercel nao consegue ler esse arquivo
+- nesse caso, a automacao correta e rodar o script no seu PC/servidor ou mover a planilha para um local acessivel ao ambiente de execucao
+
+### Google Indexing API
+
+Nao coloque a chave JSON no codigo.
+
+Use uma destas configuracoes:
+
+- `GOOGLE_INDEXING_SERVICE_ACCOUNT_FILE`
+- `GOOGLE_INDEXING_SERVICE_ACCOUNT_JSON`
+
+Para o Google aceitar os envios:
+
+1. a API Indexing precisa estar ativada no projeto Google Cloud
+2. a conta de servico precisa ser proprietaria delegada da propriedade no Search Console
+3. a URL enviada precisa ser a URL final do seu dominio
+
+Quando isso falhar, o retorno fica salvo em:
+
+- `googleIndexingStatus`
+- `googleIndexingMessage`
+
+### Logs e auditoria
+
+Cada execucao grava:
+
+- status de cada linha na propria planilha
+- log `.jsonl` separado
+- auditoria no banco em `AuditLog`
 
 ## Dependencias externas para producao
 

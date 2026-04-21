@@ -9,6 +9,7 @@
     "build:retry": "prisma generate && scripts/build-with-retry.bat",
     "start": "next start",
     "typecheck": "tsc --noEmit",
+    "jobs:schedule:process": "tsx scripts/process-scheduled-jobs.ts",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev",
     "prisma:studio": "prisma studio",

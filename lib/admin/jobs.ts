@@ -2,7 +2,7 @@ import { EmploymentType, LocationType, Prisma } from "@prisma/client";
 
 import { prisma } from "@/lib/db";
 import { jobFormSchema, type JobFormValues } from "@/lib/schemas/job-form";
-import { normalizeLines, normalizeSlug, parseOptionalDate, plainTextToHtml, sanitizeHtml } from "@/lib/admin/content";
+import { normalizeLines, normalizeSlug, parseOptionalDate, richTextFromInput, sanitizeHtml } from "@/lib/admin/content";
 
 // Função para processar validThrough (data ou meses)
 function processValidThrough(validThroughValue: string | undefined | null): Date | null {
@@ -183,7 +183,7 @@ export async function upsertJobFromForm(input: unknown, existingId?: string) {
     companyWebsiteUrl: company.websiteUrl,
     heroImageUrl: parsed.heroImageUrl?.trim() || null,
     summary: parsed.summary.trim(),
-    descriptionHtml: parsed.descriptionHtml.includes("<") ? sanitizeHtml(parsed.descriptionHtml.trim()) : plainTextToHtml(parsed.descriptionHtml.trim()),
+    descriptionHtml: richTextFromInput(parsed.descriptionHtml, { baseHeadingLevel: 2 }),
     requirements: normalizeLines(parsed.requirementsText),
     benefits: normalizeLines(parsed.benefitsText ?? ""),
     salaryMin: parsed.salaryMin ?? null,

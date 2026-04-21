@@ -1,7 +1,7 @@
 import { AuditAction, EmploymentType, LocationType, type City, type Company, type Job, type State } from "@prisma/client";
 import { NextResponse } from "next/server";
 
-import { normalizeLines, normalizeSlug, parseOptionalDate, plainTextToHtml } from "@/lib/admin/content";
+import { normalizeLines, normalizeSlug, parseOptionalDate, richTextFromInput } from "@/lib/admin/content";
 import { writeAuditLog } from "@/lib/audit";
 import { requireApiRole } from "@/lib/authz";
 import { prisma } from "@/lib/db";
@@ -415,7 +415,7 @@ function buildJobData(row: ImportedJobRow, state: State, city: City, company: Co
     companyLogoUrl: company.logoUrl,
     companyWebsiteUrl: company.websiteUrl,
     summary: row.summary.trim(),
-    descriptionHtml: row.descriptionHtml.includes("<") ? row.descriptionHtml.trim() : plainTextToHtml(row.descriptionHtml.trim()),
+    descriptionHtml: richTextFromInput(row.descriptionHtml, { baseHeadingLevel: 2 }),
     requirements: normalizeLines(row.requirementsText),
     benefits: normalizeLines(row.benefitsText ?? ""),
     salaryMin: row.salaryMin ? Math.round(row.salaryMin) : null,
