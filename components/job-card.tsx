@@ -3,6 +3,7 @@ import { ArrowUpRight, Building2, Clock3, MapPin, Sparkles } from "lucide-react"
 import { TrackedLink } from "@/components/analytics/tracked-link";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { getCityJobsPath, getCompanyJobsPath } from "@/lib/seo/jobs-pages";
 import { formatDate } from "@/lib/utils";
 
 type JobCardProps = {
@@ -12,7 +13,7 @@ type JobCardProps = {
     companyName: string;
     companyLogoUrl?: string | null;
     summary: string;
-    city: { name: string };
+    city: { name: string; slug: string };
     state: { code: string };
     publishedAt: Date;
     applyUrl: string;
@@ -56,7 +57,7 @@ export function JobCard({ job }: JobCardProps) {
               <Building2 className="h-4 w-4 text-[var(--brand-blue)]" />
             )}
             {job.company?.slug ? (
-              <TrackedLink href={`/empresas/${job.company.slug}`} eventName="company_click" entityType="company" entitySlug={job.company.slug}>
+              <TrackedLink href={getCompanyJobsPath(job.company.slug)} eventName="company_click" entityType="company" entitySlug={job.company.slug}>
                 {job.companyName}
               </TrackedLink>
             ) : (
@@ -65,7 +66,9 @@ export function JobCard({ job }: JobCardProps) {
           </span>
           <span className="inline-flex items-center gap-2">
             <MapPin className="h-4 w-4 text-[var(--brand-orange)]" />
-            {job.city.name}, {job.state.code}
+            <TrackedLink href={getCityJobsPath(job.city.slug)} eventName="city_click" entityType="city" entitySlug={job.city.slug}>
+              {job.city.name}, {job.state.code}
+            </TrackedLink>
           </span>
         </CardDescription>
       </CardHeader>

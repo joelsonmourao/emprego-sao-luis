@@ -6,6 +6,7 @@ import { Breadcrumbs } from "@/components/breadcrumbs";
 import { SectionHeading } from "@/components/section-heading";
 import { sanitizeRichTextHtml } from "@/lib/rich-text";
 import { buildSiteMetadata } from "@/lib/seo/metadata";
+import { getCompanyJobsPath } from "@/lib/seo/jobs-pages";
 import { getPostBySlug, getRelatedPosts } from "@/lib/repositories/blog";
 import { getCompanyHubs } from "@/lib/repositories/jobs";
 
@@ -59,7 +60,7 @@ export default async function BlogDetailPage({ params }: { params: Promise<{ slu
             </p>
             <div className="mt-4 flex flex-wrap gap-3">
               {companies.slice(0, 4).map((company) => (
-                <Link key={company.slug} href={`/empresas/${company.slug}`} className="rounded-full border border-[color:rgba(26,43,76,0.1)] bg-white px-4 py-2 text-sm font-medium text-[var(--brand-text-secondary)] transition hover:border-[color:rgba(255,109,0,0.24)] hover:text-[var(--brand-orange)]">
+                <Link key={company.slug} href={getCompanyJobsPath(company.slug)} className="rounded-full border border-[color:rgba(26,43,76,0.1)] bg-white px-4 py-2 text-sm font-medium text-[var(--brand-text-secondary)] transition hover:border-[color:rgba(255,109,0,0.24)] hover:text-[var(--brand-orange)]">
                   {company.name}
                 </Link>
               ))}

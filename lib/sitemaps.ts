@@ -2,11 +2,12 @@ import { cache } from "react";
 import { HubType } from "@prisma/client";
 
 import { staticPages } from "@/data/seo-pages";
-import { buildJobsSearchCanonicalPath } from "@/lib/listing";
-import { getHubProfiles } from "@/lib/repositories/hubs";
+import { getCityJobsPath, getCompanyJobsPath, getJobPath, getStateJobsPath } from "@/lib/seo/jobs-pages";
+import { shouldIndexPage } from "@/lib/seo/indexing";
 import { getAllPublishedPostEntries } from "@/lib/repositories/blog";
-import { getAllActiveJobEntries, getCompanyEntries } from "@/lib/repositories/jobs";
 import { getCities, getStates } from "@/lib/repositories/geo";
+import { getHubProfiles } from "@/lib/repositories/hubs";
+import { getAllActiveJobEntries, getCompanyEntries, getCompanyHubs } from "@/lib/repositories/jobs";
 import { getSiteOrigin } from "@/lib/site-url";
 import { absoluteUrl } from "@/lib/utils";
 
@@ -21,31 +22,6 @@ const ROOT_ROUTES_BY_CATEGORY = {
   companies: ["/empresas"],
   blog: ["/blog"]
 } as const;
-
-const JOB_QUERY_STOPWORDS = new Set([
-  "aprendiz",
-  "jovem",
-  "vaga",
-  "vagas",
-  "programa",
-  "para",
-  "com",
-  "sem",
-  "uma",
-  "um",
-  "de",
-  "da",
-  "do",
-  "das",
-  "dos",
-  "na",
-  "no",
-  "nas",
-  "nos",
-  "em",
-  "e",
-  "ou"
-]);
 
 export type SitemapCategory =
   | "home"
@@ -78,7 +54,6 @@ export type SitemapManifest = {
 
 function normalizeDate(value?: Date | string | null) {
   if (!value) return undefined;
-
   const date = value instanceof Date ? value : new Date(value);
   return Number.isNaN(date.getTime()) ? undefined : date.toISOString();
 }
@@ -90,45 +65,6 @@ function escapeXml(value: string) {
     .replace(/>/g, "&gt;")
     .replace(/"/g, "&quot;")
     .replace(/'/g, "&apos;");
-}
-
-function stripAccents(value: string) {
-  return value.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-}
-
-function normalizeSearchQuery(value: string) {
-  return stripAccents(value).toLowerCase().replace(/[^a-z0-9\s]/g, " ").replace(/\s+/g, " ").trim();
-}
-
-function deriveStrategicJobQuery(input: { title: string; cityName: string; stateName: string; stateCode: string }) {
-  const locationTokens = new Set(
-    [input.cityName, input.stateName, input.stateCode]
-      .flatMap((value) => normalizeSearchQuery(value).split(" "))
-      .filter(Boolean)
-  );
-
-  const normalized = normalizeSearchQuery(input.title)
-    .replace(/\bjovem aprendiz\b/g, " ")
-    .replace(/\baprendiz\b/g, " ")
-    .replace(/\s+/g, " ")
-    .trim();
-
-  if (!normalized) return null;
-
-  const words = normalized
-    .split(" ")
-    .filter(
-      (word) =>
-        word.length >= 3 &&
-        !JOB_QUERY_STOPWORDS.has(word) &&
-        !locationTokens.has(word) &&
-        !/\d/.test(word)
-    );
-
-  if (!words.length) return null;
-
-  const query = words.slice(0, 2).join(" ").trim();
-  return query.length >= 3 ? query : null;
 }
 
 function toSitemapEntry(path: string, lastmod?: Date | string | null): SitemapUrlEntry {
@@ -172,121 +108,18 @@ function splitEntries(category: SitemapCategory, entries: SitemapUrlEntry[]): Si
   return files;
 }
 
-function resolveDefaultPathForProfile(defaultPath: string, canonicalUrl?: string | null) {
-  if (!canonicalUrl) {
-    return defaultPath;
-  }
-
-  try {
-    const origin = getSiteOrigin();
-    const canonical = new URL(canonicalUrl, origin);
-
-    if (canonical.origin !== origin) {
-      return null;
-    }
-
-    const resolvedPath = `${canonical.pathname}${canonical.search}`.replace(/\/$/, "") || "/";
-    const normalizedDefault = defaultPath.replace(/\/$/, "") || "/";
-
-    return resolvedPath === normalizedDefault ? defaultPath : null;
-  } catch {
-    return defaultPath;
-  }
-}
-
 function buildRootEntries(category: Exclude<SitemapCategory, "listings">, lastmod?: Date | string | null) {
   return ROOT_ROUTES_BY_CATEGORY[category].map((path) => toSitemapEntry(path, lastmod));
 }
 
-function buildStrategicListingEntries(
-  jobs: Awaited<ReturnType<typeof getAllActiveJobEntries>>
-): SitemapUrlEntry[] {
-  const cityCounts = new Map<string, { total: number; stateSlug: string; citySlug: string; lastmod?: string }>();
-  const cityBaseCounts = new Map<string, { total: number; stateSlug: string; citySlug: string; lastmod?: string }>();
-
-  for (const job of jobs) {
-    const query = deriveStrategicJobQuery({
-      title: job.title,
-      cityName: job.city.name,
-      stateName: job.state.name,
-      stateCode: job.state.code
-    });
-
-    if (!query) {
-      continue;
-    }
-
-    const cityKey = `${query}__${job.state.slug}__${job.city.slug}`;
-    const cityBaseKey = `${job.state.slug}__${job.city.slug}`;
-    const lastmod = normalizeDate(job.updatedAt);
-
-    const cityEntry = cityCounts.get(cityKey) ?? {
-      total: 0,
-      stateSlug: job.state.slug,
-      citySlug: job.city.slug,
-      lastmod
-    };
-    cityEntry.total += 1;
-    cityEntry.lastmod = !cityEntry.lastmod || (lastmod && lastmod > cityEntry.lastmod) ? lastmod : cityEntry.lastmod;
-    cityCounts.set(cityKey, cityEntry);
-
-    const cityBaseEntry = cityBaseCounts.get(cityBaseKey) ?? {
-      total: 0,
-      stateSlug: job.state.slug,
-      citySlug: job.city.slug,
-      lastmod
-    };
-    cityBaseEntry.total += 1;
-    cityBaseEntry.lastmod = !cityBaseEntry.lastmod || (lastmod && lastmod > cityBaseEntry.lastmod) ? lastmod : cityBaseEntry.lastmod;
-    cityBaseCounts.set(cityBaseKey, cityBaseEntry);
-  }
-
-  const entries = new Map<string, SitemapUrlEntry>();
-
-  for (const data of cityBaseCounts.values()) {
-    if (data.total < 1) {
-      continue;
-    }
-
-    const path = buildJobsSearchCanonicalPath({
-      total: data.total,
-      stateSlug: data.stateSlug,
-      citySlug: data.citySlug,
-      order: "relevance",
-      page: 1
-    });
-
-    entries.set(path, toSitemapEntry(path, data.lastmod));
-  }
-
-  for (const [key, data] of cityCounts.entries()) {
-    const [query] = key.split("__");
-    if (data.total < 1) {
-      continue;
-    }
-
-    const path = buildJobsSearchCanonicalPath({
-      total: data.total,
-      query,
-      stateSlug: data.stateSlug,
-      citySlug: data.citySlug,
-      order: "relevance",
-      page: 1
-    });
-
-    entries.set(path, toSitemapEntry(path, data.lastmod));
-  }
-
-  return Array.from(entries.values()).sort((a, b) => a.loc.localeCompare(b.loc));
-}
-
 export const getSitemapManifest = cache(async (): Promise<SitemapManifest> => {
-  const [jobs, posts, states, cities, companies, stateProfiles, cityProfiles, companyProfiles] = await Promise.all([
+  const [jobs, posts, states, cities, companies, companyHubs, stateProfiles, cityProfiles, companyProfiles] = await Promise.all([
     getAllActiveJobEntries(),
     getAllPublishedPostEntries(),
     getStates(),
     getCities(),
     getCompanyEntries(),
+    getCompanyHubs(),
     getHubProfiles(HubType.STATE),
     getHubProfiles(HubType.CITY),
     getHubProfiles(HubType.COMPANY)
@@ -295,43 +128,59 @@ export const getSitemapManifest = cache(async (): Promise<SitemapManifest> => {
   const stateProfileMap = new Map(stateProfiles.map((profile) => [profile.slug, profile]));
   const cityProfileMap = new Map(cityProfiles.map((profile) => [profile.slug, profile]));
   const companyProfileMap = new Map(companyProfiles.map((profile) => [profile.slug, profile]));
+  const companyHubMap = new Map(companyHubs.map((company) => [company.slug, company]));
+  const activeStateCounts = jobs.reduce<Map<string, number>>((map, job) => {
+    map.set(job.state.slug, (map.get(job.state.slug) ?? 0) + 1);
+    return map;
+  }, new Map());
+  const activeCityCounts = jobs.reduce<Map<string, number>>((map, job) => {
+    map.set(job.city.slug, (map.get(job.city.slug) ?? 0) + 1);
+    return map;
+  }, new Map());
 
   const institutionals = staticPages.filter((path) => ROOT_ROUTES_BY_CATEGORY.institutionals.includes(path as never));
 
   const homeEntries = buildRootEntries("home", new Date());
   const institutionalEntries = institutionals.map((path) => toSitemapEntry(path, new Date()));
-
-  const jobEntries = jobs.map((job) => toSitemapEntry(`/vagas/${job.slug}`, job.updatedAt));
+  const jobEntries = jobs.map((job) => toSitemapEntry(getJobPath(job.slug), job.updatedAt));
 
   const stateEntries = [
     ...buildRootEntries("states", states[0]?.updatedAt ?? new Date()),
     ...states.flatMap((state) => {
       const profile = stateProfileMap.get(state.slug);
-      const directoryPath = resolveDefaultPathForProfile(`/estados/${state.slug}`, profile?.canonicalUrl);
-      const jobsPath = resolveDefaultPathForProfile(`/vagas/estado/${state.slug}`, profile?.canonicalUrl);
+      const shouldIndex = shouldIndexPage({
+        kind: "state-listing",
+        totalJobs: activeStateCounts.get(state.slug) ?? 0,
+        hasSpecificMetadata: true,
+        hasOwnContent: true,
+        internalLinkCount: 8
+      });
 
-      if (profile?.noIndex) {
+      if (profile?.noIndex || !shouldIndex) {
         return [];
       }
 
-      return [directoryPath ? toSitemapEntry(directoryPath, state.updatedAt) : null, jobsPath ? toSitemapEntry(jobsPath, state.updatedAt) : null].filter(
-        (entry): entry is SitemapUrlEntry => Boolean(entry)
-      );
+      return [toSitemapEntry(getStateJobsPath(state.slug), state.updatedAt)];
     })
   ];
 
   const cityEntries = [
     ...buildRootEntries("cities", cities[0]?.updatedAt ?? new Date()),
     ...cities.flatMap((city) => {
-      const profileKey = `${city.state.slug}__${city.slug}`;
-      const profile = cityProfileMap.get(profileKey);
+      const profile = cityProfileMap.get(`${city.state.slug}__${city.slug}`);
+      const shouldIndex = shouldIndexPage({
+        kind: "city-listing",
+        totalJobs: activeCityCounts.get(city.slug) ?? 0,
+        hasSpecificMetadata: true,
+        hasOwnContent: true,
+        internalLinkCount: 6
+      });
 
-      if (profile?.noIndex) {
+      if (profile?.noIndex || !shouldIndex) {
         return [];
       }
 
-      const path = resolveDefaultPathForProfile(`/vagas/estado/${city.state.slug}/${city.slug}`, profile?.canonicalUrl);
-      return path ? [toSitemapEntry(path, city.updatedAt)] : [];
+      return [toSitemapEntry(getCityJobsPath(city.slug), city.updatedAt)];
     })
   ];
 
@@ -339,13 +188,21 @@ export const getSitemapManifest = cache(async (): Promise<SitemapManifest> => {
     ...buildRootEntries("companies", companies[0]?.updatedAt ?? new Date()),
     ...companies.flatMap((company) => {
       const profile = companyProfileMap.get(company.slug);
+      const hub = companyHubMap.get(company.slug);
+      const totalJobs = hub?.count ?? 0;
+      const shouldIndex = shouldIndexPage({
+        kind: "company-listing",
+        totalJobs,
+        hasSpecificMetadata: true,
+        hasOwnContent: true,
+        internalLinkCount: 5
+      });
 
-      if (profile?.noIndex) {
+      if (profile?.noIndex || !shouldIndex) {
         return [];
       }
 
-      const path = resolveDefaultPathForProfile(`/empresas/${company.slug}`, profile?.canonicalUrl);
-      return path ? [toSitemapEntry(path, company.updatedAt)] : [];
+      return [toSitemapEntry(getCompanyJobsPath(company.slug), company.updatedAt)];
     })
   ];
 
@@ -353,8 +210,6 @@ export const getSitemapManifest = cache(async (): Promise<SitemapManifest> => {
     ...buildRootEntries("blog", posts[0]?.updatedAt ?? new Date()),
     ...posts.map((post) => toSitemapEntry(`/blog/${post.slug}`, post.updatedAt))
   ];
-
-  const listingEntries = buildStrategicListingEntries(jobs);
 
   const files = [
     ...splitEntries("home", homeEntries),
@@ -364,7 +219,7 @@ export const getSitemapManifest = cache(async (): Promise<SitemapManifest> => {
     ...splitEntries("cities", cityEntries),
     ...splitEntries("companies", companyEntries),
     ...splitEntries("blog", blogEntries),
-    ...splitEntries("listings", listingEntries)
+    ...splitEntries("listings", [])
   ];
 
   const counts = files.reduce(
@@ -384,10 +239,7 @@ export const getSitemapManifest = cache(async (): Promise<SitemapManifest> => {
     } satisfies Record<SitemapCategory, number>
   );
 
-  return {
-    files,
-    counts
-  };
+  return { files, counts };
 });
 
 export function buildSitemapIndexXml(files: SitemapFile[]) {

@@ -137,7 +137,7 @@ export function SiteIntegrations({ consentBanner, google, initialConsentValue }:
           ? "job"
           : pathname.startsWith("/blog/") && pathname !== "/blog"
             ? "post"
-            : pathname.startsWith("/empresas/")
+            : pathname.startsWith("/empresas/") || pathname.startsWith("/empresa/")
               ? "company"
               : "page"
     });

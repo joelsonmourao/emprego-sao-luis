@@ -14,11 +14,12 @@ import {
   buildJobsListingHeading,
   buildJobsListingIntro,
   buildJobsListingMetaTitle,
-  buildJobsSearchCanonicalPath,
-  isStrategicJobsSearchIndexable
+  buildJobsSearchCanonicalPath
 } from "@/lib/listing";
 import { getCompanyHubs, getJobsList } from "@/lib/repositories/jobs";
 import { getSearchGeoData } from "@/lib/repositories/geo";
+import { shouldIndexPage } from "@/lib/seo/indexing";
+import { getCityJobsPath, getCompanyJobsPath, getStateJobsPath } from "@/lib/seo/jobs-pages";
 import { buildSiteMetadata } from "@/lib/seo/metadata";
 import { buildBreadcrumbJsonLd, buildFaqJsonLd } from "@/lib/seo/json-ld";
 import { jobSearchParamsSchema } from "@/lib/schemas/search";
@@ -56,16 +57,6 @@ export async function generateMetadata({
   const selectedState = states.find((state) => state.slug === parsed.estado);
   const selectedCity = selectedState?.cities.find((city) => city.slug === parsed.cidade);
   
-  const indexableSearch = isStrategicJobsSearchIndexable({
-    total: jobs.total,
-    query: parsed.q,
-    stateSlug: parsed.estado,
-    citySlug: parsed.cidade,
-    companySlug: parsed.empresa,
-    order: parsed.order,
-    page: parsed.page
-  });
-
   const isBaseListing =
     !parsed.q &&
     !parsed.estado &&
@@ -74,9 +65,15 @@ export async function generateMetadata({
     (parsed.page ?? 1) === 1 &&
     (parsed.order ?? "relevance") === "relevance";
 
-  const isDuplicatedHubFilter =
-    !parsed.q &&
-    (Boolean(parsed.empresa) || (Boolean(parsed.estado) && !parsed.cidade));
+  const shouldIndex = shouldIndexPage({
+    kind: isBaseListing ? "jobs-root" : "technical-query",
+    totalJobs: jobs.total,
+    hasSpecificMetadata: true,
+    hasOwnContent: true,
+    internalLinkCount: 8,
+    hasBetterCanonical: Boolean(!parsed.q && (parsed.estado || parsed.cidade || parsed.empresa)),
+    isTechnicalQuery: !isBaseListing
+  });
 
   return buildSiteMetadata({
     title: buildJobsListingMetaTitle({
@@ -105,7 +102,7 @@ export async function generateMetadata({
     }),
     // CORREÇÃO: Se houver estado ou cidade, forçamos a indexação (false para noIndex).
     // Se quiser liberar para TUDO, basta colocar noIndex: false
-    noIndex: isBaseListing ? false : isDuplicatedHubFilter ? true : !indexableSearch
+    noIndex: !shouldIndex
   });
 }
 
@@ -263,7 +260,7 @@ export default async function JobsPage({
           <h2 className="text-base font-black text-slate-950 sm:text-lg">Empresas com vagas recentes</h2>
           <div className="mt-3 flex flex-wrap gap-2 sm:mt-4 sm:gap-3">
             {companies.slice(0, 8).map((company) => (
-              <Link key={company.slug} href={`/empresas/${company.slug}`} className="rounded-full border border-[color:rgba(26,43,76,0.1)] bg-white px-3 py-1.5 text-xs font-medium text-[var(--brand-text-secondary)] transition hover:border-[color:rgba(255,109,0,0.22)] hover:text-[var(--brand-orange)] sm:px-4 sm:py-2 sm:text-sm">
+              <Link key={company.slug} href={getCompanyJobsPath(company.slug)} className="rounded-full border border-[color:rgba(26,43,76,0.1)] bg-white px-3 py-1.5 text-xs font-medium text-[var(--brand-text-secondary)] transition hover:border-[color:rgba(255,109,0,0.22)] hover:text-[var(--brand-orange)] sm:px-4 sm:py-2 sm:text-sm">
                 {company.name}
               </Link>
             ))}
@@ -280,10 +277,21 @@ export default async function JobsPage({
             {states.slice(0, 6).map((state) => (
               <Link
                 key={state.id}
-                href={`/vagas/estado/${state.slug}`}
+                href={getStateJobsPath(state.slug)}
                 className="rounded-full border border-[color:rgba(26,43,76,0.1)] bg-white px-3 py-1.5 text-xs font-medium text-[var(--brand-text-secondary)] transition hover:border-[color:rgba(255,109,0,0.22)] hover:text-[var(--brand-orange)] sm:px-4 sm:py-2 sm:text-sm"
               >
                 {state.name}
+              </Link>
+            ))}
+          </div>
+          <div className="mt-4 flex flex-wrap gap-2 sm:mt-6 sm:gap-3">
+            {states.flatMap((state) => state.cities.slice(0, 1)).slice(0, 6).map((city) => (
+              <Link
+                key={`${city.slug}-${city.name}`}
+                href={getCityJobsPath(city.slug)}
+                className="rounded-full border border-[color:rgba(26,43,76,0.1)] bg-white px-3 py-1.5 text-xs font-medium text-[var(--brand-text-secondary)] transition hover:border-[color:rgba(255,109,0,0.22)] hover:text-[var(--brand-orange)] sm:px-4 sm:py-2 sm:text-sm"
+              >
+                {city.name}
               </Link>
             ))}
           </div>

@@ -20,6 +20,7 @@ import { JsonLd } from "@/components/json-ld";
 import { SectionHeading } from "@/components/section-heading";
 import { Button } from "@/components/ui/button";
 import { buildSiteMetadata } from "@/lib/seo/metadata";
+import { getCityJobsPath, getCompanyJobsPath } from "@/lib/seo/jobs-pages";
 import { buildFaqJsonLd } from "@/lib/seo/json-ld";
 import { getPostsBySlugs, getRecentPosts } from "@/lib/repositories/blog";
 import { getFeaturedCompanies, getFeaturedCompaniesBySlugs, getFeaturedJobs, getJobsBySlugs } from "@/lib/repositories/jobs";
@@ -187,7 +188,7 @@ export default async function HomePage() {
               {cities.slice(0, 6).map((city) => (
                 <Link
                   key={city.id}
-                  href={`/vagas/estado/${city.state.slug}/${city.slug}`}
+                  href={getCityJobsPath(city.slug)}
                   className="rounded-full border border-[color:rgba(26,43,76,0.1)] bg-white px-3 py-1.5 text-xs font-medium text-[var(--brand-text-secondary)] transition hover:border-[color:rgba(255,109,0,0.26)] hover:text-[var(--brand-orange)] sm:px-4 sm:py-2 sm:text-sm"
                 >
                   {city.name}, {city.state.code}
@@ -255,7 +256,7 @@ export default async function HomePage() {
               {cities.slice(0, 8).map((city) => (
                 <Link
                   key={city.id}
-                  href={`/vagas/estado/${city.state.slug}/${city.slug}`}
+                  href={getCityJobsPath(city.slug)}
                   className="rounded-full border border-[color:rgba(26,43,76,0.1)] bg-white px-3 py-1.5 text-xs font-medium text-[var(--brand-text-secondary)] transition hover:border-[color:rgba(255,109,0,0.28)] hover:text-[var(--brand-orange)] sm:px-4 sm:py-2 sm:text-sm"
                 >
                   {city.name}, {city.state.code}
@@ -315,7 +316,7 @@ export default async function HomePage() {
               {companies.slice(0, 6).map((company) => (
                 <Link
                   key={company.slug}
-                  href={`/empresas/${company.slug}`}
+                    href={getCompanyJobsPath(company.slug)}
                   className="rounded-[1.25rem] border border-[color:rgba(26,43,76,0.1)] bg-white px-3 py-3 text-sm text-[var(--brand-text-secondary)] transition hover:border-[color:rgba(255,109,0,0.24)] hover:text-[var(--brand-orange)] sm:px-4 sm:py-4"
                 >
                   <span className="block font-semibold text-[var(--brand-navy)]">{company.name}</span>
@@ -339,7 +340,7 @@ export default async function HomePage() {
               {cities.slice(0, 5).map((city) => (
                 <Link
                   key={city.id}
-                  href={`/vagas/estado/${city.state.slug}/${city.slug}`}
+                  href={getCityJobsPath(city.slug)}
                   className="rounded-full border border-white/18 bg-white/10 px-3 py-1.5 text-xs font-medium text-white transition hover:bg-white/16 sm:px-4 sm:py-2 sm:text-sm"
                 >
                   {city.name}

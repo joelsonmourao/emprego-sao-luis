@@ -10,6 +10,7 @@ import { JsonLd } from "@/components/json-ld";
 import { SectionHeading } from "@/components/section-heading";
 import { Button } from "@/components/ui/button";
 import { sanitizeRichTextHtml } from "@/lib/rich-text";
+import { buildJobDetailSeo, getCityJobsPath, getCompanyJobsPath, getStateJobsPath } from "@/lib/seo/jobs-pages";
 import { buildSiteMetadata } from "@/lib/seo/metadata";
 import { buildBreadcrumbJsonLd, buildJobPostingJsonLd } from "@/lib/seo/json-ld";
 import { getRelatedPosts } from "@/lib/repositories/blog";
@@ -30,10 +31,20 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     });
   }
 
+  const seo = buildJobDetailSeo({
+    title: job.title,
+    companyName: job.companyName,
+    cityName: job.city.name,
+    stateCode: job.state.code,
+    slug: job.slug
+  });
+
   return buildSiteMetadata({
-    title: job.seoTitle ?? `${job.title} em ${job.city.name}, ${job.state.code}`,
-    description: job.seoDescription ?? job.summary,
+    title: job.seoTitle ?? seo.title,
+    description: job.seoDescription ?? seo.description,
     pathname: `/vagas/${job.slug}`,
+    canonicalUrl: seo.canonicalPath,
+    noIndex: !job.isActive,
     socialImageUrl: job.heroImageUrl || job.company?.socialImageUrl || job.companyLogoUrl || undefined
   });
 }
@@ -71,21 +82,15 @@ export default async function JobDetailPage({ params }: { params: Promise<{ slug
           slug: job.slug,
           companyName: job.companyName,
           companyLogoUrl: job.company?.logoUrl ?? job.companyLogoUrl,
-          companyWebsiteUrl: job.company?.websiteUrl ?? job.companyWebsiteUrl,
           cityName: job.city.name,
           stateCode: job.state.code,
           publishedAt: job.publishedAt.toISOString(),
-          updatedAt: job.updatedAt.toISOString(),
           expiresAt: job.expiresAt?.toISOString() ?? null,
           validThrough: job.validThrough?.toISOString() ?? null,
-          applyUrl: job.applyUrl,
-          locationType: job.locationType,
           employmentType: job.employmentType,
           salaryMin: job.salaryMin,
           salaryMax: job.salaryMax,
-          workHours: job.workHours,
-          requirements: Array.isArray(job.requirements) ? job.requirements.map((item) => String(item)) : [],
-          responsibilities: Array.isArray(job.responsibilities) ? job.responsibilities.map((item) => String(item)) : []
+          countryCode: "BR"
         })}
       />
 
@@ -196,14 +201,20 @@ export default async function JobDetailPage({ params }: { params: Promise<{ slug
             </p>
             <div className="mt-4 flex flex-wrap gap-2 sm:mt-5 sm:gap-3">
               <Link
-                href={`/vagas/estado/${job.state.slug}/${job.city.slug}`}
+                href={getCityJobsPath(job.city.slug)}
                 className="rounded-full border border-[color:rgba(26,43,76,0.1)] bg-white px-3 py-1.5 text-xs font-medium text-[var(--brand-text-secondary)] transition hover:border-[color:rgba(255,109,0,0.24)] hover:text-[var(--brand-orange)] sm:px-4 sm:py-2 sm:text-sm"
               >
                 Mais vagas em {job.city.name}
               </Link>
+              <Link
+                href={getStateJobsPath(job.state.slug)}
+                className="rounded-full border border-[color:rgba(26,43,76,0.1)] bg-white px-3 py-1.5 text-xs font-medium text-[var(--brand-text-secondary)] transition hover:border-[color:rgba(255,109,0,0.24)] hover:text-[var(--brand-orange)] sm:px-4 sm:py-2 sm:text-sm"
+              >
+                Mais vagas no {job.state.name}
+              </Link>
               {job.company?.slug ? (
                 <Link
-                  href={`/empresas/${job.company.slug}`}
+                  href={getCompanyJobsPath(job.company.slug)}
                   className="rounded-full border border-[color:rgba(26,43,76,0.1)] bg-white px-3 py-1.5 text-xs font-medium text-[var(--brand-text-secondary)] transition hover:border-[color:rgba(255,109,0,0.24)] hover:text-[var(--brand-orange)] sm:px-4 sm:py-2 sm:text-sm"
                 >
                   Mais vagas da {job.company.name}

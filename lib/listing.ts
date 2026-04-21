@@ -1,3 +1,5 @@
+import { getCityJobsPath, getCompanyJobsPath, getStateJobsPath } from "@/lib/seo/jobs-pages";
+
 type ListingDescriptorInput = {
   total: number;
   stateName?: string;
@@ -5,6 +7,16 @@ type ListingDescriptorInput = {
   cityName?: string;
   companyName?: string;
   query?: string;
+};
+
+type JobsSearchIndexingInput = {
+  total: number;
+  query?: string;
+  stateSlug?: string;
+  citySlug?: string;
+  companySlug?: string;
+  order?: "relevance" | "date";
+  page?: number;
 };
 
 function formatCount(total: number) {
@@ -19,7 +31,7 @@ function capitalizeWords(value: string) {
   return value.replace(/\b\p{L}/gu, (letter) => letter.toUpperCase());
 }
 
-function formatOpportunity(query?: string) {
+function buildOpportunity(query?: string) {
   const normalized = normalizeQuery(query);
 
   if (!normalized) {
@@ -30,127 +42,100 @@ function formatOpportunity(query?: string) {
   return /jovem aprendiz/i.test(normalized) ? display : `Jovem Aprendiz ${display}`;
 }
 
-function buildLocation(input: ListingDescriptorInput) {
+export function buildJobsListingHeading(input: ListingDescriptorInput) {
+  if (input.companyName) {
+    return `Jovem Aprendiz no ${input.companyName}`;
+  }
+
   if (input.cityName && input.stateCode) {
-    return `${input.cityName}, ${input.stateCode}`;
+    return `Vagas de Jovem Aprendiz em ${input.cityName}, ${input.stateCode}`;
   }
 
   if (input.stateName) {
-    return input.stateName;
+    return `Vagas de Jovem Aprendiz no ${input.stateName}`;
   }
 
-  return "";
-}
-
-export function buildJobsListingHeading(input: ListingDescriptorInput) {
-  const count = formatCount(input.total);
-  const location = buildLocation(input);
-  const opportunity = formatOpportunity(input.query);
-
-  if (input.companyName) {
-    return `${count} de ${opportunity} na ${input.companyName}`;
-  }
-
-  if (location) {
-    return `${count} de ${opportunity} em ${location}`;
-  }
-
-  return `${count} de ${opportunity} no Brasil`;
+  return "Vagas de Jovem Aprendiz";
 }
 
 export function buildJobsListingMetaTitle(input: ListingDescriptorInput) {
-  const opportunity = formatOpportunity(input.query);
-
   if (input.companyName) {
-    return `${formatCount(input.total)} de ${opportunity} na ${input.companyName}`;
+    return `${formatCount(input.total)} de ${buildOpportunity(input.query)} no ${input.companyName}`;
   }
 
   if (input.cityName && input.stateCode) {
-    return `${formatCount(input.total)} de ${opportunity} em ${input.cityName}, ${input.stateCode}`;
+    return `${formatCount(input.total)} de ${buildOpportunity(input.query)} em ${input.cityName}, ${input.stateCode}`;
   }
 
   if (input.stateName) {
-    return `Vagas de ${opportunity} em ${input.stateName}`;
+    return `${formatCount(input.total)} de ${buildOpportunity(input.query)} no ${input.stateName}`;
   }
 
-  return `Vagas de ${opportunity} no Brasil`;
+  return `${formatCount(input.total)} de Jovem Aprendiz no Brasil`;
 }
 
 export function buildJobsListingDescription(input: ListingDescriptorInput) {
-  const location = buildLocation(input);
-  const opportunity = formatOpportunity(input.query);
-
   if (input.companyName) {
-    return `Veja ${formatCount(input.total)} de ${opportunity} ligadas a ${input.companyName}, com contexto da empresa, localidade e caminhos para continuar a busca.`;
+    return `Veja vagas de Jovem Aprendiz no ${input.companyName}, requisitos mais comuns, perfil buscado e como se candidatar as oportunidades.`;
   }
 
-  if (location) {
-    return `Encontre ${formatCount(input.total)} de ${opportunity} em ${location}, com empresas ativas, detalhes da vaga e links para continuar a busca perto de voce.`;
+  if (input.cityName && input.stateCode) {
+    return `Procure vagas de Jovem Aprendiz em ${input.cityName}, ${input.stateCode}. Veja empresas, requisitos e ${formatCount(
+      input.total
+    )} abertas para candidatura.`;
   }
 
-  return `Veja ${formatCount(input.total)} de ${opportunity} no Brasil, com busca por cidade, estado e empresas que costumam contratar.`;
+  if (input.stateName) {
+    return `Procure vagas de Jovem Aprendiz no ${input.stateName}. Veja empresas contratando, requisitos e ${formatCount(
+      input.total
+    )} abertas para candidatura.`;
+  }
+
+  return `Procure vagas de Jovem Aprendiz no Brasil. Veja empresas contratando, requisitos e ${formatCount(
+    input.total
+  )} abertas para candidatura.`;
 }
 
 export function buildJobsListingIntro(input: ListingDescriptorInput) {
-  const location = buildLocation(input);
-  const opportunity = formatOpportunity(input.query);
-
   if (input.companyName) {
-    return `Esta pagina organiza as vagas de ${opportunity} ligadas a ${input.companyName} e ajuda voce a continuar a busca por cidade, estado e empresa.`;
+    return `Confira oportunidades de Jovem Aprendiz no ${input.companyName}, veja requisitos frequentes, cidades com vagas e orientacoes para acompanhar novas oportunidades.`;
   }
 
-  if (location) {
-    return `Aqui voce encontra vagas de ${opportunity} em ${location}, com contexto local, empresas que estao contratando e caminhos para seguir na candidatura.`;
+  if (input.cityName && input.stateCode) {
+    return `Confira vagas de Jovem Aprendiz em ${input.cityName}, ${input.stateCode}, com oportunidades atualizadas por empresa e area. Veja requisitos comuns e acompanhe novas vagas para o primeiro emprego.`;
   }
 
-  return `Esta e a listagem principal do portal, com vagas de ${opportunity} organizadas por localidade e empresas para facilitar a busca do primeiro emprego.`;
+  if (input.stateName) {
+    return `Encontre vagas de Jovem Aprendiz no ${input.stateName} em empresas de diferentes segmentos. Veja oportunidades atualizadas, empresas contratando e requisitos comuns para iniciar no mercado de trabalho.`;
+  }
+
+  return `Encontre vagas de Jovem Aprendiz no Brasil, acompanhe empresas contratando e navegue por cidade, estado e empresa para chegar mais rapido as oportunidades com maior potencial de candidatura.`;
 }
 
-type JobsSearchIndexingInput = {
-  total: number;
-  query?: string;
-  stateSlug?: string;
-  citySlug?: string;
-  companySlug?: string;
-  order?: "relevance" | "date";
-  page?: number;
-};
-
 export function isStrategicJobsSearchIndexable(input: JobsSearchIndexingInput) {
-  const query = normalizeQuery(input.query);
-  const hasQuery = query.length >= 2;
-  const hasCity = Boolean(input.citySlug);
-  const hasValidCityContext = !input.citySlug || Boolean(input.stateSlug);
-  const hasCompany = Boolean(input.companySlug);
   const firstPage = (input.page ?? 1) === 1;
   const relevanceOrder = (input.order ?? "relevance") === "relevance";
+  const hasTechnicalFilters = Boolean(normalizeQuery(input.query)) || Boolean(input.stateSlug) || Boolean(input.citySlug) || Boolean(input.companySlug);
 
-  return input.total > 0 && firstPage && relevanceOrder && hasCity && hasValidCityContext && !hasCompany && (!query || hasQuery);
+  return input.total > 0 && firstPage && relevanceOrder && !hasTechnicalFilters;
 }
 
 export function buildJobsSearchCanonicalPath(input: JobsSearchIndexingInput) {
-  const params = new URLSearchParams();
   const query = normalizeQuery(input.query);
-  const isIndexable = isStrategicJobsSearchIndexable(input);
 
-  if (!query && input.stateSlug && input.citySlug && isIndexable) {
-    params.set("estado", input.stateSlug);
-    params.set("cidade", input.citySlug);
-    return `/vagas?${params.toString()}`;
-  }
-
-  if (!query && input.stateSlug && input.citySlug) {
-    return `/vagas/estado/${input.stateSlug}/${input.citySlug}`;
+  if (!query && input.citySlug) {
+    return getCityJobsPath(input.citySlug);
   }
 
   if (!query && input.stateSlug) {
-    return `/vagas/estado/${input.stateSlug}`;
+    return getStateJobsPath(input.stateSlug);
   }
 
   if (!query && input.companySlug) {
-    return `/empresas/${input.companySlug}`;
+    return getCompanyJobsPath(input.companySlug);
   }
 
+  const params = new URLSearchParams();
   if (query) params.set("q", query);
   if (input.stateSlug) params.set("estado", input.stateSlug);
   if (input.citySlug) params.set("cidade", input.citySlug);
@@ -159,13 +144,5 @@ export function buildJobsSearchCanonicalPath(input: JobsSearchIndexingInput) {
   if ((input.page ?? 1) > 1) params.set("page", String(input.page ?? 1));
 
   const queryString = params.toString();
-  if (!queryString) {
-    return "/vagas";
-  }
-
-  if (isIndexable) {
-    return `/vagas?${queryString}`;
-  }
-
-  return `/vagas?${queryString}`;
+  return queryString ? `/vagas?${queryString}` : "/vagas";
 }

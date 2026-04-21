@@ -47,6 +47,24 @@ export async function getCityByStateAndSlug(stateSlug: string, citySlug: string)
   });
 }
 
+export async function getCityBySlug(slug: string) {
+  const cities = await prisma.city.findMany({
+    where: { slug },
+    include: {
+      state: true,
+      _count: {
+        select: {
+          jobs: {
+            where: { isActive: true }
+          }
+        }
+      }
+    }
+  });
+
+  return cities.sort((left, right) => right._count.jobs - left._count.jobs)[0] ?? null;
+}
+
 export async function getSearchGeoData() {
   return prisma.state.findMany({
     orderBy: [{ name: "asc" }],

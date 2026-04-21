@@ -6,6 +6,7 @@ import { JsonLd } from "@/components/json-ld";
 import { SectionHeading } from "@/components/section-heading";
 import { buildCollectionPageJsonLd, buildCompaniesIndexSeo } from "@/lib/hub-seo";
 import { buildSiteMetadata } from "@/lib/seo/metadata";
+import { getCompanyJobsPath } from "@/lib/seo/jobs-pages";
 import { buildBreadcrumbJsonLd } from "@/lib/seo/json-ld";
 import { getCompanyHubs } from "@/lib/repositories/jobs";
 
@@ -38,7 +39,7 @@ export default async function CompaniesPage() {
       </div>
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
         {companies.map((company) => (
-          <Link key={company.slug} href={`/empresas/${company.slug}`} className="brand-chip rounded-[1.75rem] border border-slate-200 bg-white p-6 shadow-sm transition hover:-translate-y-1">
+          <Link key={company.slug} href={getCompanyJobsPath(company.slug)} className="brand-chip rounded-[1.75rem] border border-slate-200 bg-white p-6 shadow-sm transition hover:-translate-y-1">
             {company.logoUrl ? (
               <img src={company.logoUrl} alt={company.name} className="h-12 w-12 rounded-2xl border border-slate-200 bg-white object-cover p-1" />
             ) : (

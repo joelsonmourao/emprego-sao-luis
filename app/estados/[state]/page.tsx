@@ -10,6 +10,7 @@ import { SectionHeading } from "@/components/section-heading";
 import { buildCollectionPageJsonLd, buildStateDirectorySeo } from "@/lib/hub-seo";
 import { sanitizeRichTextHtml } from "@/lib/rich-text";
 import { buildSiteMetadata } from "@/lib/seo/metadata";
+import { getCityJobsPath, getCompanyJobsPath } from "@/lib/seo/jobs-pages";
 import { buildBreadcrumbJsonLd, buildFaqJsonLd } from "@/lib/seo/json-ld";
 import { getRecentPosts } from "@/lib/repositories/blog";
 import { getStateBySlug } from "@/lib/repositories/geo";
@@ -107,7 +108,7 @@ export default async function StateDetailPage({ params }: { params: Promise<{ st
             {result.cities.map((city) => (
               <Link
                 key={city.id}
-                href={`/vagas/estado/${result.slug}/${city.slug}`}
+                href={getCityJobsPath(city.slug)}
                 className="brand-chip rounded-3xl border border-slate-200 bg-white p-6 shadow-sm transition hover:-translate-y-1"
               >
                 <h2 className="text-xl font-semibold text-slate-950">{city.name}</h2>
@@ -133,7 +134,7 @@ export default async function StateDetailPage({ params }: { params: Promise<{ st
             <h2 className="text-lg font-black text-slate-950">Empresas com vagas no estado</h2>
             <div className="mt-4 flex flex-wrap gap-3">
               {companies.filter((company) => company.stateSlug === result.slug).slice(0, 6).map((company) => (
-                <Link key={company.slug} href={`/empresas/${company.slug}`} className="rounded-full border border-[color:rgba(26,43,76,0.1)] bg-white px-4 py-2 text-sm font-medium text-[var(--brand-text-secondary)] transition hover:border-[color:rgba(255,109,0,0.22)] hover:text-[var(--brand-orange)]">
+                <Link key={company.slug} href={getCompanyJobsPath(company.slug)} className="rounded-full border border-[color:rgba(26,43,76,0.1)] bg-white px-4 py-2 text-sm font-medium text-[var(--brand-text-secondary)] transition hover:border-[color:rgba(255,109,0,0.22)] hover:text-[var(--brand-orange)]">
                   {company.name}
                 </Link>
               ))}

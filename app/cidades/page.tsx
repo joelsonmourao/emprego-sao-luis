@@ -6,6 +6,7 @@ import { JsonLd } from "@/components/json-ld";
 import { SectionHeading } from "@/components/section-heading";
 import { buildCitiesIndexSeo, buildCollectionPageJsonLd } from "@/lib/hub-seo";
 import { buildSiteMetadata } from "@/lib/seo/metadata";
+import { getCityJobsPath } from "@/lib/seo/jobs-pages";
 import { buildBreadcrumbJsonLd } from "@/lib/seo/json-ld";
 import { getCities } from "@/lib/repositories/geo";
 
@@ -40,7 +41,7 @@ export default async function CitiesPage() {
         {cities.map((city) => (
           <Link
             key={city.id}
-            href={`/vagas/estado/${city.state.slug}/${city.slug}`}
+            href={getCityJobsPath(city.slug)}
             className="brand-chip rounded-[1.75rem] border border-slate-200 bg-white p-6 shadow-sm transition hover:-translate-y-1"
           >
             <MapPinned className="h-7 w-7 text-[var(--brand-orange)]" />
