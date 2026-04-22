@@ -2,7 +2,14 @@ import { cache } from "react";
 import { HubType } from "@prisma/client";
 
 import { staticPages } from "@/data/seo-pages";
+import { EMPLOYMENT_CATEGORIES } from "@/lib/employment-categories";
 import { getCityJobsPath, getCompanyJobsPath, getJobPath, getStateJobsPath } from "@/lib/seo/jobs-pages";
+import {
+  jovemAprendizCategoryPath,
+  jovemAprendizCityPath,
+  jovemAprendizCompanyPath,
+  jovemAprendizStatePath
+} from "@/lib/seo/jovem-aprendiz-programmatic";
 import { shouldIndexPage } from "@/lib/seo/indexing";
 import { getAllPublishedPostEntries } from "@/lib/repositories/blog";
 import { getCities, getStates } from "@/lib/repositories/geo";
@@ -20,7 +27,8 @@ const ROOT_ROUTES_BY_CATEGORY = {
   states: ["/estados"],
   cities: ["/cidades"],
   companies: ["/empresas"],
-  blog: ["/blog"]
+  blog: ["/blog"],
+  programmatic: []
 } as const;
 
 export type SitemapCategory =
@@ -31,7 +39,8 @@ export type SitemapCategory =
   | "cities"
   | "companies"
   | "blog"
-  | "listings";
+  | "listings"
+  | "programmatic";
 
 export type SitemapUrlEntry = {
   loc: string;
@@ -138,6 +147,17 @@ export const getSitemapManifest = cache(async (): Promise<SitemapManifest> => {
     return map;
   }, new Map());
 
+  const cityStateJobCounts = jobs.reduce<Map<string, number>>((map, job) => {
+    const key = `${job.state.slug}__${job.city.slug}`;
+    map.set(key, (map.get(key) ?? 0) + 1);
+    return map;
+  }, new Map());
+
+  const employmentCounts = jobs.reduce<Map<string, number>>((map, job) => {
+    map.set(job.employmentType, (map.get(job.employmentType) ?? 0) + 1);
+    return map;
+  }, new Map());
+
   const institutionals = staticPages.filter((path) => ROOT_ROUTES_BY_CATEGORY.institutionals.includes(path as never));
 
   const homeEntries = buildRootEntries("home", new Date());
@@ -211,6 +231,28 @@ export const getSitemapManifest = cache(async (): Promise<SitemapManifest> => {
     ...posts.map((post) => toSitemapEntry(`/blog/${post.slug}`, post.updatedAt))
   ];
 
+  const programmaticEntries: SitemapUrlEntry[] = [
+    ...states.flatMap((state) => {
+      const total = activeStateCounts.get(state.slug) ?? 0;
+      if (total <= 0) return [];
+      return [toSitemapEntry(jovemAprendizStatePath(state.slug), state.updatedAt)];
+    }),
+    ...cities.flatMap((city) => {
+      const total = cityStateJobCounts.get(`${city.state.slug}__${city.slug}`) ?? 0;
+      if (total <= 0) return [];
+      return [toSitemapEntry(jovemAprendizCityPath(city.state.slug, city.slug), city.updatedAt)];
+    }),
+    ...companyHubs.flatMap((company) => {
+      if (!company.count) return [];
+      return [toSitemapEntry(jovemAprendizCompanyPath(company.slug), new Date())];
+    }),
+    ...EMPLOYMENT_CATEGORIES.flatMap((category) => {
+      const total = employmentCounts.get(category.employmentType) ?? 0;
+      if (total <= 0) return [];
+      return [toSitemapEntry(jovemAprendizCategoryPath(category.slug), new Date())];
+    })
+  ];
+
   const files = [
     ...splitEntries("home", homeEntries),
     ...splitEntries("institutionals", institutionalEntries),
@@ -219,7 +261,8 @@ export const getSitemapManifest = cache(async (): Promise<SitemapManifest> => {
     ...splitEntries("cities", cityEntries),
     ...splitEntries("companies", companyEntries),
     ...splitEntries("blog", blogEntries),
-    ...splitEntries("listings", [])
+    ...splitEntries("listings", []),
+    ...splitEntries("programmatic", programmaticEntries)
   ];
 
   const counts = files.reduce(
@@ -235,7 +278,8 @@ export const getSitemapManifest = cache(async (): Promise<SitemapManifest> => {
       cities: 0,
       companies: 0,
       blog: 0,
-      listings: 0
+      listings: 0,
+      programmatic: 0
     } satisfies Record<SitemapCategory, number>
   );
 

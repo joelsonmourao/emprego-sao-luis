@@ -45,16 +45,20 @@ export function getCompanyJobsPath(companySlug: string) {
   return `/empresa/${companySlug}/jovem-aprendiz`;
 }
 
+/** Hub de empresa sob /vagas (SEO complementar, sem alterar URLs canonicas existentes de vaga). */
+export function getVagasEmpresaPath(companySlug: string) {
+  return `/vagas/empresa/${companySlug}`;
+}
+
 export function getJobPath(slug: string) {
   return `/vagas/${slug}`;
 }
 
 export function buildStateListingSeo(input: StateSeoInput) {
+  const countLabel = formatVacancyCount(input.totalJobs);
   return {
-    title: `${formatVacancyCount(input.totalJobs)} de Jovem Aprendiz no ${input.stateName}`,
-    description: `Procure vagas de Jovem Aprendiz no ${input.stateName}. Veja empresas contratando, requisitos e ${formatVacancyCount(
-      input.totalJobs
-    )} abertas para candidatura.`,
+    title: `${countLabel} no ${input.stateName} | Jovem Aprendiz`,
+    description: `Listagem em ${input.stateName}: ${countLabel} de Jovem Aprendiz com empresas contratando, requisitos e link de candidatura. Atualizado para busca por primeiro emprego.`,
     h1: `Vagas de Jovem Aprendiz no ${input.stateName}`,
     intro:
       `Encontre vagas de Jovem Aprendiz no ${input.stateName} em empresas de diferentes segmentos. ` +
@@ -64,11 +68,10 @@ export function buildStateListingSeo(input: StateSeoInput) {
 }
 
 export function buildCityListingSeo(input: CitySeoInput) {
+  const countLabel = formatVacancyCount(input.totalJobs);
   return {
-    title: `${formatVacancyCount(input.totalJobs)} de Jovem Aprendiz em ${input.cityName}, ${input.stateCode}`,
-    description: `Procure vagas de Jovem Aprendiz em ${input.cityName}, ${input.stateCode}. Veja empresas, requisitos e ${formatVacancyCount(
-      input.totalJobs
-    )} abertas para candidatura.`,
+    title: `${countLabel} em ${input.cityName}, ${input.stateCode} | Jovem Aprendiz`,
+    description: `${input.cityName} (${input.stateCode}): ${countLabel} de Jovem Aprendiz com empresas, requisitos e candidatura. Pagina focada em primeiro emprego na regiao.`,
     h1: `Vagas de Jovem Aprendiz em ${input.cityName}, ${input.stateCode}`,
     intro:
       `Confira vagas de Jovem Aprendiz em ${input.cityName}, ${input.stateCode}, com oportunidades atualizadas por empresa e area. ` +
@@ -77,24 +80,30 @@ export function buildCityListingSeo(input: CitySeoInput) {
   };
 }
 
-export function buildCompanyListingSeo(input: CompanySeoInput) {
+export function buildCompanyListingSeo(
+  input: CompanySeoInput,
+  options?: { variant?: "default" | "vagas-hub" }
+) {
   const countDrivenTitle =
-    input.totalJobs >= 3 ? `${formatVacancyCount(input.totalJobs)} de Jovem Aprendiz no ${input.companyName}` : null;
+    input.totalJobs >= 3 ? `${formatVacancyCount(input.totalJobs)} no ${input.companyName} | Jovem Aprendiz` : null;
+
+  const canonicalPath =
+    options?.variant === "vagas-hub" ? getVagasEmpresaPath(input.companySlug) : getCompanyJobsPath(input.companySlug);
 
   return {
-    title: countDrivenTitle ?? `Jovem Aprendiz no ${input.companyName} - vagas, requisitos e como se candidatar`,
-    description: `Veja vagas de Jovem Aprendiz no ${input.companyName}, requisitos mais comuns, perfil buscado e como se candidatar as oportunidades.`,
+    title: countDrivenTitle ?? `${input.companyName}: vagas de Jovem Aprendiz e candidatura`,
+    description: `Oportunidades de Jovem Aprendiz no ${input.companyName}: requisitos, perfil buscado, cidades e como se candidatar. ${formatVacancyCount(input.totalJobs)} listadas nesta pagina.`,
     h1: `Jovem Aprendiz no ${input.companyName}`,
     intro:
       `Confira oportunidades de Jovem Aprendiz no ${input.companyName}, veja requisitos frequentes, cidades com vagas e orientacoes para acompanhar novas oportunidades.`,
-    canonicalPath: getCompanyJobsPath(input.companySlug)
+    canonicalPath
   };
 }
 
 export function buildJobDetailSeo(input: JobSeoInput) {
   return {
-    title: `${input.title} em ${input.companyName} - ${input.cityName}, ${input.stateCode}`,
-    description: `Veja detalhes da vaga de ${input.title} em ${input.companyName}, localizada em ${input.cityName}, ${input.stateCode}. Confira requisitos, beneficios e como se candidatar.`,
+    title: `${input.title} | ${input.companyName} — ${input.cityName}, ${input.stateCode}`,
+    description: `Vaga de Jovem Aprendiz: ${input.title} na ${input.companyName} (${input.cityName}, ${input.stateCode}). Resumo, requisitos, beneficios e link oficial para candidatura.`,
     canonicalPath: getJobPath(input.slug)
   };
 }

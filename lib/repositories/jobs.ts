@@ -1,4 +1,4 @@
-import type { Prisma } from "@prisma/client";
+import type { EmploymentType, Prisma } from "@prisma/client";
 
 import { prisma } from "@/lib/db";
 import { pagination } from "@/lib/constants";
@@ -56,6 +56,7 @@ export async function getJobsList(params: {
   citySlug?: string;
   companySlug?: string;
   companyName?: string;
+  employmentType?: EmploymentType;
   order?: "relevance" | "date";
   page?: number;
 }) {
@@ -87,7 +88,8 @@ export async function getJobsList(params: {
             }
           }
         }
-      : {})
+      : {}),
+    ...(params.employmentType ? { employmentType: params.employmentType } : {})
   };
 
   const [items, total] = await Promise.all([
@@ -255,6 +257,7 @@ export async function getAllActiveJobEntries() {
       slug: true,
       title: true,
       updatedAt: true,
+      employmentType: true,
       city: {
         select: {
           slug: true,

@@ -1,3 +1,4 @@
+import { existsSync } from "node:fs";
 import { mkdir, appendFile } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
@@ -88,6 +89,25 @@ type ProcessResult = {
   summary: ProcessSummary;
   results: Array<ProcessLogEntry>;
 };
+
+const DEFAULT_WORKBOOK_NAMES = ["vagas.xlsx", "modelo_importacao_vagas.xlsx", "Vagas.xlsx"] as const;
+
+export function resolveScheduledWorkbookPath(): string | null {
+  const configured = env.SCHEDULED_JOBS_SPREADSHEET_PATH?.trim();
+  if (configured) {
+    return configured;
+  }
+
+  const root = process.cwd();
+  for (const name of DEFAULT_WORKBOOK_NAMES) {
+    const fullPath = path.join(root, name);
+    if (existsSync(fullPath)) {
+      return fullPath;
+    }
+  }
+
+  return null;
+}
 
 type PublicationContext = {
   statesByInput: Map<string, State>;
@@ -482,9 +502,11 @@ export async function processScheduledJobsWorkbook(options?: {
   sheetName?: string;
   logDir?: string;
 }) {
-  const workbookPath = options?.workbookPath || env.SCHEDULED_JOBS_SPREADSHEET_PATH;
+  const workbookPath = options?.workbookPath ?? resolveScheduledWorkbookPath();
   if (!workbookPath) {
-    throw new Error("Defina o caminho da planilha em SCHEDULED_JOBS_SPREADSHEET_PATH ou passe --file na execucao.");
+    throw new Error(
+      "Planilha nao encontrada. Defina SCHEDULED_JOBS_SPREADSHEET_PATH, passe --file na execucao, ou coloque vagas.xlsx (ou modelo_importacao_vagas.xlsx) na raiz do projeto."
+    );
   }
 
   const { workbook, sheetName, headers, rows } = readWorksheetRows(workbookPath, options?.sheetName || env.SCHEDULED_JOBS_SHEET_NAME);

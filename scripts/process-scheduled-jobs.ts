@@ -1,7 +1,7 @@
 import path from "node:path";
 
 import { prisma } from "../lib/db";
-import { processScheduledJobsWorkbook } from "../lib/scheduled-jobs";
+import { processScheduledPublicationsFromDatabase } from "../lib/scheduled-publication-db";
 
 function readCliOption(flag: string) {
   const entry = process.argv.find((value) => value.startsWith(`${flag}=`));
@@ -10,13 +10,9 @@ function readCliOption(flag: string) {
 
 async function main() {
   try {
-    const workbookPath = readCliOption("--file");
-    const sheetName = readCliOption("--sheet");
     const logDir = readCliOption("--log-dir");
 
-    const result = await processScheduledJobsWorkbook({
-      workbookPath: workbookPath ? path.resolve(workbookPath) : undefined,
-      sheetName,
+    const result = await processScheduledPublicationsFromDatabase({
       logDir: logDir ? path.resolve(logDir) : undefined
     });
 

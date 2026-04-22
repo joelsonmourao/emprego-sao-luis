@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { notFound } from "next/navigation";
 
 import { AdSlot } from "@/components/ad-slot";
 import { TrackedExternalLink } from "@/components/analytics/tracked-external-link";
@@ -10,53 +9,16 @@ import { JsonLd } from "@/components/json-ld";
 import { SectionHeading } from "@/components/section-heading";
 import { Button } from "@/components/ui/button";
 import { sanitizeRichTextHtml } from "@/lib/rich-text";
-import { buildJobDetailSeo, getCityJobsPath, getCompanyJobsPath, getStateJobsPath } from "@/lib/seo/jobs-pages";
-import { buildSiteMetadata } from "@/lib/seo/metadata";
+import { getCityJobsPath, getCompanyJobsPath, getStateJobsPath } from "@/lib/seo/jobs-pages";
 import { buildBreadcrumbJsonLd, buildJobPostingJsonLd } from "@/lib/seo/json-ld";
 import { getRelatedPosts } from "@/lib/repositories/blog";
 import { getJobBySlug, getRelatedJobs } from "@/lib/repositories/jobs";
 import { formatDate } from "@/lib/utils";
 import { getSiteSettings } from "@/lib/site-settings";
 
-export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
-  const { slug } = await params;
-  const job = await getJobBySlug(slug);
+type JobWithRelations = NonNullable<Awaited<ReturnType<typeof getJobBySlug>>>;
 
-  if (!job) {
-    return buildSiteMetadata({
-      title: "Vaga nao encontrada",
-      description: "A vaga solicitada nao foi encontrada.",
-      pathname: `/vagas/${slug}`,
-      noIndex: true
-    });
-  }
-
-  const seo = buildJobDetailSeo({
-    title: job.title,
-    companyName: job.companyName,
-    cityName: job.city.name,
-    stateCode: job.state.code,
-    slug: job.slug
-  });
-
-  return buildSiteMetadata({
-    title: job.seoTitle ?? seo.title,
-    description: job.seoDescription ?? seo.description,
-    pathname: `/vagas/${job.slug}`,
-    canonicalUrl: seo.canonicalPath,
-    noIndex: !job.isActive,
-    socialImageUrl: job.heroImageUrl || job.company?.socialImageUrl || job.companyLogoUrl || undefined
-  });
-}
-
-export default async function JobDetailPage({ params }: { params: Promise<{ slug: string }> }) {
-  const { slug } = await params;
-  const job = await getJobBySlug(slug);
-
-  if (!job) {
-    notFound();
-  }
-
+export async function JobDetailView({ job }: { job: JobWithRelations }) {
   const [relatedJobs, relatedPosts, settings] = await Promise.all([
     getRelatedJobs({
       excludeSlug: job.slug,
@@ -101,12 +63,13 @@ export default async function JobDetailPage({ params }: { params: Promise<{ slug
         <div className={`grid gap-4 ${job.heroImageUrl ? "lg:grid-cols-[1.15fr_0.85fr]" : "grid-cols-1"} sm:gap-6`}>
           <div className="min-w-0 space-y-4 sm:space-y-5">
             {job.company?.logoUrl || job.companyLogoUrl ? (
-                <div className="inline-flex max-w-full items-center gap-2.5 rounded-full border border-[color:rgba(26,43,76,0.1)] bg-white px-2.5 py-1 text-[10px] font-semibold text-[var(--brand-text-secondary)] shadow-sm sm:gap-3 sm:px-3 sm:py-1.5 sm:text-xs">
-                 <img src={job.company?.logoUrl ?? job.companyLogoUrl ?? ""} alt={job.companyName} className="h-7 w-7 rounded-2xl border border-[color:rgba(26,43,76,0.1)] bg-white object-cover p-1 sm:h-9 sm:w-9" />
-                 <span className="truncate">{job.companyName}</span>
+              <div className="inline-flex max-w-full items-center gap-2.5 rounded-full border border-[color:rgba(26,43,76,0.1)] bg-white px-2.5 py-1 text-[10px] font-semibold text-[var(--brand-text-secondary)] shadow-sm sm:gap-3 sm:px-3 sm:py-1.5 sm:text-xs">
+                <img src={job.company?.logoUrl ?? job.companyLogoUrl ?? ""} alt={job.companyName} className="h-7 w-7 rounded-2xl border border-[color:rgba(26,43,76,0.1)] bg-white object-cover p-1 sm:h-9 sm:w-9" />
+                <span className="truncate">{job.companyName}</span>
               </div>
             ) : null}
             <SectionHeading
+              titleLevel="h1"
               eyebrow={`${job.city.name}, ${job.state.code}`}
               title={job.title}
               description={`${job.companyName} • publicada em ${formatDate(job.publishedAt)} • candidatura no link oficial da empresa`}
@@ -120,14 +83,13 @@ export default async function JobDetailPage({ params }: { params: Promise<{ slug
               {job.workHours ? (
                 <span className="rounded-full border border-[color:rgba(26,43,76,0.1)] bg-white px-2.5 py-1 text-[10px] font-medium text-[var(--brand-text-secondary)] sm:px-3 sm:py-1.5 sm:text-xs">{job.workHours}</span>
               ) : null}
-              {(job.salaryMin || job.salaryMax) ? (
+              {job.salaryMin || job.salaryMax ? (
                 <span className="rounded-full border border-[color:rgba(26,43,76,0.1)] bg-white px-2.5 py-1 text-[10px] font-medium text-[var(--brand-text-secondary)] sm:px-3 sm:py-1.5 sm:text-xs">
-                  {job.salaryMin && job.salaryMax 
-                    ? `R$ ${job.salaryMin.toLocaleString('pt-BR')} - R$ ${job.salaryMax.toLocaleString('pt-BR')}`
-                    : job.salaryMin 
-                    ? `A partir de R$ ${job.salaryMin.toLocaleString('pt-BR')}`
-                    : `Ate R$ ${job.salaryMax?.toLocaleString('pt-BR')}`
-                  }
+                  {job.salaryMin && job.salaryMax
+                    ? `R$ ${job.salaryMin.toLocaleString("pt-BR")} - R$ ${job.salaryMax.toLocaleString("pt-BR")}`
+                    : job.salaryMin
+                      ? `A partir de R$ ${job.salaryMin.toLocaleString("pt-BR")}`
+                      : `Ate R$ ${job.salaryMax?.toLocaleString("pt-BR")}`}
                 </span>
               ) : (
                 <span className="rounded-full border border-[color:rgba(26,43,76,0.1)] bg-white px-2.5 py-1 text-[10px] font-medium text-[var(--brand-text-secondary)] sm:px-3 sm:py-1.5 sm:text-xs">
@@ -156,10 +118,16 @@ export default async function JobDetailPage({ params }: { params: Promise<{ slug
         </div>
       </div>
 
+      {settings.google.adsenseEnabled && settings.google.adsensePublisherId ? (
+        <div className="rounded-[1.25rem] border border-slate-200 bg-white/80 p-3 sm:p-4">
+          <AdSlot publisherId={settings.google.adsensePublisherId} slot="1111111111" format="horizontal" fullWidthResponsive={true} />
+        </div>
+      ) : null}
+
       <div className="grid gap-4 sm:gap-6 lg:grid-cols-[1.08fr_0.92fr]">
         <div className="space-y-4 sm:space-y-6">
           <div className="rounded-[1.5rem] border border-slate-200 bg-white p-4 shadow-sm sm:rounded-[1.8rem] sm:p-5 sm:rounded-3xl sm:p-8">
-             <p className="mb-4 rounded-[1.25rem] bg-[var(--brand-soft)] px-3 py-3 text-[14px] leading-6 text-[var(--brand-text-secondary)] sm:mb-5 sm:rounded-[1.5rem] sm:px-4 sm:py-4 sm:text-[15px] sm:leading-7 sm:text-base sm:leading-8">
+            <p className="mb-4 rounded-[1.25rem] bg-[var(--brand-soft)] px-3 py-3 text-[14px] leading-6 text-[var(--brand-text-secondary)] sm:mb-5 sm:rounded-[1.5rem] sm:px-4 sm:py-4 sm:text-[15px] sm:leading-7 sm:text-base sm:leading-8">
               {job.summary}
             </p>
             <div className="prose-content text-slate-700" dangerouslySetInnerHTML={{ __html: sanitizeRichTextHtml(job.descriptionHtml) }} />
@@ -167,12 +135,7 @@ export default async function JobDetailPage({ params }: { params: Promise<{ slug
 
           {settings.google.adsenseEnabled && settings.google.adsensePublisherId ? (
             <div className="my-4 sm:my-6">
-              <AdSlot
-                publisherId={settings.google.adsensePublisherId}
-                slot="5678901234"
-                format="auto"
-                fullWidthResponsive={true}
-              />
+              <AdSlot publisherId={settings.google.adsensePublisherId} slot="2222222222" format="rectangle" fullWidthResponsive={true} />
             </div>
           ) : null}
 
@@ -250,12 +213,7 @@ export default async function JobDetailPage({ params }: { params: Promise<{ slug
           </div>
 
           {settings.google.adsenseEnabled && settings.google.adsensePublisherId ? (
-            <AdSlot
-              publisherId={settings.google.adsensePublisherId}
-              slot="6789012345"
-              format="rectangle"
-              fullWidthResponsive={true}
-            />
+            <AdSlot publisherId={settings.google.adsensePublisherId} slot="6789012345" format="rectangle" fullWidthResponsive={true} />
           ) : null}
 
           <div className="space-y-3 sm:space-y-4">

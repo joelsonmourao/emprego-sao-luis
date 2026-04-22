@@ -16,7 +16,7 @@ Portal de vagas para Jovem Aprendiz com:
 ## Rodando localmente
 
 1. Copie `.env.example` para `.env`
-2. Ajuste `DATABASE_URL`, `SITE_URL`, `NEXT_PUBLIC_SITE_URL` e `AUTH_SECRET`
+2. Ajuste `DATABASE_URL`, `DATABASE_URL_DIRECT` (em Postgres local pode ser igual a `DATABASE_URL`; no Neon use URL **direta** sem `-pooler` no host para migrações), `SITE_URL`, `NEXT_PUBLIC_SITE_URL` e `AUTH_SECRET`
 3. Rode:
 
 ```bash

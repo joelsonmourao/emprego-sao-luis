@@ -1,7 +1,7 @@
-import { env } from "@/lib/env";
-
 export const BRAZIL_TIME_ZONE = "America/Sao_Paulo";
-export const SITE_TIME_ZONE = env.SITE_TIME_ZONE || BRAZIL_TIME_ZONE;
+
+/** Fuso do portal e da planilha de publicacao: sempre Brasilia (nao configuravel por env). */
+export const SITE_TIME_ZONE = BRAZIL_TIME_ZONE;
 
 type DateTimeParts = {
   year: number;

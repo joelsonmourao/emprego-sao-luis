@@ -1,11 +1,12 @@
 generator client {
   provider = "prisma-client-js"
-  engineType = "binary"
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  // Conexão direta (sem PgBouncer/pooler) para `prisma migrate`; evita P1002 em hosts tipo Neon `*-pooler.*`.
+  directUrl = env("DATABASE_URL_DIRECT")
 }
 
 enum AdminRole {
@@ -40,6 +41,16 @@ enum AuditAction {
   LOGIN
   LOGOUT
   IMPORT
+}
+
+enum JobPublicationStatus {
+  AGUARDANDO_AGENDAMENTO
+  AGENDADA
+  PUBLICANDO
+  PUBLICADA
+  INDEXANDO_GOOGLE
+  OK
+  ERRO
 }
 
 model State {
@@ -137,6 +148,12 @@ model Job {
   stateId           String
   cityId            String
   createdAt         DateTime       @default(now())
+  scheduledPublishAt DateTime?
+  publicationStatus JobPublicationStatus @default(OK)
+  googleIndexingStatus  String?  @db.VarChar(64)
+  googleIndexingMessage String?  @db.Text
+  googleIndexedAt       DateTime?
+  publishedPublicUrl    String?
 
   state State @relation(fields: [stateId], references: [id], onDelete: Restrict)
   city  City  @relation(fields: [cityId], references: [id], onDelete: Restrict)
@@ -146,6 +163,7 @@ model Job {
   @@index([isActive, publishedAt(sort: Desc)])
   @@index([stateId, cityId, isActive])
   @@index([companyId, isActive])
+  @@index([publicationStatus, scheduledPublishAt])
 }
 
 model BlogCategory {
