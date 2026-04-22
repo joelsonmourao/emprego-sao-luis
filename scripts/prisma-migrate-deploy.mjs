@@ -49,28 +49,63 @@ if (!direct) {
   process.exit(1);
 }
 
-const maxAttempts = Number(process.env.PRISMA_MIGRATE_DEPLOY_RETRIES ?? "4") || 4;
+const maxAttempts = Number(process.env.PRISMA_MIGRATE_DEPLOY_RETRIES ?? "1") || 1;
 const backoffMs = Number(process.env.PRISMA_MIGRATE_DEPLOY_BACKOFF_MS ?? "5000") || 5000;
 
-for (let attempt = 1; attempt <= maxAttempts; attempt++) {
-  const result = spawnSync("pnpm", ["exec", "prisma", "migrate", "deploy"], {
+/** `PRISMA_MIGRATE_DISABLE_LOCK_FALLBACK=1` (ou true/yes): sem bypass; só migrate com advisory lock normal. */
+const lockBypassDisabled = ["1", "true", "yes"].includes(
+  (process.env.PRISMA_MIGRATE_DISABLE_LOCK_FALLBACK ?? "").trim().toLowerCase()
+);
+
+/** Tenta lock normal antes do bypass (só se lockBypassDisabled for false). */
+const strictAdvisoryFirst = ["1", "true", "yes"].includes(
+  (process.env.PRISMA_MIGRATE_STRICT_ADVISORY_LOCK ?? "").trim().toLowerCase()
+);
+
+function runMigrate(extraEnv) {
+  return spawnSync("pnpm", ["exec", "prisma", "migrate", "deploy"], {
     cwd: root,
     stdio: "inherit",
-    env: { ...process.env, DATABASE_URL_DIRECT: direct },
+    env: { ...process.env, DATABASE_URL_DIRECT: direct, ...extraEnv },
     shell: process.platform === "win32"
   });
+}
 
-  const status = result.status === null ? 1 : result.status;
-  if (status === 0) {
+/** Padrao: um migrate com advisory lock desligado (evita espera P1002 no Neon). */
+if (!lockBypassDisabled && !strictAdvisoryFirst) {
+  console.warn(
+    "prisma-migrate-deploy: executando migrate com PRISMA_SCHEMA_DISABLE_ADVISORY_LOCK=1 (padrao). " +
+      "Para tentar lock normal antes: PRISMA_MIGRATE_STRICT_ADVISORY_LOCK=1. " +
+      "Para nunca usar bypass: PRISMA_MIGRATE_DISABLE_LOCK_FALLBACK=1."
+  );
+  const result = runMigrate({ PRISMA_SCHEMA_DISABLE_ADVISORY_LOCK: "1" });
+  process.exit(result.status === null ? 1 : result.status);
+}
+
+let lastStatus = 1;
+
+for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+  const result = runMigrate({});
+  lastStatus = result.status === null ? 1 : result.status;
+  if (lastStatus === 0) {
     process.exit(0);
   }
 
   if (attempt < maxAttempts) {
     console.warn(
-      `prisma-migrate-deploy: tentativa ${attempt}/${maxAttempts} falhou (codigo ${status}). Nova tentativa em ${backoffMs}ms...`
+      `prisma-migrate-deploy: tentativa ${attempt}/${maxAttempts} falhou (codigo ${lastStatus}). Nova tentativa em ${backoffMs}ms...`
     );
     await delay(backoffMs);
-  } else {
-    process.exit(status);
   }
 }
+
+if (!lockBypassDisabled && strictAdvisoryFirst && !process.env.PRISMA_SCHEMA_DISABLE_ADVISORY_LOCK) {
+  console.warn(
+    "prisma-migrate-deploy: fallback com PRISMA_SCHEMA_DISABLE_ADVISORY_LOCK=1 apos tentativas com lock normal."
+  );
+  const result = runMigrate({ PRISMA_SCHEMA_DISABLE_ADVISORY_LOCK: "1" });
+  process.exit(result.status === null ? 1 : result.status);
+}
+
+process.exit(lastStatus);
+

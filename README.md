@@ -16,7 +16,7 @@ Portal de vagas para Jovem Aprendiz com:
 ## Rodando localmente
 
 1. Copie `.env.example` para `.env`
-2. Ajuste `DATABASE_URL`, `DATABASE_URL_DIRECT` (em Postgres local pode ser igual a `DATABASE_URL`; no Neon use URL **direta** sem `-pooler` no host para migrações), `SITE_URL`, `NEXT_PUBLIC_SITE_URL` e `AUTH_SECRET`
+2. Ajuste `DATABASE_URL`, `DATABASE_URL_DIRECT` (em Postgres local pode ser igual a `DATABASE_URL`. No Neon: URL com pooler em `DATABASE_URL` e URL **direta** em `DATABASE_URL_DIRECT`, ou deixe `DATABASE_URL_DIRECT` vazio — o script `pnpm run migrate:deploy` deriva o host direto trocando `-pooler.` por `.` quando aplicável), `SITE_URL`, `NEXT_PUBLIC_SITE_URL` e `AUTH_SECRET`
 3. Rode:
 
 ```bash
@@ -26,6 +26,13 @@ pnpm --filter @workspace/jovem-aprendiz-vagas-next exec -- prisma db push
 pnpm --filter @workspace/jovem-aprendiz-vagas-next run db:seed
 pnpm --filter @workspace/jovem-aprendiz-vagas-next run dev
 ```
+
+### Migrações (`migrate deploy`) e erro P1002
+
+- O `pnpm run build` chama `scripts/prisma-migrate-deploy.mjs`, que injeta `DATABASE_URL_DIRECT` (derivada do pooler Neon quando faltar no `.env`).
+- **Padrão:** uma única execução de `migrate deploy` com `PRISMA_SCHEMA_DISABLE_ADVISORY_LOCK=1` (evita espera por **P1002** com pooler/Neon). Conforme a [documentação do Prisma](https://www.prisma.io/docs/orm/reference/environment-variables-reference), não use bypass com **vários** `migrate` simultâneos no mesmo banco.
+- **Modo estrito:** `PRISMA_MIGRATE_STRICT_ADVISORY_LOCK=1` tenta primeiro com lock normal (`PRISMA_MIGRATE_DEPLOY_RETRIES` / `PRISMA_MIGRATE_DEPLOY_BACKOFF_MS`) e só então faz fallback com lock desligado (salvo se `PRISMA_MIGRATE_DISABLE_LOCK_FALLBACK=1`).
+- **Sem bypass:** `PRISMA_MIGRATE_DISABLE_LOCK_FALLBACK=1` — só tentativas com lock normal; falhas P1002 precisam ser resolvidas no Postgres (sessões concorrentes, etc.).
 
 ## URLs importantes
 
