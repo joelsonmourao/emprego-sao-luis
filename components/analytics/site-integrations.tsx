@@ -154,8 +154,8 @@ export function SiteIntegrations({
   const shouldLoadGtm = analyticsAllowed && Boolean(google.gtmContainerId);
   const normalizedPublisherId = normalizeAdsensePublisherId(google.adsensePublisherId);
   const adsScriptsAllowed = advertisingAllowed && !suppressPublicAds;
-  const shouldLoadAdsense = adsScriptsAllowed && google.adsenseAutoAds && Boolean(normalizedPublisherId);
-  const shouldLoadAdsenseBase = adsScriptsAllowed && Boolean(normalizedPublisherId);
+  /** Um unico script com ?client= (unidades manuais + Auto Ads quando ligado no painel). */
+  const shouldLoadAdsenseScript = adsScriptsAllowed && Boolean(normalizedPublisherId);
 
   return (
     <>
@@ -188,23 +188,13 @@ export function SiteIntegrations({
         </Script>
       ) : null}
 
-      {shouldLoadAdsenseBase ? (
+      {shouldLoadAdsenseScript ? (
         <Script
-          id="adsense-base"
+          id="adsense-loader"
           async
           strategy="afterInteractive"
           crossOrigin="anonymous"
-          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"
-        />
-      ) : null}
-
-      {shouldLoadAdsense ? (
-        <Script
-          id="adsense-auto-ads"
-          async
-          strategy="afterInteractive"
-          crossOrigin="anonymous"
-          src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${normalizedPublisherId}`}
+          src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${encodeURIComponent(normalizedPublisherId)}`}
         />
       ) : null}
 
