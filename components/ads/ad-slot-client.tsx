@@ -10,56 +10,41 @@ declare global {
   }
 }
 
-type AdSlotProps = {
-  publisherId?: string;
-  slot?: string;
+export type AdSlotClientProps = {
+  publisherId: string;
+  slot: string;
   className?: string;
   format?: "auto" | "fluid" | "rectangle" | "horizontal";
   fullWidthResponsive?: boolean;
 };
 
-export function AdSlot({
+/** Unidade AdSense padrao (ins + push). */
+export function AdSlotClient({
   publisherId,
   slot,
   className,
   format = "auto",
   fullWidthResponsive = true
-}: AdSlotProps) {
+}: AdSlotClientProps) {
   const initializedRef = useRef(false);
 
   useEffect(() => {
-    console.log('AdSlot montado');
-    
-    if (!publisherId || !slot || initializedRef.current) {
-      console.log("[AdSense] Skipping: publisherId or slot missing or already initialized", { publisherId, slot, initialized: initializedRef.current });
-      return;
-    }
+    if (!publisherId || !slot || initializedRef.current) return;
 
-    console.log("[AdSense] Initializing ad slot", { publisherId, slot });
-
-    const timer = setTimeout(() => {
+    const timer = window.setTimeout(() => {
       try {
-        if (!window.adsbygoogle) {
-          console.error("[AdSense] window.adsbygoogle is not available");
-          return;
-        }
-
-        console.log("[AdSense] Pushing ad to window.adsbygoogle", { publisherId, slot });
+        if (!window.adsbygoogle) return;
         (window.adsbygoogle = window.adsbygoogle || []).push({});
         initializedRef.current = true;
-        console.log("[AdSense] Ad pushed successfully");
-      } catch (error) {
-        console.error("[AdSense] Error pushing ad:", error);
+      } catch {
         initializedRef.current = false;
       }
-    }, 500);
+    }, 400);
 
-    return () => clearTimeout(timer);
+    return () => window.clearTimeout(timer);
   }, [publisherId, slot]);
 
-  if (!publisherId || !slot) {
-    return null;
-  }
+  if (!publisherId || !slot) return null;
 
   return (
     <div
@@ -79,4 +64,26 @@ export function AdSlot({
       />
     </div>
   );
+}
+
+/** Codigo colado no admin (HTML do anunciante). Executado uma vez no cliente. */
+export function AdSlotSnippetClient({ html, className }: { html: string; className?: string }) {
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el || !html.trim()) return;
+    el.innerHTML = html;
+    const scripts = el.querySelectorAll("script");
+    scripts.forEach((oldScript) => {
+      const s = document.createElement("script");
+      [...oldScript.attributes].forEach((attr) => s.setAttribute(attr.name, attr.value));
+      s.textContent = oldScript.textContent;
+      oldScript.parentNode?.replaceChild(s, oldScript);
+    });
+  }, [html]);
+
+  if (!html.trim()) return null;
+
+  return <div ref={ref} className={cn("ad-snippet-root min-h-[120px] w-full", className)} />;
 }

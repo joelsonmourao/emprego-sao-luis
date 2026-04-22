@@ -1,11 +1,9 @@
 import Link from "next/link";
 
-import { AdSlot } from "@/components/ad-slot";
 import { Breadcrumbs } from "@/components/breadcrumbs";
 import { EmptyState } from "@/components/empty-state";
 import { FaqList } from "@/components/faq-list";
 import { JsonLd } from "@/components/json-ld";
-import { JobCard } from "@/components/job-card";
 import { JobSearchForm } from "@/components/job-search-form";
 import { PaginationNav } from "@/components/pagination-nav";
 import { SectionHeading } from "@/components/section-heading";
@@ -25,7 +23,7 @@ import { buildBreadcrumbJsonLd, buildFaqJsonLd } from "@/lib/seo/json-ld";
 import { jobSearchParamsSchema } from "@/lib/schemas/search";
 import { renderFaqTemplate, renderTemplate } from "@/lib/site-copy";
 import { getSiteContent } from "@/lib/site-content";
-import { getSiteSettings } from "@/lib/site-settings";
+import { JobsGridWithMidAd } from "@/components/vagas/jobs-grid-with-mid-ad";
 
 export async function generateMetadata({
   searchParams
@@ -121,7 +119,7 @@ export default async function JobsPage({
     page: typeof raw.page === "string" ? raw.page : undefined
   });
 
-  const [jobs, states, companies, siteContent, settings] = await Promise.all([
+  const [jobs, states, companies, siteContent] = await Promise.all([
     getJobsList({
       query: parsed.q,
       stateSlug: parsed.estado,
@@ -132,8 +130,7 @@ export default async function JobsPage({
     }),
     getSearchGeoData(),
     getCompanyHubs(),
-    getSiteContent(),
-    getSiteSettings()
+    getSiteContent()
   ]);
 
   const selectedState = states.find((state) => state.slug === parsed.estado);
@@ -229,23 +226,8 @@ export default async function JobsPage({
 
       {jobs.items.length ? (
         <>
-          <div className="grid gap-4 sm:gap-5 lg:grid-cols-2 xl:grid-cols-3">
-            {jobs.items.map((job) => (
-              <JobCard key={job.id} job={job} />
-            ))}
-          </div>
-          
-          {settings.google.adsenseEnabled && settings.google.adsensePublisherId ? (
-            <div className="my-4 sm:my-6">
-              <AdSlot
-                publisherId={settings.google.adsensePublisherId}
-                slot="7890123456"
-                format="auto"
-                fullWidthResponsive={true}
-              />
-            </div>
-          ) : null}
-          
+          <JobsGridWithMidAd jobs={jobs.items} />
+
           <PaginationNav page={jobs.page} totalPages={jobs.totalPages} buildHref={buildPageHref} />
         </>
       ) : (

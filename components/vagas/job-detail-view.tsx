@@ -1,6 +1,6 @@
 import Link from "next/link";
 
-import { AdSlot } from "@/components/ad-slot";
+import { PublicAdSlot } from "@/components/ads/public-ad-slot";
 import { TrackedExternalLink } from "@/components/analytics/tracked-external-link";
 import { BlogCard } from "@/components/blog-card";
 import { Breadcrumbs } from "@/components/breadcrumbs";
@@ -14,12 +14,11 @@ import { buildBreadcrumbJsonLd, buildJobPostingJsonLd } from "@/lib/seo/json-ld"
 import { getRelatedPosts } from "@/lib/repositories/blog";
 import { getJobBySlug, getRelatedJobs } from "@/lib/repositories/jobs";
 import { formatDate } from "@/lib/utils";
-import { getSiteSettings } from "@/lib/site-settings";
 
 type JobWithRelations = NonNullable<Awaited<ReturnType<typeof getJobBySlug>>>;
 
 export async function JobDetailView({ job }: { job: JobWithRelations }) {
-  const [relatedJobs, relatedPosts, settings] = await Promise.all([
+  const [relatedJobs, relatedPosts] = await Promise.all([
     getRelatedJobs({
       excludeSlug: job.slug,
       citySlug: job.city.slug,
@@ -27,8 +26,7 @@ export async function JobDetailView({ job }: { job: JobWithRelations }) {
       companySlug: job.company?.slug,
       limit: 3
     }),
-    getRelatedPosts({ limit: 3 }),
-    getSiteSettings()
+    getRelatedPosts({ limit: 3 })
   ]);
 
   return (
@@ -118,11 +116,9 @@ export async function JobDetailView({ job }: { job: JobWithRelations }) {
         </div>
       </div>
 
-      {settings.google.adsenseEnabled && settings.google.adsensePublisherId ? (
-        <div className="rounded-[1.25rem] border border-slate-200 bg-white/80 p-3 sm:p-4">
-          <AdSlot publisherId={settings.google.adsensePublisherId} slot="1111111111" format="horizontal" fullWidthResponsive={true} />
-        </div>
-      ) : null}
+      <div className="rounded-[1.25rem] border border-slate-200 bg-white/80 p-3 sm:p-4">
+        <PublicAdSlot slotSlug="job-after-hero" format="horizontal" fullWidthResponsive />
+      </div>
 
       <div className="grid gap-4 sm:gap-6 lg:grid-cols-[1.08fr_0.92fr]">
         <div className="space-y-4 sm:space-y-6">
@@ -133,11 +129,9 @@ export async function JobDetailView({ job }: { job: JobWithRelations }) {
             <div className="prose-content text-slate-700" dangerouslySetInnerHTML={{ __html: sanitizeRichTextHtml(job.descriptionHtml) }} />
           </div>
 
-          {settings.google.adsenseEnabled && settings.google.adsensePublisherId ? (
-            <div className="my-4 sm:my-6">
-              <AdSlot publisherId={settings.google.adsensePublisherId} slot="2222222222" format="rectangle" fullWidthResponsive={true} />
-            </div>
-          ) : null}
+          <div className="my-4 sm:my-6">
+            <PublicAdSlot slotSlug="job-after-description" format="rectangle" fullWidthResponsive />
+          </div>
 
           <div className="grid gap-4 md:grid-cols-2 sm:gap-5">
             <div className="rounded-[1.5rem] border border-slate-200 bg-white p-4 shadow-sm sm:rounded-[1.8rem] sm:p-5 sm:rounded-3xl sm:p-6">
@@ -212,9 +206,7 @@ export async function JobDetailView({ job }: { job: JobWithRelations }) {
             ) : null}
           </div>
 
-          {settings.google.adsenseEnabled && settings.google.adsensePublisherId ? (
-            <AdSlot publisherId={settings.google.adsensePublisherId} slot="6789012345" format="rectangle" fullWidthResponsive={true} />
-          ) : null}
+          <PublicAdSlot slotSlug="job-sidebar" format="rectangle" fullWidthResponsive />
 
           <div className="space-y-3 sm:space-y-4">
             <h2 className="text-base font-black text-[var(--brand-navy)] sm:text-lg">Vagas relacionadas</h2>

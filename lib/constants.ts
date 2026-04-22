@@ -16,6 +16,6 @@ export const siteConfig = {
 } as const;
 
 export const pagination = {
-  jobsPerPage: 6,
+  jobsPerPage: 12,
   blogPerPage: 10
 } as const;

@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import type { Route } from "next";
 import Link from "next/link";
-import { LayoutDashboard, BriefcaseBusiness, Newspaper, FileSpreadsheet, Home, Settings2, MapPinned, ImagePlus, Network, Building2, ClipboardList, LineChart, ChartNoAxesCombined } from "lucide-react";
+import { LayoutDashboard, BriefcaseBusiness, Newspaper, FileSpreadsheet, Home, Settings2, MapPinned, ImagePlus, Network, Building2, ClipboardList, LineChart, ChartNoAxesCombined, Megaphone } from "lucide-react";
 import type { AdminRole } from "@prisma/client";
 
 import { Button } from "@/components/ui/button";
@@ -17,6 +17,7 @@ const navItems: Array<{ href: Route; label: string; icon: typeof LayoutDashboard
   { href: "/admin/analytics", label: "Analytics", icon: ChartNoAxesCombined, minRole: "EDITOR" },
   { href: "/admin/site", label: "Site", icon: Settings2, minRole: "ADMIN" },
   { href: "/admin/integracoes", label: "Integracoes", icon: LineChart, minRole: "ADMIN" },
+  { href: "/admin/propagandas", label: "Propagandas", icon: Megaphone, minRole: "ADMIN" },
   { href: "/admin/publicacao", label: "Publicacao", icon: Home, minRole: "ADMIN" },
   { href: "/admin/estrutura", label: "Estrutura", icon: Network, minRole: "ADMIN" },
   { href: "/admin/hubs", label: "Hubs", icon: MapPinned, minRole: "ADMIN" },

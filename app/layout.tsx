@@ -66,8 +66,10 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function RootLayout({ children }: Readonly<{ children: ReactNode }>) {
-  const section = (await headers()).get("x-app-section");
+  const headersList = await headers();
+  const section = headersList.get("x-app-section");
   const isAdminSection = section === "admin";
+  const suppressPublicAds = headersList.get("x-suppress-public-ads") === "1";
   const settings = await getSiteSettings();
   const initialConsentValue = (await cookies()).get(CONSENT_COOKIE_NAME)?.value ?? null;
 
@@ -75,11 +77,6 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
     <html lang="pt-BR">
       <head>
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
-        <script
-          async
-          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4279201625870524"
-          crossOrigin="anonymous"
-        />
       </head>
       <body className="min-h-screen antialiased overflow-x-hidden">
         <ConsentBootstrap />
@@ -88,7 +85,14 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
         {isAdminSection ? null : <SiteHeader />}
         <main>{children}</main>
         {isAdminSection ? null : <SiteFooter />}
-        {isAdminSection ? null : <SiteIntegrations consentBanner={settings.consentBanner} google={settings.google} initialConsentValue={initialConsentValue} />}
+        {isAdminSection ? null : (
+          <SiteIntegrations
+            consentBanner={settings.consentBanner}
+            google={settings.google}
+            initialConsentValue={initialConsentValue}
+            suppressPublicAds={suppressPublicAds}
+          />
+        )}
       </body>
     </html>
   );

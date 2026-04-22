@@ -299,3 +299,29 @@ model AnalyticsEvent {
   @@index([source, createdAt(sort: Desc)])
   @@index([deviceType, createdAt(sort: Desc)])
 }
+
+model AdSettings {
+  id            String   @id @default("singleton")
+  globalEnabled Boolean  @default(true)
+  updatedAt     DateTime @updatedAt
+}
+
+model AdSlot {
+  id              String   @id @default(cuid())
+  slug            String   @unique
+  name            String
+  position        String   @db.VarChar(48)
+  pageKey         String   @default("global") @db.VarChar(48)
+  previewPath     String   @default("/") @db.VarChar(512)
+  code            String   @default("") @db.Text
+  adsenseSlotId   String?  @db.VarChar(32)
+  isActive        Boolean  @default(true)
+  maxPerPage      Int      @default(1)
+  notes           String?  @db.Text
+  sortOrder       Int      @default(0)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([pageKey, isActive])
+  @@index([sortOrder])
+}

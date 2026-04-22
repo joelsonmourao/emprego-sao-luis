@@ -11,7 +11,7 @@ import {
   TrendingUp
 } from "lucide-react";
 
-import { AdSlot } from "@/components/ad-slot";
+import { PublicAdSlot } from "@/components/ads/public-ad-slot";
 import { BlogCard } from "@/components/blog-card";
 import { FaqList } from "@/components/faq-list";
 import { JobCard } from "@/components/job-card";
@@ -27,7 +27,6 @@ import { getFeaturedCompanies, getFeaturedCompaniesBySlugs, getFeaturedJobs, get
 import { getCities, getCitiesBySlugs, getSearchGeoData, getStates, getStatesBySlugs } from "@/lib/repositories/geo";
 import { getSiteContent } from "@/lib/site-content";
 import { homeBlockKeys } from "@/lib/schemas/site-admin";
-import { getSiteSettings } from "@/lib/site-settings";
 
 export async function generateMetadata() {
   return buildSiteMetadata({
@@ -49,25 +48,16 @@ const iconMap = {
 } as const;
 
 export default async function HomePage() {
-  const [
-    featuredJobsDefault,
-    recentPostsDefault,
-    statesDefault,
-    citiesDefault,
-    searchStates,
-    companiesDefault,
-    siteContent,
-    settings
-  ] = await Promise.all([
-    getFeaturedJobs(),
-    getRecentPosts(),
-    getStates(),
-    getCities(),
-    getSearchGeoData(),
-    getFeaturedCompanies(),
-    getSiteContent(),
-    getSiteSettings()
-  ]);
+  const [featuredJobsDefault, recentPostsDefault, statesDefault, citiesDefault, searchStates, companiesDefault, siteContent] =
+    await Promise.all([
+      getFeaturedJobs(),
+      getRecentPosts(),
+      getStates(),
+      getCities(),
+      getSearchGeoData(),
+      getFeaturedCompanies(),
+      getSiteContent()
+    ]);
 
   const [featuredJobsSelected, featuredPostsSelected, featuredStatesSelected, featuredCitiesSelected, featuredCompaniesSelected] =
     await Promise.all([
@@ -121,16 +111,9 @@ export default async function HomePage() {
           </Link>
         </div>
         
-        {settings.google.adsenseEnabled && settings.google.adsensePublisherId ? (
-          <div className="mt-4 sm:mt-6">
-            <AdSlot
-              publisherId={settings.google.adsensePublisherId}
-              slot="1234567890"
-              format="auto"
-              fullWidthResponsive={true}
-            />
-          </div>
-        ) : null}
+        <div className="mt-4 sm:mt-6">
+          <PublicAdSlot slotSlug="home-after-quicklinks" format="auto" fullWidthResponsive />
+        </div>
       </section>
     ),
     featuredJobs: (
@@ -143,16 +126,9 @@ export default async function HomePage() {
             ))}
           </div>
           
-          {settings.google.adsenseEnabled && settings.google.adsensePublisherId ? (
-            <div className="my-4 sm:my-6">
-              <AdSlot
-                publisherId={settings.google.adsensePublisherId}
-                slot="2345678901"
-                format="auto"
-                fullWidthResponsive={true}
-              />
-            </div>
-          ) : null}
+          <div className="my-4 sm:my-6">
+            <PublicAdSlot slotSlug="home-featured-mid" format="auto" fullWidthResponsive />
+          </div>
           
           <div className="flex flex-wrap gap-3 sm:gap-4">
             <Button asChild size="lg" className="gap-2">
@@ -208,16 +184,9 @@ export default async function HomePage() {
           ))}
         </div>
         
-        {settings.google.adsenseEnabled && settings.google.adsensePublisherId ? (
-          <div className="my-4 sm:my-6">
-            <AdSlot
-              publisherId={settings.google.adsensePublisherId}
-              slot="3456789012"
-              format="auto"
-              fullWidthResponsive={true}
-            />
-          </div>
-        ) : null}
+        <div className="my-4 sm:my-6">
+          <PublicAdSlot slotSlug="home-blog" format="auto" fullWidthResponsive />
+        </div>
         
         <div className="flex flex-wrap gap-3 sm:gap-4">
           <Button asChild size="lg" variant="outline" className="rounded-2xl">
@@ -356,16 +325,9 @@ export default async function HomePage() {
         <SectionHeading eyebrow="FAQ" title={siteContent.home.faqTitle} description={siteContent.home.faqDescription} />
         <FaqList />
         
-        {settings.google.adsenseEnabled && settings.google.adsensePublisherId ? (
-          <div className="mt-4 sm:mt-6">
-            <AdSlot
-              publisherId={settings.google.adsensePublisherId}
-              slot="4567890123"
-              format="auto"
-              fullWidthResponsive={true}
-            />
-          </div>
-        ) : null}
+        <div className="mt-4 sm:mt-6">
+          <PublicAdSlot slotSlug="home-faq" format="auto" fullWidthResponsive />
+        </div>
       </section>
     ),
     finalCta: (

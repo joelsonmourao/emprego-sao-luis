@@ -10,6 +10,8 @@ import { CONSENT_COOKIE_NAME, CONSENT_EVENT_NAME, buildConsentCookieString, buil
 import { normalizeAdsensePublisherId } from "@/lib/google";
 
 type SiteIntegrationsProps = {
+  /** Admin autenticado navegando no site publico: nao carregar scripts AdSense */
+  suppressPublicAds?: boolean;
   consentBanner: {
     bannerEnabled: boolean;
     title: string;
@@ -53,7 +55,12 @@ function readConsent() {
   return parseConsentValue(cookie ?? null);
 }
 
-export function SiteIntegrations({ consentBanner, google, initialConsentValue }: SiteIntegrationsProps) {
+export function SiteIntegrations({
+  suppressPublicAds = false,
+  consentBanner,
+  google,
+  initialConsentValue
+}: SiteIntegrationsProps) {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const lastTrackedPathRef = useRef("");
@@ -146,8 +153,9 @@ export function SiteIntegrations({ consentBanner, google, initialConsentValue }:
   const shouldLoadGa = analyticsAllowed && Boolean(google.ga4MeasurementId);
   const shouldLoadGtm = analyticsAllowed && Boolean(google.gtmContainerId);
   const normalizedPublisherId = normalizeAdsensePublisherId(google.adsensePublisherId);
-  const shouldLoadAdsense = advertisingAllowed && google.adsenseAutoAds && Boolean(normalizedPublisherId);
-  const shouldLoadAdsenseBase = advertisingAllowed && Boolean(normalizedPublisherId);
+  const adsScriptsAllowed = advertisingAllowed && !suppressPublicAds;
+  const shouldLoadAdsense = adsScriptsAllowed && google.adsenseAutoAds && Boolean(normalizedPublisherId);
+  const shouldLoadAdsenseBase = adsScriptsAllowed && Boolean(normalizedPublisherId);
 
   return (
     <>

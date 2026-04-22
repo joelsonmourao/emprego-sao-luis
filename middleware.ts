@@ -13,6 +13,16 @@ export async function middleware(request: NextRequest) {
   const requestHeaders = new Headers(request.headers);
   requestHeaders.set("x-app-section", isAdminPage || isAdminApi ? "admin" : "public");
 
+  if (!isAdminPage && !isAdminApi) {
+    const publicToken = request.cookies.get(ADMIN_AUTH_COOKIE)?.value;
+    if (publicToken) {
+      const publicSession = await verifyAdminSessionToken(publicToken);
+      if (publicSession) {
+        requestHeaders.set("x-suppress-public-ads", "1");
+      }
+    }
+  }
+
   if (hostname === "www.slzcontent.com.br") {
     const canonicalUrl = request.nextUrl.clone();
     canonicalUrl.hostname = "slzcontent.com.br";
