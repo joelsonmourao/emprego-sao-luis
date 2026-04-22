@@ -7,11 +7,8 @@ import { usePathname, useSearchParams } from "next/navigation";
 import { CookieConsentBanner } from "@/components/consent/cookie-consent-banner";
 import { trackPortalEvent } from "@/lib/analytics/client";
 import { CONSENT_COOKIE_NAME, CONSENT_EVENT_NAME, buildConsentCookieString, buildConsentPreferences, parseConsentValue } from "@/lib/consent";
-import { normalizeAdsensePublisherId } from "@/lib/google";
 
 type SiteIntegrationsProps = {
-  /** Admin autenticado navegando no site publico: nao carregar scripts AdSense */
-  suppressPublicAds?: boolean;
   consentBanner: {
     bannerEnabled: boolean;
     title: string;
@@ -47,7 +44,7 @@ function readConsent() {
 
   const cookie = document.cookie
     .split("; ")
-    .find((entry) => entry.startsWith("jav_consent_v1="))
+    .find((entry) => entry.startsWith(`${CONSENT_COOKIE_NAME}=`))
     ?.split("=")
     .slice(1)
     .join("=");
@@ -55,12 +52,7 @@ function readConsent() {
   return parseConsentValue(cookie ?? null);
 }
 
-export function SiteIntegrations({
-  suppressPublicAds = false,
-  consentBanner,
-  google,
-  initialConsentValue
-}: SiteIntegrationsProps) {
+export function SiteIntegrations({ consentBanner, google, initialConsentValue }: SiteIntegrationsProps) {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const lastTrackedPathRef = useRef("");
@@ -122,7 +114,6 @@ export function SiteIntegrations({
   const shouldRenderConsentBanner = consentBanner.bannerEnabled;
   const consentRequired = google.consentModeEnabled && shouldRenderConsentBanner && hasOptionalIntegrations;
   const analyticsAllowed = google.analyticsEnabled && (consentRequired ? Boolean(consent?.analytics) : true);
-  const advertisingAllowed = google.adsenseEnabled && (consentRequired ? Boolean(consent?.advertising) : true);
 
   useEffect(() => {
     if (!analyticsAllowed) {
@@ -152,10 +143,6 @@ export function SiteIntegrations({
 
   const shouldLoadGa = analyticsAllowed && Boolean(google.ga4MeasurementId);
   const shouldLoadGtm = analyticsAllowed && Boolean(google.gtmContainerId);
-  const normalizedPublisherId = normalizeAdsensePublisherId(google.adsensePublisherId);
-  const adsScriptsAllowed = advertisingAllowed && !suppressPublicAds;
-  /** Um unico script com ?client= (unidades manuais + Auto Ads quando ligado no painel). */
-  const shouldLoadAdsenseScript = adsScriptsAllowed && Boolean(normalizedPublisherId);
 
   return (
     <>
@@ -186,16 +173,6 @@ export function SiteIntegrations({
             })(window,document,'script','dataLayer','${google.gtmContainerId}');
           `}
         </Script>
-      ) : null}
-
-      {shouldLoadAdsenseScript ? (
-        <Script
-          id="adsense-loader"
-          async
-          strategy="afterInteractive"
-          crossOrigin="anonymous"
-          src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${encodeURIComponent(normalizedPublisherId)}`}
-        />
       ) : null}
 
       {shouldRenderConsentBanner ? <CookieConsentBanner config={consentBanner} initialConsentValue={initialConsentValue} /> : null}
