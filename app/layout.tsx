@@ -16,6 +16,12 @@ import { CONSENT_COOKIE_NAME } from "@/lib/consent";
 import { absoluteUrl } from "@/lib/utils";
 import { getSiteOrigin } from "@/lib/site-url";
 
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 5
+};
+
 export async function generateMetadata(): Promise<Metadata> {
   const settings = await getSiteSettings();
 
@@ -75,7 +81,6 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
   return (
     <html lang="pt-BR">
       <head>
-        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
         {isAdminSection ? null : (
           <script
             async
