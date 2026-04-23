@@ -27,10 +27,9 @@ export function AdSlotClient({
   fullWidthResponsive = true
 }: AdSlotClientProps) {
   const initializedRef = useRef(false);
-  const insRef = useRef<HTMLModElement | null>(null);
 
   useEffect(() => {
-    if (!publisherId || !slot || initializedRef.current || !insRef.current) return;
+    if (!publisherId || !slot || initializedRef.current) return;
 
     function logAdRuntime(hypothesisId: string, message: string, data: Record<string, unknown>) {
       // #region agent log
@@ -39,7 +38,7 @@ export function AdSlotClient({
         headers: { "Content-Type": "application/json", "X-Debug-Session-Id": "eb6787" },
         body: JSON.stringify({
           sessionId: "eb6787",
-          runId: "immediate-push-no-delay",
+          runId: "no-delay-immediate-push",
           hypothesisId,
           location: "components/ads/ad-slot-client.tsx",
           message,
@@ -50,7 +49,7 @@ export function AdSlotClient({
       // #endregion
     }
 
-    logAdRuntime("H1", "slot_effect_started_immediate", {
+    logAdRuntime("H1", "slot_effect_started", {
       slot,
       viewportWidth: typeof window !== "undefined" ? window.innerWidth : null,
       userAgent: typeof navigator !== "undefined" ? navigator.userAgent : null,
@@ -58,6 +57,7 @@ export function AdSlotClient({
     });
 
     try {
+      // Push immediately; adsbygoogle queue is safe before script fully initializes.
       (window.adsbygoogle = window.adsbygoogle || []).push({});
       initializedRef.current = true;
       logAdRuntime("H2", "push_success_immediate", {
@@ -86,7 +86,6 @@ export function AdSlotClient({
     >
       <div className="px-3 pb-2 pt-1 text-[10px] font-semibold uppercase tracking-[0.26em] text-slate-400">Publicidade</div>
       <ins
-        ref={insRef}
         className="adsbygoogle block min-h-[250px] w-full"
         style={{ display: "block" }}
         data-ad-client={publisherId}

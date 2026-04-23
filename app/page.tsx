@@ -20,10 +20,10 @@ import { JsonLd } from "@/components/json-ld";
 import { SectionHeading } from "@/components/section-heading";
 import { Button } from "@/components/ui/button";
 import { buildSiteMetadata } from "@/lib/seo/metadata";
-import { getCityJobsPath, getCompanyJobsPath, getJobPath, getStateJobsPath } from "@/lib/seo/jobs-pages";
+import { getCityJobsPath, getCompanyJobsPath } from "@/lib/seo/jobs-pages";
 import { buildFaqJsonLd } from "@/lib/seo/json-ld";
 import { getPostsBySlugs, getRecentPosts } from "@/lib/repositories/blog";
-import { getFeaturedCompanies, getFeaturedCompaniesBySlugs, getFeaturedJobs, getJobsBySlugs, getRecentJobs } from "@/lib/repositories/jobs";
+import { getFeaturedCompanies, getFeaturedCompaniesBySlugs, getFeaturedJobs, getJobsBySlugs } from "@/lib/repositories/jobs";
 import { getCities, getCitiesBySlugs, getSearchGeoData, getStates, getStatesBySlugs } from "@/lib/repositories/geo";
 import { getSiteContent } from "@/lib/site-content";
 import { homeBlockKeys } from "@/lib/schemas/site-admin";
@@ -48,10 +48,9 @@ const iconMap = {
 } as const;
 
 export default async function HomePage() {
-  const [featuredJobsDefault, recentJobs, recentPostsDefault, statesDefault, citiesDefault, searchStates, companiesDefault, siteContent] =
+  const [featuredJobsDefault, recentPostsDefault, statesDefault, citiesDefault, searchStates, companiesDefault, siteContent] =
     await Promise.all([
       getFeaturedJobs(),
-      getRecentJobs(),
       getRecentPosts(),
       getStates(),
       getCities(),
@@ -126,42 +125,8 @@ export default async function HomePage() {
               <JobCard key={job.id} job={job} />
             ))}
           </div>
-
-          <div className="rounded-[1.5rem] border border-slate-200 bg-white p-4 shadow-[0_24px_80px_-56px_rgba(26,43,76,0.28)] sm:rounded-[2rem] sm:p-6">
-            <div className="flex items-center justify-between gap-3">
-              <h3 className="text-lg font-black text-[var(--brand-navy)] sm:text-xl">Ultimas vagas publicadas</h3>
-              <Link href="/vagas" className="text-xs font-semibold uppercase tracking-[0.22em] text-[var(--brand-orange)] sm:text-[11px]">
-                Ver mais
-              </Link>
-            </div>
-            <p className="mt-2 text-sm leading-6 text-[var(--brand-text-secondary)]">
-              Links diretos para paginas de vaga, cidade, estado e empresa ajudam o Google a rastrear novidades mais rapido.
-            </p>
-            <ul className="mt-4 grid gap-3 sm:mt-5">
-              {recentJobs.slice(0, 8).map((job) => (
-                <li key={job.id} className="rounded-2xl border border-slate-200 bg-slate-50/70 p-3">
-                  <Link href={getJobPath(job.slug)} className="text-sm font-semibold text-[var(--brand-navy)] hover:text-[var(--brand-orange)] sm:text-base">
-                    {job.title}
-                  </Link>
-                  <div className="mt-2 flex flex-wrap gap-2 text-xs text-[var(--brand-text-secondary)] sm:text-sm">
-                    <Link href={getCityJobsPath(job.city.slug)} className="rounded-full border border-slate-200 bg-white px-2.5 py-1 hover:border-[color:rgba(255,109,0,0.35)] hover:text-[var(--brand-orange)]">
-                      {job.city.name}
-                    </Link>
-                    <Link href={getStateJobsPath(job.state.slug)} className="rounded-full border border-slate-200 bg-white px-2.5 py-1 hover:border-[color:rgba(255,109,0,0.35)] hover:text-[var(--brand-orange)]">
-                      {job.state.code}
-                    </Link>
-                    {job.company ? (
-                      <Link href={getCompanyJobsPath(job.company.slug)} className="rounded-full border border-slate-200 bg-white px-2.5 py-1 hover:border-[color:rgba(255,109,0,0.35)] hover:text-[var(--brand-orange)]">
-                        {job.company.name}
-                      </Link>
-                    ) : null}
-                  </div>
-                </li>
-              ))}
-            </ul>
-          </div>
           
-          <div className="my-4 hidden sm:my-6 md:block">
+          <div className="my-4 sm:my-6">
             <PublicAdSlot slotSlug="home-featured-mid" format="auto" fullWidthResponsive />
           </div>
           
@@ -219,7 +184,7 @@ export default async function HomePage() {
           ))}
         </div>
         
-        <div className="my-4 hidden sm:my-6 md:block">
+        <div className="my-4 sm:my-6">
           <PublicAdSlot slotSlug="home-blog" format="auto" fullWidthResponsive />
         </div>
         
@@ -360,7 +325,7 @@ export default async function HomePage() {
         <SectionHeading eyebrow="FAQ" title={siteContent.home.faqTitle} description={siteContent.home.faqDescription} />
         <FaqList />
         
-        <div className="mt-4 hidden sm:mt-6 md:block">
+        <div className="mt-4 sm:mt-6">
           <PublicAdSlot slotSlug="home-faq" format="auto" fullWidthResponsive />
         </div>
       </section>
