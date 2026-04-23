@@ -11,7 +11,7 @@ import { SiteIntegrations } from "@/components/analytics/site-integrations";
 import { buildOrganizationJsonLd, buildWebsiteJsonLd } from "@/lib/seo/json-ld";
 import { siteConfig } from "@/lib/constants";
 import { getSiteSettings } from "@/lib/site-settings";
-import { normalizeSearchConsoleVerification } from "@/lib/google";
+import { normalizeAdsensePublisherId, normalizeSearchConsoleVerification } from "@/lib/google";
 import { CONSENT_COOKIE_NAME } from "@/lib/consent";
 import { absoluteUrl } from "@/lib/utils";
 import { getSiteOrigin } from "@/lib/site-url";
@@ -76,6 +76,8 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
   const section = headersList.get("x-app-section");
   const isAdminSection = section === "admin";
   const settings = await getSiteSettings();
+  const adsensePublisherId = normalizeAdsensePublisherId(settings.google.adsensePublisherId) ?? "ca-pub-4279201625870524";
+  const enableAutoAdsBootstrap = settings.google.adsenseEnabled && settings.google.adsenseAutoAds && Boolean(adsensePublisherId);
   const initialConsentValue = (await cookies()).get(CONSENT_COOKIE_NAME)?.value ?? null;
 
   return (
@@ -84,8 +86,16 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
         {isAdminSection ? null : (
           <script
             async
-            src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4279201625870524"
+            src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${adsensePublisherId}`}
             crossOrigin="anonymous"
+          />
+        )}
+        {isAdminSection || !enableAutoAdsBootstrap ? null : (
+          <script
+            id="adsense-auto-ads-bootstrap"
+            dangerouslySetInnerHTML={{
+              __html: `(window.adsbygoogle = window.adsbygoogle || []).push({ google_ad_client: "${adsensePublisherId}", enable_page_level_ads: true });`
+            }}
           />
         )}
       </head>

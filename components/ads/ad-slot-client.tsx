@@ -31,6 +31,8 @@ export function AdSlotClient({
 
   useEffect(() => {
     if (!publisherId || !slot || initializedRef.current || !insRef.current) return;
+    let cancelled = false;
+    let retryTimeout: ReturnType<typeof setTimeout> | null = null;
 
     function logAdRuntime(hypothesisId: string, message: string, data: Record<string, unknown>) {
       // #region agent log
@@ -39,7 +41,7 @@ export function AdSlotClient({
         headers: { "Content-Type": "application/json", "X-Debug-Session-Id": "eb6787" },
         body: JSON.stringify({
           sessionId: "eb6787",
-          runId: "pre-fix",
+          runId: "retry-adsbygoogle-ready",
           hypothesisId,
           location: "components/ads/ad-slot-client.tsx",
           message,
@@ -50,24 +52,29 @@ export function AdSlotClient({
       // #endregion
     }
 
-    logAdRuntime("H1", "slot_effect_started_lazy", {
+    logAdRuntime("H1", "slot_effect_started_retry", {
       slot,
       viewportWidth: typeof window !== "undefined" ? window.innerWidth : null,
       userAgent: typeof navigator !== "undefined" ? navigator.userAgent : null,
       hasAdsbygoogleGlobal: Boolean(window.adsbygoogle)
     });
 
-    function pushAd(trigger: string) {
-      if (initializedRef.current) {
+    function schedulePush(trigger: string, attempt: number) {
+      if (initializedRef.current || cancelled) {
         return;
       }
+
       try {
         if (!window.adsbygoogle) {
-          logAdRuntime("H1", "push_skipped_missing_global", {
+          logAdRuntime("H1", "push_waiting_global", {
             slot,
             viewportWidth: window.innerWidth,
-            trigger
+            trigger,
+            attempt
           });
+          if (attempt < 8) {
+            retryTimeout = setTimeout(() => schedulePush(trigger, attempt + 1), 300);
+          }
           return;
         }
         (window.adsbygoogle = window.adsbygoogle || []).push({});
@@ -76,6 +83,7 @@ export function AdSlotClient({
           slot,
           viewportWidth: window.innerWidth,
           trigger,
+          attempt,
           format,
           fullWidthResponsive
         });
@@ -84,40 +92,18 @@ export function AdSlotClient({
         logAdRuntime("H3", "push_error", {
           slot,
           viewportWidth: window.innerWidth,
-          trigger
+          trigger,
+          attempt
         });
       }
     }
-
-    const node = insRef.current;
-    if (!node) {
-      return;
-    }
-
-    if (!("IntersectionObserver" in window)) {
-      globalThis.requestAnimationFrame(() => pushAd("no-intersection-observer"));
-      return;
-    }
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        for (const entry of entries) {
-          if (entry.isIntersecting && entry.intersectionRatio > 0) {
-            pushAd("intersection");
-            observer.disconnect();
-            break;
-          }
-        }
-      },
-      {
-        root: null,
-        rootMargin: "280px 0px",
-        threshold: 0.01
+    globalThis.requestAnimationFrame(() => schedulePush("raf-immediate", 0));
+    return () => {
+      cancelled = true;
+      if (retryTimeout) {
+        clearTimeout(retryTimeout);
       }
-    );
-
-    observer.observe(node);
-    return () => observer.disconnect();
+    };
   }, [publisherId, slot, format, fullWidthResponsive]);
 
   if (!publisherId || !slot) return null;
