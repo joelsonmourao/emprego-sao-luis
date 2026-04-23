@@ -31,13 +31,54 @@ export function AdSlotClient({
   useEffect(() => {
     if (!publisherId || !slot || initializedRef.current) return;
 
+    function logAdRuntime(hypothesisId: string, message: string, data: Record<string, unknown>) {
+      // #region agent log
+      void fetch("http://127.0.0.1:7370/ingest/b54ed65d-267c-4421-b3af-1ea0f3df3748", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "X-Debug-Session-Id": "eb6787" },
+        body: JSON.stringify({
+          sessionId: "eb6787",
+          runId: "pre-fix",
+          hypothesisId,
+          location: "components/ads/ad-slot-client.tsx",
+          message,
+          data,
+          timestamp: Date.now()
+        })
+      }).catch(() => {});
+      // #endregion
+    }
+
+    logAdRuntime("H1", "slot_effect_started", {
+      slot,
+      viewportWidth: typeof window !== "undefined" ? window.innerWidth : null,
+      userAgent: typeof navigator !== "undefined" ? navigator.userAgent : null,
+      hasAdsbygoogleGlobal: Boolean(window.adsbygoogle)
+    });
+
     const timer = window.setTimeout(() => {
       try {
-        if (!window.adsbygoogle) return;
+        if (!window.adsbygoogle) {
+          logAdRuntime("H1", "push_skipped_missing_global", {
+            slot,
+            viewportWidth: window.innerWidth
+          });
+          return;
+        }
         (window.adsbygoogle = window.adsbygoogle || []).push({});
         initializedRef.current = true;
+        logAdRuntime("H2", "push_success", {
+          slot,
+          viewportWidth: window.innerWidth,
+          format,
+          fullWidthResponsive
+        });
       } catch {
         initializedRef.current = false;
+        logAdRuntime("H3", "push_error", {
+          slot,
+          viewportWidth: window.innerWidth
+        });
       }
     }, 400);
 

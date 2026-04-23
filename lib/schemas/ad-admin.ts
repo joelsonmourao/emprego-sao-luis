@@ -1,7 +1,10 @@
 import { z } from "zod";
 
+export const adModeSchema = z.enum(["manual", "automatico", "hibrido"]);
+
 export const adSettingsPatchSchema = z.object({
-  globalEnabled: z.boolean()
+  globalEnabled: z.boolean().optional(),
+  adMode: adModeSchema.optional()
 });
 
 export const adSlotPatchSchema = z.object({

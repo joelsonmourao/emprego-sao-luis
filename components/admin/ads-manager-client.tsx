@@ -17,6 +17,8 @@ type CompliancePayload = {
 
 type Props = {
   initialGlobalEnabled: boolean;
+  initialAutoAdsEnabled?: boolean;
+  initialAdMode?: "manual" | "automatico" | "hibrido";
   initialSlots: AdSlot[];
   initialCompliance: CompliancePayload;
 };
@@ -29,36 +31,53 @@ const positionLabels: Record<string, string> = {
   global: "Global"
 };
 
-export function AdsManagerClient({ initialGlobalEnabled, initialSlots, initialCompliance }: Props) {
+export function AdsManagerClient({
+  initialGlobalEnabled,
+  initialAutoAdsEnabled = false,
+  initialAdMode = "manual",
+  initialSlots,
+  initialCompliance
+}: Props) {
   const [globalEnabled, setGlobalEnabled] = useState(initialGlobalEnabled);
+  const [autoAdsEnabled, setAutoAdsEnabled] = useState(initialAutoAdsEnabled);
+  const [adMode, setAdMode] = useState<"manual" | "automatico" | "hibrido">(initialAdMode);
   const [slots, setSlots] = useState(initialSlots);
   const [compliance, setCompliance] = useState(initialCompliance);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState("");
 
-  const statusLabel = globalEnabled ? "Propagandas ativas no site" : "Todas as propagandas pausadas";
+  const statusLabel = adMode === "manual" ? "Modo manual" : adMode === "automatico" ? "Modo automatico" : "Modo hibrido";
 
   async function refreshCompliance() {
     const res = await fetch("/api/admin/ads");
     if (!res.ok) return;
-    const data = (await res.json()) as { slots: AdSlot[]; compliance: CompliancePayload };
+    const data = (await res.json()) as {
+      settings: { globalEnabled: boolean; autoAdsEnabled: boolean; adMode: "manual" | "automatico" | "hibrido" };
+      slots: AdSlot[];
+      compliance: CompliancePayload;
+    };
+    setGlobalEnabled(data.settings.globalEnabled);
+    setAutoAdsEnabled(data.settings.autoAdsEnabled);
+    setAdMode(data.settings.adMode);
     setSlots(data.slots);
     setCompliance(data.compliance);
   }
 
-  async function saveGlobal(next: boolean) {
+  async function saveMode(next: "manual" | "automatico" | "hibrido") {
     setSaving(true);
     setMessage("");
     try {
       const res = await fetch("/api/admin/ads/settings", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ globalEnabled: next })
+        body: JSON.stringify({ adMode: next })
       });
       const data = await res.json();
       if (!data.ok) throw new Error(data.error ?? "Falha ao salvar");
-      setGlobalEnabled(next);
-      setMessage("Configuracao global salva.");
+      setGlobalEnabled(Boolean(data.settings?.globalEnabled));
+      setAutoAdsEnabled(Boolean(data.settings?.autoAdsEnabled));
+      setAdMode((data.settings?.adMode as "manual" | "automatico" | "hibrido") ?? next);
+      setMessage("Modo de propagandas salvo.");
       await refreshCompliance();
     } catch (e) {
       setMessage(e instanceof Error ? e.message : "Erro ao salvar.");
@@ -108,21 +127,30 @@ export function AdsManagerClient({ initialGlobalEnabled, initialSlots, initialCo
             </div>
           </div>
           <div className="flex flex-col items-end gap-2">
-            <span className={`text-xs font-semibold uppercase tracking-wide ${globalEnabled ? "text-emerald-600" : "text-amber-600"}`}>
+            <span className={`text-xs font-semibold uppercase tracking-wide ${adMode === "manual" ? "text-emerald-600" : adMode === "automatico" ? "text-indigo-600" : "text-amber-600"}`}>
               {statusLabel}
             </span>
-            <label className="flex cursor-pointer items-center gap-3 text-sm text-slate-600">
-              <input
-                type="checkbox"
-                className="h-4 w-4 rounded border-slate-300"
-                checked={globalEnabled}
-                disabled={saving}
-                onChange={(e) => void saveGlobal(e.target.checked)}
-              />
-              Ligar todas as propagandas
-            </label>
+            <div className="grid gap-1 text-sm text-slate-600">
+              <label className="flex cursor-pointer items-center gap-2">
+                <input type="radio" className="h-4 w-4 border-slate-300" checked={adMode === "manual"} disabled={saving} onChange={() => void saveMode("manual")} />
+                Somente manual
+              </label>
+              <label className="flex cursor-pointer items-center gap-2">
+                <input type="radio" className="h-4 w-4 border-slate-300" checked={adMode === "automatico"} disabled={saving} onChange={() => void saveMode("automatico")} />
+                Somente automatico
+              </label>
+              <label className="flex cursor-pointer items-center gap-2">
+                <input type="radio" className="h-4 w-4 border-slate-300" checked={adMode === "hibrido"} disabled={saving} onChange={() => void saveMode("hibrido")} />
+                Hibrido (manual + automatico)
+              </label>
+            </div>
           </div>
         </CardHeader>
+        <CardContent>
+          <p className="text-xs text-slate-500">
+            Manual ativo: <strong>{globalEnabled ? "sim" : "nao"}</strong> · Auto Ads pronto: <strong>{autoAdsEnabled ? "sim" : "nao"}</strong>
+          </p>
+        </CardContent>
       </Card>
 
       <Card className="rounded-[2rem] border-slate-200 bg-white/95">

@@ -2,7 +2,8 @@ import { NextResponse } from "next/server";
 
 import { requireApiRole } from "@/lib/authz";
 import { adSettingsPatchSchema } from "@/lib/schemas/ad-admin";
-import { upsertAdSettings } from "@/lib/repositories/ad-system";
+import { getAdSettings, upsertAdSettings } from "@/lib/repositories/ad-system";
+import { getEditableSiteSettings, patchSiteSettings } from "@/lib/admin/site";
 
 export async function PATCH(request: Request) {
   await requireApiRole("ADMIN");
@@ -19,9 +20,33 @@ export async function PATCH(request: Request) {
     return NextResponse.json({ ok: false, error: "Payload invalido." }, { status: 400 });
   }
 
-  const row = await upsertAdSettings(parsed.data.globalEnabled);
+  const [currentSiteSettings, currentAdSettings] = await Promise.all([getEditableSiteSettings(), getAdSettings()]);
+  const currentAdMode = currentSiteSettings.google.adsenseAutoAds
+    ? currentAdSettings.globalEnabled === false
+      ? "automatico"
+      : "hibrido"
+    : "manual";
+  const nextAdMode = parsed.data.adMode ?? currentAdMode;
+  const nextGlobalEnabled =
+    parsed.data.globalEnabled ??
+    (nextAdMode === "automatico"
+      ? false
+      : true);
+  const nextAutoAdsEnabled = nextAdMode !== "manual";
+
+  const row = await upsertAdSettings(nextGlobalEnabled);
+  await patchSiteSettings({
+    google: {
+      adsenseAutoAds: nextAutoAdsEnabled
+    }
+  });
   return NextResponse.json({
     ok: true,
-    settings: { globalEnabled: row.globalEnabled, updatedAt: row.updatedAt.toISOString() }
+    settings: {
+      globalEnabled: row.globalEnabled,
+      adMode: nextAdMode,
+      autoAdsEnabled: nextAutoAdsEnabled,
+      updatedAt: row.updatedAt.toISOString()
+    }
   });
 }
