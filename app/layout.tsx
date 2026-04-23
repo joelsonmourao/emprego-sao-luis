@@ -6,7 +6,6 @@ import "./globals.css";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { JsonLd } from "@/components/json-ld";
-import { AdsenseHeadInjector } from "@/components/analytics/adsense-head-injector";
 import { ConsentBootstrap } from "@/components/analytics/consent-bootstrap";
 import { SiteIntegrations } from "@/components/analytics/site-integrations";
 import { buildOrganizationJsonLd, buildWebsiteJsonLd } from "@/lib/seo/json-ld";
@@ -15,7 +14,6 @@ import { getSiteSettings } from "@/lib/site-settings";
 import { normalizeSearchConsoleVerification } from "@/lib/google";
 import { CONSENT_COOKIE_NAME } from "@/lib/consent";
 import { absoluteUrl } from "@/lib/utils";
-import { computePublicAdsenseHeadContext } from "@/lib/public-ads-consent";
 import { getSiteOrigin } from "@/lib/site-url";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -71,22 +69,18 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
   const headersList = await headers();
   const section = headersList.get("x-app-section");
   const isAdminSection = section === "admin";
-  const suppressPublicAds = headersList.get("x-suppress-public-ads") === "1";
   const settings = await getSiteSettings();
   const initialConsentValue = (await cookies()).get(CONSENT_COOKIE_NAME)?.value ?? null;
-  const adsenseHead = computePublicAdsenseHeadContext(settings, initialConsentValue);
 
   return (
     <html lang="pt-BR">
       <head>
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
         {isAdminSection ? null : (
-          <AdsenseHeadInjector
-            adsenseEnabled={adsenseHead.adsenseEnabled}
-            consentRequired={adsenseHead.consentRequired}
-            initialAdvertisingGranted={adsenseHead.initialAdvertisingGranted}
-            publisherId={adsenseHead.publisherId}
-            suppressPublicAds={suppressPublicAds}
+          <script
+            async
+            src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4279201625870524"
+            crossOrigin="anonymous"
           />
         )}
       </head>
