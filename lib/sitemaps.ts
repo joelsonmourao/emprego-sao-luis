@@ -199,8 +199,11 @@ export const getSitemapManifest = cache(async (): Promise<SitemapManifest> => {
   const institutionalEntries = institutionals.map((path) => toSitemapEntry(path));
   const jobEntries = jobs.map((job) => toSitemapEntry(getJobPath(job.slug), job.updatedAt));
 
-  const stateEntries = [
-    ...buildRootEntries("states", latestStatesDate),
+  const stateEntries = buildRootEntries("states", latestStatesDate);
+  const cityEntries = buildRootEntries("cities", latestCitiesDate);
+  const companyEntries = buildRootEntries("companies", latestCompaniesDate);
+
+  const listingsEntries: SitemapUrlEntry[] = [
     ...states.flatMap((state) => {
       const profile = stateProfileMap.get(state.slug);
       const shouldIndex = shouldIndexPage({
@@ -216,11 +219,7 @@ export const getSitemapManifest = cache(async (): Promise<SitemapManifest> => {
       }
 
       return [toSitemapEntry(getStateJobsPath(state.slug), state.updatedAt)];
-    })
-  ];
-
-  const cityEntries = [
-    ...buildRootEntries("cities", latestCitiesDate),
+    }),
     ...cities.flatMap((city) => {
       const profile = cityProfileMap.get(`${city.state.slug}__${city.slug}`);
       const shouldIndex = shouldIndexPage({
@@ -236,11 +235,7 @@ export const getSitemapManifest = cache(async (): Promise<SitemapManifest> => {
       }
 
       return [toSitemapEntry(getCityJobsPath(city.slug), city.updatedAt)];
-    })
-  ];
-
-  const companyEntries = [
-    ...buildRootEntries("companies", latestCompaniesDate),
+    }),
     ...companies.flatMap((company) => {
       const profile = companyProfileMap.get(company.slug);
       const hub = companyHubMap.get(company.slug);
@@ -309,7 +304,7 @@ export const getSitemapManifest = cache(async (): Promise<SitemapManifest> => {
     ...splitEntries("companies", companyEntries),
     ...splitEntries("blog", blogEntries),
     ...splitEntries("fresh", freshEntries),
-    ...splitEntries("listings", []),
+    ...splitEntries("listings", listingsEntries),
     ...splitEntries("programmatic", programmaticEntries)
   ];
 
