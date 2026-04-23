@@ -1,8 +1,6 @@
 import Script from "next/script";
 
-export function ConsentBootstrap({ adsDefaultGranted = false }: { adsDefaultGranted?: boolean }) {
-  const adState = adsDefaultGranted ? "granted" : "denied";
-
+export function ConsentBootstrap() {
   return (
     <Script id="google-consent-bootstrap" strategy="beforeInteractive">
       {`
@@ -11,9 +9,9 @@ export function ConsentBootstrap({ adsDefaultGranted = false }: { adsDefaultGran
         window.gtag = window.gtag || gtag;
         gtag('consent', 'default', {
           analytics_storage: 'denied',
-          ad_storage: '${adState}',
-          ad_user_data: '${adState}',
-          ad_personalization: '${adState}',
+          ad_storage: 'granted',
+          ad_user_data: 'granted',
+          ad_personalization: 'granted',
           wait_for_update: 500
         });
         window.__javUpdateConsent = function(payload) {

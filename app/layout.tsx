@@ -77,7 +77,6 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
   const isAdminSection = section === "admin";
   const settings = await getSiteSettings();
   const adsensePublisherId = normalizeAdsensePublisherId(settings.google.adsensePublisherId) ?? "ca-pub-4279201625870524";
-  const adsDefaultGranted = !settings.google.consentModeEnabled || !settings.consentBanner.bannerEnabled;
   const initialConsentValue = (await cookies()).get(CONSENT_COOKIE_NAME)?.value ?? null;
 
   return (
@@ -103,7 +102,7 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
         )}
       </head>
       <body className="min-h-screen antialiased overflow-x-hidden">
-        <ConsentBootstrap adsDefaultGranted={adsDefaultGranted} />
+        <ConsentBootstrap />
         <JsonLd data={buildOrganizationJsonLd({ name: settings.legalName || settings.siteName, logoUrl: settings.logoUrl })} />
         <JsonLd data={buildWebsiteJsonLd({ name: settings.siteName })} />
         {isAdminSection ? null : <SiteHeader />}
