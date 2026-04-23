@@ -77,20 +77,23 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
   const isAdminSection = section === "admin";
   const settings = await getSiteSettings();
   const adsensePublisherId = normalizeAdsensePublisherId(settings.google.adsensePublisherId) ?? "ca-pub-4279201625870524";
-  const enableAutoAdsBootstrap = settings.google.adsenseEnabled && settings.google.adsenseAutoAds && Boolean(adsensePublisherId);
+  const adsDefaultGranted = !settings.google.consentModeEnabled || !settings.consentBanner.bannerEnabled;
   const initialConsentValue = (await cookies()).get(CONSENT_COOKIE_NAME)?.value ?? null;
 
   return (
     <html lang="pt-BR">
       <head>
         {isAdminSection ? null : (
-          <script
-            async
-            src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${adsensePublisherId}`}
-            crossOrigin="anonymous"
-          />
+          <>
+            <meta name="google-adsense-account" content={adsensePublisherId} />
+            <script
+              async
+              src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${adsensePublisherId}`}
+              crossOrigin="anonymous"
+            />
+          </>
         )}
-        {isAdminSection || !enableAutoAdsBootstrap ? null : (
+        {isAdminSection ? null : (
           <script
             id="adsense-auto-ads-bootstrap"
             dangerouslySetInnerHTML={{
@@ -100,7 +103,7 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
         )}
       </head>
       <body className="min-h-screen antialiased overflow-x-hidden">
-        <ConsentBootstrap />
+        <ConsentBootstrap adsDefaultGranted={adsDefaultGranted} />
         <JsonLd data={buildOrganizationJsonLd({ name: settings.legalName || settings.siteName, logoUrl: settings.logoUrl })} />
         <JsonLd data={buildWebsiteJsonLd({ name: settings.siteName })} />
         {isAdminSection ? null : <SiteHeader />}
