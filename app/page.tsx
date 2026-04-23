@@ -126,7 +126,7 @@ export default async function HomePage() {
             ))}
           </div>
           
-          <div className="my-4 sm:my-6">
+          <div className="my-4 hidden sm:my-6 md:block">
             <PublicAdSlot slotSlug="home-featured-mid" format="auto" fullWidthResponsive />
           </div>
           
@@ -184,7 +184,7 @@ export default async function HomePage() {
           ))}
         </div>
         
-        <div className="my-4 sm:my-6">
+        <div className="my-4 hidden sm:my-6 md:block">
           <PublicAdSlot slotSlug="home-blog" format="auto" fullWidthResponsive />
         </div>
         
@@ -325,7 +325,7 @@ export default async function HomePage() {
         <SectionHeading eyebrow="FAQ" title={siteContent.home.faqTitle} description={siteContent.home.faqDescription} />
         <FaqList />
         
-        <div className="mt-4 sm:mt-6">
+        <div className="mt-4 hidden sm:mt-6 md:block">
           <PublicAdSlot slotSlug="home-faq" format="auto" fullWidthResponsive />
         </div>
       </section>
