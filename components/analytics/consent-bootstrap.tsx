@@ -12,7 +12,7 @@ export function ConsentBootstrap() {
           ad_storage: 'granted',
           ad_user_data: 'granted',
           ad_personalization: 'granted',
-          wait_for_update: 500
+          wait_for_update: 0
         });
         window.__javUpdateConsent = function(payload) {
           gtag('consent', 'update', {

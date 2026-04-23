@@ -31,8 +31,6 @@ export function AdSlotClient({
 
   useEffect(() => {
     if (!publisherId || !slot || initializedRef.current || !insRef.current) return;
-    let cancelled = false;
-    let retryTimeout: ReturnType<typeof setTimeout> | null = null;
 
     function logAdRuntime(hypothesisId: string, message: string, data: Record<string, unknown>) {
       // #region agent log
@@ -41,7 +39,7 @@ export function AdSlotClient({
         headers: { "Content-Type": "application/json", "X-Debug-Session-Id": "eb6787" },
         body: JSON.stringify({
           sessionId: "eb6787",
-          runId: "retry-adsbygoogle-ready",
+          runId: "immediate-push-no-delay",
           hypothesisId,
           location: "components/ads/ad-slot-client.tsx",
           message,
@@ -52,58 +50,29 @@ export function AdSlotClient({
       // #endregion
     }
 
-    logAdRuntime("H1", "slot_effect_started_retry", {
+    logAdRuntime("H1", "slot_effect_started_immediate", {
       slot,
       viewportWidth: typeof window !== "undefined" ? window.innerWidth : null,
       userAgent: typeof navigator !== "undefined" ? navigator.userAgent : null,
       hasAdsbygoogleGlobal: Boolean(window.adsbygoogle)
     });
 
-    function schedulePush(trigger: string, attempt: number) {
-      if (initializedRef.current || cancelled) {
-        return;
-      }
-
-      try {
-        if (!window.adsbygoogle) {
-          logAdRuntime("H1", "push_waiting_global", {
-            slot,
-            viewportWidth: window.innerWidth,
-            trigger,
-            attempt
-          });
-          if (attempt < 8) {
-            retryTimeout = setTimeout(() => schedulePush(trigger, attempt + 1), 300);
-          }
-          return;
-        }
-        (window.adsbygoogle = window.adsbygoogle || []).push({});
-        initializedRef.current = true;
-        logAdRuntime("H2", "push_success", {
-          slot,
-          viewportWidth: window.innerWidth,
-          trigger,
-          attempt,
-          format,
-          fullWidthResponsive
-        });
-      } catch {
-        initializedRef.current = false;
-        logAdRuntime("H3", "push_error", {
-          slot,
-          viewportWidth: window.innerWidth,
-          trigger,
-          attempt
-        });
-      }
+    try {
+      (window.adsbygoogle = window.adsbygoogle || []).push({});
+      initializedRef.current = true;
+      logAdRuntime("H2", "push_success_immediate", {
+        slot,
+        viewportWidth: window.innerWidth,
+        format,
+        fullWidthResponsive
+      });
+    } catch {
+      initializedRef.current = false;
+      logAdRuntime("H3", "push_error_immediate", {
+        slot,
+        viewportWidth: window.innerWidth
+      });
     }
-    globalThis.requestAnimationFrame(() => schedulePush("raf-immediate", 0));
-    return () => {
-      cancelled = true;
-      if (retryTimeout) {
-        clearTimeout(retryTimeout);
-      }
-    };
   }, [publisherId, slot, format, fullWidthResponsive]);
 
   if (!publisherId || !slot) return null;
