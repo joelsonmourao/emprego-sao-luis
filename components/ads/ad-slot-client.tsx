@@ -27,9 +27,10 @@ export function AdSlotClient({
   fullWidthResponsive = true
 }: AdSlotClientProps) {
   const initializedRef = useRef(false);
+  const insRef = useRef<HTMLModElement | null>(null);
 
   useEffect(() => {
-    if (!publisherId || !slot || initializedRef.current) return;
+    if (!publisherId || !slot || initializedRef.current || !insRef.current) return;
 
     function logAdRuntime(hypothesisId: string, message: string, data: Record<string, unknown>) {
       // #region agent log
@@ -49,19 +50,23 @@ export function AdSlotClient({
       // #endregion
     }
 
-    logAdRuntime("H1", "slot_effect_started", {
+    logAdRuntime("H1", "slot_effect_started_lazy", {
       slot,
       viewportWidth: typeof window !== "undefined" ? window.innerWidth : null,
       userAgent: typeof navigator !== "undefined" ? navigator.userAgent : null,
       hasAdsbygoogleGlobal: Boolean(window.adsbygoogle)
     });
 
-    const timer = window.setTimeout(() => {
+    function pushAd(trigger: string) {
+      if (initializedRef.current) {
+        return;
+      }
       try {
         if (!window.adsbygoogle) {
           logAdRuntime("H1", "push_skipped_missing_global", {
             slot,
-            viewportWidth: window.innerWidth
+            viewportWidth: window.innerWidth,
+            trigger
           });
           return;
         }
@@ -70,6 +75,7 @@ export function AdSlotClient({
         logAdRuntime("H2", "push_success", {
           slot,
           viewportWidth: window.innerWidth,
+          trigger,
           format,
           fullWidthResponsive
         });
@@ -77,13 +83,42 @@ export function AdSlotClient({
         initializedRef.current = false;
         logAdRuntime("H3", "push_error", {
           slot,
-          viewportWidth: window.innerWidth
+          viewportWidth: window.innerWidth,
+          trigger
         });
       }
-    }, 400);
+    }
 
-    return () => window.clearTimeout(timer);
-  }, [publisherId, slot]);
+    const node = insRef.current;
+    if (!node) {
+      return;
+    }
+
+    if (!("IntersectionObserver" in window)) {
+      globalThis.requestAnimationFrame(() => pushAd("no-intersection-observer"));
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting && entry.intersectionRatio > 0) {
+            pushAd("intersection");
+            observer.disconnect();
+            break;
+          }
+        }
+      },
+      {
+        root: null,
+        rootMargin: "280px 0px",
+        threshold: 0.01
+      }
+    );
+
+    observer.observe(node);
+    return () => observer.disconnect();
+  }, [publisherId, slot, format, fullWidthResponsive]);
 
   if (!publisherId || !slot) return null;
 
@@ -96,6 +131,7 @@ export function AdSlotClient({
     >
       <div className="px-3 pb-2 pt-1 text-[10px] font-semibold uppercase tracking-[0.26em] text-slate-400">Publicidade</div>
       <ins
+        ref={insRef}
         className="adsbygoogle block min-h-[250px] w-full"
         style={{ display: "block" }}
         data-ad-client={publisherId}
