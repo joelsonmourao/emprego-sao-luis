@@ -28,6 +28,7 @@ const ROOT_ROUTES_BY_CATEGORY = {
   cities: ["/cidades"],
   companies: ["/empresas"],
   blog: ["/blog"],
+  fresh: [],
   programmatic: []
 } as const;
 
@@ -39,6 +40,7 @@ export type SitemapCategory =
   | "cities"
   | "companies"
   | "blog"
+  | "fresh"
   | "listings"
   | "programmatic";
 
@@ -65,6 +67,30 @@ function normalizeDate(value?: Date | string | null) {
   if (!value) return undefined;
   const date = value instanceof Date ? value : new Date(value);
   return Number.isNaN(date.getTime()) ? undefined : date.toISOString();
+}
+
+function getLatestDate(values: Array<Date | string | null | undefined>) {
+  const timestamps = values
+    .map((value) => {
+      if (!value) return null;
+      const date = value instanceof Date ? value : new Date(value);
+      return Number.isNaN(date.getTime()) ? null : date.getTime();
+    })
+    .filter((value): value is number => value !== null);
+
+  if (!timestamps.length) {
+    return undefined;
+  }
+
+  return new Date(Math.max(...timestamps));
+}
+
+function isWithinFreshWindow(lastmod: string, now: Date, hours: number) {
+  const date = new Date(lastmod);
+  if (Number.isNaN(date.getTime())) {
+    return false;
+  }
+  return now.getTime() - date.getTime() <= hours * 60 * 60 * 1000;
 }
 
 function escapeXml(value: string) {
@@ -159,13 +185,22 @@ export const getSitemapManifest = cache(async (): Promise<SitemapManifest> => {
   }, new Map());
 
   const institutionals = staticPages.filter((path) => ROOT_ROUTES_BY_CATEGORY.institutionals.includes(path as never));
+  const latestJobsDate = jobs[0]?.updatedAt;
+  const latestPostsDate = posts[0]?.updatedAt;
+  const latestStatesDate = states[0]?.updatedAt;
+  const latestCitiesDate = cities[0]?.updatedAt;
+  const latestCompaniesDate = companies[0]?.updatedAt;
+  const latestSiteActivityDate = getLatestDate([latestJobsDate, latestPostsDate, latestStatesDate, latestCitiesDate, latestCompaniesDate]);
 
-  const homeEntries = buildRootEntries("home", new Date());
-  const institutionalEntries = institutionals.map((path) => toSitemapEntry(path, new Date()));
+  const homeEntries = [
+    toSitemapEntry("/", latestSiteActivityDate),
+    toSitemapEntry("/vagas", latestJobsDate)
+  ];
+  const institutionalEntries = institutionals.map((path) => toSitemapEntry(path));
   const jobEntries = jobs.map((job) => toSitemapEntry(getJobPath(job.slug), job.updatedAt));
 
   const stateEntries = [
-    ...buildRootEntries("states", states[0]?.updatedAt ?? new Date()),
+    ...buildRootEntries("states", latestStatesDate),
     ...states.flatMap((state) => {
       const profile = stateProfileMap.get(state.slug);
       const shouldIndex = shouldIndexPage({
@@ -185,7 +220,7 @@ export const getSitemapManifest = cache(async (): Promise<SitemapManifest> => {
   ];
 
   const cityEntries = [
-    ...buildRootEntries("cities", cities[0]?.updatedAt ?? new Date()),
+    ...buildRootEntries("cities", latestCitiesDate),
     ...cities.flatMap((city) => {
       const profile = cityProfileMap.get(`${city.state.slug}__${city.slug}`);
       const shouldIndex = shouldIndexPage({
@@ -205,7 +240,7 @@ export const getSitemapManifest = cache(async (): Promise<SitemapManifest> => {
   ];
 
   const companyEntries = [
-    ...buildRootEntries("companies", companies[0]?.updatedAt ?? new Date()),
+    ...buildRootEntries("companies", latestCompaniesDate),
     ...companies.flatMap((company) => {
       const profile = companyProfileMap.get(company.slug);
       const hub = companyHubMap.get(company.slug);
@@ -227,7 +262,7 @@ export const getSitemapManifest = cache(async (): Promise<SitemapManifest> => {
   ];
 
   const blogEntries = [
-    ...buildRootEntries("blog", posts[0]?.updatedAt ?? new Date()),
+    ...buildRootEntries("blog", latestPostsDate),
     ...posts.map((post) => toSitemapEntry(`/blog/${post.slug}`, post.updatedAt))
   ];
 
@@ -244,14 +279,26 @@ export const getSitemapManifest = cache(async (): Promise<SitemapManifest> => {
     }),
     ...companyHubs.flatMap((company) => {
       if (!company.count) return [];
-      return [toSitemapEntry(jovemAprendizCompanyPath(company.slug), new Date())];
+      return [toSitemapEntry(jovemAprendizCompanyPath(company.slug), latestJobsDate)];
     }),
     ...EMPLOYMENT_CATEGORIES.flatMap((category) => {
       const total = employmentCounts.get(category.employmentType) ?? 0;
       if (total <= 0) return [];
-      return [toSitemapEntry(jovemAprendizCategoryPath(category.slug), new Date())];
+      return [toSitemapEntry(jovemAprendizCategoryPath(category.slug), latestJobsDate)];
     })
   ];
+
+  const freshWindowHours = Number.parseInt(process.env.SITEMAP_FRESH_WINDOW_HOURS ?? "72", 10);
+  const now = new Date();
+  const freshEntries = [
+    ...homeEntries,
+    ...jobEntries,
+    ...stateEntries,
+    ...cityEntries,
+    ...companyEntries,
+    ...blogEntries,
+    ...programmaticEntries
+  ].filter((entry) => entry.lastmod && isWithinFreshWindow(entry.lastmod, now, Number.isNaN(freshWindowHours) ? 72 : freshWindowHours));
 
   const files = [
     ...splitEntries("home", homeEntries),
@@ -261,6 +308,7 @@ export const getSitemapManifest = cache(async (): Promise<SitemapManifest> => {
     ...splitEntries("cities", cityEntries),
     ...splitEntries("companies", companyEntries),
     ...splitEntries("blog", blogEntries),
+    ...splitEntries("fresh", freshEntries),
     ...splitEntries("listings", []),
     ...splitEntries("programmatic", programmaticEntries)
   ];
@@ -278,6 +326,7 @@ export const getSitemapManifest = cache(async (): Promise<SitemapManifest> => {
       cities: 0,
       companies: 0,
       blog: 0,
+      fresh: 0,
       listings: 0,
       programmatic: 0
     } satisfies Record<SitemapCategory, number>
