@@ -143,7 +143,8 @@ function buildBaseSalaryBlock(salaryMin: number | null, salaryMax: number | null
   const max = typeof salaryMax === "number" && Number.isFinite(salaryMax) && salaryMax > 0 ? salaryMax : null;
   let qv: Record<string, unknown>;
   if (min && max && min !== max) {
-    qv = { "@type": "QuantitativeValue", minValue: min, maxValue: max, unitText: "MONTH" };
+    const avg = Math.round((min + max) / 2);
+    qv = { "@type": "QuantitativeValue", value: avg, minValue: min, maxValue: max, unitText: "MONTH" };
   } else if (min ?? max) {
     qv = { "@type": "QuantitativeValue", value: min ?? max, unitText: "MONTH" };
   } else {
@@ -189,18 +190,28 @@ function buildJobLocationBlock(job: JobPostingJsonLdInput) {
   const postal =
     job.postalCode?.trim() ||
     getReferencePostalCodeForCity({ stateCode: job.stateCode, citySlug: job.citySlug });
-  const street = job.streetAddress?.trim() || "Conforme unidade informada pela empresa";
+  const street = job.streetAddress?.trim();
+
+  const address: Record<string, unknown> = {
+    "@type": "PostalAddress",
+    addressLocality: job.cityName,
+    addressRegion: job.stateCode,
+    addressCountry: country
+  };
+
+  // Usa postalCode apenas quando tiver CEP da própria cidade.
+  if (postal) {
+    address.postalCode = postal;
+  }
+
+  // Evita placeholder genérico no schema; publique streetAddress somente quando for endereço físico real.
+  if (street) {
+    address.streetAddress = street;
+  }
 
   return {
     "@type": "Place",
-    address: {
-      "@type": "PostalAddress",
-      streetAddress: street,
-      postalCode: postal,
-      addressLocality: job.cityName,
-      addressRegion: job.stateCode,
-      addressCountry: country
-    }
+    address
   };
 }
 
@@ -237,7 +248,7 @@ export function buildJobPostingJsonLd(job: JobPostingJsonLdInput) {
     },
     educationRequirements: {
       "@type": "EducationalOccupationalCredential",
-      credentialCategory: "Ensino Médio cursando ou completo"
+      credentialCategory: "high school"
     },
     jobLocation: buildJobLocationBlock(job),
     baseSalary: buildBaseSalaryBlock(job.salaryMin, job.salaryMax),
