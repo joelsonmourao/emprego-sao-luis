@@ -97,7 +97,7 @@ function normalizeIsoDate(value?: string | null) {
 }
 
 /** Normaliza ISO para schema (remove sufixo de milissegundos `.000Z` → `Z`). */
-function sanitizeISODate(dateStr: string | undefined | null) {
+export function sanitizeISODate(dateStr: string | undefined | null) {
   return dateStr?.replace(/\.\d{3}Z$/, "Z") ?? dateStr;
 }
 
@@ -188,6 +188,12 @@ function buildHiringOrganization(input: {
   return org;
 }
 
+function isPlaceholderStreetAddress(value: string | undefined | null) {
+  if (!value?.trim()) return true;
+  const v = value.trim().toLowerCase();
+  return v === "indefinido" || v === "a definir" || v === "nao informado" || v === "não informado" || v === "s/d" || v === "-" || v === "n/d";
+}
+
 async function buildJobLocationBlock(job: JobPostingJsonLdInput) {
   const country = job.countryCode ?? "BR";
   const postal =
@@ -207,7 +213,9 @@ async function buildJobLocationBlock(job: JobPostingJsonLdInput) {
     address.postalCode = postal;
   }
 
-  address.streetAddress = street || "Indefinido";
+  if (street && !isPlaceholderStreetAddress(street)) {
+    address.streetAddress = street;
+  }
 
   return {
     "@type": "Place",
@@ -243,7 +251,7 @@ export async function buildJobPostingJsonLd(job: JobPostingJsonLdInput) {
     },
     datePosted: sanitizeISODate(datePostedRaw) ?? datePostedRaw,
     validThrough: sanitizeISODate(validThroughRaw) ?? validThroughRaw,
-    employmentType: "PART_TIME",
+    employmentType: ["PART_TIME", "INTERN"],
     educationRequirements: {
       "@type": "EducationalOccupationalCredential",
       credentialCategory: "high school"

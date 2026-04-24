@@ -10,7 +10,7 @@ import { SectionHeading } from "@/components/section-heading";
 import { Button } from "@/components/ui/button";
 import { sanitizeRichTextHtml } from "@/lib/rich-text";
 import { getCityJobsPath, getCompanyJobsPath, getStateJobsPath } from "@/lib/seo/jobs-pages";
-import { buildBreadcrumbJsonLd } from "@/lib/seo/json-ld";
+import { buildBreadcrumbJsonLd, buildJobPostingJsonLd } from "@/lib/seo/json-ld";
 import { getRelatedPosts } from "@/lib/repositories/blog";
 import { getJobBySlug, getRelatedJobs } from "@/lib/repositories/jobs";
 import { formatDate } from "@/lib/utils";
@@ -20,6 +20,36 @@ type JobWithRelations = NonNullable<Awaited<ReturnType<typeof getJobBySlug>>>;
 export async function JobDetailView({ job }: { job: JobWithRelations }) {
   const requirements = Array.isArray(job.requirements) ? job.requirements : [];
   const benefits = Array.isArray(job.benefits) ? job.benefits : [];
+
+  const jobPostingLd =
+    job.isActive ?
+      await buildJobPostingJsonLd({
+        id: job.id,
+        externalId: job.externalId,
+        seoTitle: job.seoTitle,
+        title: job.title,
+        summary: job.summary,
+        descriptionHtml: job.descriptionHtml,
+        slug: job.slug,
+        companyName: job.companyName,
+        companyLogoUrl: job.company?.logoUrl ?? job.companyLogoUrl,
+        companyWebsiteUrl: job.company?.websiteUrl ?? job.companyWebsiteUrl,
+        companySlug: job.company?.slug ?? undefined,
+        cityName: job.city.name,
+        citySlug: job.city.slug,
+        stateCode: job.state.code,
+        stateName: job.state.name,
+        locationType: job.locationType,
+        publishedAt: job.publishedAt.toISOString(),
+        expiresAt: job.expiresAt?.toISOString() ?? null,
+        validThrough: job.validThrough?.toISOString() ?? null,
+        salaryMin: job.salaryMin,
+        salaryMax: job.salaryMax,
+        requirements,
+        benefits,
+        countryCode: "BR"
+      })
+    : null;
 
   const [relatedJobs, relatedPosts] = await Promise.all([
     getRelatedJobs({
@@ -34,6 +64,7 @@ export async function JobDetailView({ job }: { job: JobWithRelations }) {
 
   return (
     <section className="mx-auto max-w-7xl space-y-6 px-4 py-6 sm:px-6 sm:py-8 sm:space-y-8 lg:px-8 lg:py-10">
+      {jobPostingLd ? <JsonLd data={jobPostingLd} /> : null}
       <JsonLd data={buildBreadcrumbJsonLd([{ name: "Home", path: "/" }, { name: "Vagas", path: "/vagas" }, { name: job.title, path: `/vagas/${job.slug}` }])} />
 
       <Breadcrumbs items={[{ label: "Home", href: "/" }, { label: "Vagas", href: "/vagas" }, { label: job.title }]} />
