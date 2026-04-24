@@ -18,6 +18,9 @@ import { formatDate } from "@/lib/utils";
 type JobWithRelations = NonNullable<Awaited<ReturnType<typeof getJobBySlug>>>;
 
 export async function JobDetailView({ job }: { job: JobWithRelations }) {
+  const requirements = Array.isArray(job.requirements) ? job.requirements : [];
+  const benefits = Array.isArray(job.benefits) ? job.benefits : [];
+
   const [relatedJobs, relatedPosts] = await Promise.all([
     getRelatedJobs({
       excludeSlug: job.slug,
@@ -127,29 +130,30 @@ export async function JobDetailView({ job }: { job: JobWithRelations }) {
               {job.summary}
             </p>
             <div className="prose-content text-slate-700" dangerouslySetInnerHTML={{ __html: sanitizeRichTextHtml(job.descriptionHtml) }} />
+            {requirements.length ? (
+              <div className="mt-6 border-t border-slate-100 pt-6 sm:mt-8 sm:pt-8">
+                <h2 className="text-lg font-semibold text-[var(--brand-navy)] sm:text-xl">Requisitos</h2>
+                <ul className="mt-3 space-y-2 text-sm leading-6 text-[var(--brand-text-secondary)] sm:mt-4 sm:space-y-3">
+                  {requirements.map((item: unknown, index: number) => (
+                    <li key={`req-${index}`}>- {String(item)}</li>
+                  ))}
+                </ul>
+              </div>
+            ) : null}
+            {benefits.length ? (
+              <div className="mt-6 border-t border-slate-100 pt-6 sm:mt-8 sm:pt-8">
+                <h2 className="text-lg font-semibold text-[var(--brand-navy)] sm:text-xl">Beneficios</h2>
+                <ul className="mt-3 space-y-2 text-sm leading-6 text-[var(--brand-text-secondary)] sm:mt-4 sm:space-y-3">
+                  {benefits.map((item: unknown, index: number) => (
+                    <li key={`ben-${index}`}>- {String(item)}</li>
+                  ))}
+                </ul>
+              </div>
+            ) : null}
           </div>
 
           <div className="my-4 sm:my-6">
             <PublicAdSlot slotSlug="job-after-description" format="rectangle" fullWidthResponsive />
-          </div>
-
-          <div className="grid gap-4 md:grid-cols-2 sm:gap-5">
-            <div className="rounded-[1.5rem] border border-slate-200 bg-white p-4 shadow-sm sm:rounded-[1.8rem] sm:p-5 sm:rounded-3xl sm:p-6">
-              <h2 className="text-lg font-semibold text-[var(--brand-navy)] sm:text-xl">Requisitos</h2>
-              <ul className="mt-3 space-y-2 text-sm leading-6 text-[var(--brand-text-secondary)] sm:mt-4 sm:space-y-3">
-                {(Array.isArray(job.requirements) ? job.requirements : []).map((item: unknown, index: number) => (
-                  <li key={`${item}-${index}`}>- {String(item)}</li>
-                ))}
-              </ul>
-            </div>
-            <div className="rounded-[1.5rem] border border-slate-200 bg-white p-4 shadow-sm sm:rounded-[1.8rem] sm:p-5 sm:rounded-3xl sm:p-6">
-              <h2 className="text-lg font-semibold text-[var(--brand-navy)] sm:text-xl">Beneficios</h2>
-              <ul className="mt-3 space-y-2 text-sm leading-6 text-[var(--brand-text-secondary)] sm:mt-4 sm:space-y-3">
-                {(Array.isArray(job.benefits) ? job.benefits : []).map((item: unknown, index: number) => (
-                  <li key={`${item}-${index}`}>- {String(item)}</li>
-                ))}
-              </ul>
-            </div>
           </div>
 
           <div className="brand-panel rounded-[1.5rem] border border-slate-200 p-4 shadow-[0_25px_80px_-50px_rgba(26,43,76,0.2)] sm:rounded-[1.8rem] sm:p-6 sm:rounded-[2rem] sm:p-8">
