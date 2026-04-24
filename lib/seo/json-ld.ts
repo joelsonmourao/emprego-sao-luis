@@ -242,10 +242,9 @@ export async function buildJobPostingJsonLd(job: JobPostingJsonLdInput) {
     datePosted: normalizeIsoDate(job.publishedAt) ?? new Date().toISOString(),
     validThrough: computeValidThroughIso(job.publishedAt, job.validThrough ?? null, job.expiresAt),
     employmentType: ["OTHER", "PART_TIME"],
-    experienceRequirements: {
-      "@type": "OccupationalExperienceRequirements",
-      monthsOfExperience: 0
-    },
+    // Para vagas de Jovem Aprendiz, evita erro de "valor positivo" no validador
+    // mantendo semântica correta de não exigir experiência prévia.
+    experienceRequirements: "no experience required",
     educationRequirements: {
       "@type": "EducationalOccupationalCredential",
       credentialCategory: "high school"
