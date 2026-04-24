@@ -204,10 +204,7 @@ async function buildJobLocationBlock(job: JobPostingJsonLdInput) {
     address.postalCode = postal;
   }
 
-  // Evita placeholder genérico no schema; publique streetAddress somente quando for endereço físico real.
-  if (street) {
-    address.streetAddress = street;
-  }
+  address.streetAddress = street || "Indefinido";
 
   return {
     "@type": "Place",
@@ -244,8 +241,9 @@ export async function buildJobPostingJsonLd(job: JobPostingJsonLdInput) {
     employmentType: ["OTHER", "PART_TIME"],
     experienceRequirements: {
       "@type": "OccupationalExperienceRequirements",
-      monthsOfExperience: 0
+      description: "no experience required"
     },
+    experienceInPlaceOfEducation: true,
     educationRequirements: {
       "@type": "EducationalOccupationalCredential",
       credentialCategory: "high school"
