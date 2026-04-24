@@ -91,7 +91,7 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
         const requirements = Array.isArray(job.requirements) ? job.requirements : [];
         const benefits = Array.isArray(job.benefits) ? job.benefits : [];
         jobPostingJsonLd = stringifyJsonLdSafe(
-          buildJobPostingJsonLd({
+          await buildJobPostingJsonLd({
             id: job.id,
             externalId: job.externalId,
             seoTitle: job.seoTitle,

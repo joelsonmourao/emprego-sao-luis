@@ -185,11 +185,11 @@ function buildHiringOrganization(input: {
   return org;
 }
 
-function buildJobLocationBlock(job: JobPostingJsonLdInput) {
+async function buildJobLocationBlock(job: JobPostingJsonLdInput) {
   const country = job.countryCode ?? "BR";
   const postal =
     job.postalCode?.trim() ||
-    getReferencePostalCodeForCity({ stateCode: job.stateCode, citySlug: job.citySlug });
+    (await getReferencePostalCodeForCity({ stateCode: job.stateCode, citySlug: job.citySlug }));
   const street = job.streetAddress?.trim();
 
   const address: Record<string, unknown> = {
@@ -219,7 +219,7 @@ const DEFAULT_INDUSTRY =
   "Programa de Aprendizagem Profissional — Jovem Aprendiz e Menor Aprendiz (Lei da Aprendizagem)";
 const DEFAULT_OCCUPATIONAL_CATEGORY = "4110-10";
 
-export function buildJobPostingJsonLd(job: JobPostingJsonLdInput) {
+export async function buildJobPostingJsonLd(job: JobPostingJsonLdInput) {
   const requirements = toStringList(job.requirements);
   const benefits = toStringList(job.benefits);
   const skills = [...requirements, ...benefits];
@@ -250,7 +250,7 @@ export function buildJobPostingJsonLd(job: JobPostingJsonLdInput) {
       "@type": "EducationalOccupationalCredential",
       credentialCategory: "high school"
     },
-    jobLocation: buildJobLocationBlock(job),
+    jobLocation: await buildJobLocationBlock(job),
     baseSalary: buildBaseSalaryBlock(job.salaryMin, job.salaryMax),
     description: descriptionHtml,
     /** Selo de candidatura rápida no Google; exige fluxo de candidatura compatível com a política do Google. */
