@@ -1,3 +1,5 @@
+import { cache } from "react";
+
 import { prisma } from "@/lib/db";
 
 export async function getStates() {
@@ -65,7 +67,7 @@ export async function getCityBySlug(slug: string) {
   return cities.sort((left, right) => right._count.jobs - left._count.jobs)[0] ?? null;
 }
 
-export async function getSearchGeoData() {
+async function fetchSearchGeoData() {
   return prisma.state.findMany({
     orderBy: [{ name: "asc" }],
     include: {
@@ -75,6 +77,8 @@ export async function getSearchGeoData() {
     }
   });
 }
+
+export const getSearchGeoData = cache(fetchSearchGeoData);
 
 export async function getCities() {
   return prisma.city.findMany({

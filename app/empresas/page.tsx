@@ -10,6 +10,8 @@ import { getCompanyJobsPath } from "@/lib/seo/jobs-pages";
 import { buildBreadcrumbJsonLd } from "@/lib/seo/json-ld";
 import { getCompanyHubs } from "@/lib/repositories/jobs";
 
+export const revalidate = 1200;
+
 export async function generateMetadata() {
   const companies = await getCompanyHubs();
   const seo = buildCompaniesIndexSeo({ total: companies.length, pathname: "/empresas" });

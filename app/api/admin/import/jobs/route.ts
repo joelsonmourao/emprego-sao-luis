@@ -5,6 +5,7 @@ import { normalizeLines, normalizeSlug, parseOptionalDate, richTextFromInput } f
 import { writeAuditLog } from "@/lib/audit";
 import { requireApiRole } from "@/lib/authz";
 import { prisma } from "@/lib/db";
+import { revalidatePublicSurfacesAfterBulkJobChange } from "@/lib/public-revalidate";
 import { importJobsPayloadSchema, type ImportedJobRow } from "@/lib/schemas/job-import";
 
 const RESPONSE_HEADERS = {
@@ -561,6 +562,10 @@ export async function POST(request: Request) {
 
     const context = await buildImportContext(payload.rows);
     await processRows(payload.rows, context);
+
+    if (context.imported.length || context.updated.length) {
+      revalidatePublicSurfacesAfterBulkJobChange();
+    }
 
     await writeAuditLog({
       actorId: session.sub,

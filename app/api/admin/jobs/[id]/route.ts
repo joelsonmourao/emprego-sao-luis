@@ -4,6 +4,7 @@ import { NextResponse } from "next/server";
 import { deleteJob, upsertJobFromForm } from "@/lib/admin/jobs";
 import { writeAuditLog } from "@/lib/audit";
 import { requireApiRole } from "@/lib/authz";
+import { revalidatePublicSurfacesForJob } from "@/lib/public-revalidate";
 
 type Context = {
   params: Promise<{ id: string }>;
@@ -15,6 +16,14 @@ export async function PATCH(request: Request, context: Context) {
     const { id } = await context.params;
     const payload = await request.json();
     const job = await upsertJobFromForm(payload, id);
+
+    revalidatePublicSurfacesForJob({
+      slug: job.slug,
+      stateSlug: job.state.slug,
+      citySlug: job.city.slug,
+      companySlug: job.company?.slug ?? null,
+      employmentType: job.employmentType
+    });
 
     await writeAuditLog({
       actorId: session.sub,
@@ -41,6 +50,14 @@ export async function DELETE(_request: Request, context: Context) {
     const session = await requireApiRole("ADMIN");
     const { id } = await context.params;
     const job = await deleteJob(id);
+
+    revalidatePublicSurfacesForJob({
+      slug: job.slug,
+      stateSlug: job.state.slug,
+      citySlug: job.city.slug,
+      companySlug: job.company?.slug ?? null,
+      employmentType: job.employmentType
+    });
 
     await writeAuditLog({
       actorId: session.sub,

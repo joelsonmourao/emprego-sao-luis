@@ -5,12 +5,21 @@ import { upsertJobFromForm } from "@/lib/admin/jobs";
 import { writeAuditLog } from "@/lib/audit";
 import { requireApiRole } from "@/lib/authz";
 import { prisma } from "@/lib/db";
+import { revalidatePublicSurfacesForJob } from "@/lib/public-revalidate";
 
 export async function POST(request: Request) {
   try {
     const session = await requireApiRole("EDITOR");
     const payload = await request.json();
     const job = await upsertJobFromForm(payload);
+
+    revalidatePublicSurfacesForJob({
+      slug: job.slug,
+      stateSlug: job.state.slug,
+      citySlug: job.city.slug,
+      companySlug: job.company?.slug ?? null,
+      employmentType: job.employmentType
+    });
 
     await writeAuditLog({
       actorId: session.sub,

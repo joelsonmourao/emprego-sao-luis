@@ -9,6 +9,8 @@ import { buildSiteMetadata } from "@/lib/seo/metadata";
 import { buildBreadcrumbJsonLd } from "@/lib/seo/json-ld";
 import { getPosts } from "@/lib/repositories/blog";
 
+export const revalidate = 7200;
+
 export async function generateMetadata() {
   return buildSiteMetadata({
     title: "Blog sobre Jovem Aprendiz e primeiro emprego",

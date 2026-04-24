@@ -202,6 +202,16 @@ export async function upsertJobFromForm(input: unknown, existingId?: string) {
     cityId: city.id
   } satisfies Omit<Prisma.JobUncheckedCreateInput, "publishedAt">;
 
+  const jobPublicSelect = {
+    id: true,
+    slug: true,
+    title: true,
+    employmentType: true,
+    state: { select: { slug: true } },
+    city: { select: { slug: true } },
+    company: { select: { slug: true } }
+  } satisfies Prisma.JobSelect;
+
   if (existingId) {
     if (!existing) {
       throw new Error("Vaga nao encontrada.");
@@ -209,7 +219,8 @@ export async function upsertJobFromForm(input: unknown, existingId?: string) {
 
     return prisma.job.update({
       where: { id: existingId },
-      data: baseData
+      data: baseData,
+      select: jobPublicSelect
     });
   }
 
@@ -219,7 +230,8 @@ export async function upsertJobFromForm(input: unknown, existingId?: string) {
   };
 
   return prisma.job.create({
-    data: createData
+    data: createData,
+    select: jobPublicSelect
   });
 }
 
@@ -233,7 +245,15 @@ export type AdminImportJobInput = JobFormValues & {
 export async function deleteJob(jobId: string) {
   const job = await prisma.job.findUnique({
     where: { id: jobId },
-    select: { id: true, title: true, slug: true }
+    select: {
+      id: true,
+      title: true,
+      slug: true,
+      employmentType: true,
+      state: { select: { slug: true } },
+      city: { select: { slug: true } },
+      company: { select: { slug: true } }
+    }
   });
 
   if (!job) {

@@ -1,4 +1,4 @@
-import { cache } from "react";
+import { unstable_cache } from "next/cache";
 import { HubType } from "@prisma/client";
 
 import { staticPages } from "@/data/seo-pages";
@@ -14,6 +14,7 @@ import { shouldIndexPage } from "@/lib/seo/indexing";
 import { getAllPublishedPostEntries } from "@/lib/repositories/blog";
 import { getCities, getStates } from "@/lib/repositories/geo";
 import { getHubProfiles } from "@/lib/repositories/hubs";
+import { SITEMAP_MANIFEST_CACHE_TAG } from "@/lib/public-revalidate";
 import { getAllActiveJobEntries, getCompanyEntries, getCompanyHubs } from "@/lib/repositories/jobs";
 import { getSiteOrigin } from "@/lib/site-url";
 import { absoluteUrl } from "@/lib/utils";
@@ -147,7 +148,7 @@ function buildRootEntries(category: Exclude<SitemapCategory, "listings">, lastmo
   return ROOT_ROUTES_BY_CATEGORY[category].map((path) => toSitemapEntry(path, lastmod));
 }
 
-export const getSitemapManifest = cache(async (): Promise<SitemapManifest> => {
+async function computeSitemapManifest(): Promise<SitemapManifest> {
   const [jobs, posts, states, cities, companies, companyHubs, stateProfiles, cityProfiles, companyProfiles] = await Promise.all([
     getAllActiveJobEntries(),
     getAllPublishedPostEntries(),
@@ -328,6 +329,11 @@ export const getSitemapManifest = cache(async (): Promise<SitemapManifest> => {
   );
 
   return { files, counts };
+}
+
+export const getSitemapManifest = unstable_cache(computeSitemapManifest, ["sitemap-manifest-v1"], {
+  revalidate: 7200,
+  tags: [SITEMAP_MANIFEST_CACHE_TAG]
 });
 
 export function buildSitemapIndexXml(files: SitemapFile[]) {

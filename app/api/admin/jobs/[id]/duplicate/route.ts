@@ -1,10 +1,13 @@
+import { revalidateTag } from "next/cache";
 import { NextResponse } from "next/server";
 
-import { requireApiRole } from "@/lib/authz";
 import { AuditAction } from "@prisma/client";
-import { writeAuditLog } from "@/lib/audit";
-import { prisma } from "@/lib/db";
+
 import { normalizeSlug } from "@/lib/admin/content";
+import { writeAuditLog } from "@/lib/audit";
+import { requireApiRole } from "@/lib/authz";
+import { prisma } from "@/lib/db";
+import { SITEMAP_MANIFEST_CACHE_TAG } from "@/lib/public-revalidate";
 
 type Context = {
   params: Promise<{ id: string }>;
@@ -70,6 +73,8 @@ export async function POST(_request: Request, context: Context) {
         slug: duplicated.slug
       }
     });
+
+    revalidateTag(SITEMAP_MANIFEST_CACHE_TAG);
 
     return NextResponse.json({ ok: true, jobId: duplicated.id });
   } catch (error) {

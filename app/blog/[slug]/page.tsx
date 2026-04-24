@@ -10,6 +10,8 @@ import { getCompanyJobsPath } from "@/lib/seo/jobs-pages";
 import { getPostBySlug, getRelatedPosts } from "@/lib/repositories/blog";
 import { getCompanyHubs } from "@/lib/repositories/jobs";
 
+export const revalidate = 7200;
+
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const post = await getPostBySlug(slug);

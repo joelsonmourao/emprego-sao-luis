@@ -15,6 +15,8 @@ import { getStateBySlug } from "@/lib/repositories/geo";
 import { getJobsList } from "@/lib/repositories/jobs";
 import { jobSearchParamsSchema } from "@/lib/schemas/search";
 
+export const revalidate = 1200;
+
 function buildPageHref(stateSlug: string, order: "relevance" | "date" | undefined, pageNumber: number) {
   const params = new URLSearchParams();
   if (order && order !== "relevance") params.set("order", order);

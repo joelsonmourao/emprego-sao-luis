@@ -28,6 +28,8 @@ import { getCities, getCitiesBySlugs, getSearchGeoData, getStates, getStatesBySl
 import { getSiteContent } from "@/lib/site-content";
 import { homeBlockKeys } from "@/lib/schemas/site-admin";
 
+export const revalidate = 600;
+
 export async function generateMetadata() {
   return buildSiteMetadata({
     title: "Jovem Aprendiz Vagas no Brasil",

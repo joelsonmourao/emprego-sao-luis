@@ -96,6 +96,11 @@ function normalizeIsoDate(value?: string | null) {
   return Number.isNaN(parsed.getTime()) ? undefined : parsed.toISOString();
 }
 
+/** Normaliza ISO para schema (remove sufixo de milissegundos `.000Z` → `Z`). */
+function sanitizeISODate(dateStr: string | undefined | null) {
+  return dateStr?.replace(/\.\d{3}Z$/, "Z") ?? dateStr;
+}
+
 function escapeHtmlText(s: string) {
   return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 }
@@ -172,15 +177,13 @@ function buildHiringOrganization(input: {
   };
   if (site && /^https?:\/\//i.test(site)) {
     org.url = site;
-    org.sameAs = site;
   } else if (input.companySlug) {
-    const hub = absoluteUrl(`/vagas/empresa/${input.companySlug}`);
-    org.url = hub;
-    org.sameAs = hub;
+    org.url = absoluteUrl(`/vagas/empresa/${input.companySlug}`);
   } else {
-    const home = absoluteUrl("/");
-    org.url = home;
-    org.sameAs = home;
+    org.url = absoluteUrl("/");
+  }
+  if (org.sameAs === org.url) {
+    delete org.sameAs;
   }
   return org;
 }
@@ -219,13 +222,15 @@ const DEFAULT_OCCUPATIONAL_CATEGORY = "4110-10";
 export async function buildJobPostingJsonLd(job: JobPostingJsonLdInput) {
   const requirements = toStringList(job.requirements);
   const benefits = toStringList(job.benefits);
-  const skills = [...requirements, ...benefits];
   const descriptionHtml = buildJobPostingDescriptionHtml({
     summary: job.summary?.trim() ?? "",
     descriptionHtml: job.descriptionHtml,
     requirements,
     benefits
   });
+
+  const datePostedRaw = normalizeIsoDate(job.publishedAt) ?? new Date().toISOString();
+  const validThroughRaw = computeValidThroughIso(job.publishedAt, job.validThrough ?? null, job.expiresAt);
 
   const data: Record<string, unknown> = {
     "@context": "https://schema.org",
@@ -236,9 +241,9 @@ export async function buildJobPostingJsonLd(job: JobPostingJsonLdInput) {
       name: job.companyName,
       value: (job.externalId?.trim() || job.id).trim()
     },
-    datePosted: normalizeIsoDate(job.publishedAt) ?? new Date().toISOString(),
-    validThrough: computeValidThroughIso(job.publishedAt, job.validThrough ?? null, job.expiresAt),
-    employmentType: ["OTHER", "PART_TIME"],
+    datePosted: sanitizeISODate(datePostedRaw) ?? datePostedRaw,
+    validThrough: sanitizeISODate(validThroughRaw) ?? validThroughRaw,
+    employmentType: "PART_TIME",
     educationRequirements: {
       "@type": "EducationalOccupationalCredential",
       credentialCategory: "high school"
@@ -248,7 +253,6 @@ export async function buildJobPostingJsonLd(job: JobPostingJsonLdInput) {
     description: descriptionHtml,
     /** Selo de candidatura rápida no Google; exige fluxo de candidatura compatível com a política do Google. */
     directApply: true,
-    skills: skills.length ? skills : ["Aprendizagem profissional", "Primeiro emprego"],
     industry: (job.industry?.trim() || DEFAULT_INDUSTRY).trim(),
     occupationalCategory: (job.occupationalCategory?.trim() || DEFAULT_OCCUPATIONAL_CATEGORY).trim(),
     hiringOrganization: buildHiringOrganization({
@@ -259,6 +263,13 @@ export async function buildJobPostingJsonLd(job: JobPostingJsonLdInput) {
     }),
     url: absoluteUrl(`/vagas/${job.slug}`)
   };
+
+  if (requirements.length) {
+    data.qualifications = requirements.join("\n");
+  }
+  if (benefits.length) {
+    data.jobBenefits = benefits.join("\n");
+  }
 
   if (job.locationType === "REMOTE") {
     data.jobLocationType = "TELECOMMUTE";

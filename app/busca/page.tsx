@@ -11,6 +11,8 @@ import { getSearchGeoData } from "@/lib/repositories/geo";
 import { buildSiteMetadata } from "@/lib/seo/metadata";
 import { jobSearchParamsSchema } from "@/lib/schemas/search";
 
+export const revalidate = 600;
+
 export async function generateMetadata() {
   return buildSiteMetadata({
     title: "Buscar vagas de Jovem Aprendiz",

@@ -3,24 +3,73 @@ import type { EmploymentType, Prisma } from "@prisma/client";
 
 import { prisma } from "@/lib/db";
 import { pagination } from "@/lib/constants";
-import { slugify } from "@/lib/utils";
 
-const jobInclude = {
+/** Full job graph for detalhe da vaga, JSON-LD e admin. */
+const jobDetailInclude = {
   city: true,
   state: true,
   company: true
 } satisfies Prisma.JobInclude;
 
-export async function getFeaturedJobs() {
+/**
+ * Campos enxutos para cards e listagens (evita descriptionHtml, requirements, benefits, etc.).
+ */
+export const jobListingSelect = {
+  id: true,
+  slug: true,
+  title: true,
+  companyName: true,
+  companyLogoUrl: true,
+  summary: true,
+  publishedAt: true,
+  applyUrl: true,
+  locationType: true,
+  featured: true,
+  employmentType: true,
+  salaryMin: true,
+  salaryMax: true,
+  city: { select: { name: true, slug: true } },
+  state: { select: { code: true, slug: true, name: true } },
+  company: { select: { slug: true, name: true } }
+} satisfies Prisma.JobSelect;
+
+export type JobListingPayload = Prisma.JobGetPayload<{ select: typeof jobListingSelect }>;
+
+const companyHubListSelect = {
+  id: true,
+  name: true,
+  slug: true,
+  logoUrl: true,
+  websiteUrl: true,
+  summary: true,
+  socialImageUrl: true,
+  seoTitle: true,
+  seoDescription: true,
+  featured: true,
+  city: { select: { name: true, slug: true } },
+  state: { select: { name: true, code: true, slug: true } },
+  _count: {
+    select: {
+      jobs: {
+        where: { isActive: true }
+      }
+    }
+  }
+} satisfies Prisma.CompanySelect;
+
+async function fetchFeaturedJobs() {
   return prisma.job.findMany({
     where: { isActive: true, featured: true },
-    include: jobInclude,
+    select: jobListingSelect,
     orderBy: [{ publishedAt: "desc" }],
     take: 6
   });
 }
 
-export async function getJobsBySlugs(slugs: string[]) {
+export const getFeaturedJobs = cache(fetchFeaturedJobs);
+
+const getJobsBySlugsCached = cache(async (slugKey: string) => {
+  const slugs = JSON.parse(slugKey) as string[];
   if (!slugs.length) return [];
 
   const items = await prisma.job.findMany({
@@ -28,30 +77,37 @@ export async function getJobsBySlugs(slugs: string[]) {
       isActive: true,
       slug: { in: slugs }
     },
-    include: jobInclude
+    select: jobListingSelect
   });
 
   const map = new Map(items.map((item) => [item.slug, item]));
-  return slugs.map((slug) => map.get(slug)).filter((item): item is (typeof items)[number] => Boolean(item));
+  return slugs.map((slug) => map.get(slug)).filter((item): item is JobListingPayload => Boolean(item));
+});
+
+export async function getJobsBySlugs(slugs: string[]) {
+  if (!slugs.length) return [];
+  return getJobsBySlugsCached(JSON.stringify(slugs));
 }
 
-export async function getRecentJobs() {
+async function fetchRecentJobs() {
   return prisma.job.findMany({
     where: { isActive: true },
-    include: jobInclude,
+    select: jobListingSelect,
     orderBy: [{ publishedAt: "desc" }],
     take: 12
   });
 }
 
+export const getRecentJobs = cache(fetchRecentJobs);
+
 export const getJobBySlug = cache(async (slug: string) => {
   return prisma.job.findUnique({
     where: { slug },
-    include: jobInclude
+    include: jobDetailInclude
   });
 });
 
-export async function getJobsList(params: {
+function jobsListCacheKey(params: {
   query?: string;
   stateSlug?: string;
   citySlug?: string;
@@ -61,6 +117,30 @@ export async function getJobsList(params: {
   order?: "relevance" | "date";
   page?: number;
 }) {
+  return JSON.stringify({
+    query: params.query ?? null,
+    stateSlug: params.stateSlug ?? null,
+    citySlug: params.citySlug ?? null,
+    companySlug: params.companySlug ?? null,
+    companyName: params.companyName ?? null,
+    employmentType: params.employmentType ?? null,
+    order: params.order ?? "relevance",
+    page: params.page ?? 1
+  });
+}
+
+const getJobsListCached = cache(async (key: string) => {
+  const params = JSON.parse(key) as {
+    query?: string;
+    stateSlug?: string;
+    citySlug?: string;
+    companySlug?: string;
+    companyName?: string;
+    employmentType?: EmploymentType;
+    order?: "relevance" | "date";
+    page?: number;
+  };
+
   const page = params.page ?? 1;
   const order = params.order ?? "relevance";
 
@@ -96,7 +176,7 @@ export async function getJobsList(params: {
   const [items, total] = await Promise.all([
     prisma.job.findMany({
       where,
-      include: jobInclude,
+      select: jobListingSelect,
       orderBy: order === "relevance" ? [{ featured: "desc" }, { publishedAt: "desc" }] : [{ publishedAt: "desc" }],
       take: pagination.jobsPerPage,
       skip: (page - 1) * pagination.jobsPerPage
@@ -110,30 +190,34 @@ export async function getJobsList(params: {
     page,
     totalPages: Math.max(1, Math.ceil(total / pagination.jobsPerPage))
   };
+});
+
+export async function getJobsList(params: {
+  query?: string;
+  stateSlug?: string;
+  citySlug?: string;
+  companySlug?: string;
+  companyName?: string;
+  employmentType?: EmploymentType;
+  order?: "relevance" | "date";
+  page?: number;
+}) {
+  return getJobsListCached(jobsListCacheKey(params));
 }
 
-export async function getFeaturedCompanies() {
+async function fetchFeaturedCompanies() {
   return prisma.company.findMany({
     where: { isActive: true },
-    include: {
-      city: true,
-      state: true,
-      _count: {
-        select: {
-          jobs: {
-            where: {
-              isActive: true
-            }
-          }
-        }
-      }
-    },
+    select: companyHubListSelect,
     orderBy: [{ featured: "desc" }, { updatedAt: "desc" }],
     take: 8
   });
 }
 
-export async function getFeaturedCompaniesBySlugs(slugs: string[]) {
+export const getFeaturedCompanies = cache(fetchFeaturedCompanies);
+
+const getFeaturedCompaniesBySlugsCached = cache(async (slugKey: string) => {
+  const slugs = JSON.parse(slugKey) as string[];
   if (!slugs.length) return [];
 
   const companies = await prisma.company.findMany({
@@ -141,24 +225,49 @@ export async function getFeaturedCompaniesBySlugs(slugs: string[]) {
       isActive: true,
       slug: { in: slugs }
     },
-    include: {
-      city: true,
-      state: true,
-      _count: {
-        select: {
-          jobs: {
-            where: {
-              isActive: true
-            }
-          }
-        }
-      }
-    }
+    select: companyHubListSelect
   });
 
   const map = new Map(companies.map((company) => [company.slug, company]));
   return slugs.map((slug) => map.get(slug)).filter((item): item is (typeof companies)[number] => Boolean(item));
+});
+
+export async function getFeaturedCompaniesBySlugs(slugs: string[]) {
+  if (!slugs.length) return [];
+  return getFeaturedCompaniesBySlugsCached(JSON.stringify(slugs));
 }
+
+const getRelatedJobsCached = cache(async (key: string) => {
+  const params = JSON.parse(key) as {
+    excludeSlug?: string;
+    citySlug?: string;
+    stateSlug?: string;
+    companySlug?: string;
+    limit?: number;
+  };
+
+  const orFilters: Prisma.JobWhereInput[] = [];
+  if (params.citySlug) orFilters.push({ city: { slug: params.citySlug } });
+  if (params.stateSlug) orFilters.push({ state: { slug: params.stateSlug } });
+  if (params.companySlug) orFilters.push({ company: { slug: params.companySlug } });
+
+  if (!orFilters.length) {
+    return [];
+  }
+
+  const related = await prisma.job.findMany({
+    where: {
+      isActive: true,
+      ...(params.excludeSlug ? { slug: { not: params.excludeSlug } } : {}),
+      OR: orFilters
+    },
+    select: jobListingSelect,
+    orderBy: [{ featured: "desc" }, { publishedAt: "desc" }],
+    take: params.limit ?? 6
+  });
+
+  return related;
+});
 
 export async function getRelatedJobs(params: {
   excludeSlug?: string;
@@ -167,38 +276,21 @@ export async function getRelatedJobs(params: {
   companySlug?: string;
   limit?: number;
 }) {
-  const related = await prisma.job.findMany({
-    where: {
-      isActive: true,
-      ...(params.excludeSlug ? { slug: { not: params.excludeSlug } } : {}),
-      OR: [
-        ...(params.citySlug ? [{ city: { slug: params.citySlug } }] : []),
-        ...(params.stateSlug ? [{ state: { slug: params.stateSlug } }] : []),
-        ...(params.companySlug ? [{ company: { slug: params.companySlug } }] : [])
-      ]
-    },
-    include: jobInclude,
-    orderBy: [{ featured: "desc" }, { publishedAt: "desc" }],
-    take: params.limit ?? 6
-  });
-
-  return related;
+  return getRelatedJobsCached(
+    JSON.stringify({
+      excludeSlug: params.excludeSlug ?? null,
+      citySlug: params.citySlug ?? null,
+      stateSlug: params.stateSlug ?? null,
+      companySlug: params.companySlug ?? null,
+      limit: params.limit ?? 6
+    })
+  );
 }
 
-export async function getCompanyHubs() {
+async function fetchCompanyHubsMapped() {
   const companies = await prisma.company.findMany({
     where: { isActive: true },
-    include: {
-      city: true,
-      state: true,
-      _count: {
-        select: {
-          jobs: {
-            where: { isActive: true }
-          }
-        }
-      }
-    },
+    select: companyHubListSelect,
     orderBy: [{ featured: "desc" }, { updatedAt: "desc" }]
   });
 
@@ -209,7 +301,6 @@ export async function getCompanyHubs() {
     logoUrl: company.logoUrl,
     websiteUrl: company.websiteUrl,
     summary: company.summary,
-    descriptionHtml: company.descriptionHtml,
     socialImageUrl: company.socialImageUrl,
     seoTitle: company.seoTitle,
     seoDescription: company.seoDescription,
@@ -223,20 +314,12 @@ export async function getCompanyHubs() {
   }));
 }
 
+export const getCompanyHubs = cache(fetchCompanyHubsMapped);
+
 export async function getCompanyHubBySlug(slug: string) {
   return prisma.company.findUnique({
     where: { slug },
-    include: {
-      city: true,
-      state: true,
-      _count: {
-        select: {
-          jobs: {
-            where: { isActive: true }
-          }
-        }
-      }
-    }
+    select: companyHubListSelect
   });
 }
 
@@ -256,7 +339,6 @@ export async function getAllActiveJobEntries() {
     where: { isActive: true },
     select: {
       slug: true,
-      title: true,
       updatedAt: true,
       employmentType: true,
       city: {

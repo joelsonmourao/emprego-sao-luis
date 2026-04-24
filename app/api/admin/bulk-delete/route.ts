@@ -6,6 +6,7 @@ import { bulkDeleteJobs } from "@/lib/admin/jobs";
 import { bulkDeleteTaxonomyEntries } from "@/lib/admin/taxonomies";
 import { writeAuditLog } from "@/lib/audit";
 import { requireApiRole } from "@/lib/authz";
+import { revalidatePublicSurfacesAfterBulkJobChange } from "@/lib/public-revalidate";
 import { bulkDeleteSchema } from "@/lib/schemas/taxonomy-admin";
 
 export async function POST(request: Request) {
@@ -42,6 +43,10 @@ export async function POST(request: Request) {
         hubProfilesDeleted: 0
       }
     );
+
+    if (payload.resource === "jobs" && deletedItems.length) {
+      revalidatePublicSurfacesAfterBulkJobChange();
+    }
 
     for (const item of deletedItems) {
       const label = "title" in item ? item.title : "name" in item ? item.name : null;

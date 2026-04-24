@@ -25,6 +25,8 @@ import { renderFaqTemplate, renderTemplate } from "@/lib/site-copy";
 import { getSiteContent } from "@/lib/site-content";
 import { JobsGridWithMidAd } from "@/components/vagas/jobs-grid-with-mid-ad";
 
+export const revalidate = 600;
+
 export async function generateMetadata({
   searchParams
 }: {

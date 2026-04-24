@@ -5,6 +5,7 @@ import { z } from "zod";
 import { writeAuditLog } from "@/lib/audit";
 import { requireApiRole } from "@/lib/authz";
 import { prisma } from "@/lib/db";
+import { revalidatePublicSurfacesForJob } from "@/lib/public-revalidate";
 
 const schema = z.object({
   isActive: z.boolean()
@@ -22,7 +23,24 @@ export async function PATCH(request: Request, context: Context) {
 
     const updated = await prisma.job.update({
       where: { id },
-      data: { isActive: body.isActive }
+      data: { isActive: body.isActive },
+      select: {
+        id: true,
+        title: true,
+        slug: true,
+        employmentType: true,
+        state: { select: { slug: true } },
+        city: { select: { slug: true } },
+        company: { select: { slug: true } }
+      }
+    });
+
+    revalidatePublicSurfacesForJob({
+      slug: updated.slug,
+      stateSlug: updated.state.slug,
+      citySlug: updated.city.slug,
+      companySlug: updated.company?.slug ?? null,
+      employmentType: updated.employmentType
     });
 
     await writeAuditLog({
