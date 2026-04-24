@@ -239,11 +239,6 @@ export async function buildJobPostingJsonLd(job: JobPostingJsonLdInput) {
     datePosted: normalizeIsoDate(job.publishedAt) ?? new Date().toISOString(),
     validThrough: computeValidThroughIso(job.publishedAt, job.validThrough ?? null, job.expiresAt),
     employmentType: ["OTHER", "PART_TIME"],
-    experienceRequirements: {
-      "@type": "OccupationalExperienceRequirements",
-      description: "no experience required"
-    },
-    experienceInPlaceOfEducation: true,
     educationRequirements: {
       "@type": "EducationalOccupationalCredential",
       credentialCategory: "high school"
