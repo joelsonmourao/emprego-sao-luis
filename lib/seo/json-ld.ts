@@ -1,5 +1,6 @@
+import { getReferencePostalCodeForCity } from "@/lib/seo/br-reference-postal";
+import { sanitizeRichTextHtml } from "@/lib/rich-text";
 import { absoluteUrl } from "@/lib/utils";
-import { stripHtml } from "@/lib/rich-text";
 
 export function buildOrganizationJsonLd(input?: { name?: string; logoUrl?: string }) {
   return {
@@ -53,27 +54,40 @@ export function buildFaqJsonLd(items: Array<{ question: string; answer: string }
   };
 }
 
-type JobPostingInput = {
-  id?: string;
+/** Piso mensal de referência (BRL) só quando a vaga não informa faixa — atualize conforme legislação. */
+const JOBPOSTING_FALLBACK_MONTHLY_BRL = 1518;
+
+export type JobPostingJsonLdInput = {
+  id: string;
   externalId?: string | null;
+  seoTitle?: string | null;
   title: string;
   summary?: string | null;
   descriptionHtml: string;
   slug: string;
   companyName: string;
   companyLogoUrl?: string | null;
+  companyWebsiteUrl?: string | null;
+  companySlug?: string | null;
   cityName: string;
+  citySlug: string;
   stateCode: string;
   stateName: string;
+  locationType?: "ONSITE" | "REMOTE" | "HYBRID" | string | null;
   publishedAt: string;
   expiresAt: string | null;
   validThrough?: string | null;
-  employmentType: string;
   salaryMin: number | null;
   salaryMax: number | null;
+  requirements: unknown[];
+  benefits: unknown[];
   streetAddress?: string | null;
   postalCode?: string | null;
   countryCode?: string | null;
+  /** Área de atuação; quando ausente, usa texto padrão do programa de aprendizagem. */
+  industry?: string | null;
+  /** Código CBO (ex.: 4110-10); quando ausente, usa padrão administrativo genérico. */
+  occupationalCategory?: string | null;
 };
 
 function normalizeIsoDate(value?: string | null) {
@@ -82,80 +96,178 @@ function normalizeIsoDate(value?: string | null) {
   return Number.isNaN(parsed.getTime()) ? undefined : parsed.toISOString();
 }
 
-function buildSalaryBlock(job: JobPostingInput) {
-  const numericValues = [job.salaryMin, job.salaryMax].filter((value): value is number => typeof value === "number" && Number.isFinite(value) && value > 0);
+function escapeHtmlText(s: string) {
+  return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+}
 
-  if (!numericValues.length) {
-    return undefined;
+function toStringList(items: unknown[]): string[] {
+  return items.map((item) => String(item).trim()).filter(Boolean);
+}
+
+function buildJobPostingDescriptionHtml(input: { summary: string; descriptionHtml: string; requirements: string[]; benefits: string[] }) {
+  const parts: string[] = [];
+  if (input.summary.trim()) {
+    parts.push(`<p>${escapeHtmlText(input.summary.trim())}</p>`);
   }
+  const body = sanitizeRichTextHtml(input.descriptionHtml).trim();
+  if (body) {
+    parts.push(body);
+  }
+  if (input.requirements.length) {
+    parts.push("<h3>Requisitos</h3>", "<ul>", ...input.requirements.map((item) => `<li>${escapeHtmlText(item)}</li>`), "</ul>");
+  }
+  if (input.benefits.length) {
+    parts.push("<h3>Beneficios</h3>", "<ul>", ...input.benefits.map((item) => `<li>${escapeHtmlText(item)}</li>`), "</ul>");
+  }
+  return parts.join("\n").slice(0, 100000);
+}
 
-  const value = job.salaryMin && job.salaryMax && job.salaryMin === job.salaryMax ? job.salaryMin : Math.min(...numericValues);
+function computeValidThroughIso(publishedAt: string, validThrough: string | null, expiresAt: string | null) {
+  const posted = new Date(publishedAt);
+  if (Number.isNaN(posted.getTime())) {
+    const d = new Date();
+    d.setUTCDate(d.getUTCDate() + 30);
+    return d.toISOString();
+  }
+  const minFromPosted = new Date(posted);
+  minFromPosted.setUTCDate(minFromPosted.getUTCDate() + 30);
+  const raw = validThrough ? new Date(validThrough) : expiresAt ? new Date(expiresAt) : null;
+  if (raw && !Number.isNaN(raw.getTime()) && raw.getTime() >= minFromPosted.getTime()) {
+    return raw.toISOString();
+  }
+  return minFromPosted.toISOString();
+}
 
+function buildBaseSalaryBlock(salaryMin: number | null, salaryMax: number | null) {
+  const min = typeof salaryMin === "number" && Number.isFinite(salaryMin) && salaryMin > 0 ? salaryMin : null;
+  const max = typeof salaryMax === "number" && Number.isFinite(salaryMax) && salaryMax > 0 ? salaryMax : null;
+  let qv: Record<string, unknown>;
+  if (min && max && min !== max) {
+    qv = { "@type": "QuantitativeValue", minValue: min, maxValue: max, unitText: "MONTH" };
+  } else if (min ?? max) {
+    qv = { "@type": "QuantitativeValue", value: min ?? max, unitText: "MONTH" };
+  } else {
+    qv = { "@type": "QuantitativeValue", value: JOBPOSTING_FALLBACK_MONTHLY_BRL, unitText: "MONTH" };
+  }
   return {
     "@type": "MonetaryAmount",
     currency: "BRL",
-    value: {
-      "@type": "QuantitativeValue",
-      value,
-      unitText: "MONTH"
-    }
+    value: qv
   };
 }
 
-function buildJobLocation(job: JobPostingInput) {
+function buildHiringOrganization(input: {
+  companyName: string;
+  companyLogoUrl?: string | null;
+  companyWebsiteUrl?: string | null;
+  companySlug?: string | null;
+}) {
+  const logo = absoluteUrl(input.companyLogoUrl ?? "/brand-mark.svg");
+  const site = input.companyWebsiteUrl?.trim();
+  const org: Record<string, unknown> = {
+    "@type": "Organization",
+    name: input.companyName,
+    logo
+  };
+  if (site && /^https?:\/\//i.test(site)) {
+    org.url = site;
+    org.sameAs = site;
+  } else if (input.companySlug) {
+    const hub = absoluteUrl(`/vagas/empresa/${input.companySlug}`);
+    org.url = hub;
+    org.sameAs = hub;
+  } else {
+    const home = absoluteUrl("/");
+    org.url = home;
+    org.sameAs = home;
+  }
+  return org;
+}
+
+function buildJobLocationBlock(job: JobPostingJsonLdInput) {
+  const country = job.countryCode ?? "BR";
+  const postal =
+    job.postalCode?.trim() ||
+    getReferencePostalCodeForCity({ stateCode: job.stateCode, citySlug: job.citySlug });
+  const street = job.streetAddress?.trim() || "Conforme unidade informada pela empresa";
+
   return {
     "@type": "Place",
     address: {
       "@type": "PostalAddress",
-      streetAddress: job.streetAddress ?? "Indefinido",
-      postalCode: job.postalCode ?? "Indefinido",
-      addressLocality: `${job.cityName}, ${job.stateName}`,
-      addressRegion: `${job.cityName}, ${job.stateName}`,
-      addressCountry: job.countryCode ?? "BR"
+      streetAddress: street,
+      postalCode: postal,
+      addressLocality: job.cityName,
+      addressRegion: job.stateCode,
+      addressCountry: country
     }
   };
 }
 
-export function buildJobPostingJsonLd(job: JobPostingInput) {
-  const description = [job.summary?.trim(), stripHtml(job.descriptionHtml).trim()]
-    .filter(Boolean)
-    .join("\n\n")
-    .slice(0, 5000);
+const DEFAULT_INDUSTRY =
+  "Programa de Aprendizagem Profissional — Jovem Aprendiz e Menor Aprendiz (Lei da Aprendizagem)";
+const DEFAULT_OCCUPATIONAL_CATEGORY = "4110-10";
+
+export function buildJobPostingJsonLd(job: JobPostingJsonLdInput) {
+  const requirements = toStringList(job.requirements);
+  const benefits = toStringList(job.benefits);
+  const skills = [...requirements, ...benefits];
+  const descriptionHtml = buildJobPostingDescriptionHtml({
+    summary: job.summary?.trim() ?? "",
+    descriptionHtml: job.descriptionHtml,
+    requirements,
+    benefits
+  });
 
   const data: Record<string, unknown> = {
     "@context": "https://schema.org",
     "@type": "JobPosting",
-    datePosted: normalizeIsoDate(job.publishedAt),
+    title: (job.seoTitle?.trim() || job.title).trim(),
+    identifier: {
+      "@type": "PropertyValue",
+      name: job.companyName,
+      value: (job.externalId?.trim() || job.id).trim()
+    },
+    datePosted: normalizeIsoDate(job.publishedAt) ?? new Date().toISOString(),
+    validThrough: computeValidThroughIso(job.publishedAt, job.validThrough ?? null, job.expiresAt),
+    employmentType: ["OTHER", "PART_TIME"],
+    experienceRequirements: {
+      "@type": "OccupationalExperienceRequirements",
+      monthsOfExperience: 0
+    },
+    educationRequirements: {
+      "@type": "EducationalOccupationalCredential",
+      credentialCategory: "Ensino Médio cursando ou completo"
+    },
+    jobLocation: buildJobLocationBlock(job),
+    baseSalary: buildBaseSalaryBlock(job.salaryMin, job.salaryMax),
+    description: descriptionHtml,
+    /** Selo de candidatura rápida no Google; exige fluxo de candidatura compatível com a política do Google. */
+    directApply: true,
+    skills: skills.length ? skills : ["Aprendizagem profissional", "Primeiro emprego"],
+    industry: (job.industry?.trim() || DEFAULT_INDUSTRY).trim(),
+    occupationalCategory: (job.occupationalCategory?.trim() || DEFAULT_OCCUPATIONAL_CATEGORY).trim(),
+    hiringOrganization: buildHiringOrganization({
+      companyName: job.companyName,
+      companyLogoUrl: job.companyLogoUrl,
+      companyWebsiteUrl: job.companyWebsiteUrl,
+      companySlug: job.companySlug
+    }),
+    url: absoluteUrl(`/vagas/${job.slug}`)
   };
 
-  const validThrough = normalizeIsoDate(job.validThrough ?? job.expiresAt);
-  if (validThrough) {
-    data.validThrough = validThrough;
+  if (job.locationType === "REMOTE") {
+    data.jobLocationType = "TELECOMMUTE";
+    data.applicantLocationRequirements = {
+      "@type": "Country",
+      name: "Brazil"
+    };
   }
-
-  const baseSalary = buildSalaryBlock(job);
-  if (baseSalary) {
-    data.baseSalary = baseSalary;
-  }
-
-  data.title = job.title;
-  data.description = description;
-  data.employmentType = job.employmentType;
-  data.hiringOrganization = {
-    "@type": "Organization",
-    name: job.companyName,
-    logo: absoluteUrl(job.companyLogoUrl ?? "/brand-mark.svg")
-  };
-  data.identifier = {
-    "@type": "PropertyValue",
-    name: job.companyName,
-    value: absoluteUrl(`/vagas/${job.slug}`)
-  };
-  data.jobLocation = buildJobLocation(job);
 
   return data;
 }
 
-export async function buildJobPostingJsonLdAsync(job: JobPostingInput) {
-  return buildJobPostingJsonLd(job);
+/** Evita quebra de `</script>` em HTML embutido no JSON (recomendação Next.js / XSS). */
+export function stringifyJsonLdSafe(data: Record<string, unknown>) {
+  return JSON.stringify(data).replace(/</g, "\\u003c");
 }

@@ -8,7 +8,9 @@ import { SiteFooter } from "@/components/site-footer";
 import { JsonLd } from "@/components/json-ld";
 import { ConsentBootstrap } from "@/components/analytics/consent-bootstrap";
 import { SiteIntegrations } from "@/components/analytics/site-integrations";
-import { buildOrganizationJsonLd, buildWebsiteJsonLd } from "@/lib/seo/json-ld";
+import { buildJobPostingJsonLd, buildOrganizationJsonLd, buildWebsiteJsonLd, stringifyJsonLdSafe } from "@/lib/seo/json-ld";
+import { getPublicJobSlugFromPathname } from "@/lib/seo/vagas-job-path";
+import { getJobBySlug } from "@/lib/repositories/jobs";
 import { siteConfig } from "@/lib/constants";
 import { getSiteSettings } from "@/lib/site-settings";
 import { normalizeAdsensePublisherId, normalizeSearchConsoleVerification } from "@/lib/google";
@@ -75,13 +77,55 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
   const headersList = await headers();
   const section = headersList.get("x-app-section");
   const isAdminSection = section === "admin";
+  const pathname = headersList.get("x-pathname");
   const settings = await getSiteSettings();
   const adsensePublisherId = normalizeAdsensePublisherId(settings.google.adsensePublisherId) ?? "ca-pub-4279201625870524";
   const initialConsentValue = (await cookies()).get(CONSENT_COOKIE_NAME)?.value ?? null;
 
+  let jobPostingJsonLd: string | null = null;
+  if (!isAdminSection && pathname) {
+    const jobSlug = getPublicJobSlugFromPathname(pathname);
+    if (jobSlug) {
+      const job = await getJobBySlug(jobSlug);
+      if (job?.isActive) {
+        const requirements = Array.isArray(job.requirements) ? job.requirements : [];
+        const benefits = Array.isArray(job.benefits) ? job.benefits : [];
+        jobPostingJsonLd = stringifyJsonLdSafe(
+          buildJobPostingJsonLd({
+            id: job.id,
+            externalId: job.externalId,
+            seoTitle: job.seoTitle,
+            title: job.title,
+            summary: job.summary,
+            descriptionHtml: job.descriptionHtml,
+            slug: job.slug,
+            companyName: job.companyName,
+            companyLogoUrl: job.company?.logoUrl ?? job.companyLogoUrl,
+            companyWebsiteUrl: job.company?.websiteUrl ?? job.companyWebsiteUrl,
+            companySlug: job.company?.slug ?? undefined,
+            cityName: job.city.name,
+            citySlug: job.city.slug,
+            stateCode: job.state.code,
+            stateName: job.state.name,
+            locationType: job.locationType,
+            publishedAt: job.publishedAt.toISOString(),
+            expiresAt: job.expiresAt?.toISOString() ?? null,
+            validThrough: job.validThrough?.toISOString() ?? null,
+            salaryMin: job.salaryMin,
+            salaryMax: job.salaryMax,
+            requirements,
+            benefits,
+            countryCode: "BR"
+          })
+        );
+      }
+    }
+  }
+
   return (
     <html lang="pt-BR">
       <head>
+        {jobPostingJsonLd ? <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jobPostingJsonLd }} /> : null}
         {isAdminSection ? null : (
           <>
             <meta name="google-adsense-account" content={adsensePublisherId} />

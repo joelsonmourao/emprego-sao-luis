@@ -12,6 +12,7 @@ export async function middleware(request: NextRequest) {
   const isLoginApi = pathname === "/api/admin/login";
   const requestHeaders = new Headers(request.headers);
   requestHeaders.set("x-app-section", isAdminPage || isAdminApi ? "admin" : "public");
+  requestHeaders.set("x-pathname", pathname);
 
   if (!isAdminPage && !isAdminApi) {
     const publicToken = request.cookies.get(ADMIN_AUTH_COOKIE)?.value;

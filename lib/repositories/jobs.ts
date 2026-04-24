@@ -1,3 +1,4 @@
+import { cache } from "react";
 import type { EmploymentType, Prisma } from "@prisma/client";
 
 import { prisma } from "@/lib/db";
@@ -43,12 +44,12 @@ export async function getRecentJobs() {
   });
 }
 
-export async function getJobBySlug(slug: string) {
+export const getJobBySlug = cache(async (slug: string) => {
   return prisma.job.findUnique({
     where: { slug },
     include: jobInclude
   });
-}
+});
 
 export async function getJobsList(params: {
   query?: string;

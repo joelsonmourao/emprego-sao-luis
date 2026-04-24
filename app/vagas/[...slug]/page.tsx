@@ -6,8 +6,7 @@ import { resolveCompanyJobsPageMetadata } from "@/lib/seo/company-jobs-metadata"
 import { buildJobDetailSeo } from "@/lib/seo/jobs-pages";
 import { buildSiteMetadata } from "@/lib/seo/metadata";
 import { getJobBySlug } from "@/lib/repositories/jobs";
-
-const RESERVED_SINGLE_SEGMENTS = new Set(["estado", "cidade", "empresa"]);
+import { JOB_DETAIL_PATH_RESERVED_FIRST_SEGMENTS } from "@/lib/seo/vagas-job-path";
 
 export async function generateMetadata({
   params,
@@ -28,7 +27,7 @@ export async function generateMetadata({
     });
   }
 
-  if (segments.length === 1 && RESERVED_SINGLE_SEGMENTS.has(segments[0])) {
+  if (segments.length === 1 && JOB_DETAIL_PATH_RESERVED_FIRST_SEGMENTS.has(segments[0])) {
     return buildSiteMetadata({
       title: "Pagina nao encontrada",
       description: "Use os links do menu para estado, cidade ou empresa.",
@@ -98,7 +97,7 @@ export default async function VagasCatchAllPage({
     notFound();
   }
 
-  if (segments.length === 1 && RESERVED_SINGLE_SEGMENTS.has(segments[0])) {
+  if (segments.length === 1 && JOB_DETAIL_PATH_RESERVED_FIRST_SEGMENTS.has(segments[0])) {
     notFound();
   }
 

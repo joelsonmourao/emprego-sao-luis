@@ -10,7 +10,7 @@ import { SectionHeading } from "@/components/section-heading";
 import { Button } from "@/components/ui/button";
 import { sanitizeRichTextHtml } from "@/lib/rich-text";
 import { getCityJobsPath, getCompanyJobsPath, getStateJobsPath } from "@/lib/seo/jobs-pages";
-import { buildBreadcrumbJsonLd, buildJobPostingJsonLd } from "@/lib/seo/json-ld";
+import { buildBreadcrumbJsonLd } from "@/lib/seo/json-ld";
 import { getRelatedPosts } from "@/lib/repositories/blog";
 import { getJobBySlug, getRelatedJobs } from "@/lib/repositories/jobs";
 import { formatDate } from "@/lib/utils";
@@ -35,28 +35,6 @@ export async function JobDetailView({ job }: { job: JobWithRelations }) {
   return (
     <section className="mx-auto max-w-7xl space-y-6 px-4 py-6 sm:px-6 sm:py-8 sm:space-y-8 lg:px-8 lg:py-10">
       <JsonLd data={buildBreadcrumbJsonLd([{ name: "Home", path: "/" }, { name: "Vagas", path: "/vagas" }, { name: job.title, path: `/vagas/${job.slug}` }])} />
-      <JsonLd
-        data={buildJobPostingJsonLd({
-          id: job.id,
-          externalId: job.externalId,
-          title: job.title,
-          summary: job.summary,
-          descriptionHtml: job.descriptionHtml,
-          slug: job.slug,
-          companyName: job.companyName,
-          companyLogoUrl: job.company?.logoUrl ?? job.companyLogoUrl,
-          cityName: job.city.name,
-          stateCode: job.state.code,
-          stateName: job.state.name,
-          publishedAt: job.publishedAt.toISOString(),
-          expiresAt: job.expiresAt?.toISOString() ?? null,
-          validThrough: job.validThrough?.toISOString() ?? null,
-          employmentType: job.employmentType,
-          salaryMin: job.salaryMin,
-          salaryMax: job.salaryMax,
-          countryCode: "BR"
-        })}
-      />
 
       <Breadcrumbs items={[{ label: "Home", href: "/" }, { label: "Vagas", href: "/vagas" }, { label: job.title }]} />
 
