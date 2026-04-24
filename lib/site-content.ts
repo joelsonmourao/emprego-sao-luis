@@ -1,3 +1,5 @@
+import { cache } from "react";
+
 import { prisma } from "@/lib/db";
 import { deepMergeDefaults } from "@/lib/merge-defaults";
 import { defaultSiteContent, siteContentSchema, type SiteContent, type SiteFaqEntry } from "@/lib/schemas/site-admin";
@@ -5,7 +7,7 @@ import { defaultSiteContent, siteContentSchema, type SiteContent, type SiteFaqEn
 export { defaultSiteContent, siteContentSchema };
 export type { SiteContent, SiteFaqEntry };
 
-export async function getSiteContent(): Promise<SiteContent> {
+export const getSiteContent = cache(async (): Promise<SiteContent> => {
   const setting = await prisma.siteSetting.findUnique({
     where: { key: "site_content" }
   });
@@ -16,4 +18,4 @@ export async function getSiteContent(): Promise<SiteContent> {
 
   const parsed = siteContentSchema.safeParse(deepMergeDefaults(defaultSiteContent, setting.value));
   return parsed.success ? parsed.data : defaultSiteContent;
-}
+});

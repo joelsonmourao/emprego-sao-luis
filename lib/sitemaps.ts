@@ -371,6 +371,15 @@ export function createXmlResponse(xml: string) {
   });
 }
 
+/** XML válido quando o manifest não pode ser calculado (falha de banco, etc.). */
+export function buildEmptySitemapIndexXml() {
+  return buildSitemapIndexXml([]);
+}
+
+export function buildEmptyUrlSetXml() {
+  return buildUrlSetXml([]);
+}
+
 export function assertSitemapOriginSafety(xml: string) {
   const origin = getSiteOrigin();
   if (origin.includes("localhost") || origin.includes("vercel.app")) {

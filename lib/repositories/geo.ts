@@ -2,7 +2,7 @@ import { cache } from "react";
 
 import { prisma } from "@/lib/db";
 
-export async function getStates() {
+async function fetchStates() {
   return prisma.state.findMany({
     orderBy: [{ name: "asc" }],
     include: {
@@ -12,6 +12,8 @@ export async function getStates() {
     }
   });
 }
+
+export const getStates = cache(fetchStates);
 
 export async function getStateBySlug(slug: string) {
   return prisma.state.findUnique({
@@ -80,7 +82,7 @@ async function fetchSearchGeoData() {
 
 export const getSearchGeoData = cache(fetchSearchGeoData);
 
-export async function getCities() {
+async function fetchCities() {
   return prisma.city.findMany({
     include: {
       state: true,
@@ -91,6 +93,8 @@ export async function getCities() {
     orderBy: [{ name: "asc" }]
   });
 }
+
+export const getCities = cache(fetchCities);
 
 export async function getStatesBySlugs(slugs: string[]) {
   if (!slugs.length) return [];

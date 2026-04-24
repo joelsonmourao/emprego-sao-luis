@@ -1,8 +1,12 @@
-import { buildSitemapIndexXml, createXmlResponse, getSitemapManifest } from "@/lib/sitemaps";
+import { buildEmptySitemapIndexXml, buildSitemapIndexXml, createXmlResponse, getSitemapManifest } from "@/lib/sitemaps";
 
-export const revalidate = 3600;
+export const dynamic = "force-dynamic";
 
 export async function GET() {
-  const manifest = await getSitemapManifest();
-  return createXmlResponse(buildSitemapIndexXml(manifest.files));
+  try {
+    const manifest = await getSitemapManifest();
+    return createXmlResponse(buildSitemapIndexXml(manifest.files));
+  } catch {
+    return createXmlResponse(buildEmptySitemapIndexXml());
+  }
 }

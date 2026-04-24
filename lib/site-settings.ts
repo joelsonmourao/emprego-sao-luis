@@ -1,3 +1,5 @@
+import { cache } from "react";
+
 import { prisma } from "@/lib/db";
 import { deepMergeDefaults } from "@/lib/merge-defaults";
 import { defaultSiteSettings, siteSettingsSchema, type SiteSettings } from "@/lib/schemas/site-admin";
@@ -6,7 +8,7 @@ import { normalizeOrigin } from "@/lib/site-url";
 export { defaultSiteSettings, siteSettingsSchema };
 export type { SiteSettings };
 
-export async function getSiteSettings(): Promise<SiteSettings> {
+export const getSiteSettings = cache(async (): Promise<SiteSettings> => {
   const setting = await prisma.siteSetting.findUnique({
     where: { key: "site_settings" }
   });
@@ -29,4 +31,4 @@ export async function getSiteSettings(): Promise<SiteSettings> {
       searchConsolePropertyUrl: searchConsolePropertyUrl ?? parsed.data.google.searchConsolePropertyUrl
     }
   };
-}
+});

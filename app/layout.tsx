@@ -24,6 +24,9 @@ export const viewport: Viewport = {
   maximumScale: 5
 };
 
+/** Evita pré-render estático no build (menos transferência Neon em cada deploy). */
+export const dynamic = "force-dynamic";
+
 export async function generateMetadata(): Promise<Metadata> {
   const settings = await getSiteSettings();
 
