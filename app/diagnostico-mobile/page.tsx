@@ -59,7 +59,7 @@ export default function DiagnosticoMobilePage() {
     <main className="mx-auto max-w-3xl p-4 sm:p-6">
       <h1 className="text-xl font-bold text-slate-900">Diagnostico de viewport mobile</h1>
       <p className="mt-2 text-sm text-slate-600">
-        Abra esta pagina no aparelho com problema para validar se o Chrome esta em modo desktop.
+          Abra esta página no aparelho com problema para validar se o Chrome está em modo desktop.
       </p>
       <div className="mt-6 rounded-2xl border border-slate-200 bg-white p-4">
         <p className="text-xs uppercase tracking-wide text-slate-500">Atualizado em</p>

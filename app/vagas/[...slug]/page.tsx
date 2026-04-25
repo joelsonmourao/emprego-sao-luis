@@ -32,7 +32,7 @@ export async function generateMetadata({
 
   if (segments.length === 1 && JOB_DETAIL_PATH_RESERVED_FIRST_SEGMENTS.has(segments[0])) {
     return buildSiteMetadata({
-      title: "Pagina nao encontrada",
+      title: "Página não encontrada",
       description: "Use os links do menu para estado, cidade ou empresa.",
       pathname: `/vagas/${segments[0]}`,
       noIndex: true
@@ -45,8 +45,8 @@ export async function generateMetadata({
 
     if (!job) {
       return buildSiteMetadata({
-        title: "Vaga nao encontrada",
-        description: "A vaga solicitada nao foi encontrada.",
+        title: "Vaga não encontrada",
+        description: "A vaga solicitada não foi encontrada.",
         pathname: `/vagas/${jobSlug}`,
         noIndex: true
       });
@@ -87,8 +87,8 @@ export async function generateMetadata({
   }
 
   return buildSiteMetadata({
-    title: "Pagina nao encontrada",
-    description: "O caminho solicitado nao existe.",
+    title: "Página não encontrada",
+    description: "O caminho solicitado não existe.",
     pathname: `/vagas/${segments.join("/")}`,
     noIndex: true
   });

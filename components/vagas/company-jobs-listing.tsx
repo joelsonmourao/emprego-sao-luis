@@ -149,9 +149,9 @@ export async function CompanyJobsListing({
         <div className="space-y-6">
           <div className="rounded-[1.8rem] border border-slate-200 bg-white p-6 shadow-sm">
             <SectionHeading
-              eyebrow="Pagina de empresa"
+        eyebrow="Página de empresa"
               title={`Como encontrar vagas de Jovem Aprendiz no ${company.name}`}
-              description={`Use esta pagina para ver vagas atualizadas do ${company.name}, cidades onde a empresa esta contratando e caminhos relacionados para ampliar a busca sem cair em filtros tecnicos.`}
+        description={`Use esta página para ver vagas atualizadas do ${company.name}, cidades onde a empresa está contratando e caminhos relacionados para ampliar a busca sem cair em filtros técnicos.`}
             />
           </div>
 
@@ -166,7 +166,7 @@ export async function CompanyJobsListing({
             </>
           ) : (
             <div className="rounded-[1.8rem] border border-slate-200 bg-white p-6 text-sm text-[var(--brand-text-secondary)] shadow-sm">
-              Esta empresa ainda nao tem vagas ativas suficientes para uma pagina forte de listagem.
+            Esta empresa ainda não tem vagas ativas suficientes para uma página forte de listagem.
             </div>
           )}
 
@@ -215,7 +215,7 @@ export async function CompanyJobsListing({
       </div>
 
       <div className="space-y-6">
-        <SectionHeading eyebrow="Perguntas frequentes" title={`FAQ sobre Jovem Aprendiz no ${company.name}`} description="Bloco de apoio para fortalecer a pagina de empresa com respostas publicas e uteis." />
+      <SectionHeading eyebrow="Perguntas frequentes" title={`FAQ sobre Jovem Aprendiz no ${company.name}`} description="Bloco de apoio para fortalecer a página de empresa com respostas públicas e úteis." />
         <FaqList items={faq} />
       </div>
     </section>

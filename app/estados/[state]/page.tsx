@@ -26,8 +26,8 @@ export async function generateMetadata({ params }: { params: Promise<{ state: st
 
   if (!result) {
     return buildSiteMetadata({
-      title: "Estado nao encontrado",
-      description: "A pagina de estado nao foi encontrada.",
+      title: "Estado não encontrado",
+      description: "A página de estado não foi encontrada.",
       pathname: `/estados/${state}`,
       noIndex: true
     });

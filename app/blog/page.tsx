@@ -14,7 +14,7 @@ export const revalidate = 7200;
 export async function generateMetadata() {
   return buildSiteMetadata({
     title: "Blog sobre Jovem Aprendiz e primeiro emprego",
-    description: "Dicas de curriculo, entrevista, empresas que contratam e caminhos para conseguir a primeira vaga.",
+    description: "Dicas de currículo, entrevista, empresas que contratam e caminhos para conseguir a primeira vaga.",
     pathname: "/blog"
   });
 }
@@ -29,7 +29,7 @@ export default async function BlogPage() {
       <div className="brand-page-hero rounded-[2.2rem] border border-slate-200 px-6 py-8 shadow-[0_35px_120px_-70px_rgba(26,43,76,0.22)] sm:px-8">
         <SectionHeading
           eyebrow="Blog"
-          title="Dicas para curriculo, entrevista e primeiro emprego"
+        title="Dicas para currículo, entrevista e primeiro emprego"
           description={`Veja ${posts.total} post(s) com orientacoes para se preparar melhor antes de se candidatar.`}
         />
         <div className="mt-6 flex flex-wrap gap-3">
@@ -44,8 +44,8 @@ export default async function BlogPage() {
       <div className="brand-chip rounded-[2rem] p-6">
         <SectionHeading
           eyebrow="Para quem esta comecando"
-          title="Aprenda a se apresentar melhor antes de enviar o curriculo"
-          description="Os textos do blog ajudam a entender como montar curriculo, se sair melhor na entrevista e aproveitar as vagas de Jovem Aprendiz com mais preparo."
+        title="Aprenda a se apresentar melhor antes de enviar o currículo"
+        description="Os textos do blog ajudam a entender como montar currículo, se sair melhor na entrevista e aproveitar as vagas de Jovem Aprendiz com mais preparo."
         />
       </div>
       <div className="grid gap-6 lg:grid-cols-3">

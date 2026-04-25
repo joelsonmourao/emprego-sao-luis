@@ -6,7 +6,7 @@ import { getRecentPosts } from "@/lib/repositories/blog";
 
 export const metadata = buildMetadata({
   title: "Modelo de cadastro de post",
-  description: "Pagina de preparacao para o futuro painel admin do blog.",
+    description: "Página de preparação para o futuro painel admin do blog.",
   pathname: "/gestao/modelos/blog",
   noIndex: true
 });

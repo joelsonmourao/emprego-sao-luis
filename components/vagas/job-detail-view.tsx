@@ -204,7 +204,7 @@ export async function JobDetailView({ job }: { job: JobWithRelations }) {
         <aside className="space-y-4 sm:space-y-6">
           <div className="brand-soft-panel rounded-[1.5rem] border border-slate-200 p-4 shadow-[0_28px_100px_-60px_rgba(26,43,76,0.18)] sm:rounded-[1.8rem] sm:p-5 sm:rounded-[2rem] sm:p-6">
             <h2 className="text-xl font-black text-[var(--brand-navy)] leading-tight sm:text-2xl">Candidatura</h2>
-            <p className="mt-2 text-sm leading-6 text-[var(--brand-text-secondary)] sm:mt-3 sm:leading-7">Leia os requisitos com calma, atualize o curriculo e envie sua candidatura pelo link oficial da empresa.</p>
+          <p className="mt-2 text-sm leading-6 text-[var(--brand-text-secondary)] sm:mt-3 sm:leading-7">Leia os requisitos com calma, atualize o currículo e envie sua candidatura pelo link oficial da empresa.</p>
             <Button asChild size="lg" className="mt-4 w-full rounded-2xl sm:mt-5">
               <TrackedExternalLink href={job.applyUrl} target="_blank" rel="noreferrer" eventName="apply_click" entityType="job" entitySlug={job.slug}>
                 Candidatar-se

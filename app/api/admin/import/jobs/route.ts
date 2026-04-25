@@ -1,7 +1,7 @@
 import { AuditAction, EmploymentType, LocationType, type City, type Company, type Job, type State } from "@prisma/client";
 import { NextResponse } from "next/server";
 
-import { normalizeLines, normalizeSlug, parseOptionalDate, richTextFromInput } from "@/lib/admin/content";
+import { normalizeLines, normalizeSlug, parseOptionalDate, richTextFromInput, sanitizeText } from "@/lib/admin/content";
 import { writeAuditLog } from "@/lib/audit";
 import { requireApiRole } from "@/lib/authz";
 import { prisma } from "@/lib/db";
@@ -13,6 +13,37 @@ const RESPONSE_HEADERS = {
 };
 
 const IMPORT_BATCH_SIZE = 100;
+const CLAUDE_DESCRIPTION_MODEL = "claude-haiku-4-5-20251001";
+const BRAZILIAN_UFS = new Set([
+  "AC",
+  "AL",
+  "AM",
+  "AP",
+  "BA",
+  "CE",
+  "DF",
+  "ES",
+  "GO",
+  "MA",
+  "MG",
+  "MS",
+  "MT",
+  "PA",
+  "PB",
+  "PE",
+  "PI",
+  "PR",
+  "RJ",
+  "RN",
+  "RO",
+  "RR",
+  "RS",
+  "SC",
+  "SE",
+  "SP",
+  "TO"
+]);
+const INVALID_AREA_VALUES = ["caxias", "sao paulo", "rio de janeiro", "fortaleza", "salvador", "curitiba", "belo horizonte", "brasil", "br"];
 
 type ImportIssue = {
   line: number;
@@ -41,6 +72,92 @@ function normalizeKey(input: string) {
     .normalize("NFD")
     .replace(/[\u0300-\u036f]/g, "")
     .toLowerCase();
+}
+
+function normalizeBrazilianUf(value: string | null | undefined) {
+  const uf = String(value ?? "").trim().toUpperCase();
+  return BRAZILIAN_UFS.has(uf) ? uf : null;
+}
+
+function sanitizeArea(value: string | null | undefined) {
+  const area = sanitizeText(value);
+  const normalized = normalizeKey(area);
+
+  if (!area || INVALID_AREA_VALUES.some((invalid) => normalized.includes(invalid))) {
+    return "Administrativo";
+  }
+
+  return area;
+}
+
+function sanitizeImportedRow(row: ImportedJobRow): ImportedJobRow {
+  return {
+    ...row,
+    title: sanitizeText(row.title),
+    descriptionHtml: sanitizeText(row.descriptionHtml),
+    summary: sanitizeText(row.summary),
+    requirementsText: sanitizeText(row.requirementsText),
+    benefitsText: sanitizeText(row.benefitsText),
+    area: sanitizeArea(row.area),
+    stateName: normalizeBrazilianUf(row.stateName) ?? ""
+  };
+}
+
+function sleep(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+async function generateUniqueDescriptionWithClaude(row: ImportedJobRow) {
+  const apiKey = process.env.ANTHROPIC_API_KEY;
+  if (!apiKey) {
+    return row.descriptionHtml;
+  }
+
+  try {
+    const response = await fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-api-key": apiKey,
+        "anthropic-version": "2023-06-01"
+      },
+      body: JSON.stringify({
+        model: CLAUDE_DESCRIPTION_MODEL,
+        max_tokens: 700,
+        temperature: 0.4,
+        system:
+          "Você escreve descrições para um portal de vagas de Jovem Aprendiz. O portal NÃO é a empresa contratante — apenas divulga a vaga. Escreva em 2 a 3 parágrafos, tom informativo e acolhedor para jovens de 14 a 24 anos. Não invente informações que não foram fornecidas. Não use bullet points. Não use slogans da empresa. Comece descrevendo a oportunidade, depois mencione o perfil esperado, depois os benefícios.",
+        messages: [
+          {
+            role: "user",
+            content: [
+              `title: ${row.title}`,
+              `company: ${row.companyName}`,
+              `city: ${row.cityName}`,
+              `state: ${row.stateName}`,
+              `area: ${row.area || "Administrativo"}`,
+              `requirements: ${row.requirementsText}`,
+              `benefits: ${row.benefitsText}`
+            ].join("\n")
+          }
+        ]
+      })
+    });
+
+    if (!response.ok) {
+      console.warn("Claude falhou ao gerar descricao unica:", response.status, await response.text());
+      return row.descriptionHtml;
+    }
+
+    const data = (await response.json()) as { content?: Array<{ type?: string; text?: string }> };
+    const text = data.content?.find((item) => item.type === "text" && item.text)?.text?.trim();
+    return text ? sanitizeText(text) : row.descriptionHtml;
+  } catch (error) {
+    console.warn("Claude indisponivel; usando descricao original.", error);
+    return row.descriptionHtml;
+  } finally {
+    await sleep(500);
+  }
 }
 
 function chunkArray<T>(items: T[], size: number) {
@@ -198,6 +315,9 @@ async function ensureStates(rows: ImportedJobRow[]) {
   const missingStates = new Map<string, { name: string; code: string; slug: string }>();
 
   for (const row of rows) {
+    const normalizedStateCode = normalizeBrazilianUf(row.stateName);
+    if (!normalizedStateCode) continue;
+
     const stateName = row.stateName.trim();
     const lookupByName = maps.byName.get(normalizeKey(stateName));
     const lookupByCode = maps.byCode.get(normalizeKey(stateName));
@@ -393,7 +513,9 @@ async function buildImportContext(rows: ImportedJobRow[]): Promise<ImportContext
 }
 
 function resolveState(context: ImportContext, row: ImportedJobRow) {
-  return context.statesByName.get(normalizeKey(row.stateName)) ?? context.statesByCode.get(normalizeKey(row.stateName)) ?? null;
+  const stateCode = normalizeBrazilianUf(row.stateName);
+  if (!stateCode) return null;
+  return context.statesByCode.get(normalizeKey(stateCode)) ?? null;
 }
 
 function resolveCity(context: ImportContext, stateId: string, row: ImportedJobRow) {
@@ -441,7 +563,7 @@ function buildJobData(row: ImportedJobRow, state: State, city: City, company: Co
   };
 }
 
-async function processRows(rows: ImportedJobRow[], context: ImportContext) {
+async function processRows(rows: ImportedJobRow[], context: ImportContext, options?: { useAi?: boolean }) {
   const operations: Array<
     ReturnType<typeof prisma.job.create> | ReturnType<typeof prisma.job.update> | ReturnType<typeof prisma.job.upsert>
   > = [];
@@ -472,7 +594,13 @@ async function processRows(rows: ImportedJobRow[], context: ImportContext) {
       const existing = existingByExternalId ?? (!externalId ? existingBySlug : null);
       const keepCurrentSlug = existingByExternalId?.slug ?? (!externalId ? existingBySlug?.slug : undefined);
       const uniqueSlug = ensureUniqueJobSlug(baseSlug, context.usedJobSlugs, keepCurrentSlug);
-      const data = buildJobData(row, state, city, company, uniqueSlug, existing ?? undefined);
+      const rowForSave = options?.useAi
+        ? {
+            ...row,
+            descriptionHtml: await generateUniqueDescriptionWithClaude(row)
+          }
+        : row;
+      const data = buildJobData(rowForSave, state, city, company, uniqueSlug, existing ?? undefined);
 
       if (externalId) {
         const alreadyKnown = context.jobsByExternalId.has(externalId);
@@ -556,12 +684,13 @@ export async function POST(request: Request) {
     }
 
     const payload = importJobsPayloadSchema.parse(rawBody);
-    if (!payload.rows.length) {
+    const rows = payload.rows.map(sanitizeImportedRow);
+    if (!rows.length) {
       return buildJsonError(400, "Nenhuma linha valida foi enviada para importacao.");
     }
 
-    const context = await buildImportContext(payload.rows);
-    await processRows(payload.rows, context);
+    const context = await buildImportContext(rows);
+    await processRows(rows, context, { useAi: payload.useAi });
 
     if (context.imported.length || context.updated.length) {
       revalidatePublicSurfacesAfterBulkJobChange();
@@ -590,11 +719,11 @@ export async function POST(request: Request) {
       {
         ok: true,
         summary: {
-          totalRows: payload.rows.length,
+          totalRows: rows.length,
           importedCount: context.imported.length,
           updatedCount: context.updated.length,
           errorCount: context.issues.length,
-          successRate: Math.round(((context.imported.length + context.updated.length) / payload.rows.length) * 100),
+          successRate: Math.round(((context.imported.length + context.updated.length) / rows.length) * 100),
           durationMs
         },
         results: {

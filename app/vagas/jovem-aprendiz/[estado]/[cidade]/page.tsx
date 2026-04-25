@@ -45,8 +45,8 @@ export async function generateMetadata({
 
   if (!city) {
     return buildSiteMetadata({
-      title: "Cidade nao encontrada",
-      description: "Pagina nao encontrada.",
+      title: "Cidade não encontrada",
+      description: "Página não encontrada.",
       pathname,
       noIndex: true
     });
@@ -152,7 +152,7 @@ export default async function JovemAprendizCidadePage({
 
       {noIndex ? (
         <p className="rounded-2xl border border-amber-200 bg-amber-50 p-6 text-sm text-amber-900">
-          Sem vagas ativas para indexar esta URL. Quando houver oportunidades, a pagina sera indexada.
+          Sem vagas ativas para indexar esta URL. Quando houver oportunidades, a página será indexada.
         </p>
       ) : null}
 

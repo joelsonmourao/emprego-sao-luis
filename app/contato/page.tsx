@@ -75,7 +75,7 @@ export default async function ContactPage() {
                 ))
               ) : (
                 <div className="rounded-[1.5rem] border border-dashed border-[color:rgba(26,43,76,0.16)] bg-white px-4 py-4 text-sm leading-7 text-[var(--brand-text-secondary)]">
-                  Os canais diretos ainda nao foram publicados nas configuracoes do portal. Enquanto isso, a equipe pode atualizar estes dados pelo painel administrativo.
+            Os canais diretos ainda não foram publicados nas configurações do portal. Enquanto isso, a equipe pode atualizar estes dados pelo painel administrativo.
                 </div>
               )}
             </div>
@@ -85,7 +85,7 @@ export default async function ContactPage() {
             <ul className="mt-4 space-y-3 text-sm leading-7 text-[var(--brand-text-secondary)]">
               <li>- Erro em vaga, link quebrado ou informacao desatualizada</li>
               <li>- Dificuldade de navegacao, busca ou filtros</li>
-              <li>- Sugestao de conteudo para curriculo, entrevista e primeiro emprego</li>
+            <li>- Sugestão de conteúdo para currículo, entrevista e primeiro emprego</li>
               <li>- Atualizacao institucional e assuntos ligados a empresas parceiras</li>
             </ul>
             <p className="mt-4 text-sm leading-7 text-[var(--brand-text-secondary)]">{settings.supportText}</p>

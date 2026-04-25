@@ -45,8 +45,8 @@ export async function generateMetadata({
 
   if (!category) {
     return buildSiteMetadata({
-      title: "Categoria nao encontrada",
-      description: "Pagina nao encontrada.",
+      title: "Categoria não encontrada",
+      description: "Página não encontrada.",
       pathname,
       noIndex: true
     });

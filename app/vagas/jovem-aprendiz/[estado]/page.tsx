@@ -45,8 +45,8 @@ export async function generateMetadata({
 
   if (!state) {
     return buildSiteMetadata({
-      title: "Estado nao encontrado",
-      description: "Pagina nao encontrada.",
+      title: "Estado não encontrado",
+      description: "Página não encontrada.",
       pathname,
       noIndex: true
     });
@@ -139,7 +139,7 @@ export default async function JovemAprendizEstadoPage({
 
       {noIndex ? (
         <p className="rounded-2xl border border-amber-200 bg-amber-50 p-6 text-sm text-amber-900">
-          Ainda nao ha vagas ativas suficientes para indexar esta pagina. Quando novas oportunidades entrarem, ela passa a ser indexada automaticamente.
+          Ainda não há vagas ativas suficientes para indexar esta página. Quando novas oportunidades entrarem, ela passa a ser indexada automaticamente.
         </p>
       ) : null}
 

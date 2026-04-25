@@ -45,8 +45,8 @@ export async function SiteFooter() {
             <div className="mt-3 flex flex-col gap-2">
               <Link href="/sobre" className="hover:text-[var(--brand-orange)]">Sobre</Link>
               <Link href="/contato" className="hover:text-[var(--brand-orange)]">Contato</Link>
-              <Link href="/politica-de-privacidade" className="hover:text-[var(--brand-orange)]">Politica de Privacidade</Link>
-              <Link href="/politica-de-cookies" className="hover:text-[var(--brand-orange)]">Politica de Cookies</Link>
+              <Link href="/politica-de-privacidade" className="hover:text-[var(--brand-orange)]">Política de Privacidade</Link>
+              <Link href="/politica-de-cookies" className="hover:text-[var(--brand-orange)]">Política de Cookies</Link>
               <Link href="/termos-de-uso" className="hover:text-[var(--brand-orange)]">Termos de Uso</Link>
             </div>
           </div>

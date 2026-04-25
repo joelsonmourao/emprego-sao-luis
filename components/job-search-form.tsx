@@ -35,7 +35,7 @@ export function JobSearchForm({
   states,
   action = "/busca",
   submitLabel = "Buscar vagas",
-  helperText = "Use cargo, cidade e estado para chegar mais rapido nas vagas.",
+  helperText = "Use cargo, cidade e estado para chegar mais rápido nas vagas.",
   footerLinkHref = "/vagas",
   footerLinkLabel = "Ver todas as vagas",
   initialQuery = "",

@@ -21,8 +21,8 @@ export default async function CookiesPolicyPage() {
 
   return (
     <section className="mx-auto max-w-4xl space-y-8 px-4 py-14 sm:px-6 lg:px-8">
-      <JsonLd data={buildBreadcrumbJsonLd([{ name: "Home", path: "/" }, { name: "Politica de Cookies", path: "/politica-de-cookies" }])} />
-      <Breadcrumbs items={[{ label: "Home", href: "/" }, { label: "Politica de Cookies" }]} />
+      <JsonLd data={buildBreadcrumbJsonLd([{ name: "Home", path: "/" }, { name: "Política de Cookies", path: "/politica-de-cookies" }])} />
+      <Breadcrumbs items={[{ label: "Home", href: "/" }, { label: "Política de Cookies" }]} />
       <div className="brand-page-hero rounded-[2.2rem] border border-slate-200 px-6 py-8 shadow-[0_35px_120px_-70px_rgba(26,43,76,0.22)] sm:px-8">
         <SectionHeading eyebrow="Cookies" title={siteContent.pages.cookies.title} description={siteContent.pages.cookies.description} />
       </div>
@@ -38,11 +38,11 @@ export default async function CookiesPolicyPage() {
               </div>
               <div>
                 <p className="font-semibold text-[var(--brand-navy)]">Analiticos</p>
-                <p>{settings.google.analyticsEnabled ? "Podem ser usados para medir navegacao e desempenho, sempre respeitando a preferencia do usuario." : "A estrutura esta pronta, mas a medicao opcional ainda nao esta ativa nesta configuracao."}</p>
+            <p>{settings.google.analyticsEnabled ? "Podem ser usados para medir navegação e desempenho, sempre respeitando a preferência do usuário." : "A estrutura está pronta, mas a medição opcional ainda não está ativa nesta configuração."}</p>
               </div>
               <div>
                 <p className="font-semibold text-[var(--brand-navy)]">Marketing</p>
-                <p>{settings.google.adsenseEnabled ? "Podem ser usados para publicidade quando esta categoria for autorizada." : "A categoria continua prevista no controle de preferencias, mas publicidade ainda nao esta ativa nesta configuracao."}</p>
+            <p>{settings.google.adsenseEnabled ? "Podem ser usados para publicidade quando esta categoria for autorizada." : "A categoria continua prevista no controle de preferências, mas publicidade ainda não está ativa nesta configuração."}</p>
               </div>
             </div>
           </div>

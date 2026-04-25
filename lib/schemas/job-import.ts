@@ -10,6 +10,7 @@ export const importedJobRowSchema = z.object({
   descriptionHtml: z.string().min(40, "Descricao obrigatoria."),
   requirementsText: z.string().min(5, "Requisitos obrigatorios."),
   benefitsText: z.string().optional().default(""),
+  area: z.string().optional().default(""),
   salaryMin: z.preprocess((val) => (val === "" ? null : Number(val)), z.number().nullable().optional()),
   salaryMax: z.preprocess((val) => (val === "" ? null : Number(val)), z.number().nullable().optional()),
   employmentType: z.enum(["APPRENTICESHIP", "INTERNSHIP", "TEMPORARY", "PART_TIME", "FULL_TIME"]).default("APPRENTICESHIP"),
@@ -34,7 +35,8 @@ export const importedJobRowSchema = z.object({
 });
 
 export const importJobsPayloadSchema = z.object({
-  rows: z.array(importedJobRowSchema)
+  rows: z.array(importedJobRowSchema),
+  useAi: z.boolean().optional().default(false)
 });
 
 export type ImportedJobRow = z.infer<typeof importedJobRowSchema>;

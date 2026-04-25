@@ -25,6 +25,8 @@ const aliases: Record<string, string> = {
   requisitos: "requirementsText",
   benefits: "benefitsText",
   beneficios: "benefitsText",
+  area: "area",
+  categoria: "area",
   salary: "salaryMin",
   salario: "salaryMin",
   salarymin: "salaryMin",
@@ -120,6 +122,7 @@ export function AdminJobImporter() {
   const [fileName, setFileName] = useState("");
   const [resultMessage, setResultMessage] = useState("");
   const [isImporting, setIsImporting] = useState(false);
+  const [useAi, setUseAi] = useState(false);
 
   const validRows = useMemo(
     () => rows.filter((row) => row.valid && row.data).map((row) => row.data as ImportedJobRow),
@@ -157,6 +160,7 @@ export function AdminJobImporter() {
         descriptionHtml: String(normalized.descriptionHtml ?? "").trim(),
         requirementsText: String(normalized.requirementsText ?? "").trim(),
         benefitsText: String(normalized.benefitsText ?? "").trim(),
+        area: String(normalized.area ?? "").trim(),
         salaryMin: parseOptionalNumber(normalized.salaryMin),
         salaryMax: parseOptionalNumber(normalized.salaryMax),
         employmentType: String(normalized.employmentType ?? "APPRENTICESHIP").trim().toUpperCase(),
@@ -202,7 +206,7 @@ export function AdminJobImporter() {
       const response = await fetch("/api/admin/import/jobs", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ rows: validRows })
+        body: JSON.stringify({ rows: validRows, useAi })
       });
 
       const result = await parseImportResponse(response);
@@ -288,6 +292,10 @@ export function AdminJobImporter() {
           </div>
 
           <div className="flex flex-wrap gap-3">
+            <label className="flex items-center gap-2 rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700">
+              <input type="checkbox" checked={useAi} onChange={(event) => setUseAi(event.target.checked)} />
+              Gerar descricoes unicas com IA
+            </label>
             <Button type="button" size="lg" onClick={handleImport} disabled={isImporting || !validRows.length}>
               {isImporting ? "Importando..." : "Importar linhas validas"}
             </Button>

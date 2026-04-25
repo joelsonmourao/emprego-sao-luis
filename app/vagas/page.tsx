@@ -234,7 +234,7 @@ export default async function JobsPage({
         </>
       ) : (
         <EmptyState
-          title="Ainda nao encontramos vagas com essa combinacao"
+        title="Ainda não encontramos vagas com essa combinação"
           description="Tente remover alguns filtros ou navegar pelas paginas de cidade e estado para encontrar mais oportunidades."
         />
       )}
@@ -255,7 +255,7 @@ export default async function JobsPage({
           <SectionHeading
             eyebrow="Continue a busca"
             title="Use cidade, estado e empresa para encontrar uma vaga com mais foco"
-            description="Quanto mais perto a busca ficar da sua realidade, mais rapido voce chega nas vagas que combinam com a sua rotina."
+        description="Quanto mais perto a busca ficar da sua realidade, mais rápido você chega nas vagas que combinam com a sua rotina."
           />
           <div className="mt-4 flex flex-wrap gap-2 sm:mt-6 sm:gap-3">
             {states.slice(0, 6).map((state) => (

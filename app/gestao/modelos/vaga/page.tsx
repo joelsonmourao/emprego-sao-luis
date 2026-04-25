@@ -7,7 +7,7 @@ import { getCompanyAdminOptions, getRecentJobs } from "@/lib/repositories/jobs";
 
 export const metadata = buildMetadata({
   title: "Modelo de cadastro de vaga",
-  description: "Pagina de preparacao para o futuro painel admin de vagas.",
+    description: "Página de preparação para o futuro painel admin de vagas.",
   pathname: "/gestao/modelos/vaga",
   noIndex: true
 });

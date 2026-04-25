@@ -33,11 +33,11 @@ export default async function AboutPage() {
         <div className="prose-content rounded-[2rem] border border-slate-200 bg-white p-8 text-slate-700 shadow-sm" dangerouslySetInnerHTML={{ __html: sanitizeRichTextHtml(siteContent.pages.about.contentHtml) }} />
         <div className="space-y-6">
           <div className="brand-chip rounded-[2rem] p-8">
-            <h2 className="text-xl font-black text-[var(--brand-navy)]">O que voce encontra aqui</h2>
+          <h2 className="text-xl font-black text-[var(--brand-navy)]">O que você encontra aqui</h2>
             <ul className="mt-4 space-y-3 text-sm leading-7 text-[var(--brand-text-secondary)]">
               <li>- Vagas por cidade, estado e empresa</li>
               <li>- Paginas organizadas para facilitar comparacao</li>
-              <li>- Conteudos para curriculo, entrevista e candidatura</li>
+            <li>- Conteúdos para currículo, entrevista e candidatura</li>
               <li>- Navegacao pensada para funcionar bem no celular</li>
             </ul>
           </div>

@@ -33,7 +33,7 @@ export const revalidate = 600;
 export async function generateMetadata() {
   return buildSiteMetadata({
     title: "Jovem Aprendiz Vagas no Brasil",
-    description: "Encontre vagas de Jovem Aprendiz por cidade e estado, veja empresas que contratam e acesse dicas para curriculo, entrevista e primeiro emprego.",
+    description: "Encontre vagas de Jovem Aprendiz por cidade e estado, veja empresas que contratam e acesse dicas para currículo, entrevista e primeiro emprego.",
     pathname: "/"
   });
 }
@@ -303,9 +303,9 @@ export default async function HomePage() {
           </div>
 
           <div className="brand-dark-panel rounded-[1.5rem] p-5 text-white shadow-[0_30px_100px_-50px_rgba(26,43,76,0.78)] sm:rounded-[2rem] sm:p-7">
-            <h2 className="text-lg font-black leading-tight sm:text-xl">Oportunidades por cidade ajudam a filtrar mais rapido</h2>
+            <h2 className="text-lg font-black leading-tight sm:text-xl">Oportunidades por cidade ajudam a filtrar mais rápido</h2>
             <p className="mt-2 text-sm leading-6 text-white/84 sm:mt-3 sm:leading-7">
-              Quando voce entra por cidade ou empresa, a navegacao fica menos genérica e o portal mostra oportunidades mais perto do seu contexto.
+              Quando você entra por cidade ou empresa, a navegação fica menos genérica e o portal mostra oportunidades mais perto do seu contexto.
             </p>
             <div className="mt-4 flex flex-wrap gap-2 sm:mt-5 sm:gap-3">
               {cities.slice(0, 5).map((city) => (

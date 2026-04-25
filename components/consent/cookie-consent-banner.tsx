@@ -99,7 +99,7 @@ export function CookieConsentBanner({ config, initialConsentValue = null }: { co
               <p className="text-sm leading-7 text-slate-600">
                 {config.description}{" "}
                 <Link href={config.policyHref as never} className="font-semibold text-[var(--brand-blue)] underline-offset-4 hover:text-[var(--brand-orange)] hover:underline">
-                  Ver politica de cookies
+            Ver política de cookies
                 </Link>
               </p>
             </div>

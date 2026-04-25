@@ -37,15 +37,15 @@ export default async function TermsPage() {
             <h2 className="text-xl font-black text-[var(--brand-navy)]">Pontos principais</h2>
             <ul className="mt-4 space-y-3 text-sm leading-7 text-[var(--brand-text-secondary)]">
               <li>- O portal organiza vagas e conteudos, mas a candidatura final acontece no link oficial informado</li>
-              <li>- Informacoes de vagas podem mudar conforme a empresa ou a fonte original</li>
-              <li>- Navegacao abusiva, copia indevida e acesso nao autorizado ao admin nao sao permitidos</li>
+            <li>- Informações de vagas podem mudar conforme a empresa ou a fonte original</li>
+            <li>- Navegação abusiva, cópia indevida e acesso não autorizado ao admin não são permitidos</li>
             </ul>
           </div>
           <div className="brand-soft-panel rounded-[2rem] border border-slate-200 p-8">
-            <h2 className="text-xl font-black text-[var(--brand-navy)]">Contato para duvidas</h2>
-            <p className="mt-3 text-sm leading-7 text-[var(--brand-text-secondary)]">
-              {settings.email ? `Se voce tiver duvidas sobre estas regras, use o e-mail ${settings.email}.` : "Quando o canal institucional principal estiver configurado, ele aparece aqui para facilitar o contato sobre uso do portal."}
-            </p>
+          <h2 className="text-xl font-black text-[var(--brand-navy)]">Contato para dúvidas</h2>
+          <p className="mt-3 text-sm leading-7 text-[var(--brand-text-secondary)]">
+            {settings.email ? `Se você tiver dúvidas sobre estas regras, use o e-mail ${settings.email}.` : "Quando o canal institucional principal estiver configurado, ele aparece aqui para facilitar o contato sobre uso do portal."}
+          </p>
           </div>
         </div>
       </div>

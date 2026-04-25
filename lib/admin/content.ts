@@ -151,6 +151,15 @@ export function normalizeLines(input: string) {
     .filter(Boolean);
 }
 
+export function sanitizeText(input: string | null | undefined) {
+  return String(input ?? "")
+    .replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F\u200B-\u200D\uFEFF]/g, "")
+    .replace(/\r\n/g, "\n")
+    .replace(/\n+/g, " ")
+    .replace(/\s{2,}/g, " ")
+    .trim();
+}
+
 export function normalizeSlug(input: string) {
   return slugify(input).slice(0, 120);
 }

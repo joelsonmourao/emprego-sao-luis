@@ -43,8 +43,8 @@ export async function generateMetadata({
 
   if (!city) {
     return buildSiteMetadata({
-      title: "Cidade nao encontrada",
-      description: "A pagina de cidade solicitada nao foi encontrada.",
+      title: "Cidade não encontrada",
+      description: "A página de cidade solicitada não foi encontrada.",
       pathname: getCityJobsPath(slug),
       noIndex: true
     });
@@ -185,7 +185,7 @@ export default async function JobsByCityCleanPage({
             <SectionHeading
               eyebrow="Busca local"
               title={`Empresas e oportunidades de Jovem Aprendiz em ${city.name}`}
-              description={`Use esta pagina para acompanhar vagas por empresa, comparar oportunidades recentes e navegar para o estado de ${state.name} e cidades proximas com mais contratacoes.`}
+        description={`Use esta página para acompanhar vagas por empresa, comparar oportunidades recentes e navegar para o estado de ${state.name} e cidades próximas com mais contratações.`}
             />
           </div>
 
@@ -200,14 +200,14 @@ export default async function JobsByCityCleanPage({
             </>
           ) : (
             <div className="rounded-[1.8rem] border border-slate-200 bg-white p-6 text-sm text-[var(--brand-text-secondary)] shadow-sm">
-              Ainda nao existem vagas ativas suficientes nesta cidade para indexacao forte.
+              Ainda não existem vagas ativas suficientes nesta cidade para indexação forte.
             </div>
           )}
 
           <div className="rounded-[1.8rem] border border-slate-200 bg-white p-6 shadow-sm">
             <SectionHeading
               eyebrow="Mais contexto"
-              title={`Como usar esta pagina para encontrar Jovem Aprendiz em ${city.name}`}
+        title={`Como usar esta página para encontrar Jovem Aprendiz em ${city.name}`}
               description={`Acompanhe novas vagas, veja empresas contratando em ${city.name}, ${city.state.code}, compare requisitos frequentes e continue a busca por oportunidades semelhantes no estado.`}
             />
           </div>
@@ -251,7 +251,7 @@ export default async function JobsByCityCleanPage({
       </div>
 
       <div className="space-y-6">
-        <SectionHeading eyebrow="Perguntas frequentes" title={`FAQ sobre Jovem Aprendiz em ${city.name}, ${city.state.code}`} description="Respostas objetivas para fortalecer a navegacao e a intencao de busca desta pagina." />
+      <SectionHeading eyebrow="Perguntas frequentes" title={`FAQ sobre Jovem Aprendiz em ${city.name}, ${city.state.code}`} description="Respostas objetivas para fortalecer a navegação e a intenção de busca desta página." />
         <FaqList items={faq} />
       </div>
     </section>

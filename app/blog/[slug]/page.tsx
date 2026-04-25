@@ -18,8 +18,8 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 
   if (!post) {
     return buildSiteMetadata({
-      title: "Post nao encontrado",
-      description: "O conteudo solicitado nao foi encontrado.",
+      title: "Post não encontrado",
+      description: "O conteúdo solicitado não foi encontrado.",
       pathname: `/blog/${slug}`,
       noIndex: true
     });
@@ -58,7 +58,7 @@ export default async function BlogDetailPage({ params }: { params: Promise<{ slu
           <div className="brand-panel rounded-[2rem] border border-slate-200 p-8 shadow-[0_25px_80px_-50px_rgba(26,43,76,0.2)]">
             <h2 className="text-2xl font-black text-[var(--brand-navy)]">Continue lendo</h2>
             <p className="mt-3 text-base leading-8 text-[var(--brand-text-secondary)]">
-              Se este conteudo te ajudou, aproveite para ver empresas com vagas e mais textos sobre curriculo, entrevista e primeiro emprego.
+        Se este conteúdo te ajudou, aproveite para ver empresas com vagas e mais textos sobre currículo, entrevista e primeiro emprego.
             </p>
             <div className="mt-4 flex flex-wrap gap-3">
               {companies.slice(0, 4).map((company) => (

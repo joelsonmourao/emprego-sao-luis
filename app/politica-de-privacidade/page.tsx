@@ -21,8 +21,8 @@ export default async function PrivacyPage() {
 
   return (
     <section className="mx-auto max-w-4xl space-y-8 px-4 py-14 sm:px-6 lg:px-8">
-      <JsonLd data={buildBreadcrumbJsonLd([{ name: "Home", path: "/" }, { name: "Politica de Privacidade", path: "/politica-de-privacidade" }])} />
-      <Breadcrumbs items={[{ label: "Home", href: "/" }, { label: "Politica de Privacidade" }]} />
+      <JsonLd data={buildBreadcrumbJsonLd([{ name: "Home", path: "/" }, { name: "Política de Privacidade", path: "/politica-de-privacidade" }])} />
+      <Breadcrumbs items={[{ label: "Home", href: "/" }, { label: "Política de Privacidade" }]} />
       <div className="brand-page-hero rounded-[2.2rem] border border-slate-200 px-6 py-8 shadow-[0_35px_120px_-70px_rgba(26,43,76,0.22)] sm:px-8">
         <SectionHeading
           eyebrow="Privacidade"
@@ -34,7 +34,7 @@ export default async function PrivacyPage() {
         <div className="prose-content rounded-[2rem] border border-slate-200 bg-white p-8 text-slate-700 shadow-sm" dangerouslySetInnerHTML={{ __html: sanitizeRichTextHtml(siteContent.pages.privacy.contentHtml) }} />
         <div className="space-y-6">
           <div className="brand-chip rounded-[2rem] p-8">
-            <h2 className="text-xl font-black text-[var(--brand-navy)]">Resumo rapido</h2>
+          <h2 className="text-xl font-black text-[var(--brand-navy)]">Resumo rápido</h2>
             <ul className="mt-4 space-y-3 text-sm leading-7 text-[var(--brand-text-secondary)]">
               <li>- O portal trata dados de navegacao e contato quando isso faz sentido para operar o servico</li>
               <li>- Recursos de medicao opcionais dependem de configuracao e consentimento</li>

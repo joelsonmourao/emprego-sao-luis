@@ -44,8 +44,8 @@ export async function generateMetadata({
 
   if (!company) {
     return buildSiteMetadata({
-      title: "Empresa nao encontrada",
-      description: "Pagina nao encontrada.",
+      title: "Empresa não encontrada",
+      description: "Página não encontrada.",
       pathname,
       noIndex: true
     });
@@ -139,13 +139,13 @@ export default async function JovemAprendizEmpresaPage({
 
       {noIndex ? (
         <p className="rounded-2xl border border-amber-200 bg-amber-50 p-6 text-sm text-amber-900">
-          Sem vagas ativas para indexar esta pagina de empresa.
+          Sem vagas ativas para indexar esta página de empresa.
         </p>
       ) : null}
 
       <div className="space-y-6">
         <div className="rounded-[1.8rem] border border-slate-200 bg-white p-6 shadow-sm">
-          <SectionHeading eyebrow="Listagem" title={`Vagas na ${company.name}`} description="Cards com resumo e link para a pagina completa da vaga." />
+      <SectionHeading eyebrow="Listagem" title={`Vagas na ${company.name}`} description="Cards com resumo e link para a página completa da vaga." />
         </div>
 
         {jobs.items.length ? (
@@ -165,7 +165,7 @@ export default async function JovemAprendizEmpresaPage({
 
         <p className="text-sm">
           <Link href={getCompanyJobsPath(company.slug)} className="font-semibold text-[var(--brand-blue)] hover:text-[var(--brand-orange)]">
-            Ver pagina classica da empresa
+            Ver página clássica da empresa
           </Link>
         </p>
       </div>

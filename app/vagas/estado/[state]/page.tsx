@@ -42,8 +42,8 @@ export async function generateMetadata({
   const stateData = await getStateBySlug(state);
   if (!stateData) {
     return buildSiteMetadata({
-      title: "Estado nao encontrado",
-      description: "A listagem estadual nao foi encontrada.",
+      title: "Estado não encontrado",
+      description: "A listagem estadual não foi encontrada.",
       pathname: getStateJobsPath(state),
       noIndex: true
     });
@@ -162,7 +162,7 @@ export default async function JobsByStatePage({
             <SectionHeading
               eyebrow="Busca por estado"
               title={`Vagas e empresas de Jovem Aprendiz no ${stateData.name}`}
-              description={`Esta pagina concentra vagas por cidade, empresas contratando no ${stateData.name} e caminhos internos para continuar a busca em paginas mais especificas.`}
+        description={`Esta página concentra vagas por cidade, empresas contratando no ${stateData.name} e caminhos internos para continuar a busca em páginas mais específicas.`}
             />
           </div>
 
@@ -177,7 +177,7 @@ export default async function JobsByStatePage({
             </>
           ) : (
             <div className="rounded-[1.8rem] border border-slate-200 bg-white p-6 text-sm text-[var(--brand-text-secondary)] shadow-sm">
-              Ainda nao existem vagas suficientes neste estado para uma pagina forte de SEO.
+              Ainda não existem vagas suficientes neste estado para uma página forte de SEO.
             </div>
           )}
 
@@ -225,7 +225,7 @@ export default async function JobsByStatePage({
       </div>
 
       <div className="space-y-6">
-        <SectionHeading eyebrow="Perguntas frequentes" title={`FAQ sobre Jovem Aprendiz no ${stateData.name}`} description="Perguntas publicas para reforcar contexto, intencao de busca e utilidade da pagina." />
+      <SectionHeading eyebrow="Perguntas frequentes" title={`FAQ sobre Jovem Aprendiz no ${stateData.name}`} description="Perguntas públicas para reforçar contexto, intenção de busca e utilidade da página." />
         <FaqList items={faq} />
       </div>
     </section>
