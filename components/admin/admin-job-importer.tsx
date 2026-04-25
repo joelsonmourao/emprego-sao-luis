@@ -62,6 +62,8 @@ type ParsedPreview = {
 type ImportApiResponse = {
   ok: boolean;
   error?: string;
+  queueId?: string;
+  status?: string;
   summary?: {
     totalRows: number;
     importedCount: number;
@@ -75,6 +77,22 @@ type ImportApiResponse = {
   };
   debug?: {
     errorDetails?: string[];
+  };
+};
+
+type ImportStatusResponse = {
+  ok: boolean;
+  error?: string;
+  queue?: {
+    id: string;
+    status: "PENDING" | "PROCESSING" | "COMPLETED" | "FAILED";
+    totalRows: number;
+    processedRows: number;
+    importedCount: number;
+    updatedCount: number;
+    errorCount: number;
+    progress: number;
+    errorMessage: string | null;
   };
 };
 
@@ -123,6 +141,7 @@ export function AdminJobImporter() {
   const [resultMessage, setResultMessage] = useState("");
   const [isImporting, setIsImporting] = useState(false);
   const [useAi, setUseAi] = useState(false);
+  const [progressMessage, setProgressMessage] = useState("");
 
   const validRows = useMemo(
     () => rows.filter((row) => row.valid && row.data).map((row) => row.data as ImportedJobRow),
@@ -201,6 +220,7 @@ export function AdminJobImporter() {
 
     setIsImporting(true);
     setResultMessage("");
+    setProgressMessage("");
 
     try {
       const response = await fetch("/api/admin/import/jobs", {
@@ -221,34 +241,43 @@ export function AdminJobImporter() {
         return;
       }
 
-      const summary = result.summary ?? {
-        totalRows: validRows.length,
-        importedCount: 0,
-        updatedCount: 0,
-        errorCount: 0,
-        successRate: 0
-      };
-
-      let message = `Importacao concluida: ${summary.importedCount} nova(s) vaga(s) e ${summary.updatedCount} atualizada(s).`;
-
-      if (summary.errorCount > 0) {
-        message += ` ${summary.errorCount} linha(s) falharam.`;
+      if (!result.queueId) {
+        setResultMessage("ERRO: fila de importacao nao foi criada.");
+        return;
       }
 
-      if (summary.durationMs) {
-        message += ` Tempo total: ${(summary.durationMs / 1000).toFixed(1)}s.`;
-      }
+      setProgressMessage(`Fila criada (${result.queueId}). Iniciando processamento...`);
+      const queueId = result.queueId;
 
-      if (result.results?.errors?.length) {
-        console.error(
-          "Detalhes dos erros:",
-          result.results.errors.map((error) => `Linha ${error.line}: ${error.message}`).join("; ")
+      while (true) {
+        await new Promise((resolve) => setTimeout(resolve, 3000));
+        const statusResponse = await fetch(`/api/admin/import-status/${queueId}`, { cache: "no-store" });
+        const statusResult = (await statusResponse.json()) as ImportStatusResponse;
+        if (!statusResponse.ok || !statusResult.ok || !statusResult.queue) {
+          setResultMessage(`ERRO: ${statusResult.error || "Nao foi possivel acompanhar o progresso da importacao."}`);
+          setProgressMessage("");
+          return;
+        }
+
+        const queue = statusResult.queue;
+        setProgressMessage(
+          `Fila ${queue.id}: ${queue.progress}% (${queue.processedRows}/${queue.totalRows}) - importadas ${queue.importedCount}, atualizadas ${queue.updatedCount}, erros ${queue.errorCount}.`
         );
-        message += " Verifique o console para detalhes.";
-      }
 
-      setResultMessage(message);
-      console.log("Resultado da importacao:", result);
+        if (queue.status === "COMPLETED") {
+          setResultMessage(
+            `Importacao concluida: ${queue.importedCount} nova(s), ${queue.updatedCount} atualizada(s), ${queue.errorCount} erro(s).`
+          );
+          setProgressMessage("");
+          return;
+        }
+
+        if (queue.status === "FAILED") {
+          setResultMessage(`ERRO: ${queue.errorMessage || "A fila de importacao falhou."}`);
+          setProgressMessage("");
+          return;
+        }
+      }
     } catch (error) {
       console.error("Erro na requisicao de importacao:", error);
       setResultMessage(`ERRO DE REDE: ${error instanceof Error ? error.message : "Falha na comunicacao com o servidor."}`);
@@ -302,6 +331,7 @@ export function AdminJobImporter() {
           </div>
 
           {resultMessage ? <p className="rounded-2xl bg-slate-100 px-4 py-3 text-sm text-slate-700">{resultMessage}</p> : null}
+          {progressMessage ? <p className="rounded-2xl bg-sky-50 px-4 py-3 text-sm text-sky-700">{progressMessage}</p> : null}
         </CardContent>
       </Card>
 
