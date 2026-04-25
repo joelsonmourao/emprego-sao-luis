@@ -11,11 +11,19 @@ export function absoluteUrl(pathname: string) {
 }
 
 export function formatDate(date: string | Date) {
-  return new Intl.DateTimeFormat("pt-BR", {
-    day: "2-digit",
-    month: "long",
-    year: "numeric"
-  }).format(typeof date === "string" ? new Date(date) : date);
+  const d = typeof date === "string" ? new Date(date) : date;
+  if (Number.isNaN(d.getTime())) {
+    return "Data indisponivel";
+  }
+  try {
+    return new Intl.DateTimeFormat("pt-BR", {
+      day: "2-digit",
+      month: "long",
+      year: "numeric"
+    }).format(d);
+  } catch {
+    return "Data indisponivel";
+  }
 }
 
 export function slugify(input: string) {

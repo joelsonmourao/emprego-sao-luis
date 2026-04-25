@@ -9,6 +9,7 @@ import { buildBreadcrumbJsonLd, buildJobPostingJsonLd, stringifyJobPostingJsonLd
 import { buildSiteMetadata } from "@/lib/seo/metadata";
 import { getJobBySlug } from "@/lib/repositories/jobs";
 import { JOB_DETAIL_PATH_RESERVED_FIRST_SEGMENTS } from "@/lib/seo/vagas-job-path";
+import { absoluteUrl } from "@/lib/utils";
 
 export const revalidate = 1;
 
@@ -122,21 +123,6 @@ export default async function VagasCatchAllPage({
     const requirements = Array.isArray(job.requirements) ? job.requirements : [];
     const benefits = Array.isArray(job.benefits) ? job.benefits : [];
     const publisherDisplayName = buildJobPublisherName(job.city?.name, job.state?.code);
-    // #region agent log
-    fetch("http://127.0.0.1:7370/ingest/b54ed65d-267c-4421-b3af-1ea0f3df3748", {
-      method: "POST",
-      headers: { "Content-Type": "application/json", "X-Debug-Session-Id": "eb6787" },
-      body: JSON.stringify({
-        sessionId: "eb6787",
-        runId: "pre-fix",
-        hypothesisId: "H1",
-        location: "app/vagas/[...slug]/page.tsx:segments.length===1",
-        message: "job route render start",
-        data: { slug: job.slug, isActive: job.isActive },
-        timestamp: Date.now()
-      })
-    }).catch(() => {});
-    // #endregion
 
     let jobPostingScript: string | null = null;
     try {
@@ -168,40 +154,10 @@ export default async function VagasCatchAllPage({
         applyUrl: job.applyUrl,
         publisherDisplayName
       });
-      // #region agent log
-      fetch("http://127.0.0.1:7370/ingest/b54ed65d-267c-4421-b3af-1ea0f3df3748", {
-        method: "POST",
-        headers: { "Content-Type": "application/json", "X-Debug-Session-Id": "eb6787" },
-        body: JSON.stringify({
-          sessionId: "eb6787",
-          runId: "pre-fix",
-          hypothesisId: "H2",
-          location: "app/vagas/[...slug]/page.tsx:jsonld",
-          message: "jsonld built",
-          data: { slug: job.slug, hasJobPosting: Boolean(jobPostingLd) },
-          timestamp: Date.now()
-        })
-      }).catch(() => {});
-      // #endregion
 
       jobPostingScript = stringifyJobPostingJsonLd(jobPostingLd);
     } catch (error) {
-      const message = error instanceof Error ? error.message : "unknown";
-      // #region agent log
-      fetch("http://127.0.0.1:7370/ingest/b54ed65d-267c-4421-b3af-1ea0f3df3748", {
-        method: "POST",
-        headers: { "Content-Type": "application/json", "X-Debug-Session-Id": "eb6787" },
-        body: JSON.stringify({
-          sessionId: "eb6787",
-          runId: "pre-fix",
-          hypothesisId: "H3",
-          location: "app/vagas/[...slug]/page.tsx:jsonld",
-          message: "jsonld failure fallback",
-          data: { slug: job.slug, error: message },
-          timestamp: Date.now()
-        })
-      }).catch(() => {});
-      // #endregion
+      void error;
       jobPostingScript = stringifyJsonLdSafe({
         "@context": "https://schema.org",
         "@type": "JobPosting",
@@ -222,7 +178,7 @@ export default async function VagasCatchAllPage({
             addressCountry: "BR"
           }
         },
-        url: `https://slzcontent.com.br/vagas/${job.slug}`,
+        url: absoluteUrl(`/vagas/${job.slug}`),
         directApply: false
       });
     }
@@ -232,11 +188,25 @@ export default async function VagasCatchAllPage({
       { name: "Vagas", path: "/vagas" },
       { name: job.title, path: `/vagas/${job.slug}` }
     ]);
+    let breadcrumbScript: string;
+    try {
+      breadcrumbScript = stringifyJsonLdSafe(breadcrumbLd);
+    } catch {
+      breadcrumbScript = stringifyJsonLdSafe({
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        itemListElement: [
+          { "@type": "ListItem", position: 1, name: "Home", item: absoluteUrl("/") },
+          { "@type": "ListItem", position: 2, name: "Vagas", item: absoluteUrl("/vagas") },
+          { "@type": "ListItem", position: 3, name: job.title, item: absoluteUrl(`/vagas/${job.slug}`) }
+        ]
+      });
+    }
 
     return (
       <>
         {jobPostingScript ? <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jobPostingScript }} /> : null}
-        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: stringifyJsonLdSafe(breadcrumbLd) }} />
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: breadcrumbScript }} />
         <JobDetailView job={job} />
       </>
     );

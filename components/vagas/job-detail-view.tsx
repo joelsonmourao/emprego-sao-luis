@@ -21,16 +21,25 @@ export async function JobDetailView({ job }: { job: JobWithRelations }) {
   const benefits = Array.isArray(job.benefits) ? job.benefits : [];
   const publisherDisplayName = buildJobPublisherName(job.city?.name, job.state?.code);
 
-  const [relatedJobs, relatedPosts] = await Promise.all([
-    getRelatedJobs({
-      excludeSlug: job.slug,
-      citySlug: job.city.slug,
-      stateSlug: job.state.slug,
-      companySlug: job.company?.slug,
-      limit: 3
-    }),
-    getRelatedPosts({ limit: 3 })
-  ]);
+  let relatedJobs: Awaited<ReturnType<typeof getRelatedJobs>> = [];
+  let relatedPosts: Awaited<ReturnType<typeof getRelatedPosts>> = [];
+  try {
+    const pair = await Promise.all([
+      getRelatedJobs({
+        excludeSlug: job.slug,
+        citySlug: job.city.slug,
+        stateSlug: job.state.slug,
+        companySlug: job.company?.slug,
+        limit: 3
+      }),
+      getRelatedPosts({ limit: 3 })
+    ]);
+    relatedJobs = pair[0];
+    relatedPosts = pair[1];
+  } catch {
+    relatedJobs = [];
+    relatedPosts = [];
+  }
 
   return (
     <section className="mx-auto max-w-7xl space-y-6 px-4 py-6 sm:px-6 sm:py-8 sm:space-y-8 lg:px-8 lg:py-10">
@@ -105,7 +114,10 @@ export async function JobDetailView({ job }: { job: JobWithRelations }) {
             <p className="mb-4 rounded-[1.25rem] bg-[var(--brand-soft)] px-3 py-3 text-[14px] leading-6 text-[var(--brand-text-secondary)] sm:mb-5 sm:rounded-[1.5rem] sm:px-4 sm:py-4 sm:text-[15px] sm:leading-7 sm:text-base sm:leading-8">
               {job.summary}
             </p>
-            <div className="prose-content text-slate-700" dangerouslySetInnerHTML={{ __html: sanitizeRichTextHtml(job.descriptionHtml) }} />
+            <div
+              className="prose-content text-slate-700"
+              dangerouslySetInnerHTML={{ __html: sanitizeRichTextHtml(job.descriptionHtml ?? "") }}
+            />
             {requirements.length ? (
               <div className="mt-6 border-t border-slate-100 pt-6 sm:mt-8 sm:pt-8">
                 <h2 className="text-lg font-semibold text-[var(--brand-navy)] sm:text-xl">Requisitos</h2>
@@ -167,7 +179,14 @@ export async function JobDetailView({ job }: { job: JobWithRelations }) {
             <h2 className="text-xl font-black text-[var(--brand-navy)] leading-tight sm:text-2xl">Candidatura</h2>
           <p className="mt-2 text-sm leading-6 text-[var(--brand-text-secondary)] sm:mt-3 sm:leading-7">Leia os requisitos com calma, atualize o currículo e envie sua candidatura pelo link oficial da empresa.</p>
             <Button asChild size="lg" className="mt-4 w-full rounded-2xl sm:mt-5">
-              <TrackedExternalLink href={job.applyUrl} target="_blank" rel="noreferrer" eventName="apply_click" entityType="job" entitySlug={job.slug}>
+              <TrackedExternalLink
+                href={job.applyUrl?.trim() || "#"}
+                target="_blank"
+                rel="noreferrer"
+                eventName="apply_click"
+                entityType="job"
+                entitySlug={job.slug}
+              >
                 Candidatar-se
               </TrackedExternalLink>
             </Button>
