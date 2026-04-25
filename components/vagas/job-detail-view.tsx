@@ -10,7 +10,7 @@ import { SectionHeading } from "@/components/section-heading";
 import { Button } from "@/components/ui/button";
 import { sanitizeRichTextHtml } from "@/lib/rich-text";
 import { getCityJobsPath, getCompanyJobsPath, getStateJobsPath } from "@/lib/seo/jobs-pages";
-import { buildBreadcrumbJsonLd, buildJobPostingJsonLd } from "@/lib/seo/json-ld";
+import { buildBreadcrumbJsonLd, buildJobPostingJsonLd, stringifyJobPostingJsonLd } from "@/lib/seo/json-ld";
 import { getRelatedPosts } from "@/lib/repositories/blog";
 import { getJobBySlug, getRelatedJobs } from "@/lib/repositories/jobs";
 import { formatDate } from "@/lib/utils";
@@ -47,7 +47,8 @@ export async function JobDetailView({ job }: { job: JobWithRelations }) {
         salaryMax: job.salaryMax,
         requirements,
         benefits,
-        countryCode: "BR"
+        countryCode: "BR",
+        applyUrl: job.applyUrl
       })
     : null;
 
@@ -64,7 +65,9 @@ export async function JobDetailView({ job }: { job: JobWithRelations }) {
 
   return (
     <section className="mx-auto max-w-7xl space-y-6 px-4 py-6 sm:px-6 sm:py-8 sm:space-y-8 lg:px-8 lg:py-10">
-      {jobPostingLd ? <JsonLd data={jobPostingLd} /> : null}
+      {jobPostingLd ? (
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: stringifyJobPostingJsonLd(jobPostingLd) }} />
+      ) : null}
       <JsonLd data={buildBreadcrumbJsonLd([{ name: "Home", path: "/" }, { name: "Vagas", path: "/vagas" }, { name: job.title, path: `/vagas/${job.slug}` }])} />
 
       <Breadcrumbs items={[{ label: "Home", href: "/" }, { label: "Vagas", href: "/vagas" }, { label: job.title }]} />

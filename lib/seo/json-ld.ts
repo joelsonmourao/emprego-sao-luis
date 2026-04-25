@@ -1,5 +1,6 @@
 import { getReferencePostalCodeForCity } from "@/lib/seo/br-reference-postal";
 import { sanitizeRichTextHtml } from "@/lib/rich-text";
+import { getSiteOrigin, normalizeOrigin } from "@/lib/site-url";
 import { absoluteUrl } from "@/lib/utils";
 
 export function buildOrganizationJsonLd(input?: { name?: string; logoUrl?: string }) {
@@ -88,9 +89,18 @@ export type JobPostingJsonLdInput = {
   industry?: string | null;
   /** Código CBO (ex.: 4110-10); quando ausente, usa padrão administrativo genérico. */
   occupationalCategory?: string | null;
-  /** Valor bruto da fonte (CMS/DB/API); sanitizado para boolean nativo no JSON-LD. */
+  /** URL de candidatura (mesma origem do site → directApply true no JSON-LD). */
+  applyUrl: string;
+  /** Valor bruto da fonte (CMS/DB/API); quando definido, sobrescreve a inferência a partir de applyUrl. */
   directApply?: unknown;
 };
+
+/** Schema.org: candidatura no próprio domínio da vaga vs link externo. */
+function inferDirectApplyFromApplyUrl(applyUrl: string): boolean {
+  const jobOrigin = normalizeOrigin(applyUrl.trim());
+  const siteOrigin = normalizeOrigin(getSiteOrigin());
+  return Boolean(jobOrigin && siteOrigin && jobOrigin === siteOrigin);
+}
 
 function normalizeIsoDate(value?: string | null) {
   if (!value) return undefined;
@@ -104,16 +114,43 @@ export function sanitizeISODate(dateStr: string | undefined | null) {
 }
 
 export function sanitizeDirectApply(value: unknown): boolean {
-  if (
-    value === true ||
-    value === "true" ||
-    value === "1" ||
-    value === "http://schema.org/True" ||
-    value === "True"
-  ) {
+  if (value === true || value === 1) {
     return true;
   }
+  if (typeof value === "string") {
+    const s = value.trim();
+    if (
+      s.toLowerCase() === "true" ||
+      s === "1" ||
+      s === "http://schema.org/True" ||
+      s === "https://schema.org/True" ||
+      s === "True"
+    ) {
+      return true;
+    }
+  }
   return false;
+}
+
+/** Serialização final do JobPosting: força `directApply` booleano no JSON. */
+export function stringifyJobPostingJsonLd(data: Record<string, unknown>) {
+  const directApply = sanitizeDirectApply(data.directApply ?? true);
+  // #region agent log
+  fetch("http://127.0.0.1:7370/ingest/b54ed65d-267c-4421-b3af-1ea0f3df3748", {
+    method: "POST",
+    headers: { "Content-Type": "application/json", "X-Debug-Session-Id": "eb6787" },
+    body: JSON.stringify({
+      sessionId: "eb6787",
+      runId: "pre-verify",
+      hypothesisId: "H2",
+      location: "lib/seo/json-ld.ts:stringifyJobPostingJsonLd",
+      message: "serialize directApply",
+      data: { typeofDirectApply: typeof directApply, directApply },
+      timestamp: Date.now()
+    })
+  }).catch(() => {});
+  // #endregion
+  return JSON.stringify({ ...data, directApply }).replace(/</g, "\\u003c");
 }
 
 function escapeHtmlText(s: string) {
@@ -300,7 +337,31 @@ export async function buildJobPostingJsonLd(job: JobPostingJsonLdInput) {
     };
   }
 
-  data.directApply = sanitizeDirectApply(job.directApply ?? true);
+  const directApply =
+    job.directApply !== undefined && job.directApply !== null
+      ? sanitizeDirectApply(job.directApply)
+      : inferDirectApplyFromApplyUrl(job.applyUrl);
+  data.directApply = directApply;
+
+  // #region agent log
+  fetch("http://127.0.0.1:7370/ingest/b54ed65d-267c-4421-b3af-1ea0f3df3748", {
+    method: "POST",
+    headers: { "Content-Type": "application/json", "X-Debug-Session-Id": "eb6787" },
+    body: JSON.stringify({
+      sessionId: "eb6787",
+      runId: "pre-verify",
+      hypothesisId: "H1",
+      location: "lib/seo/json-ld.ts:buildJobPostingJsonLd",
+      message: "directApply resolved",
+      data: {
+        hasExplicitOverride: job.directApply !== undefined && job.directApply !== null,
+        directApply,
+        sameOriginInferred: inferDirectApplyFromApplyUrl(job.applyUrl)
+      },
+      timestamp: Date.now()
+    })
+  }).catch(() => {});
+  // #endregion
 
   return data;
 }
