@@ -348,10 +348,7 @@ export async function buildJobPostingJsonLd(job: JobPostingJsonLdInput) {
     };
   }
 
-  const directApply =
-    job.directApply !== undefined && job.directApply !== null
-      ? sanitizeDirectApply(job.directApply)
-      : inferDirectApplyFromApplyUrl(job.applyUrl);
+  const directApply = false;
   data.directApply = directApply;
 
   // #region agent log
