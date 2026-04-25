@@ -16,6 +16,8 @@ type GoogleServiceAccount = {
   token_uri?: string;
 };
 
+type GoogleIndexingNotificationType = "URL_UPDATED" | "URL_DELETED";
+
 type GoogleIndexingSuccess = {
   ok: true;
   message: string;
@@ -49,6 +51,10 @@ async function loadServiceAccountFromFile(filePath: string) {
 }
 
 async function loadServiceAccount() {
+  if (process.env.GOOGLE_INDEXING_SA_JSON?.trim()) {
+    return JSON.parse(process.env.GOOGLE_INDEXING_SA_JSON) as GoogleServiceAccount;
+  }
+
   if (env.GOOGLE_INDEXING_SERVICE_ACCOUNT_JSON?.trim()) {
     return JSON.parse(env.GOOGLE_INDEXING_SERVICE_ACCOUNT_JSON) as GoogleServiceAccount;
   }
@@ -121,14 +127,86 @@ function classifyGoogleIndexingFailure(status: number, response: unknown) {
   return serialized || `Falha ao enviar URL para a Google Indexing API (status ${status}).`;
 }
 
-export async function notifyGoogleIndexing(url: string): Promise<GoogleIndexingResult> {
+const GOOGLE_INDEXING_DAILY_LIMIT = 2000;
+const GOOGLE_INDEXING_RATE_LIMIT_PER_SECOND = 5;
+let dailyWindowKey = "";
+let dailyRequestCount = 0;
+const requestTimestampsMs: number[] = [];
+
+function currentUtcDayKey() {
+  return new Date().toISOString().slice(0, 10);
+}
+
+function enforceDailyLimit() {
+  const key = currentUtcDayKey();
+  if (dailyWindowKey !== key) {
+    dailyWindowKey = key;
+    dailyRequestCount = 0;
+  }
+
+  if (dailyRequestCount >= GOOGLE_INDEXING_DAILY_LIMIT) {
+    return {
+      ok: false as const,
+      message: `Limite diario da Google Indexing API atingido (${GOOGLE_INDEXING_DAILY_LIMIT}/dia).`
+    };
+  }
+
+  dailyRequestCount += 1;
+  return null;
+}
+
+function enforceInternalRateLimit() {
+  const now = Date.now();
+  while (requestTimestampsMs.length && now - requestTimestampsMs[0] >= 1000) {
+    requestTimestampsMs.shift();
+  }
+
+  if (requestTimestampsMs.length >= GOOGLE_INDEXING_RATE_LIMIT_PER_SECOND) {
+    return {
+      ok: false as const,
+      message: `Rate limit interno atingido (${GOOGLE_INDEXING_RATE_LIMIT_PER_SECOND}/segundo).`
+    };
+  }
+
+  requestTimestampsMs.push(now);
+  return null;
+}
+
+export async function notifyGoogleIndexing(url: string, type: GoogleIndexingNotificationType = "URL_UPDATED"): Promise<GoogleIndexingResult> {
   try {
+    // #region agent log
+    fetch("http://127.0.0.1:7370/ingest/b54ed65d-267c-4421-b3af-1ea0f3df3748", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "X-Debug-Session-Id": "eb6787" },
+      body: JSON.stringify({
+        sessionId: "eb6787",
+        runId: "pre-verify",
+        hypothesisId: "H1",
+        location: "lib/google-indexing.ts:notifyGoogleIndexing",
+        message: "notify start",
+        data: { type, hasCredentials: Boolean(process.env.GOOGLE_INDEXING_SA_JSON || env.GOOGLE_INDEXING_SERVICE_ACCOUNT_JSON || env.GOOGLE_INDEXING_SERVICE_ACCOUNT_FILE) },
+        timestamp: Date.now()
+      })
+    }).catch(() => {});
+    // #endregion
+
+    const dailyLimitFailure = enforceDailyLimit();
+    if (dailyLimitFailure) {
+      return dailyLimitFailure;
+    }
+
+    const rateLimitFailure = enforceInternalRateLimit();
+    if (rateLimitFailure) {
+      return rateLimitFailure;
+    }
+
     const serviceAccount = await loadServiceAccount();
 
     if (!serviceAccount) {
       return {
         ok: false,
-        message: "Credenciais da Google Indexing API nao configuradas. Defina GOOGLE_INDEXING_SERVICE_ACCOUNT_JSON ou GOOGLE_INDEXING_SERVICE_ACCOUNT_FILE."
+        message:
+          "Credenciais da Google Indexing API nao configuradas. Defina GOOGLE_INDEXING_SA_JSON (ou GOOGLE_INDEXING_SERVICE_ACCOUNT_JSON / GOOGLE_INDEXING_SERVICE_ACCOUNT_FILE)."
       };
     }
 
@@ -141,7 +219,7 @@ export async function notifyGoogleIndexing(url: string): Promise<GoogleIndexingR
       },
       body: JSON.stringify({
         url,
-        type: "URL_UPDATED"
+        type
       })
     });
 
@@ -149,6 +227,21 @@ export async function notifyGoogleIndexing(url: string): Promise<GoogleIndexingR
     const parsedResponse = parseJsonSafely(responseText);
 
     if (!response.ok) {
+      // #region agent log
+      fetch("http://127.0.0.1:7370/ingest/b54ed65d-267c-4421-b3af-1ea0f3df3748", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "X-Debug-Session-Id": "eb6787" },
+        body: JSON.stringify({
+          sessionId: "eb6787",
+          runId: "pre-verify",
+          hypothesisId: "H2",
+          location: "lib/google-indexing.ts:notifyGoogleIndexing",
+          message: "notify failed",
+          data: { type, status: response.status },
+          timestamp: Date.now()
+        })
+      }).catch(() => {});
+      // #endregion
       return {
         ok: false,
         status: response.status,
@@ -157,9 +250,25 @@ export async function notifyGoogleIndexing(url: string): Promise<GoogleIndexingR
       };
     }
 
+    // #region agent log
+    fetch("http://127.0.0.1:7370/ingest/b54ed65d-267c-4421-b3af-1ea0f3df3748", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "X-Debug-Session-Id": "eb6787" },
+      body: JSON.stringify({
+        sessionId: "eb6787",
+        runId: "pre-verify",
+        hypothesisId: "H3",
+        location: "lib/google-indexing.ts:notifyGoogleIndexing",
+        message: "notify success",
+        data: { type, status: response.status },
+        timestamp: Date.now()
+      })
+    }).catch(() => {});
+    // #endregion
+
     return {
       ok: true,
-      message: "URL enviada com sucesso para a Google Indexing API.",
+      message: `Notificacao ${type} enviada com sucesso para a Google Indexing API.`,
       response: parsedResponse
     };
   } catch (error) {

@@ -206,6 +206,7 @@ export async function upsertJobFromForm(input: unknown, existingId?: string) {
     id: true,
     slug: true,
     title: true,
+    isActive: true,
     employmentType: true,
     state: { select: { slug: true } },
     city: { select: { slug: true } },
