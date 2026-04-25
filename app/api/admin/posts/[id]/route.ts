@@ -5,6 +5,7 @@ import { upsertBlogPostFromForm } from "@/lib/admin/blog";
 import { writeAuditLog } from "@/lib/audit";
 import { requireApiRole } from "@/lib/authz";
 import { prisma } from "@/lib/db";
+import { revalidatePublicSurfacesAfterBlogChange } from "@/lib/public-revalidate";
 
 type Context = {
   params: Promise<{ id: string }>;
@@ -29,6 +30,7 @@ export async function PATCH(request: Request, context: Context) {
       summary: "Post atualizado",
       after: { id: post.id, slug: post.slug, title: post.title }
     });
+    revalidatePublicSurfacesAfterBlogChange(post.slug);
 
     return NextResponse.json({ ok: true, postId: post.id });
   } catch (error) {
@@ -58,6 +60,7 @@ export async function DELETE(_request: Request, context: Context) {
       summary: "Post excluido",
       before: post ?? { id }
     });
+    revalidatePublicSurfacesAfterBlogChange(post?.slug);
 
     return NextResponse.json({ ok: true });
   } catch (error) {

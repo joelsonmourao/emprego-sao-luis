@@ -1,6 +1,7 @@
-import { cache } from "react";
+import { unstable_cache } from "next/cache";
 
 import { prisma } from "@/lib/db";
+import { PUBLIC_GEO_CACHE_TAG } from "@/lib/public-revalidate";
 
 async function fetchStates() {
   return prisma.state.findMany({
@@ -13,9 +14,12 @@ async function fetchStates() {
   });
 }
 
-export const getStates = cache(fetchStates);
+export const getStates = unstable_cache(fetchStates, ["states-v1"], {
+  revalidate: 3600,
+  tags: [PUBLIC_GEO_CACHE_TAG]
+});
 
-export async function getStateBySlug(slug: string) {
+export const getStateBySlug = unstable_cache(async (slug: string) => {
   return prisma.state.findUnique({
     where: { slug },
     include: {
@@ -32,9 +36,12 @@ export async function getStateBySlug(slug: string) {
       }
     }
   });
-}
+}, ["state-by-slug-v1"], {
+  revalidate: 3600,
+  tags: [PUBLIC_GEO_CACHE_TAG]
+});
 
-export async function getCityByStateAndSlug(stateSlug: string, citySlug: string) {
+export const getCityByStateAndSlug = unstable_cache(async (stateSlug: string, citySlug: string) => {
   return prisma.city.findFirst({
     where: {
       slug: citySlug,
@@ -49,9 +56,12 @@ export async function getCityByStateAndSlug(stateSlug: string, citySlug: string)
       }
     }
   });
-}
+}, ["city-by-state-and-slug-v1"], {
+  revalidate: 3600,
+  tags: [PUBLIC_GEO_CACHE_TAG]
+});
 
-export async function getCityBySlug(slug: string) {
+export const getCityBySlug = unstable_cache(async (slug: string) => {
   const cities = await prisma.city.findMany({
     where: { slug },
     include: {
@@ -67,7 +77,10 @@ export async function getCityBySlug(slug: string) {
   });
 
   return cities.sort((left, right) => right._count.jobs - left._count.jobs)[0] ?? null;
-}
+}, ["city-by-slug-v1"], {
+  revalidate: 3600,
+  tags: [PUBLIC_GEO_CACHE_TAG]
+});
 
 async function fetchSearchGeoData() {
   return prisma.state.findMany({
@@ -80,7 +93,10 @@ async function fetchSearchGeoData() {
   });
 }
 
-export const getSearchGeoData = cache(fetchSearchGeoData);
+export const getSearchGeoData = unstable_cache(fetchSearchGeoData, ["search-geo-data-v1"], {
+  revalidate: 3600,
+  tags: [PUBLIC_GEO_CACHE_TAG]
+});
 
 async function fetchCities() {
   return prisma.city.findMany({
@@ -94,9 +110,13 @@ async function fetchCities() {
   });
 }
 
-export const getCities = cache(fetchCities);
+export const getCities = unstable_cache(fetchCities, ["cities-v1"], {
+  revalidate: 3600,
+  tags: [PUBLIC_GEO_CACHE_TAG]
+});
 
-export async function getStatesBySlugs(slugs: string[]) {
+const getStatesBySlugsCached = unstable_cache(async (slugKey: string) => {
+  const slugs = JSON.parse(slugKey) as string[];
   if (!slugs.length) return [];
 
   const items = await prisma.state.findMany({
@@ -112,9 +132,17 @@ export async function getStatesBySlugs(slugs: string[]) {
   return slugs
     .map((slug) => map.get(slug))
     .filter((item): item is (typeof items)[number] => Boolean(item));
+}, ["states-by-slugs-v1"], {
+  revalidate: 3600,
+  tags: [PUBLIC_GEO_CACHE_TAG]
+});
+
+export async function getStatesBySlugs(slugs: string[]) {
+  return getStatesBySlugsCached(JSON.stringify(slugs));
 }
 
-export async function getCitiesBySlugs(slugs: string[]) {
+const getCitiesBySlugsCached = unstable_cache(async (slugKey: string) => {
+  const slugs = JSON.parse(slugKey) as string[];
   if (!slugs.length) return [];
 
   const items = await prisma.city.findMany({
@@ -131,4 +159,11 @@ export async function getCitiesBySlugs(slugs: string[]) {
   return slugs
     .map((slug) => map.get(slug))
     .filter((item): item is (typeof items)[number] => Boolean(item));
+}, ["cities-by-slugs-v1"], {
+  revalidate: 3600,
+  tags: [PUBLIC_GEO_CACHE_TAG]
+});
+
+export async function getCitiesBySlugs(slugs: string[]) {
+  return getCitiesBySlugsCached(JSON.stringify(slugs));
 }

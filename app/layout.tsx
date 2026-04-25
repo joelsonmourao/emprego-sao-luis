@@ -1,10 +1,10 @@
 import type { Metadata, Viewport } from "next";
-import type { ReactNode } from "react";
-import { cookies, headers } from "next/headers";
+import { Suspense, type ReactNode } from "react";
 import "./globals.css";
 
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
+import { PublicChrome } from "@/components/public-chrome";
 import { JsonLd } from "@/components/json-ld";
 import { ConsentBootstrap } from "@/components/analytics/consent-bootstrap";
 import { SiteIntegrations } from "@/components/analytics/site-integrations";
@@ -12,7 +12,6 @@ import { buildOrganizationJsonLd, buildWebsiteJsonLd } from "@/lib/seo/json-ld";
 import { siteConfig } from "@/lib/constants";
 import { getSiteSettings } from "@/lib/site-settings";
 import { normalizeAdsensePublisherId, normalizeSearchConsoleVerification } from "@/lib/google";
-import { CONSENT_COOKIE_NAME } from "@/lib/consent";
 import { absoluteUrl } from "@/lib/utils";
 import { getSiteOrigin } from "@/lib/site-url";
 
@@ -23,7 +22,7 @@ export const viewport: Viewport = {
 };
 
 /** Evita pré-render estático no build (menos transferência Neon em cada deploy). */
-export const dynamic = "force-dynamic";
+export const revalidate = 3600;
 
 export async function generateMetadata(): Promise<Metadata> {
   const settings = await getSiteSettings();
@@ -75,45 +74,38 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function RootLayout({ children }: Readonly<{ children: ReactNode }>) {
-  const headersList = await headers();
-  const section = headersList.get("x-app-section");
-  const isAdminSection = section === "admin";
   const settings = await getSiteSettings();
   const adsensePublisherId = normalizeAdsensePublisherId(settings.google.adsensePublisherId) ?? "ca-pub-4279201625870524";
-  const initialConsentValue = (await cookies()).get(CONSENT_COOKIE_NAME)?.value ?? null;
 
   return (
     <html lang="pt-BR">
       <head>
-        {isAdminSection ? null : (
-          <>
-            <meta name="google-adsense-account" content={adsensePublisherId} />
-            <script
-              async
-              src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${adsensePublisherId}`}
-              crossOrigin="anonymous"
-            />
-          </>
-        )}
-        {isAdminSection ? null : (
-          <script
-            id="adsense-auto-ads-bootstrap"
-            dangerouslySetInnerHTML={{
-              __html: `(window.adsbygoogle = window.adsbygoogle || []).push({ google_ad_client: "${adsensePublisherId}", enable_page_level_ads: true });`
-            }}
-          />
-        )}
+        <meta name="google-adsense-account" content={adsensePublisherId} />
+        <script
+          async
+          src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${adsensePublisherId}`}
+          crossOrigin="anonymous"
+        />
+        <script
+          id="adsense-auto-ads-bootstrap"
+          dangerouslySetInnerHTML={{
+            __html: `(window.adsbygoogle = window.adsbygoogle || []).push({ google_ad_client: "${adsensePublisherId}", enable_page_level_ads: true });`
+          }}
+        />
       </head>
       <body className="min-h-screen antialiased overflow-x-hidden">
         <ConsentBootstrap />
         <JsonLd data={buildOrganizationJsonLd({ name: settings.legalName || settings.siteName, logoUrl: settings.logoUrl })} />
         <JsonLd data={buildWebsiteJsonLd({ name: settings.siteName })} />
-        {isAdminSection ? null : <SiteHeader />}
-        <main>{children}</main>
-        {isAdminSection ? null : <SiteFooter />}
-        {isAdminSection ? null : (
-          <SiteIntegrations consentBanner={settings.consentBanner} google={settings.google} initialConsentValue={initialConsentValue} />
-        )}
+        <Suspense fallback={null}>
+          <PublicChrome
+            header={<SiteHeader />}
+            footer={<SiteFooter />}
+            integrations={<SiteIntegrations consentBanner={settings.consentBanner} google={settings.google} initialConsentValue={null} />}
+          >
+            {children}
+          </PublicChrome>
+        </Suspense>
       </body>
     </html>
   );

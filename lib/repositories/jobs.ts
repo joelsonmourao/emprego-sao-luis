@@ -1,8 +1,9 @@
-import { cache } from "react";
+import { unstable_cache } from "next/cache";
 import type { EmploymentType, Prisma } from "@prisma/client";
 
 import { prisma } from "@/lib/db";
 import { pagination } from "@/lib/constants";
+import { PUBLIC_JOBS_CACHE_TAG } from "@/lib/public-revalidate";
 
 /** Full job graph for detalhe da vaga, JSON-LD e admin. */
 const jobDetailInclude = {
@@ -66,9 +67,12 @@ async function fetchFeaturedJobs() {
   });
 }
 
-export const getFeaturedJobs = cache(fetchFeaturedJobs);
+export const getFeaturedJobs = unstable_cache(fetchFeaturedJobs, ["featured-jobs-v1"], {
+  revalidate: 600,
+  tags: [PUBLIC_JOBS_CACHE_TAG]
+});
 
-const getJobsBySlugsCached = cache(async (slugKey: string) => {
+const getJobsBySlugsCached = unstable_cache(async (slugKey: string) => {
   const slugs = JSON.parse(slugKey) as string[];
   if (!slugs.length) return [];
 
@@ -82,6 +86,9 @@ const getJobsBySlugsCached = cache(async (slugKey: string) => {
 
   const map = new Map(items.map((item) => [item.slug, item]));
   return slugs.map((slug) => map.get(slug)).filter((item): item is JobListingPayload => Boolean(item));
+}, ["jobs-by-slugs-v1"], {
+  revalidate: 1800,
+  tags: [PUBLIC_JOBS_CACHE_TAG]
 });
 
 export async function getJobsBySlugs(slugs: string[]) {
@@ -98,13 +105,19 @@ async function fetchRecentJobs() {
   });
 }
 
-export const getRecentJobs = cache(fetchRecentJobs);
+export const getRecentJobs = unstable_cache(fetchRecentJobs, ["recent-jobs-v1"], {
+  revalidate: 600,
+  tags: [PUBLIC_JOBS_CACHE_TAG]
+});
 
-export const getJobBySlug = cache(async (slug: string) => {
+export const getJobBySlug = unstable_cache(async (slug: string) => {
   return prisma.job.findUnique({
     where: { slug },
     include: jobDetailInclude
   });
+}, ["job-by-slug-v1"], {
+  revalidate: 2700,
+  tags: [PUBLIC_JOBS_CACHE_TAG]
 });
 
 function jobsListCacheKey(params: {
@@ -129,7 +142,7 @@ function jobsListCacheKey(params: {
   });
 }
 
-const getJobsListCached = cache(async (key: string) => {
+const getJobsListCached = unstable_cache(async (key: string) => {
   const params = JSON.parse(key) as {
     query?: string;
     stateSlug?: string;
@@ -190,6 +203,9 @@ const getJobsListCached = cache(async (key: string) => {
     page,
     totalPages: Math.max(1, Math.ceil(total / pagination.jobsPerPage))
   };
+}, ["jobs-list-v1"], {
+  revalidate: 600,
+  tags: [PUBLIC_JOBS_CACHE_TAG]
 });
 
 export async function getJobsList(params: {
@@ -214,9 +230,12 @@ async function fetchFeaturedCompanies() {
   });
 }
 
-export const getFeaturedCompanies = cache(fetchFeaturedCompanies);
+export const getFeaturedCompanies = unstable_cache(fetchFeaturedCompanies, ["featured-companies-v1"], {
+  revalidate: 1200,
+  tags: [PUBLIC_JOBS_CACHE_TAG]
+});
 
-const getFeaturedCompaniesBySlugsCached = cache(async (slugKey: string) => {
+const getFeaturedCompaniesBySlugsCached = unstable_cache(async (slugKey: string) => {
   const slugs = JSON.parse(slugKey) as string[];
   if (!slugs.length) return [];
 
@@ -230,6 +249,9 @@ const getFeaturedCompaniesBySlugsCached = cache(async (slugKey: string) => {
 
   const map = new Map(companies.map((company) => [company.slug, company]));
   return slugs.map((slug) => map.get(slug)).filter((item): item is (typeof companies)[number] => Boolean(item));
+}, ["featured-companies-by-slugs-v1"], {
+  revalidate: 1800,
+  tags: [PUBLIC_JOBS_CACHE_TAG]
 });
 
 export async function getFeaturedCompaniesBySlugs(slugs: string[]) {
@@ -237,7 +259,7 @@ export async function getFeaturedCompaniesBySlugs(slugs: string[]) {
   return getFeaturedCompaniesBySlugsCached(JSON.stringify(slugs));
 }
 
-const getRelatedJobsCached = cache(async (key: string) => {
+const getRelatedJobsCached = unstable_cache(async (key: string) => {
   const params = JSON.parse(key) as {
     excludeSlug?: string;
     citySlug?: string;
@@ -267,6 +289,9 @@ const getRelatedJobsCached = cache(async (key: string) => {
   });
 
   return related;
+}, ["related-jobs-v1"], {
+  revalidate: 1800,
+  tags: [PUBLIC_JOBS_CACHE_TAG]
 });
 
 export async function getRelatedJobs(params: {
@@ -314,16 +339,26 @@ async function fetchCompanyHubsMapped() {
   }));
 }
 
-export const getCompanyHubs = cache(fetchCompanyHubsMapped);
+export const getCompanyHubs = unstable_cache(fetchCompanyHubsMapped, ["company-hubs-v1"], {
+  revalidate: 1200,
+  tags: [PUBLIC_JOBS_CACHE_TAG]
+});
 
-export async function getCompanyHubBySlug(slug: string) {
+const getCompanyHubBySlugCached = unstable_cache(async (slug: string) => {
   return prisma.company.findUnique({
     where: { slug },
     select: companyHubListSelect
   });
+}, ["company-hub-by-slug-v1"], {
+  revalidate: 1200,
+  tags: [PUBLIC_JOBS_CACHE_TAG]
+});
+
+export async function getCompanyHubBySlug(slug: string) {
+  return getCompanyHubBySlugCached(slug);
 }
 
-export async function getCompanyEntries() {
+export const getCompanyEntries = unstable_cache(async () => {
   return prisma.company.findMany({
     where: { isActive: true },
     select: {
@@ -332,9 +367,12 @@ export async function getCompanyEntries() {
     },
     orderBy: [{ updatedAt: "desc" }]
   });
-}
+}, ["company-sitemap-entries-v1"], {
+  revalidate: 7200,
+  tags: [PUBLIC_JOBS_CACHE_TAG]
+});
 
-export async function getAllActiveJobEntries() {
+export const getAllActiveJobEntries = unstable_cache(async () => {
   return prisma.job.findMany({
     where: { isActive: true },
     select: {
@@ -357,7 +395,10 @@ export async function getAllActiveJobEntries() {
     },
     orderBy: [{ updatedAt: "desc" }]
   });
-}
+}, ["active-job-sitemap-entries-v1"], {
+  revalidate: 7200,
+  tags: [PUBLIC_JOBS_CACHE_TAG]
+});
 
 export async function getCompanyAdminOptions() {
   const companies = await prisma.company.findMany({

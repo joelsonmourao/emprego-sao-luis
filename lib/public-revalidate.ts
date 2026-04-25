@@ -7,6 +7,10 @@ import { jovemAprendizCategoryPath, jovemAprendizCityPath, jovemAprendizCompanyP
 import type { EmploymentType } from "@prisma/client";
 
 export const SITEMAP_MANIFEST_CACHE_TAG = "sitemap-manifest";
+export const PUBLIC_JOBS_CACHE_TAG = "public-jobs";
+export const PUBLIC_BLOG_CACHE_TAG = "public-blog";
+export const PUBLIC_GEO_CACHE_TAG = "public-geo";
+export const PUBLIC_SITE_SETTINGS_CACHE_TAG = "public-site-settings";
 
 export type JobPublicRevalidateMeta = {
   slug: string;
@@ -40,13 +44,34 @@ function revalidateJobPaths(meta: JobPublicRevalidateMeta) {
 /** After a single job create/update/delete or visibility change. */
 export function revalidatePublicSurfacesForJob(meta: JobPublicRevalidateMeta) {
   revalidateTag(SITEMAP_MANIFEST_CACHE_TAG);
+  revalidateTag(PUBLIC_JOBS_CACHE_TAG);
+  revalidateTag(PUBLIC_GEO_CACHE_TAG);
   revalidateJobPaths(meta);
 }
 
 /** After bulk import or many updates: refresh sitemap cache and top listings without per-slug path fan-out. */
 export function revalidatePublicSurfacesAfterBulkJobChange() {
   revalidateTag(SITEMAP_MANIFEST_CACHE_TAG);
+  revalidateTag(PUBLIC_JOBS_CACHE_TAG);
+  revalidateTag(PUBLIC_GEO_CACHE_TAG);
   revalidatePath("/");
   revalidatePath("/vagas");
   revalidatePath("/empresas");
+}
+
+export function revalidatePublicSurfacesAfterBlogChange(slug?: string | null) {
+  revalidateTag(PUBLIC_BLOG_CACHE_TAG);
+  revalidateTag(SITEMAP_MANIFEST_CACHE_TAG);
+  revalidatePath("/");
+  revalidatePath("/blog");
+  if (slug) {
+    revalidatePath(`/blog/${slug}`);
+  }
+}
+
+export function revalidatePublicSurfacesAfterSiteSettingsChange() {
+  revalidateTag(PUBLIC_SITE_SETTINGS_CACHE_TAG);
+  revalidatePath("/");
+  revalidatePath("/vagas");
+  revalidatePath("/blog");
 }

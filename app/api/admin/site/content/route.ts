@@ -4,6 +4,7 @@ import { NextResponse } from "next/server";
 import { writeAuditLog } from "@/lib/audit";
 import { requireApiRole } from "@/lib/authz";
 import { getEditableSiteContent, saveSiteContent } from "@/lib/admin/site";
+import { revalidatePublicSurfacesAfterSiteSettingsChange } from "@/lib/public-revalidate";
 
 export async function GET() {
   await requireApiRole("EDITOR");
@@ -26,6 +27,7 @@ export async function PATCH(request: Request) {
       entityLabel: "Conteudo do site",
       summary: "Conteudo principal do site atualizado"
     });
+    revalidatePublicSurfacesAfterSiteSettingsChange();
     return NextResponse.json({ ok: true });
   } catch (error) {
     const message = error instanceof Error ? error.message : "Nao foi possivel salvar o conteudo do site.";

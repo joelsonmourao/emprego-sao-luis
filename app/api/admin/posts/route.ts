@@ -5,6 +5,7 @@ import { upsertBlogPostFromForm } from "@/lib/admin/blog";
 import { writeAuditLog } from "@/lib/audit";
 import { requireApiRole } from "@/lib/authz";
 import { prisma } from "@/lib/db";
+import { revalidatePublicSurfacesAfterBlogChange } from "@/lib/public-revalidate";
 
 export async function POST(request: Request) {
   try {
@@ -24,6 +25,7 @@ export async function POST(request: Request) {
       summary: "Post criado",
       after: { id: post.id, slug: post.slug, title: post.title }
     });
+    revalidatePublicSurfacesAfterBlogChange(post.slug);
 
     return NextResponse.json({ ok: true, postId: post.id });
   } catch (error) {

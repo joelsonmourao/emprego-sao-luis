@@ -21,6 +21,13 @@ const analyticsEventSchema = z.object({
 
 export async function POST(request: Request) {
   try {
+    if (process.env.INTERNAL_ANALYTICS_DB_ENABLED !== "true") {
+      return NextResponse.json(
+        { ok: true, skipped: true },
+        { headers: { "Cache-Control": "no-store" } }
+      );
+    }
+
     const payload = analyticsEventSchema.parse(await request.json());
 
     if (payload.path.startsWith("/admin")) {
