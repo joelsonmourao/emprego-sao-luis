@@ -122,47 +122,100 @@ export default async function VagasCatchAllPage({
     const requirements = Array.isArray(job.requirements) ? job.requirements : [];
     const benefits = Array.isArray(job.benefits) ? job.benefits : [];
     const publisherDisplayName = buildJobPublisherName(job.city?.name, job.state?.code);
-    const jobPostingLd = await buildJobPostingJsonLd({
-      id: job.id,
-      externalId: job.externalId,
-      seoTitle: job.seoTitle,
-      title: job.title,
-      summary: job.summary,
-      descriptionHtml: job.descriptionHtml,
-      slug: job.slug,
-      companyName: job.companyName,
-      companyLogoUrl: job.company?.logoUrl ?? job.companyLogoUrl,
-      companyWebsiteUrl: job.company?.websiteUrl ?? job.companyWebsiteUrl,
-      companySlug: job.company?.slug ?? undefined,
-      cityName: job.city.name,
-      citySlug: job.city.slug,
-      stateCode: job.state.code,
-      stateName: job.state.name,
-      locationType: job.locationType,
-      publishedAt: job.publishedAt.toISOString(),
-      expiresAt: job.expiresAt?.toISOString() ?? null,
-      validThrough: job.validThrough?.toISOString() ?? null,
-      salaryMin: job.salaryMin,
-      salaryMax: job.salaryMax,
-      requirements,
-      benefits,
-      countryCode: "BR",
-      applyUrl: job.applyUrl,
-      publisherDisplayName
-    });
-    const breadcrumbLd = buildBreadcrumbJsonLd([
-      { name: "Home", path: "/" },
-      { name: "Vagas", path: "/vagas" },
-      { name: job.title, path: `/vagas/${job.slug}` }
-    ]);
+    // #region agent log
+    fetch("http://127.0.0.1:7370/ingest/b54ed65d-267c-4421-b3af-1ea0f3df3748", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "X-Debug-Session-Id": "eb6787" },
+      body: JSON.stringify({
+        sessionId: "eb6787",
+        runId: "pre-fix",
+        hypothesisId: "H1",
+        location: "app/vagas/[...slug]/page.tsx:segments.length===1",
+        message: "job route render start",
+        data: { slug: job.slug, isActive: job.isActive },
+        timestamp: Date.now()
+      })
+    }).catch(() => {});
+    // #endregion
 
-    return (
-      <>
-        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: stringifyJobPostingJsonLd(jobPostingLd) }} />
-        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: stringifyJobPostingJsonLd(breadcrumbLd) }} />
-        <JobDetailView job={job} />
-      </>
-    );
+    try {
+      const jobPostingLd = await buildJobPostingJsonLd({
+        id: job.id,
+        externalId: job.externalId,
+        seoTitle: job.seoTitle,
+        title: job.title,
+        summary: job.summary,
+        descriptionHtml: job.descriptionHtml,
+        slug: job.slug,
+        companyName: job.companyName,
+        companyLogoUrl: job.company?.logoUrl ?? job.companyLogoUrl,
+        companyWebsiteUrl: job.company?.websiteUrl ?? job.companyWebsiteUrl,
+        companySlug: job.company?.slug ?? undefined,
+        cityName: job.city.name,
+        citySlug: job.city.slug,
+        stateCode: job.state.code,
+        stateName: job.state.name,
+        locationType: job.locationType,
+        publishedAt: job.publishedAt.toISOString(),
+        expiresAt: job.expiresAt?.toISOString() ?? null,
+        validThrough: job.validThrough?.toISOString() ?? null,
+        salaryMin: job.salaryMin,
+        salaryMax: job.salaryMax,
+        requirements,
+        benefits,
+        countryCode: "BR",
+        applyUrl: job.applyUrl,
+        publisherDisplayName
+      });
+      const breadcrumbLd = buildBreadcrumbJsonLd([
+        { name: "Home", path: "/" },
+        { name: "Vagas", path: "/vagas" },
+        { name: job.title, path: `/vagas/${job.slug}` }
+      ]);
+
+      // #region agent log
+      fetch("http://127.0.0.1:7370/ingest/b54ed65d-267c-4421-b3af-1ea0f3df3748", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "X-Debug-Session-Id": "eb6787" },
+        body: JSON.stringify({
+          sessionId: "eb6787",
+          runId: "pre-fix",
+          hypothesisId: "H2",
+          location: "app/vagas/[...slug]/page.tsx:jsonld",
+          message: "jsonld built",
+          data: { slug: job.slug, hasJobPosting: Boolean(jobPostingLd) },
+          timestamp: Date.now()
+        })
+      }).catch(() => {});
+      // #endregion
+
+      return (
+        <>
+          <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: stringifyJobPostingJsonLd(jobPostingLd) }} />
+          <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: stringifyJobPostingJsonLd(breadcrumbLd) }} />
+          <JobDetailView job={job} />
+        </>
+      );
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "unknown";
+      // #region agent log
+      fetch("http://127.0.0.1:7370/ingest/b54ed65d-267c-4421-b3af-1ea0f3df3748", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "X-Debug-Session-Id": "eb6787" },
+        body: JSON.stringify({
+          sessionId: "eb6787",
+          runId: "pre-fix",
+          hypothesisId: "H3",
+          location: "app/vagas/[...slug]/page.tsx:jsonld",
+          message: "jsonld failure fallback",
+          data: { slug: job.slug, error: message },
+          timestamp: Date.now()
+        })
+      }).catch(() => {});
+      // #endregion
+
+      return <JobDetailView job={job} />;
+    }
   }
 
   if (segments[0] === "empresa" && segments.length === 2) {
