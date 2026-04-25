@@ -134,7 +134,7 @@ export function sanitizeDirectApply(value: unknown): boolean {
 
 /** Serialização final do JobPosting: força `directApply` booleano no JSON. */
 export function stringifyJobPostingJsonLd(data: Record<string, unknown>) {
-  const directApply = sanitizeDirectApply(data.directApply ?? true);
+  const directApply = sanitizeDirectApply(data.directApply ?? false);
   // #region agent log
   fetch("http://127.0.0.1:7370/ingest/b54ed65d-267c-4421-b3af-1ea0f3df3748", {
     method: "POST",
@@ -243,7 +243,18 @@ function buildHiringOrganization(input: {
 function isPlaceholderStreetAddress(value: string | undefined | null) {
   if (!value?.trim()) return true;
   const v = value.trim().toLowerCase();
-  return v === "indefinido" || v === "a definir" || v === "nao informado" || v === "não informado" || v === "s/d" || v === "-" || v === "n/d";
+  return (
+    v === "indefinido" ||
+    v === "a definir" ||
+    v === "nao informado" ||
+    v === "não informado" ||
+    v === "endereco nao informado" ||
+    v === "endereço não informado" ||
+    v === "brasil" ||
+    v === "s/d" ||
+    v === "-" ||
+    v === "n/d"
+  );
 }
 
 async function buildJobLocationBlock(job: JobPostingJsonLdInput) {
