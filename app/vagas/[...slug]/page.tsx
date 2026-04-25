@@ -5,7 +5,7 @@ import { JobDetailView } from "@/components/vagas/job-detail-view";
 import { resolveCompanyJobsPageMetadata } from "@/lib/seo/company-jobs-metadata";
 import { buildJobPublisherName } from "@/lib/seo/job-publisher";
 import { buildJobDetailSeo } from "@/lib/seo/jobs-pages";
-import { buildBreadcrumbJsonLd, buildJobPostingJsonLd, stringifyJobPostingJsonLd } from "@/lib/seo/json-ld";
+import { buildBreadcrumbJsonLd, buildJobPostingJsonLd, stringifyJobPostingJsonLd, stringifyJsonLdSafe } from "@/lib/seo/json-ld";
 import { buildSiteMetadata } from "@/lib/seo/metadata";
 import { getJobBySlug } from "@/lib/repositories/jobs";
 import { JOB_DETAIL_PATH_RESERVED_FIRST_SEGMENTS } from "@/lib/seo/vagas-job-path";
@@ -138,6 +138,7 @@ export default async function VagasCatchAllPage({
     }).catch(() => {});
     // #endregion
 
+    let jobPostingScript: string | null = null;
     try {
       const jobPostingLd = await buildJobPostingJsonLd({
         id: job.id,
@@ -167,12 +168,6 @@ export default async function VagasCatchAllPage({
         applyUrl: job.applyUrl,
         publisherDisplayName
       });
-      const breadcrumbLd = buildBreadcrumbJsonLd([
-        { name: "Home", path: "/" },
-        { name: "Vagas", path: "/vagas" },
-        { name: job.title, path: `/vagas/${job.slug}` }
-      ]);
-
       // #region agent log
       fetch("http://127.0.0.1:7370/ingest/b54ed65d-267c-4421-b3af-1ea0f3df3748", {
         method: "POST",
@@ -189,13 +184,7 @@ export default async function VagasCatchAllPage({
       }).catch(() => {});
       // #endregion
 
-      return (
-        <>
-          <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: stringifyJobPostingJsonLd(jobPostingLd) }} />
-          <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: stringifyJobPostingJsonLd(breadcrumbLd) }} />
-          <JobDetailView job={job} />
-        </>
-      );
+      jobPostingScript = stringifyJobPostingJsonLd(jobPostingLd);
     } catch (error) {
       const message = error instanceof Error ? error.message : "unknown";
       // #region agent log
@@ -213,9 +202,44 @@ export default async function VagasCatchAllPage({
         })
       }).catch(() => {});
       // #endregion
-
-      return <JobDetailView job={job} />;
+      jobPostingScript = stringifyJsonLdSafe({
+        "@context": "https://schema.org",
+        "@type": "JobPosting",
+        title: job.title,
+        datePosted: job.publishedAt.toISOString(),
+        validThrough: (job.validThrough ?? job.expiresAt ?? job.publishedAt).toISOString(),
+        employmentType: ["PART_TIME"],
+        hiringOrganization: {
+          "@type": "Organization",
+          name: job.companyName
+        },
+        jobLocation: {
+          "@type": "Place",
+          address: {
+            "@type": "PostalAddress",
+            addressLocality: job.city.name,
+            addressRegion: job.state.code,
+            addressCountry: "BR"
+          }
+        },
+        url: `https://slzcontent.com.br/vagas/${job.slug}`,
+        directApply: false
+      });
     }
+
+    const breadcrumbLd = buildBreadcrumbJsonLd([
+      { name: "Home", path: "/" },
+      { name: "Vagas", path: "/vagas" },
+      { name: job.title, path: `/vagas/${job.slug}` }
+    ]);
+
+    return (
+      <>
+        {jobPostingScript ? <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jobPostingScript }} /> : null}
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: stringifyJsonLdSafe(breadcrumbLd) }} />
+        <JobDetailView job={job} />
+      </>
+    );
   }
 
   if (segments[0] === "empresa" && segments.length === 2) {
