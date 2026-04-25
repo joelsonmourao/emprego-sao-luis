@@ -88,6 +88,8 @@ export type JobPostingJsonLdInput = {
   industry?: string | null;
   /** Código CBO (ex.: 4110-10); quando ausente, usa padrão administrativo genérico. */
   occupationalCategory?: string | null;
+  /** Valor bruto da fonte (CMS/DB/API); sanitizado para boolean nativo no JSON-LD. */
+  directApply?: unknown;
 };
 
 function normalizeIsoDate(value?: string | null) {
@@ -99,6 +101,19 @@ function normalizeIsoDate(value?: string | null) {
 /** Normaliza ISO para schema (remove sufixo de milissegundos `.000Z` → `Z`). */
 export function sanitizeISODate(dateStr: string | undefined | null) {
   return dateStr?.replace(/\.\d{3}Z$/, "Z") ?? dateStr;
+}
+
+export function sanitizeDirectApply(value: unknown): boolean {
+  if (
+    value === true ||
+    value === "true" ||
+    value === "1" ||
+    value === "http://schema.org/True" ||
+    value === "True"
+  ) {
+    return true;
+  }
+  return false;
 }
 
 function escapeHtmlText(s: string) {
@@ -285,8 +300,7 @@ export async function buildJobPostingJsonLd(job: JobPostingJsonLdInput) {
     };
   }
 
-  // Booleano JSON nativo (evita string tipo "http://schema.org/True" em ferramentas/serialização).
-  data.directApply = true;
+  data.directApply = sanitizeDirectApply(job.directApply ?? true);
 
   return data;
 }
