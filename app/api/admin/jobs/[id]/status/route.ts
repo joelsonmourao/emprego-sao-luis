@@ -5,9 +5,7 @@ import { z } from "zod";
 import { writeAuditLog } from "@/lib/audit";
 import { requireApiRole } from "@/lib/authz";
 import { prisma } from "@/lib/db";
-import { notifyGoogleIndexing } from "@/lib/google-indexing";
 import { revalidatePublicSurfacesForJob } from "@/lib/public-revalidate";
-import { getSiteUrl } from "@/lib/site-url";
 
 const schema = z.object({
   isActive: z.boolean()
@@ -35,25 +33,6 @@ export async function PATCH(request: Request, context: Context) {
         city: { select: { slug: true } },
         company: { select: { slug: true } }
       }
-    });
-
-    const publicUrl = getSiteUrl(`/vagas/${updated.slug}`);
-    const indexingResult = await notifyGoogleIndexing(publicUrl, body.isActive ? "URL_UPDATED" : "URL_DELETED");
-
-    await prisma.job.update({
-      where: { id: updated.id },
-      data: indexingResult.ok
-        ? {
-            googleIndexingStatus: "OK",
-            googleIndexingMessage: indexingResult.message,
-            googleIndexedAt: new Date(),
-            publishedPublicUrl: publicUrl
-          }
-        : {
-            googleIndexingStatus: "ERRO",
-            googleIndexingMessage: indexingResult.message,
-            publishedPublicUrl: publicUrl
-          }
     });
 
     revalidatePublicSurfacesForJob({

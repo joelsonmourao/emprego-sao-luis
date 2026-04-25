@@ -5,33 +5,13 @@ import { upsertJobFromForm } from "@/lib/admin/jobs";
 import { writeAuditLog } from "@/lib/audit";
 import { requireApiRole } from "@/lib/authz";
 import { prisma } from "@/lib/db";
-import { notifyGoogleIndexing } from "@/lib/google-indexing";
 import { revalidatePublicSurfacesForJob } from "@/lib/public-revalidate";
-import { getSiteUrl } from "@/lib/site-url";
 
 export async function POST(request: Request) {
   try {
     const session = await requireApiRole("EDITOR");
     const payload = await request.json();
     const job = await upsertJobFromForm(payload);
-    const publicUrl = getSiteUrl(`/vagas/${job.slug}`);
-    const indexingResult = await notifyGoogleIndexing(publicUrl, "URL_UPDATED");
-
-    await prisma.job.update({
-      where: { id: job.id },
-      data: indexingResult.ok
-        ? {
-            googleIndexingStatus: "OK",
-            googleIndexingMessage: indexingResult.message,
-            googleIndexedAt: new Date(),
-            publishedPublicUrl: publicUrl
-          }
-        : {
-            googleIndexingStatus: "ERRO",
-            googleIndexingMessage: indexingResult.message,
-            publishedPublicUrl: publicUrl
-          }
-    });
 
     revalidatePublicSurfacesForJob({
       slug: job.slug,

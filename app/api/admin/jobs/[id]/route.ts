@@ -4,10 +4,7 @@ import { NextResponse } from "next/server";
 import { deleteJob, upsertJobFromForm } from "@/lib/admin/jobs";
 import { writeAuditLog } from "@/lib/audit";
 import { requireApiRole } from "@/lib/authz";
-import { prisma } from "@/lib/db";
-import { notifyGoogleIndexing } from "@/lib/google-indexing";
 import { revalidatePublicSurfacesForJob } from "@/lib/public-revalidate";
-import { getSiteUrl } from "@/lib/site-url";
 
 type Context = {
   params: Promise<{ id: string }>;
@@ -19,24 +16,6 @@ export async function PATCH(request: Request, context: Context) {
     const { id } = await context.params;
     const payload = await request.json();
     const job = await upsertJobFromForm(payload, id);
-    const publicUrl = getSiteUrl(`/vagas/${job.slug}`);
-    const indexingResult = await notifyGoogleIndexing(publicUrl, "URL_UPDATED");
-
-    await prisma.job.update({
-      where: { id: job.id },
-      data: indexingResult.ok
-        ? {
-            googleIndexingStatus: "OK",
-            googleIndexingMessage: indexingResult.message,
-            googleIndexedAt: new Date(),
-            publishedPublicUrl: publicUrl
-          }
-        : {
-            googleIndexingStatus: "ERRO",
-            googleIndexingMessage: indexingResult.message,
-            publishedPublicUrl: publicUrl
-          }
-    });
 
     revalidatePublicSurfacesForJob({
       slug: job.slug,

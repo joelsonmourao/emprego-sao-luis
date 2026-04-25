@@ -5,10 +5,8 @@ import { normalizeLines, normalizeSlug, parseOptionalDate, richTextFromInput, sa
 import { writeAuditLog } from "@/lib/audit";
 import { requireApiRole } from "@/lib/authz";
 import { prisma } from "@/lib/db";
-import { notifyGoogleIndexing } from "@/lib/google-indexing";
 import { revalidatePublicSurfacesAfterBulkJobChange } from "@/lib/public-revalidate";
 import { importJobsPayloadSchema, type ImportedJobRow } from "@/lib/schemas/job-import";
-import { getSiteUrl } from "@/lib/site-url";
 
 const RESPONSE_HEADERS = {
   "Cache-Control": "no-store"
@@ -627,23 +625,6 @@ async function processRows(rows: ImportedJobRow[], context: ImportContext, queue
     for (let i = 0; i < persisted.length; i += 1) {
       const saved = persisted[i];
       const rowMeta = batchRows[i];
-      const publicUrl = getSiteUrl(`/vagas/${saved.slug}`);
-      const indexingResult = await notifyGoogleIndexing(publicUrl, "URL_UPDATED");
-      await prisma.job.update({
-        where: { id: saved.id },
-        data: indexingResult.ok
-          ? {
-              googleIndexingStatus: "OK",
-              googleIndexingMessage: indexingResult.message,
-              googleIndexedAt: new Date(),
-              publishedPublicUrl: publicUrl
-            }
-          : {
-              googleIndexingStatus: "ERRO",
-              googleIndexingMessage: indexingResult.message,
-              publishedPublicUrl: publicUrl
-            }
-      });
       if (rowMeta?.wasUpdate) {
         context.updated.push(saved.slug);
       } else {
