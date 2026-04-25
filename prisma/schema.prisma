@@ -53,6 +53,13 @@ enum JobPublicationStatus {
   ERRO
 }
 
+enum ImportQueueStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  FAILED
+}
+
 model State {
   id        String   @id @default(cuid())
   code      String   @unique @db.VarChar(2)
@@ -164,6 +171,28 @@ model Job {
   @@index([stateId, cityId, isActive])
   @@index([companyId, isActive])
   @@index([publicationStatus, scheduledPublishAt])
+}
+
+model ImportQueue {
+  id            String            @id @default(cuid())
+  status        ImportQueueStatus @default(PENDING)
+  payload       Json
+  totalRows     Int               @default(0)
+  processedRows Int               @default(0)
+  importedCount Int               @default(0)
+  updatedCount  Int               @default(0)
+  errorCount    Int               @default(0)
+  result        Json?
+  errorMessage  String?           @db.Text
+  createdById   String?
+  createdByName String?
+  createdByEmail String?
+  startedAt     DateTime?
+  finishedAt    DateTime?
+  createdAt     DateTime          @default(now())
+  updatedAt     DateTime          @updatedAt
+
+  @@index([status, createdAt(sort: Desc)])
 }
 
 model BlogCategory {

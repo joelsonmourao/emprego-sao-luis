@@ -1,18 +1,20 @@
-import { AuditAction, EmploymentType, LocationType, type City, type Company, type Job, type State } from "@prisma/client";
+import { AuditAction, EmploymentType, ImportQueueStatus, LocationType, Prisma, type City, type Company, type Job, type State } from "@prisma/client";
 import { NextResponse } from "next/server";
 
 import { normalizeLines, normalizeSlug, parseOptionalDate, richTextFromInput, sanitizeText } from "@/lib/admin/content";
 import { writeAuditLog } from "@/lib/audit";
 import { requireApiRole } from "@/lib/authz";
 import { prisma } from "@/lib/db";
+import { notifyGoogleIndexing } from "@/lib/google-indexing";
 import { revalidatePublicSurfacesAfterBulkJobChange } from "@/lib/public-revalidate";
 import { importJobsPayloadSchema, type ImportedJobRow } from "@/lib/schemas/job-import";
+import { getSiteUrl } from "@/lib/site-url";
 
 const RESPONSE_HEADERS = {
   "Cache-Control": "no-store"
 };
 
-const IMPORT_BATCH_SIZE = 100;
+const IMPORT_BATCH_SIZE = 10;
 const CLAUDE_DESCRIPTION_MODEL = "claude-haiku-4-5-20251001";
 const BRAZILIAN_UFS = new Set([
   "AC",
@@ -64,7 +66,10 @@ type ImportContext = {
   issues: ImportIssue[];
   imported: string[];
   updated: string[];
+  processedRows: number;
 };
+
+export const maxDuration = 60;
 
 function normalizeKey(input: string) {
   return input
@@ -506,7 +511,8 @@ async function buildImportContext(rows: ImportedJobRow[]): Promise<ImportContext
     usedJobSlugs: usedSlugs,
     issues: [],
     imported: [],
-    updated: []
+    updated: [],
+    processedRows: 0
   };
 
   return context;
@@ -563,29 +569,20 @@ function buildJobData(row: ImportedJobRow, state: State, city: City, company: Co
   };
 }
 
-async function processRows(rows: ImportedJobRow[], context: ImportContext, options?: { useAi?: boolean }) {
-  const operations: Array<
-    ReturnType<typeof prisma.job.create> | ReturnType<typeof prisma.job.update> | ReturnType<typeof prisma.job.upsert>
-  > = [];
+async function processRows(rows: ImportedJobRow[], context: ImportContext, queueId: string, options?: { useAi?: boolean }) {
+  const operations: Prisma.PrismaPromise<Job>[] = [];
+  const queuedRows: Array<{ slug: string; wasUpdate: boolean }> = [];
 
   for (const [index, row] of rows.entries()) {
     const line = index + 2;
 
     try {
       const state = resolveState(context, row);
-      if (!state) {
-        throw new Error(`Estado nao encontrado para "${row.stateName}".`);
-      }
-
+      if (!state) throw new Error(`Estado nao encontrado para "${row.stateName}".`);
       const city = resolveCity(context, state.id, row);
-      if (!city) {
-        throw new Error(`Cidade nao encontrada para "${row.cityName}".`);
-      }
-
+      if (!city) throw new Error(`Cidade nao encontrada para "${row.cityName}".`);
       const company = resolveCompany(context, row);
-      if (!company) {
-        throw new Error(`Empresa nao encontrada para "${row.companyName}".`);
-      }
+      if (!company) throw new Error(`Empresa nao encontrada para "${row.companyName}".`);
 
       const externalId = row.externalId?.trim() || null;
       const baseSlug = normalizeSlug(row.slug || row.title);
@@ -594,66 +591,17 @@ async function processRows(rows: ImportedJobRow[], context: ImportContext, optio
       const existing = existingByExternalId ?? (!externalId ? existingBySlug : null);
       const keepCurrentSlug = existingByExternalId?.slug ?? (!externalId ? existingBySlug?.slug : undefined);
       const uniqueSlug = ensureUniqueJobSlug(baseSlug, context.usedJobSlugs, keepCurrentSlug);
-      const rowForSave = options?.useAi
-        ? {
-            ...row,
-            descriptionHtml: await generateUniqueDescriptionWithClaude(row)
-          }
-        : row;
+      const rowForSave = options?.useAi ? { ...row, descriptionHtml: await generateUniqueDescriptionWithClaude(row) } : row;
       const data = buildJobData(rowForSave, state, city, company, uniqueSlug, existing ?? undefined);
 
       if (externalId) {
         const alreadyKnown = context.jobsByExternalId.has(externalId);
-        const trackedId = existingByExternalId?.id ?? `pending:${externalId}`;
-
-        operations.push(
-          prisma.job.upsert({
-            where: { externalId },
-            create: data,
-            update: data
-          })
-        );
-
-        context.jobsByExternalId.set(externalId, {
-          id: trackedId,
-          slug: uniqueSlug,
-          publishedAt: data.publishedAt,
-          externalId
-        });
-        context.jobsBySlug.set(uniqueSlug, {
-          id: trackedId,
-          slug: uniqueSlug,
-          publishedAt: data.publishedAt,
-          externalId
-        });
-
-        if (alreadyKnown) {
-          context.updated.push(uniqueSlug);
-        } else {
-          context.imported.push(uniqueSlug);
-        }
+        operations.push(prisma.job.upsert({ where: { externalId }, create: data, update: data }));
+        queuedRows.push({ slug: uniqueSlug, wasUpdate: alreadyKnown });
       } else {
         const alreadyKnownBySlug = context.jobsBySlug.has(baseSlug);
-
-        operations.push(
-          prisma.job.upsert({
-            where: { slug: existing?.slug ?? uniqueSlug },
-            create: data,
-            update: data
-          })
-        );
-
-        context.jobsBySlug.set(uniqueSlug, {
-          id: `pending:${uniqueSlug}`,
-          slug: uniqueSlug,
-          publishedAt: data.publishedAt,
-          externalId
-        });
-        if (alreadyKnownBySlug) {
-          context.updated.push(uniqueSlug);
-        } else {
-          context.imported.push(uniqueSlug);
-        }
+        operations.push(prisma.job.upsert({ where: { slug: existing?.slug ?? uniqueSlug }, create: data, update: data }));
+        queuedRows.push({ slug: uniqueSlug, wasUpdate: alreadyKnownBySlug });
       }
     } catch (error) {
       context.issues.push({
@@ -661,21 +609,130 @@ async function processRows(rows: ImportedJobRow[], context: ImportContext, optio
         title: row.title,
         message: error instanceof Error ? error.message : "Erro desconhecido ao processar a linha."
       });
+      context.processedRows += 1;
+      await prisma.importQueue.update({
+        where: { id: queueId },
+        data: { processedRows: context.processedRows, errorCount: context.issues.length }
+      });
     }
   }
 
+  let operationOffset = 0;
   for (const batch of chunkArray(operations, IMPORT_BATCH_SIZE)) {
     if (!batch.length) continue;
-    await prisma.$transaction(batch);
+    const persisted = await prisma.$transaction(batch);
+    const batchRows = queuedRows.slice(operationOffset, operationOffset + persisted.length);
+    operationOffset += persisted.length;
+
+    for (let i = 0; i < persisted.length; i += 1) {
+      const saved = persisted[i];
+      const rowMeta = batchRows[i];
+      const publicUrl = getSiteUrl(`/vagas/${saved.slug}`);
+      const indexingResult = await notifyGoogleIndexing(publicUrl, "URL_UPDATED");
+      await prisma.job.update({
+        where: { id: saved.id },
+        data: indexingResult.ok
+          ? {
+              googleIndexingStatus: "OK",
+              googleIndexingMessage: indexingResult.message,
+              googleIndexedAt: new Date(),
+              publishedPublicUrl: publicUrl
+            }
+          : {
+              googleIndexingStatus: "ERRO",
+              googleIndexingMessage: indexingResult.message,
+              publishedPublicUrl: publicUrl
+            }
+      });
+      if (rowMeta?.wasUpdate) {
+        context.updated.push(saved.slug);
+      } else {
+        context.imported.push(saved.slug);
+      }
+      context.processedRows += 1;
+    }
+
+    await prisma.importQueue.update({
+      where: { id: queueId },
+      data: {
+        processedRows: context.processedRows,
+        importedCount: context.imported.length,
+        updatedCount: context.updated.length,
+        errorCount: context.issues.length
+      }
+    });
+  }
+}
+
+async function processQueuedImport(queueId: string) {
+  const startedAt = Date.now();
+  const claimed = await prisma.importQueue.updateMany({
+    where: { id: queueId, status: ImportQueueStatus.PENDING },
+    data: { status: ImportQueueStatus.PROCESSING, startedAt: new Date() }
+  });
+  if (!claimed.count) return;
+
+  const queue = await prisma.importQueue.findUnique({ where: { id: queueId } });
+  if (!queue) return;
+
+  try {
+    const payload = importJobsPayloadSchema.parse(queue.payload);
+    const rows = payload.rows.map(sanitizeImportedRow);
+    const context = await buildImportContext(rows);
+    await processRows(rows, context, queueId, { useAi: payload.useAi });
+
+    if (context.imported.length || context.updated.length) {
+      revalidatePublicSurfacesAfterBulkJobChange();
+    }
+
+    await prisma.importQueue.update({
+      where: { id: queueId },
+      data: {
+        status: ImportQueueStatus.COMPLETED,
+        finishedAt: new Date(),
+        processedRows: rows.length,
+        importedCount: context.imported.length,
+        updatedCount: context.updated.length,
+        errorCount: context.issues.length,
+        result: {
+          durationMs: Date.now() - startedAt,
+          imported: context.imported,
+          updated: context.updated,
+          issues: context.issues
+        }
+      }
+    });
+
+    await writeAuditLog({
+      actorId: queue.createdById ?? undefined,
+      actorName: queue.createdByName ?? undefined,
+      actorEmail: queue.createdByEmail ?? undefined,
+      action: AuditAction.IMPORT,
+      entityType: "job-import-queue",
+      entityId: queueId,
+      summary: "Importacao de vagas finalizada em fila",
+      after: {
+        importedCount: context.imported.length,
+        updatedCount: context.updated.length,
+        errorCount: context.issues.length
+      }
+    });
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "Nao foi possivel processar a fila de importacao.";
+    await prisma.importQueue.update({
+      where: { id: queueId },
+      data: {
+        status: ImportQueueStatus.FAILED,
+        finishedAt: new Date(),
+        errorMessage: message
+      }
+    });
   }
 }
 
 export async function POST(request: Request) {
-  const startedAt = Date.now();
-
   try {
     const session = await requireApiRole("EDITOR");
-
     let rawBody: unknown;
     try {
       rawBody = await request.json();
@@ -689,70 +746,32 @@ export async function POST(request: Request) {
       return buildJsonError(400, "Nenhuma linha valida foi enviada para importacao.");
     }
 
-    const context = await buildImportContext(rows);
-    await processRows(rows, context, { useAi: payload.useAi });
-
-    if (context.imported.length || context.updated.length) {
-      revalidatePublicSurfacesAfterBulkJobChange();
-    }
-
-    await writeAuditLog({
-      actorId: session.sub,
-      actorName: session.name,
-      actorEmail: session.email,
-      actorRole: session.role,
-      action: AuditAction.IMPORT,
-      entityType: "job-import",
-      summary: "Importacao de vagas por planilha",
-      after: {
-        importedCount: context.imported.length,
-        updatedCount: context.updated.length,
-        errorCount: context.issues.length,
-        imported: context.imported,
-        updated: context.updated
-      }
+    const queue = await prisma.importQueue.create({
+      data: {
+        status: ImportQueueStatus.PENDING,
+        payload: payload,
+        totalRows: rows.length,
+        createdById: session.sub,
+        createdByName: session.name,
+        createdByEmail: session.email
+      },
+      select: { id: true, status: true, totalRows: true, createdAt: true }
     });
 
-    const durationMs = Date.now() - startedAt;
+    void processQueuedImport(queue.id);
 
     return NextResponse.json(
       {
         ok: true,
-        summary: {
-          totalRows: rows.length,
-          importedCount: context.imported.length,
-          updatedCount: context.updated.length,
-          errorCount: context.issues.length,
-          successRate: Math.round(((context.imported.length + context.updated.length) / rows.length) * 100),
-          durationMs
-        },
-        results: {
-          imported: context.imported.map((slug) => ({ slug, status: "imported" })),
-          updated: context.updated.map((slug) => ({ slug, status: "updated" })),
-          errors: context.issues.map((issue) => ({
-            line: issue.line,
-            message: issue.message,
-            fullError: `${issue.title}: ${issue.message}`
-          }))
-        },
-        debug: {
-          errorDetails: context.issues.map((issue) => `Linha ${issue.line}: ${issue.message}`)
-        }
+        queueId: queue.id,
+        status: queue.status,
+        totalRows: queue.totalRows,
+        createdAt: queue.createdAt
       },
-      {
-        headers: RESPONSE_HEADERS
-      }
+      { headers: RESPONSE_HEADERS }
     );
   } catch (error) {
-    console.error("Erro na importacao de vagas:", error);
-
-    const message = error instanceof Error ? error.message : "Nao foi possivel importar a planilha.";
-
-    return buildJsonError(400, message, {
-      debug: {
-        errorType: error instanceof Error ? error.constructor.name : "UnknownError",
-        stack: error instanceof Error ? error.stack : null
-      }
-    });
+    const message = error instanceof Error ? error.message : "Nao foi possivel enfileirar a importacao.";
+    return buildJsonError(400, message);
   }
 }
