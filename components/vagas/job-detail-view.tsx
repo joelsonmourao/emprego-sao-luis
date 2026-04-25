@@ -9,6 +9,7 @@ import { JsonLd } from "@/components/json-ld";
 import { SectionHeading } from "@/components/section-heading";
 import { Button } from "@/components/ui/button";
 import { sanitizeRichTextHtml } from "@/lib/rich-text";
+import { buildJobPublisherName } from "@/lib/seo/job-publisher";
 import { getCityJobsPath, getCompanyJobsPath, getStateJobsPath } from "@/lib/seo/jobs-pages";
 import { buildBreadcrumbJsonLd, buildJobPostingJsonLd, stringifyJobPostingJsonLd } from "@/lib/seo/json-ld";
 import { getRelatedPosts } from "@/lib/repositories/blog";
@@ -20,6 +21,7 @@ type JobWithRelations = NonNullable<Awaited<ReturnType<typeof getJobBySlug>>>;
 export async function JobDetailView({ job }: { job: JobWithRelations }) {
   const requirements = Array.isArray(job.requirements) ? job.requirements : [];
   const benefits = Array.isArray(job.benefits) ? job.benefits : [];
+  const publisherDisplayName = buildJobPublisherName(job.city?.name, job.state?.code);
 
   const jobPostingLd =
     job.isActive ?
@@ -48,7 +50,8 @@ export async function JobDetailView({ job }: { job: JobWithRelations }) {
         requirements,
         benefits,
         countryCode: "BR",
-        applyUrl: job.applyUrl
+        applyUrl: job.applyUrl,
+        publisherDisplayName
       })
     : null;
 
@@ -220,6 +223,9 @@ export async function JobDetailView({ job }: { job: JobWithRelations }) {
                 Conhecer a empresa
               </TrackedExternalLink>
             ) : null}
+            <p className="mt-3 text-xs leading-5 text-[var(--brand-text-secondary)] sm:mt-4 sm:text-sm">
+              Fonte: {publisherDisplayName}
+            </p>
           </div>
 
           <PublicAdSlot slotSlug="job-sidebar" format="rectangle" fullWidthResponsive />

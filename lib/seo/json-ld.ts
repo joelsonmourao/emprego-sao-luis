@@ -93,6 +93,7 @@ export type JobPostingJsonLdInput = {
   applyUrl: string;
   /** Valor bruto da fonte (CMS/DB/API); quando definido, sobrescreve a inferência a partir de applyUrl. */
   directApply?: unknown;
+  publisherDisplayName?: string | null;
 };
 
 /** Schema.org: candidatura no próprio domínio da vaga vs link externo. */
@@ -309,8 +310,8 @@ export async function buildJobPostingJsonLd(job: JobPostingJsonLdInput) {
     title: (job.seoTitle?.trim() || job.title).trim(),
     identifier: {
       "@type": "PropertyValue",
-      name: job.companyName,
-      value: (job.externalId?.trim() || job.id).trim()
+      name: job.publisherDisplayName?.trim() || job.companyName,
+      value: (job.id || job.slug).trim()
     },
     datePosted: sanitizeISODate(datePostedRaw) ?? datePostedRaw,
     validThrough: sanitizeISODate(validThroughRaw) ?? validThroughRaw,

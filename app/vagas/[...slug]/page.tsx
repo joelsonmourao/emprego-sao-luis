@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { CompanyJobsListing } from "@/components/vagas/company-jobs-listing";
 import { JobDetailView } from "@/components/vagas/job-detail-view";
 import { resolveCompanyJobsPageMetadata } from "@/lib/seo/company-jobs-metadata";
+import { buildJobPublisherName } from "@/lib/seo/job-publisher";
 import { buildJobDetailSeo } from "@/lib/seo/jobs-pages";
 import { buildSiteMetadata } from "@/lib/seo/metadata";
 import { getJobBySlug } from "@/lib/repositories/jobs";
@@ -58,8 +59,8 @@ export async function generateMetadata({
       stateCode: job.state.code,
       slug: job.slug
     });
-
-    return buildSiteMetadata({
+    const publisherDisplayName = buildJobPublisherName(job.city?.name, job.state?.code);
+    const metadata = await buildSiteMetadata({
       title: job.seoTitle ?? seo.title,
       description: job.seoDescription ?? seo.description,
       pathname: `/vagas/${job.slug}`,
@@ -67,6 +68,14 @@ export async function generateMetadata({
       noIndex: !job.isActive,
       socialImageUrl: job.heroImageUrl || job.company?.socialImageUrl || job.companyLogoUrl || undefined
     });
+
+    metadata.publisher = publisherDisplayName;
+    metadata.applicationName = publisherDisplayName;
+    if (metadata.openGraph) {
+      metadata.openGraph.siteName = publisherDisplayName;
+    }
+
+    return metadata;
   }
 
   if (segments[0] === "empresa" && segments.length === 2) {
