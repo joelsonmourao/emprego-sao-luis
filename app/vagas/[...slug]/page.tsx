@@ -10,7 +10,7 @@ import { buildSiteMetadata } from "@/lib/seo/metadata";
 import { getJobBySlug } from "@/lib/repositories/jobs";
 import { JOB_DETAIL_PATH_RESERVED_FIRST_SEGMENTS } from "@/lib/seo/vagas-job-path";
 
-export const revalidate = 2700;
+export const revalidate = 1;
 
 export async function generateMetadata({
   params,
