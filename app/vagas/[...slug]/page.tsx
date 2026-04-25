@@ -5,6 +5,7 @@ import { JobDetailView } from "@/components/vagas/job-detail-view";
 import { resolveCompanyJobsPageMetadata } from "@/lib/seo/company-jobs-metadata";
 import { buildJobPublisherName } from "@/lib/seo/job-publisher";
 import { buildJobDetailSeo } from "@/lib/seo/jobs-pages";
+import { buildBreadcrumbJsonLd, buildJobPostingJsonLd, stringifyJobPostingJsonLd } from "@/lib/seo/json-ld";
 import { buildSiteMetadata } from "@/lib/seo/metadata";
 import { getJobBySlug } from "@/lib/repositories/jobs";
 import { JOB_DETAIL_PATH_RESERVED_FIRST_SEGMENTS } from "@/lib/seo/vagas-job-path";
@@ -117,7 +118,51 @@ export default async function VagasCatchAllPage({
     if (!job) {
       notFound();
     }
-    return <JobDetailView job={job} />;
+
+    const requirements = Array.isArray(job.requirements) ? job.requirements : [];
+    const benefits = Array.isArray(job.benefits) ? job.benefits : [];
+    const publisherDisplayName = buildJobPublisherName(job.city?.name, job.state?.code);
+    const jobPostingLd = await buildJobPostingJsonLd({
+      id: job.id,
+      externalId: job.externalId,
+      seoTitle: job.seoTitle,
+      title: job.title,
+      summary: job.summary,
+      descriptionHtml: job.descriptionHtml,
+      slug: job.slug,
+      companyName: job.companyName,
+      companyLogoUrl: job.company?.logoUrl ?? job.companyLogoUrl,
+      companyWebsiteUrl: job.company?.websiteUrl ?? job.companyWebsiteUrl,
+      companySlug: job.company?.slug ?? undefined,
+      cityName: job.city.name,
+      citySlug: job.city.slug,
+      stateCode: job.state.code,
+      stateName: job.state.name,
+      locationType: job.locationType,
+      publishedAt: job.publishedAt.toISOString(),
+      expiresAt: job.expiresAt?.toISOString() ?? null,
+      validThrough: job.validThrough?.toISOString() ?? null,
+      salaryMin: job.salaryMin,
+      salaryMax: job.salaryMax,
+      requirements,
+      benefits,
+      countryCode: "BR",
+      applyUrl: job.applyUrl,
+      publisherDisplayName
+    });
+    const breadcrumbLd = buildBreadcrumbJsonLd([
+      { name: "Home", path: "/" },
+      { name: "Vagas", path: "/vagas" },
+      { name: job.title, path: `/vagas/${job.slug}` }
+    ]);
+
+    return (
+      <>
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: stringifyJobPostingJsonLd(jobPostingLd) }} />
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: stringifyJobPostingJsonLd(breadcrumbLd) }} />
+        <JobDetailView job={job} />
+      </>
+    );
   }
 
   if (segments[0] === "empresa" && segments.length === 2) {

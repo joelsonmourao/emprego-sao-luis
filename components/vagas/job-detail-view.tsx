@@ -5,13 +5,11 @@ import { TrackedExternalLink } from "@/components/analytics/tracked-external-lin
 import { BlogCard } from "@/components/blog-card";
 import { Breadcrumbs } from "@/components/breadcrumbs";
 import { JobCard } from "@/components/job-card";
-import { JsonLd } from "@/components/json-ld";
 import { SectionHeading } from "@/components/section-heading";
 import { Button } from "@/components/ui/button";
 import { sanitizeRichTextHtml } from "@/lib/rich-text";
 import { buildJobPublisherName } from "@/lib/seo/job-publisher";
 import { getCityJobsPath, getCompanyJobsPath, getStateJobsPath } from "@/lib/seo/jobs-pages";
-import { buildBreadcrumbJsonLd, buildJobPostingJsonLd, stringifyJobPostingJsonLd } from "@/lib/seo/json-ld";
 import { getRelatedPosts } from "@/lib/repositories/blog";
 import { getJobBySlug, getRelatedJobs } from "@/lib/repositories/jobs";
 import { formatDate } from "@/lib/utils";
@@ -22,38 +20,6 @@ export async function JobDetailView({ job }: { job: JobWithRelations }) {
   const requirements = Array.isArray(job.requirements) ? job.requirements : [];
   const benefits = Array.isArray(job.benefits) ? job.benefits : [];
   const publisherDisplayName = buildJobPublisherName(job.city?.name, job.state?.code);
-
-  const jobPostingLd =
-    job.isActive ?
-      await buildJobPostingJsonLd({
-        id: job.id,
-        externalId: job.externalId,
-        seoTitle: job.seoTitle,
-        title: job.title,
-        summary: job.summary,
-        descriptionHtml: job.descriptionHtml,
-        slug: job.slug,
-        companyName: job.companyName,
-        companyLogoUrl: job.company?.logoUrl ?? job.companyLogoUrl,
-        companyWebsiteUrl: job.company?.websiteUrl ?? job.companyWebsiteUrl,
-        companySlug: job.company?.slug ?? undefined,
-        cityName: job.city.name,
-        citySlug: job.city.slug,
-        stateCode: job.state.code,
-        stateName: job.state.name,
-        locationType: job.locationType,
-        publishedAt: job.publishedAt.toISOString(),
-        expiresAt: job.expiresAt?.toISOString() ?? null,
-        validThrough: job.validThrough?.toISOString() ?? null,
-        salaryMin: job.salaryMin,
-        salaryMax: job.salaryMax,
-        requirements,
-        benefits,
-        countryCode: "BR",
-        applyUrl: job.applyUrl,
-        publisherDisplayName
-      })
-    : null;
 
   const [relatedJobs, relatedPosts] = await Promise.all([
     getRelatedJobs({
@@ -68,11 +34,6 @@ export async function JobDetailView({ job }: { job: JobWithRelations }) {
 
   return (
     <section className="mx-auto max-w-7xl space-y-6 px-4 py-6 sm:px-6 sm:py-8 sm:space-y-8 lg:px-8 lg:py-10">
-      {jobPostingLd ? (
-        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: stringifyJobPostingJsonLd(jobPostingLd) }} />
-      ) : null}
-      <JsonLd data={buildBreadcrumbJsonLd([{ name: "Home", path: "/" }, { name: "Vagas", path: "/vagas" }, { name: job.title, path: `/vagas/${job.slug}` }])} />
-
       <Breadcrumbs items={[{ label: "Home", href: "/" }, { label: "Vagas", href: "/vagas" }, { label: job.title }]} />
 
       <div className="brand-page-hero rounded-[1.5rem] border border-slate-200 px-4 py-5 shadow-[0_35px_120px_-70px_rgba(26,43,76,0.22)] sm:rounded-[2rem] sm:px-5 sm:py-6 sm:rounded-[2.2rem] sm:px-8 sm:py-8">
