@@ -13,6 +13,16 @@ import { absoluteUrl } from "@/lib/utils";
 
 export const revalidate = 1;
 
+function toValidDate(value: unknown): Date | null {
+  if (!value) return null;
+  const date = value instanceof Date ? value : new Date(String(value));
+  return Number.isNaN(date.getTime()) ? null : date;
+}
+
+function toIso(value: unknown, fallbackIso: string) {
+  return toValidDate(value)?.toISOString() ?? fallbackIso;
+}
+
 export async function generateMetadata({
   params,
   searchParams
@@ -123,6 +133,31 @@ export default async function VagasCatchAllPage({
     const requirements = Array.isArray(job.requirements) ? job.requirements : [];
     const benefits = Array.isArray(job.benefits) ? job.benefits : [];
     const publisherDisplayName = buildJobPublisherName(job.city?.name, job.state?.code);
+    const nowIso = new Date().toISOString();
+    const publishedAtIso = toIso(job.publishedAt, nowIso);
+    const expiresAtIso = toValidDate(job.expiresAt)?.toISOString() ?? null;
+    const validThroughIso = toValidDate(job.validThrough)?.toISOString() ?? null;
+    const effectiveValidThroughIso = toIso(job.validThrough ?? job.expiresAt ?? job.publishedAt, publishedAtIso);
+
+    // #region agent log
+    fetch("http://127.0.0.1:7370/ingest/b54ed65d-267c-4421-b3af-1ea0f3df3748", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "X-Debug-Session-Id": "eb6787" },
+      body: JSON.stringify({
+        sessionId: "eb6787",
+        runId: "pre-fix",
+        hypothesisId: "H1",
+        location: "app/vagas/[...slug]/page.tsx",
+        message: "job date normalization",
+        data: {
+          slug: job.slug,
+          publishedAtType: typeof job.publishedAt,
+          hasPublishedAtIso: Boolean(publishedAtIso)
+        },
+        timestamp: Date.now()
+      })
+    }).catch(() => {});
+    // #endregion
 
     let jobPostingScript: string | null = null;
     try {
@@ -143,9 +178,9 @@ export default async function VagasCatchAllPage({
         stateCode: job.state.code,
         stateName: job.state.name,
         locationType: job.locationType,
-        publishedAt: job.publishedAt.toISOString(),
-        expiresAt: job.expiresAt?.toISOString() ?? null,
-        validThrough: job.validThrough?.toISOString() ?? null,
+        publishedAt: publishedAtIso,
+        expiresAt: expiresAtIso,
+        validThrough: validThroughIso,
         salaryMin: job.salaryMin,
         salaryMax: job.salaryMax,
         requirements,
@@ -162,8 +197,8 @@ export default async function VagasCatchAllPage({
         "@context": "https://schema.org",
         "@type": "JobPosting",
         title: job.title,
-        datePosted: job.publishedAt.toISOString(),
-        validThrough: (job.validThrough ?? job.expiresAt ?? job.publishedAt).toISOString(),
+        datePosted: publishedAtIso,
+        validThrough: effectiveValidThroughIso,
         employmentType: ["PART_TIME"],
         hiringOrganization: {
           "@type": "Organization",
