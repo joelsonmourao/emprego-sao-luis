@@ -96,33 +96,17 @@ function normalizeIsoDate(value?: string | null) {
   return Number.isNaN(parsed.getTime()) ? undefined : parsed.toISOString();
 }
 
-function toSchemaDate(value?: string | null) {
-  const iso = normalizeIsoDate(value);
-  return iso ? iso.slice(0, 10) : undefined;
-}
-
 export function sanitizeISODate(dateStr: string | undefined | null) {
   return dateStr?.replace(/\.\d{3}Z$/, "Z") ?? dateStr;
 }
 
 export function sanitizeDirectApply(value: unknown): boolean {
-  if (value === true || value === 1) {
-    return true;
-  }
-
-  if (typeof value === "string") {
-    const s = value.trim();
-    if (s.toLowerCase() === "true" || s === "1" || s === "http://schema.org/True" || s === "https://schema.org/True" || s === "True") {
-      return true;
-    }
-  }
-
+  void value;
   return false;
 }
 
 export function stringifyJobPostingJsonLd(data: Record<string, unknown>) {
-  const directApply = sanitizeDirectApply(data.directApply ?? false);
-  return JSON.stringify(removeEmptyJsonLdValues({ ...data, directApply })).replace(/</g, "\\u003c");
+  return JSON.stringify(removeEmptyJsonLdValues({ ...data, directApply: false })).replace(/</g, "\\u003c");
 }
 
 function escapeHtmlText(s: string) {
@@ -278,9 +262,9 @@ export async function buildJobPostingJsonLd(job: JobPostingJsonLdInput) {
       name: job.publisherDisplayName?.trim() || job.companyName,
       value: (job.id || job.slug).trim()
     },
-    datePosted: toSchemaDate(datePostedRaw) ?? datePostedRaw.slice(0, 10),
-    validThrough: toSchemaDate(validThroughRaw) ?? validThroughRaw.slice(0, 10),
-    employmentType: ["PART_TIME", "INTERN"],
+    datePosted: datePostedRaw,
+    validThrough: validThroughRaw,
+    employmentType: ["PART_TIME"],
     educationRequirements: {
       "@type": "EducationalOccupationalCredential",
       credentialCategory: "high school"
