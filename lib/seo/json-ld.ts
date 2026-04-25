@@ -259,8 +259,6 @@ export async function buildJobPostingJsonLd(job: JobPostingJsonLdInput) {
     jobLocation: await buildJobLocationBlock(job),
     baseSalary: buildBaseSalaryBlock(job.salaryMin, job.salaryMax),
     description: descriptionHtml,
-    /** Selo de candidatura rápida no Google; exige fluxo de candidatura compatível com a política do Google. */
-    directApply: true,
     industry: (job.industry?.trim() || DEFAULT_INDUSTRY).trim(),
     occupationalCategory: (job.occupationalCategory?.trim() || DEFAULT_OCCUPATIONAL_CATEGORY).trim(),
     hiringOrganization: buildHiringOrganization({
@@ -286,6 +284,9 @@ export async function buildJobPostingJsonLd(job: JobPostingJsonLdInput) {
       name: "Brazil"
     };
   }
+
+  // Booleano JSON nativo (evita string tipo "http://schema.org/True" em ferramentas/serialização).
+  data.directApply = true;
 
   return data;
 }
