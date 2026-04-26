@@ -61,6 +61,9 @@ type ParsedPreview = {
 
 type ImportApiResponse = {
   ok: boolean;
+  success?: boolean;
+  mode?: "direct" | "queue";
+  message?: string;
   error?: string;
   queueId?: string;
   status?: string;
@@ -105,6 +108,16 @@ function normalizeHeader(header: string) {
     .replace(/[^a-z0-9]+/g, "");
 }
 
+const DIRECT_IMPORT_LIMIT = 100;
+
+function chunkRows<T>(items: T[], size: number) {
+  const chunks: T[][] = [];
+  for (let index = 0; index < items.length; index += size) {
+    chunks.push(items.slice(index, index + size));
+  }
+  return chunks;
+}
+
 async function parseImportResponse(response: Response): Promise<ImportApiResponse> {
   const contentType = response.headers.get("content-type") ?? "";
   const body = await response.text();
@@ -140,7 +153,6 @@ export function AdminJobImporter() {
   const [fileName, setFileName] = useState("");
   const [resultMessage, setResultMessage] = useState("");
   const [isImporting, setIsImporting] = useState(false);
-  const [useAi, setUseAi] = useState(false);
   const [progressMessage, setProgressMessage] = useState("");
 
   const validRows = useMemo(
@@ -224,12 +236,68 @@ export function AdminJobImporter() {
 
     try {
       // #region agent log
-      fetch('http://127.0.0.1:7370/ingest/b54ed65d-267c-4421-b3af-1ea0f3df3748',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'dd62ba'},body:JSON.stringify({sessionId:'dd62ba',runId:'pre-fix',hypothesisId:'H4',location:'components/admin/admin-job-importer.tsx:handleImport:start',message:'Frontend iniciou importacao',data:{validRows:validRows.length,useAi},timestamp:Date.now()})}).catch(()=>{});
+      fetch('http://127.0.0.1:7370/ingest/b54ed65d-267c-4421-b3af-1ea0f3df3748',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'dd62ba'},body:JSON.stringify({sessionId:'dd62ba',runId:'post-fix',hypothesisId:'H9',location:'components/admin/admin-job-importer.tsx:handleImport:start-no-ai',message:'Frontend iniciou importacao sem IA',data:{validRows:validRows.length,useAi:false},timestamp:Date.now()})}).catch(()=>{});
+      // #endregion
+      if (validRows.length <= DIRECT_IMPORT_LIMIT) {
+        // #region agent log
+        fetch('http://127.0.0.1:7370/ingest/b54ed65d-267c-4421-b3af-1ea0f3df3748',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'dd62ba'},body:JSON.stringify({sessionId:'dd62ba',runId:'post-fix',hypothesisId:'H6',location:'components/admin/admin-job-importer.tsx:handleImport:direct-mode-selected',message:'Frontend escolheu importacao direta em lotes',data:{validRows:validRows.length,useAi:false},timestamp:Date.now()})}).catch(()=>{});
+        // #endregion
+        const chunkSize = validRows.length <= 20 ? 1 : 10;
+        const chunks = chunkRows(validRows, chunkSize);
+        let importedTotal = 0;
+        let updatedTotal = 0;
+        let errorsTotal = 0;
+        const startedAt = Date.now();
+
+        for (const [batchIndex, batchRows] of chunks.entries()) {
+          const batchStartedAt = Date.now();
+          const response = await fetch("/api/admin/import/jobs?inline=1", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ rows: batchRows, useAi: false }),
+            signal: AbortSignal.timeout(45000)
+          });
+          const result = await parseImportResponse(response);
+
+          if (!response.ok || !result.ok) {
+            const errorMessage = result.error || result.message || "Nao foi possivel importar a planilha.";
+            setResultMessage(`ERRO: ${errorMessage}`);
+            setProgressMessage("");
+            return;
+          }
+
+          importedTotal += result.summary?.importedCount ?? 0;
+          updatedTotal += result.summary?.updatedCount ?? 0;
+          errorsTotal += result.summary?.errorCount ?? 0;
+
+          const processedRows = Math.min(validRows.length, (batchIndex + 1) * chunkSize);
+          const progress = Math.round((processedRows / validRows.length) * 100);
+          // #region agent log
+          fetch('http://127.0.0.1:7370/ingest/b54ed65d-267c-4421-b3af-1ea0f3df3748',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'dd62ba'},body:JSON.stringify({sessionId:'dd62ba',runId:'post-fix',hypothesisId:'H7',location:'components/admin/admin-job-importer.tsx:handleImport:direct-mode-batch-complete',message:'Lote direto concluido',data:{batchIndex:batchIndex+1,totalBatches:chunks.length,batchRows:batchRows.length,processedRows,progress,httpStatus:response.status,batchDurationMs:Date.now()-batchStartedAt},timestamp:Date.now()})}).catch(()=>{});
+          // #endregion
+          setProgressMessage(
+            `${progress}% (${processedRows}/${validRows.length}) - importadas ${importedTotal}, atualizadas ${updatedTotal}, erros ${errorsTotal}.`
+          );
+        }
+
+        // #region agent log
+        fetch('http://127.0.0.1:7370/ingest/b54ed65d-267c-4421-b3af-1ea0f3df3748',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'dd62ba'},body:JSON.stringify({sessionId:'dd62ba',runId:'post-fix',hypothesisId:'H7',location:'components/admin/admin-job-importer.tsx:handleImport:direct-mode-finished',message:'Importacao direta finalizada no frontend',data:{rows:validRows.length,importedTotal,updatedTotal,errorsTotal,totalDurationMs:Date.now()-startedAt},timestamp:Date.now()})}).catch(()=>{});
+        // #endregion
+        setResultMessage(
+          `Importacao concluida: ${importedTotal} vaga(s) importada(s), ${updatedTotal} atualizada(s), ${errorsTotal} erro(s).`
+        );
+        setProgressMessage("");
+        return;
+      }
+
+      // #region agent log
+      fetch('http://127.0.0.1:7370/ingest/b54ed65d-267c-4421-b3af-1ea0f3df3748',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'dd62ba'},body:JSON.stringify({sessionId:'dd62ba',runId:'post-fix',hypothesisId:'H6',location:'components/admin/admin-job-importer.tsx:handleImport:queue-mode-selected',message:'Frontend escolheu modo fila sem IA',data:{validRows:validRows.length,useAi:false},timestamp:Date.now()})}).catch(()=>{});
       // #endregion
       const response = await fetch("/api/admin/import/jobs", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ rows: validRows, useAi })
+        body: JSON.stringify({ rows: validRows, useAi: false }),
+        signal: AbortSignal.timeout(45000)
       });
 
       const result = await parseImportResponse(response);
@@ -238,7 +306,7 @@ export function AdminJobImporter() {
         // #region agent log
         fetch('http://127.0.0.1:7370/ingest/b54ed65d-267c-4421-b3af-1ea0f3df3748',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'dd62ba'},body:JSON.stringify({sessionId:'dd62ba',runId:'pre-fix',hypothesisId:'H4',location:'components/admin/admin-job-importer.tsx:handleImport:error-response',message:'Frontend recebeu erro na criacao da fila',data:{httpStatus:response.status,error:result.error ?? null},timestamp:Date.now()})}).catch(()=>{});
         // #endregion
-        const errorMessage = result.error || "Nao foi possivel importar a planilha.";
+        const errorMessage = result.error || result.message || "Nao foi possivel importar a planilha.";
         setResultMessage(`ERRO: ${errorMessage}`);
 
         if (result.debug?.errorDetails?.length) {
@@ -257,11 +325,25 @@ export function AdminJobImporter() {
 
       setProgressMessage(`Fila criada (${result.queueId}). Iniciando processamento...`);
       const queueId = result.queueId;
+      let pollAttempts = 0;
+      const maxPollAttempts = 120;
 
       while (true) {
+        if (pollAttempts >= maxPollAttempts) {
+          setResultMessage("ERRO: a importacao demorou mais do que o esperado. Tente novamente.");
+          setProgressMessage("");
+          return;
+        }
+        pollAttempts += 1;
         await new Promise((resolve) => setTimeout(resolve, 3000));
-        const statusResponse = await fetch(`/api/admin/import-status/${queueId}`, { cache: "no-store" });
+        const statusResponse = await fetch(`/api/admin/import-status/${queueId}`, {
+          cache: "no-store",
+          signal: AbortSignal.timeout(15000)
+        });
         const statusResult = (await statusResponse.json()) as ImportStatusResponse;
+        // #region agent log
+        fetch('http://127.0.0.1:7370/ingest/b54ed65d-267c-4421-b3af-1ea0f3df3748',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'dd62ba'},body:JSON.stringify({sessionId:'dd62ba',runId:'post-fix',hypothesisId:'H8',location:'components/admin/admin-job-importer.tsx:handleImport:queue-polling',message:'Frontend em polling de fila',data:{queueId,pollAttempts,httpStatus:statusResponse.status,queueStatus:statusResult.queue?.status ?? null,processedRows:statusResult.queue?.processedRows ?? null,totalRows:statusResult.queue?.totalRows ?? null,progress:statusResult.queue?.progress ?? null},timestamp:Date.now()})}).catch(()=>{});
+        // #endregion
         // #region agent log
         fetch('http://127.0.0.1:7370/ingest/b54ed65d-267c-4421-b3af-1ea0f3df3748',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'dd62ba'},body:JSON.stringify({sessionId:'dd62ba',runId:'pre-fix',hypothesisId:'H1',location:'components/admin/admin-job-importer.tsx:handleImport:poll',message:'Polling do status da fila',data:{queueId,httpStatus:statusResponse.status,queueStatus:statusResult.queue?.status ?? null,processedRows:statusResult.queue?.processedRows ?? null,totalRows:statusResult.queue?.totalRows ?? null,progress:statusResult.queue?.progress ?? null},timestamp:Date.now()})}).catch(()=>{});
         // #endregion
@@ -336,10 +418,6 @@ export function AdminJobImporter() {
           </div>
 
           <div className="flex flex-wrap gap-3">
-            <label className="flex items-center gap-2 rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700">
-              <input type="checkbox" checked={useAi} onChange={(event) => setUseAi(event.target.checked)} />
-              Gerar descricoes unicas com IA
-            </label>
             <Button type="button" size="lg" onClick={handleImport} disabled={isImporting || !validRows.length}>
               {isImporting ? "Importando..." : "Importar linhas validas"}
             </Button>

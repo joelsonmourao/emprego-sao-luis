@@ -13,6 +13,8 @@ const RESPONSE_HEADERS = {
 };
 
 const IMPORT_BATCH_SIZE = 10;
+const DIRECT_IMPORT_LIMIT = 100;
+const AI_TIMEOUT_MS = 12000;
 const CLAUDE_DESCRIPTION_MODEL = "claude-haiku-4-5-20251001";
 const BRAZILIAN_UFS = new Set([
   "AC",
@@ -106,10 +108,6 @@ function sanitizeImportedRow(row: ImportedJobRow): ImportedJobRow {
   };
 }
 
-function sleep(ms: number) {
-  return new Promise((resolve) => setTimeout(resolve, ms));
-}
-
 async function generateUniqueDescriptionWithClaude(row: ImportedJobRow) {
   const apiKey = process.env.ANTHROPIC_API_KEY;
   if (!apiKey) {
@@ -119,6 +117,7 @@ async function generateUniqueDescriptionWithClaude(row: ImportedJobRow) {
   try {
     const response = await fetch("https://api.anthropic.com/v1/messages", {
       method: "POST",
+      signal: AbortSignal.timeout(AI_TIMEOUT_MS),
       headers: {
         "Content-Type": "application/json",
         "x-api-key": apiKey,
@@ -158,8 +157,6 @@ async function generateUniqueDescriptionWithClaude(row: ImportedJobRow) {
   } catch (error) {
     console.warn("Claude indisponivel; usando descricao original.", error);
     return row.descriptionHtml;
-  } finally {
-    await sleep(500);
   }
 }
 
@@ -177,7 +174,12 @@ function buildJsonError(status: number, message: string, details?: Record<string
   return NextResponse.json(
     {
       ok: false,
+      success: false,
+      message,
       error: message,
+      imported: 0,
+      updated: 0,
+      errors: [],
       ...details
     },
     {
@@ -567,7 +569,7 @@ function buildJobData(row: ImportedJobRow, state: State, city: City, company: Co
   };
 }
 
-async function processRows(rows: ImportedJobRow[], context: ImportContext, queueId: string, options?: { useAi?: boolean }) {
+async function processRows(rows: ImportedJobRow[], context: ImportContext, queueId?: string, options?: { useAi?: boolean }) {
   const operations: Prisma.PrismaPromise<Job>[] = [];
   const queuedRows: Array<{ slug: string; wasUpdate: boolean }> = [];
 
@@ -591,15 +593,40 @@ async function processRows(rows: ImportedJobRow[], context: ImportContext, queue
       const uniqueSlug = ensureUniqueJobSlug(baseSlug, context.usedJobSlugs, keepCurrentSlug);
       const rowForSave = options?.useAi ? { ...row, descriptionHtml: await generateUniqueDescriptionWithClaude(row) } : row;
       const data = buildJobData(rowForSave, state, city, company, uniqueSlug, existing ?? undefined);
+      const wasUpdate = externalId ? context.jobsByExternalId.has(externalId) : context.jobsBySlug.has(baseSlug);
+
+      if (options?.useAi) {
+        const saved =
+          externalId && externalId.length
+            ? await prisma.job.upsert({ where: { externalId }, create: data, update: data })
+            : await prisma.job.upsert({ where: { slug: existing?.slug ?? uniqueSlug }, create: data, update: data });
+
+        if (wasUpdate) {
+          context.updated.push(saved.slug);
+        } else {
+          context.imported.push(saved.slug);
+        }
+        context.processedRows += 1;
+        if (queueId) {
+          await prisma.importQueue.update({
+            where: { id: queueId },
+            data: {
+              processedRows: context.processedRows,
+              importedCount: context.imported.length,
+              updatedCount: context.updated.length,
+              errorCount: context.issues.length
+            }
+          });
+        }
+        continue;
+      }
 
       if (externalId) {
-        const alreadyKnown = context.jobsByExternalId.has(externalId);
         operations.push(prisma.job.upsert({ where: { externalId }, create: data, update: data }));
-        queuedRows.push({ slug: uniqueSlug, wasUpdate: alreadyKnown });
+        queuedRows.push({ slug: uniqueSlug, wasUpdate });
       } else {
-        const alreadyKnownBySlug = context.jobsBySlug.has(baseSlug);
         operations.push(prisma.job.upsert({ where: { slug: existing?.slug ?? uniqueSlug }, create: data, update: data }));
-        queuedRows.push({ slug: uniqueSlug, wasUpdate: alreadyKnownBySlug });
+        queuedRows.push({ slug: uniqueSlug, wasUpdate });
       }
     } catch (error) {
       // #region agent log
@@ -611,11 +638,17 @@ async function processRows(rows: ImportedJobRow[], context: ImportContext, queue
         message: error instanceof Error ? error.message : "Erro desconhecido ao processar a linha."
       });
       context.processedRows += 1;
-      await prisma.importQueue.update({
-        where: { id: queueId },
-        data: { processedRows: context.processedRows, errorCount: context.issues.length }
-      });
+      if (queueId) {
+        await prisma.importQueue.update({
+          where: { id: queueId },
+          data: { processedRows: context.processedRows, errorCount: context.issues.length }
+        });
+      }
     }
+  }
+
+  if (options?.useAi) {
+    return;
   }
 
   let operationOffset = 0;
@@ -636,15 +669,17 @@ async function processRows(rows: ImportedJobRow[], context: ImportContext, queue
       context.processedRows += 1;
     }
 
-    await prisma.importQueue.update({
-      where: { id: queueId },
-      data: {
-        processedRows: context.processedRows,
-        importedCount: context.imported.length,
-        updatedCount: context.updated.length,
-        errorCount: context.issues.length
-      }
-    });
+    if (queueId) {
+      await prisma.importQueue.update({
+        where: { id: queueId },
+        data: {
+          processedRows: context.processedRows,
+          importedCount: context.imported.length,
+          updatedCount: context.updated.length,
+          errorCount: context.issues.length
+        }
+      });
+    }
     // #region agent log
     fetch('http://127.0.0.1:7370/ingest/b54ed65d-267c-4421-b3af-1ea0f3df3748',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'dd62ba'},body:JSON.stringify({sessionId:'dd62ba',runId:'pre-fix',hypothesisId:'H2',location:'app/api/admin/import/jobs/route.ts:processRows:batch-commit',message:'Batch persistido e progresso atualizado',data:{queueId,batchSize:persisted.length,processedRows:context.processedRows,imported:context.imported.length,updated:context.updated.length,errors:context.issues.length},timestamp:Date.now()})}).catch(()=>{});
     // #endregion
@@ -677,7 +712,7 @@ async function processQueuedImport(queueId: string) {
     fetch('http://127.0.0.1:7370/ingest/b54ed65d-267c-4421-b3af-1ea0f3df3748',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'dd62ba'},body:JSON.stringify({sessionId:'dd62ba',runId:'pre-fix',hypothesisId:'H2',location:'app/api/admin/import/jobs/route.ts:processQueuedImport:payload',message:'Payload da fila carregado',data:{queueId,totalRows:rows.length,useAi:Boolean(payload.useAi)},timestamp:Date.now()})}).catch(()=>{});
     // #endregion
     const context = await buildImportContext(rows);
-    await processRows(rows, context, queueId, { useAi: payload.useAi });
+    await processRows(rows, context, queueId, { useAi: false });
 
     if (context.imported.length || context.updated.length) {
       revalidatePublicSurfacesAfterBulkJobChange();
@@ -742,12 +777,46 @@ export async function POST(request: Request) {
     }
 
     const payload = importJobsPayloadSchema.parse(rawBody);
+    const useAi = false;
     const rows = payload.rows.map(sanitizeImportedRow);
     // #region agent log
-    fetch('http://127.0.0.1:7370/ingest/b54ed65d-267c-4421-b3af-1ea0f3df3748',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'dd62ba'},body:JSON.stringify({sessionId:'dd62ba',runId:'pre-fix',hypothesisId:'H5',location:'app/api/admin/import/jobs/route.ts:POST:validated-body',message:'API recebeu payload valido de importacao',data:{rows:rows.length,useAi:Boolean(payload.useAi)},timestamp:Date.now()})}).catch(()=>{});
+    fetch('http://127.0.0.1:7370/ingest/b54ed65d-267c-4421-b3af-1ea0f3df3748',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'dd62ba'},body:JSON.stringify({sessionId:'dd62ba',runId:'post-fix',hypothesisId:'H9',location:'app/api/admin/import/jobs/route.ts:POST:validated-body-no-ai',message:'API recebeu payload e desabilitou IA',data:{rows:rows.length,requestedUseAi:Boolean(payload.useAi),effectiveUseAi:false},timestamp:Date.now()})}).catch(()=>{});
     // #endregion
     if (!rows.length) {
       return buildJsonError(400, "Nenhuma linha valida foi enviada para importacao.");
+    }
+
+    const inlineParam = new URL(request.url).searchParams.get("inline");
+    const shouldProcessInline = inlineParam === "1" || inlineParam === "true" || (rows.length <= DIRECT_IMPORT_LIMIT);
+
+    if (shouldProcessInline) {
+      const startedAt = Date.now();
+      const context = await buildImportContext(rows);
+      await processRows(rows, context, undefined, { useAi });
+
+      if (context.imported.length || context.updated.length) {
+        revalidatePublicSurfacesAfterBulkJobChange();
+      }
+
+      return NextResponse.json(
+        {
+          ok: true,
+          success: true,
+          mode: "direct",
+          summary: {
+            totalRows: rows.length,
+            importedCount: context.imported.length,
+            updatedCount: context.updated.length,
+            errorCount: context.issues.length,
+            successRate: rows.length ? Math.round(((rows.length - context.issues.length) / rows.length) * 100) : 100,
+            durationMs: Date.now() - startedAt
+          },
+          results: {
+            errors: context.issues.map((issue) => ({ line: issue.line, message: issue.message }))
+          }
+        },
+        { headers: RESPONSE_HEADERS }
+      );
     }
 
     const queue = await prisma.importQueue.create({
