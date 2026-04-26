@@ -602,6 +602,9 @@ async function processRows(rows: ImportedJobRow[], context: ImportContext, queue
         queuedRows.push({ slug: uniqueSlug, wasUpdate: alreadyKnownBySlug });
       }
     } catch (error) {
+      // #region agent log
+      fetch('http://127.0.0.1:7370/ingest/b54ed65d-267c-4421-b3af-1ea0f3df3748',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'dd62ba'},body:JSON.stringify({sessionId:'dd62ba',runId:'pre-fix',hypothesisId:'H3',location:'app/api/admin/import/jobs/route.ts:processRows:row-error',message:'Falha no processamento de linha',data:{queueId,line,title:row.title,error:error instanceof Error ? error.message : 'erro-desconhecido'},timestamp:Date.now()})}).catch(()=>{});
+      // #endregion
       context.issues.push({
         line,
         title: row.title,
@@ -642,16 +645,27 @@ async function processRows(rows: ImportedJobRow[], context: ImportContext, queue
         errorCount: context.issues.length
       }
     });
+    // #region agent log
+    fetch('http://127.0.0.1:7370/ingest/b54ed65d-267c-4421-b3af-1ea0f3df3748',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'dd62ba'},body:JSON.stringify({sessionId:'dd62ba',runId:'pre-fix',hypothesisId:'H2',location:'app/api/admin/import/jobs/route.ts:processRows:batch-commit',message:'Batch persistido e progresso atualizado',data:{queueId,batchSize:persisted.length,processedRows:context.processedRows,imported:context.imported.length,updated:context.updated.length,errors:context.issues.length},timestamp:Date.now()})}).catch(()=>{});
+    // #endregion
   }
 }
 
 async function processQueuedImport(queueId: string) {
   const startedAt = Date.now();
+  // #region agent log
+  fetch('http://127.0.0.1:7370/ingest/b54ed65d-267c-4421-b3af-1ea0f3df3748',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'dd62ba'},body:JSON.stringify({sessionId:'dd62ba',runId:'pre-fix',hypothesisId:'H1',location:'app/api/admin/import/jobs/route.ts:processQueuedImport:start',message:'Worker de fila iniciou',data:{queueId},timestamp:Date.now()})}).catch(()=>{});
+  // #endregion
   const claimed = await prisma.importQueue.updateMany({
     where: { id: queueId, status: ImportQueueStatus.PENDING },
     data: { status: ImportQueueStatus.PROCESSING, startedAt: new Date() }
   });
-  if (!claimed.count) return;
+  if (!claimed.count) {
+    // #region agent log
+    fetch('http://127.0.0.1:7370/ingest/b54ed65d-267c-4421-b3af-1ea0f3df3748',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'dd62ba'},body:JSON.stringify({sessionId:'dd62ba',runId:'pre-fix',hypothesisId:'H1',location:'app/api/admin/import/jobs/route.ts:processQueuedImport:not-claimed',message:'Fila nao foi reivindicada para processamento',data:{queueId,claimedCount:claimed.count},timestamp:Date.now()})}).catch(()=>{});
+    // #endregion
+    return;
+  }
 
   const queue = await prisma.importQueue.findUnique({ where: { id: queueId } });
   if (!queue) return;
@@ -659,6 +673,9 @@ async function processQueuedImport(queueId: string) {
   try {
     const payload = importJobsPayloadSchema.parse(queue.payload);
     const rows = payload.rows.map(sanitizeImportedRow);
+    // #region agent log
+    fetch('http://127.0.0.1:7370/ingest/b54ed65d-267c-4421-b3af-1ea0f3df3748',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'dd62ba'},body:JSON.stringify({sessionId:'dd62ba',runId:'pre-fix',hypothesisId:'H2',location:'app/api/admin/import/jobs/route.ts:processQueuedImport:payload',message:'Payload da fila carregado',data:{queueId,totalRows:rows.length,useAi:Boolean(payload.useAi)},timestamp:Date.now()})}).catch(()=>{});
+    // #endregion
     const context = await buildImportContext(rows);
     await processRows(rows, context, queueId, { useAi: payload.useAi });
 
@@ -699,6 +716,9 @@ async function processQueuedImport(queueId: string) {
       }
     });
   } catch (error) {
+    // #region agent log
+    fetch('http://127.0.0.1:7370/ingest/b54ed65d-267c-4421-b3af-1ea0f3df3748',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'dd62ba'},body:JSON.stringify({sessionId:'dd62ba',runId:'pre-fix',hypothesisId:'H1',location:'app/api/admin/import/jobs/route.ts:processQueuedImport:catch',message:'Falha geral no processamento da fila',data:{queueId,error:error instanceof Error ? error.message : 'erro-desconhecido'},timestamp:Date.now()})}).catch(()=>{});
+    // #endregion
     const message = error instanceof Error ? error.message : "Nao foi possivel processar a fila de importacao.";
     await prisma.importQueue.update({
       where: { id: queueId },
@@ -723,6 +743,9 @@ export async function POST(request: Request) {
 
     const payload = importJobsPayloadSchema.parse(rawBody);
     const rows = payload.rows.map(sanitizeImportedRow);
+    // #region agent log
+    fetch('http://127.0.0.1:7370/ingest/b54ed65d-267c-4421-b3af-1ea0f3df3748',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'dd62ba'},body:JSON.stringify({sessionId:'dd62ba',runId:'pre-fix',hypothesisId:'H5',location:'app/api/admin/import/jobs/route.ts:POST:validated-body',message:'API recebeu payload valido de importacao',data:{rows:rows.length,useAi:Boolean(payload.useAi)},timestamp:Date.now()})}).catch(()=>{});
+    // #endregion
     if (!rows.length) {
       return buildJsonError(400, "Nenhuma linha valida foi enviada para importacao.");
     }
@@ -738,6 +761,9 @@ export async function POST(request: Request) {
       },
       select: { id: true, status: true, totalRows: true, createdAt: true }
     });
+    // #region agent log
+    fetch('http://127.0.0.1:7370/ingest/b54ed65d-267c-4421-b3af-1ea0f3df3748',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'dd62ba'},body:JSON.stringify({sessionId:'dd62ba',runId:'pre-fix',hypothesisId:'H1',location:'app/api/admin/import/jobs/route.ts:POST:queue-created',message:'Fila criada para importacao',data:{queueId:queue.id,totalRows:queue.totalRows,status:queue.status},timestamp:Date.now()})}).catch(()=>{});
+    // #endregion
 
     void processQueuedImport(queue.id);
 

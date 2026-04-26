@@ -34,6 +34,9 @@ export async function GET(_request: Request, context: Context) {
   }
 
   const progress = queue.totalRows > 0 ? Math.min(100, Math.round((queue.processedRows / queue.totalRows) * 100)) : 0;
+  // #region agent log
+  fetch('http://127.0.0.1:7370/ingest/b54ed65d-267c-4421-b3af-1ea0f3df3748',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'dd62ba'},body:JSON.stringify({sessionId:'dd62ba',runId:'pre-fix',hypothesisId:'H4',location:'app/api/admin/import-status/[id]/route.ts:GET',message:'Status de fila consultado no backend',data:{queueId:id,status:queue.status,processedRows:queue.processedRows,totalRows:queue.totalRows,progress},timestamp:Date.now()})}).catch(()=>{});
+  // #endregion
   return NextResponse.json({
     ok: true,
     queue: {
