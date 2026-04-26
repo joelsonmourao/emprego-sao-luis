@@ -147,7 +147,13 @@ export function sanitizeHtml(input: string) {
 export function normalizeLines(input: string) {
   return input
     .split(/\r?\n/)
-    .map((item) => item.trim())
+    .map((item) =>
+      item
+        .trim()
+        .replace(/^[*\u2022]+\s*/, "")
+        .replace(/^(?:-\s*)+/, "")
+        .trim()
+    )
     .filter(Boolean);
 }
 

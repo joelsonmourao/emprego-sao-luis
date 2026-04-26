@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
 import { ADMIN_AUTH_COOKIE, verifyAdminSessionToken } from "@/lib/auth-token";
+import { isRemovedJobSlug } from "@/lib/seo/removed-job-slugs";
+import { JOB_DETAIL_PATH_RESERVED_FIRST_SEGMENTS } from "@/lib/seo/vagas-job-path";
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
@@ -29,6 +31,18 @@ export async function middleware(request: NextRequest) {
     canonicalUrl.hostname = "slzcontent.com.br";
     canonicalUrl.protocol = "https:";
     return NextResponse.redirect(canonicalUrl, 301);
+  }
+
+  const jobDetailMatch = pathname.match(/^\/vagas\/([^/]+)$/);
+  if (jobDetailMatch) {
+    const slug = jobDetailMatch[1];
+    if (!JOB_DETAIL_PATH_RESERVED_FIRST_SEGMENTS.has(slug) && isRemovedJobSlug(slug)) {
+      const goneUrl = request.nextUrl.clone();
+      goneUrl.pathname = `/vagas/indisponivel/${slug}`;
+      const goneResponse = NextResponse.rewrite(goneUrl, { status: 410 });
+      goneResponse.headers.set("X-Robots-Tag", "noindex, nofollow");
+      return goneResponse;
+    }
   }
 
   if (isAdminPage || isAdminApi) {

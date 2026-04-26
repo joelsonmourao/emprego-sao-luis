@@ -2,6 +2,7 @@ import { absoluteUrl } from "@/lib/utils";
 
 type StateSeoInput = {
   stateName: string;
+  stateCode: string;
   stateSlug: string;
   totalJobs: number;
 };
@@ -57,9 +58,9 @@ export function getJobPath(slug: string) {
 export function buildStateListingSeo(input: StateSeoInput) {
   const countLabel = formatVacancyCount(input.totalJobs);
   return {
-    title: `${countLabel} no ${input.stateName} | Jovem Aprendiz`,
-    description: `Listagem em ${input.stateName}: ${countLabel} de Jovem Aprendiz com empresas contratando, requisitos e link de candidatura. Atualizado para busca por primeiro emprego.`,
-    h1: `Vagas de Jovem Aprendiz no ${input.stateName}`,
+    title: `${countLabel} de Jovem Aprendiz no ${input.stateCode}`,
+    description: `Veja ${countLabel} de Jovem Aprendiz no ${input.stateName} (${input.stateCode}), compare empresas contratando e encontre oportunidades com candidatura oficial.`,
+    h1: `Vagas de Jovem Aprendiz no ${input.stateCode}`,
     intro:
       `Encontre vagas de Jovem Aprendiz no ${input.stateName} em empresas de diferentes segmentos. ` +
       `Veja oportunidades atualizadas, empresas contratando e requisitos comuns para iniciar no mercado de trabalho.`,

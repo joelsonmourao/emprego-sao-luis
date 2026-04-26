@@ -12,14 +12,39 @@ import { buildJobPublisherName } from "@/lib/seo/job-publisher";
 import { getCityJobsPath, getCompanyJobsPath, getStateJobsPath } from "@/lib/seo/jobs-pages";
 import { getRelatedPosts } from "@/lib/repositories/blog";
 import { getJobBySlug, getRelatedJobs } from "@/lib/repositories/jobs";
+import { normalizeListValues } from "@/lib/jobs/text-normalization";
 import { formatDate } from "@/lib/utils";
 
 type JobWithRelations = NonNullable<Awaited<ReturnType<typeof getJobBySlug>>>;
 
 export async function JobDetailView({ job }: { job: JobWithRelations }) {
-  const requirements = Array.isArray(job.requirements) ? job.requirements : [];
-  const benefits = Array.isArray(job.benefits) ? job.benefits : [];
+  const requirements = normalizeListValues(Array.isArray(job.requirements) ? job.requirements : []);
+  const benefits = normalizeListValues(Array.isArray(job.benefits) ? job.benefits : []);
   const publisherDisplayName = buildJobPublisherName(job.city?.name, job.state?.code);
+
+  // #region agent log
+  fetch("http://127.0.0.1:7370/ingest/b54ed65d-267c-4421-b3af-1ea0f3df3748", {
+    method: "POST",
+    headers: { "Content-Type": "application/json", "X-Debug-Session-Id": "bb2dcd" },
+    body: JSON.stringify({
+      sessionId: "bb2dcd",
+      runId: "pre-fix",
+      hypothesisId: "H4",
+      location: "components/vagas/job-detail-view.tsx",
+      message: "job detail list and salary render snapshot",
+      data: {
+        slug: job.slug,
+        requirementsCount: requirements.length,
+        benefitsCount: benefits.length,
+        firstRequirement: requirements[0] ? String(requirements[0]).slice(0, 120) : null,
+        firstBenefit: benefits[0] ? String(benefits[0]).slice(0, 120) : null,
+        salaryMin: job.salaryMin,
+        salaryMax: job.salaryMax
+      },
+      timestamp: Date.now()
+    })
+  }).catch(() => {});
+  // #endregion
 
   let relatedJobs: Awaited<ReturnType<typeof getRelatedJobs>> = [];
   let relatedPosts: Awaited<ReturnType<typeof getRelatedPosts>> = [];
@@ -72,10 +97,10 @@ export async function JobDetailView({ job }: { job: JobWithRelations }) {
               {job.salaryMin || job.salaryMax ? (
                 <span className="rounded-full border border-[color:rgba(26,43,76,0.1)] bg-white px-2.5 py-1 text-[10px] font-medium text-[var(--brand-text-secondary)] sm:px-3 sm:py-1.5 sm:text-xs">
                   {job.salaryMin && job.salaryMax
-                    ? `R$ ${job.salaryMin.toLocaleString("pt-BR")} - R$ ${job.salaryMax.toLocaleString("pt-BR")}`
+                    ? `Faixa salarial estimada: R$ ${job.salaryMin.toLocaleString("pt-BR")} a R$ ${job.salaryMax.toLocaleString("pt-BR")}`
                     : job.salaryMin
-                      ? `A partir de R$ ${job.salaryMin.toLocaleString("pt-BR")}`
-                      : `Ate R$ ${job.salaryMax?.toLocaleString("pt-BR")}`}
+                      ? `Faixa salarial estimada: a partir de R$ ${job.salaryMin.toLocaleString("pt-BR")}`
+                      : `Faixa salarial estimada: até R$ ${job.salaryMax?.toLocaleString("pt-BR")}`}
                 </span>
               ) : (
                 <span className="rounded-full border border-[color:rgba(26,43,76,0.1)] bg-white px-2.5 py-1 text-[10px] font-medium text-[var(--brand-text-secondary)] sm:px-3 sm:py-1.5 sm:text-xs">
@@ -114,6 +139,11 @@ export async function JobDetailView({ job }: { job: JobWithRelations }) {
             <p className="mb-4 rounded-[1.25rem] bg-[var(--brand-soft)] px-3 py-3 text-[14px] leading-6 text-[var(--brand-text-secondary)] sm:mb-5 sm:rounded-[1.5rem] sm:px-4 sm:py-4 sm:text-[15px] sm:leading-7 sm:text-base sm:leading-8">
               {job.summary}
             </p>
+            {job.salaryMin || job.salaryMax ? (
+              <p className="mb-4 rounded-[1.25rem] border border-[color:rgba(26,43,76,0.1)] bg-white px-3 py-3 text-[13px] leading-6 text-[var(--brand-text-secondary)] sm:px-4 sm:text-sm">
+                A empresa não informou salário oficial na publicação original.
+              </p>
+            ) : null}
             <div
               className="prose-content text-slate-700"
               dangerouslySetInnerHTML={{ __html: sanitizeRichTextHtml(job.descriptionHtml ?? "") }}
@@ -122,8 +152,8 @@ export async function JobDetailView({ job }: { job: JobWithRelations }) {
               <div className="mt-6 border-t border-slate-100 pt-6 sm:mt-8 sm:pt-8">
                 <h2 className="text-lg font-semibold text-[var(--brand-navy)] sm:text-xl">Requisitos</h2>
                 <ul className="mt-3 space-y-2 text-sm leading-6 text-[var(--brand-text-secondary)] sm:mt-4 sm:space-y-3">
-                  {requirements.map((item: unknown, index: number) => (
-                    <li key={`req-${index}`}>- {String(item)}</li>
+                  {requirements.map((item, index) => (
+                    <li key={`req-${index}`}>{item}</li>
                   ))}
                 </ul>
               </div>
@@ -132,8 +162,8 @@ export async function JobDetailView({ job }: { job: JobWithRelations }) {
               <div className="mt-6 border-t border-slate-100 pt-6 sm:mt-8 sm:pt-8">
                 <h2 className="text-lg font-semibold text-[var(--brand-navy)] sm:text-xl">Beneficios</h2>
                 <ul className="mt-3 space-y-2 text-sm leading-6 text-[var(--brand-text-secondary)] sm:mt-4 sm:space-y-3">
-                  {benefits.map((item: unknown, index: number) => (
-                    <li key={`ben-${index}`}>- {String(item)}</li>
+                  {benefits.map((item, index) => (
+                    <li key={`ben-${index}`}>{item}</li>
                   ))}
                 </ul>
               </div>

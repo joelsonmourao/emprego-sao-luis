@@ -2,12 +2,14 @@ import { notFound } from "next/navigation";
 
 import { CompanyJobsListing } from "@/components/vagas/company-jobs-listing";
 import { JobDetailView } from "@/components/vagas/job-detail-view";
+import { JobUnavailableView } from "@/components/vagas/job-unavailable-view";
 import { resolveCompanyJobsPageMetadata } from "@/lib/seo/company-jobs-metadata";
 import { buildJobPublisherName } from "@/lib/seo/job-publisher";
 import { buildJobDetailSeo } from "@/lib/seo/jobs-pages";
 import { buildBreadcrumbJsonLd, buildJobPostingJsonLd, stringifyJobPostingJsonLd, stringifyJsonLdSafe } from "@/lib/seo/json-ld";
 import { buildSiteMetadata } from "@/lib/seo/metadata";
-import { getJobBySlug } from "@/lib/repositories/jobs";
+import { getJobBySlug, getRelatedJobs } from "@/lib/repositories/jobs";
+import { isRemovedJobSlug } from "@/lib/seo/removed-job-slugs";
 import { JOB_DETAIL_PATH_RESERVED_FIRST_SEGMENTS } from "@/lib/seo/vagas-job-path";
 import { absoluteUrl } from "@/lib/utils";
 
@@ -26,6 +28,13 @@ function toIso(value: unknown, fallbackIso: string) {
 function safeString(value: unknown, fallback: string) {
   const text = typeof value === "string" ? value.trim() : "";
   return text || fallback;
+}
+
+function isJobExpired(job: Awaited<ReturnType<typeof getJobBySlug>>) {
+  if (!job) return false;
+  const refDate = job.validThrough ?? job.expiresAt;
+  if (!refDate) return false;
+  return new Date(refDate).getTime() < Date.now();
 }
 
 export async function generateMetadata({
@@ -61,10 +70,33 @@ export async function generateMetadata({
     const job = await getJobBySlug(jobSlug);
 
     if (!job) {
+      // #region agent log
+      fetch("http://127.0.0.1:7370/ingest/b54ed65d-267c-4421-b3af-1ea0f3df3748", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "X-Debug-Session-Id": "bb2dcd" },
+        body: JSON.stringify({
+          sessionId: "bb2dcd",
+          runId: "post-fix",
+          hypothesisId: "H8",
+          location: "app/vagas/[...slug]/page.tsx",
+          message: "metadata-level notFound for missing job slug",
+          data: { slug: jobSlug },
+          timestamp: Date.now()
+        })
+      }).catch(() => {});
+      // #endregion
+      notFound();
+    }
+
+    if (!job.isActive) {
+      const isExpired = isJobExpired(job);
       return buildSiteMetadata({
-        title: "Vaga não encontrada",
-        description: "A vaga solicitada não foi encontrada.",
-        pathname: `/vagas/${jobSlug}`,
+        title: isExpired ? "Vaga encerrada" : "Vaga indisponível",
+        description: isExpired
+          ? "Esta vaga foi encerrada, mas você pode continuar sua busca por vagas relacionadas."
+          : "Esta vaga não está mais disponível. Confira oportunidades atualizadas.",
+        pathname: `/vagas/${job.slug}`,
+        canonicalUrl: `/vagas/${job.slug}`,
         noIndex: true
       });
     }
@@ -130,9 +162,91 @@ export default async function VagasCatchAllPage({
   }
 
   if (segments.length === 1) {
+    const requestedSlug = segments[0];
+    if (isRemovedJobSlug(requestedSlug)) {
+      // #region agent log
+      fetch("http://127.0.0.1:7370/ingest/b54ed65d-267c-4421-b3af-1ea0f3df3748", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "X-Debug-Session-Id": "bb2dcd" },
+        body: JSON.stringify({
+          sessionId: "bb2dcd",
+          runId: "post-fix",
+          hypothesisId: "H7",
+          location: "app/vagas/[...slug]/page.tsx",
+          message: "removed slug matched",
+          data: { slug: requestedSlug },
+          timestamp: Date.now()
+        })
+      }).catch(() => {});
+      // #endregion
+      return (
+        <JobUnavailableView
+          title="Vaga removida definitivamente"
+          description="Esta vaga foi removida em definitivo. Veja vagas atuais por cidade e estado."
+          relatedJobs={[]}
+        />
+      );
+    }
+
     const job = await getJobBySlug(segments[0]);
     if (!job) {
+      // #region agent log
+      fetch("http://127.0.0.1:7370/ingest/b54ed65d-267c-4421-b3af-1ea0f3df3748", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "X-Debug-Session-Id": "bb2dcd" },
+        body: JSON.stringify({
+          sessionId: "bb2dcd",
+          runId: "pre-fix",
+          hypothesisId: "H1",
+          location: "app/vagas/[...slug]/page.tsx",
+          message: "job slug not found path",
+          data: { slug: segments[0] },
+          timestamp: Date.now()
+        })
+      }).catch(() => {});
+      // #endregion
       notFound();
+    }
+
+    if (!job.isActive) {
+      const relatedJobs = await getRelatedJobs({
+        excludeSlug: job.slug,
+        citySlug: job.city?.slug,
+        stateSlug: job.state?.slug,
+        companySlug: job.company?.slug,
+        limit: 6
+      });
+      const expired = isJobExpired(job);
+
+      // #region agent log
+      fetch("http://127.0.0.1:7370/ingest/b54ed65d-267c-4421-b3af-1ea0f3df3748", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "X-Debug-Session-Id": "bb2dcd" },
+        body: JSON.stringify({
+          sessionId: "bb2dcd",
+          runId: "post-fix",
+          hypothesisId: "H2",
+          location: "app/vagas/[...slug]/page.tsx",
+          message: "inactive job rendered as unavailable page",
+          data: { slug: job.slug, expired, hasRelated: relatedJobs.length > 0 },
+          timestamp: Date.now()
+        })
+      }).catch(() => {});
+      // #endregion
+
+      return (
+        <JobUnavailableView
+          title={expired ? "Vaga encerrada" : "Vaga indisponível"}
+          description={
+            expired
+              ? "Esta vaga foi encerrada e não aceita mais candidaturas. Ainda assim, você pode aproveitar os links abaixo para encontrar vagas parecidas."
+              : "Esta vaga não está mais disponível. Use as sugestões para encontrar oportunidades atualizadas."
+          }
+          citySlug={job.city?.slug}
+          stateSlug={job.state?.slug}
+          relatedJobs={relatedJobs}
+        />
+      );
     }
 
     const requirements = Array.isArray(job.requirements) ? job.requirements : [];
@@ -151,17 +265,20 @@ export default async function VagasCatchAllPage({
     // #region agent log
     fetch("http://127.0.0.1:7370/ingest/b54ed65d-267c-4421-b3af-1ea0f3df3748", {
       method: "POST",
-      headers: { "Content-Type": "application/json", "X-Debug-Session-Id": "eb6787" },
+      headers: { "Content-Type": "application/json", "X-Debug-Session-Id": "bb2dcd" },
       body: JSON.stringify({
-        sessionId: "eb6787",
+        sessionId: "bb2dcd",
         runId: "pre-fix",
-        hypothesisId: "H1",
+        hypothesisId: "H2",
         location: "app/vagas/[...slug]/page.tsx",
-        message: "job date normalization",
+        message: "job detail status snapshot",
         data: {
           slug: job.slug,
+          isActive: job.isActive,
           publishedAtType: typeof job.publishedAt,
           hasPublishedAtIso: Boolean(publishedAtIso),
+          expiresAtIso,
+          validThroughIso,
           cityName,
           stateCode
         },

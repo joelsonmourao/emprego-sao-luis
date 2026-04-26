@@ -1,4 +1,6 @@
 import { getReferencePostalCodeForCity } from "@/lib/seo/br-reference-postal";
+import { normalizeListValues } from "@/lib/jobs/text-normalization";
+import { getCityCoordinates } from "@/lib/seo/city-coordinates";
 import { sanitizeRichTextHtml } from "@/lib/rich-text";
 import { absoluteUrl } from "@/lib/utils";
 
@@ -54,8 +56,6 @@ export function buildFaqJsonLd(items: Array<{ question: string; answer: string }
   };
 }
 
-const JOBPOSTING_FALLBACK_MONTHLY_BRL = 1518;
-
 export type JobPostingJsonLdInput = {
   id: string;
   externalId?: string | null;
@@ -108,7 +108,7 @@ function escapeHtmlText(s: string) {
 }
 
 function toStringList(items: unknown[]): string[] {
-  return items.map((item) => String(item).trim()).filter(Boolean);
+  return normalizeListValues(items);
 }
 
 function buildJobPostingDescriptionHtml(input: { summary: string; descriptionHtml: string; requirements: string[]; benefits: string[] }) {
@@ -155,15 +155,13 @@ function computeValidThroughIso(publishedAt: string, validThrough: string | null
 function buildBaseSalaryBlock(salaryMin: number | null, salaryMax: number | null) {
   const min = typeof salaryMin === "number" && Number.isFinite(salaryMin) && salaryMin > 0 ? salaryMin : null;
   const max = typeof salaryMax === "number" && Number.isFinite(salaryMax) && salaryMax > 0 ? salaryMax : null;
-  let qv: Record<string, unknown>;
+  if (!min && !max) return null;
 
+  let qv: Record<string, unknown>;
   if (min && max && min !== max) {
-    const avg = Math.round((min + max) / 2);
-    qv = { "@type": "QuantitativeValue", value: avg, minValue: min, maxValue: max, unitText: "MONTH" };
-  } else if (min ?? max) {
-    qv = { "@type": "QuantitativeValue", value: min ?? max, unitText: "MONTH" };
+    qv = { "@type": "QuantitativeValue", minValue: min, maxValue: max, unitText: "MONTH" };
   } else {
-    qv = { "@type": "QuantitativeValue", value: JOBPOSTING_FALLBACK_MONTHLY_BRL, unitText: "MONTH" };
+    qv = { "@type": "QuantitativeValue", value: min ?? max, unitText: "MONTH" };
   }
 
   return {
@@ -225,10 +223,43 @@ async function buildJobLocationBlock(job: JobPostingJsonLdInput) {
     address.streetAddress = street;
   }
 
-  return {
+  const location: Record<string, unknown> = {
     "@type": "Place",
     address
   };
+
+  const coordinates = job.locationType === "REMOTE" ? null : getCityCoordinates(job.cityName, job.stateCode);
+  if (coordinates) {
+    location.geo = {
+      "@type": "GeoCoordinates",
+      latitude: coordinates.latitude,
+      longitude: coordinates.longitude
+    };
+  }
+
+  // #region agent log
+  fetch("http://127.0.0.1:7370/ingest/b54ed65d-267c-4421-b3af-1ea0f3df3748", {
+    method: "POST",
+    headers: { "Content-Type": "application/json", "X-Debug-Session-Id": "bb2dcd" },
+    body: JSON.stringify({
+      sessionId: "bb2dcd",
+      runId: "post-fix",
+      hypothesisId: "H6",
+      location: "lib/seo/json-ld.ts",
+      message: "joblocation geo resolution",
+      data: {
+        slug: job.slug,
+        cityName: job.cityName,
+        stateCode: job.stateCode,
+        locationType: job.locationType,
+        hasGeo: Boolean(coordinates)
+      },
+      timestamp: Date.now()
+    })
+  }).catch(() => {});
+  // #endregion
+
+  return location;
 }
 
 const DEFAULT_INDUSTRY = "Programa de Aprendizagem Profissional - Jovem Aprendiz e Menor Aprendiz (Lei da Aprendizagem)";
@@ -264,7 +295,6 @@ export async function buildJobPostingJsonLd(job: JobPostingJsonLdInput) {
       credentialCategory: "high school"
     },
     jobLocation: await buildJobLocationBlock(job),
-    baseSalary: buildBaseSalaryBlock(job.salaryMin, job.salaryMax),
     description: descriptionHtml,
     industry: (job.industry?.trim() || DEFAULT_INDUSTRY).trim(),
     occupationalCategory: (job.occupationalCategory?.trim() || DEFAULT_OCCUPATIONAL_CATEGORY).trim(),
@@ -291,6 +321,35 @@ export async function buildJobPostingJsonLd(job: JobPostingJsonLdInput) {
       name: "Brazil"
     };
   }
+
+  const baseSalary = buildBaseSalaryBlock(job.salaryMin, job.salaryMax);
+  if (baseSalary) {
+    data.baseSalary = baseSalary;
+  }
+
+  // #region agent log
+  fetch("http://127.0.0.1:7370/ingest/b54ed65d-267c-4421-b3af-1ea0f3df3748", {
+    method: "POST",
+    headers: { "Content-Type": "application/json", "X-Debug-Session-Id": "bb2dcd" },
+    body: JSON.stringify({
+      sessionId: "bb2dcd",
+      runId: "pre-fix",
+      hypothesisId: "H3",
+      location: "lib/seo/json-ld.ts",
+      message: "jobposting salary and location payload",
+      data: {
+        slug: job.slug,
+        salaryMin: job.salaryMin,
+        salaryMax: job.salaryMax,
+        hasBaseSalary: Boolean(data.baseSalary),
+        locationType: job.locationType,
+        cityName: job.cityName,
+        stateCode: job.stateCode
+      },
+      timestamp: Date.now()
+    })
+  }).catch(() => {});
+  // #endregion
 
   return removeEmptyJsonLdValues(data);
 }

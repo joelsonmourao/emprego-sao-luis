@@ -22,7 +22,17 @@ type JobCardProps = {
   };
 };
 
+function buildCardSummary(job: JobCardProps["job"]) {
+  const summary = job.summary.trim();
+  const isGeneric = /oportunidade de primeiro emprego com formacao profissional\.?/i.test(summary);
+  if (summary && !isGeneric) return summary;
+
+  return `${job.companyName} em ${job.city.name}, ${job.state.code}. ${job.title} com atividades da área e requisitos da vaga no anúncio completo.`;
+}
+
 export function JobCard({ job }: JobCardProps) {
+  const cardSummary = buildCardSummary(job);
+
   return (
     <Card className="group h-full overflow-hidden rounded-[2rem] border-[var(--brand-line)] bg-white shadow-[0_25px_90px_-55px_rgba(26,43,76,0.12)] transition duration-300 hover:-translate-y-1 hover:shadow-[0_35px_100px_-50px_rgba(26,43,76,0.18)]">
       <CardHeader className="relative overflow-hidden pb-4">
@@ -73,7 +83,7 @@ export function JobCard({ job }: JobCardProps) {
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-5">
-        <p className="line-clamp-3 text-sm leading-7 text-[var(--brand-text-secondary)]">{job.summary}</p>
+        <p className="line-clamp-3 text-sm leading-7 text-[var(--brand-text-secondary)]">{cardSummary}</p>
         <div className="flex items-center justify-between gap-3 rounded-2xl bg-[linear-gradient(135deg,rgba(244,247,246,0.98),rgba(255,248,241,0.98))] px-4 py-3">
           <span className="inline-flex items-center gap-2 text-xs font-medium text-[var(--brand-text-secondary)]">
             <Clock3 className="h-4 w-4" />

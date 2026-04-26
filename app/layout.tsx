@@ -97,15 +97,17 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
         <ConsentBootstrap />
         <JsonLd data={buildOrganizationJsonLd({ name: settings.legalName || settings.siteName, logoUrl: settings.logoUrl })} />
         <JsonLd data={buildWebsiteJsonLd({ name: settings.siteName })} />
-        <Suspense fallback={null}>
-          <PublicChrome
-            header={<SiteHeader />}
-            footer={<SiteFooter />}
-            integrations={<SiteIntegrations consentBanner={settings.consentBanner} google={settings.google} initialConsentValue={null} />}
-          >
-            {children}
-          </PublicChrome>
-        </Suspense>
+        <PublicChrome
+          header={<SiteHeader />}
+          footer={<SiteFooter />}
+          integrations={
+            <Suspense fallback={null}>
+              <SiteIntegrations consentBanner={settings.consentBanner} google={settings.google} initialConsentValue={null} />
+            </Suspense>
+          }
+        >
+          {children}
+        </PublicChrome>
       </body>
     </html>
   );
