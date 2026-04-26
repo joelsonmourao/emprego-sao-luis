@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { cache } from "react";
 
 import { Breadcrumbs } from "@/components/breadcrumbs";
 import { EmptyState } from "@/components/empty-state";
@@ -14,7 +15,7 @@ import {
   buildJobsListingMetaTitle,
   buildJobsSearchCanonicalPath
 } from "@/lib/listing";
-import { getCompanyHubs, getJobsList } from "@/lib/repositories/jobs";
+import { getCompanyHubBySlug, getFeaturedCompanies, getJobsList } from "@/lib/repositories/jobs";
 import { getSearchGeoData } from "@/lib/repositories/geo";
 import { shouldIndexPage } from "@/lib/seo/indexing";
 import { getCityJobsPath, getCompanyJobsPath, getStateJobsPath } from "@/lib/seo/jobs-pages";
@@ -24,35 +25,44 @@ import { jobSearchParamsSchema } from "@/lib/schemas/search";
 import { renderFaqTemplate, renderTemplate } from "@/lib/site-copy";
 import { getSiteContent } from "@/lib/site-content";
 import { JobsGridWithMidAd } from "@/components/vagas/jobs-grid-with-mid-ad";
+import { sendDebugLog } from "@/lib/perf/debug-log";
 
 export const revalidate = 600;
+
+const getJobsAndGeoForSearch = cache(
+  async (key: string) => {
+    const parsed = jobSearchParamsSchema.parse(JSON.parse(key) as Record<string, unknown>);
+    const [jobs, states] = await Promise.all([
+      getJobsList({
+        query: parsed.q,
+        stateSlug: parsed.estado,
+        citySlug: parsed.cidade,
+        companySlug: parsed.empresa,
+        order: parsed.order,
+        page: parsed.page
+      }),
+      getSearchGeoData()
+    ]);
+    return { jobs, states, parsed };
+  }
+);
 
 export async function generateMetadata({
   searchParams
 }: {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
+  const startedAt = Date.now();
   const raw = await searchParams;
-  const parsed = jobSearchParamsSchema.parse({
+  const normalizedInput = {
     q: typeof raw.q === "string" ? raw.q : undefined,
     estado: typeof raw.estado === "string" ? raw.estado : undefined,
     cidade: typeof raw.cidade === "string" ? raw.cidade : undefined,
     empresa: typeof raw.empresa === "string" ? raw.empresa : undefined,
     order: typeof raw.order === "string" ? raw.order : undefined,
     page: typeof raw.page === "string" ? raw.page : undefined
-  });
-
-  const [jobs, states] = await Promise.all([
-    getJobsList({
-      query: parsed.q,
-      stateSlug: parsed.estado,
-      citySlug: parsed.cidade,
-      companySlug: parsed.empresa,
-      order: parsed.order,
-      page: parsed.page
-    }),
-    getSearchGeoData()
-  ]);
+  };
+  const { jobs, states, parsed } = await getJobsAndGeoForSearch(JSON.stringify(normalizedInput));
 
   const selectedState = states.find((state) => state.slug === parsed.estado);
   const selectedCity = selectedState?.cities.find((city) => city.slug === parsed.cidade);
@@ -74,6 +84,22 @@ export async function generateMetadata({
     hasBetterCanonical: Boolean(!parsed.q && (parsed.estado || parsed.cidade || parsed.empresa)),
     isTechnicalQuery: !isBaseListing
   });
+
+  // #region agent log
+  sendDebugLog({
+    runId: "perf-audit",
+    hypothesisId: "H11",
+    location: "app/vagas/page.tsx",
+    message: "jobs metadata query footprint",
+    data: {
+      elapsedMs: Date.now() - startedAt,
+      hasStateFilter: Boolean(parsed.estado),
+      hasCityFilter: Boolean(parsed.cidade),
+      totalJobs: jobs.total,
+      stateCount: states.length
+    }
+  });
+  // #endregion
 
   return buildSiteMetadata({
     title: buildJobsListingMetaTitle({
@@ -112,32 +138,25 @@ export default async function JobsPage({
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
   const raw = await searchParams;
-  const parsed = jobSearchParamsSchema.parse({
+  const normalizedInput = {
     q: typeof raw.q === "string" ? raw.q : undefined,
     estado: typeof raw.estado === "string" ? raw.estado : undefined,
     cidade: typeof raw.cidade === "string" ? raw.cidade : undefined,
     empresa: typeof raw.empresa === "string" ? raw.empresa : undefined,
     order: typeof raw.order === "string" ? raw.order : undefined,
     page: typeof raw.page === "string" ? raw.page : undefined
-  });
+  };
+  const { jobs, states, parsed } = await getJobsAndGeoForSearch(JSON.stringify(normalizedInput));
 
-  const [jobs, states, companies, siteContent] = await Promise.all([
-    getJobsList({
-      query: parsed.q,
-      stateSlug: parsed.estado,
-      citySlug: parsed.cidade,
-      companySlug: parsed.empresa,
-      order: parsed.order,
-      page: parsed.page
-    }),
-    getSearchGeoData(),
-    getCompanyHubs(),
+  const [featuredCompanies, selectedCompany, siteContent] = await Promise.all([
+    getFeaturedCompanies(),
+    parsed.empresa ? getCompanyHubBySlug(parsed.empresa) : Promise.resolve(null),
     getSiteContent()
   ]);
 
   const selectedState = states.find((state) => state.slug === parsed.estado);
   const selectedCity = selectedState?.cities.find((city) => city.slug === parsed.cidade);
-  const selectedCompany = companies.find((company) => company.slug === parsed.empresa);
+  const selectedCompanyName = selectedCompany?.name;
   
   const heading = buildJobsListingHeading({
     total: jobs.total,
@@ -145,7 +164,7 @@ export default async function JobsPage({
     stateName: selectedState?.name,
     cityName: selectedCity?.name,
     stateCode: selectedState?.code,
-    companyName: selectedCompany?.name
+    companyName: selectedCompanyName
   });
   
   const intro = buildJobsListingIntro({
@@ -154,7 +173,7 @@ export default async function JobsPage({
     stateName: selectedState?.name,
     cityName: selectedCity?.name,
     stateCode: selectedState?.code,
-    companyName: selectedCompany?.name
+    companyName: selectedCompanyName
   });
   
   const faqValues = { totalJobs: jobs.total };
@@ -243,7 +262,7 @@ export default async function JobsPage({
         <div className="brand-chip rounded-[1.5rem] p-4 sm:rounded-[1.8rem] sm:p-5 sm:rounded-[2rem] sm:p-6">
           <h2 className="text-base font-black text-slate-950 sm:text-lg">Empresas com vagas recentes</h2>
           <div className="mt-3 flex flex-wrap gap-2 sm:mt-4 sm:gap-3">
-            {companies.slice(0, 8).map((company) => (
+            {featuredCompanies.slice(0, 8).map((company) => (
               <Link key={company.slug} href={getCompanyJobsPath(company.slug)} className="rounded-full border border-[color:rgba(26,43,76,0.1)] bg-white px-3 py-1.5 text-xs font-medium text-[var(--brand-text-secondary)] transition hover:border-[color:rgba(255,109,0,0.22)] hover:text-[var(--brand-orange)] sm:px-4 sm:py-2 sm:text-sm">
                 {company.name}
               </Link>

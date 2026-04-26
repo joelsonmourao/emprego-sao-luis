@@ -8,7 +8,7 @@ import { sanitizeRichTextHtml } from "@/lib/rich-text";
 import { buildSiteMetadata } from "@/lib/seo/metadata";
 import { getCompanyJobsPath } from "@/lib/seo/jobs-pages";
 import { getPostBySlug, getRelatedPosts } from "@/lib/repositories/blog";
-import { getCompanyHubs } from "@/lib/repositories/jobs";
+import { getFeaturedCompanies } from "@/lib/repositories/jobs";
 
 export const revalidate = 7200;
 
@@ -43,7 +43,7 @@ export default async function BlogDetailPage({ params }: { params: Promise<{ slu
 
   const [relatedPosts, companies] = await Promise.all([
     getRelatedPosts({ slug: post.slug, categoryId: post.categoryId, limit: 3 }),
-    getCompanyHubs()
+    getFeaturedCompanies()
   ]);
 
   return (

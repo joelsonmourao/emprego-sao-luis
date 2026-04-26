@@ -8,12 +8,13 @@ import { buildJobPublisherName } from "@/lib/seo/job-publisher";
 import { buildJobDetailSeo } from "@/lib/seo/jobs-pages";
 import { buildBreadcrumbJsonLd, buildJobPostingJsonLd, stringifyJobPostingJsonLd, stringifyJsonLdSafe } from "@/lib/seo/json-ld";
 import { buildSiteMetadata } from "@/lib/seo/metadata";
+import { sendDebugLog } from "@/lib/perf/debug-log";
 import { getJobBySlug, getRelatedJobs } from "@/lib/repositories/jobs";
 import { isRemovedJobSlug } from "@/lib/seo/removed-job-slugs";
 import { JOB_DETAIL_PATH_RESERVED_FIRST_SEGMENTS } from "@/lib/seo/vagas-job-path";
 import { absoluteUrl } from "@/lib/utils";
 
-export const revalidate = 1;
+export const revalidate = 1800;
 
 function toValidDate(value: unknown): Date | null {
   if (!value) return null;
@@ -44,10 +45,20 @@ export async function generateMetadata({
   params: Promise<{ slug: string[] }>;
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
+  const startedAt = Date.now();
   const { slug: segments } = await params;
   const rawSearch = await searchParams;
 
   if (!segments?.length) {
+    // #region agent log
+    sendDebugLog({
+      runId: "perf-audit",
+      hypothesisId: "H9",
+      location: "app/vagas/[...slug]/page.tsx",
+      message: "job metadata fallback path",
+      data: { elapsedMs: Date.now() - startedAt }
+    });
+    // #endregion
     return buildSiteMetadata({
       title: "Vagas",
       description: "Listagem de vagas.",

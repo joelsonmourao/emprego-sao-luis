@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { cache } from "react";
 import { notFound } from "next/navigation";
 
 import { Breadcrumbs } from "@/components/breadcrumbs";
@@ -12,10 +13,21 @@ import { shouldIndexPage } from "@/lib/seo/indexing";
 import { buildSiteMetadata } from "@/lib/seo/metadata";
 import { buildBreadcrumbJsonLd, buildFaqJsonLd } from "@/lib/seo/json-ld";
 import { getStateBySlug } from "@/lib/repositories/geo";
-import { getCompanyHubs, getJobsList } from "@/lib/repositories/jobs";
+import { getCompanyHubsByState, getJobsList } from "@/lib/repositories/jobs";
 import { jobSearchParamsSchema } from "@/lib/schemas/search";
 
-export const revalidate = 1200;
+export const revalidate = 1800;
+
+const getStateListingData = cache(async (stateSlug: string, order: "relevance" | "date" | undefined, page: number) => {
+  const stateData = await getStateBySlug(stateSlug);
+  if (!stateData) return null;
+  const jobs = await getJobsList({
+    stateSlug: stateData.slug,
+    order,
+    page
+  });
+  return { stateData, jobs };
+});
 
 function buildPageHref(slug: string, order: "relevance" | "date" | undefined, pageNumber: number) {
   const params = new URLSearchParams();
@@ -39,7 +51,8 @@ export async function generateMetadata({
     page: typeof raw.page === "string" ? raw.page : undefined
   });
 
-  const stateData = await getStateBySlug(state);
+  const listingData = await getStateListingData(state, parsed.order, parsed.page);
+  const stateData = listingData?.stateData;
   if (!stateData) {
     return buildSiteMetadata({
       title: "Estado não encontrado",
@@ -49,11 +62,7 @@ export async function generateMetadata({
     });
   }
 
-  const jobs = await getJobsList({
-    stateSlug: stateData.slug,
-    order: parsed.order,
-    page: parsed.page
-  });
+  const jobs = listingData.jobs;
 
   const seo = buildStateListingSeo({
     stateName: stateData.name,
@@ -115,19 +124,14 @@ export default async function JobsByStatePage({
     page: typeof raw.page === "string" ? raw.page : undefined
   });
 
-  const stateData = await getStateBySlug(state);
+  const listingData = await getStateListingData(state, parsed.order, parsed.page);
+  const stateData = listingData?.stateData;
   if (!stateData) {
     notFound();
   }
 
-  const [jobs, companies] = await Promise.all([
-    getJobsList({
-      stateSlug: stateData.slug,
-      order: parsed.order,
-      page: parsed.page
-    }),
-    getCompanyHubs()
-  ]);
+  const [stateCompanies] = await Promise.all([getCompanyHubsByState(stateData.slug, 8)]);
+  const jobs = listingData.jobs;
 
   const seo = buildStateListingSeo({
     stateName: stateData.name,
@@ -137,7 +141,6 @@ export default async function JobsByStatePage({
   });
 
   const faq = buildListingFaq({ name: stateData.name, totalJobs: jobs.total, type: "state" });
-  const stateCompanies = companies.filter((company) => company.stateSlug === stateData.slug).slice(0, 8);
   const topCities = stateData.cities.filter((city) => city._count.jobs > 0).slice(0, 8);
   const relatedJobs = jobs.items.slice(0, 6);
   const buildOrderHref = (order: "relevance" | "date") => buildPageHref(stateData.slug, order, 1);

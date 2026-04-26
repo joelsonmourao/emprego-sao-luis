@@ -28,7 +28,7 @@ import { getCities, getCitiesBySlugs, getSearchGeoData, getStates, getStatesBySl
 import { getSiteContent } from "@/lib/site-content";
 import { homeBlockKeys } from "@/lib/schemas/site-admin";
 
-export const revalidate = 600;
+export const revalidate = 1800;
 
 export async function generateMetadata() {
   return buildSiteMetadata({

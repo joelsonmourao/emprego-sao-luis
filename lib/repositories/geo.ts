@@ -2,6 +2,7 @@ import { unstable_cache } from "next/cache";
 
 import { prisma } from "@/lib/db";
 import { PUBLIC_GEO_CACHE_TAG } from "@/lib/public-revalidate";
+import { sendDebugLog } from "@/lib/perf/debug-log";
 
 async function fetchStates() {
   return prisma.state.findMany({
@@ -83,14 +84,34 @@ export const getCityBySlug = unstable_cache(async (slug: string) => {
 });
 
 async function fetchSearchGeoData() {
-  return prisma.state.findMany({
+  const startedAt = Date.now();
+  const result = await prisma.state.findMany({
     orderBy: [{ name: "asc" }],
-    include: {
+    select: {
+      id: true,
+      name: true,
+      slug: true,
+      code: true,
       cities: {
-        orderBy: [{ name: "asc" }]
+        orderBy: [{ name: "asc" }],
+        select: {
+          id: true,
+          name: true,
+          slug: true
+        }
       }
     }
   });
+  // #region agent log
+  sendDebugLog({
+    runId: "perf-audit",
+    hypothesisId: "H12",
+    location: "lib/repositories/geo.ts",
+    message: "search geo data query",
+    data: { elapsedMs: Date.now() - startedAt, states: result.length }
+  });
+  // #endregion
+  return result;
 }
 
 export const getSearchGeoData = unstable_cache(fetchSearchGeoData, ["search-geo-data-v1"], {

@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 import { buildAdsTxtFromPublisher } from "@/lib/google";
 import { getSiteSettings } from "@/lib/site-settings";
 
-export const revalidate = 600;
+export const revalidate = 3600;
 
 export async function GET() {
   const settings = await getSiteSettings();

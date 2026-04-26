@@ -2,10 +2,12 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
 import { ADMIN_AUTH_COOKIE, verifyAdminSessionToken } from "@/lib/auth-token";
+import { sendDebugLog } from "@/lib/perf/debug-log";
 import { isRemovedJobSlug } from "@/lib/seo/removed-job-slugs";
 import { JOB_DETAIL_PATH_RESERVED_FIRST_SEGMENTS } from "@/lib/seo/vagas-job-path";
 
 export async function middleware(request: NextRequest) {
+  const startedAt = Date.now();
   const { pathname } = request.nextUrl;
   const hostname = request.nextUrl.hostname.toLowerCase();
   const isAdminPage = pathname.startsWith("/admin");
@@ -94,9 +96,21 @@ export async function middleware(request: NextRequest) {
     response.headers.set("X-Robots-Tag", "noindex, nofollow");
   }
 
+  if (request.method === "GET" && (pathname === "/" || pathname.startsWith("/vagas") || pathname.startsWith("/blog"))) {
+    // #region agent log
+    sendDebugLog({
+      runId: "perf-audit",
+      hypothesisId: "H10",
+      location: "middleware.ts",
+      message: "middleware processed public route",
+      data: { pathname, elapsedMs: Date.now() - startedAt }
+    });
+    // #endregion
+  }
+
   return response;
 }
 
 export const config = {
-  matcher: ["/((?!_next/static|_next/image|favicon.ico|robots.txt|sitemap.xml).*)"]
+  matcher: ["/((?!_next/static|_next/image|favicon.ico|robots.txt|sitemap.xml|sitemap-fresh.xml|sitemaps/|ads.txt|icon.svg).*)"]
 };

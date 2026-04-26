@@ -4,6 +4,7 @@ import type { EmploymentType, Prisma } from "@prisma/client";
 import { prisma } from "@/lib/db";
 import { pagination } from "@/lib/constants";
 import { PUBLIC_JOBS_CACHE_TAG } from "@/lib/public-revalidate";
+import { sendDebugLog } from "@/lib/perf/debug-log";
 
 /** Full job graph for detalhe da vaga, JSON-LD e admin. */
 const jobDetailInclude = {
@@ -208,6 +209,27 @@ const getJobsListCached = unstable_cache(async (key: string) => {
   tags: [PUBLIC_JOBS_CACHE_TAG]
 });
 
+const getJobsListCachedWithPerf = unstable_cache(async (key: string) => {
+  const result = await getJobsListCached(key);
+  // #region agent log
+  sendDebugLog({
+    runId: "perf-audit",
+    hypothesisId: "H12",
+    location: "lib/repositories/jobs.ts",
+    message: "jobs list query bundle",
+    data: {
+      total: result.total,
+      page: result.page,
+      returnedItems: result.items.length
+    }
+  });
+  // #endregion
+  return result;
+}, ["jobs-list-perf-v1"], {
+  revalidate: 600,
+  tags: [PUBLIC_JOBS_CACHE_TAG]
+});
+
 export async function getJobsList(params: {
   query?: string;
   stateSlug?: string;
@@ -218,7 +240,7 @@ export async function getJobsList(params: {
   order?: "relevance" | "date";
   page?: number;
 }) {
-  return getJobsListCached(jobsListCacheKey(params));
+  return getJobsListCachedWithPerf(jobsListCacheKey(params));
 }
 
 async function fetchFeaturedCompanies() {
@@ -343,6 +365,76 @@ export const getCompanyHubs = unstable_cache(fetchCompanyHubsMapped, ["company-h
   revalidate: 1200,
   tags: [PUBLIC_JOBS_CACHE_TAG]
 });
+
+const getCompanyHubsByStateCached = unstable_cache(async (stateSlug: string, limit: number) => {
+  const companies = await prisma.company.findMany({
+    where: { isActive: true, state: { slug: stateSlug } },
+    select: companyHubListSelect,
+    orderBy: [{ featured: "desc" }, { updatedAt: "desc" }],
+    take: limit
+  });
+
+  return companies.map((company) => ({
+    id: company.id,
+    name: company.name,
+    slug: company.slug,
+    logoUrl: company.logoUrl,
+    websiteUrl: company.websiteUrl,
+    summary: company.summary,
+    socialImageUrl: company.socialImageUrl,
+    seoTitle: company.seoTitle,
+    seoDescription: company.seoDescription,
+    cityName: company.city.name,
+    citySlug: company.city.slug,
+    stateName: company.state.name,
+    stateCode: company.state.code,
+    stateSlug: company.state.slug,
+    count: company._count.jobs,
+    featured: company.featured
+  }));
+}, ["company-hubs-state-v1"], {
+  revalidate: 1800,
+  tags: [PUBLIC_JOBS_CACHE_TAG]
+});
+
+export async function getCompanyHubsByState(stateSlug: string, limit = 8) {
+  return getCompanyHubsByStateCached(stateSlug, limit);
+}
+
+const getCompanyHubsByCityCached = unstable_cache(async (citySlug: string, limit: number) => {
+  const companies = await prisma.company.findMany({
+    where: { isActive: true, city: { slug: citySlug } },
+    select: companyHubListSelect,
+    orderBy: [{ featured: "desc" }, { updatedAt: "desc" }],
+    take: limit
+  });
+
+  return companies.map((company) => ({
+    id: company.id,
+    name: company.name,
+    slug: company.slug,
+    logoUrl: company.logoUrl,
+    websiteUrl: company.websiteUrl,
+    summary: company.summary,
+    socialImageUrl: company.socialImageUrl,
+    seoTitle: company.seoTitle,
+    seoDescription: company.seoDescription,
+    cityName: company.city.name,
+    citySlug: company.city.slug,
+    stateName: company.state.name,
+    stateCode: company.state.code,
+    stateSlug: company.state.slug,
+    count: company._count.jobs,
+    featured: company.featured
+  }));
+}, ["company-hubs-city-v1"], {
+  revalidate: 1800,
+  tags: [PUBLIC_JOBS_CACHE_TAG]
+});
+
+export async function getCompanyHubsByCity(citySlug: string, limit = 8) {
+  return getCompanyHubsByCityCached(citySlug, limit);
+}
 
 const getCompanyHubBySlugCached = unstable_cache(async (slug: string) => {
   return prisma.company.findUnique({
