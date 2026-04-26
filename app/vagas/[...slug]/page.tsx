@@ -23,6 +23,11 @@ function toIso(value: unknown, fallbackIso: string) {
   return toValidDate(value)?.toISOString() ?? fallbackIso;
 }
 
+function safeString(value: unknown, fallback: string) {
+  const text = typeof value === "string" ? value.trim() : "";
+  return text || fallback;
+}
+
 export async function generateMetadata({
   params,
   searchParams
@@ -132,7 +137,11 @@ export default async function VagasCatchAllPage({
 
     const requirements = Array.isArray(job.requirements) ? job.requirements : [];
     const benefits = Array.isArray(job.benefits) ? job.benefits : [];
-    const publisherDisplayName = buildJobPublisherName(job.city?.name, job.state?.code);
+    const cityName = safeString(job.city?.name, "Brasil");
+    const citySlug = safeString(job.city?.slug, "brasil");
+    const stateCode = safeString(job.state?.code, "BR");
+    const stateName = safeString(job.state?.name, "Brasil");
+    const publisherDisplayName = buildJobPublisherName(cityName, stateCode);
     const nowIso = new Date().toISOString();
     const publishedAtIso = toIso(job.publishedAt, nowIso);
     const expiresAtIso = toValidDate(job.expiresAt)?.toISOString() ?? null;
@@ -152,7 +161,9 @@ export default async function VagasCatchAllPage({
         data: {
           slug: job.slug,
           publishedAtType: typeof job.publishedAt,
-          hasPublishedAtIso: Boolean(publishedAtIso)
+          hasPublishedAtIso: Boolean(publishedAtIso),
+          cityName,
+          stateCode
         },
         timestamp: Date.now()
       })
@@ -173,10 +184,10 @@ export default async function VagasCatchAllPage({
         companyLogoUrl: job.company?.logoUrl ?? job.companyLogoUrl,
         companyWebsiteUrl: job.company?.websiteUrl ?? job.companyWebsiteUrl,
         companySlug: job.company?.slug ?? undefined,
-        cityName: job.city.name,
-        citySlug: job.city.slug,
-        stateCode: job.state.code,
-        stateName: job.state.name,
+        cityName,
+        citySlug,
+        stateCode,
+        stateName,
         locationType: job.locationType,
         publishedAt: publishedAtIso,
         expiresAt: expiresAtIso,
@@ -208,8 +219,8 @@ export default async function VagasCatchAllPage({
           "@type": "Place",
           address: {
             "@type": "PostalAddress",
-            addressLocality: job.city.name,
-            addressRegion: job.state.code,
+            addressLocality: cityName,
+            addressRegion: stateCode,
             addressCountry: "BR"
           }
         },
@@ -221,7 +232,7 @@ export default async function VagasCatchAllPage({
     const breadcrumbLd = buildBreadcrumbJsonLd([
       { name: "Home", path: "/" },
       { name: "Vagas", path: "/vagas" },
-      { name: job.title, path: `/vagas/${job.slug}` }
+      { name: safeString(job.title, "Vaga"), path: `/vagas/${job.slug}` }
     ]);
     let breadcrumbScript: string;
     try {
@@ -233,7 +244,7 @@ export default async function VagasCatchAllPage({
         itemListElement: [
           { "@type": "ListItem", position: 1, name: "Home", item: absoluteUrl("/") },
           { "@type": "ListItem", position: 2, name: "Vagas", item: absoluteUrl("/vagas") },
-          { "@type": "ListItem", position: 3, name: job.title, item: absoluteUrl(`/vagas/${job.slug}`) }
+          { "@type": "ListItem", position: 3, name: safeString(job.title, "Vaga"), item: absoluteUrl(`/vagas/${job.slug}`) }
         ]
       });
     }
