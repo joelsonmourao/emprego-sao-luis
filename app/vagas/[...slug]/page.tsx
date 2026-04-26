@@ -224,8 +224,7 @@ export default async function VagasCatchAllPage({
             addressCountry: "BR"
           }
         },
-        url: absoluteUrl(`/vagas/${job.slug}`),
-        directApply: false
+        url: absoluteUrl(`/vagas/${job.slug}`)
       });
     }
 

@@ -86,7 +86,6 @@ export type JobPostingJsonLdInput = {
   industry?: string | null;
   occupationalCategory?: string | null;
   applyUrl: string;
-  directApply?: unknown;
   publisherDisplayName?: string | null;
 };
 
@@ -100,13 +99,8 @@ export function sanitizeISODate(dateStr: string | undefined | null) {
   return dateStr?.replace(/\.\d{3}Z$/, "Z") ?? dateStr;
 }
 
-export function sanitizeDirectApply(value: unknown): boolean {
-  void value;
-  return false;
-}
-
 export function stringifyJobPostingJsonLd(data: Record<string, unknown>) {
-  return JSON.stringify(removeEmptyJsonLdValues({ ...data, directApply: false })).replace(/</g, "\\u003c");
+  return JSON.stringify(removeEmptyJsonLdValues(data)).replace(/</g, "\\u003c");
 }
 
 function escapeHtmlText(s: string) {
@@ -279,8 +273,7 @@ export async function buildJobPostingJsonLd(job: JobPostingJsonLdInput) {
       companyLogoUrl: job.companyLogoUrl,
       companyWebsiteUrl: job.companyWebsiteUrl
     }),
-    url: absoluteUrl(`/vagas/${job.slug}`),
-    directApply: false
+    url: absoluteUrl(`/vagas/${job.slug}`)
   };
 
   if (requirements.length) {
