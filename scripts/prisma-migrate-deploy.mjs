@@ -63,7 +63,7 @@ const strictAdvisoryFirst = ["1", "true", "yes"].includes(
 );
 
 function runMigrate(extraEnv) {
-  return spawnSync("pnpm", ["exec", "prisma", "migrate", "deploy"], {
+  return spawnSync("npx", ["prisma", "migrate", "deploy"], {
     cwd: root,
     stdio: "inherit",
     env: { ...process.env, DATABASE_URL_DIRECT: direct, ...extraEnv },
