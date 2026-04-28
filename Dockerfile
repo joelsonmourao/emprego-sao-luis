@@ -22,8 +22,6 @@ COPY . .
 
 RUN rm -f tsconfig.tsbuildinfo || true
 
-RUN if [ -f prisma/schema.prisma ]; then npx prisma generate; fi
-
 RUN npm run build
 
 FROM base AS runner
