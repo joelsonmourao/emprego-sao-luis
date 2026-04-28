@@ -28,14 +28,12 @@ RUN npm run build
 
 FROM base AS runner
 
-ENV NODE_ENV=production
-
 RUN addgroup --system --gid 1001 nodejs \
   && adduser --system --uid 1001 nextjs
 
 COPY --chown=nextjs:nodejs package.json ./
 
-RUN npm install --omit=dev --legacy-peer-deps
+RUN npm install --legacy-peer-deps --include=dev
 
 COPY --chown=nextjs:nodejs --from=builder /app/.next ./.next
 
@@ -43,16 +41,16 @@ COPY --chown=nextjs:nodejs --from=builder /app/public ./public
 
 COPY --chown=nextjs:nodejs --from=builder /app/prisma ./prisma
 
-COPY --chown=nextjs:nodejs --from=builder /app/next.config.ts ./next.config.ts
+COPY --chown=nextjs:nodejs --from=builder /app/next.config.js ./next.config.js
 
 COPY --chown=nextjs:nodejs --from=builder /app/node_modules/.prisma ./node_modules/.prisma
 
 COPY --chown=nextjs:nodejs --from=builder /app/node_modules/@prisma ./node_modules/@prisma
+
+ENV NODE_ENV=production
 
 USER nextjs
 
 EXPOSE 3000
 
 CMD ["npm", "run", "start"]
-
-# Force Coolify rebuild without npm lockfile
