@@ -10,6 +10,8 @@ export async function middleware(request: NextRequest) {
   const startedAt = Date.now();
   const { pathname } = request.nextUrl;
   const hostname = request.nextUrl.hostname.toLowerCase();
+  const forwardedProto = request.headers.get("x-forwarded-proto")?.split(",")[0]?.trim().toLowerCase();
+  const isSecureRequest = request.nextUrl.protocol === "https:" || forwardedProto === "https";
   const isAdminPage = pathname.startsWith("/admin");
   const isAdminApi = pathname.startsWith("/api/admin");
   const isLoginPage = pathname === "/admin/login";
@@ -70,7 +72,7 @@ export async function middleware(request: NextRequest) {
       headers: requestHeaders
     }
   });
-  const contentSecurityPolicy = [
+  const cspDirectives = [
     "default-src 'self'",
     "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://www.google-analytics.com https://pagead2.googlesyndication.com https://partner.googleadservices.com https://www.googleadservices.com https://tpc.googlesyndication.com https://ep2.adtrafficquality.google",
     "style-src 'self' 'unsafe-inline'",
@@ -81,9 +83,12 @@ export async function middleware(request: NextRequest) {
     "object-src 'none'",
     "base-uri 'self'",
     "form-action 'self'",
-    "frame-ancestors 'self'",
-    "upgrade-insecure-requests"
-  ].join("; ");
+    "frame-ancestors 'self'"
+  ];
+  if (isSecureRequest) {
+    cspDirectives.push("upgrade-insecure-requests");
+  }
+  const contentSecurityPolicy = cspDirectives.join("; ");
 
   response.headers.set("X-Frame-Options", "SAMEORIGIN");
   response.headers.set("X-Content-Type-Options", "nosniff");
@@ -103,8 +108,11 @@ export async function middleware(request: NextRequest) {
       hypothesisId: "H10",
       location: "middleware.ts",
       message: "middleware processed public route",
-      data: { pathname, elapsedMs: Date.now() - startedAt }
+      data: { pathname, elapsedMs: Date.now() - startedAt, isSecureRequest, forwardedProto: forwardedProto ?? null }
     });
+    // #endregion
+    // #region agent log
+    fetch('http://127.0.0.1:7370/ingest/b54ed65d-267c-4421-b3af-1ea0f3df3748',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'dd62ba'},body:JSON.stringify({sessionId:'dd62ba',runId:'post-fix',hypothesisId:'H11',location:'middleware.ts:csp',message:'CSP definido com upgrade condicional',data:{pathname,isSecureRequest,forwardedProto:forwardedProto ?? null,hasUpgradeDirective:isSecureRequest},timestamp:Date.now()})}).catch(()=>{});
     // #endregion
   }
 
