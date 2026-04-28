@@ -47,6 +47,8 @@ COPY --chown=nextjs:nodejs --from=builder /app/node_modules/.prisma ./node_modul
 
 COPY --chown=nextjs:nodejs --from=builder /app/node_modules/@prisma ./node_modules/@prisma
 
+COPY --chown=nextjs:nodejs --from=builder /app/scripts ./scripts
+
 ENV NODE_ENV=production
 
 USER nextjs
