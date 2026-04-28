@@ -12,6 +12,7 @@
     "typecheck": "tsc --noEmit",
     "jobs:schedule:process": "tsx scripts/process-scheduled-jobs.ts",
     "jobs:import:xlsx": "tsx scripts/import-jobs-api.ts",
+    "admin:reset": "node scripts/reset-admin.mjs",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev",
     "prisma:studio": "prisma studio",
