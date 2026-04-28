@@ -12,7 +12,7 @@ FROM base AS deps
 
 COPY package.json package-lock.json ./
 
-RUN npm ci
+RUN npm install
 
 FROM base AS builder
 
@@ -35,7 +35,7 @@ RUN addgroup --system --gid 1001 nodejs \
 
 COPY --chown=nextjs:nodejs package.json package-lock.json ./
 
-RUN npm ci --omit=dev
+RUN npm install --omit=dev
 
 COPY --chown=nextjs:nodejs --from=builder /app/.next ./.next
 
