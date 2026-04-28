@@ -54,3 +54,5 @@ USER nextjs
 EXPOSE 3000
 
 CMD ["npm", "run", "start"]
+
+# Force Coolify rebuild without npm lockfile
