@@ -10,9 +10,9 @@ RUN apk add --no-cache libc6-compat
 
 FROM base AS deps
 
-COPY package.json package-lock.json ./
+COPY package.json ./
 
-RUN npm install
+RUN npm install --legacy-peer-deps
 
 FROM base AS builder
 
@@ -33,9 +33,9 @@ ENV NODE_ENV=production
 RUN addgroup --system --gid 1001 nodejs \
   && adduser --system --uid 1001 nextjs
 
-COPY --chown=nextjs:nodejs package.json package-lock.json ./
+COPY --chown=nextjs:nodejs package.json ./
 
-RUN npm install --omit=dev
+RUN npm install --omit=dev --legacy-peer-deps
 
 COPY --chown=nextjs:nodejs --from=builder /app/.next ./.next
 
