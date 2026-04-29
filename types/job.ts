@@ -18,7 +18,16 @@ export type JobDetail = JobCard & {
   benefits: string[];
   salaryMin: number | null;
   salaryMax: number | null;
-  employmentType: "APPRENTICESHIP" | "INTERNSHIP" | "TEMPORARY" | "PART_TIME" | "FULL_TIME";
+  employmentType:
+    | "APPRENTICESHIP"
+    | "INTERNSHIP"
+    | "TEMPORARY"
+    | "PART_TIME"
+    | "FULL_TIME"
+    | "CONTRACTOR"
+    | "VOLUNTEER"
+    | "PER_DIEM"
+    | "OTHER";
   workHours: string | null;
   expiresAt: string | null;
   seoTitle: string;

@@ -1,6 +1,7 @@
 import { unstable_cache } from "next/cache";
 import type { EmploymentType, Prisma } from "@prisma/client";
 
+import { markExpiredJobsInactive } from "@/lib/jobs/job-expiry";
 import { prisma } from "@/lib/db";
 import { pagination } from "@/lib/constants";
 import { PUBLIC_JOBS_CACHE_TAG } from "@/lib/public-revalidate";
@@ -60,6 +61,7 @@ const companyHubListSelect = {
 } satisfies Prisma.CompanySelect;
 
 async function fetchFeaturedJobs() {
+  await markExpiredJobsInactive();
   return prisma.job.findMany({
     where: { isActive: true, featured: true },
     select: jobListingSelect,
@@ -74,6 +76,7 @@ export const getFeaturedJobs = unstable_cache(fetchFeaturedJobs, ["featured-jobs
 });
 
 const getJobsBySlugsCached = unstable_cache(async (slugKey: string) => {
+  await markExpiredJobsInactive();
   const slugs = JSON.parse(slugKey) as string[];
   if (!slugs.length) return [];
 
@@ -98,6 +101,7 @@ export async function getJobsBySlugs(slugs: string[]) {
 }
 
 async function fetchRecentJobs() {
+  await markExpiredJobsInactive();
   return prisma.job.findMany({
     where: { isActive: true },
     select: jobListingSelect,
@@ -144,6 +148,7 @@ function jobsListCacheKey(params: {
 }
 
 const getJobsListCached = unstable_cache(async (key: string) => {
+  await markExpiredJobsInactive();
   const params = JSON.parse(key) as {
     query?: string;
     stateSlug?: string;
@@ -282,6 +287,7 @@ export async function getFeaturedCompaniesBySlugs(slugs: string[]) {
 }
 
 const getRelatedJobsCached = unstable_cache(async (key: string) => {
+  await markExpiredJobsInactive();
   const params = JSON.parse(key) as {
     excludeSlug?: string;
     citySlug?: string;
@@ -465,6 +471,7 @@ export const getCompanyEntries = unstable_cache(async () => {
 });
 
 export const getAllActiveJobEntries = unstable_cache(async () => {
+  await markExpiredJobsInactive();
   return prisma.job.findMany({
     where: { isActive: true },
     select: {

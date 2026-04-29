@@ -194,7 +194,7 @@ export function AdminJobImporter() {
         area: String(normalized.area ?? "").trim(),
         salaryMin: parseOptionalNumber(normalized.salaryMin),
         salaryMax: parseOptionalNumber(normalized.salaryMax),
-        employmentType: String(normalized.employmentType ?? "APPRENTICESHIP").trim().toUpperCase(),
+        employmentType: String(normalized.employmentType ?? "").trim(),
         workHours: String(normalized.workHours ?? "").trim(),
         publishedAt: String(normalized.publishedAt ?? "").trim(),
         expiresAt: String(normalized.expiresAt ?? "").trim(),

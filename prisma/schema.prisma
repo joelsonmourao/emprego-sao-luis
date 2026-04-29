@@ -20,6 +20,10 @@ enum EmploymentType {
   TEMPORARY
   PART_TIME
   FULL_TIME
+  CONTRACTOR
+  VOLUNTEER
+  PER_DIEM
+  OTHER
 }
 
 enum LocationType {

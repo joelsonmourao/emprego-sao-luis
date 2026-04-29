@@ -168,6 +168,10 @@ export function JobAdminForm({
                 <option value="PART_TIME">Meio periodo</option>
                 <option value="FULL_TIME">Tempo integral</option>
                 <option value="TEMPORARY">Temporario</option>
+                <option value="CONTRACTOR">Autonomo / PJ</option>
+                <option value="VOLUNTEER">Voluntario</option>
+                <option value="PER_DIEM">Por dia / diaria</option>
+                <option value="OTHER">Outro</option>
               </Select>
             </Field>
           </div>

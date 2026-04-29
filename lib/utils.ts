@@ -1,5 +1,7 @@
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
+
+import { formatBrazilDateLong } from "@/lib/date-utils";
 import { getSiteUrl } from "@/lib/site-url";
 
 export function cn(...inputs: ClassValue[]) {
@@ -11,19 +13,7 @@ export function absoluteUrl(pathname: string) {
 }
 
 export function formatDate(date: string | Date) {
-  const d = typeof date === "string" ? new Date(date) : date;
-  if (Number.isNaN(d.getTime())) {
-    return "Data indisponivel";
-  }
-  try {
-    return new Intl.DateTimeFormat("pt-BR", {
-      day: "2-digit",
-      month: "long",
-      year: "numeric"
-    }).format(d);
-  } catch {
-    return "Data indisponivel";
-  }
+  return formatBrazilDateLong(date);
 }
 
 export function slugify(input: string) {

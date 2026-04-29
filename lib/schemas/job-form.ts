@@ -8,7 +8,17 @@ export const jobFormSchema = z.object({
   stateSlug: z.string().min(2, "Selecione o estado."),
   citySlug: z.string().min(2, "Selecione a cidade."),
   locationType: z.enum(["ONSITE", "REMOTE", "HYBRID"]),
-  employmentType: z.enum(["APPRENTICESHIP", "INTERNSHIP", "TEMPORARY", "PART_TIME", "FULL_TIME"]),
+  employmentType: z.enum([
+    "APPRENTICESHIP",
+    "INTERNSHIP",
+    "TEMPORARY",
+    "PART_TIME",
+    "FULL_TIME",
+    "CONTRACTOR",
+    "VOLUNTEER",
+    "PER_DIEM",
+    "OTHER"
+  ]),
   summary: z.string().min(30, "Escreva um resumo mais completo."),
   descriptionHtml: z.string().min(80, "Adicione a descricao completa."),
   requirementsText: z.string().min(10, "Liste os requisitos."),

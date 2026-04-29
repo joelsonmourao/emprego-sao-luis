@@ -13,7 +13,7 @@ export const importedJobRowSchema = z.object({
   area: z.string().optional().default(""),
   salaryMin: z.preprocess((val) => (val === "" ? null : Number(val)), z.number().nullable().optional()),
   salaryMax: z.preprocess((val) => (val === "" ? null : Number(val)), z.number().nullable().optional()),
-  employmentType: z.enum(["APPRENTICESHIP", "INTERNSHIP", "TEMPORARY", "PART_TIME", "FULL_TIME"]).default("APPRENTICESHIP"),
+  employmentType: z.string().optional().default(""),
   workHours: z.string().optional().default(""),
   publishedAt: z.string().optional().default(""),
   expiresAt: z.string().optional().default(""),

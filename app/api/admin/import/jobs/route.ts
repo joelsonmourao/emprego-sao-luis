@@ -6,6 +6,8 @@ import { writeAuditLog } from "@/lib/audit";
 import { requireApiRole } from "@/lib/authz";
 import { prisma } from "@/lib/db";
 import { revalidatePublicSurfacesAfterBulkJobChange } from "@/lib/public-revalidate";
+import { parseSpreadsheetEmploymentType } from "@/lib/jobs/employment-type";
+import { markExpiredJobsInactive } from "@/lib/jobs/job-expiry";
 import { importJobsPayloadSchema, type ImportedJobRow } from "@/lib/schemas/job-import";
 
 const RESPONSE_HEADERS = {
@@ -549,7 +551,7 @@ function buildJobData(row: ImportedJobRow, state: State, city: City, company: Co
     benefits: normalizeLines(row.benefitsText ?? ""),
     salaryMin: row.salaryMin ? Math.round(row.salaryMin) : null,
     salaryMax: row.salaryMax ? Math.round(row.salaryMax) : null,
-    employmentType: row.employmentType as EmploymentType,
+    employmentType: parseSpreadsheetEmploymentType(row.employmentType),
     workHours: row.workHours?.trim() || null,
     expiresAt: parseOptionalDate(row.expiresAt),
     validThrough: processValidThroughMonths(row.validThroughMonths) ?? calculateValidThrough(row.validThrough),
@@ -718,6 +720,8 @@ async function processQueuedImport(queueId: string) {
       revalidatePublicSurfacesAfterBulkJobChange();
     }
 
+    await markExpiredJobsInactive();
+
     await prisma.importQueue.update({
       where: { id: queueId },
       data: {
@@ -797,6 +801,8 @@ export async function POST(request: Request) {
       if (context.imported.length || context.updated.length) {
         revalidatePublicSurfacesAfterBulkJobChange();
       }
+
+      await markExpiredJobsInactive();
 
       return NextResponse.json(
         {

@@ -1,7 +1,15 @@
+import dayjs from "dayjs";
+import timezone from "dayjs/plugin/timezone";
+import utc from "dayjs/plugin/utc";
 import { NextResponse } from "next/server";
 
 import { requireApiRole } from "@/lib/authz";
+import { formatBrazilCalendarDate, getBrazilNow } from "@/lib/date-utils";
 import { prisma } from "@/lib/db";
+import { SITE_TIME_ZONE } from "@/lib/timezone";
+
+dayjs.extend(utc);
+dayjs.extend(timezone);
 
 const EXPORT_BATCH_SIZE = 500;
 
@@ -66,11 +74,9 @@ type ExportJob = {
 function calculateMonthsFromValidThrough(validThrough: Date | null) {
   if (!validThrough) return "";
 
-  const today = new Date();
-  const validDate = new Date(validThrough);
-  const yearDiff = validDate.getFullYear() - today.getFullYear();
-  const monthDiff = validDate.getMonth() - today.getMonth();
-  const totalMonths = yearDiff * 12 + monthDiff;
+  const today = getBrazilNow();
+  const validDate = dayjs(validThrough).tz(SITE_TIME_ZONE);
+  const totalMonths = validDate.diff(today, "month");
 
   if (totalMonths <= 0 || totalMonths > 24) return "";
   return String(totalMonths);
@@ -101,9 +107,9 @@ function serializeJobRow(job: ExportJob) {
     salaryMax: job.salaryMax ?? "",
     employmentType: job.employmentType,
     workHours: job.workHours ?? "",
-    publishedAt: job.publishedAt.toISOString().split("T")[0],
-    expiresAt: job.expiresAt ? job.expiresAt.toISOString().split("T")[0] : "",
-    validThrough: job.validThrough ? job.validThrough.toISOString() : "",
+    publishedAt: formatBrazilCalendarDate(job.publishedAt),
+    expiresAt: job.expiresAt ? formatBrazilCalendarDate(job.expiresAt) : "",
+    validThrough: job.validThrough ? formatBrazilCalendarDate(job.validThrough) : "",
     validThroughMonths: calculateMonthsFromValidThrough(job.validThrough),
     applyUrl: job.applyUrl,
     isActive: job.isActive,

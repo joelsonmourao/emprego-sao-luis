@@ -7,44 +7,31 @@ import { Breadcrumbs } from "@/components/breadcrumbs";
 import { JobCard } from "@/components/job-card";
 import { SectionHeading } from "@/components/section-heading";
 import { Button } from "@/components/ui/button";
+import { formatBrazilDateTime } from "@/lib/date-utils";
+import { buildJobPostingDescriptionHtml } from "@/lib/jobs/job-posting-description";
 import { sanitizeRichTextHtml } from "@/lib/rich-text";
 import { buildJobPublisherName } from "@/lib/seo/job-publisher";
 import { getCityJobsPath, getCompanyJobsPath, getStateJobsPath } from "@/lib/seo/jobs-pages";
 import { getRelatedPosts } from "@/lib/repositories/blog";
 import { getJobBySlug, getRelatedJobs } from "@/lib/repositories/jobs";
-import { normalizeListValues } from "@/lib/jobs/text-normalization";
 import { formatDate } from "@/lib/utils";
 
 type JobWithRelations = NonNullable<Awaited<ReturnType<typeof getJobBySlug>>>;
 
-export async function JobDetailView({ job }: { job: JobWithRelations }) {
-  const requirements = normalizeListValues(Array.isArray(job.requirements) ? job.requirements : []);
-  const benefits = normalizeListValues(Array.isArray(job.benefits) ? job.benefits : []);
+export async function JobDetailView({ job, displayTitle }: { job: JobWithRelations; displayTitle?: string | null }) {
+  const headingTitle = (displayTitle?.trim() || job.title).trim();
   const publisherDisplayName = buildJobPublisherName(job.city?.name, job.state?.code);
-
-  // #region agent log
-  fetch("http://127.0.0.1:7370/ingest/b54ed65d-267c-4421-b3af-1ea0f3df3748", {
-    method: "POST",
-    headers: { "Content-Type": "application/json", "X-Debug-Session-Id": "bb2dcd" },
-    body: JSON.stringify({
-      sessionId: "bb2dcd",
-      runId: "pre-fix",
-      hypothesisId: "H4",
-      location: "components/vagas/job-detail-view.tsx",
-      message: "job detail list and salary render snapshot",
-      data: {
-        slug: job.slug,
-        requirementsCount: requirements.length,
-        benefitsCount: benefits.length,
-        firstRequirement: requirements[0] ? String(requirements[0]).slice(0, 120) : null,
-        firstBenefit: benefits[0] ? String(benefits[0]).slice(0, 120) : null,
-        salaryMin: job.salaryMin,
-        salaryMax: job.salaryMax
-      },
-      timestamp: Date.now()
-    })
-  }).catch(() => {});
-  // #endregion
+  const mergedDescriptionHtml = buildJobPostingDescriptionHtml({
+    displayTitle: headingTitle,
+    companyName: job.companyName,
+    cityName: job.city.name,
+    stateCode: job.state.code,
+    summary: job.summary,
+    descriptionHtml: job.descriptionHtml ?? "",
+    requirements: Array.isArray(job.requirements) ? job.requirements : [],
+    benefits: Array.isArray(job.benefits) ? job.benefits : [],
+    workHours: job.workHours
+  });
 
   let relatedJobs: Awaited<ReturnType<typeof getRelatedJobs>> = [];
   let relatedPosts: Awaited<ReturnType<typeof getRelatedPosts>> = [];
@@ -68,7 +55,7 @@ export async function JobDetailView({ job }: { job: JobWithRelations }) {
 
   return (
     <section className="mx-auto max-w-7xl space-y-6 px-4 py-6 sm:px-6 sm:py-8 sm:space-y-8 lg:px-8 lg:py-10">
-      <Breadcrumbs items={[{ label: "Home", href: "/" }, { label: "Vagas", href: "/vagas" }, { label: job.title }]} />
+      <Breadcrumbs items={[{ label: "Home", href: "/" }, { label: "Vagas", href: "/vagas" }, { label: headingTitle }]} />
 
       <div className="brand-page-hero rounded-[1.5rem] border border-slate-200 px-4 py-5 shadow-[0_35px_120px_-70px_rgba(26,43,76,0.22)] sm:rounded-[2rem] sm:px-5 sm:py-6 sm:rounded-[2.2rem] sm:px-8 sm:py-8">
         <div className={`grid gap-4 ${job.heroImageUrl ? "lg:grid-cols-[1.15fr_0.85fr]" : "grid-cols-1"} sm:gap-6`}>
@@ -82,8 +69,8 @@ export async function JobDetailView({ job }: { job: JobWithRelations }) {
             <SectionHeading
               titleLevel="h1"
               eyebrow={`${job.city.name}, ${job.state.code}`}
-              title={job.title}
-              description={`${job.companyName} • publicada em ${formatDate(job.publishedAt)} • candidatura no link oficial da empresa`}
+              title={headingTitle}
+              description={`${job.companyName} • publicada em ${formatBrazilDateTime(job.publishedAt)} • candidatura no link oficial da empresa`}
             />
             <div className="flex flex-wrap gap-2 sm:gap-2.5 sm:gap-3">
               {job.locationType ? (
@@ -123,7 +110,7 @@ export async function JobDetailView({ job }: { job: JobWithRelations }) {
           </div>
           {job.heroImageUrl ? (
             <div className="overflow-hidden rounded-[1.5rem] border border-slate-200 bg-white/70 shadow-sm sm:rounded-[2rem]">
-              <img src={job.heroImageUrl} alt={job.title} className="h-full max-h-[200px] w-full object-cover sm:max-h-[280px]" />
+              <img src={job.heroImageUrl} alt={headingTitle} className="h-full max-h-[200px] w-full object-cover sm:max-h-[280px]" />
             </div>
           ) : null}
         </div>
@@ -136,38 +123,10 @@ export async function JobDetailView({ job }: { job: JobWithRelations }) {
       <div className="grid gap-4 sm:gap-6 lg:grid-cols-[1.08fr_0.92fr]">
         <div className="space-y-4 sm:space-y-6">
           <div className="rounded-[1.5rem] border border-slate-200 bg-white p-4 shadow-sm sm:rounded-[1.8rem] sm:p-5 sm:rounded-3xl sm:p-8">
-            <p className="mb-4 rounded-[1.25rem] bg-[var(--brand-soft)] px-3 py-3 text-[14px] leading-6 text-[var(--brand-text-secondary)] sm:mb-5 sm:rounded-[1.5rem] sm:px-4 sm:py-4 sm:text-[15px] sm:leading-7 sm:text-base sm:leading-8">
-              {job.summary}
-            </p>
-            {job.salaryMin || job.salaryMax ? (
-              <p className="mb-4 rounded-[1.25rem] border border-[color:rgba(26,43,76,0.1)] bg-white px-3 py-3 text-[13px] leading-6 text-[var(--brand-text-secondary)] sm:px-4 sm:text-sm">
-                A empresa não informou salário oficial na publicação original.
-              </p>
-            ) : null}
             <div
               className="prose-content text-slate-700"
-              dangerouslySetInnerHTML={{ __html: sanitizeRichTextHtml(job.descriptionHtml ?? "") }}
+              dangerouslySetInnerHTML={{ __html: sanitizeRichTextHtml(mergedDescriptionHtml) }}
             />
-            {requirements.length ? (
-              <div className="mt-6 border-t border-slate-100 pt-6 sm:mt-8 sm:pt-8">
-                <h2 className="text-lg font-semibold text-[var(--brand-navy)] sm:text-xl">Requisitos</h2>
-                <ul className="mt-3 space-y-2 text-sm leading-6 text-[var(--brand-text-secondary)] sm:mt-4 sm:space-y-3">
-                  {requirements.map((item, index) => (
-                    <li key={`req-${index}`}>{item}</li>
-                  ))}
-                </ul>
-              </div>
-            ) : null}
-            {benefits.length ? (
-              <div className="mt-6 border-t border-slate-100 pt-6 sm:mt-8 sm:pt-8">
-                <h2 className="text-lg font-semibold text-[var(--brand-navy)] sm:text-xl">Beneficios</h2>
-                <ul className="mt-3 space-y-2 text-sm leading-6 text-[var(--brand-text-secondary)] sm:mt-4 sm:space-y-3">
-                  {benefits.map((item, index) => (
-                    <li key={`ben-${index}`}>{item}</li>
-                  ))}
-                </ul>
-              </div>
-            ) : null}
           </div>
 
           <div className="my-4 sm:my-6">

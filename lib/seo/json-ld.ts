@@ -1,7 +1,11 @@
+import type { EmploymentType } from "@prisma/client";
+
+import { normalizeDatePostedForSchema, normalizeValidThroughSchemaString } from "@/lib/date-utils";
+import { buildJobPostingDescriptionHtml } from "@/lib/jobs/job-posting-description";
+import { validateJobPostingMinimum } from "@/lib/jobs/job-posting-validate";
+import { employmentTypeToSchemaValue } from "@/lib/jobs/employment-type";
 import { getReferencePostalCodeForCity } from "@/lib/seo/br-reference-postal";
-import { normalizeListValues } from "@/lib/jobs/text-normalization";
-import { getCityCoordinates } from "@/lib/seo/city-coordinates";
-import { sanitizeRichTextHtml } from "@/lib/rich-text";
+import { buildJobPublisherName } from "@/lib/seo/job-publisher";
 import { absoluteUrl } from "@/lib/utils";
 
 export function buildOrganizationJsonLd(input?: { name?: string; logoUrl?: string }) {
@@ -60,96 +64,50 @@ export type JobPostingJsonLdInput = {
   id: string;
   externalId?: string | null;
   seoTitle?: string | null;
-  title: string;
+  /** Título público já resolvido (cargo em Cidade UF quando necessário). */
+  displayTitle: string;
   summary?: string | null;
   descriptionHtml: string;
   slug: string;
   companyName: string;
-  companyLogoUrl?: string | null;
-  companyWebsiteUrl?: string | null;
-  companySlug?: string | null;
   cityName: string;
   citySlug: string;
   stateCode: string;
   stateName: string;
   locationType?: "ONSITE" | "REMOTE" | "HYBRID" | string | null;
-  publishedAt: string;
-  expiresAt: string | null;
-  validThrough?: string | null;
+  publishedAt: string | Date;
+  expiresAt: string | Date | null;
+  validThrough?: string | Date | null;
   salaryMin: number | null;
   salaryMax: number | null;
   requirements: unknown[];
   benefits: unknown[];
+  workHours?: string | null;
   streetAddress?: string | null;
   postalCode?: string | null;
   countryCode?: string | null;
-  industry?: string | null;
-  occupationalCategory?: string | null;
+  employmentType: EmploymentType;
   applyUrl: string;
-  publisherDisplayName?: string | null;
 };
-
-function normalizeIsoDate(value?: string | null) {
-  if (!value) return undefined;
-  const parsed = new Date(value);
-  return Number.isNaN(parsed.getTime()) ? undefined : parsed.toISOString();
-}
 
 export function sanitizeISODate(dateStr: string | undefined | null) {
   return dateStr?.replace(/\.\d{3}Z$/, "Z") ?? dateStr;
 }
 
+function isPlaceholderSentinel(value: unknown) {
+  if (value === null || value === undefined) return true;
+  if (typeof value === "string") {
+    const v = value.trim();
+    if (!v) return true;
+    const low = v.toLowerCase();
+    if (low === "n/a" || low === "na" || low === "undefined" || low === "null") return true;
+    if (low === "não informado" || low === "nao informado" || low === "n/d" || low === "s/d") return true;
+  }
+  return false;
+}
+
 export function stringifyJobPostingJsonLd(data: Record<string, unknown>) {
   return JSON.stringify(removeEmptyJsonLdValues(data)).replace(/</g, "\\u003c");
-}
-
-function escapeHtmlText(s: string) {
-  return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
-}
-
-function toStringList(items: unknown[]): string[] {
-  return normalizeListValues(items);
-}
-
-function buildJobPostingDescriptionHtml(input: { summary: string; descriptionHtml: string; requirements: string[]; benefits: string[] }) {
-  const parts: string[] = [];
-
-  if (input.summary.trim()) {
-    parts.push(`<p>${escapeHtmlText(input.summary.trim())}</p>`);
-  }
-
-  const body = sanitizeRichTextHtml(input.descriptionHtml).trim();
-  if (body) {
-    parts.push(body);
-  }
-
-  if (input.requirements.length) {
-    parts.push("<h3>Requisitos</h3>", "<ul>", ...input.requirements.map((item) => `<li>${escapeHtmlText(item)}</li>`), "</ul>");
-  }
-
-  if (input.benefits.length) {
-    parts.push("<h3>Benefícios</h3>", "<ul>", ...input.benefits.map((item) => `<li>${escapeHtmlText(item)}</li>`), "</ul>");
-  }
-
-  return parts.join("\n").slice(0, 100000);
-}
-
-function computeValidThroughIso(publishedAt: string, validThrough: string | null, expiresAt: string | null) {
-  const posted = new Date(publishedAt);
-  if (Number.isNaN(posted.getTime())) {
-    const d = new Date();
-    d.setUTCDate(d.getUTCDate() + 30);
-    return d.toISOString();
-  }
-
-  const minFromPosted = new Date(posted);
-  minFromPosted.setUTCDate(minFromPosted.getUTCDate() + 30);
-  const raw = validThrough ? new Date(validThrough) : expiresAt ? new Date(expiresAt) : null;
-  if (raw && !Number.isNaN(raw.getTime()) && raw.getTime() >= minFromPosted.getTime()) {
-    return raw.toISOString();
-  }
-
-  return minFromPosted.toISOString();
 }
 
 function buildBaseSalaryBlock(salaryMin: number | null, salaryMax: number | null) {
@@ -171,21 +129,6 @@ function buildBaseSalaryBlock(salaryMin: number | null, salaryMax: number | null
   };
 }
 
-function buildHiringOrganization(input: { companyName: string; companyLogoUrl?: string | null; companyWebsiteUrl?: string | null }) {
-  const site = input.companyWebsiteUrl?.trim();
-  const org: Record<string, unknown> = {
-    "@type": "Organization",
-    name: input.companyName,
-    logo: absoluteUrl(input.companyLogoUrl ?? "/brand-mark.svg")
-  };
-
-  if (site && /^https?:\/\//i.test(site)) {
-    org.sameAs = site;
-  }
-
-  return org;
-}
-
 function isPlaceholderStreetAddress(value: string | undefined | null) {
   if (!value?.trim()) return true;
   const v = value.trim().toLowerCase();
@@ -199,12 +142,15 @@ function isPlaceholderStreetAddress(value: string | undefined | null) {
     v === "brasil" ||
     v === "s/d" ||
     v === "-" ||
-    v === "n/d"
+    v === "n/d" ||
+    v === "centro" ||
+    v === "rua nao informada" ||
+    v === "rua não informada"
   );
 }
 
 async function buildJobLocationBlock(job: JobPostingJsonLdInput) {
-  const country = job.countryCode ?? "BR";
+  const country = (job.countryCode ?? "BR").trim() || "BR";
   const postal = job.postalCode?.trim() || (await getReferencePostalCodeForCity({ stateCode: job.stateCode, citySlug: job.citySlug }));
   const street = job.streetAddress?.trim();
 
@@ -212,10 +158,10 @@ async function buildJobLocationBlock(job: JobPostingJsonLdInput) {
     "@type": "PostalAddress",
     addressLocality: job.cityName,
     addressRegion: job.stateCode,
-    addressCountry: country
+    addressCountry: country.length === 2 ? country : "BR"
   };
 
-  if (postal) {
+  if (postal && !isPlaceholderSentinel(postal)) {
     address.postalCode = postal;
   }
 
@@ -223,135 +169,131 @@ async function buildJobLocationBlock(job: JobPostingJsonLdInput) {
     address.streetAddress = street;
   }
 
-  const location: Record<string, unknown> = {
+  return {
     "@type": "Place",
     address
   };
+}
 
-  const coordinates = job.locationType === "REMOTE" ? null : getCityCoordinates(job.cityName, job.stateCode);
-  if (coordinates) {
-    location.geo = {
-      "@type": "GeoCoordinates",
-      latitude: coordinates.latitude,
-      longitude: coordinates.longitude
-    };
-  }
+export async function buildJobPostingJsonLd(job: JobPostingJsonLdInput): Promise<Record<string, unknown> | null> {
+  const descriptionHtml = buildJobPostingDescriptionHtml({
+    displayTitle: job.displayTitle,
+    companyName: job.companyName,
+    cityName: job.cityName,
+    stateCode: job.stateCode,
+    summary: job.summary?.trim() ?? "",
+    descriptionHtml: job.descriptionHtml,
+    requirements: job.requirements,
+    benefits: job.benefits,
+    workHours: job.workHours
+  });
+
+  const datePostedRaw = normalizeDatePostedForSchema(job.publishedAt) ?? normalizeDatePostedForSchema(new Date())!;
+  const validThroughRaw = normalizeValidThroughSchemaString({
+    publishedAt: job.publishedAt,
+    validThrough: job.validThrough ?? null,
+    expiresAt: job.expiresAt
+  });
 
   // #region agent log
   fetch("http://127.0.0.1:7370/ingest/b54ed65d-267c-4421-b3af-1ea0f3df3748", {
     method: "POST",
-    headers: { "Content-Type": "application/json", "X-Debug-Session-Id": "bb2dcd" },
+    headers: { "Content-Type": "application/json", "X-Debug-Session-Id": "582712" },
     body: JSON.stringify({
-      sessionId: "bb2dcd",
-      runId: "post-fix",
-      hypothesisId: "H6",
+      sessionId: "582712",
+      runId: "jobposting-tz",
+      hypothesisId: "H_TZ_LD",
       location: "lib/seo/json-ld.ts",
-      message: "joblocation geo resolution",
-      data: {
-        slug: job.slug,
-        cityName: job.cityName,
-        stateCode: job.stateCode,
-        locationType: job.locationType,
-        hasGeo: Boolean(coordinates)
-      },
+      message: "JobPosting datePosted e validThrough normalizados (BR)",
+      data: { slug: job.slug, datePostedRaw, validThroughRaw },
       timestamp: Date.now()
     })
   }).catch(() => {});
   // #endregion
 
-  return location;
-}
-
-const DEFAULT_INDUSTRY = "Programa de Aprendizagem Profissional - Jovem Aprendiz e Menor Aprendiz (Lei da Aprendizagem)";
-const DEFAULT_OCCUPATIONAL_CATEGORY = "4110-10";
-
-export async function buildJobPostingJsonLd(job: JobPostingJsonLdInput) {
-  const requirements = toStringList(job.requirements);
-  const benefits = toStringList(job.benefits);
-  const descriptionHtml = buildJobPostingDescriptionHtml({
-    summary: job.summary?.trim() ?? "",
-    descriptionHtml: job.descriptionHtml,
-    requirements,
-    benefits
-  });
-
-  const datePostedRaw = normalizeIsoDate(job.publishedAt) ?? new Date().toISOString();
-  const validThroughRaw = computeValidThroughIso(job.publishedAt, job.validThrough ?? null, job.expiresAt);
+  const employmentTypeRaw = employmentTypeToSchemaValue(job.employmentType, { title: job.displayTitle });
 
   const data: Record<string, unknown> = {
     "@context": "https://schema.org",
     "@type": "JobPosting",
-    title: (job.seoTitle?.trim() || job.title).trim(),
+    title: job.displayTitle.trim(),
     identifier: {
       "@type": "PropertyValue",
-      name: job.publisherDisplayName?.trim() || job.companyName,
-      value: (job.id || job.slug).trim()
+      name: buildJobPublisherName(job.cityName, job.stateCode),
+      value: (job.externalId?.trim() || job.id || job.slug).trim()
     },
     datePosted: datePostedRaw,
     validThrough: validThroughRaw,
-    employmentType: ["PART_TIME"],
-    educationRequirements: {
-      "@type": "EducationalOccupationalCredential",
-      credentialCategory: "high school"
+    employmentType: employmentTypeRaw,
+    hiringOrganization: {
+      "@type": "Organization",
+      name: job.companyName.trim()
     },
     jobLocation: await buildJobLocationBlock(job),
     description: descriptionHtml,
-    industry: (job.industry?.trim() || DEFAULT_INDUSTRY).trim(),
-    occupationalCategory: (job.occupationalCategory?.trim() || DEFAULT_OCCUPATIONAL_CATEGORY).trim(),
-    hiringOrganization: buildHiringOrganization({
-      companyName: job.companyName,
-      companyLogoUrl: job.companyLogoUrl,
-      companyWebsiteUrl: job.companyWebsiteUrl
-    }),
-    url: absoluteUrl(`/vagas/${job.slug}`)
+    directApply: false
   };
-
-  if (requirements.length) {
-    data.qualifications = requirements.join("\n");
-  }
-
-  if (benefits.length) {
-    data.jobBenefits = benefits.join("\n");
-  }
-
-  if (job.locationType === "REMOTE") {
-    data.jobLocationType = "TELECOMMUTE";
-    data.applicantLocationRequirements = {
-      "@type": "Country",
-      name: "Brazil"
-    };
-  }
 
   const baseSalary = buildBaseSalaryBlock(job.salaryMin, job.salaryMax);
   if (baseSalary) {
     data.baseSalary = baseSalary;
   }
 
+  const cleaned = removeEmptyJsonLdValues(data) as Record<string, unknown>;
+
+  const validation = validateJobPostingMinimum({
+    displayTitle: String(cleaned.title ?? ""),
+    descriptionHtml: String(cleaned.description ?? ""),
+    datePosted: String(cleaned.datePosted ?? ""),
+    validThrough: String(cleaned.validThrough ?? ""),
+    employmentType: job.employmentType,
+    companyName: job.companyName,
+    cityName: job.cityName,
+    stateCode: job.stateCode,
+    countryCode: (job.countryCode ?? "BR").trim() || "BR"
+  });
+
+  if (!validation.ok) {
+    // #region agent log
+    fetch("http://127.0.0.1:7370/ingest/b54ed65d-267c-4421-b3af-1ea0f3df3748", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "X-Debug-Session-Id": "582712" },
+      body: JSON.stringify({
+        sessionId: "582712",
+        runId: "jobposting-validate",
+        hypothesisId: "H_VAL",
+        location: "lib/seo/json-ld.ts",
+        message: "JobPosting schema omitido por validacao minima",
+        data: { slug: job.slug, reason: validation.reason },
+        timestamp: Date.now()
+      })
+    }).catch(() => {});
+    // #endregion
+    return null;
+  }
+
   // #region agent log
   fetch("http://127.0.0.1:7370/ingest/b54ed65d-267c-4421-b3af-1ea0f3df3748", {
     method: "POST",
-    headers: { "Content-Type": "application/json", "X-Debug-Session-Id": "bb2dcd" },
+    headers: { "Content-Type": "application/json", "X-Debug-Session-Id": "582712" },
     body: JSON.stringify({
-      sessionId: "bb2dcd",
-      runId: "pre-fix",
-      hypothesisId: "H3",
+      sessionId: "582712",
+      runId: "jobposting-ok",
+      hypothesisId: "H_LD",
       location: "lib/seo/json-ld.ts",
-      message: "jobposting salary and location payload",
+      message: "JobPosting schema montado",
       data: {
         slug: job.slug,
-        salaryMin: job.salaryMin,
-        salaryMax: job.salaryMax,
-        hasBaseSalary: Boolean(data.baseSalary),
-        locationType: job.locationType,
-        cityName: job.cityName,
-        stateCode: job.stateCode
+        keys: Object.keys(cleaned),
+        employmentType: cleaned.employmentType,
+        hasBaseSalary: Boolean(cleaned.baseSalary)
       },
       timestamp: Date.now()
     })
   }).catch(() => {});
   // #endregion
 
-  return removeEmptyJsonLdValues(data);
+  return cleaned;
 }
 
 export function stringifyJsonLdSafe(data: Record<string, unknown>) {
@@ -369,6 +311,7 @@ function removeEmptyJsonLdValues<T>(value: T): T {
     for (const [key, entry] of Object.entries(value)) {
       if (key === "monthsOfExperience") continue;
       if (entry === null || entry === undefined || entry === "") continue;
+      if (typeof entry === "string" && isPlaceholderSentinel(entry)) continue;
 
       const next = removeEmptyJsonLdValues(entry);
       if (Array.isArray(next) && !next.length) continue;

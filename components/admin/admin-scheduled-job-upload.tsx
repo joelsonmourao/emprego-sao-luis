@@ -147,7 +147,7 @@ export function AdminScheduledJobUpload() {
         benefitsText: String(normalized.benefitsText ?? "").trim(),
         salaryMin: parseOptionalNumber(normalized.salaryMin),
         salaryMax: parseOptionalNumber(normalized.salaryMax),
-        employmentType: String(normalized.employmentType ?? "APPRENTICESHIP").trim().toUpperCase(),
+        employmentType: String(normalized.employmentType ?? "").trim(),
         workHours: String(normalized.workHours ?? "").trim(),
         expiresAt: String(normalized.expiresAt ?? "").trim(),
         validThrough: String(normalized.validThrough ?? "").trim(),

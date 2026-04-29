@@ -1,3 +1,4 @@
+import { parseFlexibleDateToUtc } from "@/lib/date-utils";
 import { slugify } from "@/lib/utils";
 
 export function escapeHtml(input: string) {
@@ -180,12 +181,10 @@ export function parseOptionalNumber(value: unknown) {
 }
 
 export function parseOptionalDate(value: string | undefined | null) {
-  if (!value) {
+  if (value == null || String(value).trim() === "") {
     return null;
   }
-
-  const date = new Date(value);
-  return Number.isNaN(date.getTime()) ? null : date;
+  return parseFlexibleDateToUtc(String(value));
 }
 
 export function parseBooleanLike(value: unknown) {

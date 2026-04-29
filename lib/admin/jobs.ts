@@ -1,50 +1,35 @@
 import { EmploymentType, LocationType, Prisma } from "@prisma/client";
 
+import { normalizeLines, normalizeSlug, parseOptionalDate, richTextFromInput, sanitizeHtml } from "@/lib/admin/content";
+import { getBrazilNow, parseFlexibleDateToUtc } from "@/lib/date-utils";
 import { prisma } from "@/lib/db";
 import { jobFormSchema, type JobFormValues } from "@/lib/schemas/job-form";
-import { normalizeLines, normalizeSlug, parseOptionalDate, richTextFromInput, sanitizeHtml } from "@/lib/admin/content";
 
-// Função para processar validThrough (data ou meses)
 function processValidThrough(validThroughValue: string | undefined | null): Date | null {
   if (!validThroughValue || validThroughValue.trim() === "") {
     return null;
   }
-  
+
   const trimmed = validThroughValue.trim();
-  
-  // Tentar parse como data (formato ISO ou DD/MM/YYYY)
-  const dateValue = new Date(trimmed);
-  if (!isNaN(dateValue.getTime())) {
-    console.log(`validThrough: data direta = ${dateValue.toISOString().split('T')[0]}`);
-    return dateValue;
+  const parsed = parseFlexibleDateToUtc(trimmed);
+  if (parsed) {
+    return parsed;
   }
-  
-  // Tentar parse como número de meses
+
   const monthsToAdd = Number(trimmed);
-  if (!isNaN(monthsToAdd) && monthsToAdd > 0) {
-    const today = new Date();
-    const futureDate = new Date(today);
-    futureDate.setMonth(today.getMonth() + monthsToAdd);
-    console.log(`validThrough: ${monthsToAdd} meses a partir de hoje = ${futureDate.toISOString().split('T')[0]}`);
-    return futureDate;
+  if (!Number.isNaN(monthsToAdd) && monthsToAdd > 0) {
+    return getBrazilNow().add(monthsToAdd, "month").toDate();
   }
-  
-  console.log(`validThrough: valor inválido "${validThroughValue}", usando null`);
+
   return null;
 }
 
-// Função para processar validThroughMonths (número de meses do selector)
 function processValidThroughMonths(validThroughMonths: number | null | undefined): Date | null {
   if (!validThroughMonths || validThroughMonths < 1 || validThroughMonths > 24) {
     return null;
   }
-  
-  const today = new Date();
-  const futureDate = new Date(today);
-  futureDate.setMonth(today.getMonth() + validThroughMonths);
-  
-  console.log(`validThroughMonths: ${validThroughMonths} meses a partir de hoje = ${futureDate.toISOString().split('T')[0]}`);
-  return futureDate;
+
+  return getBrazilNow().add(validThroughMonths, "month").toDate();
 }
 
 export async function getStateAndCityBySlug(stateSlug: string, citySlug: string) {

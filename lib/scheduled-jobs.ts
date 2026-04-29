@@ -6,6 +6,8 @@ import path from "node:path";
 import { AuditAction, EmploymentType, LocationType, type City, type Company, type Job, type State } from "@prisma/client";
 import XLSX from "xlsx";
 
+import { parseSpreadsheetEmploymentType } from "@/lib/jobs/employment-type";
+import { markExpiredJobsInactive } from "@/lib/jobs/job-expiry";
 import { writeAuditLog } from "@/lib/audit";
 import { normalizeLines, normalizeSlug, parseOptionalDate, richTextFromInput } from "@/lib/admin/content";
 import { resolveCompanyByName, resolveStateAndCityFromNames } from "@/lib/admin/jobs";
@@ -156,18 +158,6 @@ function parseCurrencyValue(value: unknown) {
 
   const parsed = Number(normalized);
   return Number.isFinite(parsed) ? Math.round(parsed) : null;
-}
-
-function normalizeEmploymentType(value: unknown): EmploymentType {
-  const normalized = String(value ?? "")
-    .trim()
-    .toUpperCase();
-
-  if (normalized && normalized in EmploymentType) {
-    return normalized as EmploymentType;
-  }
-
-  return EmploymentType.APPRENTICESHIP;
 }
 
 function normalizeLocationType(value: unknown): LocationType {
@@ -390,7 +380,7 @@ async function upsertScheduledJob(row: ScheduledRow, context: PublicationContext
     salaryMin: parseCurrencyValue(row.salaryMin),
     salaryMax: parseCurrencyValue(row.salaryMax),
     salaryCurrency: "BRL",
-    employmentType: normalizeEmploymentType(row.employmentType),
+    employmentType: parseSpreadsheetEmploymentType(row.employmentType),
     workHours: normalizeCellString(row.workHours) || null,
     expiresAt: parseOptionalDate(normalizeCellString(row.expiresAt)),
     validThrough: parseOptionalDate(normalizeCellString(row.validThrough)),
@@ -676,6 +666,8 @@ export async function processScheduledJobsWorkbook(options?: {
     errorCount,
     logFilePath
   };
+
+  await markExpiredJobsInactive();
 
   await writeAuditLog({
     action: AuditAction.UPDATE,
