@@ -230,8 +230,7 @@ export async function buildJobPostingJsonLd(job: JobPostingJsonLdInput): Promise
       name: job.companyName.trim()
     },
     jobLocation: await buildJobLocationBlock(job),
-    description: descriptionHtml,
-    directApply: false
+    description: descriptionHtml
   };
 
   const baseSalary = buildBaseSalaryBlock(job.salaryMin, job.salaryMax);
