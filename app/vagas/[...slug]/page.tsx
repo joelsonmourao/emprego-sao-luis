@@ -250,6 +250,7 @@ export default async function VagasCatchAllPage({
         stateName,
         locationType: job.locationType,
         publishedAt: job.publishedAt,
+        updatedAt: job.updatedAt,
         expiresAt: job.expiresAt,
         validThrough: job.validThrough ?? null,
         salaryMin: job.salaryMin,

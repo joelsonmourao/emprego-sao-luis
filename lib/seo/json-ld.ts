@@ -76,6 +76,7 @@ export type JobPostingJsonLdInput = {
   stateName: string;
   locationType?: "ONSITE" | "REMOTE" | "HYBRID" | string | null;
   publishedAt: string | Date;
+  updatedAt?: string | Date | null;
   expiresAt: string | Date | null;
   validThrough?: string | Date | null;
   salaryMin: number | null;
@@ -188,7 +189,10 @@ export async function buildJobPostingJsonLd(job: JobPostingJsonLdInput): Promise
     workHours: job.workHours
   });
 
-  const datePostedRaw = normalizeDatePostedForSchema(job.publishedAt) ?? normalizeDatePostedForSchema(new Date())!;
+  const datePostedRaw =
+    normalizeDatePostedForSchema(job.updatedAt ?? null) ??
+    normalizeDatePostedForSchema(job.publishedAt) ??
+    normalizeDatePostedForSchema(new Date())!;
   const validThroughRaw = normalizeValidThroughSchemaString({
     publishedAt: job.publishedAt,
     validThrough: job.validThrough ?? null,
@@ -219,7 +223,6 @@ export async function buildJobPostingJsonLd(job: JobPostingJsonLdInput): Promise
     "@type": "JobPosting",
     title: job.displayTitle.trim(),
     url: jobUrl,
-    sameAs: jobUrl,
     identifier: {
       "@type": "PropertyValue",
       name: buildJobPublisherName(job.cityName, job.stateCode),
@@ -230,8 +233,9 @@ export async function buildJobPostingJsonLd(job: JobPostingJsonLdInput): Promise
     employmentType: employmentTypeRaw,
     hiringOrganization: {
       "@type": "Organization",
-      name: job.companyName.trim(),
-      logo: "https://slzcontent.com.br/icon.svg"
+      name: job.companyName,
+      logo: "https://slzcontent.com.br/icon.svg",
+      sameAs: jobUrl
     },
     jobLocation: await buildJobLocationBlock(job),
     description: descriptionHtml
@@ -289,7 +293,8 @@ export async function buildJobPostingJsonLd(job: JobPostingJsonLdInput): Promise
         slug: job.slug,
         keys: Object.keys(cleaned),
         employmentType: cleaned.employmentType,
-        hasBaseSalary: Boolean(cleaned.baseSalary)
+        hasBaseSalary: Boolean(cleaned.baseSalary),
+        hiringOrganization: cleaned.hiringOrganization
       },
       timestamp: Date.now()
     })
