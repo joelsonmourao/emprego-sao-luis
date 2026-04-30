@@ -227,7 +227,8 @@ export async function buildJobPostingJsonLd(job: JobPostingJsonLdInput): Promise
     employmentType: employmentTypeRaw,
     hiringOrganization: {
       "@type": "Organization",
-      name: job.companyName.trim()
+      name: job.companyName.trim(),
+      logo: "https://slzcontent.com.br/icon.svg"
     },
     jobLocation: await buildJobLocationBlock(job),
     description: descriptionHtml
