@@ -212,11 +212,14 @@ export async function buildJobPostingJsonLd(job: JobPostingJsonLdInput): Promise
   // #endregion
 
   const employmentTypeRaw = employmentTypeToSchemaValue(job.employmentType, { title: job.displayTitle });
+  const jobUrl = absoluteUrl(`/vagas/${job.slug}`);
 
   const data: Record<string, unknown> = {
     "@context": "https://schema.org",
     "@type": "JobPosting",
     title: job.displayTitle.trim(),
+    url: jobUrl,
+    sameAs: jobUrl,
     identifier: {
       "@type": "PropertyValue",
       name: buildJobPublisherName(job.cityName, job.stateCode),
