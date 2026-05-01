@@ -17,7 +17,6 @@ COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 RUN rm -f tsconfig.tsbuildinfo || true
 RUN npm run build
-RUN npm prune --omit=dev --no-audit --no-fund
 
 FROM base AS runner
 ENV NODE_ENV=production
