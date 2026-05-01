@@ -13,7 +13,17 @@ RUN npm install --legacy-peer-deps --include=dev --package-lock=false --no-audit
 
 COPY . .
 RUN rm -f tsconfig.tsbuildinfo || true
-RUN npm run build
+RUN set -eux; \
+  echo "=== BUILD DIAGNOSTIC: BEFORE ==="; \
+  node -v; npm -v; \
+  df -h; \
+  echo "MemTotal/MemAvailable:"; \
+  (grep -E "MemTotal|MemAvailable|SwapTotal|SwapFree" /proc/meminfo || true); \
+  echo "=== RUNNING npm run build ==="; \
+  npm run build; \
+  echo "=== BUILD DIAGNOSTIC: AFTER ==="; \
+  df -h; \
+  (grep -E "MemTotal|MemAvailable|SwapTotal|SwapFree" /proc/meminfo || true)
 
 ENV NODE_ENV=production
 
