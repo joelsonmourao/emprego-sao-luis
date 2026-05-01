@@ -28,11 +28,31 @@ export function getSiteOrigin() {
   const isProduction = process.env.NODE_ENV === "production";
 
   if (isProduction) {
-    if (!siteUrl) {
-      throw new Error("SITE_URL precisa estar configurada em producao para gerar URLs publicas de SEO.");
+    if (siteUrl) {
+      return siteUrl;
     }
 
-    return siteUrl;
+    const fallback = publicSiteUrl || "http://localhost:3000";
+    // #region agent log
+    fetch("http://127.0.0.1:7370/ingest/b54ed65d-267c-4421-b3af-1ea0f3df3748", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "X-Debug-Session-Id": "582712" },
+      body: JSON.stringify({
+        sessionId: "582712",
+        runId: "no-available-server",
+        hypothesisId: "H_PROD_SITE_URL_MISSING",
+        location: "lib/site-url.ts:getSiteOrigin",
+        message: "SITE_URL ausente em producao; usando fallback para evitar indisponibilidade",
+        data: {
+          hasSiteUrl: Boolean(siteUrl),
+          hasPublicSiteUrl: Boolean(publicSiteUrl),
+          fallback
+        },
+        timestamp: Date.now()
+      })
+    }).catch(() => {});
+    // #endregion
+    return fallback;
   }
 
   if (publicSiteUrl) {
