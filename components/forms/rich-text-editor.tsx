@@ -8,6 +8,7 @@ import Placeholder from "@tiptap/extension-placeholder";
 import { Bold, Eye, Italic, Link2, List, ListOrdered, Pilcrow, RemoveFormatting, Type } from "lucide-react";
 
 import { sanitizeRichTextHtml } from "@/lib/rich-text";
+import { looksLikeMarkdown, markdownToHtml } from "@/lib/admin/content";
 import { cn } from "@/lib/utils";
 
 export function RichTextEditor({
@@ -62,7 +63,42 @@ export function RichTextEditor({
     }
   }, [editor, value]);
 
-  const previewHtml = useMemo(() => sanitizeRichTextHtml(value), [value]);
+  const previewHtml = useMemo(() => {
+    const plainValue = value
+      .replace(/<br\s*\/?>/gi, "\n")
+      .replace(/<\/(p|div|li|h[1-6]|ul|ol)>/gi, "\n")
+      .replace(/<[^>]*>/g, "")
+      .replace(/&nbsp;/g, " ")
+      .replace(/&amp;/g, "&")
+      .replace(/&lt;/g, "<")
+      .replace(/&gt;/g, ">")
+      .trim();
+    const markdownDetected = looksLikeMarkdown(plainValue);
+    const html = markdownDetected ? markdownToHtml(plainValue, { baseHeadingLevel: 2 }) : sanitizeRichTextHtml(value);
+
+    // #region agent log
+    fetch("http://127.0.0.1:7370/ingest/b54ed65d-267c-4421-b3af-1ea0f3df3748", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "X-Debug-Session-Id": "582712" },
+      body: JSON.stringify({
+        sessionId: "582712",
+        runId: "blog-markdown",
+        hypothesisId: "H2_PREVIEW_MARKDOWN",
+        location: "components/forms/rich-text-editor.tsx:previewHtml",
+        message: "Preview do editor avaliou markdown",
+        data: {
+          markdownDetected,
+          valuePreview: value.slice(0, 160),
+          plainPreview: plainValue.slice(0, 120),
+          outputPreview: html.slice(0, 180)
+        },
+        timestamp: Date.now()
+      })
+    }).catch(() => {});
+    // #endregion
+
+    return html;
+  }, [value]);
 
   function toggleLink() {
     if (!editor) return;

@@ -98,7 +98,34 @@ export default async function AdminBlogPage({ searchParams }: AdminBlogPageProps
           slug: post.slug,
           categoryName: post.category.name,
           isPublished: post.isPublished,
-          publishedAt: new Intl.DateTimeFormat("pt-BR").format(post.publishedAt)
+          publishedAt: (() => {
+            const rawIso = post.publishedAt instanceof Date ? post.publishedAt.toISOString() : String(post.publishedAt);
+            const asDate = post.publishedAt instanceof Date ? post.publishedAt : new Date(post.publishedAt as unknown as string);
+            const isValid = !Number.isNaN(asDate.getTime());
+
+            // #region agent log
+            fetch("http://127.0.0.1:7370/ingest/b54ed65d-267c-4421-b3af-1ea0f3df3748", {
+              method: "POST",
+              headers: { "Content-Type": "application/json", "X-Debug-Session-Id": "582712" },
+              body: JSON.stringify({
+                sessionId: "582712",
+                runId: "invalid-time",
+                hypothesisId: "H3_PUBLISHED_AT_INVALID",
+                location: "app/admin/(painel)/blog/page.tsx:mapPosts",
+                message: "Formatacao de data da listagem admin blog",
+                data: {
+                  postId: post.id,
+                  rawIso,
+                  isDateInstance: post.publishedAt instanceof Date,
+                  isValidDate: isValid
+                },
+                timestamp: Date.now()
+              })
+            }).catch(() => {});
+            // #endregion
+
+            return isValid ? new Intl.DateTimeFormat("pt-BR").format(asDate) : "Data invalida";
+          })()
         }))}
       />
 
