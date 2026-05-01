@@ -3,16 +3,15 @@ import { HubType } from "@prisma/client";
 
 import { staticPages } from "@/data/seo-pages";
 import { EMPLOYMENT_CATEGORIES } from "@/lib/employment-categories";
-import { getCityJobsPath, getCompanyJobsPath, getJobPath, getStateJobsPath } from "@/lib/seo/jobs-pages";
+import { getCityJobsPath, getCompanyJobsPath, getJobPath } from "@/lib/seo/jobs-pages";
 import {
   jovemAprendizCategoryPath,
   jovemAprendizCityPath,
-  jovemAprendizCompanyPath,
-  jovemAprendizStatePath
+  jovemAprendizCompanyPath
 } from "@/lib/seo/jovem-aprendiz-programmatic";
 import { shouldIndexPage } from "@/lib/seo/indexing";
 import { getAllPublishedPostEntries } from "@/lib/repositories/blog";
-import { getCities, getStates } from "@/lib/repositories/geo";
+import { getCities } from "@/lib/repositories/geo";
 import { getHubProfiles } from "@/lib/repositories/hubs";
 import { SITEMAP_MANIFEST_CACHE_TAG } from "@/lib/public-revalidate";
 import { getAllActiveJobEntries, getCompanyEntries, getCompanyHubs } from "@/lib/repositories/jobs";
@@ -25,7 +24,6 @@ const ROOT_ROUTES_BY_CATEGORY = {
   home: ["/", "/vagas"],
   institutionals: ["/sobre", "/contato", "/politica-de-privacidade", "/politica-de-cookies", "/termos-de-uso"],
   jobs: [],
-  states: ["/estados"],
   cities: ["/cidades"],
   companies: ["/empresas"],
   blog: ["/blog"],
@@ -37,7 +35,6 @@ export type SitemapCategory =
   | "home"
   | "institutionals"
   | "jobs"
-  | "states"
   | "cities"
   | "companies"
   | "blog"
@@ -48,6 +45,8 @@ export type SitemapCategory =
 export type SitemapUrlEntry = {
   loc: string;
   lastmod?: string;
+  changefreq?: "always" | "hourly" | "daily" | "weekly" | "monthly" | "yearly" | "never";
+  priority?: number;
 };
 
 export type SitemapFile = {
@@ -103,10 +102,16 @@ function escapeXml(value: string) {
     .replace(/'/g, "&apos;");
 }
 
-function toSitemapEntry(path: string, lastmod?: Date | string | null): SitemapUrlEntry {
+function toSitemapEntry(
+  path: string,
+  lastmod?: Date | string | null,
+  seo?: { changefreq?: SitemapUrlEntry["changefreq"]; priority?: number }
+): SitemapUrlEntry {
   return {
     loc: absoluteUrl(path),
-    lastmod: normalizeDate(lastmod)
+    lastmod: normalizeDate(lastmod),
+    changefreq: seo?.changefreq,
+    priority: seo?.priority
   };
 }
 
@@ -149,26 +154,19 @@ function buildRootEntries(category: Exclude<SitemapCategory, "listings">, lastmo
 }
 
 async function computeSitemapManifest(): Promise<SitemapManifest> {
-  const [jobs, posts, states, cities, companies, companyHubs, stateProfiles, cityProfiles, companyProfiles] = await Promise.all([
+  const [jobs, posts, cities, companies, companyHubs, cityProfiles, companyProfiles] = await Promise.all([
     getAllActiveJobEntries(),
     getAllPublishedPostEntries(),
-    getStates(),
     getCities(),
     getCompanyEntries(),
     getCompanyHubs(),
-    getHubProfiles(HubType.STATE),
     getHubProfiles(HubType.CITY),
     getHubProfiles(HubType.COMPANY)
   ]);
 
-  const stateProfileMap = new Map(stateProfiles.map((profile) => [profile.slug, profile]));
   const cityProfileMap = new Map(cityProfiles.map((profile) => [profile.slug, profile]));
   const companyProfileMap = new Map(companyProfiles.map((profile) => [profile.slug, profile]));
   const companyHubMap = new Map(companyHubs.map((company) => [company.slug, company]));
-  const activeStateCounts = jobs.reduce<Map<string, number>>((map, job) => {
-    map.set(job.state.slug, (map.get(job.state.slug) ?? 0) + 1);
-    return map;
-  }, new Map());
   const activeCityCounts = jobs.reduce<Map<string, number>>((map, job) => {
     map.set(job.city.slug, (map.get(job.city.slug) ?? 0) + 1);
     return map;
@@ -188,39 +186,29 @@ async function computeSitemapManifest(): Promise<SitemapManifest> {
   const institutionals = staticPages.filter((path) => ROOT_ROUTES_BY_CATEGORY.institutionals.includes(path as never));
   const latestJobsDate = jobs[0]?.updatedAt;
   const latestPostsDate = posts[0]?.updatedAt;
-  const latestStatesDate = states[0]?.updatedAt;
   const latestCitiesDate = cities[0]?.updatedAt;
   const latestCompaniesDate = companies[0]?.updatedAt;
-  const latestSiteActivityDate = getLatestDate([latestJobsDate, latestPostsDate, latestStatesDate, latestCitiesDate, latestCompaniesDate]);
+  const latestSiteActivityDate = getLatestDate([latestJobsDate, latestPostsDate, latestCitiesDate, latestCompaniesDate]);
 
   const homeEntries = [
-    toSitemapEntry("/", latestSiteActivityDate),
-    toSitemapEntry("/vagas", latestJobsDate)
+    toSitemapEntry("/", latestSiteActivityDate, { changefreq: "daily", priority: 1 }),
+    toSitemapEntry("/vagas", latestJobsDate, { changefreq: "daily", priority: 0.9 })
   ];
-  const institutionalEntries = institutionals.map((path) => toSitemapEntry(path));
-  const jobEntries = jobs.map((job) => toSitemapEntry(getJobPath(job.slug), job.updatedAt));
+  const institutionalEntries = institutionals.map((path) => toSitemapEntry(path, undefined, { changefreq: "monthly", priority: 0.4 }));
+  const jobEntries = jobs.map((job) => toSitemapEntry(getJobPath(job.slug), job.updatedAt, { changefreq: "daily", priority: 0.8 }));
 
-  const stateEntries = buildRootEntries("states", latestStatesDate);
-  const cityEntries = buildRootEntries("cities", latestCitiesDate);
-  const companyEntries = buildRootEntries("companies", latestCompaniesDate);
+  const cityEntries = buildRootEntries("cities", latestCitiesDate).map((entry) => ({
+    ...entry,
+    changefreq: "weekly" as const,
+    priority: 0.7
+  }));
+  const companyEntries = buildRootEntries("companies", latestCompaniesDate).map((entry) => ({
+    ...entry,
+    changefreq: "weekly" as const,
+    priority: 0.5
+  }));
 
   const listingsEntries: SitemapUrlEntry[] = [
-    ...states.flatMap((state) => {
-      const profile = stateProfileMap.get(state.slug);
-      const shouldIndex = shouldIndexPage({
-        kind: "state-listing",
-        totalJobs: activeStateCounts.get(state.slug) ?? 0,
-        hasSpecificMetadata: true,
-        hasOwnContent: true,
-        internalLinkCount: 8
-      });
-
-      if (profile?.noIndex || !shouldIndex) {
-        return [];
-      }
-
-      return [toSitemapEntry(getStateJobsPath(state.slug), state.updatedAt)];
-    }),
     ...cities.flatMap((city) => {
       const profile = cityProfileMap.get(`${city.state.slug}__${city.slug}`);
       const shouldIndex = shouldIndexPage({
@@ -235,7 +223,7 @@ async function computeSitemapManifest(): Promise<SitemapManifest> {
         return [];
       }
 
-      return [toSitemapEntry(getCityJobsPath(city.slug), city.updatedAt)];
+      return [toSitemapEntry(getCityJobsPath(city.slug), city.updatedAt, { changefreq: "daily", priority: 0.7 })];
     }),
     ...companies.flatMap((company) => {
       const profile = companyProfileMap.get(company.slug);
@@ -253,34 +241,29 @@ async function computeSitemapManifest(): Promise<SitemapManifest> {
         return [];
       }
 
-      return [toSitemapEntry(getCompanyJobsPath(company.slug), company.updatedAt)];
+      return [toSitemapEntry(getCompanyJobsPath(company.slug), company.updatedAt, { changefreq: "weekly", priority: 0.5 })];
     })
   ];
 
   const blogEntries = [
     ...buildRootEntries("blog", latestPostsDate),
-    ...posts.map((post) => toSitemapEntry(`/blog/${post.slug}`, post.updatedAt))
+    ...posts.map((post) => toSitemapEntry(`/blog/${post.slug}`, post.updatedAt, { changefreq: "weekly", priority: 0.6 }))
   ];
 
   const programmaticEntries: SitemapUrlEntry[] = [
-    ...states.flatMap((state) => {
-      const total = activeStateCounts.get(state.slug) ?? 0;
-      if (total <= 0) return [];
-      return [toSitemapEntry(jovemAprendizStatePath(state.slug), state.updatedAt)];
-    }),
     ...cities.flatMap((city) => {
       const total = cityStateJobCounts.get(`${city.state.slug}__${city.slug}`) ?? 0;
       if (total <= 0) return [];
-      return [toSitemapEntry(jovemAprendizCityPath(city.state.slug, city.slug), city.updatedAt)];
+      return [toSitemapEntry(jovemAprendizCityPath(city.state.slug, city.slug), city.updatedAt, { changefreq: "daily", priority: 0.7 })];
     }),
     ...companyHubs.flatMap((company) => {
       if (!company.count) return [];
-      return [toSitemapEntry(jovemAprendizCompanyPath(company.slug), latestJobsDate)];
+      return [toSitemapEntry(jovemAprendizCompanyPath(company.slug), latestJobsDate, { changefreq: "weekly", priority: 0.5 })];
     }),
     ...EMPLOYMENT_CATEGORIES.flatMap((category) => {
       const total = employmentCounts.get(category.employmentType) ?? 0;
       if (total <= 0) return [];
-      return [toSitemapEntry(jovemAprendizCategoryPath(category.slug), latestJobsDate)];
+      return [toSitemapEntry(jovemAprendizCategoryPath(category.slug), latestJobsDate, { changefreq: "weekly", priority: 0.6 })];
     })
   ];
 
@@ -289,7 +272,6 @@ async function computeSitemapManifest(): Promise<SitemapManifest> {
   const freshEntries = [
     ...homeEntries,
     ...jobEntries,
-    ...stateEntries,
     ...cityEntries,
     ...companyEntries,
     ...blogEntries,
@@ -300,7 +282,6 @@ async function computeSitemapManifest(): Promise<SitemapManifest> {
     ...splitEntries("home", homeEntries),
     ...splitEntries("institutionals", institutionalEntries),
     ...splitEntries("jobs", jobEntries),
-    ...splitEntries("states", stateEntries),
     ...splitEntries("cities", cityEntries),
     ...splitEntries("companies", companyEntries),
     ...splitEntries("blog", blogEntries),
@@ -318,7 +299,6 @@ async function computeSitemapManifest(): Promise<SitemapManifest> {
       home: 0,
       institutionals: 0,
       jobs: 0,
-      states: 0,
       cities: 0,
       companies: 0,
       blog: 0,
@@ -351,7 +331,9 @@ export function buildUrlSetXml(entries: SitemapUrlEntry[]) {
   const xml = entries
     .map((entry) => {
       const lastmod = entry.lastmod ? `<lastmod>${escapeXml(entry.lastmod)}</lastmod>` : "";
-      return `<url><loc>${escapeXml(entry.loc)}</loc>${lastmod}</url>`;
+      const changefreq = entry.changefreq ? `<changefreq>${entry.changefreq}</changefreq>` : "";
+      const priority = typeof entry.priority === "number" ? `<priority>${entry.priority.toFixed(1)}</priority>` : "";
+      return `<url><loc>${escapeXml(entry.loc)}</loc>${lastmod}${changefreq}${priority}</url>`;
     })
     .join("");
 

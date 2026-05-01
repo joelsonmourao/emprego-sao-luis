@@ -76,6 +76,8 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function RootLayout({ children }: Readonly<{ children: ReactNode }>) {
   const settings = await getSiteSettings();
   const adsensePublisherId = normalizeAdsensePublisherId(settings.google.adsensePublisherId) ?? "ca-pub-4279201625870524";
+  const adsenseAdblockRecoveryTag = process.env.NEXT_PUBLIC_ADSENSE_ADBLOCK_RECOVERY_TAG?.trim();
+  const adsenseErrorProtectionTag = process.env.NEXT_PUBLIC_ADSENSE_ERROR_PROTECTION_TAG?.trim();
 
   return (
     <html lang="pt-BR">
@@ -92,6 +94,9 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
             __html: `(window.adsbygoogle = window.adsbygoogle || []).push({ google_ad_client: "${adsensePublisherId}", enable_page_level_ads: true });`
           }}
         />
+        {/* Tag oficial de recuperação de bloqueio de anúncios do Google AdSense (copiada sem alterações via env). */}
+        {adsenseAdblockRecoveryTag ? <script id="adsense-adblock-recovery" dangerouslySetInnerHTML={{ __html: adsenseAdblockRecoveryTag }} /> : null}
+        {adsenseErrorProtectionTag ? <script id="adsense-error-protection" dangerouslySetInnerHTML={{ __html: adsenseErrorProtectionTag }} /> : null}
       </head>
       <body className="min-h-screen antialiased overflow-x-hidden">
         <ConsentBootstrap />

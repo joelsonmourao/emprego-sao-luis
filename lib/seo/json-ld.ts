@@ -185,10 +185,8 @@ export async function buildJobPostingJsonLd(job: JobPostingJsonLdInput): Promise
     workHours: job.workHours
   });
 
-  const datePostedRaw =
-    normalizeDatePostedForSchema(job.updatedAt ?? null) ??
-    normalizeDatePostedForSchema(job.publishedAt) ??
-    normalizeDatePostedForSchema(new Date())!;
+  const datePostedRaw = normalizeDatePostedForSchema(job.publishedAt) ?? normalizeDatePostedForSchema(new Date())!;
+  const dateModifiedRaw = normalizeDatePostedForSchema(job.updatedAt ?? null) ?? undefined;
   const validThroughRaw = normalizeValidThroughSchemaString({
     publishedAt: job.publishedAt,
     validThrough: job.validThrough ?? null,
@@ -213,6 +211,7 @@ export async function buildJobPostingJsonLd(job: JobPostingJsonLdInput): Promise
 
   const employmentTypeRaw = employmentTypeToSchemaValue(job.employmentType, { title: job.displayTitle });
   const jobUrl = absoluteUrl(`/vagas/${job.slug}`);
+  const sourceUrl = job.applyUrl?.trim() || undefined;
 
   const data: Record<string, unknown> = {
     "@context": "https://schema.org",
@@ -225,16 +224,18 @@ export async function buildJobPostingJsonLd(job: JobPostingJsonLdInput): Promise
       value: (job.externalId?.trim() || job.id || job.slug).trim()
     },
     datePosted: datePostedRaw,
+    dateModified: dateModifiedRaw,
     validThrough: validThroughRaw,
     employmentType: employmentTypeRaw,
     hiringOrganization: {
       "@type": "Organization",
       name: job.companyName,
       logo: "https://slzcontent.com.br/icon.svg",
-      sameAs: jobUrl
+      sameAs: sourceUrl
     },
     jobLocation: await buildJobLocationBlock(job),
-    description: descriptionHtml
+    description: descriptionHtml,
+    directApply: false
   };
 
   const baseSalary = buildBaseSalaryBlock(job.salaryMin, job.salaryMax);

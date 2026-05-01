@@ -11,6 +11,6 @@ export default function robots(): MetadataRoute.Robots {
       disallow: ["/admin", "/api/admin", "/api/internal"]
     },
     host: baseUrl,
-    sitemap: [`${baseUrl}/sitemap.xml`, `${baseUrl}/sitemap-fresh.xml`]
+    sitemap: `${baseUrl}/sitemap.xml`
   };
 }
