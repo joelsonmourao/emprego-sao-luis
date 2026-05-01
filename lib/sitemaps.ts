@@ -22,7 +22,7 @@ export const SITEMAP_CHUNK_SIZE = 1000;
 
 const ROOT_ROUTES_BY_CATEGORY = {
   home: ["/", "/vagas"],
-  institutionals: ["/sobre", "/contato", "/politica-de-privacidade", "/politica-de-cookies", "/termos-de-uso"],
+  institutionals: ["/sobre", "/contato", "/politica-de-privacidade", "/politica-de-cookies", "/termos-de-uso", "/menor-aprendiz"],
   jobs: [],
   cities: ["/cidades"],
   companies: ["/empresas"],

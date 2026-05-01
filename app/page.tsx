@@ -32,8 +32,9 @@ export const revalidate = 1800;
 
 export async function generateMetadata() {
   return buildSiteMetadata({
-    title: "Jovem Aprendiz Vagas no Brasil",
-    description: "Encontre vagas de Jovem Aprendiz por cidade e estado, veja empresas que contratam e acesse dicas para currículo, entrevista e primeiro emprego.",
+    title: "Vagas de Jovem Aprendiz e Menor Aprendiz no Brasil",
+    description:
+      "Encontre vagas de Jovem Aprendiz e Menor Aprendiz por cidade e estado, veja empresas que contratam e acesse dicas para curriculo, entrevista e primeiro emprego.",
     pathname: "/"
   });
 }
@@ -385,6 +386,9 @@ export default async function HomePage() {
                   {siteContent.home.primaryButton.label}
                   <ArrowRight className="h-4 w-4" />
                 </Link>
+              </Button>
+              <Button asChild variant="secondary" size="lg" className="rounded-2xl">
+                <Link href={"/menor-aprendiz" as Route}>Guia de Menor Aprendiz</Link>
               </Button>
               <Button asChild variant="outline" size="lg" className="rounded-2xl border-white/30 bg-white/10 text-white hover:bg-white/16">
                 <Link href={siteContent.home.secondaryButton.href as Route}>{siteContent.home.secondaryButton.label}</Link>

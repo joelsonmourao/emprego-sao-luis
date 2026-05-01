@@ -13,8 +13,8 @@ export const revalidate = 7200;
 
 export async function generateMetadata() {
   return buildSiteMetadata({
-    title: "Blog sobre Jovem Aprendiz e primeiro emprego",
-    description: "Dicas de currículo, entrevista, empresas que contratam e caminhos para conseguir a primeira vaga.",
+    title: "Blog sobre Jovem Aprendiz, Menor Aprendiz e primeiro emprego",
+    description: "Dicas de curriculo, entrevista, empresas que contratam e caminhos para conseguir a primeira vaga.",
     pathname: "/blog"
   });
 }

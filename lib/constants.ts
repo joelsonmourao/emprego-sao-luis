@@ -6,9 +6,12 @@ export const siteConfig = {
   defaultLocale: "pt-BR",
   keywords: [
     "jovem aprendiz",
+    "menor aprendiz",
     "vaga de jovem aprendiz",
+    "vaga de menor aprendiz",
     "primeiro emprego",
     "curriculo para jovem aprendiz",
+    "curriculo para menor aprendiz",
     "entrevista para jovem aprendiz",
     "vagas por cidade",
     "empresas que contratam jovem aprendiz"

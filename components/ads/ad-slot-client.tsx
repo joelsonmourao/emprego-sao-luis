@@ -35,38 +35,8 @@ export function AdSlotClient({
       // Push immediately; adsbygoogle queue is safe before script fully initializes.
       (window.adsbygoogle = window.adsbygoogle || []).push({});
       initializedRef.current = true;
-      // #region agent log
-      fetch("http://127.0.0.1:7370/ingest/b54ed65d-267c-4421-b3af-1ea0f3df3748", {
-        method: "POST",
-        headers: { "Content-Type": "application/json", "X-Debug-Session-Id": "582712" },
-        body: JSON.stringify({
-          sessionId: "582712",
-          runId: "ads-debug",
-          hypothesisId: "H3_SLOT_PUSH_CLIENT",
-          location: "components/ads/ad-slot-client.tsx:useEffect",
-          message: "Slot AdSense push executado no cliente",
-          data: { hasPublisherId: Boolean(publisherId), hasSlot: Boolean(slot) },
-          timestamp: Date.now()
-        })
-      }).catch(() => {});
-      // #endregion
     } catch {
       initializedRef.current = false;
-      // #region agent log
-      fetch("http://127.0.0.1:7370/ingest/b54ed65d-267c-4421-b3af-1ea0f3df3748", {
-        method: "POST",
-        headers: { "Content-Type": "application/json", "X-Debug-Session-Id": "582712" },
-        body: JSON.stringify({
-          sessionId: "582712",
-          runId: "ads-debug",
-          hypothesisId: "H3_SLOT_PUSH_CLIENT",
-          location: "components/ads/ad-slot-client.tsx:useEffect",
-          message: "Slot AdSense push falhou no cliente",
-          data: { hasPublisherId: Boolean(publisherId), hasSlot: Boolean(slot) },
-          timestamp: Date.now()
-        })
-      }).catch(() => {});
-      // #endregion
     }
   }, [publisherId, slot, format, fullWidthResponsive]);
 

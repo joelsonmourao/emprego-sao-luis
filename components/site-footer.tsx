@@ -8,6 +8,9 @@ import { getSiteSettings } from "@/lib/site-settings";
 
 export async function SiteFooter() {
   const [siteContent, settings] = await Promise.all([getSiteContent(), getSiteSettings()]);
+  const navItems = siteContent.navigation.main.some((item) => item.href === "/menor-aprendiz")
+    ? siteContent.navigation.main
+    : [...siteContent.navigation.main, { href: "/menor-aprendiz", label: "Menor Aprendiz" }];
   const shortcutIconMap = {
     compass: Compass,
     handshake: Building2,
@@ -33,7 +36,7 @@ export async function SiteFooter() {
           <div>
             <h2 className="text-base font-semibold text-white">{siteContent.footer.navigationTitle}</h2>
             <div className="mt-3 flex flex-col gap-2">
-              {siteContent.navigation.main.slice(0, 4).map((item) => (
+              {navItems.slice(0, 5).map((item) => (
                 <Link key={item.href} href={item.href as Route} className="hover:text-[var(--brand-orange)]">
                   {item.label}
                 </Link>

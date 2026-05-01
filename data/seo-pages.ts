@@ -5,6 +5,7 @@ export const staticPages = [
   "/cidades",
   "/empresas",
   "/blog",
+  "/menor-aprendiz",
   "/sobre",
   "/politica-de-privacidade",
   "/politica-de-cookies",

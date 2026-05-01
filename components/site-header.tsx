@@ -8,6 +8,9 @@ import { getSiteContent } from "@/lib/site-content";
 
 export async function SiteHeader() {
   const siteContent = await getSiteContent();
+  const navItems = siteContent.navigation.main.some((item) => item.href === "/menor-aprendiz")
+    ? siteContent.navigation.main
+    : [...siteContent.navigation.main, { href: "/menor-aprendiz", label: "Menor Aprendiz" }];
 
   return (
     <header className="z-40 border-b border-[color:rgba(255,255,255,0.08)] bg-[var(--brand-navy)] text-white shadow-[0_18px_50px_-35px_rgba(26,43,76,0.7)] backdrop-blur-2xl md:sticky md:top-0">
@@ -29,7 +32,7 @@ export async function SiteHeader() {
         <SiteLogo className="hidden min-w-0 flex-1 sm:flex" />
 
         <nav className="hidden items-center gap-3 md:flex">
-          {siteContent.navigation.main.map((item) => (
+          {navItems.map((item) => (
             <Link
               key={item.href}
               href={item.href as Route}
@@ -56,7 +59,7 @@ export async function SiteHeader() {
       <div className="border-t border-white/10 md:hidden">
         <div className="mx-auto max-w-7xl px-4 py-2 sm:px-6">
           <div className="no-scrollbar flex items-center gap-2 overflow-x-auto pb-1">
-            {siteContent.navigation.main.map((item) => (
+            {navItems.map((item) => (
               <Link
                 key={item.href}
                 href={item.href as Route}

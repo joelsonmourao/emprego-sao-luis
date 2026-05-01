@@ -213,7 +213,7 @@ export default async function JobsPage({
       <div className="brand-page-hero rounded-[1.5rem] border border-slate-200 px-4 py-5 shadow-[0_35px_120px_-70px_rgba(26,43,76,0.22)] sm:rounded-[2rem] sm:px-5 sm:py-6 sm:rounded-[2.2rem] sm:px-8 sm:py-8">
         <div className="space-y-3 sm:space-y-4">
           <p className="text-[10px] font-semibold uppercase tracking-[0.24em] text-[var(--brand-orange)] sm:text-xs sm:tracking-[0.28em]">
-            {parsed.q ? "Busca filtrada" : "Vagas de Jovem Aprendiz"}
+            {parsed.q ? "Busca filtrada" : "Vagas de Jovem Aprendiz e Menor Aprendiz"}
           </p>
           <h1 className="text-[1.75rem] font-black tracking-tight leading-[1.1] text-[var(--brand-navy)] sm:text-4xl sm:leading-[1.08]">{heading}</h1>
           <p className="max-w-4xl text-[14px] leading-6 text-[var(--brand-text-secondary)] sm:text-[15px] sm:leading-7 sm:text-lg sm:leading-8">{intro}</p>
