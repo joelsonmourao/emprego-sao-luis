@@ -81,8 +81,6 @@ export type JobPostingJsonLdInput = {
   validThrough?: string | Date | null;
   salaryMin: number | null;
   salaryMax: number | null;
-  requirements: unknown[];
-  benefits: unknown[];
   workHours?: string | null;
   streetAddress?: string | null;
   postalCode?: string | null;
@@ -184,8 +182,6 @@ export async function buildJobPostingJsonLd(job: JobPostingJsonLdInput): Promise
     stateCode: job.stateCode,
     summary: job.summary?.trim() ?? "",
     descriptionHtml: job.descriptionHtml,
-    requirements: job.requirements,
-    benefits: job.benefits,
     workHours: job.workHours
   });
 

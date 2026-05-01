@@ -221,8 +221,6 @@ export default async function VagasCatchAllPage({
       notFound();
     }
 
-    const requirements = Array.isArray(job.requirements) ? job.requirements : [];
-    const benefits = Array.isArray(job.benefits) ? job.benefits : [];
     const cityName = safeString(job.city?.name, "Brasil");
     const citySlug = safeString(job.city?.slug, "brasil");
     const stateCode = safeString(job.state?.code, "BR");
@@ -255,8 +253,6 @@ export default async function VagasCatchAllPage({
         validThrough: job.validThrough ?? null,
         salaryMin: job.salaryMin,
         salaryMax: job.salaryMax,
-        requirements,
-        benefits,
         workHours: job.workHours,
         countryCode: "BR",
         employmentType: job.employmentType,

@@ -28,8 +28,6 @@ export async function JobDetailView({ job, displayTitle }: { job: JobWithRelatio
     stateCode: job.state.code,
     summary: job.summary,
     descriptionHtml: job.descriptionHtml ?? "",
-    requirements: Array.isArray(job.requirements) ? job.requirements : [],
-    benefits: Array.isArray(job.benefits) ? job.benefits : [],
     workHours: job.workHours
   });
 

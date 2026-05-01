@@ -1,5 +1,4 @@
 import { sanitizeRichTextHtml } from "@/lib/rich-text";
-import { normalizeListValues } from "@/lib/jobs/text-normalization";
 
 const INSTITUTIONAL_PATTERNS =
   /\b(nossa hist[oó]ria|quem somos|sobre n[oó]s|somos uma empresa|h[aá] mais de|fundada em|presente em|unidades|alunos|miss[aã]o|valores|cultura|grupo educacional|conhe[cç]a nossa hist[oó]ria|p[aá]gina de carreira|nossas institui[cç][oõ]es|fazemos parte|transformar o mundo|somos refer[eê]ncia|empresa l[ií]der|maior grupo|representativos grupos|nascemos do desejo)\b/i;
@@ -20,10 +19,6 @@ function hasLocationIndicators(text: string) {
   return LOCATION_INDICATOR_PATTERNS.test(text);
 }
 
-export function filterInstitutionalListItems(items: string[]) {
-  return items.map((s) => s.trim()).filter((s) => s && !isLikelyInstitutionalLine(s));
-}
-
 /**
  * HTML da description do JobPosting e do conteúdo alinhado ao schema: neutro, sem repetir cards do site.
  */
@@ -34,14 +29,9 @@ export function buildJobPostingDescriptionHtml(input: {
   stateCode: string;
   summary: string;
   descriptionHtml: string;
-  requirements: unknown[];
-  benefits: unknown[];
   workHours?: string | null;
 }) {
   const runId = "jobposting-location-indicators";
-  const requirements = filterInstitutionalListItems(normalizeListValues(input.requirements));
-  const benefits = filterInstitutionalListItems(normalizeListValues(input.benefits));
-
   const parts: string[] = [];
 
   parts.push(`<p>${escapeHtmlText(`Confira esta oportunidade de ${input.displayTitle}.`)}</p>`);
@@ -98,14 +88,6 @@ export function buildJobPostingDescriptionHtml(input: {
   // #endregion
   if (body) {
     parts.push(body);
-  }
-
-  if (requirements.length) {
-    parts.push("<h3>Requisitos</h3>", "<ul>", ...requirements.map((item) => `<li>${escapeHtmlText(item)}</li>`), "</ul>");
-  }
-
-  if (benefits.length) {
-    parts.push("<h3>Benefícios</h3>", "<ul>", ...benefits.map((item) => `<li>${escapeHtmlText(item)}</li>`), "</ul>");
   }
 
   const hours = input.workHours?.trim();
