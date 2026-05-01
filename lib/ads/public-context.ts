@@ -54,6 +54,30 @@ export const getPublicAdContext = cache(async (): Promise<PublicAdContext> => {
   const publisherId = normalizeAdsensePublisherId(siteSettings.google.adsensePublisherId);
   const integrationsAdsenseReady = Boolean(siteSettings.google.adsenseEnabled && publisherId);
 
+  // #region agent log
+  fetch("http://127.0.0.1:7370/ingest/b54ed65d-267c-4421-b3af-1ea0f3df3748", {
+    method: "POST",
+    headers: { "Content-Type": "application/json", "X-Debug-Session-Id": "582712" },
+    body: JSON.stringify({
+      sessionId: "582712",
+      runId: "ads-debug",
+      hypothesisId: "H1_ADS_DISABLED_OR_SUPPRESSED",
+      location: "lib/ads/public-context.ts:getPublicAdContext",
+      message: "Contexto de anuncios publico resolvido",
+      data: {
+        suppressForAdmin,
+        globalEnabled: adSettings.globalEnabled,
+        adsenseEnabled: siteSettings.google.adsenseEnabled,
+        hasPublisherId: Boolean(publisherId),
+        integrationsAdsenseReady,
+        slotsCount: slots.length,
+        activeSlotsCount: slots.filter((slot) => slot.isActive).length
+      },
+      timestamp: Date.now()
+    })
+  }).catch(() => {});
+  // #endregion
+
   return {
     suppressForAdmin,
     globalEnabled: adSettings.globalEnabled,

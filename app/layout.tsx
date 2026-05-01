@@ -78,6 +78,26 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
   const adsensePublisherId = normalizeAdsensePublisherId(settings.google.adsensePublisherId) ?? "ca-pub-4279201625870524";
   const adsenseAdblockRecoveryTag = process.env.NEXT_PUBLIC_ADSENSE_ADBLOCK_RECOVERY_TAG?.trim();
   const adsenseErrorProtectionTag = process.env.NEXT_PUBLIC_ADSENSE_ERROR_PROTECTION_TAG?.trim();
+  // #region agent log
+  fetch("http://127.0.0.1:7370/ingest/b54ed65d-267c-4421-b3af-1ea0f3df3748", {
+    method: "POST",
+    headers: { "Content-Type": "application/json", "X-Debug-Session-Id": "582712" },
+    body: JSON.stringify({
+      sessionId: "582712",
+      runId: "ads-debug",
+      hypothesisId: "H2_GLOBAL_TAGS_NOT_INJECTED",
+      location: "app/layout.tsx:RootLayout",
+      message: "Scripts globais de AdSense preparados no head",
+      data: {
+        adsenseEnabled: settings.google.adsenseEnabled,
+        hasPublisherId: Boolean(normalizeAdsensePublisherId(settings.google.adsensePublisherId)),
+        hasRecoveryTagEnv: Boolean(adsenseAdblockRecoveryTag),
+        hasErrorProtectionTagEnv: Boolean(adsenseErrorProtectionTag)
+      },
+      timestamp: Date.now()
+    })
+  }).catch(() => {});
+  // #endregion
 
   return (
     <html lang="pt-BR">
