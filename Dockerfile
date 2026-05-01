@@ -10,7 +10,7 @@ ENV NODE_ENV=production
 RUN apk add --no-cache libc6-compat
 
 COPY package.json package-lock.json ./
-RUN npm install --legacy-peer-deps
+RUN npm install --legacy-peer-deps --package-lock=false --no-audit --no-fund
 
 COPY . .
 RUN rm -f tsconfig.tsbuildinfo || true
