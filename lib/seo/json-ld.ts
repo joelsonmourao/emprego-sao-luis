@@ -85,6 +85,8 @@ export type JobPostingJsonLdInput = {
   streetAddress?: string | null;
   postalCode?: string | null;
   countryCode?: string | null;
+  latitude?: number | null;
+  longitude?: number | null;
   employmentType: EmploymentType;
   applyUrl: string;
 };
@@ -168,10 +170,22 @@ async function buildJobLocationBlock(job: JobPostingJsonLdInput) {
     address.streetAddress = street;
   }
 
-  return {
+  const place: Record<string, unknown> = {
     "@type": "Place",
     address
   };
+
+  const latitude = typeof job.latitude === "number" && Number.isFinite(job.latitude) ? job.latitude : null;
+  const longitude = typeof job.longitude === "number" && Number.isFinite(job.longitude) ? job.longitude : null;
+  if (latitude !== null && longitude !== null) {
+    place.geo = {
+      "@type": "GeoCoordinates",
+      latitude,
+      longitude
+    };
+  }
+
+  return place;
 }
 
 export async function buildJobPostingJsonLd(job: JobPostingJsonLdInput): Promise<Record<string, unknown> | null> {
