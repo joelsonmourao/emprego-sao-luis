@@ -9,6 +9,7 @@ import { resolveCompanyJobsPageMetadata } from "@/lib/seo/company-jobs-metadata"
 import { buildJobPublisherName } from "@/lib/seo/job-publisher";
 import { buildJobDetailSeo } from "@/lib/seo/jobs-pages";
 import { buildBreadcrumbJsonLd, buildJobPostingJsonLd, stringifyJobPostingJsonLd, stringifyJsonLdSafe } from "@/lib/seo/json-ld";
+import { getCityCoordinates } from "@/lib/seo/city-coordinates";
 import { buildSiteMetadata } from "@/lib/seo/metadata";
 import { sendDebugLog } from "@/lib/perf/debug-log";
 import { getJobBySlug } from "@/lib/repositories/jobs";
@@ -225,6 +226,29 @@ export default async function VagasCatchAllPage({
     const citySlug = safeString(job.city?.slug, "brasil");
     const stateCode = safeString(job.state?.code, "BR");
     const stateName = safeString(job.state?.name, "Brasil");
+    const coordinates = getCityCoordinates(job.city?.name ?? cityName, job.state?.code ?? stateCode);
+    // #region agent log
+    fetch("http://127.0.0.1:7370/ingest/b54ed65d-267c-4421-b3af-1ea0f3df3748", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "X-Debug-Session-Id": "582712" },
+      body: JSON.stringify({
+        sessionId: "582712",
+        runId: "jobposting-geo",
+        hypothesisId: "H_GEO_INPUT_MISSING",
+        location: "app/vagas/[...slug]/page.tsx",
+        message: "Coordenadas resolvidas para JobPosting",
+        data: {
+          slug: job.slug,
+          city: job.city?.name ?? cityName,
+          state: job.state?.code ?? stateCode,
+          hasCoordinates: Boolean(coordinates),
+          latitude: coordinates?.latitude ?? null,
+          longitude: coordinates?.longitude ?? null
+        },
+        timestamp: Date.now()
+      })
+    }).catch(() => {});
+    // #endregion
     const displayTitle = resolvePublicJobTitle({
       title: job.title,
       seoTitle: job.seoTitle,
@@ -255,6 +279,8 @@ export default async function VagasCatchAllPage({
         salaryMax: job.salaryMax,
         workHours: job.workHours,
         countryCode: "BR",
+        latitude: coordinates?.latitude ?? null,
+        longitude: coordinates?.longitude ?? null,
         employmentType: job.employmentType,
         applyUrl: job.applyUrl
       });

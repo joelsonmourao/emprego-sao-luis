@@ -185,6 +185,28 @@ async function buildJobLocationBlock(job: JobPostingJsonLdInput) {
     };
   }
 
+  // #region agent log
+  fetch("http://127.0.0.1:7370/ingest/b54ed65d-267c-4421-b3af-1ea0f3df3748", {
+    method: "POST",
+    headers: { "Content-Type": "application/json", "X-Debug-Session-Id": "582712" },
+    body: JSON.stringify({
+      sessionId: "582712",
+      runId: "jobposting-geo",
+      hypothesisId: "H_GEO_OUTPUT_BUILD",
+      location: "lib/seo/json-ld.ts:buildJobLocationBlock",
+      message: "Bloco de localizacao do JobPosting montado",
+      data: {
+        cityName: job.cityName,
+        stateCode: job.stateCode,
+        hasGeo: Boolean(place.geo),
+        latitude: latitude ?? null,
+        longitude: longitude ?? null
+      },
+      timestamp: Date.now()
+    })
+  }).catch(() => {});
+  // #endregion
+
   return place;
 }
 
