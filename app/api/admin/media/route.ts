@@ -3,11 +3,16 @@ import { promises as fs } from "fs";
 import path from "path";
 import { NextResponse } from "next/server";
 
+
 import { writeAuditLog } from "@/lib/audit";
 import { requireApiRole } from "@/lib/authz";
 import { prisma } from "@/lib/db";
 import { slugify } from "@/lib/utils";
 
+
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
 const uploadsDir = path.join(process.cwd(), "public", "uploads", "site");
 
 export async function GET() {

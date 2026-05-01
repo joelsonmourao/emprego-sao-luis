@@ -15,19 +15,41 @@ const envSchema = z.object({
   CRON_SECRET: z.string().optional()
 });
 
-export const env = envSchema.parse({
-  DATABASE_URL: process.env.DATABASE_URL,
-  SITE_URL: process.env.SITE_URL,
-  NEXT_PUBLIC_SITE_URL: process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000",
-  AUTH_SECRET:
-    process.env.AUTH_SECRET ??
-    (process.env.NODE_ENV === "production" ? undefined : "dev-only-change-this-secret-key"),
-  ADMIN_LOGIN_USER: process.env.ADMIN_LOGIN_USER,
-  ADMIN_SECRET_KEY: process.env.ADMIN_SECRET_KEY,
-  SCHEDULED_JOBS_SPREADSHEET_PATH: process.env.SCHEDULED_JOBS_SPREADSHEET_PATH,
-  SCHEDULED_JOBS_SHEET_NAME: process.env.SCHEDULED_JOBS_SHEET_NAME,
-  SCHEDULED_JOBS_LOG_DIR: process.env.SCHEDULED_JOBS_LOG_DIR,
-  GOOGLE_INDEXING_SERVICE_ACCOUNT_JSON: process.env.GOOGLE_INDEXING_SERVICE_ACCOUNT_JSON,
-  GOOGLE_INDEXING_SERVICE_ACCOUNT_FILE: process.env.GOOGLE_INDEXING_SERVICE_ACCOUNT_FILE,
-  CRON_SECRET: process.env.CRON_SECRET
+export type AppEnv = z.infer<typeof envSchema>;
+
+function parseEnv(): AppEnv {
+  return envSchema.parse({
+    DATABASE_URL: process.env.DATABASE_URL,
+    SITE_URL: process.env.SITE_URL,
+    NEXT_PUBLIC_SITE_URL: process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000",
+    AUTH_SECRET:
+      process.env.AUTH_SECRET ??
+      (process.env.NODE_ENV === "production" ? undefined : "dev-only-change-this-secret-key"),
+    ADMIN_LOGIN_USER: process.env.ADMIN_LOGIN_USER,
+    ADMIN_SECRET_KEY: process.env.ADMIN_SECRET_KEY,
+    SCHEDULED_JOBS_SPREADSHEET_PATH: process.env.SCHEDULED_JOBS_SPREADSHEET_PATH,
+    SCHEDULED_JOBS_SHEET_NAME: process.env.SCHEDULED_JOBS_SHEET_NAME,
+    SCHEDULED_JOBS_LOG_DIR: process.env.SCHEDULED_JOBS_LOG_DIR,
+    GOOGLE_INDEXING_SERVICE_ACCOUNT_JSON: process.env.GOOGLE_INDEXING_SERVICE_ACCOUNT_JSON,
+    GOOGLE_INDEXING_SERVICE_ACCOUNT_FILE: process.env.GOOGLE_INDEXING_SERVICE_ACCOUNT_FILE,
+    CRON_SECRET: process.env.CRON_SECRET
+  });
+}
+
+let cachedEnv: AppEnv | undefined;
+
+/** Parse e valida variáveis só no primeiro uso (evita falha no topo do build do Next/Coolify). */
+export function getEnv(): AppEnv {
+  cachedEnv ??= parseEnv();
+  return cachedEnv;
+}
+
+/** Alias com acesso lazy; igual a `getEnv()` mas preserva código existente (`env.X`). */
+export const env = new Proxy({} as AppEnv, {
+  get(_target, prop: string | symbol) {
+    if (typeof prop !== "string") {
+      return undefined;
+    }
+    return getEnv()[prop as keyof AppEnv];
+  }
 });

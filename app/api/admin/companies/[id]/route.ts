@@ -1,11 +1,16 @@
 import { AuditAction } from "@prisma/client";
 import { NextResponse } from "next/server";
 
+
 import { requireApiRole } from "@/lib/authz";
 import { prisma } from "@/lib/db";
 import { deleteCompany, upsertCompanyFromForm } from "@/lib/admin/companies";
 import { writeAuditLog } from "@/lib/audit";
 
+
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
 type Context = {
   params: Promise<{ id: string }>;
 };

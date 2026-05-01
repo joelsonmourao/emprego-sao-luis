@@ -1,11 +1,16 @@
 import { AuditAction } from "@prisma/client";
 import { NextResponse } from "next/server";
 
+
 import { writeAuditLog } from "@/lib/audit";
 import { requireApiRole } from "@/lib/authz";
 import { deleteTaxonomyEntry, updateTaxonomyEntry } from "@/lib/admin/taxonomies";
 import { taxonomyResourceSchema } from "@/lib/schemas/taxonomy-admin";
 
+
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
 export async function PATCH(
   request: Request,
   context: { params: Promise<{ resource: string; id: string }> }

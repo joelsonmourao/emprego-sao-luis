@@ -2,11 +2,16 @@ import { JobPublicationStatus } from "@prisma/client";
 import { NextResponse } from "next/server";
 import * as XLSX from "xlsx";
 
+
 import { requireApiRole } from "@/lib/authz";
 import { prisma } from "@/lib/db";
 import { getSiteUrl } from "@/lib/site-url";
 import { formatDateTimeSpreadsheetValue, normalizeScheduledAtValue } from "@/lib/timezone";
 
+
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
 function sheetPublishStatus(status: JobPublicationStatus): "AGUARDANDO" | "PUBLICADA" | "ERRO" {
   if (status === JobPublicationStatus.OK || status === JobPublicationStatus.PUBLICADA || status === JobPublicationStatus.INDEXANDO_GOOGLE) {
     return "PUBLICADA";

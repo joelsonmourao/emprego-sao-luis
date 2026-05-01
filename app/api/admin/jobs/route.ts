@@ -1,12 +1,17 @@
 import { AuditAction } from "@prisma/client";
 import { NextResponse } from "next/server";
 
+
 import { upsertJobFromForm } from "@/lib/admin/jobs";
 import { writeAuditLog } from "@/lib/audit";
 import { requireApiRole } from "@/lib/authz";
 import { prisma } from "@/lib/db";
 import { revalidatePublicSurfacesForJob } from "@/lib/public-revalidate";
 
+
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
 export async function POST(request: Request) {
   try {
     const session = await requireApiRole("EDITOR");

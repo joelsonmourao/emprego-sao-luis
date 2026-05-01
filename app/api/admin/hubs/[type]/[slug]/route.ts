@@ -1,10 +1,15 @@
 import { HubType } from "@prisma/client";
 import { NextResponse } from "next/server";
 
+
 import { upsertHubProfile } from "@/lib/admin/site";
 import { requireApiRole } from "@/lib/authz";
 import { getHubProfile } from "@/lib/repositories/hubs";
 
+
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
 const hubTypeMap: Record<string, HubType> = {
   state: "STATE",
   city: "CITY",

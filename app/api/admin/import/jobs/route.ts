@@ -1,6 +1,7 @@
 import { AuditAction, EmploymentType, ImportQueueStatus, LocationType, Prisma, type City, type Company, type Job, type State } from "@prisma/client";
 import { NextResponse } from "next/server";
 
+
 import { normalizeSlug, parseOptionalDate, richTextFromInput, sanitizeText } from "@/lib/admin/content";
 import { writeAuditLog } from "@/lib/audit";
 import { requireApiRole } from "@/lib/authz";
@@ -10,6 +11,10 @@ import { parseSpreadsheetEmploymentType } from "@/lib/jobs/employment-type";
 import { markExpiredJobsInactive } from "@/lib/jobs/job-expiry";
 import { importJobsPayloadSchema, type ImportedJobRow } from "@/lib/schemas/job-import";
 
+
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
 const RESPONSE_HEADERS = {
   "Cache-Control": "no-store"
 };

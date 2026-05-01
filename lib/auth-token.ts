@@ -1,14 +1,28 @@
 import { SignJWT } from "jose/jwt/sign";
 import { jwtVerify } from "jose/jwt/verify";
 
-import { env } from "@/lib/env";
-
 export const ADMIN_AUTH_COOKIE = "jovem-aprendiz-admin-session";
 const ADMIN_AUTH_ISSUER = "jovem-aprendiz-vagas";
 const ADMIN_AUTH_AUDIENCE = "admin";
 const ADMIN_AUTH_TTL = 60 * 60 * 24 * 7;
 
-const authSecret = new TextEncoder().encode(env.AUTH_SECRET);
+const DEV_FALLBACK_AUTH_SECRET = "dev-only-change-this-secret-key";
+
+function getEncodedAuthSecret(): Uint8Array {
+  const raw =
+    process.env.AUTH_SECRET ?? (process.env.NODE_ENV === "production" ? undefined : DEV_FALLBACK_AUTH_SECRET);
+  if (!raw || raw.length < 16) {
+    throw new Error("AUTH_SECRET precisa estar configurada (minimo 16 caracteres).");
+  }
+  return new TextEncoder().encode(raw);
+}
+
+let cachedEncodedSecret: Uint8Array | undefined;
+
+function encodedSecret(): Uint8Array {
+  cachedEncodedSecret ??= getEncodedAuthSecret();
+  return cachedEncodedSecret;
+}
 
 export type AdminSessionTokenPayload = {
   sub: string;
@@ -36,12 +50,12 @@ export async function createAdminSessionToken(payload: {
     .setAudience(ADMIN_AUTH_AUDIENCE)
     .setIssuedAt()
     .setExpirationTime(`${ADMIN_AUTH_TTL}s`)
-    .sign(authSecret);
+    .sign(encodedSecret());
 }
 
 export async function verifyAdminSessionToken(token: string) {
   try {
-    const { payload } = await jwtVerify(token, authSecret, {
+    const { payload } = await jwtVerify(token, encodedSecret(), {
       issuer: ADMIN_AUTH_ISSUER,
       audience: ADMIN_AUTH_AUDIENCE
     });

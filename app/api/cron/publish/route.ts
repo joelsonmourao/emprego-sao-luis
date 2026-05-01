@@ -3,8 +3,11 @@ import { NextResponse } from "next/server";
 import { env } from "@/lib/env";
 import { processScheduledPublicationsFromDatabase } from "@/lib/scheduled-publication-db";
 
-export const runtime = "nodejs";
 
+
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
 function isAuthorized(request: Request) {
   const authHeader = request.headers.get("authorization");
   const expectedSecret = env.CRON_SECRET?.trim();

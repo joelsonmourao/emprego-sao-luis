@@ -1,6 +1,7 @@
 import { AuditAction } from "@prisma/client";
 import { NextResponse } from "next/server";
 
+
 import { bulkDeleteCompanies } from "@/lib/admin/companies";
 import { bulkDeleteJobs } from "@/lib/admin/jobs";
 import { bulkDeleteTaxonomyEntries } from "@/lib/admin/taxonomies";
@@ -9,6 +10,10 @@ import { requireApiRole } from "@/lib/authz";
 import { revalidatePublicSurfacesAfterBulkJobChange } from "@/lib/public-revalidate";
 import { bulkDeleteSchema } from "@/lib/schemas/taxonomy-admin";
 
+
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
 export async function POST(request: Request) {
   try {
     const session = await requireApiRole("ADMIN");

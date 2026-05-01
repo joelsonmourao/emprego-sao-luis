@@ -1,11 +1,16 @@
 import { AuditAction } from "@prisma/client";
 import { NextResponse } from "next/server";
 
+
 import { writeAuditLog } from "@/lib/audit";
 import { requireApiRole } from "@/lib/authz";
 import { getEditableSiteSettings, patchSiteSettings } from "@/lib/admin/site";
 import { revalidatePublicSurfacesAfterSiteSettingsChange } from "@/lib/public-revalidate";
 
+
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
 export async function GET() {
   await requireApiRole("EDITOR");
   const settings = await getEditableSiteSettings();

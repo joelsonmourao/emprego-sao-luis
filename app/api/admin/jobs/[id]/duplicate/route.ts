@@ -1,6 +1,7 @@
 import { revalidateTag } from "next/cache";
 import { NextResponse } from "next/server";
 
+
 import { AuditAction } from "@prisma/client";
 
 import { normalizeSlug } from "@/lib/admin/content";
@@ -9,6 +10,10 @@ import { requireApiRole } from "@/lib/authz";
 import { prisma } from "@/lib/db";
 import { SITEMAP_MANIFEST_CACHE_TAG } from "@/lib/public-revalidate";
 
+
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
 type Context = {
   params: Promise<{ id: string }>;
 };

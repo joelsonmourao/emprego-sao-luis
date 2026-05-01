@@ -1,9 +1,14 @@
 import { NextResponse } from "next/server";
 
+
 import { requireApiRole } from "@/lib/authz";
 import { scheduledJobUploadPayloadSchema } from "@/lib/schemas/scheduled-job-upload";
 import { importScheduledJobsFromUploadRows } from "@/lib/scheduled-publication-db";
 
+
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
 const RESPONSE_HEADERS = {
   "Cache-Control": "no-store"
 };

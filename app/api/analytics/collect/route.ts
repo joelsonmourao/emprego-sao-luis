@@ -2,9 +2,14 @@ import { Prisma } from "@prisma/client";
 import { NextResponse } from "next/server";
 import { z } from "zod";
 
+
 import { prisma } from "@/lib/db";
 import { parseReferrerHost, parseRequestContext } from "@/lib/analytics/server";
 
+
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
 const analyticsEventSchema = z.object({
   eventName: z.string().min(1).max(80),
   path: z.string().min(1).max(2048),

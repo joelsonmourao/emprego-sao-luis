@@ -2,10 +2,11 @@ import { NextResponse } from "next/server";
 
 import { adSlotPatchSchema } from "@/lib/schemas/ad-admin";
 
+
+
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
-
 type RouteContext = { params: Promise<{ slug: string }> };
 
 export async function PATCH(request: Request, context: RouteContext) {

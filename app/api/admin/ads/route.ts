@@ -2,10 +2,11 @@ import { NextResponse } from "next/server";
 
 import { buildAdComplianceReport } from "@/lib/ads/compliance";
 
+
+
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
-
 export async function GET() {
   try {
     // #region agent log

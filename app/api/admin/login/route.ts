@@ -2,12 +2,17 @@ import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 import { AuditAction } from "@prisma/client";
 
+
 import { writeAuditLog } from "@/lib/audit";
 import { prisma } from "@/lib/db";
 import { ADMIN_AUTH_COOKIE, createAdminSessionToken, verifyPassword } from "@/lib/auth";
 import { getSiteOrigin } from "@/lib/site-url";
 import { adminLoginSchema } from "@/lib/schemas/admin-auth";
 
+
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
 export async function POST(request: Request) {
   try {
     const body = adminLoginSchema.parse(await request.json());

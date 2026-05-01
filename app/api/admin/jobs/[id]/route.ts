@@ -1,11 +1,16 @@
 import { AuditAction } from "@prisma/client";
 import { NextResponse } from "next/server";
 
+
 import { deleteJob, upsertJobFromForm } from "@/lib/admin/jobs";
 import { writeAuditLog } from "@/lib/audit";
 import { requireApiRole } from "@/lib/authz";
 import { revalidatePublicSurfacesForJob } from "@/lib/public-revalidate";
 
+
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
 type Context = {
   params: Promise<{ id: string }>;
 };

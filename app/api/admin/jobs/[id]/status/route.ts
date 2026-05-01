@@ -2,11 +2,16 @@ import { AuditAction } from "@prisma/client";
 import { NextResponse } from "next/server";
 import { z } from "zod";
 
+
 import { writeAuditLog } from "@/lib/audit";
 import { requireApiRole } from "@/lib/authz";
 import { prisma } from "@/lib/db";
 import { revalidatePublicSurfacesForJob } from "@/lib/public-revalidate";
 
+
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
 const schema = z.object({
   isActive: z.boolean()
 });

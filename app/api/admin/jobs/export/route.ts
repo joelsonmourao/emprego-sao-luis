@@ -3,11 +3,16 @@ import timezone from "dayjs/plugin/timezone";
 import utc from "dayjs/plugin/utc";
 import { NextResponse } from "next/server";
 
+
 import { requireApiRole } from "@/lib/authz";
 import { formatBrazilCalendarDate, getBrazilNow } from "@/lib/date-utils";
 import { prisma } from "@/lib/db";
 import { SITE_TIME_ZONE } from "@/lib/timezone";
 
+
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
 dayjs.extend(utc);
 dayjs.extend(timezone);
 

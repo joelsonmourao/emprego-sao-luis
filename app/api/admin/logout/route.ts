@@ -2,10 +2,15 @@ import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 import { AuditAction } from "@prisma/client";
 
+
 import { getAdminSession } from "@/lib/auth";
 import { ADMIN_AUTH_COOKIE } from "@/lib/auth";
 import { writeAuditLog } from "@/lib/audit";
 
+
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
 export async function POST() {
   const session = await getAdminSession();
   const cookieStore = await cookies();
