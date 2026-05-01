@@ -7,6 +7,7 @@ import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 import { blogFormDefaults, blogFormSchema, type BlogFormInput } from "@/lib/schemas/blog-form";
+import { looksLikeMarkdown } from "@/lib/admin/content";
 import { slugify } from "@/lib/utils";
 import { Field, Input, Textarea } from "@/components/forms/field";
 import { RichTextEditor } from "@/components/forms/rich-text-editor";
@@ -44,11 +45,32 @@ export function BlogAdminForm({
   });
 
   const content = watch("contentHtml") ?? "";
+  const excerpt = watch("excerpt") ?? "";
   const seoTitle = watch("seoTitle") ?? "";
   const seoDescription = watch("seoDescription") ?? "";
 
   async function onSubmit(values: BlogFormInput) {
     setServerError("");
+    // #region agent log
+    fetch("http://127.0.0.1:7370/ingest/b54ed65d-267c-4421-b3af-1ea0f3df3748", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "X-Debug-Session-Id": "582712" },
+      body: JSON.stringify({
+        sessionId: "582712",
+        runId: "blog-markdown",
+        hypothesisId: "H5_INPUT_FIELD_MISMATCH",
+        location: "components/admin/blog-admin-form.tsx:onSubmit",
+        message: "Conteudo enviado no form de blog",
+        data: {
+          excerptLen: values.excerpt.length,
+          contentLen: values.contentHtml.length,
+          excerptMarkdown: looksLikeMarkdown(values.excerpt),
+          contentMarkdown: looksLikeMarkdown(values.contentHtml)
+        },
+        timestamp: Date.now()
+      })
+    }).catch(() => {});
+    // #endregion
 
     const response = await fetch(mode === "create" ? "/api/admin/posts" : `/api/admin/posts/${postId}`, {
       method: mode === "create" ? "POST" : "PATCH",
@@ -119,6 +141,11 @@ export function BlogAdminForm({
               <Textarea {...register("excerpt")} className="min-h-28" />
             </Field>
             {errors.excerpt ? <p className="text-sm text-rose-600">{errors.excerpt.message}</p> : null}
+            {looksLikeMarkdown(excerpt) ? (
+              <p className="text-xs text-amber-700">
+                O campo Resumo nao tem preview Markdown. Para pre-visualizar Markdown, use o campo Conteudo.
+              </p>
+            ) : null}
           </div>
 
           <div className="space-y-2">
