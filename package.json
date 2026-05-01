@@ -8,7 +8,7 @@
     "build": "prisma generate && (node scripts/prisma-migrate-deploy.mjs || node -e \"process.exit(0)\") && next build",
     "migrate:deploy": "node scripts/prisma-migrate-deploy.mjs",
     "build:retry": "prisma generate && scripts/build-with-retry.bat",
-    "start": "next start -p 3000",
+    "start": "next start -H 0.0.0.0 -p 3000",
     "typecheck": "tsc --noEmit",
     "jobs:schedule:process": "tsx scripts/process-scheduled-jobs.ts",
     "jobs:import:xlsx": "tsx scripts/import-jobs-api.ts",
