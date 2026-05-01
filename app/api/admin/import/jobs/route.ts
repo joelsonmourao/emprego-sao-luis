@@ -1,7 +1,7 @@
 import { AuditAction, EmploymentType, ImportQueueStatus, LocationType, Prisma, type City, type Company, type Job, type State } from "@prisma/client";
 import { NextResponse } from "next/server";
 
-import { normalizeLines, normalizeSlug, parseOptionalDate, richTextFromInput, sanitizeText } from "@/lib/admin/content";
+import { normalizeSlug, parseOptionalDate, richTextFromInput, sanitizeText } from "@/lib/admin/content";
 import { writeAuditLog } from "@/lib/audit";
 import { requireApiRole } from "@/lib/authz";
 import { prisma } from "@/lib/db";
@@ -103,11 +103,16 @@ function sanitizeImportedRow(row: ImportedJobRow): ImportedJobRow {
     title: sanitizeText(row.title),
     descriptionHtml: sanitizeText(row.descriptionHtml),
     summary: sanitizeText(row.summary),
-    requirementsText: sanitizeText(row.requirementsText),
-    benefitsText: sanitizeText(row.benefitsText),
+    requirementsText: sanitizeText(row.requirementsText ?? ""),
+    benefitsText: sanitizeText(row.benefitsText ?? ""),
     area: sanitizeArea(row.area),
     stateName: normalizeBrazilianUf(row.stateName) ?? ""
   };
+}
+
+function hasMarkdownSyntax(text: string) {
+  if (!text) return false;
+  return /(^|\n)\s{0,3}(#{1,6}\s+|[-*]\s+|\d+\.\s+|> )/.test(text) || /\*\*[^*]+\*\*|`[^`]+`/.test(text);
 }
 
 async function generateUniqueDescriptionWithClaude(row: ImportedJobRow) {
@@ -539,6 +544,29 @@ function resolveCompany(context: ImportContext, row: ImportedJobRow) {
 }
 
 function buildJobData(row: ImportedJobRow, state: State, city: City, company: Company, slug: string, existing?: Pick<Job, "publishedAt">) {
+  const sourceDescription = row.descriptionHtml;
+  const normalizedDescription = richTextFromInput(sourceDescription, { baseHeadingLevel: 2 });
+  // #region agent log
+  fetch("http://127.0.0.1:7370/ingest/b54ed65d-267c-4421-b3af-1ea0f3df3748", {
+    method: "POST",
+    headers: { "Content-Type": "application/json", "X-Debug-Session-Id": "582712" },
+    body: JSON.stringify({
+      sessionId: "582712",
+      runId: "import-markdown-check",
+      hypothesisId: "H_MD_CONVERSION",
+      location: "app/api/admin/import/jobs/route.ts:buildJobData",
+      message: "Descricao processada para importacao",
+      data: {
+        title: row.title,
+        hasMarkdownSyntax: hasMarkdownSyntax(sourceDescription),
+        sourcePreview: sourceDescription.slice(0, 180),
+        normalizedPreview: normalizedDescription.slice(0, 220)
+      },
+      timestamp: Date.now()
+    })
+  }).catch(() => {});
+  // #endregion
+
   return {
     title: row.title.trim(),
     slug,
@@ -546,9 +574,9 @@ function buildJobData(row: ImportedJobRow, state: State, city: City, company: Co
     companyLogoUrl: company.logoUrl,
     companyWebsiteUrl: company.websiteUrl,
     summary: row.summary.trim(),
-    descriptionHtml: richTextFromInput(row.descriptionHtml, { baseHeadingLevel: 2 }),
-    requirements: normalizeLines(row.requirementsText),
-    benefits: normalizeLines(row.benefitsText ?? ""),
+    descriptionHtml: normalizedDescription,
+    requirements: [],
+    benefits: [],
     salaryMin: row.salaryMin ? Math.round(row.salaryMin) : null,
     salaryMax: row.salaryMax ? Math.round(row.salaryMax) : null,
     employmentType: parseSpreadsheetEmploymentType(row.employmentType),

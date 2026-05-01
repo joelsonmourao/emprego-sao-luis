@@ -8,7 +8,6 @@ import { JobCard } from "@/components/job-card";
 import { SectionHeading } from "@/components/section-heading";
 import { Button } from "@/components/ui/button";
 import { formatBrazilDateTime } from "@/lib/date-utils";
-import { buildJobPostingDescriptionHtml } from "@/lib/jobs/job-posting-description";
 import { sanitizeRichTextHtml } from "@/lib/rich-text";
 import { buildJobPublisherName } from "@/lib/seo/job-publisher";
 import { getCityJobsPath, getCompanyJobsPath, getStateJobsPath } from "@/lib/seo/jobs-pages";
@@ -21,15 +20,7 @@ type JobWithRelations = NonNullable<Awaited<ReturnType<typeof getJobBySlug>>>;
 export async function JobDetailView({ job, displayTitle }: { job: JobWithRelations; displayTitle?: string | null }) {
   const headingTitle = (displayTitle?.trim() || job.title).trim();
   const publisherDisplayName = buildJobPublisherName(job.city?.name, job.state?.code);
-  const mergedDescriptionHtml = buildJobPostingDescriptionHtml({
-    displayTitle: headingTitle,
-    companyName: job.companyName,
-    cityName: job.city.name,
-    stateCode: job.state.code,
-    summary: job.summary,
-    descriptionHtml: job.descriptionHtml ?? "",
-    workHours: job.workHours
-  });
+  const mergedDescriptionHtml = job.descriptionHtml ?? "";
 
   let relatedJobs: Awaited<ReturnType<typeof getRelatedJobs>> = [];
   let relatedPosts: Awaited<ReturnType<typeof getRelatedPosts>> = [];

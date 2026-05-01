@@ -8,7 +8,7 @@ export const importedJobRowSchema = z.object({
   stateName: z.string().min(2, "Estado obrigatorio."),
   summary: z.string().min(20, "Resumo obrigatorio."),
   descriptionHtml: z.string().min(40, "Descricao obrigatoria."),
-  requirementsText: z.string().min(5, "Requisitos obrigatorios."),
+  requirementsText: z.string().optional().default(""),
   benefitsText: z.string().optional().default(""),
   area: z.string().optional().default(""),
   salaryMin: z.preprocess((val) => (val === "" ? null : Number(val)), z.number().nullable().optional()),
