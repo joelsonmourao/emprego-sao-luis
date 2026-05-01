@@ -7,6 +7,18 @@ import { JOB_DETAIL_PATH_RESERVED_FIRST_SEGMENTS } from "@/lib/seo/vagas-job-pat
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
+  const isPublicBypassPath =
+    pathname === "/" ||
+    pathname === "/robots.txt" ||
+    pathname === "/sitemap.xml" ||
+    pathname.startsWith("/sitemaps/") ||
+    pathname === "/favicon.ico" ||
+    pathname === "/icon.svg";
+
+  if (isPublicBypassPath) {
+    return NextResponse.next();
+  }
+
   const hostname = request.nextUrl.hostname.toLowerCase();
   const forwardedProto = request.headers.get("x-forwarded-proto")?.split(",")[0]?.trim().toLowerCase();
   const isSecureRequest = request.nextUrl.protocol === "https:" || forwardedProto === "https";

@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+
+Disallow: /admin
+Disallow: /api/admin
+Disallow: /api/internal
+
+Sitemap: https://slzcontent.com.br/sitemap.xml
