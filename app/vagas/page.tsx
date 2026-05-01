@@ -25,7 +25,6 @@ import { jobSearchParamsSchema } from "@/lib/schemas/search";
 import { renderFaqTemplate, renderTemplate } from "@/lib/site-copy";
 import { getSiteContent } from "@/lib/site-content";
 import { JobsGridWithMidAd } from "@/components/vagas/jobs-grid-with-mid-ad";
-import { sendDebugLog } from "@/lib/perf/debug-log";
 
 export const revalidate = 600;
 
@@ -52,7 +51,6 @@ export async function generateMetadata({
 }: {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
-  const startedAt = Date.now();
   const raw = await searchParams;
   const normalizedInput = {
     q: typeof raw.q === "string" ? raw.q : undefined,
@@ -84,22 +82,6 @@ export async function generateMetadata({
     hasBetterCanonical: Boolean(!parsed.q && (parsed.estado || parsed.cidade || parsed.empresa)),
     isTechnicalQuery: !isBaseListing
   });
-
-  // #region agent log
-  sendDebugLog({
-    runId: "perf-audit",
-    hypothesisId: "H11",
-    location: "app/vagas/page.tsx",
-    message: "jobs metadata query footprint",
-    data: {
-      elapsedMs: Date.now() - startedAt,
-      hasStateFilter: Boolean(parsed.estado),
-      hasCityFilter: Boolean(parsed.cidade),
-      totalJobs: jobs.total,
-      stateCount: states.length
-    }
-  });
-  // #endregion
 
   return buildSiteMetadata({
     title: buildJobsListingMetaTitle({

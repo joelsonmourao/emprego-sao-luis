@@ -2,9 +2,6 @@ import { sanitizeRichTextHtml } from "@/lib/rich-text";
 
 const INSTITUTIONAL_PATTERNS =
   /\b(nossa hist[oó]ria|quem somos|sobre n[oó]s|somos uma empresa|h[aá] mais de|fundada em|presente em|unidades|alunos|miss[aã]o|valores|cultura|grupo educacional|conhe[cç]a nossa hist[oó]ria|p[aá]gina de carreira|nossas institui[cç][oõ]es|fazemos parte|transformar o mundo|somos refer[eê]ncia|empresa l[ií]der|maior grupo|representativos grupos|nascemos do desejo)\b/i;
-const LOCATION_INDICATOR_PATTERNS =
-  /\b(a vaga est[aá] associada|as informa[cç][oõ]es dispon[ií]veis indicam atua[cç][aã]o|o cadastro foi organizado com base nos dados p[uú]blicos informados|de acordo com os dados dispon[ií]veis, a oportunidade est[aá] relacionada)\b/i;
-
 function escapeHtmlText(s: string) {
   return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 }
@@ -13,10 +10,6 @@ export function isLikelyInstitutionalLine(text: string) {
   const t = text.trim();
   if (!t) return true;
   return INSTITUTIONAL_PATTERNS.test(t);
-}
-
-function hasLocationIndicators(text: string) {
-  return LOCATION_INDICATOR_PATTERNS.test(text);
 }
 
 /**
@@ -31,7 +24,6 @@ export function buildJobPostingDescriptionHtml(input: {
   descriptionHtml: string;
   workHours?: string | null;
 }) {
-  const runId = "jobposting-location-indicators";
   const parts: string[] = [];
 
   parts.push(`<p>${escapeHtmlText(`Confira esta oportunidade de ${input.displayTitle}.`)}</p>`);
@@ -45,47 +37,11 @@ export function buildJobPostingDescriptionHtml(input: {
   }
 
   const summary = input.summary.trim();
-  // #region agent log
-  fetch("http://127.0.0.1:7370/ingest/b54ed65d-267c-4421-b3af-1ea0f3df3748", {
-    method: "POST",
-    headers: { "Content-Type": "application/json", "X-Debug-Session-Id": "582712" },
-    body: JSON.stringify({
-      sessionId: "582712",
-      runId,
-      hypothesisId: "H2_SUMMARY_SOURCE",
-      location: "lib/jobs/job-posting-description.ts:summary",
-      message: "Summary inspected for location indicators",
-      data: {
-        hasLocationIndicators: hasLocationIndicators(summary),
-        summaryPreview: summary.slice(0, 180)
-      },
-      timestamp: Date.now()
-    })
-  }).catch(() => {});
-  // #endregion
   if (summary && !isLikelyInstitutionalLine(summary)) {
     parts.push(`<p>${escapeHtmlText(summary)}</p>`);
   }
 
   const body = sanitizeRichTextHtml(input.descriptionHtml).trim();
-  // #region agent log
-  fetch("http://127.0.0.1:7370/ingest/b54ed65d-267c-4421-b3af-1ea0f3df3748", {
-    method: "POST",
-    headers: { "Content-Type": "application/json", "X-Debug-Session-Id": "582712" },
-    body: JSON.stringify({
-      sessionId: "582712",
-      runId,
-      hypothesisId: "H1_BODY_SOURCE",
-      location: "lib/jobs/job-posting-description.ts:body",
-      message: "Body inspected for location indicators",
-      data: {
-        hasLocationIndicators: hasLocationIndicators(body),
-        bodyPreview: body.replace(/\s+/g, " ").slice(0, 220)
-      },
-      timestamp: Date.now()
-    })
-  }).catch(() => {});
-  // #endregion
   if (body) {
     parts.push(body);
   }
@@ -98,24 +54,6 @@ export function buildJobPostingDescriptionHtml(input: {
   parts.push(`<p>${escapeHtmlText("A candidatura deve ser feita pelo link oficial informado na vaga.")}</p>`);
 
   const finalHtml = parts.join("\n").slice(0, 100000);
-  // #region agent log
-  fetch("http://127.0.0.1:7370/ingest/b54ed65d-267c-4421-b3af-1ea0f3df3748", {
-    method: "POST",
-    headers: { "Content-Type": "application/json", "X-Debug-Session-Id": "582712" },
-    body: JSON.stringify({
-      sessionId: "582712",
-      runId,
-      hypothesisId: "H4_FINAL_HTML",
-      location: "lib/jobs/job-posting-description.ts:return",
-      message: "Final JobPosting description generated",
-      data: {
-        hasLocationIndicators: hasLocationIndicators(finalHtml),
-        finalPreview: finalHtml.replace(/\s+/g, " ").slice(0, 240)
-      },
-      timestamp: Date.now()
-    })
-  }).catch(() => {});
-  // #endregion
 
   return finalHtml;
 }

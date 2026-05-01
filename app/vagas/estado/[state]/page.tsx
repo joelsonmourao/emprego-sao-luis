@@ -79,28 +79,6 @@ export async function generateMetadata({
     internalLinkCount: 8
   });
 
-  // #region agent log
-  fetch("http://127.0.0.1:7370/ingest/b54ed65d-267c-4421-b3af-1ea0f3df3748", {
-    method: "POST",
-    headers: { "Content-Type": "application/json", "X-Debug-Session-Id": "bb2dcd" },
-    body: JSON.stringify({
-      sessionId: "bb2dcd",
-      runId: "pre-fix",
-      hypothesisId: "H5",
-      location: "app/vagas/estado/[state]/page.tsx",
-      message: "state listing indexing decision",
-      data: {
-        stateSlug: stateData.slug,
-        totalJobs: jobs.total,
-        page: parsed.page,
-        order: parsed.order ?? "relevance",
-        shouldIndex
-      },
-      timestamp: Date.now()
-    })
-  }).catch(() => {});
-  // #endregion
-
   return buildSiteMetadata({
     title: seo.title,
     description: seo.description,

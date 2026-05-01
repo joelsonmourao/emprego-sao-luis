@@ -236,11 +236,9 @@ export function AdminJobImporter() {
 
     try {
       // #region agent log
-      fetch('http://127.0.0.1:7370/ingest/b54ed65d-267c-4421-b3af-1ea0f3df3748',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'dd62ba'},body:JSON.stringify({sessionId:'dd62ba',runId:'post-fix',hypothesisId:'H9',location:'components/admin/admin-job-importer.tsx:handleImport:start-no-ai',message:'Frontend iniciou importacao sem IA',data:{validRows:validRows.length,useAi:false},timestamp:Date.now()})}).catch(()=>{});
       // #endregion
       if (validRows.length <= DIRECT_IMPORT_LIMIT) {
         // #region agent log
-        fetch('http://127.0.0.1:7370/ingest/b54ed65d-267c-4421-b3af-1ea0f3df3748',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'dd62ba'},body:JSON.stringify({sessionId:'dd62ba',runId:'post-fix',hypothesisId:'H6',location:'components/admin/admin-job-importer.tsx:handleImport:direct-mode-selected',message:'Frontend escolheu importacao direta em lotes',data:{validRows:validRows.length,useAi:false},timestamp:Date.now()})}).catch(()=>{});
         // #endregion
         const chunkSize = validRows.length <= 20 ? 1 : 10;
         const chunks = chunkRows(validRows, chunkSize);
@@ -273,7 +271,6 @@ export function AdminJobImporter() {
           const processedRows = Math.min(validRows.length, (batchIndex + 1) * chunkSize);
           const progress = Math.round((processedRows / validRows.length) * 100);
           // #region agent log
-          fetch('http://127.0.0.1:7370/ingest/b54ed65d-267c-4421-b3af-1ea0f3df3748',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'dd62ba'},body:JSON.stringify({sessionId:'dd62ba',runId:'post-fix',hypothesisId:'H7',location:'components/admin/admin-job-importer.tsx:handleImport:direct-mode-batch-complete',message:'Lote direto concluido',data:{batchIndex:batchIndex+1,totalBatches:chunks.length,batchRows:batchRows.length,processedRows,progress,httpStatus:response.status,batchDurationMs:Date.now()-batchStartedAt},timestamp:Date.now()})}).catch(()=>{});
           // #endregion
           setProgressMessage(
             `${progress}% (${processedRows}/${validRows.length}) - importadas ${importedTotal}, atualizadas ${updatedTotal}, erros ${errorsTotal}.`
@@ -281,7 +278,6 @@ export function AdminJobImporter() {
         }
 
         // #region agent log
-        fetch('http://127.0.0.1:7370/ingest/b54ed65d-267c-4421-b3af-1ea0f3df3748',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'dd62ba'},body:JSON.stringify({sessionId:'dd62ba',runId:'post-fix',hypothesisId:'H7',location:'components/admin/admin-job-importer.tsx:handleImport:direct-mode-finished',message:'Importacao direta finalizada no frontend',data:{rows:validRows.length,importedTotal,updatedTotal,errorsTotal,totalDurationMs:Date.now()-startedAt},timestamp:Date.now()})}).catch(()=>{});
         // #endregion
         setResultMessage(
           `Importacao concluida: ${importedTotal} vaga(s) importada(s), ${updatedTotal} atualizada(s), ${errorsTotal} erro(s).`
@@ -291,7 +287,6 @@ export function AdminJobImporter() {
       }
 
       // #region agent log
-      fetch('http://127.0.0.1:7370/ingest/b54ed65d-267c-4421-b3af-1ea0f3df3748',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'dd62ba'},body:JSON.stringify({sessionId:'dd62ba',runId:'post-fix',hypothesisId:'H6',location:'components/admin/admin-job-importer.tsx:handleImport:queue-mode-selected',message:'Frontend escolheu modo fila sem IA',data:{validRows:validRows.length,useAi:false},timestamp:Date.now()})}).catch(()=>{});
       // #endregion
       const response = await fetch("/api/admin/import/jobs", {
         method: "POST",
@@ -304,7 +299,6 @@ export function AdminJobImporter() {
 
       if (!response.ok || !result.ok) {
         // #region agent log
-        fetch('http://127.0.0.1:7370/ingest/b54ed65d-267c-4421-b3af-1ea0f3df3748',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'dd62ba'},body:JSON.stringify({sessionId:'dd62ba',runId:'pre-fix',hypothesisId:'H4',location:'components/admin/admin-job-importer.tsx:handleImport:error-response',message:'Frontend recebeu erro na criacao da fila',data:{httpStatus:response.status,error:result.error ?? null},timestamp:Date.now()})}).catch(()=>{});
         // #endregion
         const errorMessage = result.error || result.message || "Nao foi possivel importar a planilha.";
         setResultMessage(`ERRO: ${errorMessage}`);
@@ -317,7 +311,6 @@ export function AdminJobImporter() {
 
       if (!result.queueId) {
         // #region agent log
-        fetch('http://127.0.0.1:7370/ingest/b54ed65d-267c-4421-b3af-1ea0f3df3748',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'dd62ba'},body:JSON.stringify({sessionId:'dd62ba',runId:'pre-fix',hypothesisId:'H5',location:'components/admin/admin-job-importer.tsx:handleImport:missingQueueId',message:'API respondeu sem queueId',data:{ok:result.ok ?? null,status:result.status ?? null},timestamp:Date.now()})}).catch(()=>{});
         // #endregion
         setResultMessage("ERRO: fila de importacao nao foi criada.");
         return;
@@ -342,10 +335,8 @@ export function AdminJobImporter() {
         });
         const statusResult = (await statusResponse.json()) as ImportStatusResponse;
         // #region agent log
-        fetch('http://127.0.0.1:7370/ingest/b54ed65d-267c-4421-b3af-1ea0f3df3748',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'dd62ba'},body:JSON.stringify({sessionId:'dd62ba',runId:'post-fix',hypothesisId:'H8',location:'components/admin/admin-job-importer.tsx:handleImport:queue-polling',message:'Frontend em polling de fila',data:{queueId,pollAttempts,httpStatus:statusResponse.status,queueStatus:statusResult.queue?.status ?? null,processedRows:statusResult.queue?.processedRows ?? null,totalRows:statusResult.queue?.totalRows ?? null,progress:statusResult.queue?.progress ?? null},timestamp:Date.now()})}).catch(()=>{});
         // #endregion
         // #region agent log
-        fetch('http://127.0.0.1:7370/ingest/b54ed65d-267c-4421-b3af-1ea0f3df3748',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'dd62ba'},body:JSON.stringify({sessionId:'dd62ba',runId:'pre-fix',hypothesisId:'H1',location:'components/admin/admin-job-importer.tsx:handleImport:poll',message:'Polling do status da fila',data:{queueId,httpStatus:statusResponse.status,queueStatus:statusResult.queue?.status ?? null,processedRows:statusResult.queue?.processedRows ?? null,totalRows:statusResult.queue?.totalRows ?? null,progress:statusResult.queue?.progress ?? null},timestamp:Date.now()})}).catch(()=>{});
         // #endregion
         if (!statusResponse.ok || !statusResult.ok || !statusResult.queue) {
           setResultMessage(`ERRO: ${statusResult.error || "Nao foi possivel acompanhar o progresso da importacao."}`);
@@ -374,7 +365,6 @@ export function AdminJobImporter() {
       }
     } catch (error) {
       // #region agent log
-      fetch('http://127.0.0.1:7370/ingest/b54ed65d-267c-4421-b3af-1ea0f3df3748',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'dd62ba'},body:JSON.stringify({sessionId:'dd62ba',runId:'pre-fix',hypothesisId:'H4',location:'components/admin/admin-job-importer.tsx:handleImport:catch',message:'Erro de rede no frontend',data:{error:error instanceof Error ? error.message : 'erro-desconhecido'},timestamp:Date.now()})}).catch(()=>{});
       // #endregion
       console.error("Erro na requisicao de importacao:", error);
       setResultMessage(`ERRO DE REDE: ${error instanceof Error ? error.message : "Falha na comunicacao com o servidor."}`);

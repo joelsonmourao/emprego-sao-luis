@@ -148,39 +148,9 @@ export function parseFlexibleDateToUtc(value: string | undefined | null): Date |
 
   const fallback = new Date(s);
   if (!Number.isNaN(fallback.getTime())) {
-    // #region agent log
-    fetch("http://127.0.0.1:7370/ingest/b54ed65d-267c-4421-b3af-1ea0f3df3748", {
-      method: "POST",
-      headers: { "Content-Type": "application/json", "X-Debug-Session-Id": "582712" },
-      body: JSON.stringify({
-        sessionId: "582712",
-        runId: "date-parse",
-        hypothesisId: "H_TZ_FALLBACK",
-        location: "lib/date-utils.ts",
-        message: "Data parseada com fallback nativo (verificar formato)",
-        data: { raw: s.slice(0, 80) },
-        timestamp: Date.now()
-      })
-    }).catch(() => {});
-    // #endregion
     return fallback;
   }
 
-  // #region agent log
-  fetch("http://127.0.0.1:7370/ingest/b54ed65d-267c-4421-b3af-1ea0f3df3748", {
-    method: "POST",
-    headers: { "Content-Type": "application/json", "X-Debug-Session-Id": "582712" },
-    body: JSON.stringify({
-      sessionId: "582712",
-      runId: "date-parse",
-      hypothesisId: "H_TZ_INVALID",
-      location: "lib/date-utils.ts",
-      message: "Data invalida na entrada",
-      data: { raw: s.slice(0, 80) },
-      timestamp: Date.now()
-    })
-  }).catch(() => {});
-  // #endregion
 
   return null;
 }
