@@ -42,12 +42,14 @@ export async function generateMetadata({
 
   const city = await getCityByStateAndSlug(estado, cidade);
   const pathname = jovemAprendizCityPath(estado, cidade);
+  const canonicalPath = city ? getCityJobsPath(city.slug) : getCityJobsPath(cidade);
 
   if (!city) {
     return buildSiteMetadata({
       title: "Cidade não encontrada",
       description: "Página não encontrada.",
       pathname,
+      canonicalUrl: canonicalPath,
       noIndex: true
     });
   }
@@ -60,8 +62,9 @@ export async function generateMetadata({
     title,
     description,
     pathname,
-    canonicalUrl: pathname,
-    noIndex: jobs.total === 0 || parsed.page > 1 || (parsed.order ?? "relevance") !== "relevance"
+    canonicalUrl: canonicalPath,
+    // Variante programatica mantida apenas para navegacao e UX.
+    noIndex: true
   });
 }
 

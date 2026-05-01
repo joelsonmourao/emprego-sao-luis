@@ -6,8 +6,7 @@ import { EMPLOYMENT_CATEGORIES } from "@/lib/employment-categories";
 import { getCityJobsPath, getCompanyJobsPath, getJobPath } from "@/lib/seo/jobs-pages";
 import {
   jovemAprendizCategoryPath,
-  jovemAprendizCityPath,
-  jovemAprendizCompanyPath
+  jovemAprendizCityPath
 } from "@/lib/seo/jovem-aprendiz-programmatic";
 import { shouldIndexPage } from "@/lib/seo/indexing";
 import { getAllPublishedPostEntries } from "@/lib/repositories/blog";
@@ -254,11 +253,12 @@ async function computeSitemapManifest(): Promise<SitemapManifest> {
     ...cities.flatMap((city) => {
       const total = cityStateJobCounts.get(`${city.state.slug}__${city.slug}`) ?? 0;
       if (total <= 0) return [];
-      return [toSitemapEntry(jovemAprendizCityPath(city.state.slug, city.slug), city.updatedAt, { changefreq: "daily", priority: 0.7 })];
+      // Rotas programaticas de cidade ficam fora do sitemap para evitar duplicidade com /vagas/cidade/[slug].
+      return [];
     }),
-    ...companyHubs.flatMap((company) => {
-      if (!company.count) return [];
-      return [toSitemapEntry(jovemAprendizCompanyPath(company.slug), latestJobsDate, { changefreq: "weekly", priority: 0.5 })];
+    ...companyHubs.flatMap(() => {
+      // Rotas programaticas de empresa ficam fora do sitemap para evitar duplicidade com /empresa/[slug]/jovem-aprendiz.
+      return [];
     }),
     ...EMPLOYMENT_CATEGORIES.flatMap((category) => {
       const total = employmentCounts.get(category.employmentType) ?? 0;

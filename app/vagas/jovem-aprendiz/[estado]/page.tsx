@@ -42,12 +42,14 @@ export async function generateMetadata({
 
   const state = await getStateBySlug(estado);
   const pathname = jovemAprendizStatePath(estado);
+  const canonicalPath = getStateJobsPath(estado);
 
   if (!state) {
     return buildSiteMetadata({
       title: "Estado não encontrado",
       description: "Página não encontrada.",
       pathname,
+      canonicalUrl: canonicalPath,
       noIndex: true
     });
   }
@@ -60,8 +62,9 @@ export async function generateMetadata({
     title,
     description,
     pathname,
-    canonicalUrl: pathname,
-    noIndex: jobs.total === 0 || parsed.page > 1 || (parsed.order ?? "relevance") !== "relevance"
+    canonicalUrl: canonicalPath,
+    // Variante programatica mantida apenas para navegacao e UX.
+    noIndex: true
   });
 }
 

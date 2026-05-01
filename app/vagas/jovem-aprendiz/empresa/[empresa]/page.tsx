@@ -41,12 +41,14 @@ export async function generateMetadata({
 
   const company = await getCompanyHubBySlug(empresa);
   const pathname = jovemAprendizCompanyPath(empresa);
+  const canonicalPath = getCompanyJobsPath(empresa);
 
   if (!company) {
     return buildSiteMetadata({
       title: "Empresa não encontrada",
       description: "Página não encontrada.",
       pathname,
+      canonicalUrl: canonicalPath,
       noIndex: true
     });
   }
@@ -59,9 +61,10 @@ export async function generateMetadata({
     title,
     description,
     pathname,
-    canonicalUrl: pathname,
+    canonicalUrl: canonicalPath,
     socialImageUrl: company.socialImageUrl || company.logoUrl || undefined,
-    noIndex: jobs.total === 0 || parsed.page > 1 || (parsed.order ?? "relevance") !== "relevance"
+    // Variante programatica mantida apenas para navegacao e UX.
+    noIndex: true
   });
 }
 
