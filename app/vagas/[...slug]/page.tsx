@@ -9,7 +9,6 @@ import { resolveCompanyJobsPageMetadata } from "@/lib/seo/company-jobs-metadata"
 import { buildJobPublisherName } from "@/lib/seo/job-publisher";
 import { buildJobDetailSeo } from "@/lib/seo/jobs-pages";
 import { buildBreadcrumbJsonLd, buildJobPostingJsonLd, stringifyJobPostingJsonLd, stringifyJsonLdSafe } from "@/lib/seo/json-ld";
-import { getCityCoordinates } from "@/lib/seo/city-coordinates";
 import { buildSiteMetadata } from "@/lib/seo/metadata";
 import { getJobBySlug } from "@/lib/repositories/jobs";
 import { isRemovedJobSlug } from "@/lib/seo/removed-job-slugs";
@@ -155,7 +154,6 @@ export default async function VagasCatchAllPage({
     const citySlug = safeString(job.city?.slug, "brasil");
     const stateCode = safeString(job.state?.code, "BR");
     const stateName = safeString(job.state?.name, "Brasil");
-    const coordinates = getCityCoordinates(job.city?.name ?? cityName, job.state?.code ?? stateCode);
     const displayTitle = resolvePublicJobTitle({
       title: job.title,
       seoTitle: job.seoTitle,
@@ -186,8 +184,6 @@ export default async function VagasCatchAllPage({
         salaryMax: job.salaryMax,
         workHours: job.workHours,
         countryCode: "BR",
-        latitude: coordinates?.latitude ?? null,
-        longitude: coordinates?.longitude ?? null,
         employmentType: job.employmentType,
         applyUrl: job.applyUrl
       });

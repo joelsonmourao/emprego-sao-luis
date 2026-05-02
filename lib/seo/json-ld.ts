@@ -4,6 +4,7 @@ import { normalizeDatePostedForSchema, normalizeValidThroughSchemaString } from 
 import { buildJobPostingDescriptionHtml } from "@/lib/jobs/job-posting-description";
 import { validateJobPostingMinimum } from "@/lib/jobs/job-posting-validate";
 import { employmentTypeToSchemaValue } from "@/lib/jobs/employment-type";
+import { getGeoCoordinatesByCityState, resolveBrazilUfFromJobState } from "@/lib/geo/municipios-coordenadas";
 import { getReferencePostalCodeForCity } from "@/lib/seo/br-reference-postal";
 import { buildJobPublisherName } from "@/lib/seo/job-publisher";
 import { absoluteUrl } from "@/lib/utils";
@@ -85,8 +86,6 @@ export type JobPostingJsonLdInput = {
   streetAddress?: string | null;
   postalCode?: string | null;
   countryCode?: string | null;
-  latitude?: number | null;
-  longitude?: number | null;
   employmentType: EmploymentType;
   applyUrl: string;
 };
@@ -151,15 +150,24 @@ function isPlaceholderStreetAddress(value: string | undefined | null) {
 }
 
 async function buildJobLocationBlock(job: JobPostingJsonLdInput) {
-  const country = (job.countryCode ?? "BR").trim() || "BR";
-  const postal = job.postalCode?.trim() || (await getReferencePostalCodeForCity({ stateCode: job.stateCode, citySlug: job.citySlug }));
+  const countryCode = ((job.countryCode ?? "BR").trim() || "BR").toUpperCase();
+  const resolvedUf = resolveBrazilUfFromJobState(job.stateCode, job.stateName);
+  const stateForPostal = resolvedUf ?? job.stateCode.trim();
+  const postal =
+    job.postalCode?.trim() ||
+    (await getReferencePostalCodeForCity({ stateCode: stateForPostal || job.stateCode, citySlug: job.citySlug }));
   const street = job.streetAddress?.trim();
+
+  const addressCountry =
+    !countryCode || countryCode === "BR"
+      ? { "@type": "Country", name: "Brazil" }
+      : { "@type": "Country", name: countryCode };
 
   const address: Record<string, unknown> = {
     "@type": "PostalAddress",
-    addressLocality: job.cityName,
-    addressRegion: job.stateCode,
-    addressCountry: country.length === 2 ? country : "BR"
+    addressLocality: job.cityName.trim(),
+    addressRegion: resolvedUf ?? job.stateCode.trim(),
+    addressCountry
   };
 
   if (postal && !isPlaceholderSentinel(postal)) {
@@ -175,14 +183,17 @@ async function buildJobLocationBlock(job: JobPostingJsonLdInput) {
     address
   };
 
-  const latitude = typeof job.latitude === "number" && Number.isFinite(job.latitude) ? job.latitude : null;
-  const longitude = typeof job.longitude === "number" && Number.isFinite(job.longitude) ? job.longitude : null;
-  if (latitude !== null && longitude !== null) {
-    place.geo = {
-      "@type": "GeoCoordinates",
-      latitude,
-      longitude
-    };
+  const cityTrim = job.cityName.trim();
+  const ufHint = resolvedUf ?? (job.stateCode.trim() || job.stateName.trim());
+  if (cityTrim && ufHint) {
+    const coords = getGeoCoordinatesByCityState(cityTrim, ufHint);
+    if (coords) {
+      place.geo = {
+        "@type": "GeoCoordinates",
+        latitude: coords.latitude,
+        longitude: coords.longitude
+      };
+    }
   }
 
   return place;
