@@ -1,11 +1,12 @@
 import type { EmploymentType } from "@prisma/client";
 
+import { siteConfig } from "@/lib/constants";
 import { normalizeDatePostedForSchema, normalizeValidThroughSchemaString } from "@/lib/date-utils";
+import { getGeoCoordinatesByCityState, resolveBrazilUfFromJobState } from "@/lib/geo/municipios-coordenadas";
 import { buildJobPostingDescriptionHtml } from "@/lib/jobs/job-posting-description";
 import { validateJobPostingMinimum } from "@/lib/jobs/job-posting-validate";
 import { employmentTypeToSchemaValue } from "@/lib/jobs/employment-type";
 import { getReferencePostalCodeForCity } from "@/lib/seo/br-reference-postal";
-import { buildJobPublisherName } from "@/lib/seo/job-publisher";
 import { absoluteUrl } from "@/lib/utils";
 
 export function buildOrganizationJsonLd(input?: { name?: string; logoUrl?: string }) {
@@ -85,8 +86,6 @@ export type JobPostingJsonLdInput = {
   streetAddress?: string | null;
   postalCode?: string | null;
   countryCode?: string | null;
-  latitude?: number | null;
-  longitude?: number | null;
   employmentType: EmploymentType;
   applyUrl: string;
 };
@@ -151,15 +150,24 @@ function isPlaceholderStreetAddress(value: string | undefined | null) {
 }
 
 async function buildJobLocationBlock(job: JobPostingJsonLdInput) {
-  const country = (job.countryCode ?? "BR").trim() || "BR";
-  const postal = job.postalCode?.trim() || (await getReferencePostalCodeForCity({ stateCode: job.stateCode, citySlug: job.citySlug }));
+  const countryCode = ((job.countryCode ?? "BR").trim() || "BR").toUpperCase();
+  const resolvedUf = resolveBrazilUfFromJobState(job.stateCode, job.stateName);
+  const stateForPostal = resolvedUf ?? job.stateCode.trim();
+  const postal =
+    job.postalCode?.trim() ||
+    (await getReferencePostalCodeForCity({ stateCode: stateForPostal || job.stateCode, citySlug: job.citySlug }));
   const street = job.streetAddress?.trim();
+
+  const addressCountry =
+    !countryCode || countryCode === "BR"
+      ? { "@type": "Country", name: "Brazil" }
+      : { "@type": "Country", name: countryCode };
 
   const address: Record<string, unknown> = {
     "@type": "PostalAddress",
-    addressLocality: job.cityName,
-    addressRegion: job.stateCode,
-    addressCountry: country.length === 2 ? country : "BR"
+    addressLocality: job.cityName.trim(),
+    addressRegion: resolvedUf ?? job.stateCode.trim(),
+    addressCountry
   };
 
   if (postal && !isPlaceholderSentinel(postal)) {
@@ -175,37 +183,18 @@ async function buildJobLocationBlock(job: JobPostingJsonLdInput) {
     address
   };
 
-  const latitude = typeof job.latitude === "number" && Number.isFinite(job.latitude) ? job.latitude : null;
-  const longitude = typeof job.longitude === "number" && Number.isFinite(job.longitude) ? job.longitude : null;
-  if (latitude !== null && longitude !== null) {
-    place.geo = {
-      "@type": "GeoCoordinates",
-      latitude,
-      longitude
-    };
+  const cityTrim = job.cityName.trim();
+  const ufHint = resolvedUf ?? (job.stateCode.trim() || job.stateName.trim());
+  if (cityTrim && ufHint) {
+    const coords = getGeoCoordinatesByCityState(cityTrim, ufHint);
+    if (coords) {
+      place.geo = {
+        "@type": "GeoCoordinates",
+        latitude: coords.latitude,
+        longitude: coords.longitude
+      };
+    }
   }
-
-  // #region agent log
-  fetch("http://127.0.0.1:7370/ingest/b54ed65d-267c-4421-b3af-1ea0f3df3748", {
-    method: "POST",
-    headers: { "Content-Type": "application/json", "X-Debug-Session-Id": "582712" },
-    body: JSON.stringify({
-      sessionId: "582712",
-      runId: "jobposting-geo",
-      hypothesisId: "H_GEO_OUTPUT_BUILD",
-      location: "lib/seo/json-ld.ts:buildJobLocationBlock",
-      message: "Bloco de localizacao do JobPosting montado",
-      data: {
-        cityName: job.cityName,
-        stateCode: job.stateCode,
-        hasGeo: Boolean(place.geo),
-        latitude: latitude ?? null,
-        longitude: longitude ?? null
-      },
-      timestamp: Date.now()
-    })
-  }).catch(() => {});
-  // #endregion
 
   return place;
 }
@@ -229,22 +218,6 @@ export async function buildJobPostingJsonLd(job: JobPostingJsonLdInput): Promise
     expiresAt: job.expiresAt
   });
 
-  // #region agent log
-  fetch("http://127.0.0.1:7370/ingest/b54ed65d-267c-4421-b3af-1ea0f3df3748", {
-    method: "POST",
-    headers: { "Content-Type": "application/json", "X-Debug-Session-Id": "582712" },
-    body: JSON.stringify({
-      sessionId: "582712",
-      runId: "jobposting-tz",
-      hypothesisId: "H_TZ_LD",
-      location: "lib/seo/json-ld.ts",
-      message: "JobPosting datePosted e validThrough normalizados (BR)",
-      data: { slug: job.slug, datePostedRaw, validThroughRaw },
-      timestamp: Date.now()
-    })
-  }).catch(() => {});
-  // #endregion
-
   const employmentTypeRaw = employmentTypeToSchemaValue(job.employmentType, { title: job.displayTitle });
   const jobUrl = absoluteUrl(`/vagas/${job.slug}`);
   const sourceUrl = job.applyUrl?.trim() || undefined;
@@ -256,7 +229,7 @@ export async function buildJobPostingJsonLd(job: JobPostingJsonLdInput): Promise
     url: jobUrl,
     identifier: {
       "@type": "PropertyValue",
-      name: buildJobPublisherName(job.cityName, job.stateCode),
+      name: siteConfig.name,
       value: (job.externalId?.trim() || job.id || job.slug).trim()
     },
     datePosted: datePostedRaw,
@@ -294,45 +267,8 @@ export async function buildJobPostingJsonLd(job: JobPostingJsonLdInput): Promise
   });
 
   if (!validation.ok) {
-    // #region agent log
-    fetch("http://127.0.0.1:7370/ingest/b54ed65d-267c-4421-b3af-1ea0f3df3748", {
-      method: "POST",
-      headers: { "Content-Type": "application/json", "X-Debug-Session-Id": "582712" },
-      body: JSON.stringify({
-        sessionId: "582712",
-        runId: "jobposting-validate",
-        hypothesisId: "H_VAL",
-        location: "lib/seo/json-ld.ts",
-        message: "JobPosting schema omitido por validacao minima",
-        data: { slug: job.slug, reason: validation.reason },
-        timestamp: Date.now()
-      })
-    }).catch(() => {});
-    // #endregion
     return null;
   }
-
-  // #region agent log
-  fetch("http://127.0.0.1:7370/ingest/b54ed65d-267c-4421-b3af-1ea0f3df3748", {
-    method: "POST",
-    headers: { "Content-Type": "application/json", "X-Debug-Session-Id": "582712" },
-    body: JSON.stringify({
-      sessionId: "582712",
-      runId: "jobposting-ok",
-      hypothesisId: "H_LD",
-      location: "lib/seo/json-ld.ts",
-      message: "JobPosting schema montado",
-      data: {
-        slug: job.slug,
-        keys: Object.keys(cleaned),
-        employmentType: cleaned.employmentType,
-        hasBaseSalary: Boolean(cleaned.baseSalary),
-        hiringOrganization: cleaned.hiringOrganization
-      },
-      timestamp: Date.now()
-    })
-  }).catch(() => {});
-  // #endregion
 
   return cleaned;
 }

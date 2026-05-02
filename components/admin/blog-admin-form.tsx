@@ -51,26 +51,6 @@ export function BlogAdminForm({
 
   async function onSubmit(values: BlogFormInput) {
     setServerError("");
-    // #region agent log
-    fetch("http://127.0.0.1:7370/ingest/b54ed65d-267c-4421-b3af-1ea0f3df3748", {
-      method: "POST",
-      headers: { "Content-Type": "application/json", "X-Debug-Session-Id": "582712" },
-      body: JSON.stringify({
-        sessionId: "582712",
-        runId: "blog-markdown",
-        hypothesisId: "H5_INPUT_FIELD_MISMATCH",
-        location: "components/admin/blog-admin-form.tsx:onSubmit",
-        message: "Conteudo enviado no form de blog",
-        data: {
-          excerptLen: values.excerpt.length,
-          contentLen: values.contentHtml.length,
-          excerptMarkdown: looksLikeMarkdown(values.excerpt),
-          contentMarkdown: looksLikeMarkdown(values.contentHtml)
-        },
-        timestamp: Date.now()
-      })
-    }).catch(() => {});
-    // #endregion
 
     const response = await fetch(mode === "create" ? "/api/admin/posts" : `/api/admin/posts/${postId}`, {
       method: mode === "create" ? "POST" : "PATCH",

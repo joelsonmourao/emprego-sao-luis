@@ -353,9 +353,12 @@ export function createXmlResponse(xml: string) {
   });
 }
 
-/** XML válido quando o manifest não pode ser calculado (falha de banco, etc.). */
+/** XML válido quando o manifest não pode ser calculado (não chama DB nem SITE_URL). */
+const EMPTY_SITEMAP_INDEX_XML =
+  '<?xml version="1.0" encoding="UTF-8"?><sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"></sitemapindex>';
+
 export function buildEmptySitemapIndexXml() {
-  return buildSitemapIndexXml([]);
+  return EMPTY_SITEMAP_INDEX_XML;
 }
 
 export function buildEmptyUrlSetXml() {

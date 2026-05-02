@@ -76,26 +76,6 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function RootLayout({ children }: Readonly<{ children: ReactNode }>) {
   const settings = await getSiteSettings();
   const adsensePublisherId = normalizeAdsensePublisherId(settings.google.adsensePublisherId) ?? "ca-pub-4279201625870524";
-  // #region agent log
-  fetch("http://127.0.0.1:7370/ingest/b54ed65d-267c-4421-b3af-1ea0f3df3748", {
-    method: "POST",
-    headers: { "Content-Type": "application/json", "X-Debug-Session-Id": "582712" },
-    body: JSON.stringify({
-      sessionId: "582712",
-      runId: "adsense-auto",
-      hypothesisId: "H1_SERVER_CONFIG",
-      location: "app/layout.tsx:RootLayout",
-      message: "Configuracao AdSense resolvida no servidor",
-      data: {
-        adsenseEnabled: settings.google.adsenseEnabled,
-        adsenseAutoAds: settings.google.adsenseAutoAds,
-        hasConfiguredPublisher: Boolean((settings.google.adsensePublisherId || "").trim()),
-        resolvedPublisherId: adsensePublisherId
-      },
-      timestamp: Date.now()
-    })
-  }).catch(() => {});
-  // #endregion
 
   return (
     <html lang="pt-BR">

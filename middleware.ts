@@ -2,13 +2,23 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
 import { ADMIN_AUTH_COOKIE, verifyAdminSessionToken } from "@/lib/auth-token";
-import { sendDebugLog } from "@/lib/perf/debug-log";
 import { isRemovedJobSlug } from "@/lib/seo/removed-job-slugs";
 import { JOB_DETAIL_PATH_RESERVED_FIRST_SEGMENTS } from "@/lib/seo/vagas-job-path";
 
 export async function middleware(request: NextRequest) {
-  const startedAt = Date.now();
   const { pathname } = request.nextUrl;
+  const isPublicBypassPath =
+    pathname === "/" ||
+    pathname === "/robots.txt" ||
+    pathname === "/sitemap.xml" ||
+    pathname.startsWith("/sitemaps/") ||
+    pathname === "/favicon.ico" ||
+    pathname === "/icon.svg";
+
+  if (isPublicBypassPath) {
+    return NextResponse.next();
+  }
+
   const hostname = request.nextUrl.hostname.toLowerCase();
   const forwardedProto = request.headers.get("x-forwarded-proto")?.split(",")[0]?.trim().toLowerCase();
   const isSecureRequest = request.nextUrl.protocol === "https:" || forwardedProto === "https";
@@ -99,21 +109,6 @@ export async function middleware(request: NextRequest) {
 
   if (isAdminPage || isAdminApi) {
     response.headers.set("X-Robots-Tag", "noindex, nofollow");
-  }
-
-  if (request.method === "GET" && (pathname === "/" || pathname.startsWith("/vagas") || pathname.startsWith("/blog"))) {
-    // #region agent log
-    sendDebugLog({
-      runId: "perf-audit",
-      hypothesisId: "H10",
-      location: "middleware.ts",
-      message: "middleware processed public route",
-      data: { pathname, elapsedMs: Date.now() - startedAt, isSecureRequest, forwardedProto: forwardedProto ?? null }
-    });
-    // #endregion
-    // #region agent log
-    fetch('http://127.0.0.1:7370/ingest/b54ed65d-267c-4421-b3af-1ea0f3df3748',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'dd62ba'},body:JSON.stringify({sessionId:'dd62ba',runId:'post-fix',hypothesisId:'H11',location:'middleware.ts:csp',message:'CSP definido com upgrade condicional',data:{pathname,isSecureRequest,forwardedProto:forwardedProto ?? null,hasUpgradeDirective:isSecureRequest},timestamp:Date.now()})}).catch(()=>{});
-    // #endregion
   }
 
   return response;

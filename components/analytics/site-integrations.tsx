@@ -144,40 +144,6 @@ export function SiteIntegrations({ consentBanner, google, initialConsentValue }:
   const shouldLoadGa = analyticsAllowed && Boolean(google.ga4MeasurementId);
   const shouldLoadGtm = analyticsAllowed && Boolean(google.gtmContainerId);
 
-  useEffect(() => {
-    const adsenseScript = typeof document !== "undefined"
-      ? document.querySelector('script[src*="googlesyndication.com/pagead/js/adsbygoogle.js"]')
-      : null;
-    const adsenseMeta = typeof document !== "undefined"
-      ? document.querySelector('meta[name="google-adsense-account"]')
-      : null;
-
-    // #region agent log
-    fetch("http://127.0.0.1:7370/ingest/b54ed65d-267c-4421-b3af-1ea0f3df3748", {
-      method: "POST",
-      headers: { "Content-Type": "application/json", "X-Debug-Session-Id": "582712" },
-      body: JSON.stringify({
-        sessionId: "582712",
-        runId: "adsense-auto",
-        hypothesisId: "H2_CLIENT_RUNTIME",
-        location: "components/analytics/site-integrations.tsx:useEffect",
-        message: "Estado runtime do AdSense no cliente",
-        data: {
-          consentModeEnabled: google.consentModeEnabled,
-          adsenseEnabled: google.adsenseEnabled,
-          adsenseAutoAds: google.adsenseAutoAds,
-          consentRequired,
-          consentAdvertising: consent?.advertising ?? null,
-          hasAdsenseScriptTag: Boolean(adsenseScript),
-          hasAdsenseMetaTag: Boolean(adsenseMeta),
-          adsbygoogleQueueExists: typeof window !== "undefined" && Array.isArray(window.adsbygoogle)
-        },
-        timestamp: Date.now()
-      })
-    }).catch(() => {});
-    // #endregion
-  }, [consent?.advertising, consentRequired, google.adsenseAutoAds, google.adsenseEnabled, google.consentModeEnabled]);
-
   return (
     <>
       {shouldLoadGa ? (

@@ -5,7 +5,6 @@ import { markExpiredJobsInactive } from "@/lib/jobs/job-expiry";
 import { prisma } from "@/lib/db";
 import { pagination } from "@/lib/constants";
 import { PUBLIC_JOBS_CACHE_TAG } from "@/lib/public-revalidate";
-import { sendDebugLog } from "@/lib/perf/debug-log";
 
 /** Full job graph for detalhe da vaga, JSON-LD e admin. */
 const jobDetailInclude = {
@@ -216,19 +215,6 @@ const getJobsListCached = unstable_cache(async (key: string) => {
 
 const getJobsListCachedWithPerf = unstable_cache(async (key: string) => {
   const result = await getJobsListCached(key);
-  // #region agent log
-  sendDebugLog({
-    runId: "perf-audit",
-    hypothesisId: "H12",
-    location: "lib/repositories/jobs.ts",
-    message: "jobs list query bundle",
-    data: {
-      total: result.total,
-      page: result.page,
-      returnedItems: result.items.length
-    }
-  });
-  // #endregion
   return result;
 }, ["jobs-list-perf-v1"], {
   revalidate: 600,

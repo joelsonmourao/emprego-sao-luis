@@ -6,16 +6,14 @@ import { JobUnavailableView } from "@/components/vagas/job-unavailable-view";
 import { isJobPastPublicDeadline } from "@/lib/jobs/job-expiry";
 import { resolvePublicJobTitle } from "@/lib/jobs/job-title";
 import { resolveCompanyJobsPageMetadata } from "@/lib/seo/company-jobs-metadata";
-import { buildJobPublisherName } from "@/lib/seo/job-publisher";
+import { JobBreadcrumbJsonLd } from "@/components/vagas/job-breadcrumb-json-ld";
+import { JobPostingJsonLd } from "@/components/vagas/job-posting-json-ld";
 import { buildJobDetailSeo } from "@/lib/seo/jobs-pages";
-import { buildBreadcrumbJsonLd, buildJobPostingJsonLd, stringifyJobPostingJsonLd, stringifyJsonLdSafe } from "@/lib/seo/json-ld";
-import { getCityCoordinates } from "@/lib/seo/city-coordinates";
 import { buildSiteMetadata } from "@/lib/seo/metadata";
-import { sendDebugLog } from "@/lib/perf/debug-log";
 import { getJobBySlug } from "@/lib/repositories/jobs";
 import { isRemovedJobSlug } from "@/lib/seo/removed-job-slugs";
 import { JOB_DETAIL_PATH_RESERVED_FIRST_SEGMENTS } from "@/lib/seo/vagas-job-path";
-import { absoluteUrl } from "@/lib/utils";
+import { getSiteSettings } from "@/lib/site-settings";
 
 export const revalidate = 1800;
 
@@ -31,20 +29,10 @@ export async function generateMetadata({
   params: Promise<{ slug: string[] }>;
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
-  const startedAt = Date.now();
   const { slug: segments } = await params;
   const rawSearch = await searchParams;
 
   if (!segments?.length) {
-    // #region agent log
-    sendDebugLog({
-      runId: "perf-audit",
-      hypothesisId: "H9",
-      location: "app/vagas/[...slug]/page.tsx",
-      message: "job metadata fallback path",
-      data: { elapsedMs: Date.now() - startedAt }
-    });
-    // #endregion
     return buildSiteMetadata({
       title: "Vagas",
       description: "Listagem de vagas.",
@@ -67,40 +55,10 @@ export async function generateMetadata({
     const job = await getJobBySlug(jobSlug);
 
     if (!job) {
-      // #region agent log
-      fetch("http://127.0.0.1:7370/ingest/b54ed65d-267c-4421-b3af-1ea0f3df3748", {
-        method: "POST",
-        headers: { "Content-Type": "application/json", "X-Debug-Session-Id": "582712" },
-        body: JSON.stringify({
-          sessionId: "582712",
-          runId: "metadata",
-          hypothesisId: "H_META",
-          location: "app/vagas/[...slug]/page.tsx",
-          message: "metadata notFound slug inexistente",
-          data: { slug: jobSlug },
-          timestamp: Date.now()
-        })
-      }).catch(() => {});
-      // #endregion
       notFound();
     }
 
     if (!job.isActive || isJobPastPublicDeadline(job)) {
-      // #region agent log
-      fetch("http://127.0.0.1:7370/ingest/b54ed65d-267c-4421-b3af-1ea0f3df3748", {
-        method: "POST",
-        headers: { "Content-Type": "application/json", "X-Debug-Session-Id": "582712" },
-        body: JSON.stringify({
-          sessionId: "582712",
-          runId: "metadata",
-          hypothesisId: "H_META",
-          location: "app/vagas/[...slug]/page.tsx",
-          message: "metadata notFound vaga inativa ou vencida",
-          data: { slug: job.slug, isActive: job.isActive },
-          timestamp: Date.now()
-        })
-      }).catch(() => {});
-      // #endregion
       notFound();
     }
 
@@ -118,7 +76,8 @@ export async function generateMetadata({
       stateCode: job.state.code,
       slug: job.slug
     });
-    const publisherDisplayName = buildJobPublisherName(job.city?.name, job.state?.code);
+    const settings = await getSiteSettings();
+    const siteBrandName = settings.siteName.trim();
     const metadata = await buildSiteMetadata({
       title: job.seoTitle ?? seo.title,
       description: job.seoDescription ?? seo.description,
@@ -128,10 +87,10 @@ export async function generateMetadata({
       socialImageUrl: job.heroImageUrl || job.company?.socialImageUrl || job.companyLogoUrl || undefined
     });
 
-    metadata.publisher = publisherDisplayName;
-    metadata.applicationName = publisherDisplayName;
+    metadata.publisher = siteBrandName;
+    metadata.applicationName = siteBrandName;
     if (metadata.openGraph) {
-      metadata.openGraph.siteName = publisherDisplayName;
+      metadata.openGraph.siteName = siteBrandName;
     }
 
     return metadata;
@@ -185,40 +144,10 @@ export default async function VagasCatchAllPage({
 
     const job = await getJobBySlug(segments[0]);
     if (!job) {
-      // #region agent log
-      fetch("http://127.0.0.1:7370/ingest/b54ed65d-267c-4421-b3af-1ea0f3df3748", {
-        method: "POST",
-        headers: { "Content-Type": "application/json", "X-Debug-Session-Id": "582712" },
-        body: JSON.stringify({
-          sessionId: "582712",
-          runId: "page",
-          hypothesisId: "H404",
-          location: "app/vagas/[...slug]/page.tsx",
-          message: "pagina vaga notFound slug inexistente",
-          data: { slug: segments[0] },
-          timestamp: Date.now()
-        })
-      }).catch(() => {});
-      // #endregion
       notFound();
     }
 
     if (!job.isActive || isJobPastPublicDeadline(job)) {
-      // #region agent log
-      fetch("http://127.0.0.1:7370/ingest/b54ed65d-267c-4421-b3af-1ea0f3df3748", {
-        method: "POST",
-        headers: { "Content-Type": "application/json", "X-Debug-Session-Id": "582712" },
-        body: JSON.stringify({
-          sessionId: "582712",
-          runId: "page",
-          hypothesisId: "H410",
-          location: "app/vagas/[...slug]/page.tsx",
-          message: "pagina vaga notFound inativa ou vencida",
-          data: { slug: job.slug, isActive: job.isActive },
-          timestamp: Date.now()
-        })
-      }).catch(() => {});
-      // #endregion
       notFound();
     }
 
@@ -226,29 +155,6 @@ export default async function VagasCatchAllPage({
     const citySlug = safeString(job.city?.slug, "brasil");
     const stateCode = safeString(job.state?.code, "BR");
     const stateName = safeString(job.state?.name, "Brasil");
-    const coordinates = getCityCoordinates(job.city?.name ?? cityName, job.state?.code ?? stateCode);
-    // #region agent log
-    fetch("http://127.0.0.1:7370/ingest/b54ed65d-267c-4421-b3af-1ea0f3df3748", {
-      method: "POST",
-      headers: { "Content-Type": "application/json", "X-Debug-Session-Id": "582712" },
-      body: JSON.stringify({
-        sessionId: "582712",
-        runId: "jobposting-geo",
-        hypothesisId: "H_GEO_INPUT_MISSING",
-        location: "app/vagas/[...slug]/page.tsx",
-        message: "Coordenadas resolvidas para JobPosting",
-        data: {
-          slug: job.slug,
-          city: job.city?.name ?? cityName,
-          state: job.state?.code ?? stateCode,
-          hasCoordinates: Boolean(coordinates),
-          latitude: coordinates?.latitude ?? null,
-          longitude: coordinates?.longitude ?? null
-        },
-        timestamp: Date.now()
-      })
-    }).catch(() => {});
-    // #endregion
     const displayTitle = resolvePublicJobTitle({
       title: job.title,
       seoTitle: job.seoTitle,
@@ -256,81 +162,43 @@ export default async function VagasCatchAllPage({
       stateCode: job.state?.code ?? stateCode
     });
 
-    let jobPostingScript: string | null = null;
-    try {
-      const jobPostingLd = await buildJobPostingJsonLd({
-        id: job.id,
-        externalId: job.externalId,
-        displayTitle,
-        summary: job.summary,
-        descriptionHtml: job.descriptionHtml,
-        slug: job.slug,
-        companyName: job.companyName,
-        cityName: job.city?.name ?? cityName,
-        citySlug,
-        stateCode: job.state?.code ?? stateCode,
-        stateName,
-        locationType: job.locationType,
-        publishedAt: job.publishedAt,
-        updatedAt: job.updatedAt,
-        expiresAt: job.expiresAt,
-        validThrough: job.validThrough ?? null,
-        salaryMin: job.salaryMin,
-        salaryMax: job.salaryMax,
-        workHours: job.workHours,
-        countryCode: "BR",
-        latitude: coordinates?.latitude ?? null,
-        longitude: coordinates?.longitude ?? null,
-        employmentType: job.employmentType,
-        applyUrl: job.applyUrl
-      });
+    const jobPostingInput = {
+      id: job.id,
+      externalId: job.externalId,
+      displayTitle,
+      summary: job.summary,
+      descriptionHtml: job.descriptionHtml,
+      slug: job.slug,
+      companyName: job.companyName,
+      cityName: job.city?.name ?? cityName,
+      citySlug,
+      stateCode: job.state?.code ?? stateCode,
+      stateName,
+      locationType: job.locationType,
+      publishedAt: job.publishedAt,
+      updatedAt: job.updatedAt,
+      expiresAt: job.expiresAt,
+      validThrough: job.validThrough ?? null,
+      salaryMin: job.salaryMin,
+      salaryMax: job.salaryMax,
+      workHours: job.workHours,
+      countryCode: "BR",
+      employmentType: job.employmentType,
+      applyUrl: job.applyUrl
+    };
 
-      jobPostingScript = jobPostingLd ? stringifyJobPostingJsonLd(jobPostingLd) : null;
-    } catch (error) {
-      // #region agent log
-      fetch("http://127.0.0.1:7370/ingest/b54ed65d-267c-4421-b3af-1ea0f3df3748", {
-        method: "POST",
-        headers: { "Content-Type": "application/json", "X-Debug-Session-Id": "582712" },
-        body: JSON.stringify({
-          sessionId: "582712",
-          runId: "page",
-          hypothesisId: "H_LD_ERR",
-          location: "app/vagas/[...slug]/page.tsx",
-          message: "falha ao montar JobPosting JSON-LD",
-          data: { slug: job.slug, err: error instanceof Error ? error.message : "unknown" },
-          timestamp: Date.now()
-        })
-      }).catch(() => {});
-      // #endregion
-      jobPostingScript = null;
-    }
-
-    const breadcrumbLd = buildBreadcrumbJsonLd([
+    const breadcrumbItems = [
       { name: "Home", path: "/" },
       { name: "Vagas", path: "/vagas" },
       { name: safeString(displayTitle, "Vaga"), path: `/vagas/${job.slug}` }
-    ]);
-    let breadcrumbScript: string;
-    try {
-      breadcrumbScript = stringifyJsonLdSafe(breadcrumbLd);
-    } catch {
-      breadcrumbScript = stringifyJsonLdSafe({
-        "@context": "https://schema.org",
-        "@type": "BreadcrumbList",
-        itemListElement: [
-          { "@type": "ListItem", position: 1, name: "Home", item: absoluteUrl("/") },
-          { "@type": "ListItem", position: 2, name: "Vagas", item: absoluteUrl("/vagas") },
-          { "@type": "ListItem", position: 3, name: safeString(displayTitle, "Vaga"), item: absoluteUrl(`/vagas/${job.slug}`) }
-        ]
-      });
-    }
+    ];
 
     return (
-      <>
-        {jobPostingScript ? <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jobPostingScript }} /> : null}
-        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: breadcrumbScript }} />
+      <main id="conteudo-principal-vaga" className="min-w-0">
+        <JobPostingJsonLd input={jobPostingInput} />
+        <JobBreadcrumbJsonLd items={breadcrumbItems} />
         <JobDetailView job={job} displayTitle={displayTitle} />
-      </>
+      </main>
     );
   }
 

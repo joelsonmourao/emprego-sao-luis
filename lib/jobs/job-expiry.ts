@@ -30,21 +30,6 @@ export async function markExpiredJobsInactive(): Promise<{ id: string; slug: str
 
   if (rows.length) {
     const brazilNow = getBrazilNow().format("YYYY-MM-DD HH:mm:ss Z");
-    // #region agent log
-    fetch("http://127.0.0.1:7370/ingest/b54ed65d-267c-4421-b3af-1ea0f3df3748", {
-      method: "POST",
-      headers: { "Content-Type": "application/json", "X-Debug-Session-Id": "582712" },
-      body: JSON.stringify({
-        sessionId: "582712",
-        runId: "expiry",
-        hypothesisId: "H_EXPIRE",
-        location: "lib/jobs/job-expiry.ts",
-        message: "Vagas desativadas por vencimento (SQL)",
-        data: { count: rows.length, brazilNow, slugs: rows.map((r) => r.slug).slice(0, 40) },
-        timestamp: Date.now()
-      })
-    }).catch(() => {});
-    // #endregion
     console.warn(`[job-expiry] Desativadas ${rows.length} vaga(s) por validade (agora BR ${brazilNow}): ${rows.map((r) => r.slug).join(", ")}`);
   }
 
