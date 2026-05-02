@@ -35,7 +35,7 @@ export async function generateMetadata() {
   return buildSiteMetadata({
     title: "Vagas de Jovem Aprendiz e Menor Aprendiz no Brasil",
     description:
-      "Encontre vagas de Jovem Aprendiz e Menor Aprendiz por cidade e estado, veja empresas que contratam e acesse dicas para curriculo, entrevista e primeiro emprego.",
+      "Encontre vagas de Jovem Aprendiz e Menor Aprendiz por cidade e estado, veja empresas que contratam e acesse dicas para currículo, entrevista e primeiro emprego.",
     pathname: "/"
   });
 }

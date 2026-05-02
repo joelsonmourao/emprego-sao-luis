@@ -2,7 +2,7 @@ export const siteConfig = {
   name: "Jovem Aprendiz Vagas",
   legalName: "Jovem Aprendiz Vagas",
   description:
-    "Portal com vagas de Jovem Aprendiz, cidades, empresas e dicas para quem esta buscando o primeiro emprego.",
+    "Portal com vagas de Jovem Aprendiz, cidades, empresas e dicas para quem está buscando o primeiro emprego.",
   defaultLocale: "pt-BR",
   keywords: [
     "jovem aprendiz",

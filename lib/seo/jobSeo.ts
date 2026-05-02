@@ -16,10 +16,6 @@ function vacancyCountPhrase(count: number, keyword: string) {
   return `${count} vaga(s) de ${keyword}`;
 }
 
-function vacancyCountWordVagas(count: number) {
-  return count === 1 ? "1 vaga" : `${count} vagas`;
-}
-
 /** Limita meta description (~160) cortando em espaço quando possível. */
 export function clampMetaDescription(text: string, max = 160) {
   const t = text.replace(/\s+/g, " ").trim();
@@ -35,23 +31,35 @@ export function generateJobCitySeoTitle(input: JobCitySeoBase) {
   return `${vacancyCountPhrase(input.count, input.keyword)} em ${input.city}, ${input.uf}`;
 }
 
+/** Texto fixo para meta description (sem cortar no meio de frase). */
 export function generateJobCitySeoDescription(input: JobCitySeoBase & { companies?: string[] }) {
   const loc = `${input.city}, ${input.uf}`;
-  const companies = (input.companies ?? []).map((c) => c.trim()).filter(Boolean);
-  const unique = [...new Set(companies)].slice(0, 3);
+  const kw = input.keyword;
+  const qty = input.count === 1 ? "1 vaga" : `${input.count} vagas`;
 
-  let text: string;
-  if (unique.length >= 2) {
-    const listed =
-      unique.length === 2
-        ? `${unique[0]} e ${unique[1]}`
-        : `${unique.slice(0, -1).join(", ")} e ${unique[unique.length - 1]}`;
-    text = `Confira ${vacancyCountWordVagas(input.count)} de ${input.keyword} em ${loc}, com oportunidades em empresas como ${listed}. Veja detalhes das vagas e como se candidatar.`;
-  } else {
-    text = `Confira ${vacancyCountWordVagas(input.count)} de ${input.keyword} em ${loc}. Veja oportunidades disponíveis, empresas contratando e detalhes para se candidatar.`;
+  const base = `Confira ${qty} de ${kw} em ${loc}. Veja oportunidades disponíveis, empresas contratando e detalhes para se candidatar.`;
+
+  const companies = (input.companies ?? []).map((c) => c.trim()).filter(Boolean);
+  const unique = [...new Set(companies)];
+
+  if (unique.length < 2) {
+    return base.length > 160 ? clampMetaDescription(base) : base;
   }
 
-  return clampMetaDescription(text);
+  const withTwo = (a: string, b: string) =>
+    `Confira ${qty} de ${kw} em ${loc}, com oportunidades em empresas como ${a}, ${b} e outras. Veja detalhes e saiba como se candidatar.`;
+
+  let rich = withTwo(unique[0], unique[1]);
+  if (rich.length <= 160) {
+    return rich;
+  }
+
+  rich = `Confira ${qty} de ${kw} em ${loc}, com oportunidades em empresas como ${unique[0]} e outras. Veja detalhes e saiba como se candidatar.`;
+  if (rich.length <= 160) {
+    return rich;
+  }
+
+  return base.length > 160 ? clampMetaDescription(base) : base;
 }
 
 export function generateJobCityH1(input: JobCitySeoBase) {

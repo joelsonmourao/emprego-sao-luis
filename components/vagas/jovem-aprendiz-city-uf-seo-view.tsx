@@ -93,7 +93,7 @@ export function JovemAprendizCityUfSeoView(props: JovemAprendizCityUfSeoViewProp
         data={buildBreadcrumbJsonLd([
           { name: "Home", path: "/" },
           { name: "Vagas", path: "/vagas" },
-          { name: "Jovem Aprendiz", path: "/vagas" },
+          { name: "Jovem Aprendiz", path: "/vagas/jovem-aprendiz" },
           { name: `${city.name}, ${city.state.code}`, path: pathname }
         ])}
       />
@@ -105,7 +105,7 @@ export function JovemAprendizCityUfSeoView(props: JovemAprendizCityUfSeoViewProp
         items={[
           { label: "Home", href: "/" },
           { label: "Vagas", href: "/vagas" },
-          { label: "Jovem Aprendiz", href: "/vagas" },
+          { label: "Jovem Aprendiz", href: "/vagas/jovem-aprendiz" },
           { label: `${city.name}, ${city.state.code}` }
         ]}
       />

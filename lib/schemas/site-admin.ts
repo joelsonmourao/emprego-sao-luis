@@ -207,7 +207,7 @@ export type SiteFaqEntry = z.infer<typeof faqSchema>;
 
 export const defaultSiteContent: SiteContent = {
   navigation: {
-    topBarText: "Vagas e dicas para quem esta buscando o primeiro emprego",
+    topBarText: "Vagas e dicas para quem está buscando o primeiro emprego",
     topBarLinkLabel: "Ler dicas do blog",
     topBarLinkHref: "/blog",
     headerCtaLabel: "Buscar vagas",
@@ -224,8 +224,8 @@ export const defaultSiteContent: SiteContent = {
   home: {
     heroBadge: "Portal de vagas para primeiro emprego",
     heroTitle: "Encontre vagas de Jovem Aprendiz por cargo, estado e cidade.",
-    heroDescription: "Busque oportunidades, navegue por vagas em destaque e acesse o blog com orientacoes de curriculo, entrevista e primeiro emprego.",
-    searchHelperText: "Pesquise por cargo, cidade e estado para chegar mais rapido nas vagas.",
+    heroDescription: "Busque oportunidades, navegue por vagas em destaque e acesse o blog com orientações de currículo, entrevista e primeiro emprego.",
+    searchHelperText: "Pesquise por cargo, cidade e estado para chegar mais rápido nas vagas.",
     primaryButton: {
       label: "Ver vagas",
       href: "/vagas"
@@ -239,7 +239,7 @@ export const defaultSiteContent: SiteContent = {
     quickJobsDescription: "Entre direto na lista principal e filtre por cidade e estado da vaga.",
     quickBlogEyebrow: "Acesso rapido",
     quickBlogTitle: "Acessar blog",
-    quickBlogDescription: "Veja dicas de curriculo, entrevista e primeiro emprego para se preparar melhor.",
+    quickBlogDescription: "Veja dicas de currículo, entrevista e primeiro emprego para se preparar melhor.",
     heroHighlights: [
       {
         title: "Ver vagas agora",
@@ -515,24 +515,24 @@ export const defaultSiteContent: SiteContent = {
     }
   },
   footer: {
-    navigationTitle: "Navegacao",
-    informationTitle: "Informacoes",
-    shortcutsTitle: "Atalhos uteis",
+    navigationTitle: "Navegação",
+    informationTitle: "Informações",
+    shortcutsTitle: "Atalhos úteis",
     description: "Um portal feito para ajudar jovens a encontrar vagas, conhecer empresas e se preparar melhor para o primeiro emprego.",
-    copyrightText: "© 2026 Jovem Aprendiz Vagas. Informacoes para quem esta em busca do primeiro emprego.",
+    copyrightText: "© 2026 Jovem Aprendiz Vagas. Informações para quem está em busca do primeiro emprego.",
     shortcuts: [
       {
         title: "Buscar por cidade e estado",
-        description: "Veja onde as oportunidades estao aparecendo mais perto de voce.",
+        description: "Veja onde as oportunidades estão aparecendo mais perto de você.",
         iconKey: "compass"
       },
       {
         title: "Acompanhar empresas",
-        description: "Descubra companhias que publicam vagas para Jovem Aprendiz com frequencia.",
+        description: "Descubra companhias que publicam vagas para Jovem Aprendiz com frequência.",
         iconKey: "handshake"
       },
       {
-        title: "Ler dicas de curriculo e entrevista",
+        title: "Ler dicas de currículo e entrevista",
         description: "Use o blog para se preparar melhor antes de se candidatar.",
         iconKey: "file-text"
       }
@@ -543,7 +543,7 @@ export const defaultSiteContent: SiteContent = {
 export const defaultSiteSettings: SiteSettings = {
   siteName: "Jovem Aprendiz Vagas",
   legalName: "Jovem Aprendiz Vagas",
-  shortDescription: "Vagas, cidades, empresas e dicas para quem esta buscando o primeiro emprego como Jovem Aprendiz.",
+  shortDescription: "Vagas, cidades, empresas e dicas para quem está buscando o primeiro emprego como Jovem Aprendiz.",
   logoUrl: "/brand-logo.svg",
   logoCompactUrl: "/brand-mark.svg",
   faviconUrl: "/icon.svg",
@@ -559,12 +559,12 @@ export const defaultSiteSettings: SiteSettings = {
     tiktok: ""
   },
   defaultOgAlt: "Jovem Aprendiz Vagas",
-  supportText: "Use os canais desta pagina para relatar erros, pedir atualizacao de informacoes ou falar com a equipe responsavel pelo portal.",
+  supportText: "Use os canais desta página para relatar erros, pedir atualização de informações ou falar com a equipe responsável pelo portal.",
   consentBanner: {
     bannerEnabled: true,
     title: "Seu uso do portal pode ser mais bem ajustado com suas preferencias",
     description:
-      "Usamos cookies necessarios para o portal funcionar e, quando voce autoriza, recursos de medicao e publicidade para entender o desempenho das paginas e melhorar a experiencia.",
+      "Usamos cookies necessários para o portal funcionar e, quando você autoriza, recursos de medição e publicidade para entender o desempenho das páginas e melhorar a experiência.",
     policyHref: "/politica-de-cookies",
     acceptLabel: "Aceitar",
     rejectLabel: "Recusar",
