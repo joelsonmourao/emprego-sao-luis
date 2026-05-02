@@ -1,3 +1,4 @@
+import { buildJovemAprendizCityUfPath } from "@/lib/seo/jovem-aprendiz-city-uf-slug";
 import { getCityJobsPath, getCompanyJobsPath, getStateJobsPath } from "@/lib/seo/jobs-pages";
 
 type ListingDescriptorInput = {
@@ -14,6 +15,8 @@ type JobsSearchIndexingInput = {
   query?: string;
   stateSlug?: string;
   citySlug?: string;
+  /** Sigla UF (ex.: MA) — usada na URL compacta `/vagas/jovem-aprendiz/{cidade}-{uf}`. */
+  stateCode?: string;
   companySlug?: string;
   order?: "relevance" | "date";
   page?: number;
@@ -122,6 +125,21 @@ export function isStrategicJobsSearchIndexable(input: JobsSearchIndexingInput) {
 
 export function buildJobsSearchCanonicalPath(input: JobsSearchIndexingInput) {
   const query = normalizeQuery(input.query);
+
+  const firstPage = (input.page ?? 1) === 1;
+  const defaultOrder = (input.order ?? "relevance") === "relevance";
+
+  if (
+    !query &&
+    !input.companySlug &&
+    input.citySlug &&
+    input.stateCode &&
+    input.total > 0 &&
+    firstPage &&
+    defaultOrder
+  ) {
+    return buildJovemAprendizCityUfPath(input.citySlug, input.stateCode);
+  }
 
   if (!query && input.citySlug) {
     return getCityJobsPath(input.citySlug);

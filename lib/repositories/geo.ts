@@ -61,6 +61,29 @@ export const getCityByStateAndSlug = unstable_cache(async (stateSlug: string, ci
   tags: [PUBLIC_GEO_CACHE_TAG]
 });
 
+/** Cidade por slug + sigla da UF (ex.: `sao-luis` + `MA`) para URLs `/vagas/jovem-aprendiz/{slug}-{uf}`. */
+export const getCityByStateCodeAndSlug = unstable_cache(async (stateCode: string, citySlug: string) => {
+  const code = stateCode.trim().toUpperCase();
+  const slug = citySlug.trim().toLowerCase();
+  if (!code || !slug) return null;
+
+  return prisma.city.findFirst({
+    where: {
+      slug,
+      state: { code }
+    },
+    include: {
+      state: true,
+      _count: {
+        select: { jobs: true }
+      }
+    }
+  });
+}, ["city-by-state-code-slug-v1"], {
+  revalidate: 3600,
+  tags: [PUBLIC_GEO_CACHE_TAG]
+});
+
 export const getCityBySlug = unstable_cache(async (slug: string) => {
   const cities = await prisma.city.findMany({
     where: { slug },

@@ -507,3 +507,35 @@ export async function getCompanyAdminOptions() {
     citySlug: company.city.slug
   }));
 }
+
+/** Uma entrada por combinação cidade + UF com vaga ativa de aprendiz (para sitemap compacto). */
+async function fetchApprenticeCityUfSitemapRows() {
+  await markExpiredJobsInactive();
+  const rows = await prisma.job.findMany({
+    where: { isActive: true, employmentType: "APPRENTICESHIP" },
+    select: {
+      updatedAt: true,
+      city: { select: { slug: true } },
+      state: { select: { code: true } }
+    }
+  });
+
+  const latest = new Map<string, Date>();
+  for (const row of rows) {
+    const key = `${row.city.slug}__${row.state.code}`;
+    const prev = latest.get(key);
+    if (!prev || row.updatedAt > prev) {
+      latest.set(key, row.updatedAt);
+    }
+  }
+
+  return [...latest.entries()].map(([key, lastmod]) => {
+    const [citySlug, stateCode] = key.split("__");
+    return { citySlug, stateCode, lastmod };
+  });
+}
+
+export const getApprenticeCityUfSitemapRows = unstable_cache(fetchApprenticeCityUfSitemapRows, ["apprentice-city-uf-sitemap-v1"], {
+  revalidate: 7200,
+  tags: [PUBLIC_JOBS_CACHE_TAG]
+});

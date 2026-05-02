@@ -8,12 +8,13 @@ import { JobCard } from "@/components/job-card";
 import { JsonLd } from "@/components/json-ld";
 import { PaginationNav } from "@/components/pagination-nav";
 import { SectionHeading } from "@/components/section-heading";
+import { buildJovemAprendizCityUfPath } from "@/lib/seo/jovem-aprendiz-city-uf-slug";
 import { buildListingCollectionPageJsonLd, buildListingFaq, buildStateListingSeo, getCityJobsPath, getCompanyJobsPath, getStateJobsPath } from "@/lib/seo/jobs-pages";
 import { shouldIndexPage } from "@/lib/seo/indexing";
 import { buildSiteMetadata } from "@/lib/seo/metadata";
 import { buildBreadcrumbJsonLd, buildFaqJsonLd } from "@/lib/seo/json-ld";
 import { getStateBySlug } from "@/lib/repositories/geo";
-import { getCompanyHubsByState, getJobsList } from "@/lib/repositories/jobs";
+import { getApprenticeCityUfSitemapRows, getCompanyHubsByState, getJobsList } from "@/lib/repositories/jobs";
 import { jobSearchParamsSchema } from "@/lib/schemas/search";
 
 export const revalidate = 1800;
@@ -108,8 +109,11 @@ export default async function JobsByStatePage({
     notFound();
   }
 
-  const [stateCompanies] = await Promise.all([getCompanyHubsByState(stateData.slug, 8)]);
+  const [stateCompanies, apprenticeCityRows] = await Promise.all([getCompanyHubsByState(stateData.slug, 8), getApprenticeCityUfSitemapRows()]);
   const jobs = listingData.jobs;
+  const apprenticeCitySlugSet = new Set(
+    apprenticeCityRows.filter((row) => row.stateCode === stateData.code).map((row) => row.citySlug)
+  );
 
   const seo = buildStateListingSeo({
     stateName: stateData.name,
@@ -199,11 +203,23 @@ export default async function JobsByStatePage({
           <div className="brand-chip rounded-[1.8rem] p-6">
             <h2 className="text-lg font-black text-[var(--brand-navy)]">Cidades principais</h2>
             <div className="mt-4 flex flex-wrap gap-3">
-              {topCities.map((city) => (
-                <Link key={city.id} href={getCityJobsPath(city.slug)} className="rounded-full border border-[color:rgba(26,43,76,0.1)] bg-white px-4 py-2 text-sm font-medium text-[var(--brand-text-secondary)] transition hover:text-[var(--brand-orange)]">
-                  {city.name}
-                </Link>
-              ))}
+              {topCities.map((city) => {
+                const href = apprenticeCitySlugSet.has(city.slug)
+                  ? buildJovemAprendizCityUfPath(city.slug, stateData.code)
+                  : getCityJobsPath(city.slug);
+                const label = apprenticeCitySlugSet.has(city.slug)
+                  ? `Vagas de Jovem Aprendiz em ${city.name}, ${stateData.code}`
+                  : `${city.name}, ${stateData.code}`;
+                return (
+                  <Link
+                    key={city.id}
+                    href={href}
+                    className="rounded-full border border-[color:rgba(26,43,76,0.1)] bg-white px-4 py-2 text-sm font-medium text-[var(--brand-text-secondary)] transition hover:text-[var(--brand-orange)]"
+                  >
+                    {label}
+                  </Link>
+                );
+              })}
             </div>
           </div>
 

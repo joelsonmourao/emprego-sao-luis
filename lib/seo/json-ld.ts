@@ -2,7 +2,7 @@ import type { EmploymentType } from "@prisma/client";
 
 import { siteConfig } from "@/lib/constants";
 import { normalizeDatePostedForSchema, normalizeValidThroughSchemaString } from "@/lib/date-utils";
-import { getGeoCoordinatesByCityState, resolveBrazilUfFromJobState } from "@/lib/geo/municipios-coordenadas";
+import { resolveBrazilUfFromJobState } from "@/lib/geo/municipios-coordenadas";
 import { buildJobPostingDescriptionHtml } from "@/lib/jobs/job-posting-description";
 import { validateJobPostingMinimum } from "@/lib/jobs/job-posting-validate";
 import { employmentTypeToSchemaValue } from "@/lib/jobs/employment-type";
@@ -61,6 +61,80 @@ export function buildFaqJsonLd(items: Array<{ question: string; answer: string }
   };
 }
 
+export function buildWebPageJsonLd(input: { name: string; description: string; path: string }) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    name: input.name,
+    description: input.description,
+    url: absoluteUrl(input.path)
+  };
+}
+
+export function buildItemListJsonLdFromJobs(items: Array<{ position: number; name: string; path: string }>) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    itemListElement: items.map((item) => ({
+      "@type": "ListItem",
+      position: item.position,
+      name: item.name,
+      url: absoluteUrl(item.path)
+    }))
+  };
+}
+
+/** Place simples (lista SEO) — sem coordenadas quando não há lat/lng confiáveis no banco. */
+export function buildPlaceJsonLdForCityLocality(input: { cityName: string; stateCode: string }) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "Place",
+    name: `${input.cityName}, ${input.stateCode}`,
+    address: {
+      "@type": "PostalAddress",
+      addressLocality: input.cityName.trim(),
+      addressRegion: input.stateCode.trim(),
+      addressCountry: { "@type": "Country", name: "Brazil" }
+    }
+  };
+}
+
+const DEFAULT_HIRING_ORG_LOGO = "https://slzcontent.com.br/icon.svg";
+
+function pickTrustworthyExternalSameAs(input: {
+  siteHostname: string;
+  applyUrl: string;
+  companyWebsiteUrl?: string | null;
+  sourceUrl?: string | null;
+}): string | undefined {
+  const tryOne = (raw?: string | null) => {
+    const u = raw?.trim();
+    if (!u) return undefined;
+    try {
+      const parsed = new URL(u);
+      if (parsed.protocol !== "https:" && parsed.protocol !== "http:") return undefined;
+      const host = parsed.hostname.replace(/^www\./i, "");
+      if (!host || host === input.siteHostname) return undefined;
+      return parsed.toString();
+    } catch {
+      return undefined;
+    }
+  };
+
+  return tryOne(input.companyWebsiteUrl) ?? tryOne(input.sourceUrl) ?? tryOne(input.applyUrl);
+}
+
+function resolveHiringOrganizationLogo(companyLogoUrl?: string | null) {
+  const u = companyLogoUrl?.trim();
+  if (u && (u.startsWith("https://") || u.startsWith("http://"))) {
+    return u;
+  }
+  if (u?.startsWith("/")) {
+    return absoluteUrl(u);
+  }
+  return DEFAULT_HIRING_ORG_LOGO;
+}
+
 export type JobPostingJsonLdInput = {
   id: string;
   externalId?: string | null;
@@ -71,6 +145,9 @@ export type JobPostingJsonLdInput = {
   descriptionHtml: string;
   slug: string;
   companyName: string;
+  companyLogoUrl?: string | null;
+  companyWebsiteUrl?: string | null;
+  sourceUrl?: string | null;
   cityName: string;
   citySlug: string;
   stateCode: string;
@@ -178,25 +255,10 @@ async function buildJobLocationBlock(job: JobPostingJsonLdInput) {
     address.streetAddress = street;
   }
 
-  const place: Record<string, unknown> = {
+  return {
     "@type": "Place",
     address
   };
-
-  const cityTrim = job.cityName.trim();
-  const ufHint = resolvedUf ?? (job.stateCode.trim() || job.stateName.trim());
-  if (cityTrim && ufHint) {
-    const coords = getGeoCoordinatesByCityState(cityTrim, ufHint);
-    if (coords) {
-      place.geo = {
-        "@type": "GeoCoordinates",
-        latitude: coords.latitude,
-        longitude: coords.longitude
-      };
-    }
-  }
-
-  return place;
 }
 
 export async function buildJobPostingJsonLd(job: JobPostingJsonLdInput): Promise<Record<string, unknown> | null> {
@@ -210,11 +272,8 @@ export async function buildJobPostingJsonLd(job: JobPostingJsonLdInput): Promise
     workHours: job.workHours
   });
 
-  /** Google Rich Results para JobPosting costuma validar melhor sem `dateModified`; usamos a última alteração em `datePosted`. */
   const datePostedRaw =
-    normalizeDatePostedForSchema(job.updatedAt ?? null) ??
-    normalizeDatePostedForSchema(job.publishedAt) ??
-    normalizeDatePostedForSchema(new Date())!;
+    normalizeDatePostedForSchema(job.publishedAt) ?? normalizeDatePostedForSchema(new Date())!;
   const validThroughRaw = normalizeValidThroughSchemaString({
     publishedAt: job.publishedAt,
     validThrough: job.validThrough ?? null,
@@ -223,6 +282,28 @@ export async function buildJobPostingJsonLd(job: JobPostingJsonLdInput): Promise
 
   const employmentTypeRaw = employmentTypeToSchemaValue(job.employmentType, { title: job.displayTitle });
   const jobUrl = absoluteUrl(`/vagas/${job.slug}`);
+  let siteHostname = "";
+  try {
+    siteHostname = new URL(jobUrl).hostname.replace(/^www\./i, "");
+  } catch {
+    siteHostname = "";
+  }
+
+  const sameAs = pickTrustworthyExternalSameAs({
+    siteHostname,
+    applyUrl: job.applyUrl,
+    companyWebsiteUrl: job.companyWebsiteUrl,
+    sourceUrl: job.sourceUrl
+  });
+
+  const hiringOrganization: Record<string, unknown> = {
+    "@type": "Organization",
+    name: job.companyName,
+    logo: resolveHiringOrganizationLogo(job.companyLogoUrl)
+  };
+  if (sameAs) {
+    hiringOrganization.sameAs = sameAs;
+  }
 
   const data: Record<string, unknown> = {
     "@context": "https://schema.org",
@@ -237,12 +318,7 @@ export async function buildJobPostingJsonLd(job: JobPostingJsonLdInput): Promise
     datePosted: datePostedRaw,
     validThrough: validThroughRaw,
     employmentType: employmentTypeRaw,
-    hiringOrganization: {
-      "@type": "Organization",
-      name: job.companyName,
-      logo: "https://slzcontent.com.br/icon.svg",
-      sameAs: jobUrl
-    },
+    hiringOrganization,
     jobLocation: await buildJobLocationBlock(job),
     description: descriptionHtml,
     directApply: false

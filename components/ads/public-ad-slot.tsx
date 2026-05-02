@@ -23,7 +23,7 @@ export async function PublicAdSlot({
   format = "auto",
   fullWidthResponsive = true,
   className,
-  minHeightClass = "min-h-[1px]"
+  minHeightClass = "min-h-[250px]"
 }: PublicAdSlotProps) {
   const ctx = await getPublicAdContext();
   const slot = ctx.slotsBySlug.get(slotSlug);

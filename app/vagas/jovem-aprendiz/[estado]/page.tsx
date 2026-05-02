@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { EmploymentType } from "@prisma/client";
 import { notFound } from "next/navigation";
 
 import { Breadcrumbs } from "@/components/breadcrumbs";
@@ -7,13 +8,26 @@ import { JobCard } from "@/components/job-card";
 import { JsonLd } from "@/components/json-ld";
 import { PaginationNav } from "@/components/pagination-nav";
 import { SectionHeading } from "@/components/section-heading";
-import { buildListingFaq, buildListingCollectionPageJsonLd, getStateJobsPath } from "@/lib/seo/jobs-pages";
+import { JovemAprendizCityUfSeoView } from "@/components/vagas/jovem-aprendiz-city-uf-seo-view";
+import { siteConfig } from "@/lib/constants";
+import { getCityByStateCodeAndSlug, getStateBySlug } from "@/lib/repositories/geo";
+import { getApprenticeCityUfSitemapRows, getJobsList } from "@/lib/repositories/jobs";
+import { jobSearchParamsSchema } from "@/lib/schemas/search";
+import { buildJovemAprendizCityUfPath, parseJovemAprendizCityUfSegment } from "@/lib/seo/jovem-aprendiz-city-uf-slug";
 import { buildProgrammaticStateTitle, jovemAprendizCityPath, jovemAprendizStatePath } from "@/lib/seo/jovem-aprendiz-programmatic";
+import {
+  generateJobCityAboutBody,
+  generateJobCityAboutTitle,
+  generateJobCityFaq,
+  generateJobCityH1,
+  generateJobCityIntro,
+  generateJobCitySeoDescription,
+  generateJobCitySeoTitle
+} from "@/lib/seo/jobSeo";
+import { buildListingFaq, buildListingCollectionPageJsonLd, getStateJobsPath } from "@/lib/seo/jobs-pages";
 import { buildSiteMetadata } from "@/lib/seo/metadata";
 import { buildBreadcrumbJsonLd, buildFaqJsonLd } from "@/lib/seo/json-ld";
-import { getStateBySlug } from "@/lib/repositories/geo";
-import { getJobsList } from "@/lib/repositories/jobs";
-import { jobSearchParamsSchema } from "@/lib/schemas/search";
+import { getSiteSettings } from "@/lib/site-settings";
 
 export const revalidate = 1200;
 
@@ -40,15 +54,68 @@ export async function generateMetadata({
     page: typeof raw.page === "string" ? raw.page : undefined
   });
 
+  const compact = parseJovemAprendizCityUfSegment(estado);
+  const pathname = `/vagas/jovem-aprendiz/${estado.trim().toLowerCase()}`;
+
+  if (compact) {
+    const settings = await getSiteSettings();
+    const brand = settings.siteName?.trim() || siteConfig.name;
+    const city = await getCityByStateCodeAndSlug(compact.uf, compact.citySlug);
+
+    if (!city) {
+      return buildSiteMetadata({
+        title: "Pagina nao encontrada",
+        description: "A cidade solicitada nao foi encontrada.",
+        pathname,
+        canonicalUrl: pathname,
+        noIndex: true
+      });
+    }
+
+    const jobs = await getJobsList({
+      stateSlug: city.state.slug,
+      citySlug: city.slug,
+      employmentType: EmploymentType.APPRENTICESHIP,
+      order: parsed.order,
+      page: parsed.page
+    });
+
+    if (jobs.total === 0) {
+      return buildSiteMetadata({
+        title: "Sem vagas ativas",
+        description: "Nao ha vagas de Jovem Aprendiz ativas para esta cidade no momento.",
+        pathname,
+        canonicalUrl: pathname,
+        noIndex: true
+      });
+    }
+
+    const companies = jobs.items.map((j) => j.company?.name ?? j.companyName).filter(Boolean);
+    const keyword = "Jovem Aprendiz";
+
+    return buildSiteMetadata({
+      title: generateJobCitySeoTitle({ count: jobs.total, keyword, city: city.name, uf: city.state.code, brand }),
+      description: generateJobCitySeoDescription({
+        count: jobs.total,
+        keyword,
+        city: city.name,
+        uf: city.state.code,
+        companies
+      }),
+      pathname,
+      canonicalUrl: pathname,
+      noIndex: parsed.page > 1 || (parsed.order ?? "relevance") !== "relevance"
+    });
+  }
+
   const state = await getStateBySlug(estado);
-  const pathname = jovemAprendizStatePath(estado);
   const canonicalPath = getStateJobsPath(estado);
 
   if (!state) {
     return buildSiteMetadata({
-      title: "Estado não encontrado",
-      description: "Página não encontrada.",
-      pathname,
+      title: "Estado nao encontrado",
+      description: "Pagina nao encontrada.",
+      pathname: jovemAprendizStatePath(estado),
       canonicalUrl: canonicalPath,
       noIndex: true
     });
@@ -61,10 +128,9 @@ export async function generateMetadata({
   return buildSiteMetadata({
     title,
     description,
-    pathname,
-    canonicalUrl: canonicalPath,
-    // Variante programatica mantida apenas para navegacao e UX.
-    noIndex: true
+    pathname: jovemAprendizStatePath(estado),
+    canonicalUrl: getStateJobsPath(state.slug),
+    noIndex: jobs.total === 0 || parsed.page > 1 || (parsed.order ?? "relevance") !== "relevance"
   });
 }
 
@@ -82,18 +148,78 @@ export default async function JovemAprendizEstadoPage({
     page: typeof raw.page === "string" ? raw.page : undefined
   });
 
+  const compact = parseJovemAprendizCityUfSegment(estado);
+
+  if (compact) {
+    const city = await getCityByStateCodeAndSlug(compact.uf, compact.citySlug);
+    if (!city) {
+      notFound();
+    }
+
+    const jobs = await getJobsList({
+      stateSlug: city.state.slug,
+      citySlug: city.slug,
+      employmentType: EmploymentType.APPRENTICESHIP,
+      order: parsed.order,
+      page: parsed.page
+    });
+
+    if (jobs.total === 0) {
+      notFound();
+    }
+
+    const settings = await getSiteSettings();
+    const brand = settings.siteName?.trim() || siteConfig.name;
+    const keyword = "Jovem Aprendiz";
+    const companies = jobs.items.map((j) => j.company?.name ?? j.companyName).filter(Boolean);
+
+    return (
+      <JovemAprendizCityUfSeoView
+        estadoSegment={estado.trim().toLowerCase()}
+        city={city}
+        jobs={jobs}
+        order={parsed.order ?? "relevance"}
+        title={generateJobCitySeoTitle({ count: jobs.total, keyword, city: city.name, uf: city.state.code, brand })}
+        description={generateJobCitySeoDescription({
+          count: jobs.total,
+          keyword,
+          city: city.name,
+          uf: city.state.code,
+          companies
+        })}
+        h1={generateJobCityH1({ count: jobs.total, keyword, city: city.name, uf: city.state.code })}
+        intro={generateJobCityIntro({
+          count: jobs.total,
+          keyword,
+          city: city.name,
+          uf: city.state.code,
+          companies
+        })}
+        aboutTitle={generateJobCityAboutTitle(city.name, city.state.code)}
+        aboutBody={generateJobCityAboutBody(city.name, city.state.code)}
+        faq={generateJobCityFaq(city.name, city.state.code)}
+      />
+    );
+  }
+
   const state = await getStateBySlug(estado);
   if (!state) {
     notFound();
   }
 
-  const jobs = await getJobsList({ stateSlug: state.slug, order: parsed.order, page: parsed.page });
+  const [jobs, apprenticeCityRows] = await Promise.all([
+    getJobsList({ stateSlug: state.slug, order: parsed.order, page: parsed.page }),
+    getApprenticeCityUfSitemapRows()
+  ]);
   const pathname = jovemAprendizStatePath(estado);
   const title = buildProgrammaticStateTitle(jobs.total, state.name, state.code);
   const intro = `Listagem de vagas de Jovem Aprendiz no estado ${state.name}. Somente oportunidades ativas no portal.`;
   const faq = buildListingFaq({ name: state.name, totalJobs: jobs.total, type: "state" });
   const buildOrderHref = (order: "relevance" | "date") => buildPageHref(state.slug, order, 1);
   const noIndex = jobs.total === 0;
+  const apprenticeCitySlugSet = new Set(
+    apprenticeCityRows.filter((row) => row.stateCode === state.code).map((row) => row.citySlug)
+  );
 
   return (
     <section className="mx-auto max-w-7xl space-y-8 px-4 py-8 sm:px-6 lg:px-8">
@@ -174,20 +300,26 @@ export default async function JovemAprendizEstadoPage({
 
         <aside className="space-y-6">
           <div className="brand-chip rounded-[1.8rem] p-6">
-            <h2 className="text-lg font-black text-[var(--brand-navy)]">Cidades com vagas</h2>
+            <h2 className="text-lg font-black text-[var(--brand-navy)]">Jovem Aprendiz por cidade</h2>
             <ul className="mt-4 space-y-2 text-sm">
               {state.cities
-                .filter((c) => c._count.jobs > 0)
-                .slice(0, 12)
+                .filter((c) => apprenticeCitySlugSet.has(c.slug))
+                .slice(0, 24)
                 .map((c) => (
                   <li key={c.id}>
-                    <Link className="font-medium text-[var(--brand-blue)] hover:text-[var(--brand-orange)]" href={jovemAprendizCityPath(state.slug, c.slug)}>
-                      {c.name}
+                    <Link
+                      className="font-medium text-[var(--brand-blue)] hover:text-[var(--brand-orange)]"
+                      href={buildJovemAprendizCityUfPath(c.slug, state.code)}
+                    >
+                      {`Vagas de Jovem Aprendiz em ${c.name}, ${state.code}`}
                     </Link>
                   </li>
                 ))}
             </ul>
-            <Link href={getStateJobsPath(state.slug)} className="mt-4 inline-block text-sm font-semibold text-[var(--brand-text-secondary)] hover:text-[var(--brand-orange)]">
+            <Link
+              href={getStateJobsPath(state.slug)}
+              className="mt-4 inline-block text-sm font-semibold text-[var(--brand-text-secondary)] hover:text-[var(--brand-orange)]"
+            >
               Ver rota classica do estado
             </Link>
           </div>

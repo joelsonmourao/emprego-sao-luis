@@ -4,16 +4,14 @@ import { HubType } from "@prisma/client";
 import { staticPages } from "@/data/seo-pages";
 import { EMPLOYMENT_CATEGORIES } from "@/lib/employment-categories";
 import { getCityJobsPath, getCompanyJobsPath, getJobPath } from "@/lib/seo/jobs-pages";
-import {
-  jovemAprendizCategoryPath,
-  jovemAprendizCityPath
-} from "@/lib/seo/jovem-aprendiz-programmatic";
+import { buildJovemAprendizCityUfPath } from "@/lib/seo/jovem-aprendiz-city-uf-slug";
+import { jovemAprendizCategoryPath } from "@/lib/seo/jovem-aprendiz-programmatic";
 import { shouldIndexPage } from "@/lib/seo/indexing";
 import { getAllPublishedPostEntries } from "@/lib/repositories/blog";
 import { getCities } from "@/lib/repositories/geo";
 import { getHubProfiles } from "@/lib/repositories/hubs";
 import { SITEMAP_MANIFEST_CACHE_TAG } from "@/lib/public-revalidate";
-import { getAllActiveJobEntries, getCompanyEntries, getCompanyHubs } from "@/lib/repositories/jobs";
+import { getAllActiveJobEntries, getApprenticeCityUfSitemapRows, getCompanyEntries, getCompanyHubs } from "@/lib/repositories/jobs";
 import { getSiteOrigin } from "@/lib/site-url";
 import { absoluteUrl } from "@/lib/utils";
 
@@ -153,14 +151,15 @@ function buildRootEntries(category: Exclude<SitemapCategory, "listings">, lastmo
 }
 
 async function computeSitemapManifest(): Promise<SitemapManifest> {
-  const [jobs, posts, cities, companies, companyHubs, cityProfiles, companyProfiles] = await Promise.all([
+  const [jobs, posts, cities, companies, companyHubs, cityProfiles, companyProfiles, apprenticeCityUfRows] = await Promise.all([
     getAllActiveJobEntries(),
     getAllPublishedPostEntries(),
     getCities(),
     getCompanyEntries(),
     getCompanyHubs(),
     getHubProfiles(HubType.CITY),
-    getHubProfiles(HubType.COMPANY)
+    getHubProfiles(HubType.COMPANY),
+    getApprenticeCityUfSitemapRows()
   ]);
 
   const cityProfileMap = new Map(cityProfiles.map((profile) => [profile.slug, profile]));
@@ -250,6 +249,9 @@ async function computeSitemapManifest(): Promise<SitemapManifest> {
   ];
 
   const programmaticEntries: SitemapUrlEntry[] = [
+    ...apprenticeCityUfRows.map((row) =>
+      toSitemapEntry(buildJovemAprendizCityUfPath(row.citySlug, row.stateCode), row.lastmod, { changefreq: "daily", priority: 0.75 })
+    ),
     ...cities.flatMap((city) => {
       const total = cityStateJobCounts.get(`${city.state.slug}__${city.slug}`) ?? 0;
       if (total <= 0) return [];

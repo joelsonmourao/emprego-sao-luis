@@ -15,9 +15,10 @@ import {
   buildJobsListingMetaTitle,
   buildJobsSearchCanonicalPath
 } from "@/lib/listing";
-import { getCompanyHubBySlug, getFeaturedCompanies, getJobsList } from "@/lib/repositories/jobs";
+import { getApprenticeCityUfSitemapRows, getCompanyHubBySlug, getFeaturedCompanies, getJobsList } from "@/lib/repositories/jobs";
 import { getSearchGeoData } from "@/lib/repositories/geo";
 import { shouldIndexPage } from "@/lib/seo/indexing";
+import { buildJovemAprendizCityUfPath } from "@/lib/seo/jovem-aprendiz-city-uf-slug";
 import { getCityJobsPath, getCompanyJobsPath, getStateJobsPath } from "@/lib/seo/jobs-pages";
 import { buildSiteMetadata } from "@/lib/seo/metadata";
 import { buildBreadcrumbJsonLd, buildFaqJsonLd } from "@/lib/seo/json-ld";
@@ -104,6 +105,7 @@ export async function generateMetadata({
       query: parsed.q,
       stateSlug: parsed.estado,
       citySlug: parsed.cidade,
+      stateCode: selectedState?.code,
       companySlug: parsed.empresa,
       order: parsed.order,
       page: parsed.page
@@ -130,15 +132,32 @@ export default async function JobsPage({
   };
   const { jobs, states, parsed } = await getJobsAndGeoForSearch(JSON.stringify(normalizedInput));
 
-  const [featuredCompanies, selectedCompany, siteContent] = await Promise.all([
+  const [featuredCompanies, selectedCompany, siteContent, apprenticeSeoRows] = await Promise.all([
     getFeaturedCompanies(),
     parsed.empresa ? getCompanyHubBySlug(parsed.empresa) : Promise.resolve(null),
-    getSiteContent()
+    getSiteContent(),
+    getApprenticeCityUfSitemapRows()
   ]);
 
   const selectedState = states.find((state) => state.slug === parsed.estado);
   const selectedCity = selectedState?.cities.find((city) => city.slug === parsed.cidade);
   const selectedCompanyName = selectedCompany?.name;
+
+  const cityMetaByKey = new Map<string, { name: string; stateCode: string }>();
+  for (const st of states) {
+    for (const c of st.cities) {
+      cityMetaByKey.set(`${c.slug}__${st.code}`, { name: c.name, stateCode: st.code });
+    }
+  }
+  const apprenticeSeoCityLinks = apprenticeSeoRows
+    .map((row) => {
+      const meta = cityMetaByKey.get(`${row.citySlug}__${row.stateCode}`);
+      if (!meta) return null;
+      return { ...row, cityName: meta.name, stateCode: meta.stateCode };
+    })
+    .filter((item): item is NonNullable<typeof item> => Boolean(item))
+    .sort((a, b) => new Date(b.lastmod).getTime() - new Date(a.lastmod).getTime())
+    .slice(0, 12);
   
   const heading = buildJobsListingHeading({
     total: jobs.total,
@@ -270,13 +289,13 @@ export default async function JobsPage({
             ))}
           </div>
           <div className="mt-4 flex flex-wrap gap-2 sm:mt-6 sm:gap-3">
-            {states.flatMap((state) => state.cities.slice(0, 1)).slice(0, 6).map((city) => (
+            {apprenticeSeoCityLinks.map((row) => (
               <Link
-                key={`${city.slug}-${city.name}`}
-                href={getCityJobsPath(city.slug)}
+                key={`${row.citySlug}-${row.stateCode}`}
+                href={buildJovemAprendizCityUfPath(row.citySlug, row.stateCode)}
                 className="rounded-full border border-[color:rgba(26,43,76,0.1)] bg-white px-3 py-1.5 text-xs font-medium text-[var(--brand-text-secondary)] transition hover:border-[color:rgba(255,109,0,0.22)] hover:text-[var(--brand-orange)] sm:px-4 sm:py-2 sm:text-sm"
               >
-                {city.name}
+                {`Vagas de Jovem Aprendiz em ${row.cityName}, ${row.stateCode}`}
               </Link>
             ))}
           </div>

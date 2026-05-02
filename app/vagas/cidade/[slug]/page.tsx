@@ -8,12 +8,13 @@ import { JobCard } from "@/components/job-card";
 import { JsonLd } from "@/components/json-ld";
 import { PaginationNav } from "@/components/pagination-nav";
 import { SectionHeading } from "@/components/section-heading";
+import { buildJovemAprendizCityUfPath } from "@/lib/seo/jovem-aprendiz-city-uf-slug";
 import { buildListingFaq, buildListingCollectionPageJsonLd, buildCityListingSeo, getCityJobsPath, getCompanyJobsPath, getStateJobsPath } from "@/lib/seo/jobs-pages";
 import { shouldIndexPage } from "@/lib/seo/indexing";
 import { buildSiteMetadata } from "@/lib/seo/metadata";
 import { buildBreadcrumbJsonLd, buildFaqJsonLd } from "@/lib/seo/json-ld";
 import { getCityBySlug, getStateBySlug } from "@/lib/repositories/geo";
-import { getCompanyHubsByCity, getJobsList } from "@/lib/repositories/jobs";
+import { getApprenticeCityUfSitemapRows, getCompanyHubsByCity, getJobsList } from "@/lib/repositories/jobs";
 import { jobSearchParamsSchema } from "@/lib/schemas/search";
 
 export const revalidate = 1800;
@@ -115,11 +116,13 @@ export default async function JobsByCityCleanPage({
     notFound();
   }
 
-  const [state, companiesInCity] = await Promise.all([
+  const [state, companiesInCity, apprenticeCityRows] = await Promise.all([
     getStateBySlug(city.state.slug),
-    getCompanyHubsByCity(city.slug, 8)
+    getCompanyHubsByCity(city.slug, 8),
+    getApprenticeCityUfSitemapRows()
   ]);
   const jobs = listingData.jobs;
+  const hasApprenticeSeoHub = apprenticeCityRows.some((r) => r.citySlug === city.slug && r.stateCode === city.state.code);
 
   if (!state) {
     notFound();
@@ -234,6 +237,14 @@ export default async function JobsByCityCleanPage({
           <div className="brand-panel rounded-[1.8rem] border border-slate-200 p-6 shadow-sm">
             <h2 className="text-lg font-black text-[var(--brand-navy)]">Continue pelo estado</h2>
             <div className="mt-4 space-y-3">
+              {hasApprenticeSeoHub ? (
+                <Link
+                  href={buildJovemAprendizCityUfPath(city.slug, city.state.code)}
+                  className="block rounded-2xl border border-[color:rgba(26,43,76,0.1)] bg-white px-4 py-3 text-sm font-semibold text-[var(--brand-text-secondary)] transition hover:text-[var(--brand-orange)]"
+                >
+                  {`Vagas de Jovem Aprendiz em ${city.name}, ${city.state.code}`}
+                </Link>
+              ) : null}
               <Link href={getStateJobsPath(state.slug)} className="block rounded-2xl border border-[color:rgba(26,43,76,0.1)] bg-white px-4 py-3 text-sm font-semibold text-[var(--brand-text-secondary)] transition hover:text-[var(--brand-orange)]">
                 Ver vagas de Jovem Aprendiz no {state.name}
               </Link>

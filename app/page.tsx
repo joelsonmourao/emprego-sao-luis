@@ -20,10 +20,11 @@ import { JsonLd } from "@/components/json-ld";
 import { SectionHeading } from "@/components/section-heading";
 import { Button } from "@/components/ui/button";
 import { buildSiteMetadata } from "@/lib/seo/metadata";
+import { buildJovemAprendizCityUfPath } from "@/lib/seo/jovem-aprendiz-city-uf-slug";
 import { getCityJobsPath, getCompanyJobsPath } from "@/lib/seo/jobs-pages";
 import { buildFaqJsonLd } from "@/lib/seo/json-ld";
 import { getPostsBySlugs, getRecentPosts } from "@/lib/repositories/blog";
-import { getFeaturedCompanies, getFeaturedCompaniesBySlugs, getFeaturedJobs, getJobsBySlugs } from "@/lib/repositories/jobs";
+import { getApprenticeCityUfSitemapRows, getFeaturedCompanies, getFeaturedCompaniesBySlugs, getFeaturedJobs, getJobsBySlugs } from "@/lib/repositories/jobs";
 import { getCities, getCitiesBySlugs, getSearchGeoData, getStates, getStatesBySlugs } from "@/lib/repositories/geo";
 import { getSiteContent } from "@/lib/site-content";
 import { homeBlockKeys } from "@/lib/schemas/site-admin";
@@ -51,7 +52,7 @@ const iconMap = {
 } as const;
 
 export default async function HomePage() {
-  const [featuredJobsDefault, recentPostsDefault, statesDefault, citiesDefault, searchStates, companiesDefault, siteContent] =
+  const [featuredJobsDefault, recentPostsDefault, statesDefault, citiesDefault, searchStates, companiesDefault, siteContent, apprenticeSeoRows] =
     await Promise.all([
       getFeaturedJobs(),
       getRecentPosts(),
@@ -59,7 +60,8 @@ export default async function HomePage() {
       getCities(),
       getSearchGeoData(),
       getFeaturedCompanies(),
-      getSiteContent()
+      getSiteContent(),
+      getApprenticeCityUfSitemapRows()
     ]);
 
   const [featuredJobsSelected, featuredPostsSelected, featuredStatesSelected, featuredCitiesSelected, featuredCompaniesSelected] =
@@ -79,6 +81,19 @@ export default async function HomePage() {
   const sectionsEnabled = siteContent.home.blocks;
   const validOrder = siteContent.home.blockOrder.filter((key) => homeBlockKeys.includes(key));
   const orderedBlocks = [...validOrder, ...homeBlockKeys.filter((key) => !validOrder.includes(key))];
+
+  const cityKeyToMeta = new Map(
+    citiesDefault.map((c) => [`${c.slug}__${c.state.code}`, { name: c.name, slug: c.slug, code: c.state.code }])
+  );
+  const apprenticeSeoCityLinks = apprenticeSeoRows
+    .map((row) => {
+      const meta = cityKeyToMeta.get(`${row.citySlug}__${row.stateCode}`);
+      if (!meta) return null;
+      return { ...row, cityName: meta.name, stateCode: meta.code };
+    })
+    .filter((item): item is NonNullable<typeof item> => Boolean(item))
+    .sort((a, b) => new Date(b.lastmod).getTime() - new Date(a.lastmod).getTime())
+    .slice(0, 24);
 
   const pageSections: Record<(typeof homeBlockKeys)[number], ReactNode> = {
     quickAccess: (
@@ -319,6 +334,25 @@ export default async function HomePage() {
                 </Link>
               ))}
             </div>
+            {apprenticeSeoCityLinks.length ? (
+              <div className="mt-6 border-t border-white/14 pt-5">
+                <h3 className="text-base font-black text-white sm:text-lg">Vagas de Jovem Aprendiz por cidade</h3>
+                <p className="mt-2 text-xs leading-5 text-white/80 sm:text-sm">
+                  Páginas com vagas ativas de Jovem Aprendiz divulgadas por empresas na região.
+                </p>
+                <div className="mt-3 flex flex-wrap gap-2 sm:mt-4 sm:gap-3">
+                  {apprenticeSeoCityLinks.map((row) => (
+                    <Link
+                      key={`${row.citySlug}-${row.stateCode}`}
+                      href={buildJovemAprendizCityUfPath(row.citySlug, row.stateCode) as Route}
+                      className="rounded-full border border-white/18 bg-white/10 px-3 py-1.5 text-xs font-medium text-white transition hover:bg-white/16 sm:px-4 sm:py-2 sm:text-sm"
+                    >
+                      {`Jovem Aprendiz em ${row.cityName}, ${row.stateCode}`}
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            ) : null}
           </div>
         </div>
       </section>

@@ -7,6 +7,7 @@ import { JobCard } from "@/components/job-card";
 import { JsonLd } from "@/components/json-ld";
 import { PaginationNav } from "@/components/pagination-nav";
 import { SectionHeading } from "@/components/section-heading";
+import { buildJovemAprendizCityUfPath } from "@/lib/seo/jovem-aprendiz-city-uf-slug";
 import { buildListingFaq, buildListingCollectionPageJsonLd, getCityJobsPath, getStateJobsPath } from "@/lib/seo/jobs-pages";
 import { buildProgrammaticCityTitle, jovemAprendizCityPath, jovemAprendizStatePath } from "@/lib/seo/jovem-aprendiz-programmatic";
 import { buildSiteMetadata } from "@/lib/seo/metadata";
@@ -57,13 +58,13 @@ export async function generateMetadata({
   const jobs = await getJobsList({ stateSlug: city.state.slug, citySlug: city.slug, order: parsed.order, page: parsed.page });
   const title = buildProgrammaticCityTitle(jobs.total, city.name, city.state.code);
   const description = `Listagem com ${jobs.total} vaga(s) de Jovem Aprendiz em ${city.name}, ${city.state.code}.`;
+  const seoCanonical = jobs.total > 0 ? buildJovemAprendizCityUfPath(city.slug, city.state.code) : canonicalPath;
 
   return buildSiteMetadata({
     title,
     description,
-    pathname,
-    canonicalUrl: canonicalPath,
-    // Variante programatica mantida apenas para navegacao e UX.
+    pathname: seoCanonical,
+    canonicalUrl: seoCanonical,
     noIndex: true
   });
 }
@@ -189,6 +190,16 @@ export default async function JovemAprendizCidadePage({
           <div className="brand-chip rounded-[1.8rem] p-6">
             <h2 className="text-lg font-black text-[var(--brand-navy)]">Rotas relacionadas</h2>
             <ul className="mt-4 space-y-2 text-sm">
+              {jobs.total > 0 ? (
+                <li>
+                  <Link
+                    className="text-[var(--brand-blue)] hover:text-[var(--brand-orange)]"
+                    href={buildJovemAprendizCityUfPath(city.slug, city.state.code)}
+                  >
+                    {`Vagas de Jovem Aprendiz em ${city.name}, ${city.state.code}`}
+                  </Link>
+                </li>
+              ) : null}
               <li>
                 <Link className="text-[var(--brand-blue)] hover:text-[var(--brand-orange)]" href={getCityJobsPath(city.slug)}>
                   Listagem classica da cidade
