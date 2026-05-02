@@ -9,7 +9,7 @@ import { SectionHeading } from "@/components/section-heading";
 import { Button } from "@/components/ui/button";
 import { formatBrazilDateTime } from "@/lib/date-utils";
 import { sanitizeRichTextHtml } from "@/lib/rich-text";
-import { buildJobPublisherName } from "@/lib/seo/job-publisher";
+import { getSiteSettings } from "@/lib/site-settings";
 import { getCityJobsPath, getCompanyJobsPath, getStateJobsPath } from "@/lib/seo/jobs-pages";
 import { getRelatedPosts } from "@/lib/repositories/blog";
 import { getJobBySlug, getRelatedJobs } from "@/lib/repositories/jobs";
@@ -19,7 +19,8 @@ type JobWithRelations = NonNullable<Awaited<ReturnType<typeof getJobBySlug>>>;
 
 export async function JobDetailView({ job, displayTitle }: { job: JobWithRelations; displayTitle?: string | null }) {
   const headingTitle = (displayTitle?.trim() || job.title).trim();
-  const publisherDisplayName = buildJobPublisherName(job.city?.name, job.state?.code);
+  const settings = await getSiteSettings();
+  const sourceSiteLabel = settings.siteName.trim();
   const mergedDescriptionHtml = job.descriptionHtml ?? "";
 
   let relatedJobs: Awaited<ReturnType<typeof getRelatedJobs>> = [];
@@ -182,7 +183,7 @@ export async function JobDetailView({ job, displayTitle }: { job: JobWithRelatio
               </TrackedExternalLink>
             ) : null}
             <p className="mt-3 text-xs leading-5 text-[var(--brand-text-secondary)] sm:mt-4 sm:text-sm">
-              Fonte: {publisherDisplayName}
+              Fonte: {sourceSiteLabel}
             </p>
           </div>
 
