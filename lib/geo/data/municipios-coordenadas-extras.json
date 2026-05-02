@@ -1,0 +1,30 @@
+[
+  {
+    "city": "Jaboatão dos Guararapes",
+    "uf": "PE",
+    "latitude": -8.11278,
+    "longitude": -35.01472,
+    "note": "IBGE/GeoNames centroid; cities1000 agrupa nome curto \"Jaboatao\" em outro código."
+  },
+  {
+    "city": "Mesquita",
+    "uf": "RJ",
+    "latitude": -22.80278,
+    "longitude": -43.46056,
+    "note": "Centro administrativo; distingue de Mesquita MG no cities1000."
+  },
+  {
+    "city": "Sobradinho",
+    "uf": "DF",
+    "latitude": -15.64917,
+    "longitude": -47.80028,
+    "note": "Distrito de Sobradinho DF; cities1000 prioriza Sobradinho BA."
+  },
+  {
+    "city": "Gramado",
+    "uf": "RS",
+    "latitude": -29.37389,
+    "longitude": -50.87611,
+    "note": "Fora do recorte cities1000; coordenadas oficiais IBGE."
+  }
+]

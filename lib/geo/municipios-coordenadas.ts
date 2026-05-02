@@ -1,13 +1,19 @@
 /**
- * Coordenadas aproximadas de municípios (fonte local, sem API em tempo de request).
- * Chave de busca: cidade normalizada (sem acento, minúsculas) + UF.
+ * Coordenadas de municípios brasileiros (base local GeoNames cities1000 + admin1, gerada por
+ * `node scripts/generate-municipios-geonames.mjs`). Sem API em tempo de request.
  */
+
+import municipiosExtrasJson from "@/lib/geo/data/municipios-coordenadas-extras.json";
+import municipiosJson from "@/lib/geo/data/municipios-coordenadas.json";
 
 export type MunicipioCoordenada = {
   city: string;
   uf: string;
   latitude: number;
   longitude: number;
+  ibge?: string;
+  /** Apenas em `municipios-coordenadas-extras.json` (documentação humana). */
+  note?: string;
 };
 
 const BR_UF = new Set([
@@ -40,7 +46,6 @@ const BR_UF = new Set([
   "TO"
 ]);
 
-/** Nome completo do estado (sem acento, minúsculas) → UF */
 const STATE_NAME_TO_UF: Record<string, string> = {
   acre: "AC",
   alagoas: "AL",
@@ -49,6 +54,7 @@ const STATE_NAME_TO_UF: Record<string, string> = {
   bahia: "BA",
   ceara: "CE",
   "distrito federal": "DF",
+  "federal district": "DF",
   "espirito santo": "ES",
   goias: "GO",
   maranhao: "MA",
@@ -71,28 +77,6 @@ const STATE_NAME_TO_UF: Record<string, string> = {
   tocantins: "TO"
 };
 
-/** Base local: cidade como referência humana; busca usa normalização. */
-export const MUNICIPIOS_COORDENADAS: MunicipioCoordenada[] = [
-  { city: "Araruama", uf: "RJ", latitude: -22.883333, longitude: -42.333332 },
-  { city: "São Luís", uf: "MA", latitude: -2.5297, longitude: -44.3028 },
-  { city: "Fortaleza", uf: "CE", latitude: -3.7319, longitude: -38.5267 },
-  { city: "São Paulo", uf: "SP", latitude: -23.55052, longitude: -46.633308 },
-  { city: "Teresina", uf: "PI", latitude: -5.0892, longitude: -42.8016 },
-  { city: "Recife", uf: "PE", latitude: -8.0476, longitude: -34.877 },
-  { city: "João Pessoa", uf: "PB", latitude: -7.1195, longitude: -34.845 },
-  { city: "Natal", uf: "RN", latitude: -5.7945, longitude: -35.211 },
-  { city: "Nova Santa Rita", uf: "RS", latitude: -29.8568, longitude: -51.2763 },
-  { city: "Porto Alegre", uf: "RS", latitude: -30.0346, longitude: -51.2177 },
-  { city: "Rio de Janeiro", uf: "RJ", latitude: -22.9068, longitude: -43.1729 },
-  { city: "Salvador", uf: "BA", latitude: -12.9777, longitude: -38.5016 },
-  { city: "Belo Horizonte", uf: "MG", latitude: -19.9167, longitude: -43.9345 },
-  { city: "Curitiba", uf: "PR", latitude: -25.429, longitude: -49.2671 },
-  { city: "Belém", uf: "PA", latitude: -1.4558, longitude: -48.4902 },
-  { city: "Manaus", uf: "AM", latitude: -3.119, longitude: -60.0217 },
-  { city: "Goiânia", uf: "GO", latitude: -16.6869, longitude: -49.2648 },
-  { city: "Brasília", uf: "DF", latitude: -15.7939, longitude: -47.8828 }
-];
-
 function normalizeText(value: string) {
   return value
     .normalize("NFD")
@@ -102,25 +86,47 @@ function normalizeText(value: string) {
     .trim();
 }
 
-/** Chave estável para cidade (sem acento, minúsculas, sem pontuação extra). */
+/** Chave estável: cidade normalizada + UF em minúsculas (ex.: `sao paulo|sp`). */
 export function normalizeCityKey(city: string) {
-  return normalizeText(city).replace(/[^a-z0-9\s]/g, " ").replace(/\s+/g, " ").trim();
+  return normalizeText(city)
+    .replace(/[''`´]/g, "")
+    .replace(/[^a-z0-9\s]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
 }
 
-function buildLookup() {
+/** Chave composta para índice (cidade + "|" + UF). */
+export function normalizeGeoKey(city: string, uf: string): string | null {
+  const u = resolveBrazilUfString(uf);
+  if (!u) return null;
+  const ck = normalizeCityKey(city);
+  if (!ck) return null;
+  return `${ck}|${u.toLowerCase()}`;
+}
+
+function buildGeoLookup() {
   const map = new Map<string, { latitude: number; longitude: number }>();
-  for (const row of MUNICIPIOS_COORDENADAS) {
-    const key = `${normalizeCityKey(row.city)}|${row.uf.trim().toUpperCase()}`;
+  const rows = municipiosJson as MunicipioCoordenada[];
+  for (const row of rows) {
+    const key = normalizeGeoKey(row.city, row.uf);
+    if (!key) continue;
+    map.set(key, { latitude: row.latitude, longitude: row.longitude });
+  }
+  const extras = municipiosExtrasJson as MunicipioCoordenada[];
+  for (const row of extras) {
+    const key = normalizeGeoKey(row.city, row.uf);
+    if (!key) continue;
     map.set(key, { latitude: row.latitude, longitude: row.longitude });
   }
   return map;
 }
 
-const LOOKUP = buildLookup();
+const GEO_BY_CITY_UF = buildGeoLookup();
 
-/**
- * Converte nome completo do estado ou UF em sigla de 2 letras, quando reconhecível.
- */
+export function getMunicipiosGeoCount() {
+  return GEO_BY_CITY_UF.size;
+}
+
 export function resolveBrazilUfString(stateInput: string): string | null {
   const raw = stateInput?.trim();
   if (!raw) return null;
@@ -134,23 +140,20 @@ export function resolveBrazilUfString(stateInput: string): string | null {
   return STATE_NAME_TO_UF[key] ?? null;
 }
 
-/**
- * Usa `stateCode` (ex.: RJ) e, se necessário, `stateName` (ex.: Rio de Janeiro).
- */
 export function resolveBrazilUfFromJobState(stateCode: string, stateName: string): string | null {
   return resolveBrazilUfString(stateCode) ?? resolveBrazilUfString(stateName);
 }
 
 /**
- * Retorna latitude/longitude quando a cidade e a UF existem na base local; caso contrário `null`.
- * `uf` pode ser sigla (RJ) ou nome completo do estado (Rio de Janeiro).
+ * Retorna latitude/longitude quando cidade e UF batem na base local; caso contrário `null`.
+ * `uf` pode ser sigla (RJ) ou nome do estado (Rio de Janeiro).
  */
 export function getGeoCoordinatesByCityState(city: string, uf: string): { latitude: number; longitude: number } | null {
   const cityTrim = city?.trim();
   if (!cityTrim) return null;
 
-  const ufResolved = resolveBrazilUfString(uf);
-  if (!ufResolved) return null;
+  const key = normalizeGeoKey(cityTrim, uf);
+  if (!key) return null;
 
-  return LOOKUP.get(`${normalizeCityKey(cityTrim)}|${ufResolved}`) ?? null;
+  return GEO_BY_CITY_UF.get(key) ?? null;
 }

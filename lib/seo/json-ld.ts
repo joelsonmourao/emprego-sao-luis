@@ -1,12 +1,12 @@
 import type { EmploymentType } from "@prisma/client";
 
+import { siteConfig } from "@/lib/constants";
 import { normalizeDatePostedForSchema, normalizeValidThroughSchemaString } from "@/lib/date-utils";
+import { getGeoCoordinatesByCityState, resolveBrazilUfFromJobState } from "@/lib/geo/municipios-coordenadas";
 import { buildJobPostingDescriptionHtml } from "@/lib/jobs/job-posting-description";
 import { validateJobPostingMinimum } from "@/lib/jobs/job-posting-validate";
 import { employmentTypeToSchemaValue } from "@/lib/jobs/employment-type";
-import { getGeoCoordinatesByCityState, resolveBrazilUfFromJobState } from "@/lib/geo/municipios-coordenadas";
 import { getReferencePostalCodeForCity } from "@/lib/seo/br-reference-postal";
-import { buildJobPublisherName } from "@/lib/seo/job-publisher";
 import { absoluteUrl } from "@/lib/utils";
 
 export function buildOrganizationJsonLd(input?: { name?: string; logoUrl?: string }) {
@@ -229,7 +229,7 @@ export async function buildJobPostingJsonLd(job: JobPostingJsonLdInput): Promise
     url: jobUrl,
     identifier: {
       "@type": "PropertyValue",
-      name: buildJobPublisherName(job.cityName, job.stateCode),
+      name: siteConfig.name,
       value: (job.externalId?.trim() || job.id || job.slug).trim()
     },
     datePosted: datePostedRaw,
@@ -243,7 +243,8 @@ export async function buildJobPostingJsonLd(job: JobPostingJsonLdInput): Promise
       sameAs: sourceUrl
     },
     jobLocation: await buildJobLocationBlock(job),
-    description: descriptionHtml
+    description: descriptionHtml,
+    directApply: false
   };
 
   const baseSalary = buildBaseSalaryBlock(job.salaryMin, job.salaryMax);

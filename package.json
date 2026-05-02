@@ -18,7 +18,9 @@
     "prisma:migrate": "prisma migrate dev",
     "prisma:studio": "prisma studio",
     "db:seed": "tsx prisma/seed.ts",
-    "db:seed-admin": "tsx scripts/create-admin.ts"
+    "db:seed-admin": "tsx scripts/create-admin.ts",
+    "geo:build-municipios": "node scripts/generate-municipios-geonames.mjs",
+    "audit:job-geo": "tsx scripts/audit-job-geo.ts"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
