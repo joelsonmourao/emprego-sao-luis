@@ -210,8 +210,11 @@ export async function buildJobPostingJsonLd(job: JobPostingJsonLdInput): Promise
     workHours: job.workHours
   });
 
-  const datePostedRaw = normalizeDatePostedForSchema(job.publishedAt) ?? normalizeDatePostedForSchema(new Date())!;
-  const dateModifiedRaw = normalizeDatePostedForSchema(job.updatedAt ?? null) ?? undefined;
+  /** Google Rich Results para JobPosting costuma validar melhor sem `dateModified`; usamos a última alteração em `datePosted`. */
+  const datePostedRaw =
+    normalizeDatePostedForSchema(job.updatedAt ?? null) ??
+    normalizeDatePostedForSchema(job.publishedAt) ??
+    normalizeDatePostedForSchema(new Date())!;
   const validThroughRaw = normalizeValidThroughSchemaString({
     publishedAt: job.publishedAt,
     validThrough: job.validThrough ?? null,
@@ -220,7 +223,6 @@ export async function buildJobPostingJsonLd(job: JobPostingJsonLdInput): Promise
 
   const employmentTypeRaw = employmentTypeToSchemaValue(job.employmentType, { title: job.displayTitle });
   const jobUrl = absoluteUrl(`/vagas/${job.slug}`);
-  const sourceUrl = job.applyUrl?.trim() || undefined;
 
   const data: Record<string, unknown> = {
     "@context": "https://schema.org",
@@ -233,14 +235,13 @@ export async function buildJobPostingJsonLd(job: JobPostingJsonLdInput): Promise
       value: (job.externalId?.trim() || job.id || job.slug).trim()
     },
     datePosted: datePostedRaw,
-    dateModified: dateModifiedRaw,
     validThrough: validThroughRaw,
     employmentType: employmentTypeRaw,
     hiringOrganization: {
       "@type": "Organization",
       name: job.companyName,
       logo: "https://slzcontent.com.br/icon.svg",
-      sameAs: sourceUrl
+      sameAs: jobUrl
     },
     jobLocation: await buildJobLocationBlock(job),
     description: descriptionHtml,

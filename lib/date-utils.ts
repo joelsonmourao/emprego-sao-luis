@@ -106,7 +106,7 @@ export function normalizeValidThroughSchemaString(input: {
 }
 
 /**
- * datePosted para JobPosting: mesmo instante do banco, formatado no offset do Brasil.
+ * Data ISO com offset do Brasil para JobPosting (ex.: `datePosted`), a partir do instante do banco.
  */
 export function normalizeDatePostedForSchema(input: string | Date | null | undefined): string | undefined {
   if (input == null || input === "") return undefined;
