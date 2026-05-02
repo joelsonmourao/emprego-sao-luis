@@ -10,7 +10,6 @@ export type JobCitySeoBase = {
   uf: string;
 };
 
-export type JobCitySeoBranded = JobCitySeoBase & { brand: string };
 
 function vacancyCountPhrase(count: number, keyword: string) {
   if (count === 1) return `1 vaga de ${keyword}`;
@@ -31,9 +30,9 @@ export function clampMetaDescription(text: string, max = 160) {
   return cut.trimEnd() + (cut.endsWith(".") ? "" : ".");
 }
 
-export function generateJobCitySeoTitle(input: JobCitySeoBranded) {
-  const base = `${vacancyCountPhrase(input.count, input.keyword)} em ${input.city}, ${input.uf}`;
-  return `${base} | ${input.brand.trim()}`;
+/** Título sem sufixo de marca — o layout raiz aplica `template: "%s | {siteName}"`. */
+export function generateJobCitySeoTitle(input: JobCitySeoBase) {
+  return `${vacancyCountPhrase(input.count, input.keyword)} em ${input.city}, ${input.uf}`;
 }
 
 export function generateJobCitySeoDescription(input: JobCitySeoBase & { companies?: string[] }) {

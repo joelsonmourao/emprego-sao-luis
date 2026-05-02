@@ -89,7 +89,7 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
         <script
           id="adsense-auto-ads-bootstrap"
           dangerouslySetInnerHTML={{
-            __html: `(window.adsbygoogle = window.adsbygoogle || []).push({ google_ad_client: "${adsensePublisherId}", enable_page_level_ads: true });`
+            __html: `(window.adsbygoogle = window.adsbygoogle || []).push({ google_ad_client: "${adsensePublisherId}", enable_page_level_ads: false });`
           }}
         />
       </head>

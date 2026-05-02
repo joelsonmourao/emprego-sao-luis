@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { EmploymentType } from "@prisma/client";
 import { notFound } from "next/navigation";
 
 import { Breadcrumbs } from "@/components/breadcrumbs";
@@ -10,11 +9,11 @@ import { PaginationNav } from "@/components/pagination-nav";
 import { SectionHeading } from "@/components/section-heading";
 import { JovemAprendizCityUfSeoView } from "@/components/vagas/jovem-aprendiz-city-uf-seo-view";
 import { siteConfig } from "@/lib/constants";
-import { getCityByStateCodeAndSlug, getStateBySlug } from "@/lib/repositories/geo";
+import { getCityByStateCodeAndSlug, getSearchGeoData, getStateBySlug } from "@/lib/repositories/geo";
 import { getApprenticeCityUfSitemapRows, getJobsList } from "@/lib/repositories/jobs";
 import { jobSearchParamsSchema } from "@/lib/schemas/search";
 import { buildJovemAprendizCityUfPath, parseJovemAprendizCityUfSegment } from "@/lib/seo/jovem-aprendiz-city-uf-slug";
-import { buildProgrammaticStateTitle, jovemAprendizCityPath, jovemAprendizStatePath } from "@/lib/seo/jovem-aprendiz-programmatic";
+import { buildProgrammaticStateTitle, jovemAprendizStatePath } from "@/lib/seo/jovem-aprendiz-programmatic";
 import {
   generateJobCityAboutBody,
   generateJobCityAboutTitle,
@@ -27,6 +26,7 @@ import {
 import { buildListingFaq, buildListingCollectionPageJsonLd, getStateJobsPath } from "@/lib/seo/jobs-pages";
 import { buildSiteMetadata } from "@/lib/seo/metadata";
 import { buildBreadcrumbJsonLd, buildFaqJsonLd } from "@/lib/seo/json-ld";
+import type { JobSearchFilterGeoState } from "@/lib/vagas/job-search-filter-resolve";
 import { getSiteSettings } from "@/lib/site-settings";
 
 export const revalidate = 1200;
@@ -40,6 +40,16 @@ function buildPageHref(stateSlug: string, order: "relevance" | "date" | undefine
   return query ? `${base}?${query}` : base;
 }
 
+function mapGeoForFilterBar(states: Awaited<ReturnType<typeof getSearchGeoData>>): JobSearchFilterGeoState[] {
+  return states.map((s) => ({
+    id: s.id,
+    name: s.name,
+    slug: s.slug,
+    code: s.code,
+    cities: s.cities.map((c) => ({ id: c.id, name: c.name, slug: c.slug }))
+  }));
+}
+
 export async function generateMetadata({
   params,
   searchParams
@@ -51,21 +61,20 @@ export async function generateMetadata({
   const raw = await searchParams;
   const parsed = jobSearchParamsSchema.parse({
     order: typeof raw.order === "string" ? raw.order : undefined,
-    page: typeof raw.page === "string" ? raw.page : undefined
+    page: typeof raw.page === "string" ? raw.page : undefined,
+    modalidade: typeof raw.modalidade === "string" ? raw.modalidade : undefined
   });
 
   const compact = parseJovemAprendizCityUfSegment(estado);
   const pathname = `/vagas/jovem-aprendiz/${estado.trim().toLowerCase()}`;
 
   if (compact) {
-    const settings = await getSiteSettings();
-    const brand = settings.siteName?.trim() || siteConfig.name;
     const city = await getCityByStateCodeAndSlug(compact.uf, compact.citySlug);
 
     if (!city) {
       return buildSiteMetadata({
-        title: "Pagina nao encontrada",
-        description: "A cidade solicitada nao foi encontrada.",
+        title: "Página não encontrada",
+        description: "A cidade solicitada não foi encontrada.",
         pathname,
         canonicalUrl: pathname,
         noIndex: true
@@ -75,7 +84,8 @@ export async function generateMetadata({
     const jobs = await getJobsList({
       stateSlug: city.state.slug,
       citySlug: city.slug,
-      employmentType: EmploymentType.APPRENTICESHIP,
+      jovemAprendizHubExpanded: true,
+      locationType: parsed.modalidade,
       order: parsed.order,
       page: parsed.page
     });
@@ -83,7 +93,7 @@ export async function generateMetadata({
     if (jobs.total === 0) {
       return buildSiteMetadata({
         title: "Sem vagas ativas",
-        description: "Nao ha vagas de Jovem Aprendiz ativas para esta cidade no momento.",
+        description: "Não há vagas de Jovem Aprendiz ativas para esta cidade no momento.",
         pathname,
         canonicalUrl: pathname,
         noIndex: true
@@ -93,8 +103,11 @@ export async function generateMetadata({
     const companies = jobs.items.map((j) => j.company?.name ?? j.companyName).filter(Boolean);
     const keyword = "Jovem Aprendiz";
 
+    const variantNoIndex =
+      parsed.page > 1 || (parsed.order ?? "relevance") !== "relevance" || Boolean(parsed.modalidade);
+
     return buildSiteMetadata({
-      title: generateJobCitySeoTitle({ count: jobs.total, keyword, city: city.name, uf: city.state.code, brand }),
+      title: generateJobCitySeoTitle({ count: jobs.total, keyword, city: city.name, uf: city.state.code }),
       description: generateJobCitySeoDescription({
         count: jobs.total,
         keyword,
@@ -104,7 +117,7 @@ export async function generateMetadata({
       }),
       pathname,
       canonicalUrl: pathname,
-      noIndex: parsed.page > 1 || (parsed.order ?? "relevance") !== "relevance"
+      noIndex: variantNoIndex
     });
   }
 
@@ -113,8 +126,8 @@ export async function generateMetadata({
 
   if (!state) {
     return buildSiteMetadata({
-      title: "Estado nao encontrado",
-      description: "Pagina nao encontrada.",
+      title: "Estado não encontrado",
+      description: "Página não encontrada.",
       pathname: jovemAprendizStatePath(estado),
       canonicalUrl: canonicalPath,
       noIndex: true
@@ -145,7 +158,8 @@ export default async function JovemAprendizEstadoPage({
   const raw = await searchParams;
   const parsed = jobSearchParamsSchema.parse({
     order: typeof raw.order === "string" ? raw.order : undefined,
-    page: typeof raw.page === "string" ? raw.page : undefined
+    page: typeof raw.page === "string" ? raw.page : undefined,
+    modalidade: typeof raw.modalidade === "string" ? raw.modalidade : undefined
   });
 
   const compact = parseJovemAprendizCityUfSegment(estado);
@@ -156,13 +170,17 @@ export default async function JovemAprendizEstadoPage({
       notFound();
     }
 
-    const jobs = await getJobsList({
-      stateSlug: city.state.slug,
-      citySlug: city.slug,
-      employmentType: EmploymentType.APPRENTICESHIP,
-      order: parsed.order,
-      page: parsed.page
-    });
+    const [jobs, geoRaw] = await Promise.all([
+      getJobsList({
+        stateSlug: city.state.slug,
+        citySlug: city.slug,
+        jovemAprendizHubExpanded: true,
+        locationType: parsed.modalidade,
+        order: parsed.order,
+        page: parsed.page
+      }),
+      getSearchGeoData()
+    ]);
 
     if (jobs.total === 0) {
       notFound();
@@ -172,6 +190,8 @@ export default async function JovemAprendizEstadoPage({
     const brand = settings.siteName?.trim() || siteConfig.name;
     const keyword = "Jovem Aprendiz";
     const companies = jobs.items.map((j) => j.company?.name ?? j.companyName).filter(Boolean);
+    const titleBase = generateJobCitySeoTitle({ count: jobs.total, keyword, city: city.name, uf: city.state.code });
+    const webPageJsonLdName = `${titleBase} | ${brand}`;
 
     return (
       <JovemAprendizCityUfSeoView
@@ -179,7 +199,8 @@ export default async function JovemAprendizEstadoPage({
         city={city}
         jobs={jobs}
         order={parsed.order ?? "relevance"}
-        title={generateJobCitySeoTitle({ count: jobs.total, keyword, city: city.name, uf: city.state.code, brand })}
+        modalidade={parsed.modalidade}
+        webPageJsonLdName={webPageJsonLdName}
         description={generateJobCitySeoDescription({
           count: jobs.total,
           keyword,
@@ -198,6 +219,7 @@ export default async function JovemAprendizEstadoPage({
         aboutTitle={generateJobCityAboutTitle(city.name, city.state.code)}
         aboutBody={generateJobCityAboutBody(city.name, city.state.code)}
         faq={generateJobCityFaq(city.name, city.state.code)}
+        geoStates={mapGeoForFilterBar(geoRaw)}
       />
     );
   }
@@ -250,7 +272,7 @@ export default async function JovemAprendizEstadoPage({
                   : "rounded-full bg-[var(--brand-navy)] px-4 py-2 font-semibold text-white"
               }
             >
-              Relevancia
+              Relevância
             </Link>
             <Link
               href={buildOrderHref("date")}
@@ -278,7 +300,7 @@ export default async function JovemAprendizEstadoPage({
             <SectionHeading
               eyebrow="Listagem"
               title={`Vagas em destaque no ${state.name}`}
-              description="Compare cargos, empresas e links de candidatura. Conteudo pensado para SEO local e navegacao clara."
+              description="Compare cargos, empresas e links de candidatura. Conteúdo pensado para SEO local e navegação clara."
             />
           </div>
 
@@ -320,7 +342,7 @@ export default async function JovemAprendizEstadoPage({
               href={getStateJobsPath(state.slug)}
               className="mt-4 inline-block text-sm font-semibold text-[var(--brand-text-secondary)] hover:text-[var(--brand-orange)]"
             >
-              Ver rota classica do estado
+              Ver rota clássica do estado
             </Link>
           </div>
         </aside>

@@ -1,5 +1,16 @@
 import { BR_UF_CODES } from "@/lib/seo/br-uf";
 
+/** Slugs de cidade que não podem ser confundidos com rotas aninhadas em `/vagas/jovem-aprendiz/...`. */
+export const JOVEM_APRENDIZ_CITY_UF_RESERVED_SLUGS = new Set([
+  "categoria",
+  "estado",
+  "cidade",
+  "empresa",
+  "blog",
+  "indisponivel",
+  "jovem-aprendiz"
+]);
+
 /**
  * URL compacta tipo Glassdoor (sem copiar marca): `/vagas/jovem-aprendiz/{citySlug}-{uf}`.
  * Ex.: `sao-luis-ma`, `fortaleza-ce`.
@@ -26,6 +37,7 @@ export function parseJovemAprendizCityUfSegment(segment: string): { citySlug: st
   if (!citySlug || uf.length !== 2) return null;
   const upper = uf.toUpperCase();
   if (!BR_UF_CODES.has(upper)) return null;
+  if (JOVEM_APRENDIZ_CITY_UF_RESERVED_SLUGS.has(citySlug)) return null;
 
   return { citySlug, uf: upper };
 }

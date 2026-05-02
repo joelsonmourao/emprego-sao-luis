@@ -45,11 +45,11 @@ export function JobCard({ job }: JobCardProps) {
               </span>
               {job.locationType ? (
                 <span className="inline-flex rounded-full bg-[rgba(255,109,0,0.12)] px-3 py-1 text-xs font-semibold text-[var(--brand-orange)]">
-                  {job.locationType === "REMOTE" ? "Remoto" : job.locationType === "HYBRID" ? "Hibrido" : "Presencial"}
+                  {job.locationType === "REMOTE" ? "Remoto" : job.locationType === "HYBRID" ? "Híbrido" : "Presencial"}
                 </span>
               ) : null}
             </div>
-            <CardTitle className="text-[1.7rem] leading-tight">
+            <CardTitle className="text-lg leading-snug sm:text-[1.35rem] sm:leading-tight md:text-[1.5rem]">
               <TrackedLink href={`/vagas/${job.slug}`} eventName="job_click" entityType="job" entitySlug={job.slug}>
                 {job.title}
               </TrackedLink>

@@ -79,7 +79,7 @@ export function buildJobsListingMetaTitle(input: ListingDescriptorInput) {
 
 export function buildJobsListingDescription(input: ListingDescriptorInput) {
   if (input.companyName) {
-    return `Veja vagas de Jovem Aprendiz no ${input.companyName}, requisitos mais comuns, perfil buscado e como se candidatar as oportunidades.`;
+    return `Veja vagas de Jovem Aprendiz no ${input.companyName}, requisitos mais comuns, perfil buscado e como se candidatar às oportunidades.`;
   }
 
   if (input.cityName && input.stateCode) {
@@ -101,7 +101,7 @@ export function buildJobsListingDescription(input: ListingDescriptorInput) {
 
 export function buildJobsListingIntro(input: ListingDescriptorInput) {
   if (input.companyName) {
-    return `Confira oportunidades de Jovem Aprendiz no ${input.companyName}, veja requisitos frequentes, cidades com vagas e orientacoes para acompanhar novas oportunidades.`;
+    return `Confira oportunidades de Jovem Aprendiz no ${input.companyName}, veja requisitos frequentes, cidades com vagas e orientações para acompanhar novas oportunidades.`;
   }
 
   if (input.cityName && input.stateCode) {
@@ -112,7 +112,7 @@ export function buildJobsListingIntro(input: ListingDescriptorInput) {
     return `Encontre vagas de Jovem Aprendiz no ${input.stateName} em empresas de diferentes segmentos. Veja oportunidades atualizadas, empresas contratando e requisitos comuns para iniciar no mercado de trabalho.`;
   }
 
-  return `Encontre vagas de Jovem Aprendiz no Brasil, acompanhe empresas contratando e navegue por cidade, estado e empresa para chegar mais rapido as oportunidades com maior potencial de candidatura.`;
+    return `Encontre vagas de Jovem Aprendiz no Brasil, acompanhe empresas contratando e navegue por cidade, estado e empresa para chegar mais rápido às oportunidades com maior potencial de candidatura.`;
 }
 
 export function isStrategicJobsSearchIndexable(input: JobsSearchIndexingInput) {

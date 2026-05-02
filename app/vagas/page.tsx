@@ -5,7 +5,7 @@ import { Breadcrumbs } from "@/components/breadcrumbs";
 import { EmptyState } from "@/components/empty-state";
 import { FaqList } from "@/components/faq-list";
 import { JsonLd } from "@/components/json-ld";
-import { JobSearchForm } from "@/components/job-search-form";
+import { JobSearchFilterBar } from "@/components/vagas/job-search-filter-bar";
 import { PaginationNav } from "@/components/pagination-nav";
 import { SectionHeading } from "@/components/section-heading";
 import {
@@ -211,6 +211,8 @@ export default async function JobsPage({
       <JsonLd data={buildFaqJsonLd(faq)} />
       <Breadcrumbs items={[{ label: "Home", href: "/" }, { label: "Vagas", href: "/vagas" }]} />
 
+      <JobSearchFilterBar states={states} className="min-h-[5.5rem]" />
+
       <div className="brand-page-hero rounded-[1.5rem] border border-slate-200 px-4 py-5 shadow-[0_35px_120px_-70px_rgba(26,43,76,0.22)] sm:rounded-[2rem] sm:px-5 sm:py-6 sm:rounded-[2.2rem] sm:px-8 sm:py-8">
         <div className="space-y-3 sm:space-y-4">
           <p className="text-[10px] font-semibold uppercase tracking-[0.24em] text-[var(--brand-orange)] sm:text-xs sm:tracking-[0.28em]">
@@ -228,7 +230,7 @@ export default async function JobsPage({
                   : "whitespace-nowrap rounded-full border border-[color:rgba(26,43,76,0.1)] bg-white px-3 py-1.5 text-xs font-medium text-[var(--brand-text-secondary)] transition hover:border-[color:rgba(255,109,0,0.22)] hover:text-[var(--brand-orange)] sm:px-4 sm:py-2 sm:text-sm"
               }
             >
-              Relevancia
+              Relevância
             </Link>
             <Link
               href={buildOrderHref("date") as never}
@@ -244,8 +246,6 @@ export default async function JobsPage({
         </div>
       </div>
 
-      <JobSearchForm states={states} action="/vagas" initialQuery={parsed.q} initialState={parsed.estado} initialCity={parsed.cidade} compact />
-
       {jobs.items.length ? (
         <>
           <JobsGridWithMidAd jobs={jobs.items} />
@@ -255,7 +255,7 @@ export default async function JobsPage({
       ) : (
         <EmptyState
         title="Ainda não encontramos vagas com essa combinação"
-          description="Tente remover alguns filtros ou navegar pelas paginas de cidade e estado para encontrar mais oportunidades."
+          description="Tente remover alguns filtros ou navegar pelas páginas de cidade e estado para encontrar mais oportunidades."
         />
       )}
 
@@ -275,7 +275,7 @@ export default async function JobsPage({
           <SectionHeading
             eyebrow="Continue a busca"
             title="Use cidade, estado e empresa para encontrar uma vaga com mais foco"
-        description="Quanto mais perto a busca ficar da sua realidade, mais rápido você chega nas vagas que combinam com a sua rotina."
+            description="Quanto mais perto a busca ficar da sua realidade, mais rápido você chega nas vagas que combinam com a sua rotina."
           />
           <div className="mt-4 flex flex-wrap gap-2 sm:mt-6 sm:gap-3">
             {states.slice(0, 6).map((state) => (

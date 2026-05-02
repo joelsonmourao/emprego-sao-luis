@@ -63,6 +63,7 @@ export async function buildSiteMetadata(input: BuildMetadataInput): Promise<Meta
   const siteName = settings.siteName || siteConfig.name;
   const canonical = absoluteUrl(input.canonicalUrl || input.pathname);
   const socialImage = absoluteUrl(input.socialImageUrl || settings.defaultSocialImageUrl || "/brand-logo.svg");
+  const titleWithBrand = input.title.includes("|") ? input.title.trim() : `${input.title.trim()} | ${siteName}`;
 
   return {
     title: input.title,
@@ -74,7 +75,7 @@ export async function buildSiteMetadata(input: BuildMetadataInput): Promise<Meta
     openGraph: {
       type: "website",
       url: canonical,
-      title: input.title,
+      title: titleWithBrand,
       description: input.description,
       locale: "pt_BR",
       siteName,
@@ -89,7 +90,7 @@ export async function buildSiteMetadata(input: BuildMetadataInput): Promise<Meta
     },
     twitter: {
       card: "summary_large_image",
-      title: input.title,
+      title: titleWithBrand,
       description: input.description,
       images: [socialImage]
     },

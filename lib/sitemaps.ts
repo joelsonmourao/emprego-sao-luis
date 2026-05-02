@@ -2,10 +2,8 @@ import { unstable_cache } from "next/cache";
 import { HubType } from "@prisma/client";
 
 import { staticPages } from "@/data/seo-pages";
-import { EMPLOYMENT_CATEGORIES } from "@/lib/employment-categories";
 import { getCityJobsPath, getCompanyJobsPath, getJobPath } from "@/lib/seo/jobs-pages";
 import { buildJovemAprendizCityUfPath } from "@/lib/seo/jovem-aprendiz-city-uf-slug";
-import { jovemAprendizCategoryPath } from "@/lib/seo/jovem-aprendiz-programmatic";
 import { shouldIndexPage } from "@/lib/seo/indexing";
 import { getAllPublishedPostEntries } from "@/lib/repositories/blog";
 import { getCities } from "@/lib/repositories/geo";
@@ -176,11 +174,6 @@ async function computeSitemapManifest(): Promise<SitemapManifest> {
     return map;
   }, new Map());
 
-  const employmentCounts = jobs.reduce<Map<string, number>>((map, job) => {
-    map.set(job.employmentType, (map.get(job.employmentType) ?? 0) + 1);
-    return map;
-  }, new Map());
-
   const institutionals = staticPages.filter((path) => ROOT_ROUTES_BY_CATEGORY.institutionals.includes(path as never));
   const latestJobsDate = jobs[0]?.updatedAt;
   const latestPostsDate = posts[0]?.updatedAt;
@@ -261,11 +254,6 @@ async function computeSitemapManifest(): Promise<SitemapManifest> {
     ...companyHubs.flatMap(() => {
       // Rotas programaticas de empresa ficam fora do sitemap para evitar duplicidade com /empresa/[slug]/jovem-aprendiz.
       return [];
-    }),
-    ...EMPLOYMENT_CATEGORIES.flatMap((category) => {
-      const total = employmentCounts.get(category.employmentType) ?? 0;
-      if (total <= 0) return [];
-      return [toSitemapEntry(jovemAprendizCategoryPath(category.slug), latestJobsDate, { changefreq: "weekly", priority: 0.6 })];
     })
   ];
 

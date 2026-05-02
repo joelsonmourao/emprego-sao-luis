@@ -71,8 +71,8 @@ export function buildStateListingSeo(input: StateSeoInput) {
 export function buildCityListingSeo(input: CitySeoInput) {
   const countLabel = formatVacancyCount(input.totalJobs);
   return {
-    title: `${countLabel} em ${input.cityName}, ${input.stateCode} | Jovem Aprendiz`,
-    description: `${input.cityName} (${input.stateCode}): ${countLabel} de Jovem Aprendiz com empresas, requisitos e candidatura. Pagina focada em primeiro emprego na regiao.`,
+    title: `${countLabel} em ${input.cityName}, ${input.stateCode}`,
+    description: `${input.cityName} (${input.stateCode}): ${countLabel} de Jovem Aprendiz com empresas, requisitos e candidatura. Página focada em primeiro emprego na região.`,
     h1: `Vagas de Jovem Aprendiz em ${input.cityName}, ${input.stateCode}`,
     intro:
       `Confira vagas de Jovem Aprendiz em ${input.cityName}, ${input.stateCode}, com oportunidades atualizadas por empresa e area. ` +
@@ -86,17 +86,17 @@ export function buildCompanyListingSeo(
   options?: { variant?: "default" | "vagas-hub" }
 ) {
   const countDrivenTitle =
-    input.totalJobs >= 3 ? `${formatVacancyCount(input.totalJobs)} no ${input.companyName} | Jovem Aprendiz` : null;
+    input.totalJobs >= 3 ? `${formatVacancyCount(input.totalJobs)} no ${input.companyName}` : null;
 
   const canonicalPath =
     options?.variant === "vagas-hub" ? getVagasEmpresaPath(input.companySlug) : getCompanyJobsPath(input.companySlug);
 
   return {
     title: countDrivenTitle ?? `${input.companyName}: vagas de Jovem Aprendiz e candidatura`,
-    description: `Oportunidades de Jovem Aprendiz no ${input.companyName}: requisitos, perfil buscado, cidades e como se candidatar. ${formatVacancyCount(input.totalJobs)} listadas nesta pagina.`,
+    description: `Oportunidades de Jovem Aprendiz no ${input.companyName}: requisitos, perfil buscado, cidades e como se candidatar. ${formatVacancyCount(input.totalJobs)} listadas nesta página.`,
     h1: `Jovem Aprendiz no ${input.companyName}`,
     intro:
-      `Confira oportunidades de Jovem Aprendiz no ${input.companyName}, veja requisitos frequentes, cidades com vagas e orientacoes para acompanhar novas oportunidades.`,
+      `Confira oportunidades de Jovem Aprendiz no ${input.companyName}, veja requisitos frequentes, cidades com vagas e orientações para acompanhar novas oportunidades.`,
     canonicalPath
   };
 }
@@ -104,7 +104,7 @@ export function buildCompanyListingSeo(
 export function buildJobDetailSeo(input: JobSeoInput) {
   return {
     title: `${input.title} | ${input.companyName} — ${input.cityName}, ${input.stateCode}`,
-    description: `Vaga de Jovem Aprendiz: ${input.title} na ${input.companyName} (${input.cityName}, ${input.stateCode}). Resumo, requisitos, beneficios e link oficial para candidatura.`,
+    description: `Vaga de Jovem Aprendiz: ${input.title} na ${input.companyName} (${input.cityName}, ${input.stateCode}). Resumo, requisitos, benefícios e link oficial para candidatura.`,
     canonicalPath: getJobPath(input.slug)
   };
 }
@@ -125,7 +125,7 @@ export function buildListingFaq(input: { name: string; totalJobs: number; type: 
       ? [
           {
             question: `Como acompanhar novas vagas de Jovem Aprendiz no ${input.name}?`,
-            answer: `Acompanhe a pagina do ${input.name} para ver novas oportunidades, cidades com vagas e atualizacoes recentes do portal.`
+            answer: `Acompanhe a página do ${input.name} para ver novas oportunidades, cidades com vagas e atualizações recentes do portal.`
           },
           {
             question: `O ${input.name} esta contratando Jovem Aprendiz agora?`,
@@ -139,7 +139,7 @@ export function buildListingFaq(input: { name: string; totalJobs: number; type: 
           },
           {
             question: `Como encontrar empresas com vagas de Jovem Aprendiz em ${input.name}?`,
-            answer: `Use os blocos de empresas da pagina para acessar marcas com vagas abertas e continuar a busca pelas oportunidades mais recentes.`
+            answer: `Use os blocos de empresas da página para acessar marcas com vagas abertas e continuar a busca pelas oportunidades mais recentes.`
           }
         ];
 

@@ -1,7 +1,8 @@
 import { unstable_cache } from "next/cache";
-import type { EmploymentType, Prisma } from "@prisma/client";
+import type { EmploymentType, LocationType, Prisma } from "@prisma/client";
 
 import { markExpiredJobsInactive } from "@/lib/jobs/job-expiry";
+import { jovemAprendizHubOrKeywordsWhere } from "@/lib/jobs/jovem-aprendiz-hub-where";
 import { prisma } from "@/lib/db";
 import { pagination } from "@/lib/constants";
 import { PUBLIC_JOBS_CACHE_TAG } from "@/lib/public-revalidate";
@@ -131,6 +132,9 @@ function jobsListCacheKey(params: {
   companySlug?: string;
   companyName?: string;
   employmentType?: EmploymentType;
+  /** Hub compacto: OR aprendizagem + palavras-chave no conteúdo. */
+  jovemAprendizHubExpanded?: boolean;
+  locationType?: LocationType;
   order?: "relevance" | "date";
   page?: number;
 }) {
@@ -141,6 +145,8 @@ function jobsListCacheKey(params: {
     companySlug: params.companySlug ?? null,
     companyName: params.companyName ?? null,
     employmentType: params.employmentType ?? null,
+    jovemAprendizHubExpanded: params.jovemAprendizHubExpanded ?? false,
+    locationType: params.locationType ?? null,
     order: params.order ?? "relevance",
     page: params.page ?? 1
   });
@@ -155,6 +161,8 @@ const getJobsListCached = unstable_cache(async (key: string) => {
     companySlug?: string;
     companyName?: string;
     employmentType?: EmploymentType;
+    jovemAprendizHubExpanded?: boolean;
+    locationType?: LocationType;
     order?: "relevance" | "date";
     page?: number;
   };
@@ -162,19 +170,35 @@ const getJobsListCached = unstable_cache(async (key: string) => {
   const page = params.page ?? 1;
   const order = params.order ?? "relevance";
 
+  const typeScope: Prisma.JobWhereInput = params.jovemAprendizHubExpanded
+    ? jovemAprendizHubOrKeywordsWhere()
+    : params.employmentType
+      ? { employmentType: params.employmentType }
+      : {};
+
+  const searchOr: Prisma.JobWhereInput | null = params.query
+    ? {
+        OR: [
+          { title: { contains: params.query, mode: "insensitive" } },
+          { companyName: { contains: params.query, mode: "insensitive" } },
+          { summary: { contains: params.query, mode: "insensitive" } },
+          { city: { name: { contains: params.query, mode: "insensitive" } } },
+          { state: { name: { contains: params.query, mode: "insensitive" } } }
+        ]
+      }
+    : null;
+
+  const andParts: Prisma.JobWhereInput[] = [];
+  if (Object.keys(typeScope).length > 0) {
+    andParts.push(typeScope);
+  }
+  if (searchOr) {
+    andParts.push(searchOr);
+  }
+
   const where: Prisma.JobWhereInput = {
     isActive: true,
-    ...(params.query
-      ? {
-          OR: [
-            { title: { contains: params.query, mode: "insensitive" } },
-            { companyName: { contains: params.query, mode: "insensitive" } },
-            { summary: { contains: params.query, mode: "insensitive" } },
-            { city: { name: { contains: params.query, mode: "insensitive" } } },
-            { state: { name: { contains: params.query, mode: "insensitive" } } }
-          ]
-        }
-      : {}),
+    ...(andParts.length ? { AND: andParts } : {}),
     ...(params.stateSlug ? { state: { slug: params.stateSlug } } : {}),
     ...(params.citySlug ? { city: { slug: params.citySlug } } : {}),
     ...(params.companySlug ? { company: { slug: params.companySlug } } : {}),
@@ -188,7 +212,7 @@ const getJobsListCached = unstable_cache(async (key: string) => {
           }
         }
       : {}),
-    ...(params.employmentType ? { employmentType: params.employmentType } : {})
+    ...(params.locationType ? { locationType: params.locationType } : {})
   };
 
   const [items, total] = await Promise.all([
@@ -228,6 +252,8 @@ export async function getJobsList(params: {
   companySlug?: string;
   companyName?: string;
   employmentType?: EmploymentType;
+  jovemAprendizHubExpanded?: boolean;
+  locationType?: LocationType;
   order?: "relevance" | "date";
   page?: number;
 }) {
@@ -508,11 +534,11 @@ export async function getCompanyAdminOptions() {
   }));
 }
 
-/** Uma entrada por combinação cidade + UF com vaga ativa de aprendiz (para sitemap compacto). */
+/** Uma entrada por combinação cidade + UF com vaga ativa no hub Jovem Aprendiz (para sitemap compacto). */
 async function fetchApprenticeCityUfSitemapRows() {
   await markExpiredJobsInactive();
   const rows = await prisma.job.findMany({
-    where: { isActive: true, employmentType: "APPRENTICESHIP" },
+    where: { isActive: true, ...jovemAprendizHubOrKeywordsWhere() },
     select: {
       updatedAt: true,
       city: { select: { slug: true } },

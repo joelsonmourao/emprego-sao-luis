@@ -3,6 +3,7 @@ import { cache } from "react";
 import { notFound } from "next/navigation";
 
 import { Breadcrumbs } from "@/components/breadcrumbs";
+import { JobSearchFilterBar } from "@/components/vagas/job-search-filter-bar";
 import { FaqList } from "@/components/faq-list";
 import { JobCard } from "@/components/job-card";
 import { JsonLd } from "@/components/json-ld";
@@ -13,9 +14,10 @@ import { buildListingCollectionPageJsonLd, buildListingFaq, buildStateListingSeo
 import { shouldIndexPage } from "@/lib/seo/indexing";
 import { buildSiteMetadata } from "@/lib/seo/metadata";
 import { buildBreadcrumbJsonLd, buildFaqJsonLd } from "@/lib/seo/json-ld";
-import { getStateBySlug } from "@/lib/repositories/geo";
+import { getSearchGeoData, getStateBySlug } from "@/lib/repositories/geo";
 import { getApprenticeCityUfSitemapRows, getCompanyHubsByState, getJobsList } from "@/lib/repositories/jobs";
 import { jobSearchParamsSchema } from "@/lib/schemas/search";
+import type { JobSearchFilterGeoState } from "@/lib/vagas/job-search-filter-resolve";
 
 export const revalidate = 1800;
 
@@ -109,7 +111,18 @@ export default async function JobsByStatePage({
     notFound();
   }
 
-  const [stateCompanies, apprenticeCityRows] = await Promise.all([getCompanyHubsByState(stateData.slug, 8), getApprenticeCityUfSitemapRows()]);
+  const [stateCompanies, apprenticeCityRows, geoRaw] = await Promise.all([
+    getCompanyHubsByState(stateData.slug, 8),
+    getApprenticeCityUfSitemapRows(),
+    getSearchGeoData()
+  ]);
+  const geoStates: JobSearchFilterGeoState[] = geoRaw.map((s) => ({
+    id: s.id,
+    name: s.name,
+    slug: s.slug,
+    code: s.code,
+    cities: s.cities.map((c) => ({ id: c.id, name: c.name, slug: c.slug }))
+  }));
   const jobs = listingData.jobs;
   const apprenticeCitySlugSet = new Set(
     apprenticeCityRows.filter((row) => row.stateCode === stateData.code).map((row) => row.citySlug)
@@ -141,6 +154,8 @@ export default async function JobsByStatePage({
 
       <Breadcrumbs items={[{ label: "Home", href: "/" }, { label: "Vagas", href: "/vagas" }, { label: stateData.name }]} />
 
+      <JobSearchFilterBar states={geoStates} defaultQuery="" defaultLocation={stateData.code} className="min-h-[5.5rem]" />
+
       <div className="brand-page-hero rounded-[2rem] border border-slate-200 px-5 py-6 shadow-[0_35px_120px_-70px_rgba(26,43,76,0.22)] sm:px-8 sm:py-8">
         <div className="space-y-4">
           <div className="flex flex-wrap items-center gap-3 text-sm">
@@ -156,7 +171,7 @@ export default async function JobsByStatePage({
           <div className="flex flex-wrap items-center gap-3 text-sm">
             <span className="font-semibold text-[var(--brand-text-secondary)]">Ordenar por:</span>
             <Link href={buildOrderHref("relevance")} className={parsed.order === "date" ? "rounded-full border border-[color:rgba(26,43,76,0.1)] bg-white px-4 py-2 font-medium text-[var(--brand-text-secondary)]" : "rounded-full bg-[var(--brand-navy)] px-4 py-2 font-semibold text-white"}>
-              Relevancia
+              Relevância
             </Link>
             <Link href={buildOrderHref("date")} className={parsed.order === "date" ? "rounded-full bg-[var(--brand-navy)] px-4 py-2 font-semibold text-white" : "rounded-full border border-[color:rgba(26,43,76,0.1)] bg-white px-4 py-2 font-medium text-[var(--brand-text-secondary)]"}>
               Data
@@ -171,7 +186,7 @@ export default async function JobsByStatePage({
             <SectionHeading
               eyebrow="Busca por estado"
               title={`Vagas e empresas de Jovem Aprendiz no ${stateData.name}`}
-        description={`Esta página concentra vagas por cidade, empresas contratando no ${stateData.name} e caminhos internos para continuar a busca em páginas mais específicas.`}
+              description={`Esta página concentra vagas por cidade, empresas contratando no ${stateData.name} e caminhos internos para continuar a busca em páginas mais específicas.`}
             />
           </div>
 
@@ -192,9 +207,9 @@ export default async function JobsByStatePage({
 
           <div className="rounded-[1.8rem] border border-slate-200 bg-white p-6 shadow-sm">
             <SectionHeading
-              eyebrow="Conteudo complementar"
+              eyebrow="Conteúdo complementar"
               title={`Como encontrar Jovem Aprendiz no ${stateData.name}`}
-              description={`Compare cidades com maior volume de vagas, descubra empresas contratando no estado e navegue por paginas mais especificas para aumentar a chance de encontrar oportunidades com match real.`}
+              description={`Compare cidades com maior volume de vagas, descubra empresas contratando no estado e navegue por páginas mais específicas para aumentar a chance de encontrar oportunidades com match real.`}
             />
           </div>
         </div>
