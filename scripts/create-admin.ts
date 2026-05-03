@@ -1,15 +1,19 @@
-import { PrismaClient } from '@prisma/client';
-import { hashPassword } from '@/lib/auth';
+import { PrismaClient } from "@prisma/client";
+
+import {
+  ADMIN_BOOTSTRAP_EMAIL,
+  ADMIN_BOOTSTRAP_PASSWORD
+} from "@/lib/admin-bootstrap-credentials";
+import { hashPassword } from "@/lib/password-hash";
 
 const prisma = new PrismaClient();
 
 async function createAdminUser() {
   try {
-    console.log('🔧 Criando usuário administrador padrão...');
+    console.log("🔧 Criando usuário administrador padrão...");
 
-    // E-mail e senha padrão (altere após o primeiro login)
-    const adminEmail = process.env.ADMIN_LOGIN_USER || 'admin@jovemaprendizvagas.com.br';
-    const adminPassword = process.env.ADMIN_SECRET_KEY || 'admin123456';
+    const adminEmail = (process.env.ADMIN_LOGIN_USER?.trim() || ADMIN_BOOTSTRAP_EMAIL).toLowerCase();
+    const adminPassword = process.env.ADMIN_SECRET_KEY?.trim() || ADMIN_BOOTSTRAP_PASSWORD;
 
     // Verificar se usuário já existe
     const existingAdmin = await prisma.adminUser.findUnique({

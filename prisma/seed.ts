@@ -1,6 +1,7 @@
 import { EmploymentType, LocationType, PrismaClient } from "@prisma/client";
 
-import { hashPassword } from "@/lib/auth";
+import { ADMIN_BOOTSTRAP_EMAIL, ADMIN_BOOTSTRAP_PASSWORD } from "@/lib/admin-bootstrap-credentials";
+import { hashPassword } from "@/lib/password-hash";
 import { env } from "@/lib/env";
 import { defaultSiteContent } from "@/lib/site-content";
 import { defaultSiteSettings } from "@/lib/site-settings";
@@ -312,13 +313,21 @@ async function main() {
     });
   }
 
+  const adminEmail = (
+    env.ADMIN_LOGIN_USER?.trim() || ADMIN_BOOTSTRAP_EMAIL
+  ).toLowerCase();
+  const adminSecret = env.ADMIN_SECRET_KEY?.trim() || ADMIN_BOOTSTRAP_PASSWORD;
   await prisma.adminUser.upsert({
-    where: { email: (env.ADMIN_LOGIN_USER || "").toLowerCase() },
-    update: { name: "Administrador", passwordHash: await hashPassword(env.ADMIN_SECRET_KEY || ""), isActive: true },
+    where: { email: adminEmail },
+    update: {
+      name: "Administrador",
+      passwordHash: await hashPassword(adminSecret),
+      isActive: true
+    },
     create: {
       name: "Administrador",
-      email: (env.ADMIN_LOGIN_USER || "").toLowerCase(),
-      passwordHash: await hashPassword(env.ADMIN_SECRET_KEY || ""),
+      email: adminEmail,
+      passwordHash: await hashPassword(adminSecret),
       isActive: true
     }
   });
