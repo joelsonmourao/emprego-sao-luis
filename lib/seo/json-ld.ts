@@ -2,7 +2,7 @@ import type { EmploymentType } from "@prisma/client";
 
 import { siteConfig } from "@/lib/constants";
 import { normalizeDatePostedForSchema, normalizeValidThroughSchemaString } from "@/lib/date-utils";
-import { resolveBrazilUfFromJobState } from "@/lib/geo/municipios-coordenadas";
+import { getGeoCoordinatesByCityState, resolveBrazilUfFromJobState } from "@/lib/geo/municipios-coordenadas";
 import { buildJobPostingDescriptionHtml } from "@/lib/jobs/job-posting-description";
 import { validateJobPostingMinimum } from "@/lib/jobs/job-posting-validate";
 import { employmentTypeToSchemaValue } from "@/lib/jobs/employment-type";
@@ -153,8 +153,10 @@ export type JobPostingJsonLdInput = {
   stateCode: string;
   stateName: string;
   locationType?: "ONSITE" | "REMOTE" | "HYBRID" | string | null;
+  /** Primeira publicação (imutável na edição). */
   publishedAt: string | Date;
-  updatedAt?: string | Date | null;
+  /** Criação no banco — fallback só se `publishedAt` estiver ausente. */
+  createdAt?: string | Date | null;
   expiresAt: string | Date | null;
   validThrough?: string | Date | null;
   salaryMin: number | null;
@@ -227,7 +229,6 @@ function isPlaceholderStreetAddress(value: string | undefined | null) {
 }
 
 async function buildJobLocationBlock(job: JobPostingJsonLdInput) {
-  const countryCode = ((job.countryCode ?? "BR").trim() || "BR").toUpperCase();
   const resolvedUf = resolveBrazilUfFromJobState(job.stateCode, job.stateName);
   const stateForPostal = resolvedUf ?? job.stateCode.trim();
   const postal =
@@ -235,16 +236,11 @@ async function buildJobLocationBlock(job: JobPostingJsonLdInput) {
     (await getReferencePostalCodeForCity({ stateCode: stateForPostal || job.stateCode, citySlug: job.citySlug }));
   const street = job.streetAddress?.trim();
 
-  const addressCountry =
-    !countryCode || countryCode === "BR"
-      ? { "@type": "Country", name: "Brazil" }
-      : { "@type": "Country", name: countryCode };
-
   const address: Record<string, unknown> = {
     "@type": "PostalAddress",
     addressLocality: job.cityName.trim(),
     addressRegion: resolvedUf ?? job.stateCode.trim(),
-    addressCountry
+    addressCountry: { "@type": "Country", name: "Brazil" }
   };
 
   if (postal && !isPlaceholderSentinel(postal)) {
@@ -255,10 +251,22 @@ async function buildJobLocationBlock(job: JobPostingJsonLdInput) {
     address.streetAddress = street;
   }
 
-  return {
+  const place: Record<string, unknown> = {
     "@type": "Place",
     address
   };
+
+  const ufForGeo = (resolvedUf ?? job.stateCode.trim()).toUpperCase();
+  const geo = getGeoCoordinatesByCityState(job.cityName.trim(), ufForGeo);
+  if (geo && Number.isFinite(geo.latitude) && Number.isFinite(geo.longitude)) {
+    place.geo = {
+      "@type": "GeoCoordinates",
+      latitude: geo.latitude,
+      longitude: geo.longitude
+    };
+  }
+
+  return place;
 }
 
 export async function buildJobPostingJsonLd(job: JobPostingJsonLdInput): Promise<Record<string, unknown> | null> {
@@ -272,13 +280,17 @@ export async function buildJobPostingJsonLd(job: JobPostingJsonLdInput): Promise
     workHours: job.workHours
   });
 
-  const datePostedRaw =
-    normalizeDatePostedForSchema(job.publishedAt) ?? normalizeDatePostedForSchema(new Date())!;
+  const datePostedSource = job.publishedAt ?? job.createdAt ?? null;
+  const datePostedRaw = normalizeDatePostedForSchema(datePostedSource);
   const validThroughRaw = normalizeValidThroughSchemaString({
     publishedAt: job.publishedAt,
     validThrough: job.validThrough ?? null,
     expiresAt: job.expiresAt
   });
+
+  if (!datePostedRaw?.trim() || !validThroughRaw?.trim()) {
+    return null;
+  }
 
   const employmentTypeRaw = employmentTypeToSchemaValue(job.employmentType, { title: job.displayTitle });
   const jobUrl = absoluteUrl(`/vagas/${job.slug}`);

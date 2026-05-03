@@ -95,8 +95,8 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
       </head>
       <body className="min-h-screen antialiased overflow-x-hidden">
         <ConsentBootstrap />
-        <JsonLd data={buildOrganizationJsonLd({ name: settings.legalName || settings.siteName, logoUrl: settings.logoUrl })} />
-        <JsonLd data={buildWebsiteJsonLd({ name: settings.siteName })} />
+        <JsonLd data={buildOrganizationJsonLd({ name: siteConfig.name, logoUrl: settings.logoUrl })} />
+        <JsonLd data={buildWebsiteJsonLd({ name: siteConfig.name })} />
         <PublicChrome
           header={<SiteHeader />}
           footer={<SiteFooter />}

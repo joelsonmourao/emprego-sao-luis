@@ -72,13 +72,15 @@ export async function buildSiteMetadata(input: BuildMetadataInput): Promise<Meta
     alternates: {
       canonical
     },
+    publisher: siteConfig.name,
+    applicationName: siteConfig.name,
     openGraph: {
       type: "website",
       url: canonical,
       title: titleWithBrand,
       description: input.description,
       locale: "pt_BR",
-      siteName,
+      siteName: siteConfig.name,
       images: [
         {
           url: socialImage,
@@ -102,7 +104,6 @@ export async function buildSiteMetadata(input: BuildMetadataInput): Promise<Meta
       : {
           index: true,
           follow: true
-        },
-    applicationName: siteName
+        }
   };
 }

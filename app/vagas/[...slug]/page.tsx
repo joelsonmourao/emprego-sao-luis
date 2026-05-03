@@ -13,7 +13,7 @@ import { buildSiteMetadata } from "@/lib/seo/metadata";
 import { getJobBySlug } from "@/lib/repositories/jobs";
 import { isRemovedJobSlug } from "@/lib/seo/removed-job-slugs";
 import { JOB_DETAIL_PATH_RESERVED_FIRST_SEGMENTS } from "@/lib/seo/vagas-job-path";
-import { getSiteSettings } from "@/lib/site-settings";
+import { siteConfig } from "@/lib/constants";
 
 export const revalidate = 1800;
 
@@ -76,8 +76,6 @@ export async function generateMetadata({
       stateCode: job.state.code,
       slug: job.slug
     });
-    const settings = await getSiteSettings();
-    const siteBrandName = settings.siteName.trim();
     const metadata = await buildSiteMetadata({
       title: job.seoTitle ?? seo.title,
       description: job.seoDescription ?? seo.description,
@@ -87,10 +85,10 @@ export async function generateMetadata({
       socialImageUrl: job.heroImageUrl || job.company?.socialImageUrl || job.companyLogoUrl || undefined
     });
 
-    metadata.publisher = siteBrandName;
-    metadata.applicationName = siteBrandName;
+    metadata.publisher = siteConfig.name;
+    metadata.applicationName = siteConfig.name;
     if (metadata.openGraph) {
-      metadata.openGraph.siteName = siteBrandName;
+      metadata.openGraph.siteName = siteConfig.name;
     }
 
     return metadata;
@@ -179,7 +177,7 @@ export default async function VagasCatchAllPage({
       stateName,
       locationType: job.locationType,
       publishedAt: job.publishedAt,
-      updatedAt: job.updatedAt,
+      createdAt: job.createdAt,
       expiresAt: job.expiresAt,
       validThrough: job.validThrough ?? null,
       salaryMin: job.salaryMin,
