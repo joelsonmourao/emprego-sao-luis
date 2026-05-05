@@ -3,7 +3,7 @@ import type { EmploymentType } from "@prisma/client";
 import { siteConfig } from "@/lib/constants";
 import { normalizeDatePostedForSchema, normalizeValidThroughSchemaString } from "@/lib/date-utils";
 import { getGeoCoordinatesByCityState, resolveBrazilUfFromJobState } from "@/lib/geo/municipios-coordenadas";
-import { buildJobPostingDescriptionHtml } from "@/lib/jobs/job-posting-description";
+import { cleanJobDescriptionForSchema } from "@/lib/jobs/job-posting-description";
 import { validateJobPostingMinimum } from "@/lib/jobs/job-posting-validate";
 import { employmentTypeToSchemaValue } from "@/lib/jobs/employment-type";
 import { getReferencePostalCodeForCity } from "@/lib/seo/br-reference-postal";
@@ -270,14 +270,10 @@ async function buildJobLocationBlock(job: JobPostingJsonLdInput) {
 }
 
 export async function buildJobPostingJsonLd(job: JobPostingJsonLdInput): Promise<Record<string, unknown> | null> {
-  const descriptionHtml = buildJobPostingDescriptionHtml({
-    displayTitle: job.displayTitle,
-    companyName: job.companyName,
-    cityName: job.cityName,
-    stateCode: job.stateCode,
-    summary: job.summary?.trim() ?? "",
-    descriptionHtml: job.descriptionHtml,
-    workHours: job.workHours
+  const descriptionHtml = cleanJobDescriptionForSchema(job.descriptionHtml, {
+    slug: job.slug,
+    id: job.id,
+    title: job.displayTitle.trim()
   });
 
   const datePostedSource = job.publishedAt ?? job.createdAt ?? null;

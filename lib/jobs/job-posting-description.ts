@@ -1,59 +1,54 @@
 import { sanitizeRichTextHtml } from "@/lib/rich-text";
 
-const INSTITUTIONAL_PATTERNS =
-  /\b(nossa hist[oó]ria|quem somos|sobre n[oó]s|somos uma empresa|h[aá] mais de|fundada em|presente em|unidades|alunos|miss[aã]o|valores|cultura|grupo educacional|conhe[cç]a nossa hist[oó]ria|p[aá]gina de carreira|nossas institui[cç][oõ]es|fazemos parte|transformar o mundo|somos refer[eê]ncia|empresa l[ií]der|maior grupo|representativos grupos|nascemos do desejo)\b/i;
 function escapeHtmlText(s: string) {
   return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 }
 
-export function isLikelyInstitutionalLine(text: string) {
-  const t = text.trim();
-  if (!t) return true;
-  return INSTITUTIONAL_PATTERNS.test(t);
+function shouldWarnMissingJobDescription() {
+  if (process.env.NODE_ENV === "development") return true;
+  return process.env.npm_lifecycle_event === "build";
 }
 
 /**
- * HTML da description do JobPosting e do conteúdo alinhado ao schema: neutro, sem repetir cards do site.
+ * Remove apenas tags perigosas do HTML da vaga, preservando o texto e marcação útil (p, h2, ul, etc.).
+ * Não adiciona frases, não reescreve e não injeta dados de cidade/empresa.
  */
-export function buildJobPostingDescriptionHtml(input: {
-  displayTitle: string;
-  companyName: string;
-  cityName: string;
-  stateCode: string;
-  summary: string;
-  descriptionHtml: string;
-  workHours?: string | null;
-}) {
-  const parts: string[] = [];
+function stripDangerousMarkup(html: string) {
+  return html
+    .replace(/<script[\s\S]*?>[\s\S]*?<\/script>/gi, "")
+    .replace(/<style[\s\S]*?>[\s\S]*?<\/style>/gi, "")
+    .replace(/<iframe[\s\S]*?>[\s\S]*?<\/iframe>/gi, "")
+    .replace(/<iframe\b[^>]*\/?>/gi, "")
+    .replace(/<object[\s\S]*?>[\s\S]*?<\/object>/gi, "")
+    .replace(/<object\b[^>]*\/?>/gi, "")
+    .replace(/<embed\b[^>]*\/?>/gi, "");
+}
 
-  parts.push(`<p>${escapeHtmlText(`Confira esta oportunidade de ${input.displayTitle}.`)}</p>`);
+/**
+ * Prepara o HTML de `job.description` (campo `descriptionHtml` no app) exclusivamente para o campo
+ * `description` do JSON-LD JobPosting.
+ */
+export function cleanJobDescriptionForSchema(
+  descriptionHtml: string,
+  context: { slug?: string | null; id?: string | null; title: string }
+): string {
+  const raw = typeof descriptionHtml === "string" ? descriptionHtml : "";
+  const titleFallback = (context.title ?? "").trim();
 
-  if (input.companyName.trim()) {
-    parts.push(
-      `<p>${escapeHtmlText(
-        `A vaga está relacionada à empresa ${input.companyName.trim()}. Esta página apenas divulga a oportunidade e não representa a empresa contratante.`
-      )}</p>`
-    );
+  if (!raw.trim()) {
+    if (shouldWarnMissingJobDescription()) {
+      console.warn(`Descrição ausente para a vaga: ${context.slug || context.id || "unknown"}`);
+    }
+    return escapeHtmlText(titleFallback || "Vaga");
   }
 
-  const summary = input.summary.trim();
-  if (summary && !isLikelyInstitutionalLine(summary)) {
-    parts.push(`<p>${escapeHtmlText(summary)}</p>`);
+  const cleaned = sanitizeRichTextHtml(stripDangerousMarkup(raw)).trim();
+  if (!cleaned) {
+    if (shouldWarnMissingJobDescription()) {
+      console.warn(`Descrição ausente para a vaga: ${context.slug || context.id || "unknown"}`);
+    }
+    return escapeHtmlText(titleFallback || "Vaga");
   }
 
-  const body = sanitizeRichTextHtml(input.descriptionHtml).trim();
-  if (body) {
-    parts.push(body);
-  }
-
-  const hours = input.workHours?.trim();
-  if (hours && !isLikelyInstitutionalLine(hours)) {
-    parts.push("<h3>Jornada</h3>", `<p>${escapeHtmlText(hours)}</p>`);
-  }
-
-  parts.push(`<p>${escapeHtmlText("A candidatura deve ser feita pelo link oficial informado na vaga.")}</p>`);
-
-  const finalHtml = parts.join("\n").slice(0, 100000);
-
-  return finalHtml;
+  return cleaned;
 }
