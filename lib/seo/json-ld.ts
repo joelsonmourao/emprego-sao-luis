@@ -101,29 +101,6 @@ export function buildPlaceJsonLdForCityLocality(input: { cityName: string; state
 
 const DEFAULT_HIRING_ORG_LOGO = "https://slzcontent.com.br/icon.svg";
 
-function pickTrustworthyExternalSameAs(input: {
-  siteHostname: string;
-  applyUrl: string;
-  companyWebsiteUrl?: string | null;
-  sourceUrl?: string | null;
-}): string | undefined {
-  const tryOne = (raw?: string | null) => {
-    const u = raw?.trim();
-    if (!u) return undefined;
-    try {
-      const parsed = new URL(u);
-      if (parsed.protocol !== "https:" && parsed.protocol !== "http:") return undefined;
-      const host = parsed.hostname.replace(/^www\./i, "");
-      if (!host || host === input.siteHostname) return undefined;
-      return parsed.toString();
-    } catch {
-      return undefined;
-    }
-  };
-
-  return tryOne(input.companyWebsiteUrl) ?? tryOne(input.sourceUrl) ?? tryOne(input.applyUrl);
-}
-
 function resolveHiringOrganizationLogo(companyLogoUrl?: string | null) {
   const u = companyLogoUrl?.trim();
   if (u && (u.startsWith("https://") || u.startsWith("http://"))) {
@@ -290,28 +267,13 @@ export async function buildJobPostingJsonLd(job: JobPostingJsonLdInput): Promise
 
   const employmentTypeRaw = employmentTypeToSchemaValue(job.employmentType, { title: job.displayTitle });
   const jobUrl = absoluteUrl(`/vagas/${job.slug}`);
-  let siteHostname = "";
-  try {
-    siteHostname = new URL(jobUrl).hostname.replace(/^www\./i, "");
-  } catch {
-    siteHostname = "";
-  }
-
-  const sameAs = pickTrustworthyExternalSameAs({
-    siteHostname,
-    applyUrl: job.applyUrl,
-    companyWebsiteUrl: job.companyWebsiteUrl,
-    sourceUrl: job.sourceUrl
-  });
 
   const hiringOrganization: Record<string, unknown> = {
     "@type": "Organization",
     name: job.companyName,
-    logo: resolveHiringOrganizationLogo(job.companyLogoUrl)
+    logo: resolveHiringOrganizationLogo(job.companyLogoUrl),
+    sameAs: jobUrl
   };
-  if (sameAs) {
-    hiringOrganization.sameAs = sameAs;
-  }
 
   const data: Record<string, unknown> = {
     "@context": "https://schema.org",
