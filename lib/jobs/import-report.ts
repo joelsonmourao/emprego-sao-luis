@@ -1,6 +1,6 @@
 import { prisma } from "@/lib/db";
 
-import { extractJobTitle, jobPostingSchemaTitleLooksPolluted } from "@/lib/jobs/job-title-schema";
+import { jobPostingSchemaTitleLooksPolluted } from "@/lib/jobs/job-title-schema";
 
 export type JobImportSummaryReport = {
   newJobsCreated: number;
@@ -66,11 +66,9 @@ export async function finalizeImportReport(summary: JobImportSummaryReport): Pro
   return summary;
 }
 
-export function schemaTitleForJob(job: { jobTitle?: string | null; title: string }): string {
-  const jt = job.jobTitle?.trim();
-  if (jt) return jt;
-  const ex = extractJobTitle(job.title);
-  return ex.trim() || job.title.trim();
+/** Título emitido em JobPosting (mesmo texto que `Job.title`). */
+export function schemaTitleForJob(job: { title: string }): string {
+  return job.title.trim();
 }
 
 export function countSchemaTitlePollutedForSlugs(slugs: string[]): Promise<number> {

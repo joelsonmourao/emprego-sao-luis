@@ -4,7 +4,6 @@ import { siteConfig } from "@/lib/constants";
 import { normalizeDatePostedForSchema, normalizeValidThroughSchemaString } from "@/lib/date-utils";
 import { getGeoCoordinatesByCityState, resolveBrazilUfFromJobState } from "@/lib/geo/municipios-coordenadas";
 import { employmentTypeToSchemaValue } from "@/lib/jobs/employment-type";
-import { extractJobTitle } from "@/lib/jobs/job-title-schema";
 import { cleanJobDescriptionForSchema } from "@/lib/jobs/job-posting-description";
 import { validateJobPostingMinimum } from "@/lib/jobs/job-posting-validate";
 import { getReferencePostalCodeForCity } from "@/lib/seo/br-reference-postal";
@@ -253,7 +252,8 @@ async function buildJobLocationBlock(job: JobPostingJsonLdInput) {
 
 export async function buildJobPostingJsonLd(job: JobPostingJsonLdInput): Promise<Record<string, unknown> | null> {
   const stored = job.storedTitle.trim();
-  const schemaPostingTitle = (job.jobTitle?.trim() || extractJobTitle(stored)).trim() || job.displayTitle.trim();
+  /** Igual ao título salvo (planilha / painel), não ao cargo curto em `jobTitle`. */
+  const schemaPostingTitle = stored || job.displayTitle.trim();
 
   const descriptionHtml = cleanJobDescriptionForSchema(job.descriptionHtml, {
     slug: job.slug,

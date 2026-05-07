@@ -2,7 +2,11 @@ import type { City, Company, Job, LocationType, State } from "@prisma/client";
 
 import { normalizeSlug, parseOptionalDate, richTextFromInput } from "@/lib/admin/content";
 import { parseSpreadsheetEmploymentType } from "@/lib/jobs/employment-type";
-import { extractJobTitle, sanitizeSpreadsheetTitle } from "@/lib/jobs/job-title-schema";
+import {
+  ensureSpreadsheetTitleWithCitySlashUf,
+  extractJobTitle,
+  sanitizeSpreadsheetTitle
+} from "@/lib/jobs/job-title-schema";
 import type { ImportedJobRow } from "@/lib/schemas/job-import";
 
 export type JobImportSnapshot = Pick<
@@ -59,7 +63,8 @@ export function findExistingJobSnapshot(row: ImportedJobRow, lookup: ImportJobLo
 }
 
 export function buildNewJobSlugBase(row: ImportedJobRow, state: State, city: City, company: Company): string {
-  const titlePart = normalizeSlug(sanitizeSpreadsheetTitle(row.title)) || "vaga";
+  const resolvedForSlug = ensureSpreadsheetTitleWithCitySlashUf(row.title, city.name, state.code);
+  const titlePart = normalizeSlug(resolvedForSlug) || "vaga";
   const cityPart = city.slug || normalizeSlug(row.cityName);
   const ufPart = state.code.toLowerCase();
   const companyPart = company.slug;
@@ -69,18 +74,16 @@ export function buildNewJobSlugBase(row: ImportedJobRow, state: State, city: Cit
   return joined.slice(0, 180) || `vaga-${Date.now()}`;
 }
 
-function ensureSeoTitle(row: ImportedJobRow, city: City, state: State, company: Company): string {
+function ensureSeoTitle(row: ImportedJobRow, city: City, state: State, company: Company, resolvedTitle: string): string {
   const fromRow = row.seoTitle?.trim() ?? "";
   if (fromRow.length >= 10) return fromRow;
-  return sanitizeSpreadsheetTitle(
-    `${sanitizeSpreadsheetTitle(row.title)} — ${company.name}, ${city.name} — ${state.code}`
-  ).slice(0, 500);
+  return sanitizeSpreadsheetTitle(`${resolvedTitle} — ${company.name}, ${city.name} — ${state.code}`).slice(0, 500);
 }
 
-function ensureSeoDescription(row: ImportedJobRow, city: City, state: State): string {
+function ensureSeoDescription(row: ImportedJobRow, city: City, state: State, resolvedTitle: string): string {
   const d = row.seoDescription?.trim() ?? "";
   if (d.length >= 20) return d;
-  const fb = `Vaga de Jovem Aprendiz: ${sanitizeSpreadsheetTitle(row.title)} em ${city.name}, ${state.code}. Resumo, requisitos e link oficial para candidatura.`;
+  const fb = `Vaga de Jovem Aprendiz: ${resolvedTitle} em ${city.name}, ${state.code}. Resumo, requisitos e link oficial para candidatura.`;
   return fb.slice(0, 5000);
 }
 
@@ -93,7 +96,7 @@ export function buildJobCreateData(
   descriptionHtmlNormalized: string,
   validThrough: Date | null
 ) {
-  const title = sanitizeSpreadsheetTitle(row.title);
+  const title = ensureSpreadsheetTitleWithCitySlashUf(row.title, city.name, state.code);
   const extracted = extractJobTitle(title);
   const jobTitle = extracted.trim() || title;
 
@@ -119,8 +122,8 @@ export function buildJobCreateData(
     sourceName: row.sourceName?.trim() || null,
     sourceUrl: row.sourceUrl?.trim() || null,
     locationType: row.locationType as LocationType,
-    seoTitle: ensureSeoTitle(row, city, state, company),
-    seoDescription: ensureSeoDescription(row, city, state),
+    seoTitle: ensureSeoTitle(row, city, state, company, title),
+    seoDescription: ensureSeoDescription(row, city, state, title),
     featured: row.featured,
     externalId: row.externalId?.trim() || null,
     publishedAt: parseOptionalDate(row.publishedAt) ?? new Date(),
@@ -143,8 +146,10 @@ export function buildJobUpdateData(
   processValidThroughMonths: ValidThroughFn,
   calculateValidThrough: CalculateValidThroughFn
 ) {
+  const resolvedFromSheet = ensureSpreadsheetTitleWithCitySlashUf(row.title, city.name, state.code);
+
   const hadSeoTitle = Boolean(existing.seoTitle?.trim());
-  const nextSeoTitle = hadSeoTitle ? undefined : ensureSeoTitle(row, city, state, company);
+  const nextSeoTitle = hadSeoTitle ? undefined : ensureSeoTitle(row, city, state, company, resolvedFromSheet);
 
   const hadJobTitle = Boolean(existing.jobTitle?.trim());
   const nextJobTitle = hadJobTitle ? undefined : extractJobTitle(existing.title).trim() || undefined;
@@ -172,7 +177,7 @@ export function buildJobUpdateData(
     sourceName: row.sourceName?.trim() || null,
     sourceUrl: row.sourceUrl?.trim() || null,
     locationType: row.locationType as LocationType,
-    seoDescription: ensureSeoDescription(row, city, state),
+    seoDescription: ensureSeoDescription(row, city, state, resolvedFromSheet),
     featured: row.featured,
     companyId: company.id,
     stateId: state.id,

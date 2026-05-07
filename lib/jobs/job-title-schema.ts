@@ -2,6 +2,36 @@
  * Título vindo da planilha: só limpeza leve (espaços, quebras, caracteres de controle).
  * Não inventa cargo/área; remove numeração no início do título.
  */
+function foldKey(s: string) {
+  return s
+    .trim()
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "");
+}
+
+function titleAlreadyContainsCityAndUf(title: string, cityName: string, uf: string) {
+  const t = foldKey(title);
+  const c = foldKey(cityName.trim().replace(/\s+/g, " "));
+  if (!c || !t.includes(c)) return false;
+  const safeUf = uf.trim().replace(/[.*+?^${}()|[\]\\]/g, "\\$&").toUpperCase();
+  return new RegExp(`\\b${safeUf}\\b`, "i").test(title);
+}
+
+/**
+ * Título público tipo planilha: `Jovem Aprendiz São Paulo / SP`.
+ * Se já houver cidade e UF no texto, mantém só a limpeza.
+ */
+export function ensureSpreadsheetTitleWithCitySlashUf(rawTitle: string, cityName: string, stateCode: string): string {
+  const city = cityName.trim().replace(/\s+/g, " ");
+  const uf = stateCode.trim().toUpperCase();
+  const base = sanitizeSpreadsheetTitle(rawTitle);
+  if (!city || !uf) return base || "";
+  if (!base.trim()) return `${city} / ${uf}`.trim();
+  if (titleAlreadyContainsCityAndUf(base, city, uf)) return base;
+  return `${base} ${city} / ${uf}`.replace(/\s+/g, " ").trim();
+}
+
 export function sanitizeSpreadsheetTitle(raw: string): string {
   let s = raw.replace(/\r\n|\r|\n/g, " ").replace(/\s+/g, " ").trim();
   s = s.replace(/^[\u200B-\u200D\uFEFF]+|[\u200B-\u200D\uFEFF]+$/g, "");
