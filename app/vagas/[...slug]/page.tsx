@@ -62,12 +62,14 @@ export async function generateMetadata({
     }
 
     const pageTitle = job.title.trim();
+    const metaCityName = safeString(job.city?.name, "Brasil");
+    const metaStateCode = safeString(job.state?.code, "BR");
 
     const seo = buildJobDetailSeo({
       title: pageTitle,
       companyName: job.companyName,
-      cityName: job.city.name,
-      stateCode: job.state.code,
+      cityName: metaCityName,
+      stateCode: metaStateCode,
       slug: job.slug
     });
     const metadata = await buildSiteMetadata({
