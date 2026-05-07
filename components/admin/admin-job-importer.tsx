@@ -382,7 +382,9 @@ export function AdminJobImporter() {
           </div>
           <CardTitle>Importar vagas por Excel</CardTitle>
           <CardDescription>
-            Envie uma planilha `.xlsx` com colunas como `title`, `company`, `city`, `state`, `description`, `applyUrl` e os campos SEO.
+            Envie uma planilha `.xlsx` com colunas como `title`, `company`, `city`, `state`, `description`, `applyUrl` e SEO. Para
+            atualizar uma vaga já publicada, use `externalId` (ou a coluna `slug` com o slug exato da URL). Links iguais (`applyUrl`) em
+            várias linhas não casam com vaga antiga — só `externalId` e `slug`.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">

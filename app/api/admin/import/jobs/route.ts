@@ -484,21 +484,12 @@ async function buildImportContext(rows: ImportedJobRow[]): Promise<ImportContext
         .filter((slug): slug is string => Boolean(slug))
     )
   );
-  const rawApplyUrls = Array.from(new Set(rows.map((row) => row.applyUrl.trim())));
-  const rawSourceUrls = Array.from(new Set(rows.map((row) => row.sourceUrl?.trim()).filter(Boolean))) as string[];
-
   const orFilters: Prisma.JobWhereInput[] = [];
   if (requestedExternalIds.length) {
     orFilters.push({ externalId: { in: requestedExternalIds } });
   }
   if (explicitSlugs.length) {
     orFilters.push({ slug: { in: explicitSlugs } });
-  }
-  if (rawApplyUrls.length) {
-    orFilters.push({ applyUrl: { in: rawApplyUrls } });
-  }
-  if (rawSourceUrls.length) {
-    orFilters.push({ sourceUrl: { in: rawSourceUrls } });
   }
 
   const existingJobs =

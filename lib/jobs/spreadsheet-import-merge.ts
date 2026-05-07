@@ -2,7 +2,6 @@ import type { City, Company, Job, LocationType, State } from "@prisma/client";
 
 import { normalizeSlug, parseOptionalDate, richTextFromInput } from "@/lib/admin/content";
 import { parseSpreadsheetEmploymentType } from "@/lib/jobs/employment-type";
-import { normalizeJobListingUrlKey } from "@/lib/jobs/import-url-key";
 import { extractJobTitle, sanitizeSpreadsheetTitle } from "@/lib/jobs/job-title-schema";
 import type { ImportedJobRow } from "@/lib/schemas/job-import";
 
@@ -14,16 +13,16 @@ export type JobImportSnapshot = Pick<
 export type ImportJobLookup = {
   jobsByExternalId: Map<string, JobImportSnapshot>;
   jobsBySlug: Map<string, JobImportSnapshot>;
-  jobsByApplyUrlKey: Map<string, JobImportSnapshot>;
-  jobsBySourceUrlKey: Map<string, JobImportSnapshot>;
   usedJobSlugs: Set<string>;
 };
 
+/**
+ * Casamento vaga existente: só `externalId` e coluna explícita `slug` da planilha.
+ * Não usa `applyUrl`/`sourceUrl` (links genéricos geram falsas "atualizações").
+ */
 export function buildImportJobLookup(jobs: JobImportSnapshot[]): ImportJobLookup {
   const jobsByExternalId = new Map<string, JobImportSnapshot>();
   const jobsBySlug = new Map<string, JobImportSnapshot>();
-  const jobsByApplyUrlKey = new Map<string, JobImportSnapshot>();
-  const jobsBySourceUrlKey = new Map<string, JobImportSnapshot>();
   const usedJobSlugs = new Set<string>();
 
   for (const job of jobs) {
@@ -32,20 +31,9 @@ export function buildImportJobLookup(jobs: JobImportSnapshot[]): ImportJobLookup
     if (job.externalId) {
       jobsByExternalId.set(job.externalId, job);
     }
-    const applyKey = normalizeJobListingUrlKey(job.applyUrl);
-    if (applyKey && !jobsByApplyUrlKey.has(applyKey)) {
-      jobsByApplyUrlKey.set(applyKey, job);
-    }
-    const src = job.sourceUrl?.trim();
-    if (src) {
-      const sk = normalizeJobListingUrlKey(src);
-      if (sk && !jobsBySourceUrlKey.has(sk)) {
-        jobsBySourceUrlKey.set(sk, job);
-      }
-    }
   }
 
-  return { jobsByExternalId, jobsBySlug, jobsByApplyUrlKey, jobsBySourceUrlKey, usedJobSlugs };
+  return { jobsByExternalId, jobsBySlug, usedJobSlugs };
 }
 
 export function registerSnapshotInLookup(lookup: ImportJobLookup, job: JobImportSnapshot) {
@@ -54,14 +42,6 @@ export function registerSnapshotInLookup(lookup: ImportJobLookup, job: JobImport
   if (job.externalId) {
     lookup.jobsByExternalId.set(job.externalId, job);
   }
-  const applyKey = normalizeJobListingUrlKey(job.applyUrl);
-  if (applyKey) {
-    lookup.jobsByApplyUrlKey.set(applyKey, job);
-  }
-  const src = job.sourceUrl?.trim();
-  if (src) {
-    lookup.jobsBySourceUrlKey.set(normalizeJobListingUrlKey(src), job);
-  }
 }
 
 export function findExistingJobSnapshot(row: ImportedJobRow, lookup: ImportJobLookup): JobImportSnapshot | null {
@@ -69,16 +49,6 @@ export function findExistingJobSnapshot(row: ImportedJobRow, lookup: ImportJobLo
   if (ext) {
     const byExt = lookup.jobsByExternalId.get(ext);
     if (byExt) return byExt;
-  }
-  const applyKey = normalizeJobListingUrlKey(row.applyUrl);
-  if (applyKey) {
-    const byApply = lookup.jobsByApplyUrlKey.get(applyKey);
-    if (byApply) return byApply;
-  }
-  const src = row.sourceUrl?.trim();
-  if (src) {
-    const bySrc = lookup.jobsBySourceUrlKey.get(normalizeJobListingUrlKey(src));
-    if (bySrc) return bySrc;
   }
   const slugCol = row.slug?.trim();
   if (slugCol) {
