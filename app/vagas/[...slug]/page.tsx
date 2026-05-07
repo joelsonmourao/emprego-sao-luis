@@ -4,7 +4,6 @@ import { CompanyJobsListing } from "@/components/vagas/company-jobs-listing";
 import { JobDetailView } from "@/components/vagas/job-detail-view";
 import { JobUnavailableView } from "@/components/vagas/job-unavailable-view";
 import { isJobPastPublicDeadline } from "@/lib/jobs/job-expiry";
-import { resolvePublicJobTitle } from "@/lib/jobs/job-title";
 import { resolveCompanyJobsPageMetadata } from "@/lib/seo/company-jobs-metadata";
 import { JobBreadcrumbJsonLd } from "@/components/vagas/job-breadcrumb-json-ld";
 import { JobPostingJsonLd } from "@/components/vagas/job-posting-json-ld";
@@ -62,15 +61,10 @@ export async function generateMetadata({
       notFound();
     }
 
-    const displayTitle = resolvePublicJobTitle({
-      title: job.title,
-      seoTitle: job.seoTitle,
-      cityName: job.city.name,
-      stateCode: job.state.code
-    });
+    const pageTitle = job.title.trim();
 
     const seo = buildJobDetailSeo({
-      title: displayTitle,
+      title: pageTitle,
       companyName: job.companyName,
       cityName: job.city.name,
       stateCode: job.state.code,
@@ -153,17 +147,14 @@ export default async function VagasCatchAllPage({
     const citySlug = safeString(job.city?.slug, "brasil");
     const stateCode = safeString(job.state?.code, "BR");
     const stateName = safeString(job.state?.name, "Brasil");
-    const displayTitle = resolvePublicJobTitle({
-      title: job.title,
-      seoTitle: job.seoTitle,
-      cityName: job.city?.name ?? cityName,
-      stateCode: job.state?.code ?? stateCode
-    });
+    const pageTitle = job.title.trim();
 
     const jobPostingInput = {
       id: job.id,
       externalId: job.externalId,
-      displayTitle,
+      storedTitle: job.title,
+      jobTitle: job.jobTitle,
+      displayTitle: pageTitle,
       summary: job.summary,
       descriptionHtml: job.descriptionHtml,
       slug: job.slug,
@@ -191,14 +182,14 @@ export default async function VagasCatchAllPage({
     const breadcrumbItems = [
       { name: "Home", path: "/" },
       { name: "Vagas", path: "/vagas" },
-      { name: safeString(displayTitle, "Vaga"), path: `/vagas/${job.slug}` }
+      { name: safeString(pageTitle, "Vaga"), path: `/vagas/${job.slug}` }
     ];
 
     return (
       <main id="conteudo-principal-vaga" className="min-w-0">
         <JobPostingJsonLd input={jobPostingInput} />
         <JobBreadcrumbJsonLd items={breadcrumbItems} />
-        <JobDetailView job={job} displayTitle={displayTitle} />
+        <JobDetailView job={job} displayTitle={pageTitle} />
       </main>
     );
   }

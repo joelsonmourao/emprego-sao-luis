@@ -1,14 +1,29 @@
-import { AuditAction, EmploymentType, ImportQueueStatus, LocationType, Prisma, type City, type Company, type Job, type State } from "@prisma/client";
+import { AuditAction, ImportQueueStatus, Prisma, type City, type Company, type State } from "@prisma/client";
 import { NextResponse } from "next/server";
-
 
 import { normalizeSlug, parseOptionalDate, richTextFromInput, sanitizeText } from "@/lib/admin/content";
 import { writeAuditLog } from "@/lib/audit";
 import { requireApiRole } from "@/lib/authz";
 import { prisma } from "@/lib/db";
-import { revalidatePublicSurfacesAfterBulkJobChange } from "@/lib/public-revalidate";
-import { parseSpreadsheetEmploymentType } from "@/lib/jobs/employment-type";
+import {
+  countSchemaTitlePollutedForSlugs,
+  emptyImportSummaryReport,
+  finalizeImportReport,
+  formatImportReportMessage,
+  type JobImportSummaryReport
+} from "@/lib/jobs/import-report";
 import { markExpiredJobsInactive } from "@/lib/jobs/job-expiry";
+import {
+  buildImportJobLookup,
+  buildJobCreateData,
+  buildJobUpdateData,
+  buildNewJobSlugBase,
+  findExistingJobSnapshot,
+  registerSnapshotInLookup,
+  snapshotFromPersisted,
+  type JobImportSnapshot
+} from "@/lib/jobs/spreadsheet-import-merge";
+import { revalidatePublicSurfacesAfterBulkJobChange } from "@/lib/public-revalidate";
 import { importJobsPayloadSchema, type ImportedJobRow } from "@/lib/schemas/job-import";
 
 
@@ -19,7 +34,6 @@ const RESPONSE_HEADERS = {
   "Cache-Control": "no-store"
 };
 
-const IMPORT_BATCH_SIZE = 10;
 const DIRECT_IMPORT_LIMIT = 100;
 const AI_TIMEOUT_MS = 12000;
 const CLAUDE_DESCRIPTION_MODEL = "claude-haiku-4-5-20251001";
@@ -67,13 +81,13 @@ type ImportContext = {
   citiesByStateAndSlug: Map<string, City>;
   companiesBySlug: Map<string, Company>;
   companiesByName: Map<string, Company>;
-  jobsByExternalId: Map<string, Pick<Job, "id" | "slug" | "publishedAt" | "externalId">>;
-  jobsBySlug: Map<string, Pick<Job, "id" | "slug" | "publishedAt" | "externalId">>;
-  usedJobSlugs: Set<string>;
+  jobLookup: ReturnType<typeof buildImportJobLookup>;
   issues: ImportIssue[];
   imported: string[];
   updated: string[];
   processedRows: number;
+  summary: JobImportSummaryReport;
+  touchedSlugs: string[];
 };
 
 export const maxDuration = 60;
@@ -165,16 +179,6 @@ async function generateUniqueDescriptionWithClaude(row: ImportedJobRow) {
     console.warn("Claude indisponivel; usando descricao original.", error);
     return row.descriptionHtml;
   }
-}
-
-function chunkArray<T>(items: T[], size: number) {
-  const chunks: T[][] = [];
-
-  for (let index = 0; index < items.length; index += size) {
-    chunks.push(items.slice(index, index + size));
-  }
-
-  return chunks;
 }
 
 function buildJsonError(status: number, message: string, details?: Record<string, unknown>) {
@@ -279,22 +283,6 @@ function buildCompanyMaps(companies: Company[]) {
   }
 
   return { bySlug, byName };
-}
-
-function buildJobMaps(jobs: Array<Pick<Job, "id" | "slug" | "publishedAt" | "externalId">>) {
-  const byExternalId = new Map<string, Pick<Job, "id" | "slug" | "publishedAt" | "externalId">>();
-  const bySlug = new Map<string, Pick<Job, "id" | "slug" | "publishedAt" | "externalId">>();
-  const usedSlugs = new Set<string>();
-
-  for (const job of jobs) {
-    bySlug.set(job.slug, job);
-    usedSlugs.add(job.slug);
-    if (job.externalId) {
-      byExternalId.set(job.externalId, job);
-    }
-  }
-
-  return { byExternalId, bySlug, usedSlugs };
 }
 
 function ensureUniqueJobSlug(baseSlug: string, usedSlugs: Set<string>, currentSlug?: string) {
@@ -488,23 +476,50 @@ async function buildImportContext(rows: ImportedJobRow[]): Promise<ImportContext
     citiesByStateAndSlug
   );
 
-  const requestedBaseSlugs = Array.from(new Set(rows.map((row) => normalizeSlug(row.slug || row.title)).filter(Boolean)));
   const requestedExternalIds = Array.from(new Set(rows.map((row) => row.externalId?.trim()).filter(Boolean))) as string[];
-  const existingJobs = await prisma.job.findMany({
-    where: {
-      OR: [
-        ...(requestedBaseSlugs.length ? requestedBaseSlugs.map((slug) => ({ slug: { startsWith: slug } })) : []),
-        ...(requestedExternalIds.length ? [{ externalId: { in: requestedExternalIds } }] : [])
-      ]
-    },
-    select: {
-      id: true,
-      slug: true,
-      publishedAt: true,
-      externalId: true
-    }
-  });
-  const { byExternalId, bySlug, usedSlugs } = buildJobMaps(existingJobs);
+  const explicitSlugs = Array.from(
+    new Set(
+      rows
+        .map((row) => (row.slug?.trim() ? normalizeSlug(row.slug.trim()) : ""))
+        .filter((slug): slug is string => Boolean(slug))
+    )
+  );
+  const rawApplyUrls = Array.from(new Set(rows.map((row) => row.applyUrl.trim())));
+  const rawSourceUrls = Array.from(new Set(rows.map((row) => row.sourceUrl?.trim()).filter(Boolean))) as string[];
+
+  const orFilters: Prisma.JobWhereInput[] = [];
+  if (requestedExternalIds.length) {
+    orFilters.push({ externalId: { in: requestedExternalIds } });
+  }
+  if (explicitSlugs.length) {
+    orFilters.push({ slug: { in: explicitSlugs } });
+  }
+  if (rawApplyUrls.length) {
+    orFilters.push({ applyUrl: { in: rawApplyUrls } });
+  }
+  if (rawSourceUrls.length) {
+    orFilters.push({ sourceUrl: { in: rawSourceUrls } });
+  }
+
+  const existingJobs =
+    orFilters.length > 0
+      ? await prisma.job.findMany({
+          where: { OR: orFilters },
+          select: {
+            id: true,
+            slug: true,
+            title: true,
+            seoTitle: true,
+            publishedAt: true,
+            externalId: true,
+            applyUrl: true,
+            sourceUrl: true,
+            jobTitle: true
+          }
+        })
+      : [];
+
+  const jobLookup = buildImportJobLookup(existingJobs as JobImportSnapshot[]);
 
   const context: ImportContext = {
     statesByName,
@@ -513,13 +528,13 @@ async function buildImportContext(rows: ImportedJobRow[]): Promise<ImportContext
     citiesByStateAndSlug,
     companiesBySlug,
     companiesByName,
-    jobsByExternalId: byExternalId,
-    jobsBySlug: bySlug,
-    usedJobSlugs: usedSlugs,
+    jobLookup,
     issues: [],
     imported: [],
     updated: [],
-    processedRows: 0
+    processedRows: 0,
+    summary: emptyImportSummaryReport(),
+    touchedSlugs: []
   };
 
   return context;
@@ -543,100 +558,85 @@ function resolveCompany(context: ImportContext, row: ImportedJobRow) {
   return context.companiesBySlug.get(normalizeSlug(row.companyName)) ?? context.companiesByName.get(buildCompanyNameKey(row.companyName)) ?? null;
 }
 
-function buildJobData(row: ImportedJobRow, state: State, city: City, company: Company, slug: string, existing?: Pick<Job, "publishedAt">) {
-  const sourceDescription = row.descriptionHtml;
-  const normalizedDescription = richTextFromInput(sourceDescription, { baseHeadingLevel: 2 });
+async function persistImportedRow(rowForSave: ImportedJobRow, context: ImportContext) {
+  const state = resolveState(context, rowForSave);
+  if (!state) throw new Error(`Estado nao encontrado para "${rowForSave.stateName}".`);
+  const city = resolveCity(context, state.id, rowForSave);
+  if (!city) throw new Error(`Cidade nao encontrada para "${rowForSave.cityName}".`);
+  const company = resolveCompany(context, rowForSave);
+  if (!company) throw new Error(`Empresa nao encontrada para "${rowForSave.companyName}".`);
 
-  return {
-    title: row.title.trim(),
-    slug,
-    companyName: company.name,
-    companyLogoUrl: company.logoUrl,
-    companyWebsiteUrl: company.websiteUrl,
-    summary: row.summary.trim(),
-    descriptionHtml: normalizedDescription,
-    requirements: [],
-    benefits: [],
-    salaryMin: row.salaryMin ? Math.round(row.salaryMin) : null,
-    salaryMax: row.salaryMax ? Math.round(row.salaryMax) : null,
-    employmentType: parseSpreadsheetEmploymentType(row.employmentType),
-    workHours: row.workHours?.trim() || null,
-    expiresAt: parseOptionalDate(row.expiresAt),
-    validThrough: processValidThroughMonths(row.validThroughMonths) ?? calculateValidThrough(row.validThrough),
-    applyUrl: row.applyUrl,
-    isActive: row.isActive,
-    sourceName: row.sourceName?.trim() || null,
-    sourceUrl: row.sourceUrl?.trim() || null,
-    locationType: row.locationType as LocationType,
-    seoTitle: row.seoTitle.trim(),
-    seoDescription: row.seoDescription.trim(),
-    featured: row.featured,
-    externalId: row.externalId?.trim() || null,
-    publishedAt: existing?.publishedAt ?? parseOptionalDate(row.publishedAt) ?? new Date(),
-    companyId: company.id,
-    stateId: state.id,
-    cityId: city.id
-  };
+  const normalizedDescription = richTextFromInput(rowForSave.descriptionHtml, { baseHeadingLevel: 2 });
+  const validThrough = processValidThroughMonths(rowForSave.validThroughMonths) ?? calculateValidThrough(rowForSave.validThrough);
+
+  const existing = findExistingJobSnapshot(rowForSave, context.jobLookup);
+
+  if (existing) {
+    const updateData = buildJobUpdateData(
+      rowForSave,
+      state,
+      city,
+      company,
+      existing,
+      normalizedDescription,
+      processValidThroughMonths,
+      calculateValidThrough
+    );
+    const saved = await prisma.job.update({ where: { id: existing.id }, data: updateData });
+    const snap = snapshotFromPersisted(saved);
+
+    if (saved.title === existing.title) {
+      context.summary.oldTitlesPreserved += 1;
+    } else {
+      context.summary.titleOverwritesInvalid += 1;
+    }
+    if (saved.slug === existing.slug) {
+      context.summary.oldSlugsPreserved += 1;
+    } else {
+      context.summary.slugMutationsInvalid += 1;
+    }
+    if (existing.seoTitle?.trim() && saved.seoTitle === existing.seoTitle) {
+      context.summary.oldSeoTitlesPreserved += 1;
+    }
+
+    context.summary.existingJobsUpdated += 1;
+    context.updated.push(saved.slug);
+    context.touchedSlugs.push(saved.slug);
+    registerSnapshotInLookup(context.jobLookup, snap);
+    return;
+  }
+
+  const baseSlug = buildNewJobSlugBase(rowForSave, state, city, company);
+  const uniqueSlug = ensureUniqueJobSlug(baseSlug, context.jobLookup.usedJobSlugs, undefined);
+  const createData = buildJobCreateData(rowForSave, state, city, company, uniqueSlug, normalizedDescription, validThrough);
+  const saved = await prisma.job.create({ data: createData });
+  const snap = snapshotFromPersisted(saved);
+
+  context.summary.newJobsCreated += 1;
+  context.imported.push(saved.slug);
+  context.touchedSlugs.push(saved.slug);
+  registerSnapshotInLookup(context.jobLookup, snap);
 }
 
 async function processRows(rows: ImportedJobRow[], context: ImportContext, queueId?: string, options?: { useAi?: boolean }) {
-  const operations: Prisma.PrismaPromise<Job>[] = [];
-  const queuedRows: Array<{ slug: string; wasUpdate: boolean }> = [];
-
   for (const [index, row] of rows.entries()) {
     const line = index + 2;
 
     try {
-      const state = resolveState(context, row);
-      if (!state) throw new Error(`Estado nao encontrado para "${row.stateName}".`);
-      const city = resolveCity(context, state.id, row);
-      if (!city) throw new Error(`Cidade nao encontrada para "${row.cityName}".`);
-      const company = resolveCompany(context, row);
-      if (!company) throw new Error(`Empresa nao encontrada para "${row.companyName}".`);
-
-      const externalId = row.externalId?.trim() || null;
-      const baseSlug = normalizeSlug(row.slug || row.title);
-      const existingByExternalId = externalId ? context.jobsByExternalId.get(externalId) ?? null : null;
-      const existingBySlug = context.jobsBySlug.get(baseSlug) ?? null;
-      const existing = existingByExternalId ?? (!externalId ? existingBySlug : null);
-      const keepCurrentSlug = existingByExternalId?.slug ?? (!externalId ? existingBySlug?.slug : undefined);
-      const uniqueSlug = ensureUniqueJobSlug(baseSlug, context.usedJobSlugs, keepCurrentSlug);
       const rowForSave = options?.useAi ? { ...row, descriptionHtml: await generateUniqueDescriptionWithClaude(row) } : row;
-      const data = buildJobData(rowForSave, state, city, company, uniqueSlug, existing ?? undefined);
-      const wasUpdate = externalId ? context.jobsByExternalId.has(externalId) : context.jobsBySlug.has(baseSlug);
+      await persistImportedRow(rowForSave, context);
+      context.processedRows += 1;
 
-      if (options?.useAi) {
-        const saved =
-          externalId && externalId.length
-            ? await prisma.job.upsert({ where: { externalId }, create: data, update: data })
-            : await prisma.job.upsert({ where: { slug: existing?.slug ?? uniqueSlug }, create: data, update: data });
-
-        if (wasUpdate) {
-          context.updated.push(saved.slug);
-        } else {
-          context.imported.push(saved.slug);
-        }
-        context.processedRows += 1;
-        if (queueId) {
-          await prisma.importQueue.update({
-            where: { id: queueId },
-            data: {
-              processedRows: context.processedRows,
-              importedCount: context.imported.length,
-              updatedCount: context.updated.length,
-              errorCount: context.issues.length
-            }
-          });
-        }
-        continue;
-      }
-
-      if (externalId) {
-        operations.push(prisma.job.upsert({ where: { externalId }, create: data, update: data }));
-        queuedRows.push({ slug: uniqueSlug, wasUpdate });
-      } else {
-        operations.push(prisma.job.upsert({ where: { slug: existing?.slug ?? uniqueSlug }, create: data, update: data }));
-        queuedRows.push({ slug: uniqueSlug, wasUpdate });
+      if (queueId) {
+        await prisma.importQueue.update({
+          where: { id: queueId },
+          data: {
+            processedRows: context.processedRows,
+            importedCount: context.imported.length,
+            updatedCount: context.updated.length,
+            errorCount: context.issues.length
+          }
+        });
       }
     } catch (error) {
       context.issues.push({
@@ -654,40 +654,9 @@ async function processRows(rows: ImportedJobRow[], context: ImportContext, queue
     }
   }
 
-  if (options?.useAi) {
-    return;
-  }
-
-  let operationOffset = 0;
-  for (const batch of chunkArray(operations, IMPORT_BATCH_SIZE)) {
-    if (!batch.length) continue;
-    const persisted = await prisma.$transaction(batch);
-    const batchRows = queuedRows.slice(operationOffset, operationOffset + persisted.length);
-    operationOffset += persisted.length;
-
-    for (let i = 0; i < persisted.length; i += 1) {
-      const saved = persisted[i];
-      const rowMeta = batchRows[i];
-      if (rowMeta?.wasUpdate) {
-        context.updated.push(saved.slug);
-      } else {
-        context.imported.push(saved.slug);
-      }
-      context.processedRows += 1;
-    }
-
-    if (queueId) {
-      await prisma.importQueue.update({
-        where: { id: queueId },
-        data: {
-          processedRows: context.processedRows,
-          importedCount: context.imported.length,
-          updatedCount: context.updated.length,
-          errorCount: context.issues.length
-        }
-      });
-    }
-  }
+  const uniqueTouched = [...new Set(context.touchedSlugs)];
+  context.summary.schemaTitlePollutedCount = await countSchemaTitlePollutedForSlugs(uniqueTouched);
+  await finalizeImportReport(context.summary);
 }
 
 async function processQueuedImport(queueId: string) {
@@ -728,7 +697,9 @@ async function processQueuedImport(queueId: string) {
           durationMs: Date.now() - startedAt,
           imported: context.imported,
           updated: context.updated,
-          issues: context.issues
+          issues: context.issues,
+          importReport: context.summary,
+          importReportText: formatImportReportMessage(context.summary)
         }
       }
     });
@@ -744,7 +715,8 @@ async function processQueuedImport(queueId: string) {
       after: {
         importedCount: context.imported.length,
         updatedCount: context.updated.length,
-        errorCount: context.issues.length
+        errorCount: context.issues.length,
+        importReport: context.summary
       }
     });
   } catch (error) {
@@ -771,7 +743,6 @@ export async function POST(request: Request) {
     }
 
     const payload = importJobsPayloadSchema.parse(rawBody);
-    const useAi = false;
     const rows = payload.rows.map(sanitizeImportedRow);
     if (!rows.length) {
       return buildJsonError(400, "Nenhuma linha valida foi enviada para importacao.");
@@ -783,7 +754,7 @@ export async function POST(request: Request) {
     if (shouldProcessInline) {
       const startedAt = Date.now();
       const context = await buildImportContext(rows);
-      await processRows(rows, context, undefined, { useAi });
+      await processRows(rows, context, undefined, { useAi: false });
 
       if (context.imported.length || context.updated.length) {
         revalidatePublicSurfacesAfterBulkJobChange();
@@ -804,6 +775,8 @@ export async function POST(request: Request) {
             successRate: rows.length ? Math.round(((rows.length - context.issues.length) / rows.length) * 100) : 100,
             durationMs: Date.now() - startedAt
           },
+          importReport: context.summary,
+          importReportText: formatImportReportMessage(context.summary),
           results: {
             errors: context.issues.map((issue) => ({ line: issue.line, message: issue.message }))
           }

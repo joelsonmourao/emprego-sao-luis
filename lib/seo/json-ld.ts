@@ -3,9 +3,10 @@ import type { EmploymentType } from "@prisma/client";
 import { siteConfig } from "@/lib/constants";
 import { normalizeDatePostedForSchema, normalizeValidThroughSchemaString } from "@/lib/date-utils";
 import { getGeoCoordinatesByCityState, resolveBrazilUfFromJobState } from "@/lib/geo/municipios-coordenadas";
+import { employmentTypeToSchemaValue } from "@/lib/jobs/employment-type";
+import { extractJobTitle } from "@/lib/jobs/job-title-schema";
 import { cleanJobDescriptionForSchema } from "@/lib/jobs/job-posting-description";
 import { validateJobPostingMinimum } from "@/lib/jobs/job-posting-validate";
-import { employmentTypeToSchemaValue } from "@/lib/jobs/employment-type";
 import { getReferencePostalCodeForCity } from "@/lib/seo/br-reference-postal";
 import { absoluteUrl } from "@/lib/utils";
 
@@ -116,7 +117,11 @@ export type JobPostingJsonLdInput = {
   id: string;
   externalId?: string | null;
   seoTitle?: string | null;
-  /** Título público já resolvido (cargo em Cidade UF quando necessário). */
+  /** Título salvo no banco (H1 / página). */
+  storedTitle: string;
+  /** Cargo limpo para schema.org JobPosting.title (opcional). */
+  jobTitle?: string | null;
+  /** Legado / breadcrumb; quando omitido, usa storedTitle. */
   displayTitle: string;
   summary?: string | null;
   descriptionHtml: string;
@@ -247,10 +252,13 @@ async function buildJobLocationBlock(job: JobPostingJsonLdInput) {
 }
 
 export async function buildJobPostingJsonLd(job: JobPostingJsonLdInput): Promise<Record<string, unknown> | null> {
+  const stored = job.storedTitle.trim();
+  const schemaPostingTitle = (job.jobTitle?.trim() || extractJobTitle(stored)).trim() || job.displayTitle.trim();
+
   const descriptionHtml = cleanJobDescriptionForSchema(job.descriptionHtml, {
     slug: job.slug,
     id: job.id,
-    title: job.displayTitle.trim()
+    title: stored
   });
 
   const datePostedSource = job.publishedAt ?? job.createdAt ?? null;
@@ -265,7 +273,7 @@ export async function buildJobPostingJsonLd(job: JobPostingJsonLdInput): Promise
     return null;
   }
 
-  const employmentTypeRaw = employmentTypeToSchemaValue(job.employmentType, { title: job.displayTitle });
+  const employmentTypeRaw = employmentTypeToSchemaValue(job.employmentType, { title: schemaPostingTitle });
   const jobUrl = absoluteUrl(`/vagas/${job.slug}`);
 
   const hiringOrganization: Record<string, unknown> = {
@@ -278,7 +286,7 @@ export async function buildJobPostingJsonLd(job: JobPostingJsonLdInput): Promise
   const data: Record<string, unknown> = {
     "@context": "https://schema.org",
     "@type": "JobPosting",
-    title: job.displayTitle.trim(),
+    title: schemaPostingTitle,
     url: jobUrl,
     identifier: {
       "@type": "PropertyValue",
@@ -302,7 +310,7 @@ export async function buildJobPostingJsonLd(job: JobPostingJsonLdInput): Promise
   const cleaned = removeEmptyJsonLdValues(data) as Record<string, unknown>;
 
   const validation = validateJobPostingMinimum({
-    displayTitle: String(cleaned.title ?? ""),
+    displayTitle: schemaPostingTitle,
     descriptionHtml: String(cleaned.description ?? ""),
     datePosted: String(cleaned.datePosted ?? ""),
     validThrough: String(cleaned.validThrough ?? ""),

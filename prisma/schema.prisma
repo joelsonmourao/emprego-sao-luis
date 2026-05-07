@@ -128,6 +128,8 @@ model Job {
   id                String         @id @default(cuid())
   externalId        String?        @unique
   title             String
+  /** Cargo limpo para schema.org JobPosting.title (opcional; fallback em extractJobTitle(title)). */
+  jobTitle          String?
   slug              String         @unique
   companyId         String?
   companyName       String

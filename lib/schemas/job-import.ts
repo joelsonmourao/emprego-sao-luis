@@ -28,8 +28,8 @@ export const importedJobRowSchema = z.object({
   sourceName: z.string().optional().default(""),
   sourceUrl: z.string().optional().default(""),
   locationType: z.enum(["ONSITE", "REMOTE", "HYBRID"]).default("ONSITE"),
-  seoTitle: z.string().min(10, "SEO title obrigatorio."),
-  seoDescription: z.string().min(20, "SEO description obrigatoria."),
+  seoTitle: z.string().optional().default(""),
+  seoDescription: z.string().optional().default(""),
   featured: z.boolean().default(false),
   externalId: z.string().optional().default("")
 });
