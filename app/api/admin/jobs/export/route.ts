@@ -97,6 +97,30 @@ function escapeCsvValue(value: unknown) {
   return stringValue;
 }
 
+function stripHtmlToText(html: string) {
+  return html
+    .replace(/<style[\s\S]*?<\/style>/gi, " ")
+    .replace(/<script[\s\S]*?<\/script>/gi, " ")
+    .replace(/<[^>]*>/g, " ")
+    .replace(/&nbsp;/gi, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function ensureExportSummary(job: ExportJob) {
+  const fromSummary = (job.summary ?? "").trim().replace(/\s+/g, " ");
+  if (fromSummary.length >= 20) {
+    return fromSummary.slice(0, 220);
+  }
+
+  const fromDescription = stripHtmlToText(job.descriptionHtml ?? "");
+  if (fromDescription.length >= 20) {
+    return fromDescription.slice(0, 220);
+  }
+
+  return `Vaga de ${job.title} na ${job.companyName} em ${job.city.name}, ${job.state.name}.`;
+}
+
 function serializeJobRow(job: ExportJob) {
   const row = {
     title: job.title,
@@ -104,7 +128,7 @@ function serializeJobRow(job: ExportJob) {
     companyName: job.companyName,
     cityName: job.city.name,
     stateName: job.state.name,
-    summary: job.summary,
+    summary: ensureExportSummary(job),
     descriptionHtml: job.descriptionHtml,
     requirementsText: Array.isArray(job.requirements) ? job.requirements.join(", ") : "",
     benefitsText: Array.isArray(job.benefits) ? job.benefits.join(", ") : "",
