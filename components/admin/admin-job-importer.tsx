@@ -110,6 +110,28 @@ function normalizeHeader(header: string) {
 
 const DIRECT_IMPORT_LIMIT = 100;
 
+function ensureImportSummary(input: {
+  summary?: string;
+  descriptionHtml?: string;
+  title: string;
+  companyName: string;
+  cityName: string;
+  stateName: string;
+}) {
+  const fromSummary = String(input.summary ?? "").trim().replace(/\s+/g, " ");
+  if (fromSummary.length >= 20) return fromSummary.slice(0, 220);
+
+  const fromDescription = String(input.descriptionHtml ?? "")
+    .replace(/<style[\s\S]*?<\/style>/gi, " ")
+    .replace(/<script[\s\S]*?<\/script>/gi, " ")
+    .replace(/<[^>]*>/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+  if (fromDescription.length >= 20) return fromDescription.slice(0, 220);
+
+  return `Vaga de ${input.title} na ${input.companyName} em ${input.cityName}, ${input.stateName}.`;
+}
+
 function chunkRows<T>(items: T[], size: number) {
   const chunks: T[][] = [];
   for (let index = 0; index < items.length; index += size) {
@@ -187,7 +209,14 @@ export function AdminJobImporter() {
         companyName: String(normalized.companyName ?? "").trim(),
         cityName: String(normalized.cityName ?? "").trim(),
         stateName: String(normalized.stateName ?? "").trim(),
-        summary: String(normalized.summary ?? normalized.descriptionHtml ?? "").trim().slice(0, 220),
+        summary: ensureImportSummary({
+          summary: String(normalized.summary ?? ""),
+          descriptionHtml: String(normalized.descriptionHtml ?? ""),
+          title: String(normalized.title ?? "").trim(),
+          companyName: String(normalized.companyName ?? "").trim(),
+          cityName: String(normalized.cityName ?? "").trim(),
+          stateName: String(normalized.stateName ?? "").trim()
+        }),
         descriptionHtml: String(normalized.descriptionHtml ?? "").trim(),
         requirementsText: String(normalized.requirementsText ?? "").trim(),
         benefitsText: String(normalized.benefitsText ?? "").trim(),

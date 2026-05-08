@@ -105,6 +105,21 @@ function normalizeBrazilianUf(value: string | null | undefined) {
   return BRAZILIAN_UFS.has(uf) ? uf : null;
 }
 
+function ensureImportedSummary(row: ImportedJobRow) {
+  const fromSummary = sanitizeText(row.summary).replace(/\s+/g, " ").trim();
+  if (fromSummary.length >= 20) return fromSummary.slice(0, 220);
+
+  const fromDescription = sanitizeText(row.descriptionHtml)
+    .replace(/<style[\s\S]*?<\/style>/gi, " ")
+    .replace(/<script[\s\S]*?<\/script>/gi, " ")
+    .replace(/<[^>]*>/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+  if (fromDescription.length >= 20) return fromDescription.slice(0, 220);
+
+  return `Vaga de ${sanitizeText(row.title)} na ${sanitizeText(row.companyName)} em ${sanitizeText(row.cityName)}, ${sanitizeText(row.stateName)}.`;
+}
+
 function sanitizeArea(value: string | null | undefined) {
   const area = sanitizeText(value);
   const normalized = normalizeKey(area);
@@ -121,7 +136,7 @@ function sanitizeImportedRow(row: ImportedJobRow): ImportedJobRow {
     ...row,
     title: sanitizeText(row.title),
     descriptionHtml: sanitizeText(row.descriptionHtml),
-    summary: sanitizeText(row.summary),
+    summary: ensureImportedSummary(row),
     requirementsText: sanitizeText(row.requirementsText ?? ""),
     benefitsText: sanitizeText(row.benefitsText ?? ""),
     area: sanitizeArea(row.area),
