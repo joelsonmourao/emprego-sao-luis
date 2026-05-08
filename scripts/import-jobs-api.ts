@@ -46,6 +46,12 @@ const aliases: Record<string, string> = {
   featured: "featured"
 };
 
+function parseBooleanWithDefault(value: unknown, defaultValue: boolean) {
+  if (value === null || value === undefined) return defaultValue;
+  if (typeof value === "string" && value.trim() === "") return defaultValue;
+  return parseBooleanLike(value);
+}
+
 function readOption(name: string) {
   const entry = process.argv.find((arg) => arg.startsWith(`${name}=`));
   return entry ? entry.slice(name.length + 1) : undefined;
@@ -99,13 +105,13 @@ function parseRows(filePath: string): ImportedJobRow[] {
       validThrough: String(normalized.validThrough ?? "").trim(),
       validThroughMonths: parseOptionalNumber(normalized.validThroughMonths),
       applyUrl: String(normalized.applyUrl ?? "").trim(),
-      isActive: parseBooleanLike(normalized.isActive ?? true),
+      isActive: parseBooleanWithDefault(normalized.isActive, true),
       sourceName: String(normalized.sourceName ?? "").trim(),
       sourceUrl: String(normalized.sourceUrl ?? "").trim(),
       locationType: String(normalized.locationType ?? "ONSITE").trim().toUpperCase(),
       seoTitle: String(normalized.seoTitle ?? normalized.title ?? "").trim(),
       seoDescription: String(normalized.seoDescription ?? normalized.summary ?? "").trim(),
-      featured: parseBooleanLike(normalized.featured ?? false),
+      featured: parseBooleanWithDefault(normalized.featured, false),
       externalId: String(normalized.externalId ?? "").trim()
     };
 

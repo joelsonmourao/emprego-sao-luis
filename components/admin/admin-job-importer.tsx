@@ -110,6 +110,12 @@ function normalizeHeader(header: string) {
 
 const DIRECT_IMPORT_LIMIT = 100;
 
+function parseBooleanWithDefault(value: unknown, defaultValue: boolean) {
+  if (value === null || value === undefined) return defaultValue;
+  if (typeof value === "string" && value.trim() === "") return defaultValue;
+  return parseBooleanLike(value);
+}
+
 function ensureImportSummary(input: {
   summary?: string;
   descriptionHtml?: string;
@@ -230,13 +236,13 @@ export function AdminJobImporter() {
         validThrough: String(normalized.validThrough ?? "").trim(),
         validThroughMonths: parseOptionalNumber(normalized.validThroughMonths),
         applyUrl: String(normalized.applyUrl ?? "").trim(),
-        isActive: parseBooleanLike(normalized.isActive ?? true),
+        isActive: parseBooleanWithDefault(normalized.isActive, true),
         sourceName: String(normalized.sourceName ?? "").trim(),
         sourceUrl: String(normalized.sourceUrl ?? "").trim(),
         locationType: String(normalized.locationType ?? "ONSITE").trim().toUpperCase(),
         seoTitle: String(normalized.seoTitle ?? normalized.title ?? "").trim(),
         seoDescription: String(normalized.seoDescription ?? normalized.summary ?? "").trim(),
-        featured: parseBooleanLike(normalized.featured ?? false),
+        featured: parseBooleanWithDefault(normalized.featured, false),
         externalId: String(normalized.externalId ?? "").trim()
       };
 

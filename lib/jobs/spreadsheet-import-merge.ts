@@ -69,7 +69,31 @@ export function buildNewJobSlugBase(row: ImportedJobRow, state: State, city: Cit
   const ufPart = state.code.toLowerCase();
   const companyPart = company.slug;
   const ext = row.externalId?.trim();
-  const parts = [titlePart, cityPart, ufPart, companyPart, ext ? normalizeSlug(ext) : ""].filter(Boolean);
+  const externalSlugSuffix = (() => {
+    if (!ext) return "";
+    const normalized = normalizeSlug(ext);
+    const prefixedNumeric = normalized.match(/^[a-z]+-(\d{4,})$/i);
+    if (prefixedNumeric?.[1]) {
+      return prefixedNumeric[1];
+    }
+    return normalized;
+  })();
+  const titleTokens = new Set(titlePart.split("-").filter(Boolean));
+  const cityTokens = cityPart.split("-").filter(Boolean);
+  const companyTokens = companyPart.split("-").filter(Boolean);
+
+  // Evita duplicar cidade/UF/empresa quando já vierem no título.
+  const shouldAppendCity = cityTokens.some((t) => !titleTokens.has(t));
+  const shouldAppendUf = !titleTokens.has(ufPart);
+  const shouldAppendCompany = companyTokens.some((t) => !titleTokens.has(t));
+
+  const parts = [
+    titlePart,
+    shouldAppendCity ? cityPart : "",
+    shouldAppendUf ? ufPart : "",
+    shouldAppendCompany ? companyPart : "",
+    externalSlugSuffix
+  ].filter(Boolean);
   const joined = parts.join("-").replace(/-+/g, "-").replace(/^-|-$/g, "");
   return joined.slice(0, 180) || `vaga-${Date.now()}`;
 }
