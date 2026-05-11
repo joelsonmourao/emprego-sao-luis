@@ -1,6 +1,6 @@
 import { buildEmptyUrlSetXml, buildUrlSetXml, createXmlResponse, findSitemapFile, getSitemapManifest } from "@/lib/sitemaps";
 
-export const revalidate = 3600;
+export const dynamic = "force-dynamic";
 
 export async function GET(_: Request, context: { params: Promise<{ slug: string }> }) {
   try {

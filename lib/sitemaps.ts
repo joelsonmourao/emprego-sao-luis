@@ -301,8 +301,10 @@ async function computeSitemapManifest(): Promise<SitemapManifest> {
   return { files, counts };
 }
 
-export const getSitemapManifest = unstable_cache(computeSitemapManifest, ["sitemap-manifest-v1"], {
-  revalidate: 7200,
+export const getSitemapManifest = unstable_cache(computeSitemapManifest, ["sitemap-manifest-v2"], {
+  // TTL curto: em várias réplicas o revalidateTag só limpa o cache do processo que importou; as outras
+  // recebem dados novos dentro deste intervalo mesmo sem tag.
+  revalidate: 180,
   tags: [SITEMAP_MANIFEST_CACHE_TAG]
 });
 
@@ -338,7 +340,8 @@ export function createXmlResponse(xml: string) {
   return new Response(xml, {
     headers: {
       "Content-Type": "application/xml; charset=utf-8",
-      "Cache-Control": "public, s-maxage=3600, stale-while-revalidate=86400"
+      // Evita CDN/proxy segurar XML antigo por horas após import (revalidateTag não invalida cache HTTP).
+      "Cache-Control": "public, max-age=0, s-maxage=120, stale-while-revalidate=600, must-revalidate"
     }
   });
 }

@@ -20,6 +20,12 @@ export type JobPublicRevalidateMeta = {
   employmentType: EmploymentType;
 };
 
+function revalidateSitemapIndexPaths() {
+  revalidatePath("/sitemap.xml");
+  revalidatePath("/sitemap-fresh.xml");
+  revalidatePath("/sitemaps/index.xml");
+}
+
 function revalidateJobPaths(meta: JobPublicRevalidateMeta) {
   revalidatePath("/");
   revalidatePath("/vagas");
@@ -46,6 +52,7 @@ export function revalidatePublicSurfacesForJob(meta: JobPublicRevalidateMeta) {
   revalidateTag(SITEMAP_MANIFEST_CACHE_TAG);
   revalidateTag(PUBLIC_JOBS_CACHE_TAG);
   revalidateTag(PUBLIC_GEO_CACHE_TAG);
+  revalidateSitemapIndexPaths();
   revalidateJobPaths(meta);
 }
 
@@ -54,6 +61,7 @@ export function revalidatePublicSurfacesAfterBulkJobChange() {
   revalidateTag(SITEMAP_MANIFEST_CACHE_TAG);
   revalidateTag(PUBLIC_JOBS_CACHE_TAG);
   revalidateTag(PUBLIC_GEO_CACHE_TAG);
+  revalidateSitemapIndexPaths();
   revalidatePath("/");
   revalidatePath("/vagas");
   revalidatePath("/empresas");
@@ -62,6 +70,7 @@ export function revalidatePublicSurfacesAfterBulkJobChange() {
 export function revalidatePublicSurfacesAfterBlogChange(slug?: string | null) {
   revalidateTag(PUBLIC_BLOG_CACHE_TAG);
   revalidateTag(SITEMAP_MANIFEST_CACHE_TAG);
+  revalidateSitemapIndexPaths();
   revalidatePath("/");
   revalidatePath("/blog");
   if (slug) {

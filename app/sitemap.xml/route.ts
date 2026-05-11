@@ -1,6 +1,6 @@
 import { buildEmptySitemapIndexXml, buildSitemapIndexXml, createXmlResponse, getSitemapManifest } from "@/lib/sitemaps";
 
-export const revalidate = 3600;
+export const dynamic = "force-dynamic";
 
 const FALLBACK_SITEMAP_INDEX_XML = buildEmptySitemapIndexXml();
 
