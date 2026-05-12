@@ -135,6 +135,7 @@ async function main() {
   const apiUrl = readOption("--api-url") ?? "http://127.0.0.1:3000/api/admin/import/jobs";
   const cookie = readOption("--cookie");
   const useAi = hasFlag("--use-ai");
+  const reprocessExistingContent = hasFlag("--reprocess-existing-content");
 
   if (!filePath) {
     throw new Error("Informe a planilha com --file=\"C:\\\\caminho\\\\vagas.xlsx\".");
@@ -147,7 +148,7 @@ async function main() {
       "Content-Type": "application/json",
       ...(cookie ? { Cookie: cookie } : {})
     },
-    body: JSON.stringify({ rows, useAi })
+    body: JSON.stringify({ rows, useAi, reprocessExistingContent })
   });
   const body = await response.text();
 

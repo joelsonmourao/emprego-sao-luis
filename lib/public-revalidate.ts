@@ -67,6 +67,41 @@ export function revalidatePublicSurfacesAfterBulkJobChange() {
   revalidatePath("/empresas");
 }
 
+/**
+ * Após importação com slugs conhecidos: invalida tags de cache do Next e revalida paths agregados
+ * (inclui cada página de vaga e listagens afetadas). Em self-hosted com múltiplas réplicas, cada
+ * instância mantém cache próprio — se algo persistir antigo, reinicie o container ou faça redeploy.
+ */
+export function revalidatePublicSurfacesAfterJobImports(metas: JobPublicRevalidateMeta[]) {
+  revalidateTag(SITEMAP_MANIFEST_CACHE_TAG);
+  revalidateTag(PUBLIC_JOBS_CACHE_TAG);
+  revalidateTag(PUBLIC_GEO_CACHE_TAG);
+  revalidateSitemapIndexPaths();
+
+  const paths = new Set<string>(["/", "/vagas", "/empresas"]);
+
+  for (const meta of metas) {
+    paths.add(getJobPath(meta.slug));
+    paths.add(getStateJobsPath(meta.stateSlug));
+    paths.add(getCityJobsPath(meta.citySlug));
+    paths.add(jovemAprendizStatePath(meta.stateSlug));
+    paths.add(jovemAprendizCityPath(meta.stateSlug, meta.citySlug));
+    const categorySlug = EMPLOYMENT_CATEGORIES.find((item) => item.employmentType === meta.employmentType)?.slug;
+    if (categorySlug) {
+      paths.add(jovemAprendizCategoryPath(categorySlug));
+    }
+    if (meta.companySlug) {
+      paths.add(getCompanyJobsPath(meta.companySlug));
+      paths.add(getVagasEmpresaPath(meta.companySlug));
+      paths.add(jovemAprendizCompanyPath(meta.companySlug));
+    }
+  }
+
+  for (const path of paths) {
+    revalidatePath(path);
+  }
+}
+
 export function revalidatePublicSurfacesAfterBlogChange(slug?: string | null) {
   revalidateTag(PUBLIC_BLOG_CACHE_TAG);
   revalidateTag(SITEMAP_MANIFEST_CACHE_TAG);

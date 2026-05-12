@@ -36,7 +36,12 @@ export const importedJobRowSchema = z.object({
 
 export const importJobsPayloadSchema = z.object({
   rows: z.array(importedJobRowSchema),
-  useAi: z.boolean().optional().default(false)
+  useAi: z.boolean().optional().default(false),
+  /**
+   * Quando true, vagas já existentes (externalId/slug) recebem título, SEO title, jobTitle e JSON de
+   * requisitos/benefícios conforme a planilha — comportamento padrão continua preservando título/seoTitle antigos.
+   */
+  reprocessExistingContent: z.boolean().optional().default(false)
 });
 
 export type ImportedJobRow = z.infer<typeof importedJobRowSchema>;

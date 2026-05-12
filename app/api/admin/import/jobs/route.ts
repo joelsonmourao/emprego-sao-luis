@@ -23,7 +23,11 @@ import {
   snapshotFromPersisted,
   type JobImportSnapshot
 } from "@/lib/jobs/spreadsheet-import-merge";
-import { revalidatePublicSurfacesAfterBulkJobChange } from "@/lib/public-revalidate";
+import {
+  revalidatePublicSurfacesAfterBulkJobChange,
+  revalidatePublicSurfacesAfterJobImports,
+  type JobPublicRevalidateMeta
+} from "@/lib/public-revalidate";
 import { importJobsPayloadSchema, type ImportedJobRow } from "@/lib/schemas/job-import";
 
 
@@ -88,6 +92,8 @@ type ImportContext = {
   processedRows: number;
   summary: JobImportSummaryReport;
   touchedSlugs: string[];
+  /** Modo correção: sobrescreve title/seoTitle/jobTitle em updates e aplica requisitos/benefícios da planilha. */
+  reprocessExistingContent: boolean;
 };
 
 export const maxDuration = 60;
@@ -480,7 +486,28 @@ async function ensureCompanies(
   };
 }
 
-async function buildImportContext(rows: ImportedJobRow[]): Promise<ImportContext> {
+async function fetchJobRevalidateMetasForSlugs(slugs: string[]): Promise<JobPublicRevalidateMeta[]> {
+  if (!slugs.length) return [];
+  const jobs = await prisma.job.findMany({
+    where: { slug: { in: slugs } },
+    select: {
+      slug: true,
+      employmentType: true,
+      company: { select: { slug: true } },
+      city: { select: { slug: true } },
+      state: { select: { slug: true } }
+    }
+  });
+  return jobs.map((job) => ({
+    slug: job.slug,
+    stateSlug: job.state.slug,
+    citySlug: job.city.slug,
+    companySlug: job.company?.slug ?? null,
+    employmentType: job.employmentType
+  }));
+}
+
+async function buildImportContext(rows: ImportedJobRow[], opts?: { reprocessExistingContent?: boolean }): Promise<ImportContext> {
   const { statesByName, statesByCode } = await ensureStates(rows);
   const { citiesByStateAndName, citiesByStateAndSlug } = await ensureCities(rows, statesByName, statesByCode);
   const { companiesBySlug, companiesByName } = await ensureCompanies(
@@ -540,7 +567,8 @@ async function buildImportContext(rows: ImportedJobRow[]): Promise<ImportContext
     updated: [],
     processedRows: 0,
     summary: emptyImportSummaryReport(),
-    touchedSlugs: []
+    touchedSlugs: [],
+    reprocessExistingContent: Boolean(opts?.reprocessExistingContent)
   };
 
   return context;
@@ -586,7 +614,8 @@ async function persistImportedRow(rowForSave: ImportedJobRow, context: ImportCon
       existing,
       normalizedDescription,
       processValidThroughMonths,
-      calculateValidThrough
+      calculateValidThrough,
+      { reprocessExistingContent: context.reprocessExistingContent }
     );
     const saved = await prisma.job.update({ where: { id: existing.id }, data: updateData });
     const snap = snapshotFromPersisted(saved);
@@ -681,11 +710,16 @@ async function processQueuedImport(queueId: string) {
   try {
     const payload = importJobsPayloadSchema.parse(queue.payload);
     const rows = payload.rows.map(sanitizeImportedRow);
-    const context = await buildImportContext(rows);
+    const context = await buildImportContext(rows, { reprocessExistingContent: payload.reprocessExistingContent === true });
     await processRows(rows, context, queueId, { useAi: false });
 
     if (context.imported.length || context.updated.length) {
-      revalidatePublicSurfacesAfterBulkJobChange();
+      const metas = await fetchJobRevalidateMetasForSlugs([...new Set(context.touchedSlugs)]);
+      if (metas.length) {
+        revalidatePublicSurfacesAfterJobImports(metas);
+      } else {
+        revalidatePublicSurfacesAfterBulkJobChange();
+      }
     }
 
     await markExpiredJobsInactive();
@@ -754,16 +788,23 @@ export async function POST(request: Request) {
       return buildJsonError(400, "Nenhuma linha valida foi enviada para importacao.");
     }
 
+    const reprocessExistingContent = payload.reprocessExistingContent === true;
+
     const inlineParam = new URL(request.url).searchParams.get("inline");
     const shouldProcessInline = inlineParam === "1" || inlineParam === "true" || (rows.length <= DIRECT_IMPORT_LIMIT);
 
     if (shouldProcessInline) {
       const startedAt = Date.now();
-      const context = await buildImportContext(rows);
+      const context = await buildImportContext(rows, { reprocessExistingContent });
       await processRows(rows, context, undefined, { useAi: false });
 
       if (context.imported.length || context.updated.length) {
-        revalidatePublicSurfacesAfterBulkJobChange();
+        const metas = await fetchJobRevalidateMetasForSlugs([...new Set(context.touchedSlugs)]);
+        if (metas.length) {
+          revalidatePublicSurfacesAfterJobImports(metas);
+        } else {
+          revalidatePublicSurfacesAfterBulkJobChange();
+        }
       }
 
       await markExpiredJobsInactive();

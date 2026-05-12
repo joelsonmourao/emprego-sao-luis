@@ -179,6 +179,7 @@ async function parseImportResponse(response: Response): Promise<ImportApiRespons
 export function AdminJobImporter() {
   const [rows, setRows] = useState<ParsedPreview[]>([]);
   const [fileName, setFileName] = useState("");
+  const [reprocessExistingContent, setReprocessExistingContent] = useState(false);
   const [resultMessage, setResultMessage] = useState("");
   const [isImporting, setIsImporting] = useState(false);
   const [progressMessage, setProgressMessage] = useState("");
@@ -287,7 +288,7 @@ export function AdminJobImporter() {
           const response = await fetch("/api/admin/import/jobs?inline=1", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ rows: batchRows, useAi: false }),
+            body: JSON.stringify({ rows: batchRows, useAi: false, reprocessExistingContent }),
             signal: AbortSignal.timeout(45000)
           });
           const result = await parseImportResponse(response);
@@ -326,7 +327,7 @@ export function AdminJobImporter() {
       const response = await fetch("/api/admin/import/jobs", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ rows: validRows, useAi: false }),
+        body: JSON.stringify({ rows: validRows, useAi: false, reprocessExistingContent }),
         signal: AbortSignal.timeout(45000)
       });
 
@@ -417,9 +418,10 @@ export function AdminJobImporter() {
           </div>
           <CardTitle>Importar vagas por Excel</CardTitle>
           <CardDescription>
-            Envie uma planilha `.xlsx` com colunas como `title`, `company`, `city`, `state`, `description`, `applyUrl` e SEO. Para
+            Envie uma planilha `.xlsx` com colunas como `title`, `company`, `city`, `state`, `description`, `applyUrl` e SEO.             Para
             atualizar uma vaga já publicada, use `externalId` (ou a coluna `slug` com o slug exato da URL). Links iguais (`applyUrl`) em
-            várias linhas não casam com vaga antiga — só `externalId` e `slug`.
+            várias linhas não casam com vaga antiga — só `externalId` e `slug`. Marque a opção abaixo apenas quando quiser sobrescrever
+            título e SEO de vagas já existentes com os dados corrigidos da planilha.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -443,6 +445,24 @@ export function AdminJobImporter() {
               <p className="mt-2 text-3xl font-black text-slate-900">{rows.length}</p>
             </div>
           </div>
+
+          <label className="flex cursor-pointer items-start gap-3 rounded-2xl border border-amber-200 bg-amber-50/80 px-4 py-3 text-sm text-amber-950">
+            <input
+              type="checkbox"
+              className="mt-0.5 h-4 w-4 shrink-0 accent-amber-600"
+              checked={reprocessExistingContent}
+              onChange={(event) => setReprocessExistingContent(event.target.checked)}
+            />
+            <span>
+              <span className="font-semibold">Reprocessar conteúdo de vagas existentes</span> — envia{" "}
+              <code className="rounded bg-amber-100 px-1 py-0.5 text-xs">reprocessExistingContent: true</code> na API. Atualiza{" "}
+              <code className="rounded bg-amber-100 px-1 py-0.5 text-xs">title</code>,{" "}
+              <code className="rounded bg-amber-100 px-1 py-0.5 text-xs">seoTitle</code>,{" "}
+              <code className="rounded bg-amber-100 px-1 py-0.5 text-xs">jobTitle</code> e JSON de requisitos/benefícios quando a
+              planilha tiver texto nessas colunas. Sem esta opção, o comportamento anterior é mantido (título e SEO title antigos
+              preservados em updates).
+            </span>
+          </label>
 
           <div className="flex flex-wrap gap-3">
             <Button type="button" size="lg" onClick={handleImport} disabled={isImporting || !validRows.length}>

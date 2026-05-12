@@ -1,6 +1,6 @@
 import type { City, Company, Job, LocationType, State } from "@prisma/client";
 
-import { normalizeSlug, parseOptionalDate, richTextFromInput } from "@/lib/admin/content";
+import { normalizeLines, normalizeSlug, parseOptionalDate, richTextFromInput } from "@/lib/admin/content";
 import { parseSpreadsheetEmploymentType } from "@/lib/jobs/employment-type";
 import {
   ensureSpreadsheetTitleWithCitySlashUf,
@@ -133,8 +133,8 @@ export function buildJobCreateData(
     companyWebsiteUrl: company.websiteUrl,
     summary: row.summary.trim(),
     descriptionHtml: descriptionHtmlNormalized,
-    requirements: [],
-    benefits: [],
+    requirements: normalizeLines(row.requirementsText ?? ""),
+    benefits: normalizeLines(row.benefitsText ?? ""),
     salaryMin: row.salaryMin ? Math.round(row.salaryMin) : null,
     salaryMax: row.salaryMax ? Math.round(row.salaryMax) : null,
     employmentType: parseSpreadsheetEmploymentType(row.employmentType),
@@ -160,6 +160,11 @@ export function buildJobCreateData(
 type ValidThroughFn = (months: number | null | undefined) => Date | null;
 type CalculateValidThroughFn = (value: string | number | null | undefined) => Date | null;
 
+export type BuildJobUpdateOptions = {
+  /** Atualiza title, seoTitle e jobTitle de vagas existentes a partir da planilha (modo correção). */
+  reprocessExistingContent?: boolean;
+};
+
 export function buildJobUpdateData(
   row: ImportedJobRow,
   state: State,
@@ -168,21 +173,40 @@ export function buildJobUpdateData(
   existing: JobImportSnapshot,
   descriptionHtmlNormalized: string,
   processValidThroughMonths: ValidThroughFn,
-  calculateValidThrough: CalculateValidThroughFn
+  calculateValidThrough: CalculateValidThroughFn,
+  options?: BuildJobUpdateOptions
 ) {
+  const reprocess = Boolean(options?.reprocessExistingContent);
   const resolvedFromSheet = ensureSpreadsheetTitleWithCitySlashUf(row.title, city.name, state.code);
 
   const hadSeoTitle = Boolean(existing.seoTitle?.trim());
-  const nextSeoTitle = hadSeoTitle ? undefined : ensureSeoTitle(row, city, state, company, resolvedFromSheet);
+  const nextSeoTitle = reprocess
+    ? ensureSeoTitle(row, city, state, company, resolvedFromSheet)
+    : hadSeoTitle
+      ? undefined
+      : ensureSeoTitle(row, city, state, company, resolvedFromSheet);
 
   const hadJobTitle = Boolean(existing.jobTitle?.trim());
-  const nextJobTitle = hadJobTitle ? undefined : extractJobTitle(existing.title).trim() || undefined;
+  const nextJobTitle = reprocess
+    ? (() => {
+        const extracted = extractJobTitle(resolvedFromSheet).trim();
+        return extracted || resolvedFromSheet;
+      })()
+    : hadJobTitle
+      ? undefined
+      : extractJobTitle(existing.title).trim() || undefined;
 
   const validThrough =
     processValidThroughMonths(row.validThroughMonths) ?? calculateValidThrough(row.validThrough);
 
   const externalIdPatch =
     !existing.externalId?.trim() && row.externalId?.trim() ? { externalId: row.externalId.trim() } : {};
+
+  const requirementsPatch =
+    row.requirementsText?.trim() ? { requirements: normalizeLines(row.requirementsText) } : {};
+  const benefitsPatch = row.benefitsText?.trim() ? { benefits: normalizeLines(row.benefitsText) } : {};
+
+  const titlePatch = reprocess ? { title: resolvedFromSheet } : {};
 
   return {
     companyName: company.name,
@@ -206,8 +230,11 @@ export function buildJobUpdateData(
     companyId: company.id,
     stateId: state.id,
     cityId: city.id,
-    ...(nextSeoTitle ? { seoTitle: nextSeoTitle } : {}),
-    ...(nextJobTitle ? { jobTitle: nextJobTitle } : {}),
+    ...titlePatch,
+    ...(nextSeoTitle !== undefined ? { seoTitle: nextSeoTitle } : {}),
+    ...(nextJobTitle !== undefined ? { jobTitle: nextJobTitle } : {}),
+    ...requirementsPatch,
+    ...benefitsPatch,
     ...externalIdPatch
   };
 }
