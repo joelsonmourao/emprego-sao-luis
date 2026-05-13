@@ -4,7 +4,8 @@ export function SectionHeading({
   description,
   tone = "default",
   align = "left",
-  titleLevel = "h2"
+  titleLevel = "h2",
+  titleClassName
 }: {
   eyebrow?: string;
   title: string;
@@ -13,6 +14,8 @@ export function SectionHeading({
   align?: "left" | "center";
   /** Use h1 apenas uma vez por pagina (ex.: titulo principal da vaga). */
   titleLevel?: "h1" | "h2";
+  /** Classes extras no titulo (ex.: entry-title em paginas de vaga). */
+  titleClassName?: string;
 }) {
   return (
     <div className={`max-w-3xl min-w-0 space-y-3 ${align === "center" ? "mx-auto text-center" : ""}`}>
@@ -29,21 +32,27 @@ export function SectionHeading({
       ) : null}
       {titleLevel === "h1" ? (
         <h1
-          className={
+          className={[
             tone === "light"
               ? "text-[1.9rem] font-black tracking-tight text-white break-words leading-[1.08] sm:text-4xl"
-              : "text-[1.9rem] font-black tracking-tight text-[var(--brand-navy)] break-words leading-[1.08] sm:text-4xl"
-          }
+              : "text-[1.9rem] font-black tracking-tight text-[var(--brand-navy)] break-words leading-[1.08] sm:text-4xl",
+            titleClassName?.trim()
+          ]
+            .filter(Boolean)
+            .join(" ")}
         >
           {title}
         </h1>
       ) : (
         <h2
-          className={
+          className={[
             tone === "light"
               ? "text-[1.9rem] font-black tracking-tight text-white break-words leading-[1.08] sm:text-4xl"
-              : "text-[1.9rem] font-black tracking-tight text-[var(--brand-navy)] break-words leading-[1.08] sm:text-4xl"
-          }
+              : "text-[1.9rem] font-black tracking-tight text-[var(--brand-navy)] break-words leading-[1.08] sm:text-4xl",
+            titleClassName?.trim()
+          ]
+            .filter(Boolean)
+            .join(" ")}
         >
           {title}
         </h2>

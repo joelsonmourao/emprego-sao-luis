@@ -188,11 +188,11 @@ export default async function VagasCatchAllPage({
     ];
 
     return (
-      <main id="conteudo-principal-vaga" className="min-w-0">
+      <>
         <JobPostingJsonLd input={jobPostingInput} />
         <JobBreadcrumbJsonLd items={breadcrumbItems} />
         <JobDetailView job={job} displayTitle={pageTitle} />
-      </main>
+      </>
     );
   }
 

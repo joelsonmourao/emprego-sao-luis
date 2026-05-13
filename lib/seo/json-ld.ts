@@ -230,6 +230,13 @@ async function buildJobLocationBlock(job: JobPostingJsonLdInput) {
 
   if (street && !isPlaceholderStreetAddress(street)) {
     address.streetAddress = street;
+  } else if (!isPlaceholderSentinel(job.cityName) && job.locationType !== "REMOTE") {
+    const region = (resolvedUf ?? job.stateCode).trim();
+    const locality = job.cityName.trim();
+    const fallbackStreet = `${locality}, ${region}`;
+    if (!isPlaceholderStreetAddress(fallbackStreet)) {
+      address.streetAddress = fallbackStreet;
+    }
   }
 
   const place: Record<string, unknown> = {
