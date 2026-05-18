@@ -7,6 +7,7 @@ import { isJobPastPublicDeadline } from "@/lib/jobs/job-expiry";
 import { resolveCompanyJobsPageMetadata } from "@/lib/seo/company-jobs-metadata";
 import { JobBreadcrumbJsonLd } from "@/components/vagas/job-breadcrumb-json-ld";
 import { JobPostingJsonLd } from "@/components/vagas/job-posting-json-ld";
+import { getTrustedLocationEnrichmentForJob } from "@/lib/location/location-enrichment-service";
 import { buildJobDetailSeo } from "@/lib/seo/jobs-pages";
 import { buildSiteMetadata } from "@/lib/seo/metadata";
 import { getJobBySlug } from "@/lib/repositories/jobs";
@@ -151,34 +152,32 @@ export default async function VagasCatchAllPage({
     const stateName = safeString(job.state?.name, "Brasil");
     const pageTitle = job.title.trim();
 
+    const locationEnrichment = await getTrustedLocationEnrichmentForJob({
+      companyName: job.companyName,
+      city: job.city?.name ?? cityName,
+      state: job.state?.code ?? stateCode
+    });
+
     const jobPostingInput = {
       id: job.id,
       externalId: job.externalId,
       storedTitle: job.title,
-      jobTitle: job.jobTitle,
-      displayTitle: pageTitle,
-      summary: job.summary,
       descriptionHtml: job.descriptionHtml,
       slug: job.slug,
       companyName: job.companyName,
       companyLogoUrl: job.company?.logoUrl ?? job.companyLogoUrl,
       companyWebsiteUrl: job.company?.websiteUrl ?? job.companyWebsiteUrl,
-      sourceUrl: job.sourceUrl,
+      companySlug: job.company?.slug ?? null,
       cityName: job.city?.name ?? cityName,
-      citySlug,
       stateCode: job.state?.code ?? stateCode,
       stateName,
-      locationType: job.locationType,
       publishedAt: job.publishedAt,
       createdAt: job.createdAt,
       expiresAt: job.expiresAt,
       validThrough: job.validThrough ?? null,
       salaryMin: job.salaryMin,
-      salaryMax: job.salaryMax,
-      workHours: job.workHours,
-      countryCode: "BR",
-      employmentType: job.employmentType,
-      applyUrl: job.applyUrl
+      locationEnrichment,
+      employmentType: job.employmentType
     };
 
     const breadcrumbItems = [

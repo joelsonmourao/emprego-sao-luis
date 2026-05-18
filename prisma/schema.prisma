@@ -64,6 +64,13 @@ enum ImportQueueStatus {
   FAILED
 }
 
+enum LocationMatchStatus {
+  MATCHED
+  LOW_CONFIDENCE
+  NOT_FOUND
+  API_ERROR
+}
+
 model State {
   id        String   @id @default(cuid())
   code      String   @unique @db.VarChar(2)
@@ -122,6 +129,30 @@ model Company {
   @@index([isActive, updatedAt(sort: Desc)])
   @@index([stateId, cityId, isActive])
   @@index([featured, isActive])
+}
+
+model LocationEnrichmentCache {
+  id                    String              @id @default(cuid())
+  companyName           String
+  companyNameNormalized String
+  city                  String
+  state                 String              @db.VarChar(2)
+  provider              String
+  providerPlaceId       String?
+  streetAddress         String?
+  postalCode            String?
+  latitude              Float?
+  longitude             Float?
+  matchStatus           LocationMatchStatus
+  matchConfidence       Float?
+  rawQuery              String?
+  lastFetchedAt         DateTime?
+  lastValidatedAt       DateTime?
+  createdAt             DateTime            @default(now())
+  updatedAt             DateTime            @updatedAt
+
+  @@unique([companyNameNormalized, city, state])
+  @@index([matchStatus])
 }
 
 model Job {

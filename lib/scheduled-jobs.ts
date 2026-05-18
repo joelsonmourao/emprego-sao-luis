@@ -12,6 +12,7 @@ import { writeAuditLog } from "@/lib/audit";
 import { normalizeLines, normalizeSlug, parseOptionalDate, richTextFromInput } from "@/lib/admin/content";
 import { resolveCompanyByName, resolveStateAndCityFromNames } from "@/lib/admin/jobs";
 import { prisma } from "@/lib/db";
+import { ensureLocationEnrichment } from "@/lib/location/location-enrichment-service";
 import { env } from "@/lib/env";
 import { notifyGoogleIndexing } from "@/lib/google-indexing";
 import { getSiteUrl } from "@/lib/site-url";
@@ -425,6 +426,12 @@ async function upsertScheduledJob(row: ScheduledRow, context: PublicationContext
       publishedAt: job.publishedAt,
       externalId: job.externalId
     });
+  }
+
+  try {
+    await ensureLocationEnrichment({ companyName: company.name, city: city.name, state: state.code });
+  } catch (error) {
+    console.warn(`[location-enrichment] Falha na publicação agendada (${company.name} / ${city.name}):`, error);
   }
 
   return job;

@@ -12,6 +12,7 @@ import {
   formatImportReportMessage,
   type JobImportSummaryReport
 } from "@/lib/jobs/import-report";
+import { ensureLocationEnrichment } from "@/lib/location/location-enrichment-service";
 import { markExpiredJobsInactive } from "@/lib/jobs/job-expiry";
 import {
   buildImportJobLookup,
@@ -638,6 +639,7 @@ async function persistImportedRow(rowForSave: ImportedJobRow, context: ImportCon
     context.updated.push(saved.slug);
     context.touchedSlugs.push(saved.slug);
     registerSnapshotInLookup(context.jobLookup, snap);
+    await enrichLocationAfterImport(company.name, city.name, state.code);
     return;
   }
 
@@ -651,6 +653,15 @@ async function persistImportedRow(rowForSave: ImportedJobRow, context: ImportCon
   context.imported.push(saved.slug);
   context.touchedSlugs.push(saved.slug);
   registerSnapshotInLookup(context.jobLookup, snap);
+  await enrichLocationAfterImport(company.name, city.name, state.code);
+}
+
+async function enrichLocationAfterImport(companyName: string, city: string, state: string) {
+  try {
+    await ensureLocationEnrichment({ companyName, city, state });
+  } catch (error) {
+    console.warn(`[location-enrichment] Falha ao enriquecer localização na importação (${companyName} / ${city} / ${state}):`, error);
+  }
 }
 
 async function processRows(rows: ImportedJobRow[], context: ImportContext, queueId?: string, options?: { useAi?: boolean }) {

@@ -18,6 +18,7 @@ import { normalizeLines, normalizeSlug, parseOptionalDate, richTextFromInput } f
 import { resolveCompanyByName, resolveStateAndCityFromNames } from "@/lib/admin/jobs";
 import { writeAuditLog } from "@/lib/audit";
 import { prisma } from "@/lib/db";
+import { ensureLocationEnrichment } from "@/lib/location/location-enrichment-service";
 import { notifyGoogleIndexing } from "@/lib/google-indexing";
 import { appendPublicationAuditLog } from "@/lib/publication-audit-log";
 import { parseScheduledAtInputToUtc } from "@/lib/scheduled-at-utc";
@@ -329,6 +330,12 @@ async function upsertScheduledDraftJob(row: ScheduledJobUploadRow, context: Publ
       publicationStatus: job.publicationStatus,
       isActive: job.isActive
     });
+  }
+
+  try {
+    await ensureLocationEnrichment({ companyName: company.name, city: city.name, state: state.code });
+  } catch (error) {
+    console.warn(`[location-enrichment] Falha no upload agendado (${company.name} / ${city.name}):`, error);
   }
 
   return job;

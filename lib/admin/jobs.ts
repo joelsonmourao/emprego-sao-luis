@@ -3,6 +3,7 @@ import { EmploymentType, LocationType, Prisma } from "@prisma/client";
 import { normalizeLines, normalizeSlug, parseOptionalDate, richTextFromInput, sanitizeHtml } from "@/lib/admin/content";
 import { getBrazilNow, parseFlexibleDateToUtc } from "@/lib/date-utils";
 import { prisma } from "@/lib/db";
+import { ensureLocationEnrichment } from "@/lib/location/location-enrichment-service";
 import { jobFormSchema, type JobFormValues } from "@/lib/schemas/job-form";
 
 function processValidThrough(validThroughValue: string | undefined | null): Date | null {
@@ -203,11 +204,13 @@ export async function upsertJobFromForm(input: unknown, existingId?: string) {
       throw new Error("Vaga nao encontrada.");
     }
 
-    return prisma.job.update({
+    const saved = await prisma.job.update({
       where: { id: existingId },
       data: baseData,
       select: jobPublicSelect
     });
+    await enrichJobLocationQuietly(company.name, city.name, state.code);
+    return saved;
   }
 
   const createData: Prisma.JobUncheckedCreateInput = {
@@ -215,10 +218,20 @@ export async function upsertJobFromForm(input: unknown, existingId?: string) {
     publishedAt: new Date()
   };
 
-  return prisma.job.create({
+  const saved = await prisma.job.create({
     data: createData,
     select: jobPublicSelect
   });
+  await enrichJobLocationQuietly(company.name, city.name, state.code);
+  return saved;
+}
+
+async function enrichJobLocationQuietly(companyName: string, city: string, state: string) {
+  try {
+    await ensureLocationEnrichment({ companyName, city, state });
+  } catch (error) {
+    console.warn(`[location-enrichment] Falha ao enriquecer localização no admin (${companyName} / ${city} / ${state}):`, error);
+  }
 }
 
 export type AdminImportJobInput = JobFormValues & {
