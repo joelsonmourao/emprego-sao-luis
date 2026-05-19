@@ -9,7 +9,11 @@
  *
  * Dry-run (sem API, sem gravar cache):
  *   npm run enrich:locations:backfill -- --dry-run
+ *   npm run enrich:locations:backfill:dry-run -- --latest-jobs=2000
  *   LOCATION_BACKFILL_DRY_RUN=1 npm run enrich:locations:backfill
+ *
+ * Escopo opcional:
+ *   --latest-jobs=2000  (considera somente as vagas mais recentes por createdAt DESC)
  *
  * Variáveis opcionais (execução real):
  *   GEOAPIFY_API_KEY=...                         (obrigatória para chamadas reais)
@@ -38,8 +42,27 @@ type LocationKey = {
   companyNameNormalized: string;
 };
 
+type BackfillScope = {
+  latestJobs: number | null;
+};
+
 function isDryRun() {
   return process.argv.includes("--dry-run") || process.env.LOCATION_BACKFILL_DRY_RUN === "1";
+}
+
+function parseLatestJobsArg(): BackfillScope {
+  const arg = process.argv.find((item) => item.startsWith("--latest-jobs"));
+  if (!arg) return { latestJobs: null };
+
+  const [, rawValue] = arg.split("=");
+  const value = rawValue?.trim();
+  const parsed = Number.parseInt(value ?? "", 10);
+
+  if (!value || !Number.isFinite(parsed) || parsed < 1 || String(parsed) !== value) {
+    throw new Error('Argumento inválido: use "--latest-jobs=2000" com um número inteiro positivo.');
+  }
+
+  return { latestJobs: parsed };
 }
 
 function parsePositiveInt(value: string | undefined, fallback: number, max?: number) {
@@ -64,13 +87,21 @@ function buildKey(input: { companyName: string; city: string; state: string }): 
   };
 }
 
-async function collectUniqueKeysFromJobs() {
+function formatScope(scope: BackfillScope) {
+  return scope.latestJobs
+    ? `Escopo limitado às ${scope.latestJobs} vagas mais recentes (createdAt DESC).`
+    : "Escopo sem limite: todas as vagas do banco.";
+}
+
+async function collectUniqueKeysFromJobs(scope: BackfillScope) {
   const jobs = await prisma.job.findMany({
     select: {
       companyName: true,
       city: { select: { name: true } },
       state: { select: { code: true } }
-    }
+    },
+    orderBy: [{ createdAt: "desc" }, { id: "desc" }],
+    ...(scope.latestJobs ? { take: scope.latestJobs } : {})
   });
 
   const keyMap = new Map<string, LocationKey>();
@@ -100,11 +131,13 @@ async function collectUniqueKeysFromJobs() {
   };
 }
 
-async function runDryRun() {
+async function runDryRun(scope: BackfillScope) {
   console.info("=== Backfill de localização — DRY-RUN ===");
   console.info("Nenhuma chamada à API externa. Nenhuma gravação em LocationEnrichmentCache.\n");
+  console.info(formatScope(scope));
+  console.info("Critério de recência: Job.createdAt DESC.\n");
 
-  const { jobsAnalyzed, skippedInvalidJobs, keys } = await collectUniqueKeysFromJobs();
+  const { jobsAnalyzed, skippedInvalidJobs, keys } = await collectUniqueKeysFromJobs(scope);
   const preview = await previewLocationEnrichmentBackfill(
     keys.map((key) => ({ companyName: key.companyName, city: key.city, state: key.state }))
   );
@@ -115,6 +148,9 @@ async function runDryRun() {
   });
 
   console.info(`Vagas no banco: ${jobsAnalyzed}`);
+  if (scope.latestJobs) {
+    console.info(`Escopo limitado às vagas mais recentes: ${scope.latestJobs}`);
+  }
   console.info(`Vagas ignoradas (empresa/cidade/UF inválidos): ${skippedInvalidJobs}`);
   console.info(`Combinações empresa/cidade/UF únicas: ${keys.length}`);
   console.info(`Registros em LocationEnrichmentCache (total): ${cacheRows}`);
@@ -164,7 +200,7 @@ async function runPool<T>(items: T[], concurrency: number, worker: (item: T, ind
   await Promise.all(workers);
 }
 
-async function runBackfill() {
+async function runBackfill(scope: BackfillScope) {
   const maxApiCallsPerRun = resolveBackfillMaxApiCallsPerRun();
   const concurrency = parsePositiveInt(process.env.LOCATION_BACKFILL_CONCURRENCY, 1, 3);
   const delayMs = parsePositiveInt(process.env.LOCATION_BACKFILL_DELAY_MS, 500);
@@ -180,6 +216,8 @@ async function runBackfill() {
   );
   console.info("Provedor: Geoapify Geocoding API — GET https://api.geoapify.com/v1/geocode/search");
   console.info("Este script NÃO roda automaticamente. Execute apenas quando desejar.\n");
+  console.info(formatScope(scope));
+  console.info("Critério de recência: Job.createdAt DESC.\n");
 
   if (!process.env.GEOAPIFY_API_KEY?.trim()) {
     console.warn(
@@ -187,7 +225,7 @@ async function runBackfill() {
     );
   }
 
-  const { jobsAnalyzed, skippedInvalidJobs, keys } = await collectUniqueKeysFromJobs();
+  const { jobsAnalyzed, skippedInvalidJobs, keys } = await collectUniqueKeysFromJobs(scope);
 
   const stats = {
     jobsAnalyzed,
@@ -213,6 +251,9 @@ async function runBackfill() {
   };
 
   console.info(`Vagas no banco: ${stats.jobsAnalyzed}`);
+  if (scope.latestJobs) {
+    console.info(`Escopo limitado às vagas mais recentes: ${scope.latestJobs}`);
+  }
   console.info(`Combinações empresa/cidade/UF únicas: ${stats.uniqueKeysEvaluated}`);
   console.info(`Ignoradas por dados incompletos (vagas): ${stats.skippedInvalid}\n`);
 
@@ -305,6 +346,9 @@ async function runBackfill() {
 
   console.info("\n=== Resumo do backfill ===");
   console.info(`Vagas analisadas: ${stats.jobsAnalyzed}`);
+  if (scope.latestJobs) {
+    console.info(`Escopo limitado às vagas mais recentes: ${scope.latestJobs} (createdAt DESC)`);
+  }
   console.info(`Chaves empresa/cidade/UF únicas avaliadas: ${stats.uniqueKeysEvaluated}`);
   console.info(`Cache confiável reutilizado: ${stats.cacheReusedTrusted}`);
   console.info(`Cache negativo reutilizado (sem nova API): ${stats.cacheReusedNoRetry}`);
@@ -325,11 +369,13 @@ async function runBackfill() {
 }
 
 async function main() {
+  const scope = parseLatestJobsArg();
+
   if (isDryRun()) {
-    await runDryRun();
+    await runDryRun(scope);
     return;
   }
-  await runBackfill();
+  await runBackfill(scope);
 }
 
 main()
