@@ -118,15 +118,42 @@ function shouldSkipApiFetch(lastFetchedAt: Date | null | undefined) {
   return ageMs < CACHE_RETRY_DAYS * 24 * 60 * 60 * 1000;
 }
 
+export type LocationEnrichmentRunOutcome =
+  | "skipped_invalid_input"
+  | "cache_reused_trusted"
+  | "cache_reused_no_retry"
+  | "api_matched"
+  | "api_not_found"
+  | "api_low_confidence"
+  | "api_error";
+
+function isValidEnrichmentInput(input: LocationEnrichmentLookupInput) {
+  const companyName = input.companyName?.trim();
+  const city = input.city?.trim();
+  const state = input.state?.trim().toUpperCase();
+  if (!companyName || !city || !state || state.length !== 2) return false;
+  return true;
+}
+
 /**
- * Enriquece localização durante importação/admin. Não lança erro se a API falhar.
+ * Processa uma combinação empresa/cidade/UF (idempotente). Usado na importação e no backfill manual.
  */
-export async function ensureLocationEnrichment(input: LocationEnrichmentLookupInput): Promise<void> {
+export async function runLocationEnrichment(
+  input: LocationEnrichmentLookupInput,
+  options?: { quiet?: boolean }
+): Promise<LocationEnrichmentRunOutcome> {
+  if (!isValidEnrichmentInput(input)) {
+    return "skipped_invalid_input";
+  }
+
   const companyName = input.companyName.trim();
   const city = input.city.trim();
   const state = input.state.trim().toUpperCase();
   const companyNameNormalized = normalizeCompanyNameForCache(companyName);
   const rawQuery = buildRawQuery(input);
+  const log = (message: string) => {
+    if (!options?.quiet) console.info(message);
+  };
 
   const existing = await prisma.locationEnrichmentCache.findUnique({
     where: {
@@ -141,19 +168,19 @@ export async function ensureLocationEnrichment(input: LocationEnrichmentLookupIn
   if (existing) {
     const trusted = trustedFieldsFromCache(existing);
     if (trusted) {
-      console.info(`[location-enrichment] Cache confiável reutilizado na importação: ${companyName} / ${city} / ${state}.`);
-      return;
+      log(`[location-enrichment] Cache confiável reutilizado: ${companyName} / ${city} / ${state}.`);
+      return "cache_reused_trusted";
     }
     if (shouldSkipApiFetch(existing.lastFetchedAt)) {
-      console.info(
+      log(
         `[location-enrichment] Tentativa anterior reutilizada (sem nova API): ${companyName} / ${city} / ${state} [${existing.matchStatus}].`
       );
-      return;
+      return "cache_reused_no_retry";
     }
   }
 
   const provider = resolveProvider();
-  console.info(`[location-enrichment] Consultando API (${provider.id}): ${rawQuery}`);
+  log(`[location-enrichment] Consultando API (${provider.id}): ${rawQuery}`);
 
   let place: Awaited<ReturnType<LocationEnrichmentProvider["searchBranch"]>> = null;
   try {
@@ -175,11 +202,11 @@ export async function ensureLocationEnrichment(input: LocationEnrichmentLookupIn
       latitude: null,
       longitude: null
     });
-    return;
+    return "api_error";
   }
 
   if (!place) {
-    console.info(`[location-enrichment] Localização não encontrada: ${companyName} / ${city} / ${state}.`);
+    log(`[location-enrichment] Localização não encontrada: ${companyName} / ${city} / ${state}.`);
     await upsertCacheRow({
       companyName,
       companyNameNormalized,
@@ -195,7 +222,7 @@ export async function ensureLocationEnrichment(input: LocationEnrichmentLookupIn
       latitude: null,
       longitude: null
     });
-    return;
+    return "api_not_found";
   }
 
   const matchConfidence = scorePlaceMatch(input, place);
@@ -203,7 +230,7 @@ export async function ensureLocationEnrichment(input: LocationEnrichmentLookupIn
   const hasAddress = Boolean(place.streetAddress?.trim() && place.postalCode?.trim());
 
   if (matchConfidence < CONFIDENCE_THRESHOLD || !hasGeo || !hasAddress) {
-    console.info(
+    log(
       `[location-enrichment] Localização rejeitada por baixa confiança (${matchConfidence.toFixed(2)}): ${companyName} / ${city} / ${state}.`
     );
     await upsertCacheRow({
@@ -221,10 +248,10 @@ export async function ensureLocationEnrichment(input: LocationEnrichmentLookupIn
       latitude: place.latitude,
       longitude: place.longitude
     });
-    return;
+    return "api_low_confidence";
   }
 
-  console.info(
+  log(
     `[location-enrichment] Localização encontrada com confiança ${matchConfidence.toFixed(2)}: ${companyName} / ${city} / ${state}.`
   );
 
@@ -243,6 +270,15 @@ export async function ensureLocationEnrichment(input: LocationEnrichmentLookupIn
     latitude: place.latitude,
     longitude: place.longitude
   });
+
+  return "api_matched";
+}
+
+/**
+ * Enriquece localização durante importação/admin. Não lança erro se a API falhar.
+ */
+export async function ensureLocationEnrichment(input: LocationEnrichmentLookupInput): Promise<void> {
+  await runLocationEnrichment(input);
 }
 
 async function upsertCacheRow(data: {

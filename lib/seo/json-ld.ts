@@ -216,28 +216,35 @@ function isPlaceholderStreetAddress(value: string | undefined | null) {
   );
 }
 
-function buildJobLocationBlock(job: JobPostingJsonLdInput) {
+function buildPostalAddressForJobPosting(job: JobPostingJsonLdInput) {
   const resolvedUf = resolveBrazilUfFromJobState(job.stateCode, job.stateName);
   const enrichment = job.locationEnrichment ?? null;
 
   const address: Record<string, unknown> = {
-    "@type": "PostalAddress",
-    addressLocality: job.cityName.trim(),
-    addressRegion: resolvedUf ?? job.stateCode.trim(),
-    addressCountry: "BR"
+    "@type": "PostalAddress"
   };
 
   if (enrichment?.streetAddress && !isPlaceholderStreetAddress(enrichment.streetAddress)) {
     address.streetAddress = enrichment.streetAddress.trim();
   }
 
+  address.addressLocality = job.cityName.trim();
+  address.addressRegion = resolvedUf ?? job.stateCode.trim();
+
   if (enrichment?.postalCode && !isPlaceholderSentinel(enrichment.postalCode)) {
     address.postalCode = enrichment.postalCode.trim();
   }
 
+  address.addressCountry = "BR";
+
+  return address;
+}
+
+function buildJobLocationBlock(job: JobPostingJsonLdInput) {
+  const enrichment = job.locationEnrichment ?? null;
   const place: Record<string, unknown> = {
     "@type": "Place",
-    address
+    address: buildPostalAddressForJobPosting(job)
   };
 
   const lat = enrichment?.latitude;
@@ -251,6 +258,24 @@ function buildJobLocationBlock(job: JobPostingJsonLdInput) {
   }
 
   return place;
+}
+
+function buildHiringOrganizationBlock(job: JobPostingJsonLdInput) {
+  const org: Record<string, unknown> = {
+    "@type": "Organization",
+    name: job.companyName.trim()
+  };
+
+  const sameAs = resolveHiringOrganizationSameAs({
+    companyWebsiteUrl: job.companyWebsiteUrl,
+    companySlug: job.companySlug
+  });
+  if (sameAs) org.sameAs = sameAs;
+
+  const logo = resolveHiringOrganizationLogo(job.companyLogoUrl);
+  if (logo) org.logo = logo;
+
+  return org;
 }
 
 export function buildJobPostingJsonLd(job: JobPostingJsonLdInput): Record<string, unknown> | null {
@@ -275,20 +300,7 @@ export function buildJobPostingJsonLd(job: JobPostingJsonLdInput): Record<string
     return null;
   }
 
-  const hiringOrganization: Record<string, unknown> = {
-    "@type": "Organization",
-    name: job.companyName.trim()
-  };
-
-  const sameAs = resolveHiringOrganizationSameAs({
-    companyWebsiteUrl: job.companyWebsiteUrl,
-    companySlug: job.companySlug
-  });
-  if (sameAs) hiringOrganization.sameAs = sameAs;
-
-  const logo = resolveHiringOrganizationLogo(job.companyLogoUrl);
-  if (logo) hiringOrganization.logo = logo;
-
+  const hiringOrganization = buildHiringOrganizationBlock(job);
   const jobLocation = buildJobLocationBlock(job);
   const hasDetailedLocation = Boolean(
     (job.locationEnrichment?.streetAddress && job.locationEnrichment?.postalCode) ||
@@ -301,31 +313,33 @@ export function buildJobPostingJsonLd(job: JobPostingJsonLdInput): Record<string
     );
   }
 
-  const data: Record<string, unknown> = {
-    "@context": "https://schema.org/",
-    "@type": "JobPosting",
-    title: schemaPostingTitle,
-    identifier: {
-      "@type": "PropertyValue",
-      name: IDENTIFIER_NAME,
-      value: (job.externalId?.trim() || job.id).trim()
-    },
-    datePosted: datePostedRaw,
-    validThrough: validThroughRaw,
-    employmentType: [...JOB_POSTING_EMPLOYMENT_TYPES],
-    hiringOrganization,
-    jobLocation,
-    description: descriptionHtml,
-    directApply: false
-  };
-
   const baseSalary = buildBaseSalaryBlock(job.salaryMin);
   if (baseSalary) {
-    data.baseSalary = baseSalary;
     console.info(`[job-posting-schema] baseSalary incluído (salaryMin) para vaga ${job.slug}.`);
   } else {
     console.info(`[job-posting-schema] baseSalary omitido — salaryMin inválido para vaga ${job.slug}.`);
   }
+
+  /** Ordem fixa dos campos no JSON-LD serializado (schema.org JobPosting). */
+  const data: Record<string, unknown> = {};
+  data["@context"] = "https://schema.org/";
+  data["@type"] = "JobPosting";
+  data.title = schemaPostingTitle;
+  data.description = descriptionHtml;
+  data.identifier = {
+    "@type": "PropertyValue",
+    name: IDENTIFIER_NAME,
+    value: (job.externalId?.trim() || job.id).trim()
+  };
+  data.datePosted = datePostedRaw;
+  data.validThrough = validThroughRaw;
+  data.employmentType = [...JOB_POSTING_EMPLOYMENT_TYPES];
+  data.hiringOrganization = hiringOrganization;
+  data.jobLocation = jobLocation;
+  if (baseSalary) {
+    data.baseSalary = baseSalary;
+  }
+  data.directApply = false;
 
   const cleaned = removeEmptyJsonLdValues(data) as Record<string, unknown>;
 
