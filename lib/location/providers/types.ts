@@ -13,6 +13,9 @@ export type LocationProviderPlace = {
   rankConfidenceCityLevel?: number | null;
   rankConfidenceStreetLevel?: number | null;
   rankMatchType?: string | null;
+  businessStatus?: string | null;
+  companyRelationScore?: number | null;
+  structuredAddressComplete?: boolean | null;
 };
 
 export interface LocationEnrichmentProvider {

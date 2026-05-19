@@ -2,19 +2,20 @@ import { LocationMatchStatus } from "@prisma/client";
 
 import { prisma } from "@/lib/db";
 import { normalizeCompanyNameForCache } from "@/lib/location/normalize-company-name";
-import { createGeoapifyGeocodingProvider } from "@/lib/location/providers/geoapify-geocoding-provider";
+import { createGooglePlacesNewProvider } from "@/lib/location/providers/google-places-new-provider";
 import type { LocationEnrichmentProvider } from "@/lib/location/providers/types";
 import type { LocationEnrichmentLookupInput, TrustedLocationEnrichment } from "@/lib/location/types";
 
 const CONFIDENCE_THRESHOLD = 0.75;
 const CACHE_RETRY_DAYS = 90;
+const ACTIVE_LOCATION_PROVIDER_ID = "google_places_new";
 
 function resolveProvider(): LocationEnrichmentProvider {
   const configured = process.env.LOCATION_ENRICHMENT_PROVIDER?.trim().toLowerCase();
-  if (configured && configured !== "geoapify") {
-    console.warn(`[location-enrichment] Provedor desconhecido "${configured}"; usando geoapify.`);
+  if (configured && configured !== ACTIVE_LOCATION_PROVIDER_ID) {
+    console.warn(`[location-enrichment] Provedor desconhecido "${configured}"; usando ${ACTIVE_LOCATION_PROVIDER_ID}.`);
   }
-  return createGeoapifyGeocodingProvider();
+  return createGooglePlacesNewProvider();
 }
 
 function buildRawQuery(input: LocationEnrichmentLookupInput) {
@@ -131,10 +132,11 @@ function cacheMapKey(companyNameNormalized: string, city: string, state: string)
 export type LocationEnrichmentBackfillPreview = {
   uniqueKeys: number;
   skippedInvalid: number;
+  skippedGenericCompany: number;
   wouldReuseTrustedCache: number;
   wouldReuseNegativeCache: number;
   wouldCallApi: number;
-  hasGeoapifyApiKey: boolean;
+  hasGooglePlacesApiKey: boolean;
   maxApiCallsPerRun: number;
   wouldExceedApiLimit: boolean;
   pendingAfterLimit: number;
@@ -143,27 +145,30 @@ export type LocationEnrichmentBackfillPreview = {
 /** Estima o backfill sem chamar API externa (somente leitura do banco). */
 export function resolveBackfillMaxApiCallsPerRun() {
   const parsed = Number.parseInt(process.env.LOCATION_BACKFILL_MAX_API_CALLS_PER_RUN ?? "", 10);
-  return Number.isFinite(parsed) && parsed > 0 ? parsed : 2800;
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : 2400;
 }
 
 export async function previewLocationEnrichmentBackfill(
   keys: LocationEnrichmentLookupInput[]
 ): Promise<LocationEnrichmentBackfillPreview> {
-  const hasGeoapifyApiKey = Boolean(process.env.GEOAPIFY_API_KEY?.trim());
+  const hasGooglePlacesApiKey = Boolean(process.env.GOOGLE_PLACES_API_KEY?.trim());
   const maxApiCallsPerRun = resolveBackfillMaxApiCallsPerRun();
   const preview: LocationEnrichmentBackfillPreview = {
     uniqueKeys: 0,
     skippedInvalid: 0,
+    skippedGenericCompany: 0,
     wouldReuseTrustedCache: 0,
     wouldReuseNegativeCache: 0,
     wouldCallApi: 0,
-    hasGeoapifyApiKey,
+    hasGooglePlacesApiKey,
     maxApiCallsPerRun,
     wouldExceedApiLimit: false,
     pendingAfterLimit: 0
   };
 
-  const cacheRows = await prisma.locationEnrichmentCache.findMany();
+  const cacheRows = await prisma.locationEnrichmentCache.findMany({
+    where: { provider: ACTIVE_LOCATION_PROVIDER_ID }
+  });
   const cacheByKey = new Map(
     cacheRows.map((row) => [cacheMapKey(row.companyNameNormalized, row.city, row.state), row])
   );
@@ -175,6 +180,11 @@ export async function previewLocationEnrichmentBackfill(
     }
 
     preview.uniqueKeys += 1;
+
+    if (isGenericCompanyName(input.companyName)) {
+      preview.skippedGenericCompany += 1;
+      continue;
+    }
 
     const companyNameNormalized = normalizeCompanyNameForCache(input.companyName);
     const city = input.city.trim();
@@ -203,6 +213,7 @@ export async function previewLocationEnrichmentBackfill(
 
 export type LocationEnrichmentRunOutcome =
   | "skipped_invalid_input"
+  | "api_skipped_generic_company"
   | "cache_reused_trusted"
   | "cache_reused_no_retry"
   | "api_skipped_quota"
@@ -217,6 +228,20 @@ function isValidEnrichmentInput(input: LocationEnrichmentLookupInput) {
   const state = input.state?.trim().toUpperCase();
   if (!companyName || !city || !state || state.length !== 2) return false;
   return true;
+}
+
+function isGenericCompanyName(companyName: string | null | undefined) {
+  const normalized = normalizeCompanyNameForCache(companyName ?? "");
+  return (
+    !normalized ||
+    normalized === "empresa" ||
+    normalized === "confidencial" ||
+    normalized === "empresa confidencial" ||
+    normalized === "nao informado" ||
+    normalized === "não informado" ||
+    normalized === "nao informada" ||
+    normalized === "não informada"
+  );
 }
 
 /**
@@ -239,6 +264,7 @@ export async function runLocationEnrichment(
     if (!options?.quiet) console.info(message);
   };
 
+  const provider = resolveProvider();
   const existing = await prisma.locationEnrichmentCache.findUnique({
     where: {
       companyNameNormalized_city_state: {
@@ -249,7 +275,7 @@ export async function runLocationEnrichment(
     }
   });
 
-  if (existing) {
+  if (existing && existing.provider === provider.id) {
     const trusted = trustedFieldsFromCache(existing);
     if (trusted) {
       log(`[location-enrichment] Cache confiável reutilizado: ${companyName} / ${city} / ${state}.`);
@@ -263,12 +289,16 @@ export async function runLocationEnrichment(
     }
   }
 
+  if (isGenericCompanyName(companyName)) {
+    log(`[location-enrichment] Empresa genérica ignorada sem chamada de API: ${companyName} / ${city} / ${state}.`);
+    return "api_skipped_generic_company";
+  }
+
   if (options?.allowApiCall && !options.allowApiCall()) {
     log(`[location-enrichment] Cota de API do backfill atingida; pendente: ${companyName} / ${city} / ${state}.`);
     return "api_skipped_quota";
   }
 
-  const provider = resolveProvider();
   log(`[location-enrichment] Consultando API (${provider.id}): ${rawQuery}`);
 
   let place: Awaited<ReturnType<LocationEnrichmentProvider["searchBranch"]>> = null;

@@ -1,7 +1,7 @@
 /**
  * Backfill MANUAL e ÚNICO de localização enriquecida para vagas antigas.
  *
- * Provedor: Geoapify Geocoding API (plano free).
+ * Provedor: Google Places API (New) - Text Search.
  *
  * Uso:
  *   npm run enrich:locations:backfill
@@ -17,8 +17,8 @@
  *   --reprocess-invalid-street-cache  (reprocessa apenas caches MATCHED com streetAddress inválido)
  *
  * Variáveis opcionais (execução real):
- *   GEOAPIFY_API_KEY=...                         (obrigatória para chamadas reais)
- *   LOCATION_BACKFILL_MAX_API_CALLS_PER_RUN=2800 (padrão: 2800)
+ *   GOOGLE_PLACES_API_KEY=...                    (obrigatória para chamadas reais)
+ *   LOCATION_BACKFILL_MAX_API_CALLS_PER_RUN=2400 (padrão: 2400)
  *   LOCATION_BACKFILL_CONCURRENCY=1              (padrão: 1, máx. 3)
  *   LOCATION_BACKFILL_DELAY_MS=500               (pausa entre lotes, padrão: 500)
  *   LOCATION_BACKFILL_BATCH_SIZE=100             (tamanho do lote, padrão: 100)
@@ -183,10 +183,11 @@ async function runDryRun(scope: BackfillScope) {
     ? {
         uniqueKeys: keys.length,
         skippedInvalid: 0,
+        skippedGenericCompany: 0,
         wouldReuseTrustedCache: 0,
         wouldReuseNegativeCache: 0,
         wouldCallApi: keys.length,
-        hasGeoapifyApiKey: Boolean(process.env.GEOAPIFY_API_KEY?.trim()),
+        hasGooglePlacesApiKey: Boolean(process.env.GOOGLE_PLACES_API_KEY?.trim()),
         maxApiCallsPerRun: resolveBackfillMaxApiCallsPerRun(),
         wouldExceedApiLimit: keys.length > resolveBackfillMaxApiCallsPerRun(),
         pendingAfterLimit: Math.max(0, keys.length - resolveBackfillMaxApiCallsPerRun())
@@ -213,12 +214,13 @@ async function runDryRun(scope: BackfillScope) {
   console.info(`Registros MATCHED no cache: ${matchedRows}`);
   console.info("");
   console.info("Estimativa se você rodar o backfill real agora:");
-  console.info(`  - Reutilizariam cache confiável (sem API): ${preview.wouldReuseTrustedCache}`);
   console.info(`  - Reutilizariam cache negativo (sem API, janela 90 dias): ${preview.wouldReuseNegativeCache}`);
-  console.info(`  - Chamariam a API Geoapify: ${preview.wouldCallApi}`);
+  console.info(`  - Reutilizariam cache Google confiável (sem API): ${preview.wouldReuseTrustedCache}`);
+  console.info(`  - Chamariam Google Places API: ${preview.wouldCallApi}`);
+  console.info(`  - Ignoradas por nome de empresa genérico: ${preview.skippedGenericCompany}`);
   console.info(`  - Chaves inválidas: ${preview.skippedInvalid}`);
   console.info("");
-  console.info(`GEOAPIFY_API_KEY configurada: ${preview.hasGeoapifyApiKey ? "sim" : "NÃO"}`);
+  console.info(`GOOGLE_PLACES_API_KEY configurada: ${preview.hasGooglePlacesApiKey ? "sim" : "NÃO"}`);
   console.info(`Limite por execução (LOCATION_BACKFILL_MAX_API_CALLS_PER_RUN): ${preview.maxApiCallsPerRun}`);
 
   if (preview.wouldExceedApiLimit) {
@@ -231,13 +233,13 @@ async function runDryRun(scope: BackfillScope) {
     console.info(`\nEstimativa cabe no limite desta execução (${preview.wouldCallApi} <= ${preview.maxApiCallsPerRun}).`);
   }
 
-  if (!preview.hasGeoapifyApiKey) {
+  if (!preview.hasGooglePlacesApiKey) {
     console.warn(
-      "\nAtenção: sem GEOAPIFY_API_KEY, o backfill real NÃO fará HTTP, mas gravará NOT_FOUND no cache para cada chave nova."
+      "\nAtenção: sem GOOGLE_PLACES_API_KEY, o backfill real NÃO fará HTTP, mas gravará NOT_FOUND no cache para cada chave nova."
     );
   }
 
-  console.info("\nProvedor: Geoapify Geocoding API — GET /v1/geocode/search");
+  console.info("\nProvedor: Google Places API (New) — POST /v1/places:searchText");
   console.info("Execute o backfill real com: npm run enrich:locations:backfill");
 }
 
@@ -270,14 +272,14 @@ async function runBackfill(scope: BackfillScope) {
   console.info(
     `Concorrência: ${concurrency} | Delay entre lotes: ${delayMs}ms | Lote: ${batchSize} | Limite API: ${maxApiCallsPerRun}`
   );
-  console.info("Provedor: Geoapify Geocoding API — GET https://api.geoapify.com/v1/geocode/search");
+  console.info("Provedor: Google Places API (New) — POST https://places.googleapis.com/v1/places:searchText");
   console.info("Este script NÃO roda automaticamente. Execute apenas quando desejar.\n");
   console.info(formatScope(scope));
   console.info("Critério de recência: Job.createdAt DESC.\n");
 
-  if (!process.env.GEOAPIFY_API_KEY?.trim()) {
+  if (!process.env.GOOGLE_PLACES_API_KEY?.trim()) {
     console.warn(
-      "GEOAPIFY_API_KEY ausente: o script continuará, mas cada chave nova será salva como NOT_FOUND sem consulta HTTP real.\n"
+      "GOOGLE_PLACES_API_KEY ausente: o script continuará, mas cada chave nova será salva como NOT_FOUND sem consulta HTTP real.\n"
     );
   }
 
@@ -299,6 +301,7 @@ async function runBackfill(scope: BackfillScope) {
     apiCalled: 0,
     apiMatched: 0,
     apiFailed: 0,
+    apiSkippedGenericCompany: 0,
     apiSkippedQuota: 0
   };
 
@@ -306,6 +309,7 @@ async function runBackfill(scope: BackfillScope) {
     skipped_invalid_input: 0,
     cache_reused_trusted: 0,
     cache_reused_no_retry: 0,
+    api_skipped_generic_company: 0,
     api_skipped_quota: 0,
     api_matched: 0,
     api_not_found: 0,
@@ -337,13 +341,19 @@ async function runBackfill(scope: BackfillScope) {
 
       const label = `${key.companyName} / ${key.city} / ${key.state}`;
       const globalIndex = offset + indexInBatch + 1;
+      let apiCallReservedForThisKey = false;
 
       try {
         const outcome = await runLocationEnrichment(
           { companyName: key.companyName, city: key.city, state: key.state },
           {
             quiet: true,
-            allowApiCall: () => apiCallsThisRun < maxApiCallsPerRun
+            allowApiCall: () => {
+              if (apiCallsThisRun >= maxApiCallsPerRun) return false;
+              apiCallsThisRun += 1;
+              apiCallReservedForThisKey = true;
+              return true;
+            }
           }
         );
 
@@ -367,6 +377,12 @@ async function runBackfill(scope: BackfillScope) {
           return;
         }
 
+        if (outcome === "api_skipped_generic_company") {
+          stats.apiSkippedGenericCompany += 1;
+          console.info(`[${globalIndex}/${keys.length}] ignorado (empresa genérica, sem API): ${label}`);
+          return;
+        }
+
         if (outcome === "api_skipped_quota") {
           stats.apiSkippedQuota += 1;
           quotaReached = true;
@@ -374,8 +390,9 @@ async function runBackfill(scope: BackfillScope) {
           return;
         }
 
-        apiCallsThisRun += 1;
-        stats.apiCalled += 1;
+        if (apiCallReservedForThisKey) {
+          stats.apiCalled += 1;
+        }
 
         if (outcome === "api_matched") {
           stats.apiMatched += 1;
@@ -386,8 +403,9 @@ async function runBackfill(scope: BackfillScope) {
         stats.apiFailed += 1;
         console.info(`[${globalIndex}/${keys.length}] API → sem correspondência (${outcome}): ${label}`);
       } catch (error) {
-        apiCallsThisRun += 1;
-        stats.apiCalled += 1;
+        if (apiCallReservedForThisKey) {
+          stats.apiCalled += 1;
+        }
         stats.apiFailed += 1;
         outcomeCounts.api_error += 1;
         console.warn(`[${globalIndex}/${keys.length}] erro (continuando): ${label}`, error);
@@ -418,7 +436,7 @@ async function runBackfill(scope: BackfillScope) {
   console.info(`Chaves empresa/cidade/UF únicas avaliadas: ${stats.uniqueKeysEvaluated}`);
   console.info(`Cache confiável reutilizado: ${stats.cacheReusedTrusted}`);
   console.info(`Cache negativo reutilizado (sem nova API): ${stats.cacheReusedNoRetry}`);
-  console.info(`Chamadas à API Geoapify nesta execução: ${stats.apiCalled}`);
+  console.info(`Chamadas à API Google Places nesta execução: ${stats.apiCalled}`);
   console.info(`Limite por execução: ${maxApiCallsPerRun}`);
   if (quotaReached) {
     console.info(`Limite alcançado: sim`);
@@ -426,6 +444,7 @@ async function runBackfill(scope: BackfillScope) {
   }
   console.info(`Enriquecidas com sucesso (MATCHED): ${stats.apiMatched}`);
   console.info(`Sem sucesso após API: ${stats.apiFailed}`);
+  console.info(`Ignoradas por nome de empresa genérico: ${stats.apiSkippedGenericCompany}`);
   console.info(`Ignoradas por quota (sem gravar cache): ${stats.apiSkippedQuota}`);
   console.info(`Ignoradas por dados incompletos: ${stats.skippedInvalid}`);
   console.info("\nDetalhe por resultado:");
