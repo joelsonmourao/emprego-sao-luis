@@ -26,6 +26,8 @@
     "enrich:locations:backfill:dry-run": "tsx scripts/location-enrichment-backfill.ts -- --dry-run",
     "enrich:locations:reset-geoapify-cache": "tsx scripts/location-reset-geoapify-cache.ts",
     "enrich:locations:reset-geoapify-cache:dry-run": "tsx scripts/location-reset-geoapify-cache.ts -- --dry-run",
+    "enrich:locations:reset-google-cache": "tsx scripts/location-reset-google-cache.ts",
+    "enrich:locations:reset-google-cache:dry-run": "tsx scripts/location-reset-google-cache.ts -- --dry-run",
     "audit:seo": "node scripts/audit-seo.mjs",
     "seo:jovem-aprendiz": "tsx scripts/seo-jovem-aprendiz.ts",
     "lint": "node -e \"console.log('lint: no eslint config in this package; skipped')\""

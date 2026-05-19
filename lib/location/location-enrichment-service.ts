@@ -196,7 +196,7 @@ export async function previewLocationEnrichmentBackfill(
         preview.wouldReuseTrustedCache += 1;
         continue;
       }
-      if (shouldSkipApiFetch(existing.lastFetchedAt)) {
+      if (existing.matchStatus !== LocationMatchStatus.API_ERROR && shouldSkipApiFetch(existing.lastFetchedAt)) {
         preview.wouldReuseNegativeCache += 1;
         continue;
       }
@@ -281,7 +281,7 @@ export async function runLocationEnrichment(
       log(`[location-enrichment] Cache confiável reutilizado: ${companyName} / ${city} / ${state}.`);
       return "cache_reused_trusted";
     }
-    if (shouldSkipApiFetch(existing.lastFetchedAt)) {
+    if (existing.matchStatus !== LocationMatchStatus.API_ERROR && shouldSkipApiFetch(existing.lastFetchedAt)) {
       log(
         `[location-enrichment] Tentativa anterior reutilizada (sem nova API): ${companyName} / ${city} / ${state} [${existing.matchStatus}].`
       );
@@ -346,7 +346,7 @@ export async function runLocationEnrichment(
 
   const matchConfidence = scorePlaceMatch(input, place);
   const hasGeo = place.latitude != null && place.longitude != null;
-  const hasAddress = Boolean(place.streetAddress?.trim() && place.postalCode?.trim());
+  const hasAddress = Boolean(place.structuredAddressComplete !== false && place.streetAddress?.trim() && place.postalCode?.trim());
 
   if (matchConfidence < CONFIDENCE_THRESHOLD || !hasGeo || !hasAddress) {
     log(

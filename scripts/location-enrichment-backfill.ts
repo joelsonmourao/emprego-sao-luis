@@ -235,7 +235,7 @@ async function runDryRun(scope: BackfillScope) {
 
   if (!preview.hasGooglePlacesApiKey) {
     console.warn(
-      "\nAtenção: sem GOOGLE_PLACES_API_KEY, o backfill real NÃO fará HTTP, mas gravará NOT_FOUND no cache para cada chave nova."
+      "\nAtenção: sem GOOGLE_PLACES_API_KEY, o backfill real NÃO fará HTTP e registrará API_ERROR com retry permitido."
     );
   }
 
@@ -279,7 +279,7 @@ async function runBackfill(scope: BackfillScope) {
 
   if (!process.env.GOOGLE_PLACES_API_KEY?.trim()) {
     console.warn(
-      "GOOGLE_PLACES_API_KEY ausente: o script continuará, mas cada chave nova será salva como NOT_FOUND sem consulta HTTP real.\n"
+      "GOOGLE_PLACES_API_KEY ausente: o script continuará, mas cada chave nova será salva como API_ERROR com retry permitido.\n"
     );
   }
 

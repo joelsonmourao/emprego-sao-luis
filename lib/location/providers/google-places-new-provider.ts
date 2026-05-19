@@ -132,8 +132,7 @@ export function createGooglePlacesNewProvider(): LocationEnrichmentProvider {
     async searchBranch(query, context) {
       const apiKey = process.env.GOOGLE_PLACES_API_KEY?.trim();
       if (!apiKey) {
-        console.warn("[location-enrichment] GOOGLE_PLACES_API_KEY ausente; API de localização indisponível.");
-        return null;
+        throw new Error("[location-enrichment] GOOGLE_PLACES_API_KEY ausente; API de localização indisponível.");
       }
 
       try {
@@ -154,8 +153,8 @@ export function createGooglePlacesNewProvider(): LocationEnrichmentProvider {
         });
 
         if (!response.ok) {
-          console.warn("[location-enrichment] Google Places New respondeu com erro:", response.status, await response.text());
-          return null;
+          const body = await response.text();
+          throw new Error(`[location-enrichment] Google Places New respondeu com erro HTTP ${response.status}: ${body}`);
         }
 
         const data = (await response.json()) as GooglePlacesSearchResponse;
@@ -168,15 +167,24 @@ export function createGooglePlacesNewProvider(): LocationEnrichmentProvider {
           .sort((a, b) => b.score - a.score);
 
         const best = scored[0];
-        if (!best || best.score < 0.75) return null;
-        if (!best.place.structuredAddressComplete) return null;
-        if (!best.place.postalCode?.trim()) return null;
-        if ((best.place.companyRelationScore ?? 0) < 0.5) return null;
+        if (!best) return null;
+
+        if (
+          best.score < 0.75 ||
+          !best.place.structuredAddressComplete ||
+          !best.place.postalCode?.trim() ||
+          (best.place.companyRelationScore ?? 0) < 0.5
+        ) {
+          return {
+            ...best.place,
+            structuredAddressComplete: false
+          };
+        }
 
         return best.place;
       } catch (error) {
         console.warn("[location-enrichment] Falha ao consultar Google Places New:", error);
-        return null;
+        throw error;
       }
     }
   };
