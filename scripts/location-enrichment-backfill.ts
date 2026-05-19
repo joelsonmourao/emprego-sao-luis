@@ -1,21 +1,33 @@
 /**
  * Backfill MANUAL e ÚNICO de localização enriquecida para vagas antigas.
  *
- * Não roda automaticamente em deploy, cron ou páginas públicas.
+ * Provedor: Geoapify Geocoding API (plano free).
  *
  * Uso:
  *   npm run enrich:locations:backfill
+ *   npm run enrich:locations:backfill:dry-run
  *
- * Variáveis opcionais:
- *   LOCATION_BACKFILL_CONCURRENCY=2   (padrão: 2, máx. 3)
- *   LOCATION_BACKFILL_DELAY_MS=400    (pausa entre lotes, padrão: 400)
- *   LOCATION_BACKFILL_BATCH_SIZE=20   (tamanho do lote, padrão: 20)
+ * Dry-run (sem API, sem gravar cache):
+ *   npm run enrich:locations:backfill -- --dry-run
+ *   LOCATION_BACKFILL_DRY_RUN=1 npm run enrich:locations:backfill
+ *
+ * Variáveis opcionais (execução real):
+ *   GEOAPIFY_API_KEY=...                         (obrigatória para chamadas reais)
+ *   LOCATION_BACKFILL_MAX_API_CALLS_PER_RUN=2800 (padrão: 2800)
+ *   LOCATION_BACKFILL_CONCURRENCY=1              (padrão: 1, máx. 3)
+ *   LOCATION_BACKFILL_DELAY_MS=500               (pausa entre lotes, padrão: 500)
+ *   LOCATION_BACKFILL_BATCH_SIZE=100             (tamanho do lote, padrão: 100)
  */
 
-import { PrismaClient } from "@prisma/client";
+import { LocationMatchStatus, PrismaClient } from "@prisma/client";
 
 import { normalizeCompanyNameForCache } from "@/lib/location/normalize-company-name";
-import { runLocationEnrichment, type LocationEnrichmentRunOutcome } from "@/lib/location/location-enrichment-service";
+import {
+  previewLocationEnrichmentBackfill,
+  resolveBackfillMaxApiCallsPerRun,
+  runLocationEnrichment,
+  type LocationEnrichmentRunOutcome
+} from "@/lib/location/location-enrichment-service";
 
 const prisma = new PrismaClient();
 
@@ -25,6 +37,10 @@ type LocationKey = {
   state: string;
   companyNameNormalized: string;
 };
+
+function isDryRun() {
+  return process.argv.includes("--dry-run") || process.env.LOCATION_BACKFILL_DRY_RUN === "1";
+}
 
 function parsePositiveInt(value: string | undefined, fallback: number, max?: number) {
   const parsed = Number.parseInt(value ?? "", 10);
@@ -48,6 +64,91 @@ function buildKey(input: { companyName: string; city: string; state: string }): 
   };
 }
 
+async function collectUniqueKeysFromJobs() {
+  const jobs = await prisma.job.findMany({
+    select: {
+      companyName: true,
+      city: { select: { name: true } },
+      state: { select: { code: true } }
+    }
+  });
+
+  const keyMap = new Map<string, LocationKey>();
+  let skippedInvalidJobs = 0;
+
+  for (const job of jobs) {
+    const companyName = job.companyName?.trim();
+    const city = job.city?.name?.trim();
+    const state = job.state?.code?.trim().toUpperCase();
+
+    if (!companyName || !city || !state || state.length !== 2) {
+      skippedInvalidJobs += 1;
+      continue;
+    }
+
+    const key = buildKey({ companyName, city, state });
+    const mapKey = `${key.companyNameNormalized}__${key.city}__${key.state}`;
+    if (!keyMap.has(mapKey)) {
+      keyMap.set(mapKey, key);
+    }
+  }
+
+  return {
+    jobsAnalyzed: jobs.length,
+    skippedInvalidJobs,
+    keys: [...keyMap.values()]
+  };
+}
+
+async function runDryRun() {
+  console.info("=== Backfill de localização — DRY-RUN ===");
+  console.info("Nenhuma chamada à API externa. Nenhuma gravação em LocationEnrichmentCache.\n");
+
+  const { jobsAnalyzed, skippedInvalidJobs, keys } = await collectUniqueKeysFromJobs();
+  const preview = await previewLocationEnrichmentBackfill(
+    keys.map((key) => ({ companyName: key.companyName, city: key.city, state: key.state }))
+  );
+
+  const cacheRows = await prisma.locationEnrichmentCache.count();
+  const matchedRows = await prisma.locationEnrichmentCache.count({
+    where: { matchStatus: LocationMatchStatus.MATCHED }
+  });
+
+  console.info(`Vagas no banco: ${jobsAnalyzed}`);
+  console.info(`Vagas ignoradas (empresa/cidade/UF inválidos): ${skippedInvalidJobs}`);
+  console.info(`Combinações empresa/cidade/UF únicas: ${keys.length}`);
+  console.info(`Registros em LocationEnrichmentCache (total): ${cacheRows}`);
+  console.info(`Registros MATCHED no cache: ${matchedRows}`);
+  console.info("");
+  console.info("Estimativa se você rodar o backfill real agora:");
+  console.info(`  - Reutilizariam cache confiável (sem API): ${preview.wouldReuseTrustedCache}`);
+  console.info(`  - Reutilizariam cache negativo (sem API, janela 90 dias): ${preview.wouldReuseNegativeCache}`);
+  console.info(`  - Chamariam a API Geoapify: ${preview.wouldCallApi}`);
+  console.info(`  - Chaves inválidas: ${preview.skippedInvalid}`);
+  console.info("");
+  console.info(`GEOAPIFY_API_KEY configurada: ${preview.hasGeoapifyApiKey ? "sim" : "NÃO"}`);
+  console.info(`Limite por execução (LOCATION_BACKFILL_MAX_API_CALLS_PER_RUN): ${preview.maxApiCallsPerRun}`);
+
+  if (preview.wouldExceedApiLimit) {
+    console.warn(
+      `\nAtenção: ${preview.wouldCallApi} chamadas previstas excedem o limite de ${preview.maxApiCallsPerRun} por execução.`
+    );
+    console.warn(`Combinações que ficariam pendentes nesta execução: ${preview.pendingAfterLimit}`);
+    console.warn("Execute o backfill em dias seguintes até esgotar as pendentes.");
+  } else if (preview.wouldCallApi > 0) {
+    console.info(`\nEstimativa cabe no limite desta execução (${preview.wouldCallApi} <= ${preview.maxApiCallsPerRun}).`);
+  }
+
+  if (!preview.hasGeoapifyApiKey) {
+    console.warn(
+      "\nAtenção: sem GEOAPIFY_API_KEY, o backfill real NÃO fará HTTP, mas gravará NOT_FOUND no cache para cada chave nova."
+    );
+  }
+
+  console.info("\nProvedor: Geoapify Geocoding API — GET /v1/geocode/search");
+  console.info("Execute o backfill real com: npm run enrich:locations:backfill");
+}
+
 async function runPool<T>(items: T[], concurrency: number, worker: (item: T, index: number) => Promise<void>) {
   let cursor = 0;
 
@@ -63,72 +164,61 @@ async function runPool<T>(items: T[], concurrency: number, worker: (item: T, ind
   await Promise.all(workers);
 }
 
-async function main() {
-  const concurrency = parsePositiveInt(process.env.LOCATION_BACKFILL_CONCURRENCY, 2, 3);
-  const delayMs = parsePositiveInt(process.env.LOCATION_BACKFILL_DELAY_MS, 400);
-  const batchSize = parsePositiveInt(process.env.LOCATION_BACKFILL_BATCH_SIZE, 20);
+async function runBackfill() {
+  const maxApiCallsPerRun = resolveBackfillMaxApiCallsPerRun();
+  const concurrency = parsePositiveInt(process.env.LOCATION_BACKFILL_CONCURRENCY, 1, 3);
+  const delayMs = parsePositiveInt(process.env.LOCATION_BACKFILL_DELAY_MS, 500);
+  const batchSize = parsePositiveInt(process.env.LOCATION_BACKFILL_BATCH_SIZE, 100);
+
+  let apiCallsThisRun = 0;
+  let quotaReached = false;
+  let pendingAfterLimit = 0;
 
   console.info("=== Backfill de localização (manual) ===");
-  console.info(`Concorrência: ${concurrency} | Delay entre lotes: ${delayMs}ms | Lote: ${batchSize}`);
+  console.info(
+    `Concorrência: ${concurrency} | Delay entre lotes: ${delayMs}ms | Lote: ${batchSize} | Limite API: ${maxApiCallsPerRun}`
+  );
+  console.info("Provedor: Geoapify Geocoding API — GET https://api.geoapify.com/v1/geocode/search");
   console.info("Este script NÃO roda automaticamente. Execute apenas quando desejar.\n");
 
-  const jobs = await prisma.job.findMany({
-    select: {
-      id: true,
-      companyName: true,
-      city: { select: { name: true } },
-      state: { select: { code: true } }
-    }
-  });
+  if (!process.env.GEOAPIFY_API_KEY?.trim()) {
+    console.warn(
+      "GEOAPIFY_API_KEY ausente: o script continuará, mas cada chave nova será salva como NOT_FOUND sem consulta HTTP real.\n"
+    );
+  }
+
+  const { jobsAnalyzed, skippedInvalidJobs, keys } = await collectUniqueKeysFromJobs();
 
   const stats = {
-    jobsAnalyzed: jobs.length,
-    uniqueKeysEvaluated: 0,
-    skippedInvalid: 0,
+    jobsAnalyzed,
+    uniqueKeysEvaluated: keys.length,
+    skippedInvalid: skippedInvalidJobs,
     cacheReusedTrusted: 0,
     cacheReusedNoRetry: 0,
     apiCalled: 0,
     apiMatched: 0,
-    apiFailed: 0
+    apiFailed: 0,
+    apiSkippedQuota: 0
   };
 
   const outcomeCounts: Record<LocationEnrichmentRunOutcome, number> = {
     skipped_invalid_input: 0,
     cache_reused_trusted: 0,
     cache_reused_no_retry: 0,
+    api_skipped_quota: 0,
     api_matched: 0,
     api_not_found: 0,
     api_low_confidence: 0,
     api_error: 0
   };
 
-  const keyMap = new Map<string, LocationKey>();
-
-  for (const job of jobs) {
-    const companyName = job.companyName?.trim();
-    const city = job.city?.name?.trim();
-    const state = job.state?.code?.trim().toUpperCase();
-
-    if (!companyName || !city || !state || state.length !== 2) {
-      stats.skippedInvalid += 1;
-      continue;
-    }
-
-    const key = buildKey({ companyName, city, state });
-    const mapKey = `${key.companyNameNormalized}__${key.city}__${key.state}`;
-    if (!keyMap.has(mapKey)) {
-      keyMap.set(mapKey, key);
-    }
-  }
-
-  const keys = [...keyMap.values()];
-  stats.uniqueKeysEvaluated = keys.length;
-
   console.info(`Vagas no banco: ${stats.jobsAnalyzed}`);
   console.info(`Combinações empresa/cidade/UF únicas: ${stats.uniqueKeysEvaluated}`);
   console.info(`Ignoradas por dados incompletos (vagas): ${stats.skippedInvalid}\n`);
 
-  for (let offset = 0; offset < keys.length; offset += batchSize) {
+  outer: for (let offset = 0; offset < keys.length; offset += batchSize) {
+    if (quotaReached) break;
+
     const batch = keys.slice(offset, offset + batchSize);
     const batchNumber = Math.floor(offset / batchSize) + 1;
     const totalBatches = Math.ceil(keys.length / batchSize);
@@ -136,13 +226,18 @@ async function main() {
     console.info(`--- Lote ${batchNumber}/${totalBatches} (${batch.length} chaves) ---`);
 
     await runPool(batch, concurrency, async (key, indexInBatch) => {
+      if (quotaReached) return;
+
       const label = `${key.companyName} / ${key.city} / ${key.state}`;
       const globalIndex = offset + indexInBatch + 1;
 
       try {
         const outcome = await runLocationEnrichment(
           { companyName: key.companyName, city: key.city, state: key.state },
-          { quiet: true }
+          {
+            quiet: true,
+            allowApiCall: () => apiCallsThisRun < maxApiCallsPerRun
+          }
         );
 
         outcomeCounts[outcome] += 1;
@@ -165,6 +260,14 @@ async function main() {
           return;
         }
 
+        if (outcome === "api_skipped_quota") {
+          stats.apiSkippedQuota += 1;
+          quotaReached = true;
+          console.warn(`[${globalIndex}/${keys.length}] limite de API atingido; pendente: ${label}`);
+          return;
+        }
+
+        apiCallsThisRun += 1;
         stats.apiCalled += 1;
 
         if (outcome === "api_matched") {
@@ -176,15 +279,28 @@ async function main() {
         stats.apiFailed += 1;
         console.info(`[${globalIndex}/${keys.length}] API → sem correspondência (${outcome}): ${label}`);
       } catch (error) {
+        apiCallsThisRun += 1;
+        stats.apiCalled += 1;
         stats.apiFailed += 1;
         outcomeCounts.api_error += 1;
         console.warn(`[${globalIndex}/${keys.length}] erro (continuando): ${label}`, error);
       }
     });
 
+    if (quotaReached) {
+      pendingAfterLimit = keys.length - (offset + batch.length);
+      if (pendingAfterLimit < 0) pendingAfterLimit = 0;
+      break outer;
+    }
+
     if (offset + batchSize < keys.length && delayMs > 0) {
       await sleep(delayMs);
     }
+  }
+
+  if (quotaReached) {
+    const processed = stats.cacheReusedTrusted + stats.cacheReusedNoRetry + stats.apiCalled + stats.apiSkippedQuota;
+    pendingAfterLimit = Math.max(0, keys.length - processed);
   }
 
   console.info("\n=== Resumo do backfill ===");
@@ -192,14 +308,28 @@ async function main() {
   console.info(`Chaves empresa/cidade/UF únicas avaliadas: ${stats.uniqueKeysEvaluated}`);
   console.info(`Cache confiável reutilizado: ${stats.cacheReusedTrusted}`);
   console.info(`Cache negativo reutilizado (sem nova API): ${stats.cacheReusedNoRetry}`);
-  console.info(`Chamadas à API: ${stats.apiCalled}`);
+  console.info(`Chamadas à API Geoapify nesta execução: ${stats.apiCalled}`);
+  console.info(`Limite por execução: ${maxApiCallsPerRun}`);
+  if (quotaReached) {
+    console.info(`Limite alcançado: sim`);
+    console.info(`Combinações pendentes para outro dia: ${pendingAfterLimit}`);
+  }
   console.info(`Enriquecidas com sucesso (MATCHED): ${stats.apiMatched}`);
   console.info(`Sem sucesso após API: ${stats.apiFailed}`);
+  console.info(`Ignoradas por quota (sem gravar cache): ${stats.apiSkippedQuota}`);
   console.info(`Ignoradas por dados incompletos: ${stats.skippedInvalid}`);
   console.info("\nDetalhe por resultado:");
   for (const [outcome, count] of Object.entries(outcomeCounts)) {
     if (count > 0) console.info(`  - ${outcome}: ${count}`);
   }
+}
+
+async function main() {
+  if (isDryRun()) {
+    await runDryRun();
+    return;
+  }
+  await runBackfill();
 }
 
 main()

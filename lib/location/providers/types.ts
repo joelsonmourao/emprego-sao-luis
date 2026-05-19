@@ -9,6 +9,10 @@ export type LocationProviderPlace = {
   latitude: number | null;
   longitude: number | null;
   types: string[];
+  rankConfidence?: number | null;
+  rankConfidenceCityLevel?: number | null;
+  rankConfidenceStreetLevel?: number | null;
+  rankMatchType?: string | null;
 };
 
 export interface LocationEnrichmentProvider {
