@@ -1,4 +1,5 @@
 import type { LocationEnrichmentProvider, LocationProviderPlace } from "@/lib/location/providers/types";
+import { buildStructuredStreetAddress } from "@/lib/location/street-address-validation";
 
 type GeoapifyRank = {
   confidence?: number;
@@ -30,16 +31,6 @@ type GeoapifySearchResponse = {
   results?: GeoapifyResult[];
 };
 
-function buildStreetAddress(result: GeoapifyResult) {
-  const line1 = result.address_line1?.trim();
-  if (line1) return line1;
-
-  const street = result.street?.trim();
-  const number = result.housenumber?.trim();
-  if (street && number) return `${street}, ${number}`;
-  return street ?? number ?? null;
-}
-
 function normalizeStateCode(value: string | undefined | null) {
   return value?.trim().toUpperCase() ?? "";
 }
@@ -52,7 +43,7 @@ function normalizeCityKey(value: string | undefined | null) {
     .toLowerCase() ?? "";
 }
 
-function mapResult(result: GeoapifyResult): LocationProviderPlace | null {
+function mapResult(result: GeoapifyResult, companyName?: string): LocationProviderPlace | null {
   const providerPlaceId = result.place_id?.trim();
   const displayName = (result.name ?? result.formatted ?? "").trim();
   if (!providerPlaceId || !displayName) return null;
@@ -64,7 +55,11 @@ function mapResult(result: GeoapifyResult): LocationProviderPlace | null {
     providerPlaceId,
     displayName,
     formattedAddress: result.formatted?.trim() ?? displayName,
-    streetAddress: buildStreetAddress(result),
+    streetAddress: buildStructuredStreetAddress({
+      street: result.street,
+      houseNumber: result.housenumber,
+      companyName
+    }),
     postalCode: result.postcode?.trim() || null,
     city: result.city?.trim() || null,
     state: normalizeStateCode(result.state_code || result.state),
@@ -107,8 +102,12 @@ function scoreCandidate(
     score -= 0.15;
   }
 
-  if (place.streetAddress?.trim()) score += 0.08;
-  if (place.postalCode?.trim()) score += 0.04;
+  if (place.streetAddress?.trim()) {
+    score += 0.08;
+  } else {
+    score -= 0.3;
+  }
+  if (place.streetAddress?.trim() && place.postalCode?.trim()) score += 0.04;
   if (place.latitude != null && place.longitude != null) score += 0.05;
 
   const usefulTypes = new Set(["amenity", "building", "street", "suburb", "district"]);
@@ -163,7 +162,7 @@ export function createGeoapifyGeocodingProvider(): LocationEnrichmentProvider {
         const data = (await response.json()) as GeoapifySearchResponse;
         const candidates = (data.results ?? [])
           .filter((row) => row.country_code?.trim().toLowerCase() === "br")
-          .map(mapResult)
+          .map((row) => mapResult(row, context.companyName))
           .filter((p): p is LocationProviderPlace => Boolean(p));
 
         if (!candidates.length) return null;
@@ -173,11 +172,7 @@ export function createGeoapifyGeocodingProvider(): LocationEnrichmentProvider {
           .sort((a, b) => b.score - a.score);
 
         const best = scored[0];
-        if (!best || best.score < 0.72) return null;
-
-        const minGeoapifyConfidence = 0.55;
-        if ((best.place.rankConfidence ?? 0) < minGeoapifyConfidence) return null;
-        if ((best.place.rankConfidenceCityLevel ?? 0) < 0.5) return null;
+        if (!best || best.score < 0.35) return null;
 
         return best.place;
       } catch (error) {

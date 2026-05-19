@@ -273,7 +273,7 @@ export async function runLocationEnrichment(
 
   let place: Awaited<ReturnType<LocationEnrichmentProvider["searchBranch"]>> = null;
   try {
-    place = await provider.searchBranch(rawQuery, { city, state });
+    place = await provider.searchBranch(rawQuery, { city, state, companyName });
   } catch (error) {
     console.warn("[location-enrichment] API indisponível:", error);
     await upsertCacheRow({
@@ -332,10 +332,10 @@ export async function runLocationEnrichment(
       matchStatus: LocationMatchStatus.LOW_CONFIDENCE,
       matchConfidence,
       providerPlaceId: place.providerPlaceId,
-      streetAddress: place.streetAddress,
-      postalCode: place.postalCode,
-      latitude: place.latitude,
-      longitude: place.longitude
+      streetAddress: null,
+      postalCode: null,
+      latitude: null,
+      longitude: null
     });
     return "api_low_confidence";
   }

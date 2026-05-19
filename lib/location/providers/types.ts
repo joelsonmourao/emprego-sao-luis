@@ -17,5 +17,5 @@ export type LocationProviderPlace = {
 
 export interface LocationEnrichmentProvider {
   readonly id: string;
-  searchBranch(query: string, context: { city: string; state: string }): Promise<LocationProviderPlace | null>;
+  searchBranch(query: string, context: { city: string; state: string; companyName?: string }): Promise<LocationProviderPlace | null>;
 }

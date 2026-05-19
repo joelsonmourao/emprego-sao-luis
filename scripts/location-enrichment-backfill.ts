@@ -14,6 +14,7 @@
  *
  * Escopo opcional:
  *   --latest-jobs=2000  (considera somente as vagas mais recentes por createdAt DESC)
+ *   --reprocess-invalid-street-cache  (reprocessa apenas caches MATCHED com streetAddress inválido)
  *
  * Variáveis opcionais (execução real):
  *   GEOAPIFY_API_KEY=...                         (obrigatória para chamadas reais)
@@ -32,6 +33,7 @@ import {
   runLocationEnrichment,
   type LocationEnrichmentRunOutcome
 } from "@/lib/location/location-enrichment-service";
+import { isInvalidCachedStreetAddress } from "@/lib/location/street-address-validation";
 
 const prisma = new PrismaClient();
 
@@ -44,6 +46,7 @@ type LocationKey = {
 
 type BackfillScope = {
   latestJobs: number | null;
+  reprocessInvalidStreetCacheOnly: boolean;
 };
 
 function isDryRun() {
@@ -52,7 +55,8 @@ function isDryRun() {
 
 function parseLatestJobsArg(): BackfillScope {
   const arg = process.argv.find((item) => item.startsWith("--latest-jobs"));
-  if (!arg) return { latestJobs: null };
+  const reprocessInvalidStreetCacheOnly = process.argv.includes("--reprocess-invalid-street-cache");
+  if (!arg) return { latestJobs: null, reprocessInvalidStreetCacheOnly };
 
   const [, rawValue] = arg.split("=");
   const value = rawValue?.trim();
@@ -62,7 +66,7 @@ function parseLatestJobsArg(): BackfillScope {
     throw new Error('Argumento inválido: use "--latest-jobs=2000" com um número inteiro positivo.');
   }
 
-  return { latestJobs: parsed };
+  return { latestJobs: parsed, reprocessInvalidStreetCacheOnly };
 }
 
 function parsePositiveInt(value: string | undefined, fallback: number, max?: number) {
@@ -88,12 +92,48 @@ function buildKey(input: { companyName: string; city: string; state: string }): 
 }
 
 function formatScope(scope: BackfillScope) {
+  if (scope.reprocessInvalidStreetCacheOnly) {
+    return "Escopo limitado aos caches MATCHED com streetAddress inválido (nome de POI/empresa).";
+  }
+
   return scope.latestJobs
     ? `Escopo limitado às ${scope.latestJobs} vagas mais recentes (createdAt DESC).`
     : "Escopo sem limite: todas as vagas do banco.";
 }
 
+async function collectInvalidStreetCacheKeys() {
+  const rows = await prisma.locationEnrichmentCache.findMany({
+    where: { matchStatus: LocationMatchStatus.MATCHED },
+    select: {
+      id: true,
+      companyName: true,
+      companyNameNormalized: true,
+      city: true,
+      state: true,
+      streetAddress: true
+    }
+  });
+
+  const invalidRows = rows.filter((row) => isInvalidCachedStreetAddress(row.streetAddress, row.companyName));
+
+  return {
+    jobsAnalyzed: invalidRows.length,
+    skippedInvalidJobs: 0,
+    keys: invalidRows.map((row) => ({
+      companyName: row.companyName,
+      city: row.city,
+      state: row.state,
+      companyNameNormalized: row.companyNameNormalized
+    })),
+    invalidCacheIds: invalidRows.map((row) => row.id)
+  };
+}
+
 async function collectUniqueKeysFromJobs(scope: BackfillScope) {
+  if (scope.reprocessInvalidStreetCacheOnly) {
+    return collectInvalidStreetCacheKeys();
+  }
+
   const jobs = await prisma.job.findMany({
     select: {
       companyName: true,
@@ -127,7 +167,8 @@ async function collectUniqueKeysFromJobs(scope: BackfillScope) {
   return {
     jobsAnalyzed: jobs.length,
     skippedInvalidJobs,
-    keys: [...keyMap.values()]
+    keys: [...keyMap.values()],
+    invalidCacheIds: []
   };
 }
 
@@ -137,10 +178,22 @@ async function runDryRun(scope: BackfillScope) {
   console.info(formatScope(scope));
   console.info("Critério de recência: Job.createdAt DESC.\n");
 
-  const { jobsAnalyzed, skippedInvalidJobs, keys } = await collectUniqueKeysFromJobs(scope);
-  const preview = await previewLocationEnrichmentBackfill(
-    keys.map((key) => ({ companyName: key.companyName, city: key.city, state: key.state }))
-  );
+  const { jobsAnalyzed, skippedInvalidJobs, keys, invalidCacheIds } = await collectUniqueKeysFromJobs(scope);
+  const preview = scope.reprocessInvalidStreetCacheOnly
+    ? {
+        uniqueKeys: keys.length,
+        skippedInvalid: 0,
+        wouldReuseTrustedCache: 0,
+        wouldReuseNegativeCache: 0,
+        wouldCallApi: keys.length,
+        hasGeoapifyApiKey: Boolean(process.env.GEOAPIFY_API_KEY?.trim()),
+        maxApiCallsPerRun: resolveBackfillMaxApiCallsPerRun(),
+        wouldExceedApiLimit: keys.length > resolveBackfillMaxApiCallsPerRun(),
+        pendingAfterLimit: Math.max(0, keys.length - resolveBackfillMaxApiCallsPerRun())
+      }
+    : await previewLocationEnrichmentBackfill(
+        keys.map((key) => ({ companyName: key.companyName, city: key.city, state: key.state }))
+      );
 
   const cacheRows = await prisma.locationEnrichmentCache.count();
   const matchedRows = await prisma.locationEnrichmentCache.count({
@@ -150,6 +203,9 @@ async function runDryRun(scope: BackfillScope) {
   console.info(`Vagas no banco: ${jobsAnalyzed}`);
   if (scope.latestJobs) {
     console.info(`Escopo limitado às vagas mais recentes: ${scope.latestJobs}`);
+  }
+  if (scope.reprocessInvalidStreetCacheOnly) {
+    console.info(`Caches MATCHED com streetAddress inválido encontrados: ${invalidCacheIds.length}`);
   }
   console.info(`Vagas ignoradas (empresa/cidade/UF inválidos): ${skippedInvalidJobs}`);
   console.info(`Combinações empresa/cidade/UF únicas: ${keys.length}`);
@@ -225,7 +281,14 @@ async function runBackfill(scope: BackfillScope) {
     );
   }
 
-  const { jobsAnalyzed, skippedInvalidJobs, keys } = await collectUniqueKeysFromJobs(scope);
+  const { jobsAnalyzed, skippedInvalidJobs, keys, invalidCacheIds } = await collectUniqueKeysFromJobs(scope);
+
+  if (scope.reprocessInvalidStreetCacheOnly && invalidCacheIds.length > 0) {
+    await prisma.locationEnrichmentCache.deleteMany({
+      where: { id: { in: invalidCacheIds } }
+    });
+    console.info(`Caches inválidos removidos antes do reprocessamento: ${invalidCacheIds.length}\n`);
+  }
 
   const stats = {
     jobsAnalyzed,
@@ -253,6 +316,9 @@ async function runBackfill(scope: BackfillScope) {
   console.info(`Vagas no banco: ${stats.jobsAnalyzed}`);
   if (scope.latestJobs) {
     console.info(`Escopo limitado às vagas mais recentes: ${scope.latestJobs}`);
+  }
+  if (scope.reprocessInvalidStreetCacheOnly) {
+    console.info(`Caches MATCHED com streetAddress inválido para reprocessar: ${invalidCacheIds.length}`);
   }
   console.info(`Combinações empresa/cidade/UF únicas: ${stats.uniqueKeysEvaluated}`);
   console.info(`Ignoradas por dados incompletos (vagas): ${stats.skippedInvalid}\n`);

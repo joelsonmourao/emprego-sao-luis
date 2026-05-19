@@ -102,6 +102,7 @@ export function buildPlaceJsonLdForCityLocality(input: { cityName: string; state
 
 const JOB_POSTING_EMPLOYMENT_TYPES = ["FULL_TIME", "PART_TIME"] as const;
 const IDENTIFIER_NAME = "Jovem Aprendiz Vagas";
+const DEFAULT_HIRING_ORGANIZATION_LOGO = "https://slzcontent.com.br/icon.svg";
 
 export type JobPostingJsonLdInput = {
   id: string;
@@ -162,10 +163,10 @@ function isValidHttpUrl(value: string) {
 
 function resolveHiringOrganizationLogo(companyLogoUrl?: string | null) {
   const u = companyLogoUrl?.trim();
-  if (!u) return undefined;
+  if (!u) return DEFAULT_HIRING_ORGANIZATION_LOGO;
   if (u.startsWith("https://") || u.startsWith("http://")) return u;
   if (u.startsWith("/")) return absoluteUrl(u);
-  return undefined;
+  return DEFAULT_HIRING_ORGANIZATION_LOGO;
 }
 
 function resolveHiringOrganizationSameAs(input: {
