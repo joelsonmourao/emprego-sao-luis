@@ -4,6 +4,9 @@ import { prisma } from "@/lib/db";
 import { formatBrazilDateTime } from "@/lib/date-utils";
 import { ScheduledPublicationsTable } from "@/components/admin/scheduled-publications-table";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 type PageProps = {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 };

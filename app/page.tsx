@@ -26,10 +26,11 @@ import { buildFaqJsonLd } from "@/lib/seo/json-ld";
 import { getPostsBySlugs, getRecentPosts } from "@/lib/repositories/blog";
 import { getApprenticeCityUfSitemapRows, getFeaturedCompanies, getFeaturedCompaniesBySlugs, getFeaturedJobs, getJobsBySlugs } from "@/lib/repositories/jobs";
 import { getCities, getCitiesBySlugs, getSearchGeoData, getStates, getStatesBySlugs } from "@/lib/repositories/geo";
-import { getSiteContent } from "@/lib/site-content";
+import { defaultSiteContent, getSiteContent } from "@/lib/site-content";
 import { homeBlockKeys } from "@/lib/schemas/site-admin";
 
-export const revalidate = 1800;
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
 export async function generateMetadata() {
   return buildSiteMetadata({
@@ -52,26 +53,49 @@ const iconMap = {
 } as const;
 
 export default async function HomePage() {
-  const [featuredJobsDefault, recentPostsDefault, statesDefault, citiesDefault, searchStates, companiesDefault, siteContent, apprenticeSeoRows] =
-    await Promise.all([
-      getFeaturedJobs(),
-      getRecentPosts(),
-      getStates(),
-      getCities(),
-      getSearchGeoData(),
-      getFeaturedCompanies(),
-      getSiteContent(),
-      getApprenticeCityUfSitemapRows()
-    ]);
+  let featuredJobsDefault = [] as Awaited<ReturnType<typeof getFeaturedJobs>>;
+  let recentPostsDefault = [] as Awaited<ReturnType<typeof getRecentPosts>>;
+  let statesDefault = [] as Awaited<ReturnType<typeof getStates>>;
+  let citiesDefault = [] as Awaited<ReturnType<typeof getCities>>;
+  let searchStates = [] as Awaited<ReturnType<typeof getSearchGeoData>>;
+  let companiesDefault = [] as Awaited<ReturnType<typeof getFeaturedCompanies>>;
+  let siteContent = defaultSiteContent;
+  let apprenticeSeoRows = [] as Awaited<ReturnType<typeof getApprenticeCityUfSitemapRows>>;
 
-  const [featuredJobsSelected, featuredPostsSelected, featuredStatesSelected, featuredCitiesSelected, featuredCompaniesSelected] =
-    await Promise.all([
-      getJobsBySlugs(siteContent.home.featured.jobSlugs),
-      getPostsBySlugs(siteContent.home.featured.postSlugs),
-      getStatesBySlugs(siteContent.home.featured.stateSlugs),
-      getCitiesBySlugs(siteContent.home.featured.citySlugs),
-      getFeaturedCompaniesBySlugs(siteContent.home.featured.companySlugs)
-    ]);
+  try {
+    [featuredJobsDefault, recentPostsDefault, statesDefault, citiesDefault, searchStates, companiesDefault, siteContent, apprenticeSeoRows] =
+      await Promise.all([
+        getFeaturedJobs(),
+        getRecentPosts(),
+        getStates(),
+        getCities(),
+        getSearchGeoData(),
+        getFeaturedCompanies(),
+        getSiteContent(),
+        getApprenticeCityUfSitemapRows()
+      ]);
+  } catch (error) {
+    console.error("[home] Falha ao carregar dados iniciais da home. Renderizando fallback seguro.", error);
+  }
+
+  let featuredJobsSelected = [] as Awaited<ReturnType<typeof getJobsBySlugs>>;
+  let featuredPostsSelected = [] as Awaited<ReturnType<typeof getPostsBySlugs>>;
+  let featuredStatesSelected = [] as Awaited<ReturnType<typeof getStatesBySlugs>>;
+  let featuredCitiesSelected = [] as Awaited<ReturnType<typeof getCitiesBySlugs>>;
+  let featuredCompaniesSelected = [] as Awaited<ReturnType<typeof getFeaturedCompaniesBySlugs>>;
+
+  try {
+    [featuredJobsSelected, featuredPostsSelected, featuredStatesSelected, featuredCitiesSelected, featuredCompaniesSelected] =
+      await Promise.all([
+        getJobsBySlugs(siteContent.home.featured.jobSlugs),
+        getPostsBySlugs(siteContent.home.featured.postSlugs),
+        getStatesBySlugs(siteContent.home.featured.stateSlugs),
+        getCitiesBySlugs(siteContent.home.featured.citySlugs),
+        getFeaturedCompaniesBySlugs(siteContent.home.featured.companySlugs)
+      ]);
+  } catch (error) {
+    console.error("[home] Falha ao carregar selecoes em destaque. Mantendo dados padrao.", error);
+  }
 
   const featuredJobs = featuredJobsSelected.length ? featuredJobsSelected : featuredJobsDefault;
   const recentPosts = featuredPostsSelected.length ? featuredPostsSelected : recentPostsDefault;

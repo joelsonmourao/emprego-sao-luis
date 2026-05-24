@@ -8,14 +8,19 @@ export { defaultSiteContent, siteContentSchema };
 export type { SiteContent, SiteFaqEntry };
 
 export const getSiteContent = cache(async (): Promise<SiteContent> => {
-  const setting = await prisma.siteSetting.findUnique({
-    where: { key: "site_content" }
-  });
+  try {
+    const setting = await prisma.siteSetting.findUnique({
+      where: { key: "site_content" }
+    });
 
-  if (!setting) {
+    if (!setting) {
+      return defaultSiteContent;
+    }
+
+    const parsed = siteContentSchema.safeParse(deepMergeDefaults(defaultSiteContent, setting.value));
+    return parsed.success ? parsed.data : defaultSiteContent;
+  } catch (error) {
+    console.error("[site-content] Falha ao carregar conteudo do site. Usando defaults.", error);
     return defaultSiteContent;
   }
-
-  const parsed = siteContentSchema.safeParse(deepMergeDefaults(defaultSiteContent, setting.value));
-  return parsed.success ? parsed.data : defaultSiteContent;
 });

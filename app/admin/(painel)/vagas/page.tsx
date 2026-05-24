@@ -8,6 +8,9 @@ import { Button } from "@/components/ui/button";
 import { AdminJobsTable } from "@/components/admin/admin-jobs-table";
 import { PaginationNav } from "@/components/pagination-nav";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 type AdminJobsPageProps = {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 };

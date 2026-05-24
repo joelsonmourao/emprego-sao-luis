@@ -27,7 +27,8 @@ import { renderFaqTemplate, renderTemplate } from "@/lib/site-copy";
 import { getSiteContent } from "@/lib/site-content";
 import { JobsGridWithMidAd } from "@/components/vagas/jobs-grid-with-mid-ad";
 
-export const revalidate = 600;
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
 const getJobsAndGeoForSearch = cache(
   async (key: string) => {

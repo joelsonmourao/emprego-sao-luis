@@ -3,6 +3,9 @@ import type { ReactNode } from "react";
 import { requireAdminSession } from "@/lib/auth";
 import { AdminShell } from "@/components/admin/admin-shell";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 export default async function AdminProtectedLayout({ children }: { children: ReactNode }) {
   const session = await requireAdminSession();
 

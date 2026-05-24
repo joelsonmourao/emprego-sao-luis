@@ -15,7 +15,8 @@ import { isRemovedJobSlug } from "@/lib/seo/removed-job-slugs";
 import { JOB_DETAIL_PATH_RESERVED_FIRST_SEGMENTS } from "@/lib/seo/vagas-job-path";
 import { siteConfig } from "@/lib/constants";
 
-export const revalidate = 1800;
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
 function safeString(value: unknown, fallback: string) {
   const text = typeof value === "string" ? value.trim() : "";

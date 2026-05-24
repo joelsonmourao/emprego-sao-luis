@@ -5,6 +5,9 @@ import { JobAdminForm } from "@/components/admin/job-admin-form";
 import { getCompanyAdminOptions } from "@/lib/repositories/jobs";
 import { formatBrazilDateTime } from "@/lib/date-utils";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 type Props = {
   params: Promise<{ id: string }>;
 };
