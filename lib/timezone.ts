@@ -1,4 +1,4 @@
-export const BRAZIL_TIME_ZONE = "America/Sao_Paulo";
+export const BRAZIL_TIME_ZONE = "America/Fortaleza";
 
 /** Fuso do portal e da planilha de publicacao: sempre Brasilia (nao configuravel por env). */
 export const SITE_TIME_ZONE = BRAZIL_TIME_ZONE;

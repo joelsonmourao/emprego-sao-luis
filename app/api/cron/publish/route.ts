@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 
 import { env } from "@/lib/env";
-import { processScheduledPublicationsFromDatabase } from "@/lib/scheduled-publication-db";
+import { processDueScheduledJobs } from "@/lib/job-publication";
 
 
 
@@ -10,13 +10,15 @@ export const dynamic = "force-dynamic";
 export const revalidate = 0;
 function isAuthorized(request: Request) {
   const authHeader = request.headers.get("authorization");
+  const xCronHeader = request.headers.get("x-cron-secret");
+  const querySecret = new URL(request.url).searchParams.get("secret");
   const expectedSecret = env.CRON_SECRET?.trim();
 
   if (!expectedSecret) {
     return true;
   }
 
-  return authHeader === `Bearer ${expectedSecret}`;
+  return authHeader === `Bearer ${expectedSecret}` || xCronHeader === expectedSecret || querySecret === expectedSecret;
 }
 
 export async function GET(request: Request) {
@@ -31,10 +33,17 @@ export async function GET(request: Request) {
   }
 
   try {
-    const result = await processScheduledPublicationsFromDatabase({
-      logDir: env.SCHEDULED_JOBS_LOG_DIR?.trim() || undefined
-    });
-    return NextResponse.json(result, { status: result.ok ? 200 : 207 });
+    const result = await processDueScheduledJobs();
+    return NextResponse.json(
+      {
+        ok: true,
+        published: result.published,
+        sentToIndexing: result.sentToIndexing,
+        indexingErrors: result.indexingErrors,
+        publicationErrors: result.publicationErrors
+      },
+      { status: 200 }
+    );
   } catch (error) {
     return NextResponse.json(
       {

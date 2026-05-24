@@ -35,6 +35,10 @@ const aliases: Record<string, string> = {
   workhours: "workHours",
   jornada: "workHours",
   publishedat: "publishedAt",
+  datahorapublicacao: "dataHoraPublicacao",
+  datahora: "dataHoraPublicacao",
+  data_publicacao: "dataHoraPublicacao",
+  publicacao_agendada: "dataHoraPublicacao",
   expiresat: "expiresAt",
   validthrough: "validThrough",
   applyurl: "applyUrl",
@@ -233,6 +237,7 @@ export function AdminJobImporter() {
         employmentType: String(normalized.employmentType ?? "").trim(),
         workHours: String(normalized.workHours ?? "").trim(),
         publishedAt: String(normalized.publishedAt ?? "").trim(),
+        dataHoraPublicacao: normalized.dataHoraPublicacao ?? "",
         expiresAt: String(normalized.expiresAt ?? "").trim(),
         validThrough: String(normalized.validThrough ?? "").trim(),
         validThroughMonths: parseOptionalNumber(normalized.validThroughMonths),
@@ -418,7 +423,8 @@ export function AdminJobImporter() {
           </div>
           <CardTitle>Importar vagas por Excel</CardTitle>
           <CardDescription>
-            Envie uma planilha `.xlsx` com colunas como `title`, `company`, `city`, `state`, `description`, `applyUrl` e SEO.             Para
+            Envie uma planilha `.xlsx` com colunas como `title`, `company`, `city`, `state`, `description`, `applyUrl`, SEO e
+            `dataHoraPublicacao` (formato `dd/MM/yyyy HH:mm`, `dd/MM/yyyy H:mm`, `yyyy-MM-dd HH:mm` ou data nativa do Excel). Para
             atualizar uma vaga já publicada, use `externalId` (ou a coluna `slug` com o slug exato da URL). Links iguais (`applyUrl`) em
             várias linhas não casam com vaga antiga — só `externalId` e `slug`. Marque a opção abaixo apenas quando quiser sobrescrever
             título e SEO de vagas já existentes com os dados corrigidos da planilha.

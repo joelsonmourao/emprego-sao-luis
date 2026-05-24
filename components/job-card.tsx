@@ -15,7 +15,7 @@ type JobCardProps = {
     summary: string;
     city: { name: string; slug: string };
     state: { code: string };
-    publishedAt: Date;
+    publishedAt: Date | null;
     applyUrl: string;
     locationType?: string;
     company?: { slug: string; name: string } | null;
@@ -87,7 +87,7 @@ export function JobCard({ job }: JobCardProps) {
         <div className="flex items-center justify-between gap-3 rounded-2xl bg-[linear-gradient(135deg,rgba(244,247,246,0.98),rgba(255,248,241,0.98))] px-4 py-3">
           <span className="inline-flex items-center gap-2 text-xs font-medium text-[var(--brand-text-secondary)]">
             <Clock3 className="h-4 w-4" />
-            Publicada em {formatDate(job.publishedAt)}
+            Publicada em {job.publishedAt ? formatDate(job.publishedAt) : "data indisponivel"}
           </span>
           <Button asChild size="sm" className="gap-2 rounded-2xl">
             <TrackedLink href={`/vagas/${job.slug}`} eventName="job_click" entityType="job" entitySlug={job.slug}>

@@ -63,7 +63,7 @@ export function addCalendarDaysBrazilEnd(input: string | Date, days: number): Da
 
 /** Data efetiva de término público: validThrough, senão expiresAt, senão +90 dias (fim do dia BR). */
 export function getEffectiveJobDeadlineUtc(input: {
-  publishedAt: Date | string;
+  publishedAt: Date | string | null | undefined;
   validThrough: Date | string | null | undefined;
   expiresAt: Date | string | null | undefined;
 }): Date {
@@ -82,12 +82,12 @@ export function getEffectiveJobDeadlineUtc(input: {
     return ex.toDate();
   }
 
-  return addCalendarDaysBrazilEnd(input.publishedAt, 90);
+  return addCalendarDaysBrazilEnd(input.publishedAt ?? new Date(), 90);
 }
 
 /** Vaga vencida quando o instante atual é depois do prazo efetivo (instante UTC). */
 export function isExpiredBrazil(job: {
-  publishedAt: Date | string;
+  publishedAt: Date | string | null | undefined;
   validThrough: Date | string | null | undefined;
   expiresAt: Date | string | null | undefined;
 }) {
@@ -96,7 +96,7 @@ export function isExpiredBrazil(job: {
 
 /** String ISO do fim do dia BR correspondente ao instante do prazo (para schema validThrough). */
 export function normalizeValidThroughSchemaString(input: {
-  publishedAt: Date | string;
+  publishedAt: Date | string | null | undefined;
   validThrough: Date | string | null | undefined;
   expiresAt: Date | string | null | undefined;
 }) {

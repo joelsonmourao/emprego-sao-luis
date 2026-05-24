@@ -1,4 +1,14 @@
-import { AuditAction, ImportQueueStatus, Prisma, type City, type Company, type State } from "@prisma/client";
+import {
+  AuditAction,
+  ImportQueueStatus,
+  JobIndexingStatus,
+  JobScheduleSource,
+  JobStatus,
+  Prisma,
+  type City,
+  type Company,
+  type State
+} from "@prisma/client";
 import { NextResponse } from "next/server";
 
 import { normalizeSlug, parseOptionalDate, richTextFromInput, sanitizeText } from "@/lib/admin/content";
@@ -24,12 +34,14 @@ import {
   snapshotFromPersisted,
   type JobImportSnapshot
 } from "@/lib/jobs/spreadsheet-import-merge";
+import { submitPublishedJobToIndexing } from "@/lib/job-publication";
 import {
   revalidatePublicSurfacesAfterBulkJobChange,
   revalidatePublicSurfacesAfterJobImports,
   type JobPublicRevalidateMeta
 } from "@/lib/public-revalidate";
 import { importJobsPayloadSchema, type ImportedJobRow } from "@/lib/schemas/job-import";
+import { parseScheduledAtInputToUtc } from "@/lib/scheduled-at-utc";
 
 
 export const runtime = "nodejs";
@@ -95,6 +107,14 @@ type ImportContext = {
   touchedSlugs: string[];
   /** Modo correção: sobrescreve title/seoTitle/jobTitle em updates e aplica requisitos/benefícios da planilha. */
   reprocessExistingContent: boolean;
+  metrics: {
+    drafts: number;
+    scheduled: number;
+    publishedNow: number;
+    indexingSent: number;
+    dateTimeErrors: number;
+    indexingErrors: number;
+  };
 };
 
 export const maxDuration = 60;
@@ -147,7 +167,49 @@ function sanitizeImportedRow(row: ImportedJobRow): ImportedJobRow {
     requirementsText: sanitizeText(row.requirementsText ?? ""),
     benefitsText: sanitizeText(row.benefitsText ?? ""),
     area: sanitizeArea(row.area),
-    stateName: normalizeBrazilianUf(row.stateName) ?? ""
+    stateName: normalizeBrazilianUf(row.stateName) ?? "",
+    dataHoraPublicacao:
+      typeof row.dataHoraPublicacao === "string" ? row.dataHoraPublicacao.trim() : row.dataHoraPublicacao
+  };
+}
+
+function resolvePublicationBySpreadsheet(rawValue: ImportedJobRow["dataHoraPublicacao"]) {
+  const hasRawValue = !(rawValue === null || rawValue === undefined || String(rawValue).trim() === "");
+  if (!hasRawValue) {
+    return {
+      status: JobStatus.DRAFT,
+      isActive: false,
+      scheduledAt: null,
+      publishedAt: null,
+      scheduleSource: null,
+      rawValue: null
+    };
+  }
+
+  const parsed = parseScheduledAtInputToUtc(rawValue);
+  if (!parsed) {
+    throw new Error("Formato invalido em dataHoraPublicacao. Use dd/MM/yyyy HH:mm.");
+  }
+
+  const now = new Date();
+  if (parsed.getTime() > now.getTime()) {
+    return {
+      status: JobStatus.SCHEDULED,
+      isActive: false,
+      scheduledAt: parsed,
+      publishedAt: null,
+      scheduleSource: JobScheduleSource.PLANILHA,
+      rawValue: String(rawValue)
+    };
+  }
+
+  return {
+    status: JobStatus.PUBLISHED,
+    isActive: true,
+    scheduledAt: null,
+    publishedAt: now,
+    scheduleSource: JobScheduleSource.PLANILHA,
+    rawValue: String(rawValue)
   };
 }
 
@@ -569,7 +631,15 @@ async function buildImportContext(rows: ImportedJobRow[], opts?: { reprocessExis
     processedRows: 0,
     summary: emptyImportSummaryReport(),
     touchedSlugs: [],
-    reprocessExistingContent: Boolean(opts?.reprocessExistingContent)
+    reprocessExistingContent: Boolean(opts?.reprocessExistingContent),
+    metrics: {
+      drafts: 0,
+      scheduled: 0,
+      publishedNow: 0,
+      indexingSent: 0,
+      dateTimeErrors: 0,
+      indexingErrors: 0
+    }
   };
 
   return context;
@@ -603,6 +673,7 @@ async function persistImportedRow(rowForSave: ImportedJobRow, context: ImportCon
 
   const normalizedDescription = richTextFromInput(rowForSave.descriptionHtml, { baseHeadingLevel: 2 });
   const validThrough = processValidThroughMonths(rowForSave.validThroughMonths) ?? calculateValidThrough(rowForSave.validThrough);
+  const publication = resolvePublicationBySpreadsheet(rowForSave.dataHoraPublicacao);
 
   const existing = findExistingJobSnapshot(rowForSave, context.jobLookup);
 
@@ -618,7 +689,21 @@ async function persistImportedRow(rowForSave: ImportedJobRow, context: ImportCon
       calculateValidThrough,
       { reprocessExistingContent: context.reprocessExistingContent }
     );
-    const saved = await prisma.job.update({ where: { id: existing.id }, data: updateData });
+    const saved = await prisma.job.update({
+      where: { id: existing.id },
+      data: {
+        ...updateData,
+        status: publication.status,
+        isActive: publication.isActive,
+        scheduledAt: publication.scheduledAt,
+        publishedAt: publication.publishedAt,
+        scheduleSource: publication.scheduleSource,
+        scheduledImportRawValue: publication.rawValue,
+        importError: null,
+        indexingStatus: publication.status === JobStatus.PUBLISHED ? JobIndexingStatus.NOT_SENT : JobIndexingStatus.NOT_SENT,
+        indexingError: null
+      }
+    });
     const snap = snapshotFromPersisted(saved);
 
     if (saved.title === existing.title) {
@@ -640,12 +725,33 @@ async function persistImportedRow(rowForSave: ImportedJobRow, context: ImportCon
     context.touchedSlugs.push(saved.slug);
     registerSnapshotInLookup(context.jobLookup, snap);
     await enrichLocationAfterImport(company.name, city.name, state.code);
+    if (publication.status === JobStatus.DRAFT) context.metrics.drafts += 1;
+    if (publication.status === JobStatus.SCHEDULED) context.metrics.scheduled += 1;
+    if (publication.status === JobStatus.PUBLISHED) {
+      context.metrics.publishedNow += 1;
+      if (saved.autoSubmitToIndexing) {
+        const indexing = await submitPublishedJobToIndexing(saved.id);
+        if (indexing.ok) context.metrics.indexingSent += 1;
+        else if (!indexing.skipped) context.metrics.indexingErrors += 1;
+      }
+    }
     return;
   }
 
   const baseSlug = buildNewJobSlugBase(rowForSave, state, city, company);
   const uniqueSlug = ensureUniqueJobSlug(baseSlug, context.jobLookup.usedJobSlugs, undefined);
-  const createData = buildJobCreateData(rowForSave, state, city, company, uniqueSlug, normalizedDescription, validThrough);
+  const createData = {
+    ...buildJobCreateData(rowForSave, state, city, company, uniqueSlug, normalizedDescription, validThrough),
+    status: publication.status,
+    isActive: publication.isActive,
+    scheduledAt: publication.scheduledAt,
+    publishedAt: publication.publishedAt,
+    scheduleSource: publication.scheduleSource,
+    scheduledImportRawValue: publication.rawValue,
+    importError: null,
+    indexingStatus: JobIndexingStatus.NOT_SENT,
+    indexingError: null
+  };
   const saved = await prisma.job.create({ data: createData });
   const snap = snapshotFromPersisted(saved);
 
@@ -654,6 +760,16 @@ async function persistImportedRow(rowForSave: ImportedJobRow, context: ImportCon
   context.touchedSlugs.push(saved.slug);
   registerSnapshotInLookup(context.jobLookup, snap);
   await enrichLocationAfterImport(company.name, city.name, state.code);
+  if (publication.status === JobStatus.DRAFT) context.metrics.drafts += 1;
+  if (publication.status === JobStatus.SCHEDULED) context.metrics.scheduled += 1;
+  if (publication.status === JobStatus.PUBLISHED) {
+    context.metrics.publishedNow += 1;
+    if (saved.autoSubmitToIndexing) {
+      const indexing = await submitPublishedJobToIndexing(saved.id);
+      if (indexing.ok) context.metrics.indexingSent += 1;
+      else if (!indexing.skipped) context.metrics.indexingErrors += 1;
+    }
+  }
 }
 
 async function enrichLocationAfterImport(companyName: string, city: string, state: string) {
@@ -685,10 +801,14 @@ async function processRows(rows: ImportedJobRow[], context: ImportContext, queue
         });
       }
     } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : "Erro desconhecido ao processar a linha.";
+      if (errorMessage.includes("dataHoraPublicacao")) {
+        context.metrics.dateTimeErrors += 1;
+      }
       context.issues.push({
         line,
         title: row.title,
-        message: error instanceof Error ? error.message : "Erro desconhecido ao processar a linha."
+        message: errorMessage
       });
       context.processedRows += 1;
       if (queueId) {
@@ -750,7 +870,8 @@ async function processQueuedImport(queueId: string) {
           updated: context.updated,
           issues: context.issues,
           importReport: context.summary,
-          importReportText: formatImportReportMessage(context.summary)
+          importReportText: formatImportReportMessage(context.summary),
+          metrics: context.metrics
         }
       }
     });
@@ -830,11 +951,18 @@ export async function POST(request: Request) {
             importedCount: context.imported.length,
             updatedCount: context.updated.length,
             errorCount: context.issues.length,
+            draftCount: context.metrics.drafts,
+            scheduledCount: context.metrics.scheduled,
+            publishedNowCount: context.metrics.publishedNow,
+            indexingSentCount: context.metrics.indexingSent,
+            dateTimeErrorCount: context.metrics.dateTimeErrors,
+            indexingErrorCount: context.metrics.indexingErrors,
             successRate: rows.length ? Math.round(((rows.length - context.issues.length) / rows.length) * 100) : 100,
             durationMs: Date.now() - startedAt
           },
           importReport: context.summary,
           importReportText: formatImportReportMessage(context.summary),
+          metrics: context.metrics,
           results: {
             errors: context.issues.map((issue) => ({ line: issue.line, message: issue.message }))
           }

@@ -16,6 +16,7 @@ export const importedJobRowSchema = z.object({
   employmentType: z.string().optional().default(""),
   workHours: z.string().optional().default(""),
   publishedAt: z.string().optional().default(""),
+  dataHoraPublicacao: z.union([z.string(), z.number(), z.date()]).optional().nullable(),
   expiresAt: z.string().optional().default(""),
   validThrough: z.string().optional().default(""),
   validThroughMonths: z.preprocess((val) => {

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { Prisma } from "@prisma/client";
+import { JobStatus } from "@prisma/client";
 
 import { prisma } from "@/lib/db";
 import { EmptyState } from "@/components/empty-state";
@@ -31,6 +32,14 @@ export default async function AdminJobsPage({ searchParams }: AdminJobsPageProps
     where.isActive = true;
   } else if (status === "inactive") {
     where.isActive = false;
+  } else if (status === "draft") {
+    where.status = JobStatus.DRAFT;
+  } else if (status === "scheduled") {
+    where.status = JobStatus.SCHEDULED;
+  } else if (status === "published") {
+    where.status = JobStatus.PUBLISHED;
+  } else if (status === "error") {
+    where.status = JobStatus.ERROR;
   }
 
   const jobs = await prisma.job.findMany({
@@ -92,6 +101,10 @@ export default async function AdminJobsPage({ searchParams }: AdminJobsPageProps
           <option value="all">Todas</option>
           <option value="active">Ativas</option>
           <option value="inactive">Inativas</option>
+          <option value="draft">Rascunho</option>
+          <option value="scheduled">Agendada</option>
+          <option value="published">Publicada</option>
+          <option value="error">Erro</option>
         </select>
         <Button type="submit">Filtrar</Button>
       </form>
@@ -103,7 +116,8 @@ export default async function AdminJobsPage({ searchParams }: AdminJobsPageProps
           slug: job.slug,
           companyName: job.companyName,
           isActive: job.isActive,
-          publishedAt: new Intl.DateTimeFormat("pt-BR").format(job.publishedAt),
+          status: job.status,
+          publishedAt: job.publishedAt ? new Intl.DateTimeFormat("pt-BR").format(job.publishedAt) : "-",
           cityName: job.city.name,
           stateCode: job.state.code
         }))}

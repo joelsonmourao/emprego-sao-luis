@@ -1,9 +1,11 @@
-import { EmploymentType, LocationType, Prisma } from "@prisma/client";
+import { EmploymentType, JobIndexingStatus, JobScheduleSource, JobStatus, LocationType, Prisma } from "@prisma/client";
 
 import { normalizeLines, normalizeSlug, parseOptionalDate, richTextFromInput, sanitizeHtml } from "@/lib/admin/content";
 import { getBrazilNow, parseFlexibleDateToUtc } from "@/lib/date-utils";
 import { prisma } from "@/lib/db";
 import { ensureLocationEnrichment } from "@/lib/location/location-enrichment-service";
+import { submitPublishedJobToIndexing } from "@/lib/job-publication";
+import { parseScheduledAtInputToUtc } from "@/lib/scheduled-at-utc";
 import { jobFormSchema, type JobFormValues } from "@/lib/schemas/job-form";
 
 function processValidThrough(validThroughValue: string | undefined | null): Date | null {
@@ -185,8 +187,24 @@ export async function upsertJobFromForm(input: unknown, existingId?: string) {
     seoDescription: parsed.seoDescription.trim(),
     featured: parsed.featured,
     stateId: state.id,
-    cityId: city.id
+    cityId: city.id,
+    autoSubmitToIndexing: parsed.autoSubmitToIndexing
   } satisfies Omit<Prisma.JobUncheckedCreateInput, "publishedAt">;
+
+  const scheduledAt = parseScheduledAtInputToUtc(parsed.scheduledAt);
+  if (parsed.status === "SCHEDULED" && !scheduledAt) {
+    throw new Error("Data/hora de publicacao invalida. Use dd/MM/yyyy HH:mm.");
+  }
+
+  const publicationFields = {
+    status: parsed.status as JobStatus,
+    isActive: parsed.status === "PUBLISHED" ? true : parsed.isActive,
+    scheduledAt: parsed.status === "SCHEDULED" ? scheduledAt : null,
+    scheduleSource: parsed.status === "SCHEDULED" ? JobScheduleSource.ADMIN : JobScheduleSource.MANUAL,
+    publishedAt: parsed.status === "PUBLISHED" ? new Date() : null,
+    indexingStatus: parsed.status === "PUBLISHED" ? JobIndexingStatus.NOT_SENT : JobIndexingStatus.SKIPPED,
+    indexingError: null
+  } satisfies Prisma.JobUncheckedUpdateInput;
 
   const jobPublicSelect = {
     id: true,
@@ -206,16 +224,22 @@ export async function upsertJobFromForm(input: unknown, existingId?: string) {
 
     const saved = await prisma.job.update({
       where: { id: existingId },
-      data: baseData,
+      data: {
+        ...baseData,
+        ...publicationFields
+      },
       select: jobPublicSelect
     });
     await enrichJobLocationQuietly(company.name, city.name, state.code);
+    if (parsed.status === "PUBLISHED" && parsed.autoSubmitToIndexing) {
+      await submitPublishedJobToIndexing(saved.id);
+    }
     return saved;
   }
 
   const createData: Prisma.JobUncheckedCreateInput = {
     ...baseData,
-    publishedAt: new Date()
+    ...publicationFields
   };
 
   const saved = await prisma.job.create({
@@ -223,6 +247,9 @@ export async function upsertJobFromForm(input: unknown, existingId?: string) {
     select: jobPublicSelect
   });
   await enrichJobLocationQuietly(company.name, city.name, state.code);
+  if (parsed.status === "PUBLISHED" && parsed.autoSubmitToIndexing) {
+    await submitPublishedJobToIndexing(saved.id);
+  }
   return saved;
 }
 

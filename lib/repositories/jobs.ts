@@ -1,5 +1,6 @@
 import { unstable_cache } from "next/cache";
 import type { EmploymentType, LocationType, Prisma } from "@prisma/client";
+import { JobStatus } from "@prisma/client";
 
 import { markExpiredJobsInactive } from "@/lib/jobs/job-expiry";
 import { jovemAprendizHubOrKeywordsWhere } from "@/lib/jobs/jovem-aprendiz-hub-where";
@@ -38,6 +39,12 @@ export const jobListingSelect = {
 
 export type JobListingPayload = Prisma.JobGetPayload<{ select: typeof jobListingSelect }>;
 
+const publishedJobWhere: Prisma.JobWhereInput = {
+  isActive: true,
+  status: JobStatus.PUBLISHED,
+  publishedAt: { not: null }
+};
+
 const companyHubListSelect = {
   id: true,
   name: true,
@@ -54,7 +61,7 @@ const companyHubListSelect = {
   _count: {
     select: {
       jobs: {
-        where: { isActive: true }
+        where: publishedJobWhere
       }
     }
   }
@@ -63,7 +70,7 @@ const companyHubListSelect = {
 async function fetchFeaturedJobs() {
   await markExpiredJobsInactive();
   return prisma.job.findMany({
-    where: { isActive: true, featured: true },
+    where: { ...publishedJobWhere, featured: true },
     select: jobListingSelect,
     orderBy: [{ publishedAt: "desc" }],
     take: 6
@@ -82,7 +89,7 @@ const getJobsBySlugsCached = unstable_cache(async (slugKey: string) => {
 
   const items = await prisma.job.findMany({
     where: {
-      isActive: true,
+      ...publishedJobWhere,
       slug: { in: slugs }
     },
     select: jobListingSelect
@@ -103,7 +110,7 @@ export async function getJobsBySlugs(slugs: string[]) {
 async function fetchRecentJobs() {
   await markExpiredJobsInactive();
   return prisma.job.findMany({
-    where: { isActive: true },
+    where: publishedJobWhere,
     select: jobListingSelect,
     orderBy: [{ publishedAt: "desc" }],
     take: 12
@@ -116,8 +123,8 @@ export const getRecentJobs = unstable_cache(fetchRecentJobs, ["recent-jobs-v1"],
 });
 
 export const getJobBySlug = unstable_cache(async (slug: string) => {
-  return prisma.job.findUnique({
-    where: { slug },
+  return prisma.job.findFirst({
+    where: { slug, status: JobStatus.PUBLISHED, isActive: true },
     include: jobDetailInclude
   });
 }, ["job-by-slug-v1"], {
@@ -197,7 +204,7 @@ const getJobsListCached = unstable_cache(async (key: string) => {
   }
 
   const where: Prisma.JobWhereInput = {
-    isActive: true,
+    ...publishedJobWhere,
     ...(andParts.length ? { AND: andParts } : {}),
     ...(params.stateSlug ? { state: { slug: params.stateSlug } } : {}),
     ...(params.citySlug ? { city: { slug: params.citySlug } } : {}),
@@ -319,7 +326,7 @@ const getRelatedJobsCached = unstable_cache(async (key: string) => {
 
   const related = await prisma.job.findMany({
     where: {
-      isActive: true,
+      ...publishedJobWhere,
       ...(params.excludeSlug ? { slug: { not: params.excludeSlug } } : {}),
       OR: orFilters
     },
@@ -485,7 +492,7 @@ export const getCompanyEntries = unstable_cache(async () => {
 export const getAllActiveJobEntries = unstable_cache(async () => {
   await markExpiredJobsInactive();
   return prisma.job.findMany({
-    where: { isActive: true },
+    where: publishedJobWhere,
     select: {
       slug: true,
       updatedAt: true,
@@ -538,7 +545,7 @@ export async function getCompanyAdminOptions() {
 async function fetchApprenticeCityUfSitemapRows() {
   await markExpiredJobsInactive();
   const rows = await prisma.job.findMany({
-    where: { isActive: true, ...jovemAprendizHubOrKeywordsWhere() },
+    where: { ...publishedJobWhere, ...jovemAprendizHubOrKeywordsWhere() },
     select: {
       updatedAt: true,
       city: { select: { slug: true } },

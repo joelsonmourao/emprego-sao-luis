@@ -59,7 +59,7 @@ type ExportJob = {
   salaryMax: number | null;
   employmentType: string;
   workHours: string | null;
-  publishedAt: Date;
+  publishedAt: Date | null;
   expiresAt: Date | null;
   validThrough: Date | null;
   applyUrl: string;
@@ -136,7 +136,7 @@ function serializeJobRow(job: ExportJob) {
     salaryMax: job.salaryMax ?? "",
     employmentType: job.employmentType,
     workHours: job.workHours ?? "",
-    publishedAt: formatBrazilCalendarDate(job.publishedAt),
+    publishedAt: job.publishedAt ? formatBrazilCalendarDate(job.publishedAt) : "",
     expiresAt: job.expiresAt ? formatBrazilCalendarDate(job.expiresAt) : "",
     validThrough: job.validThrough ? formatBrazilCalendarDate(job.validThrough) : "",
     validThroughMonths: calculateMonthsFromValidThrough(job.validThrough),

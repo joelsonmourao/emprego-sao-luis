@@ -57,6 +57,29 @@ enum JobPublicationStatus {
   ERRO
 }
 
+enum JobStatus {
+  DRAFT
+  SCHEDULED
+  PUBLISHED
+  EXPIRED
+  ERROR
+}
+
+enum JobIndexingStatus {
+  NOT_SENT
+  QUEUED
+  SENT
+  ERROR
+  SKIPPED
+}
+
+enum JobScheduleSource {
+  PLANILHA
+  ADMIN
+  AUTOMATICO
+  MANUAL
+}
+
 enum ImportQueueStatus {
   PENDING
   PROCESSING
@@ -177,7 +200,7 @@ model Job {
   salaryCurrency    String         @default("BRL")
   employmentType    EmploymentType @default(APPRENTICESHIP)
   workHours         String?
-  publishedAt       DateTime
+  publishedAt       DateTime?
   updatedAt         DateTime       @updatedAt
   expiresAt         DateTime?
   validThrough      DateTime?
@@ -198,16 +221,48 @@ model Job {
   googleIndexingMessage String?  @db.Text
   googleIndexedAt       DateTime?
   publishedPublicUrl    String?
+  status                JobStatus         @default(DRAFT)
+  scheduledAt           DateTime?
+  autoSubmitToIndexing  Boolean           @default(true)
+  indexingStatus        JobIndexingStatus @default(NOT_SENT)
+  indexingLastSubmittedAt DateTime?
+  indexingError         String?           @db.Text
+  scheduleSource        JobScheduleSource?
+  scheduledImportRawValue String?
+  importError           String?           @db.Text
 
   state State @relation(fields: [stateId], references: [id], onDelete: Restrict)
   city  City  @relation(fields: [cityId], references: [id], onDelete: Restrict)
   company Company? @relation(fields: [companyId], references: [id], onDelete: SetNull)
+  indexingLogs IndexingLog[]
 
   @@index([slug])
   @@index([isActive, publishedAt(sort: Desc)])
   @@index([stateId, cityId, isActive])
   @@index([companyId, isActive])
   @@index([publicationStatus, scheduledPublishAt])
+  @@index([status, scheduledAt])
+  @@index([status, isActive, publishedAt(sort: Desc)])
+  @@index([indexingStatus, indexingLastSubmittedAt])
+}
+
+model IndexingLog {
+  id          String   @id @default(cuid())
+  jobId       String?
+  url         String
+  type        String
+  status      String
+  httpStatus  Int?
+  response    Json?
+  error       String?
+  attempts    Int      @default(1)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  job Job? @relation(fields: [jobId], references: [id], onDelete: SetNull)
+
+  @@index([jobId, createdAt(sort: Desc)])
+  @@index([status, createdAt(sort: Desc)])
 }
 
 model ImportQueue {

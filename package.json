@@ -13,6 +13,7 @@
     "typecheck": "tsc --noEmit",
     "jobs:schedule:process": "tsx scripts/process-scheduled-jobs.ts",
     "jobs:import:xlsx": "tsx scripts/import-jobs-api.ts",
+    "jobs:backfill-titles": "tsx scripts/backfill-job-titles.ts",
     "admin:reset": "node scripts/reset-admin.mjs",
     "db:migrate:neon": "node scripts/migrate-from-neon.mjs",
     "prisma:generate": "prisma generate",

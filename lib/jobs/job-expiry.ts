@@ -2,7 +2,7 @@ import { getBrazilNow, getEffectiveJobDeadlineUtc, isExpiredBrazil } from "@/lib
 import { prisma } from "@/lib/db";
 
 type DeadlineFields = {
-  publishedAt: Date | string;
+  publishedAt: Date | string | null | undefined;
   validThrough: Date | string | null | undefined;
   expiresAt: Date | string | null | undefined;
 };

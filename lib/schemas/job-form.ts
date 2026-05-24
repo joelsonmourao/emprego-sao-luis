@@ -33,7 +33,10 @@ export const jobFormSchema = z.object({
   seoTitle: z.string().min(10, "Defina um title melhor para SEO."),
   seoDescription: z.string().min(30, "Defina uma description mais completa."),
   featured: z.boolean().default(false),
-  isActive: z.boolean().default(true)
+  isActive: z.boolean().default(true),
+  status: z.enum(["DRAFT", "SCHEDULED", "PUBLISHED", "EXPIRED", "ERROR"]).default("DRAFT"),
+  scheduledAt: z.string().optional().default(""),
+  autoSubmitToIndexing: z.boolean().default(true)
 });
 
 export type JobFormInput = z.input<typeof jobFormSchema>;
@@ -62,5 +65,8 @@ export const jobFormDefaults: JobFormValues = {
   seoTitle: "",
   seoDescription: "",
   featured: false,
-  isActive: true
+  isActive: true,
+  status: "DRAFT",
+  scheduledAt: "",
+  autoSubmitToIndexing: true
 };

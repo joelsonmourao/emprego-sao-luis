@@ -11,7 +11,7 @@ dayjs.extend(customParseFormat);
 
 /**
  * Converte valor de planilha (texto, numero Excel, ISO) para instante UTC,
- * interpretando data/hora "sem fuso" como relogio de Brasilia (America/Sao_Paulo).
+ * interpretando data/hora "sem fuso" como relogio de America/Fortaleza.
  */
 export function parseScheduledAtInputToUtc(value: unknown): Date | null {
   const key = normalizeScheduledAtValue(value);

@@ -14,6 +14,7 @@ type JobRow = {
   slug: string;
   companyName: string;
   isActive: boolean;
+  status: "DRAFT" | "SCHEDULED" | "PUBLISHED" | "EXPIRED" | "ERROR";
   publishedAt: string;
   cityName: string;
   stateCode: string;
@@ -84,6 +85,18 @@ export function AdminJobsTable({ jobs }: { jobs: JobRow[] }) {
     await fetch(`/api/admin/jobs/${jobId}/duplicate`, {
       method: "POST"
     });
+    setBusyId(null);
+    router.refresh();
+  }
+
+  async function publishNow(jobId: string) {
+    setBusyId(jobId);
+    setFeedback("");
+    const response = await fetch(`/api/admin/jobs/${jobId}/publish-now`, { method: "POST" });
+    const result = (await response.json()) as { ok: boolean; error?: string };
+    if (!response.ok || !result.ok) {
+      setFeedback(result.error ?? "Falha ao publicar agora.");
+    }
     setBusyId(null);
     router.refresh();
   }
@@ -192,7 +205,7 @@ export function AdminJobsTable({ jobs }: { jobs: JobRow[] }) {
                         job.isActive ? "bg-emerald-50 text-emerald-700" : "bg-slate-100 text-slate-600"
                       }`}
                     >
-                      {job.isActive ? "Ativa" : "Inativa"}
+                      {job.status}
                     </span>
                   </td>
                   <td className="px-6 py-4 text-slate-600">{job.publishedAt}</td>
@@ -207,6 +220,9 @@ export function AdminJobsTable({ jobs }: { jobs: JobRow[] }) {
                       <Button size="sm" variant="secondary" disabled={busyId === job.id || busyId === "bulk-delete"} onClick={() => toggleStatus(job.id, job.isActive)}>
                         <Power className="mr-2 h-4 w-4" />
                         {job.isActive ? "Desativar" : "Ativar"}
+                      </Button>
+                      <Button size="sm" variant="outline" disabled={busyId === job.id || busyId === "bulk-delete"} onClick={() => publishNow(job.id)}>
+                        Publicar agora
                       </Button>
                       <Button size="sm" variant="outline" disabled={busyId === job.id || busyId === "bulk-delete"} onClick={() => duplicateJob(job.id)}>
                         <Copy className="mr-2 h-4 w-4" />

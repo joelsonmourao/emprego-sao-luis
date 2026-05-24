@@ -3,6 +3,8 @@ import { readFile } from "node:fs/promises";
 import { importPKCS8, SignJWT } from "jose";
 
 import { env } from "@/lib/env";
+import { getSiteUrl } from "@/lib/site-url";
+import { isJobPastPublicDeadline } from "@/lib/jobs/job-expiry";
 
 const GOOGLE_INDEXING_SCOPE = "https://www.googleapis.com/auth/indexing";
 const TOKEN_GRANT_TYPE = "urn:ietf:params:oauth:grant-type:jwt-bearer";
@@ -10,7 +12,7 @@ const GOOGLE_INDEXING_ENDPOINT = "https://indexing.googleapis.com/v3/urlNotifica
 
 type GoogleServiceAccount = {
   project_id: string;
-  private_key_id: string;
+  private_key_id?: string;
   private_key: string;
   client_email: string;
   token_uri?: string;
@@ -49,6 +51,15 @@ async function loadServiceAccountFromFile(filePath: string) {
 }
 
 async function loadServiceAccount() {
+  if (env.GOOGLE_INDEXING_CLIENT_EMAIL?.trim() && env.GOOGLE_INDEXING_PRIVATE_KEY?.trim() && env.GOOGLE_INDEXING_PROJECT_ID?.trim()) {
+    return {
+      client_email: env.GOOGLE_INDEXING_CLIENT_EMAIL.trim(),
+      private_key: env.GOOGLE_INDEXING_PRIVATE_KEY.replace(/\\n/g, "\n"),
+      project_id: env.GOOGLE_INDEXING_PROJECT_ID.trim(),
+      token_uri: "https://oauth2.googleapis.com/token"
+    } satisfies GoogleServiceAccount;
+  }
+
   if (env.GOOGLE_INDEXING_SERVICE_ACCOUNT_JSON?.trim()) {
     return JSON.parse(env.GOOGLE_INDEXING_SERVICE_ACCOUNT_JSON) as GoogleServiceAccount;
   }
@@ -58,6 +69,10 @@ async function loadServiceAccount() {
   }
 
   return null;
+}
+
+export function isGoogleIndexingEnabled() {
+  return String(env.GOOGLE_INDEXING_ENABLED ?? "").toLowerCase() === "true";
 }
 
 async function getGoogleAccessToken(serviceAccount: GoogleServiceAccount) {
@@ -123,6 +138,13 @@ function classifyGoogleIndexingFailure(status: number, response: unknown) {
 
 /** Usado apenas por fluxos agendados/publicacao em lote — nao chamar nas rotas de CRUD de vaga. */
 export async function notifyGoogleIndexing(url: string): Promise<GoogleIndexingResult> {
+  if (!isGoogleIndexingEnabled()) {
+    return {
+      ok: false,
+      message: "Google Indexing API desativada em GOOGLE_INDEXING_ENABLED."
+    };
+  }
+
   try {
     const serviceAccount = await loadServiceAccount();
 
@@ -169,4 +191,66 @@ export async function notifyGoogleIndexing(url: string): Promise<GoogleIndexingR
       message: error instanceof Error ? error.message : "Erro inesperado ao chamar a Google Indexing API."
     };
   }
+}
+
+type JobForIndexingValidation = {
+  id: string;
+  slug: string;
+  title: string;
+  summary: string;
+  status: string;
+  publishedAt: Date | null;
+  expiresAt: Date | null;
+  validThrough: Date | null;
+  city?: { name?: string | null } | null;
+  state?: { code?: string | null } | null;
+};
+
+export function validateJobForGoogleIndexing(job: JobForIndexingValidation): { ok: true; url: string } | { ok: false; reason: string } {
+  if (!isGoogleIndexingEnabled()) {
+    return { ok: false, reason: "Google Indexing API desativada em GOOGLE_INDEXING_ENABLED." };
+  }
+
+  if (job.status !== "PUBLISHED") {
+    return { ok: false, reason: "Apenas vagas publicadas podem ser enviadas para indexacao." };
+  }
+
+  if (!job.slug?.trim()) {
+    return { ok: false, reason: "Slug da vaga ausente." };
+  }
+
+  const publicUrl = getSiteUrl(`/vagas/${job.slug}`);
+  if (!publicUrl) {
+    return { ok: false, reason: "SITE_URL ou NEXT_PUBLIC_SITE_URL nao configurado para montar URL publica." };
+  }
+
+  if (!job.title?.trim()) {
+    return { ok: false, reason: "Titulo da vaga ausente." };
+  }
+
+  if (!job.summary?.trim()) {
+    return { ok: false, reason: "Descricao/resumo da vaga ausente." };
+  }
+
+  if (!job.city?.name?.trim()) {
+    return { ok: false, reason: "Cidade da vaga ausente." };
+  }
+
+  if (!job.state?.code?.trim()) {
+    return { ok: false, reason: "UF da vaga ausente." };
+  }
+
+  if (!job.publishedAt) {
+    return { ok: false, reason: "publishedAt ausente para vaga publicada." };
+  }
+
+  if (isJobPastPublicDeadline({
+    publishedAt: job.publishedAt,
+    expiresAt: job.expiresAt,
+    validThrough: job.validThrough
+  })) {
+    return { ok: false, reason: "Vaga expirada; envio para indexacao ignorado." };
+  }
+
+  return { ok: true, url: publicUrl };
 }

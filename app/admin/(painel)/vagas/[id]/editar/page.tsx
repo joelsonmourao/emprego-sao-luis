@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { prisma } from "@/lib/db";
 import { JobAdminForm } from "@/components/admin/job-admin-form";
 import { getCompanyAdminOptions } from "@/lib/repositories/jobs";
+import { formatBrazilDateTime } from "@/lib/date-utils";
 
 type Props = {
   params: Promise<{ id: string }>;
@@ -50,7 +51,10 @@ export default async function EditAdminJobPage({ params }: Props) {
         seoTitle: job.seoTitle ?? "",
         seoDescription: job.seoDescription ?? "",
         featured: job.featured,
-        isActive: job.isActive
+        isActive: job.isActive,
+        status: job.status,
+        scheduledAt: job.scheduledAt ? formatBrazilDateTime(job.scheduledAt) : "",
+        autoSubmitToIndexing: job.autoSubmitToIndexing
       }}
       states={states.map((state) => ({ value: state.slug, label: `${state.name} (${state.code})` }))}
       cities={cities.map((city) => ({ value: city.slug, label: city.name, stateSlug: city.state.slug }))}

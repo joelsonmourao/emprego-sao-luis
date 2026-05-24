@@ -63,6 +63,7 @@ export function JobAdminForm({
 
   const selectedState = watch("stateSlug");
   const selectedCompanyId = watch("companyId");
+  const selectedStatus = watch("status");
   const filteredCities = useMemo(
     () => cities.filter((city) => !selectedState || city.stateSlug === selectedState),
     [cities, selectedState]
@@ -97,6 +98,20 @@ export function JobAdminForm({
 
     setServerSuccess(mode === "create" ? "Vaga criada com sucesso." : "Vaga atualizada com sucesso.");
     router.push("/admin/vagas" as Route);
+    router.refresh();
+  }
+
+  async function runJobAction(action: "publish-now" | "cancel-schedule" | "submit-indexing") {
+    if (!jobId) return;
+    setServerError("");
+    setServerSuccess("");
+    const response = await fetch(`/api/admin/jobs/${jobId}/${action}`, { method: "POST" });
+    const result = (await response.json()) as { ok: boolean; error?: string };
+    if (!response.ok || !result.ok) {
+      setServerError(result.error ?? "Nao foi possivel executar esta acao.");
+      return;
+    }
+    setServerSuccess("Acao executada com sucesso.");
     router.refresh();
   }
 
@@ -313,6 +328,32 @@ export function JobAdminForm({
             </label>
           </div>
 
+          <div className="rounded-2xl border border-slate-200 bg-slate-50/80 p-4">
+            <p className="mb-3 text-sm font-semibold text-slate-900">Status de divulgacao</p>
+            <div className="grid gap-4 lg:grid-cols-3">
+              <Field label="Status da vaga">
+                <Select {...register("status")}>
+                  <option value="DRAFT">Rascunho</option>
+                  <option value="SCHEDULED">Agendada</option>
+                  <option value="PUBLISHED">Publicada</option>
+                  <option value="EXPIRED">Expirada</option>
+                  <option value="ERROR">Erro</option>
+                </Select>
+              </Field>
+              <Field label="Data/hora de publicacao" hint="Formato: dd/MM/yyyy HH:mm">
+                <Input
+                  {...register("scheduledAt")}
+                  placeholder="25/05/2026 08:30"
+                  disabled={selectedStatus !== "SCHEDULED"}
+                />
+              </Field>
+              <label className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm font-medium text-slate-700">
+                <input type="checkbox" className="h-4 w-4" {...register("autoSubmitToIndexing")} />
+                Enviar automaticamente ao Google ao publicar
+              </label>
+            </div>
+          </div>
+
           <div className="grid gap-6 lg:grid-cols-2">
             <div className="space-y-2">
               <Field label="SEO title">
@@ -335,6 +376,25 @@ export function JobAdminForm({
             <Button type="submit" size="lg" disabled={isSubmitting}>
               {isSubmitting ? "Salvando..." : mode === "create" ? "Criar vaga" : "Salvar alteracoes"}
             </Button>
+            {mode === "edit" ? (
+              <>
+                <Button type="button" variant="secondary" size="lg" onClick={() => runJobAction("publish-now")}>
+                  Publicar agora
+                </Button>
+                <Button type="button" variant="outline" size="lg" onClick={() => runJobAction("cancel-schedule")}>
+                  Cancelar agendamento
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="lg"
+                  onClick={() => runJobAction("submit-indexing")}
+                  disabled={selectedStatus !== "PUBLISHED"}
+                >
+                  Reenviar indexacao
+                </Button>
+              </>
+            ) : null}
             <Button type="button" variant="secondary" size="lg" onClick={() => router.push("/admin/vagas" as Route)}>
               Voltar para a lista
             </Button>
