@@ -1,14 +1,16 @@
 import Link from "next/link";
 
+import { GoogleIndexingPanel } from "@/components/admin/google-indexing-panel";
 import { SiteIntegrationsForm } from "@/components/admin/site-integrations-form";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { getGoogleIndexingAdminSnapshot } from "@/lib/admin/google-indexing";
 import { getEditableSiteSettings } from "@/lib/admin/site";
 import { requireRole } from "@/lib/authz";
 
 export default async function AdminIntegrationsPage() {
   await requireRole("ADMIN");
-  const settings = await getEditableSiteSettings();
+  const [settings, indexingSnapshot] = await Promise.all([getEditableSiteSettings(), getGoogleIndexingAdminSnapshot()]);
 
   return (
     <div className="grid gap-6">
@@ -31,6 +33,8 @@ export default async function AdminIntegrationsPage() {
           </Button>
         </CardContent>
       </Card>
+
+      <GoogleIndexingPanel initialSnapshot={indexingSnapshot} />
 
       <SiteIntegrationsForm initialValues={settings} />
     </div>

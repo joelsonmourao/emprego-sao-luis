@@ -33,6 +33,10 @@ type GoogleIndexingFailure = {
 
 export type GoogleIndexingResult = GoogleIndexingSuccess | GoogleIndexingFailure;
 
+export type GoogleIndexingConnectionResult =
+  | { ok: true; message: string }
+  | { ok: false; message: string };
+
 function parseJsonSafely(value: string) {
   if (!value) {
     return null;
@@ -69,6 +73,16 @@ async function loadServiceAccount() {
   }
 
   return null;
+}
+
+export function hasGoogleIndexingCredentials() {
+  return Boolean(
+    (env.GOOGLE_INDEXING_CLIENT_EMAIL?.trim() &&
+      env.GOOGLE_INDEXING_PRIVATE_KEY?.trim() &&
+      env.GOOGLE_INDEXING_PROJECT_ID?.trim()) ||
+      env.GOOGLE_INDEXING_SERVICE_ACCOUNT_JSON?.trim() ||
+      env.GOOGLE_INDEXING_SERVICE_ACCOUNT_FILE?.trim()
+  );
 }
 
 export function isGoogleIndexingEnabled() {
@@ -116,6 +130,30 @@ async function getGoogleAccessToken(serviceAccount: GoogleServiceAccount) {
   }
 
   return payload.access_token as string;
+}
+
+export async function testGoogleIndexingConnection(): Promise<GoogleIndexingConnectionResult> {
+  if (!isGoogleIndexingEnabled()) {
+    return { ok: false, message: "Google Indexing API desativada em GOOGLE_INDEXING_ENABLED." };
+  }
+
+  const serviceAccount = await loadServiceAccount();
+  if (!serviceAccount) {
+    return { ok: false, message: "Credenciais ausentes. Configure as variaveis de ambiente da Google Indexing API." };
+  }
+
+  try {
+    await getGoogleAccessToken(serviceAccount);
+    return { ok: true, message: "Conexao validada com sucesso. Token OAuth gerado." };
+  } catch (error) {
+    return {
+      ok: false,
+      message:
+        error instanceof Error
+          ? `Falha ao validar conexao com Google Indexing API: ${error.message}`
+          : "Falha ao validar conexao com Google Indexing API."
+    };
+  }
 }
 
 function classifyGoogleIndexingFailure(status: number, response: unknown) {
