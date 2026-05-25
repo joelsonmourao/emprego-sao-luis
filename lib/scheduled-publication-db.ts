@@ -5,7 +5,10 @@ import path from "node:path";
 import {
   AuditAction,
   EmploymentType,
+  JobIndexingStatus,
   JobPublicationStatus,
+  JobScheduleSource,
+  JobStatus,
   LocationType,
   type AdminRole,
   type City,
@@ -229,7 +232,45 @@ async function resolveCompanyCached(
   return company;
 }
 
-async function upsertScheduledDraftJob(row: ScheduledJobUploadRow, context: PublicationContext, scheduledUtc: Date) {
+function resolveScheduledImportStatus(value: unknown) {
+  const rawValue = value === null || value === undefined ? "" : String(value).trim();
+  if (!rawValue) {
+    return {
+      status: JobStatus.DRAFT,
+      scheduledAt: null as Date | null,
+      importError: null as string | null,
+      publicationStatus: JobPublicationStatus.OK
+    };
+  }
+
+  const scheduledUtc = parseScheduledAtInputToUtc(value);
+  if (!scheduledUtc) {
+    return {
+      status: JobStatus.ERROR,
+      scheduledAt: null as Date | null,
+      importError: "Formato invalido em dataHoraPublicacao. Use dd/MM/yyyy HH:mm.",
+      publicationStatus: JobPublicationStatus.ERRO
+    };
+  }
+
+  if (scheduledUtc.getTime() <= Date.now()) {
+    return {
+      status: JobStatus.ERROR,
+      scheduledAt: null as Date | null,
+      importError: "Data/hora de publicacao esta no passado. Ajuste dataHoraPublicacao ou use Publicar agora.",
+      publicationStatus: JobPublicationStatus.ERRO
+    };
+  }
+
+  return {
+    status: JobStatus.SCHEDULED,
+    scheduledAt: scheduledUtc,
+    importError: null as string | null,
+    publicationStatus: JobPublicationStatus.AGUARDANDO_AGENDAMENTO
+  };
+}
+
+async function upsertScheduledDraftJob(row: ScheduledJobUploadRow, context: PublicationContext) {
   const stateInput = row.stateName.trim();
   const cityInput = row.cityName.trim();
   const companyInput = row.companyName.trim();
@@ -239,6 +280,7 @@ async function upsertScheduledDraftJob(row: ScheduledJobUploadRow, context: Publ
   const description = row.descriptionHtml.trim();
   const sourceUrl = row.sourceUrl?.trim() || row.applyUrl.trim();
   const slugBase = normalizeSlug(row.slug || row.title);
+  const importDecision = resolveScheduledImportStatus(row.dataHoraPublicacao);
 
   const { state, city } = await resolveStateAndCityCached(context, stateInput, cityInput);
   const company = await resolveCompanyCached(context, {
@@ -259,8 +301,6 @@ async function upsertScheduledDraftJob(row: ScheduledJobUploadRow, context: Publ
   }
 
   const finalSlug = ensureUniqueJobSlug(slugBase, context.usedSlugs, keepCurrentSlug);
-
-  const importStamp = new Date();
 
   const jobData = {
     title,
@@ -289,15 +329,23 @@ async function upsertScheduledDraftJob(row: ScheduledJobUploadRow, context: Publ
     seoDescription: row.seoDescription.trim() || buildSeoDescription(title, city.name, state.code),
     featured: row.featured,
     externalId,
-    publishedAt: importStamp,
+    publishedAt: null,
     stateId: state.id,
     cityId: city.id,
-    scheduledPublishAt: scheduledUtc,
-    publicationStatus: JobPublicationStatus.AGUARDANDO_AGENDAMENTO,
+    scheduledPublishAt: importDecision.scheduledAt,
+    publicationStatus: importDecision.publicationStatus,
     googleIndexingStatus: null,
     googleIndexingMessage: null,
     googleIndexedAt: null,
-    publishedPublicUrl: null
+    publishedPublicUrl: null,
+    status: importDecision.status,
+    scheduledAt: importDecision.scheduledAt,
+    scheduleSource: JobScheduleSource.PLANILHA,
+    scheduledImportRawValue: row.dataHoraPublicacao == null ? null : String(row.dataHoraPublicacao),
+    importError: importDecision.importError,
+    indexingStatus: importDecision.status === JobStatus.ERROR ? JobIndexingStatus.SKIPPED : JobIndexingStatus.NOT_SENT,
+    indexingError: importDecision.importError,
+    indexingLastSubmittedAt: null
   };
 
   const job = externalId
@@ -363,19 +411,25 @@ export async function importScheduledJobsFromUploadRows(
   for (const [index, row] of rows.entries()) {
     const line = index + 2;
     try {
-      const scheduledUtc = parseScheduledAtInputToUtc(row.scheduledAt);
-      if (!scheduledUtc) {
-        throw new Error(`Data/hora invalida em scheduledAt: "${String(row.scheduledAt)}". Use formato reconhecido (ex.: 21/04/2026 14:30 ou Excel).`);
-      }
-
-      const job = await upsertScheduledDraftJob(row, context, scheduledUtc);
+      const job = await upsertScheduledDraftJob(row, context);
       imported.push(job.slug);
+      if (job.status === JobStatus.ERROR) {
+        errors.push({
+          line,
+          message: job.importError ?? "Erro ao interpretar dataHoraPublicacao."
+        });
+      }
       await appendPublicationAuditLog({
         phase: "upload",
         jobId: job.id,
         slug: job.slug,
         externalId: job.externalId,
-        message: "Linha salva como AGUARDANDO_AGENDAMENTO (upload planilha)."
+        message: `Linha importada com status ${job.status} (upload planilha com dataHoraPublicacao).`,
+        extra: {
+          status: job.status,
+          scheduledAt: job.scheduledAt,
+          importError: job.importError
+        }
       });
     } catch (error) {
       errors.push({

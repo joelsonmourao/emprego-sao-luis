@@ -84,7 +84,7 @@ function parsePartsFromString(value: string): DateTimeParts | null {
   if (!trimmed) return null;
 
   const isoLike = trimmed.match(
-    /^(\d{4})-(\d{2})-(\d{2})(?:[ T](\d{2}):(\d{2})(?::(\d{2}))?)?$/
+    /^(\d{4})-(\d{2})-(\d{2})(?:[ T](\d{1,2}):(\d{2})(?::(\d{2}))?)?$/
   );
 
   if (isoLike) {
@@ -99,7 +99,7 @@ function parsePartsFromString(value: string): DateTimeParts | null {
   }
 
   const brLike = trimmed.match(
-    /^(\d{2})\/(\d{2})\/(\d{4})(?:[ T](\d{2}):(\d{2})(?::(\d{2}))?)?$/
+    /^(\d{2})\/(\d{2})\/(\d{4})(?:[ T](\d{1,2}):(\d{2})(?::(\d{2}))?)?$/
   );
 
   if (brLike) {
@@ -126,9 +126,23 @@ export function normalizeScheduledAtValue(value: unknown, timeZone = SITE_TIME_Z
   }
 
   if (typeof value === "number" && Number.isFinite(value)) {
-    const excelEpoch = new Date(Date.UTC(1899, 11, 30));
-    const milliseconds = Math.round(value * 24 * 60 * 60 * 1000);
-    return formatDateTimeKeyInTimeZone(new Date(excelEpoch.getTime() + milliseconds), timeZone);
+    const wholeDays = Math.floor(value);
+    const dayFraction = value - wholeDays;
+    const base = new Date(Date.UTC(1899, 11, 30 + wholeDays));
+
+    const totalSeconds = Math.round(dayFraction * 24 * 60 * 60);
+    const hours = Math.floor(totalSeconds / 3600);
+    const minutes = Math.floor((totalSeconds % 3600) / 60);
+    const seconds = totalSeconds % 60;
+
+    return partsToKey({
+      year: base.getUTCFullYear(),
+      month: base.getUTCMonth() + 1,
+      day: base.getUTCDate(),
+      hour: Math.max(0, Math.min(23, hours)),
+      minute: Math.max(0, Math.min(59, minutes)),
+      second: Math.max(0, Math.min(59, seconds))
+    });
   }
 
   const stringValue = String(value).trim();

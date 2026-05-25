@@ -3,14 +3,12 @@ import { z } from "zod";
 import { importedJobRowSchema } from "@/lib/schemas/job-import";
 
 /**
- * Mesmas colunas da importacao padrao + `scheduledAt` obrigatorio (data/hora em Brasilia).
+ * Mesmas colunas da importacao padrao + `dataHoraPublicacao`.
  */
 export const scheduledJobUploadRowSchema = importedJobRowSchema
   .omit({ isActive: true, publishedAt: true })
   .extend({
-    scheduledAt: z.union([z.string(), z.number()], {
-      errorMap: () => ({ message: "scheduledAt obrigatorio (data e hora da publicacao em Brasilia)." })
-    })
+    dataHoraPublicacao: z.union([z.string(), z.number(), z.date()]).optional().nullable()
   });
 
 export const scheduledJobUploadPayloadSchema = z.object({

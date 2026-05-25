@@ -24,7 +24,9 @@ type Row = {
 export function ScheduledPublicationsTable({ rows }: { rows: Row[] }) {
   const router = useRouter();
   const [busyId, setBusyId] = useState<string | null>(null);
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [message, setMessage] = useState("");
+  const allSelected = rows.length > 0 && rows.every((row) => selectedIds.includes(row.id));
 
   async function callAction(jobId: string, action: "publish-now" | "cancel-schedule" | "submit-indexing") {
     setBusyId(jobId);
@@ -40,13 +42,103 @@ export function ScheduledPublicationsTable({ rows }: { rows: Row[] }) {
     router.refresh();
   }
 
+  function toggleSelection(id: string, checked: boolean) {
+    setSelectedIds((current) => (checked ? [...new Set([...current, id])] : current.filter((item) => item !== id)));
+  }
+
+  function toggleAll(checked: boolean) {
+    setSelectedIds(checked ? rows.map((row) => row.id) : []);
+  }
+
+  async function deleteJobs(ids: string[]) {
+    if (!ids.length) return;
+    setMessage("");
+    const response = await fetch("/api/admin/bulk-delete", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ resource: "jobs", ids })
+    });
+    const result = (await response.json()) as { ok: boolean; error?: string; deletedCount?: number };
+    if (!response.ok || !result.ok) {
+      setMessage(result.error ?? "Falha ao apagar vagas selecionadas.");
+      return;
+    }
+    setMessage(`${result.deletedCount ?? 0} vaga(s) apagada(s) com sucesso.`);
+    setSelectedIds([]);
+    router.refresh();
+  }
+
+  async function rescheduleJob(jobId: string) {
+    const input = window.prompt("Informe a nova dataHoraPublicacao (dd/MM/yyyy HH:mm):");
+    if (!input?.trim()) return;
+    setBusyId(jobId);
+    setMessage("");
+    const response = await fetch(`/api/admin/jobs/${jobId}/reschedule`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ dataHoraPublicacao: input.trim() })
+    });
+    const result = (await response.json()) as { ok: boolean; error?: string };
+    if (!response.ok || !result.ok) {
+      setMessage(result.error ?? "Falha ao reagendar vaga.");
+    } else {
+      setMessage("Vaga reagendada com sucesso.");
+    }
+    setBusyId(null);
+    router.refresh();
+  }
+
+  async function fixScheduledImport() {
+    const confirmed = window.confirm(
+      "Confirmar a correcao da importacao agendada? Essa acao vai reagendar vagas publicadas indevidamente."
+    );
+    if (!confirmed) return;
+    setMessage("");
+    const response = await fetch("/api/admin/jobs/fix-scheduled-import", { method: "POST" });
+    const result = (await response.json()) as {
+      ok: boolean;
+      error?: string;
+      analisadas?: number;
+      reagendadas?: number;
+      ignoradas?: number;
+      erros?: number;
+    };
+    if (!response.ok || !result.ok) {
+      setMessage(result.error ?? "Falha ao corrigir importacao agendada.");
+      return;
+    }
+    setMessage(
+      `Correcao concluida: analisadas ${result.analisadas ?? 0}, reagendadas ${result.reagendadas ?? 0}, ignoradas ${result.ignoradas ?? 0}, erros ${result.erros ?? 0}.`
+    );
+    router.refresh();
+  }
+
   return (
     <div className="rounded-[2rem] border border-slate-200 bg-white/95">
+      <div className="flex flex-wrap items-center gap-2 border-b border-slate-100 px-6 py-4">
+        <Button size="sm" variant="outline" onClick={() => deleteJobs(selectedIds)} disabled={!selectedIds.length}>
+          Apagar selecionadas
+        </Button>
+        <Button size="sm" variant="outline" onClick={fixScheduledImport}>
+          Corrigir importacao agendada
+        </Button>
+        <Button size="sm" variant="outline" onClick={fixScheduledImport}>
+          Corrigir vagas publicadas indevidamente
+        </Button>
+      </div>
       {message ? <p className="border-b border-slate-100 px-6 py-3 text-sm text-slate-700">{message}</p> : null}
       <div className="overflow-x-auto">
         <table className="min-w-full text-left text-sm">
           <thead className="bg-slate-50 text-slate-500">
             <tr>
+              <th className="px-4 py-4 font-semibold">
+                <input
+                  type="checkbox"
+                  checked={allSelected}
+                  onChange={(event) => toggleAll(event.target.checked)}
+                  aria-label="Selecionar todas as vagas"
+                />
+              </th>
               <th className="px-6 py-4 font-semibold">Titulo</th>
               <th className="px-6 py-4 font-semibold">Empresa</th>
               <th className="px-6 py-4 font-semibold">Cidade/UF</th>
@@ -63,6 +155,14 @@ export function ScheduledPublicationsTable({ rows }: { rows: Row[] }) {
           <tbody>
             {rows.map((row) => (
               <tr key={row.id} className="border-t border-slate-100">
+                <td className="px-4 py-4">
+                  <input
+                    type="checkbox"
+                    checked={selectedIds.includes(row.id)}
+                    onChange={(event) => toggleSelection(row.id, event.target.checked)}
+                    aria-label={`Selecionar vaga ${row.title}`}
+                  />
+                </td>
                 <td className="px-6 py-4">
                   <p className="font-semibold text-slate-950">{row.title}</p>
                 </td>
@@ -83,6 +183,9 @@ export function ScheduledPublicationsTable({ rows }: { rows: Row[] }) {
                     <Button size="sm" variant="outline" onClick={() => callAction(row.id, "cancel-schedule")} disabled={busyId === row.id}>
                       Cancelar
                     </Button>
+                    <Button size="sm" variant="outline" onClick={() => rescheduleJob(row.id)} disabled={busyId === row.id}>
+                      Reagendar vaga
+                    </Button>
                     <Button
                       size="sm"
                       variant="outline"
@@ -96,6 +199,11 @@ export function ScheduledPublicationsTable({ rows }: { rows: Row[] }) {
                         <a href={row.url} target="_blank" rel="noreferrer">
                           Ver vaga
                         </a>
+                      </Button>
+                    ) : null}
+                    {row.status === "ERROR" ? (
+                      <Button size="sm" variant="outline" onClick={() => deleteJobs([row.id])}>
+                        Apagar vaga com erro
                       </Button>
                     ) : null}
                   </div>

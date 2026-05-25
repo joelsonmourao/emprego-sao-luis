@@ -47,10 +47,10 @@ const aliases: Record<string, string> = {
   resumo: "summary",
   summary: "summary",
   featured: "featured",
-  scheduledat: "scheduledAt",
-  agendado: "scheduledAt",
-  data_publicacao: "scheduledAt",
-  publicacao_agendada: "scheduledAt"
+  datahorapublicacao: "dataHoraPublicacao",
+  datahora: "dataHoraPublicacao",
+  data_publicacao: "dataHoraPublicacao",
+  publicacao_agendada: "dataHoraPublicacao"
 };
 
 type ParsedPreview = {
@@ -160,7 +160,7 @@ export function AdminScheduledJobUpload() {
         seoDescription: String(normalized.seoDescription ?? normalized.summary ?? "").trim(),
         featured: parseBooleanLike(normalized.featured ?? false),
         externalId: String(normalized.externalId ?? "").trim(),
-        scheduledAt: normalized.scheduledAt ?? ""
+        dataHoraPublicacao: normalized.dataHoraPublicacao ?? ""
       };
 
       const parsedRow = scheduledJobUploadRowSchema.safeParse(candidate);
@@ -216,7 +216,7 @@ export function AdminScheduledJobUpload() {
 
       const summary = result.summary ?? { totalRows: validRows.length, saved: 0, errors: 0 };
       setResultMessage(
-        `Salvo: ${summary.saved} vaga(s) com status AGUARDANDO_AGENDAMENTO (horario de Brasilia). O cron publica quando chegar a data/hora.`
+        `Processamento concluido: ${summary.saved} vaga(s) importada(s). Revise os status SCHEDULED, DRAFT ou ERROR na tela de divulgacoes agendadas.`
       );
     } catch (error) {
       setResultMessage(`ERRO DE REDE: ${error instanceof Error ? error.message : "Falha na comunicacao."}`);
@@ -233,14 +233,14 @@ export function AdminScheduledJobUpload() {
         </div>
         <CardTitle>Upload de planilha agendada</CardTitle>
         <CardDescription>
-          Envie um Excel com as mesmas colunas da importacao padrao e a coluna obrigatoria <strong>scheduledAt</strong> (data e hora em{" "}
-          <strong>Brasilia</strong>). As vagas ficam invisiveis no site ate a publicacao automatica.
+          Envie um Excel com as mesmas colunas da importacao padrao e a coluna obrigatoria{" "}
+          <strong>dataHoraPublicacao</strong> no formato <strong>dd/MM/yyyy HH:mm</strong>.
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         <label className="flex cursor-pointer items-center justify-center gap-3 rounded-[1.75rem] border border-dashed border-amber-300 bg-amber-50/80 px-6 py-10 text-center text-sm text-amber-950 transition hover:border-amber-400 hover:bg-amber-100/80">
           <Upload className="h-5 w-5" />
-          <span>{fileName ? `Arquivo: ${fileName}` : "Selecionar Excel (.xlsx) com scheduledAt"}</span>
+          <span>{fileName ? `Arquivo: ${fileName}` : "Selecionar Excel (.xlsx) com dataHoraPublicacao"}</span>
           <input type="file" accept=".xlsx,.xls" className="hidden" onChange={handleFileChange} />
         </label>
 
@@ -301,7 +301,7 @@ export function AdminScheduledJobUpload() {
                   </div>
                   {row.valid ? (
                     <p className="mt-1 text-xs text-slate-600">
-                      {row.data?.title} • {row.data?.scheduledAt != null ? String(row.data.scheduledAt) : ""}
+                      {row.data?.title} • {row.data?.dataHoraPublicacao != null ? String(row.data.dataHoraPublicacao) : ""}
                     </p>
                   ) : (
                     <ul className="mt-2 space-y-1 text-xs text-rose-700">

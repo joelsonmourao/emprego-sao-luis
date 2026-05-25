@@ -4,6 +4,7 @@ import { importPKCS8, SignJWT } from "jose";
 
 import { env } from "@/lib/env";
 import { getSiteUrl } from "@/lib/site-url";
+import { normalizeOrigin } from "@/lib/site-url";
 import { isJobPastPublicDeadline } from "@/lib/jobs/job-expiry";
 
 const GOOGLE_INDEXING_SCOPE = "https://www.googleapis.com/auth/indexing";
@@ -257,9 +258,17 @@ export function validateJobForGoogleIndexing(job: JobForIndexingValidation): { o
     return { ok: false, reason: "Slug da vaga ausente." };
   }
 
+  const siteOrigin = normalizeOrigin(env.SITE_URL);
+  if (!siteOrigin) {
+    return { ok: false, reason: "SITE_URL precisa estar configurado para envio de indexacao." };
+  }
+
   const publicUrl = getSiteUrl(`/vagas/${job.slug}`);
-  if (!publicUrl) {
-    return { ok: false, reason: "SITE_URL ou NEXT_PUBLIC_SITE_URL nao configurado para montar URL publica." };
+  if (!publicUrl.startsWith(siteOrigin)) {
+    return { ok: false, reason: "URL publica da vaga nao pertence ao SITE_URL configurado." };
+  }
+  if (!publicUrl.includes("/vagas/")) {
+    return { ok: false, reason: "Somente URLs de vagas podem ser enviadas para Google Indexing API." };
   }
 
   if (!job.title?.trim()) {

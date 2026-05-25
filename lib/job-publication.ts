@@ -3,8 +3,18 @@ import { JobIndexingStatus, JobScheduleSource, JobStatus, Prisma } from "@prisma
 import { prisma } from "@/lib/db";
 import { notifyGoogleIndexing, validateJobForGoogleIndexing } from "@/lib/google-indexing";
 import { revalidatePublicSurfacesForJob } from "@/lib/public-revalidate";
+import { getSiteUrl } from "@/lib/site-url";
+import { parseScheduledAtInputToUtc } from "@/lib/scheduled-at-utc";
 
 type IndexingLogStatus = "SUCCESS" | "ERROR" | "SKIPPED" | "RETRY";
+
+function getJobPublicUrlForLog(slug: string) {
+  try {
+    return getSiteUrl(`/vagas/${slug}`);
+  } catch {
+    return `/vagas/${slug}`;
+  }
+}
 
 async function createIndexingLog(input: {
   jobId?: string | null;
@@ -77,7 +87,7 @@ export async function submitPublishedJobToIndexing(jobId: string) {
     });
     await createIndexingLog({
       jobId: job.id,
-      url: `job://${job.id}`,
+      url: getJobPublicUrlForLog(job.slug),
       type: "URL_UPDATED",
       status: "SKIPPED",
       error: validation.reason
@@ -162,7 +172,7 @@ export async function publishJobNow(jobId: string, source: JobScheduleSource = J
     });
     await createIndexingLog({
       jobId: job.id,
-      url: `job://${job.id}`,
+      url: getJobPublicUrlForLog(job.slug),
       type: "URL_UPDATED",
       status: "SKIPPED",
       error: "Envio automatico desativado para esta vaga."
@@ -207,6 +217,11 @@ export async function processDueScheduledJobs() {
   const due = await prisma.job.findMany({
     where: {
       status: JobStatus.SCHEDULED,
+      NOT: {
+        status: {
+          in: [JobStatus.ERROR, JobStatus.DRAFT, JobStatus.EXPIRED]
+        }
+      },
       scheduledAt: { not: null, lte: now }
     },
     select: { id: true }
@@ -244,7 +259,7 @@ export async function processDueScheduledJobs() {
     try {
       const job = await prisma.job.findUnique({
         where: { id },
-        select: { id: true, autoSubmitToIndexing: true }
+        select: { id: true, slug: true, autoSubmitToIndexing: true }
       });
       if (!job) continue;
 
@@ -258,7 +273,7 @@ export async function processDueScheduledJobs() {
         });
         await createIndexingLog({
           jobId: job.id,
-          url: `job://${job.id}`,
+          url: getJobPublicUrlForLog(job.slug),
           type: "URL_UPDATED",
           status: "SKIPPED",
           error: "Envio automatico desativado para esta vaga."
@@ -296,5 +311,72 @@ export async function processDueScheduledJobs() {
     sentToIndexing,
     indexingErrors,
     publicationErrors
+  };
+}
+
+export async function fixScheduledImportPublication() {
+  const now = new Date();
+  const todayStart = new Date();
+  todayStart.setHours(0, 0, 0, 0);
+
+  const jobs = await prisma.job.findMany({
+    where: {
+      scheduleSource: JobScheduleSource.PLANILHA,
+      status: JobStatus.PUBLISHED,
+      scheduledImportRawValue: { not: null },
+      publishedAt: { gte: todayStart }
+    },
+    select: {
+      id: true,
+      slug: true,
+      scheduledImportRawValue: true
+    }
+  });
+
+  let reagendadas = 0;
+  let ignoradas = 0;
+  let erros = 0;
+
+  for (const job of jobs) {
+    try {
+      const parsed = parseScheduledAtInputToUtc(job.scheduledImportRawValue);
+      if (!parsed || parsed.getTime() <= now.getTime()) {
+        ignoradas += 1;
+        continue;
+      }
+
+      await prisma.$transaction(async (tx) => {
+        await tx.job.update({
+          where: { id: job.id },
+          data: {
+            status: JobStatus.SCHEDULED,
+            isActive: false,
+            scheduledAt: parsed,
+            publishedAt: null,
+            indexingStatus: JobIndexingStatus.NOT_SENT,
+            indexingError: null,
+            indexingLastSubmittedAt: null
+          }
+        });
+
+        await tx.indexingLog.deleteMany({
+          where: {
+            jobId: job.id,
+            createdAt: { gte: todayStart }
+          }
+        });
+      });
+
+      reagendadas += 1;
+    } catch {
+      erros += 1;
+    }
+  }
+
+  return {
+    analisadas: jobs.length,
+    reagendadas,
+    ignoradas,
+    erros
   };
 }
