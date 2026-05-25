@@ -212,25 +212,33 @@ export async function cancelScheduledPublication(jobId: string) {
   return job;
 }
 
-export async function processDueScheduledJobs() {
+const CRON_PUBLISH_LIMIT = 50;
+
+export async function processDueScheduledJobs(limit = CRON_PUBLISH_LIMIT) {
   const now = new Date();
   const due = await prisma.job.findMany({
     where: {
       status: JobStatus.SCHEDULED,
-      NOT: {
-        status: {
-          in: [JobStatus.ERROR, JobStatus.DRAFT, JobStatus.EXPIRED]
-        }
-      },
       scheduledAt: { not: null, lte: now }
     },
+    orderBy: [{ scheduledAt: "asc" }, { createdAt: "asc" }],
+    take: limit,
     select: { id: true }
   });
 
   if (!due.length) {
+    const remainingScheduled = await prisma.job.count({
+      where: {
+        status: JobStatus.SCHEDULED,
+        scheduledAt: { not: null, lte: now }
+      }
+    });
+
     return {
+      limit,
       published: 0,
       sentToIndexing: 0,
+      remainingScheduled,
       indexingErrors: 0,
       publicationErrors: 0
     };
@@ -306,9 +314,18 @@ export async function processDueScheduledJobs() {
     }
   });
 
+  const remainingScheduled = await prisma.job.count({
+    where: {
+      status: JobStatus.SCHEDULED,
+      scheduledAt: { not: null, lte: now }
+    }
+  });
+
   return {
+    limit,
     published,
     sentToIndexing,
+    remainingScheduled,
     indexingErrors,
     publicationErrors
   };

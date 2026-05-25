@@ -27,8 +27,10 @@ async function runCron(request: Request) {
     const result = await processDueScheduledJobs();
     return NextResponse.json({
       ok: true,
+      limit: result.limit,
       published: result.published,
       sentToIndexing: result.sentToIndexing,
+      remainingScheduled: result.remainingScheduled,
       indexingErrors: result.indexingErrors,
       publicationErrors: result.publicationErrors
     });

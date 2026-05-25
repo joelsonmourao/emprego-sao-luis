@@ -37,8 +37,10 @@ export async function GET(request: Request) {
     return NextResponse.json(
       {
         ok: true,
+        limit: result.limit,
         published: result.published,
         sentToIndexing: result.sentToIndexing,
+        remainingScheduled: result.remainingScheduled,
         indexingErrors: result.indexingErrors,
         publicationErrors: result.publicationErrors
       },
