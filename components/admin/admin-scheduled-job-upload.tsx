@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { normalizeSlug, parseBooleanLike, parseOptionalNumber } from "@/lib/admin/content";
 import { scheduledJobUploadRowSchema, type ScheduledJobUploadRow } from "@/lib/schemas/scheduled-job-upload";
+import { formatScheduledAtDisplay } from "@/lib/timezone";
 
 const aliases: Record<string, string> = {
   title: "title",
@@ -136,8 +137,10 @@ export function AdminScheduledJobUpload() {
       }
 
       const candidate = {
-        title: String(normalized.title ?? "").trim(),
-        slug: String(normalized.slug ?? "").trim() || normalizeSlug(String(normalized.title ?? "")),
+        title: String(normalized.title ?? normalized.seoTitle ?? "").trim(),
+        slug:
+          String(normalized.slug ?? "").trim() ||
+          normalizeSlug(String(normalized.title ?? normalized.seoTitle ?? "")),
         companyName: String(normalized.companyName ?? "").trim(),
         cityName: String(normalized.cityName ?? "").trim(),
         stateName: String(normalized.stateName ?? "").trim(),
@@ -233,8 +236,9 @@ export function AdminScheduledJobUpload() {
         </div>
         <CardTitle>Upload de planilha agendada</CardTitle>
         <CardDescription>
-          Envie um Excel com as mesmas colunas da importacao padrao e a coluna obrigatoria{" "}
-          <strong>dataHoraPublicacao</strong> no formato <strong>dd/MM/yyyy HH:mm</strong>.
+          Obrigatorios: <strong>seoTitle</strong>, <strong>seoDescription</strong>, <strong>description</strong>,{" "}
+          <strong>applyUrl</strong>, <strong>city</strong> e <strong>state</strong>. O campo <strong>dataHoraPublicacao</strong> e usado para
+          agendamento e nao e obrigatorio.
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
@@ -273,8 +277,8 @@ export function AdminScheduledJobUpload() {
           </Button>
         </div>
         <p className="text-xs text-slate-500">
-          O arquivo exportado inclui: scheduledAt, publishStatus (AGUARDANDO, PUBLICADA, ERRO), publishedUrl, publishedAt, googleIndexingStatus,
-          googleIndexedAt, googleIndexingMessage, title e externalId.
+          O arquivo exportado inclui: dataHoraPublicacao, publishStatus (AGUARDANDO, PUBLICADA, ERRO), publishedUrl, publishedAt,
+          googleIndexingStatus, googleIndexedAt, googleIndexingMessage, title e externalId.
         </p>
 
         {resultMessage ? <p className="rounded-2xl bg-slate-100 px-4 py-3 text-sm text-slate-700">{resultMessage}</p> : null}
@@ -301,7 +305,12 @@ export function AdminScheduledJobUpload() {
                   </div>
                   {row.valid ? (
                     <p className="mt-1 text-xs text-slate-600">
-                      {row.data?.title} • {row.data?.dataHoraPublicacao != null ? String(row.data.dataHoraPublicacao) : ""}
+                      {row.data?.title} •{" "}
+                      {(() => {
+                        const raw = row.data?.dataHoraPublicacao;
+                        if (raw == null || String(raw).trim() === "") return "Sem agendamento (DRAFT)";
+                        return formatScheduledAtDisplay(raw) || String(raw);
+                      })()}
                     </p>
                   ) : (
                     <ul className="mt-2 space-y-1 text-xs text-rose-700">

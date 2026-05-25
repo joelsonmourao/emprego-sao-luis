@@ -75,6 +75,11 @@ export function formatDateTimeSpreadsheetValue(date: Date, timeZone = SITE_TIME_
   return `${formatPart(parts.day)}/${formatPart(parts.month)}/${parts.year} ${formatPart(parts.hour)}:${formatPart(parts.minute)}:${formatPart(parts.second)}`;
 }
 
+export function formatDateTimeSpreadsheetValueMinutes(date: Date, timeZone = SITE_TIME_ZONE) {
+  const parts = getDateTimePartsInTimeZone(date, timeZone);
+  return `${formatPart(parts.day)}/${formatPart(parts.month)}/${parts.year} ${formatPart(parts.hour)}:${formatPart(parts.minute)}`;
+}
+
 function buildDateFromLocalParts(parts: DateTimeParts) {
   return new Date(parts.year, parts.month - 1, parts.day, parts.hour, parts.minute, parts.second);
 }
@@ -191,4 +196,12 @@ export function toWorkbookDateTimeValue(value: Date | string | null | undefined,
 export function parseScheduledKeyToDate(value: string) {
   const parts = parsePartsFromString(value);
   return parts ? buildDateFromLocalParts(parts) : null;
+}
+
+export function formatScheduledAtDisplay(value: unknown, timeZone = SITE_TIME_ZONE) {
+  const normalized = normalizeScheduledAtValue(value, timeZone);
+  if (!normalized) return "";
+  const parsed = parseScheduledKeyToDate(normalized);
+  if (!parsed) return "";
+  return formatDateTimeSpreadsheetValueMinutes(parsed, timeZone);
 }

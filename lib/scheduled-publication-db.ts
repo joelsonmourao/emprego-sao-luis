@@ -13,7 +13,6 @@ import {
   type AdminRole,
   type City,
   type Company,
-  type Job,
   type State
 } from "@prisma/client";
 
@@ -38,9 +37,8 @@ type PublicationContext = {
   statesByInput: Map<string, State>;
   citiesByKey: Map<string, City>;
   companiesByKey: Map<string, Company>;
-  jobsByExternalId: Map<string, Pick<Job, "id" | "slug" | "publishedAt" | "externalId" | "publicationStatus" | "isActive">>;
-  jobsBySlug: Map<string, Pick<Job, "id" | "slug" | "publishedAt" | "externalId" | "publicationStatus" | "isActive">>;
   usedSlugs: Set<string>;
+  usedExternalIds: Set<string>;
 };
 
 function normalizeKey(input: string) {
@@ -57,30 +55,6 @@ function cityKey(stateId: string, cityName: string) {
 
 function companyKey(companyName: string) {
   return normalizeKey(companyName);
-}
-
-function parseCurrencyValue(value: unknown) {
-  if (value === null || value === undefined || value === "") {
-    return null;
-  }
-
-  if (typeof value === "number" && Number.isFinite(value)) {
-    return Math.round(value);
-  }
-
-  const normalized = String(value)
-    .trim()
-    .replace(/\s/g, "")
-    .replace(/\./g, "")
-    .replace(",", ".")
-    .replace(/[^\d.-]/g, "");
-
-  if (!normalized) {
-    return null;
-  }
-
-  const parsed = Number(normalized);
-  return Number.isFinite(parsed) ? Math.round(parsed) : null;
 }
 
 function normalizeEmploymentType(value: unknown): EmploymentType {
@@ -105,10 +79,6 @@ function normalizeLocationType(value: unknown): LocationType {
   }
 
   return LocationType.ONSITE;
-}
-
-function buildSeoTitle(title: string, city: string, state: string) {
-  return title || `Vaga de Jovem Aprendiz em ${city}/${state}`;
 }
 
 function buildSeoDescription(title: string, city: string, state: string) {
@@ -142,41 +112,56 @@ function ensureUniqueJobSlug(baseSlug: string, usedSlugs: Set<string>, currentSl
   return nextSlug;
 }
 
+function buildInternalExternalId() {
+  return `sheet-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
+}
+
+function ensureUniqueExternalId(rawExternalId: string | null, usedExternalIds: Set<string>) {
+  const base = rawExternalId?.trim() || buildInternalExternalId();
+
+  if (!usedExternalIds.has(base)) {
+    usedExternalIds.add(base);
+    return base;
+  }
+
+  let suffix = 2;
+  while (usedExternalIds.has(`${base}-${suffix}`)) {
+    suffix += 1;
+  }
+
+  const next = `${base}-${suffix}`;
+  usedExternalIds.add(next);
+  return next;
+}
+
 async function createPublicationContext(rows: ScheduledJobUploadRow[]) {
   const externalIds = Array.from(new Set(rows.map((row) => row.externalId?.trim()).filter(Boolean))) as string[];
   const baseSlugs = Array.from(
-    new Set(rows.map((row) => normalizeSlug(row.slug || row.title).trim()).filter(Boolean))
+    new Set(rows.map((row) => normalizeSlug(row.slug || row.title || row.seoTitle).trim()).filter(Boolean))
   );
 
-  const existingJobs = await prisma.job.findMany({
-    where: {
-      OR: [
-        ...(externalIds.length ? [{ externalId: { in: externalIds } }] : []),
-        ...(baseSlugs.length ? baseSlugs.map((slug) => ({ slug: { startsWith: slug } })) : [])
-      ]
-    },
-    select: {
-      id: true,
-      slug: true,
-      publishedAt: true,
-      externalId: true,
-      publicationStatus: true,
-      isActive: true
-    }
-  });
-
-  const jobsByExternalId = new Map<
-    string,
-    Pick<Job, "id" | "slug" | "publishedAt" | "externalId" | "publicationStatus" | "isActive">
-  >();
-  const jobsBySlug = new Map<string, Pick<Job, "id" | "slug" | "publishedAt" | "externalId" | "publicationStatus" | "isActive">>();
   const usedSlugs = new Set<string>();
+  const usedExternalIds = new Set<string>();
 
-  for (const job of existingJobs) {
-    jobsBySlug.set(job.slug, job);
-    usedSlugs.add(job.slug);
-    if (job.externalId) {
-      jobsByExternalId.set(job.externalId, job);
+  if (baseSlugs.length) {
+    const existingBySlug = await prisma.job.findMany({
+      where: { OR: baseSlugs.map((slug) => ({ slug: { startsWith: slug } })) },
+      select: { slug: true }
+    });
+    for (const job of existingBySlug) {
+      usedSlugs.add(job.slug);
+    }
+  }
+
+  if (externalIds.length) {
+    const existingByExternalId = await prisma.job.findMany({
+      where: { externalId: { in: externalIds } },
+      select: { externalId: true }
+    });
+    for (const job of existingByExternalId) {
+      if (job.externalId) {
+        usedExternalIds.add(job.externalId);
+      }
     }
   }
 
@@ -184,9 +169,8 @@ async function createPublicationContext(rows: ScheduledJobUploadRow[]) {
     statesByInput: new Map<string, State>(),
     citiesByKey: new Map<string, City>(),
     companiesByKey: new Map<string, Company>(),
-    jobsByExternalId,
-    jobsBySlug,
-    usedSlugs
+    usedSlugs,
+    usedExternalIds
   } satisfies PublicationContext;
 }
 
@@ -239,7 +223,7 @@ function resolveScheduledImportStatus(value: unknown) {
       status: JobStatus.DRAFT,
       scheduledAt: null as Date | null,
       importError: null as string | null,
-      publicationStatus: JobPublicationStatus.OK
+      publicationStatus: JobPublicationStatus.AGUARDANDO_AGENDAMENTO
     };
   }
 
@@ -270,16 +254,46 @@ function resolveScheduledImportStatus(value: unknown) {
   };
 }
 
-async function upsertScheduledDraftJob(row: ScheduledJobUploadRow, context: PublicationContext) {
+async function findCompanyNameFallback() {
+  const existing = await prisma.company.findFirst({
+    select: { name: true },
+    orderBy: { createdAt: "asc" }
+  });
+
+  return existing?.name || "Empresa nao informada";
+}
+
+function buildCompanySummary(companyName: string) {
+  return `Veja vagas de Jovem Aprendiz ligadas a ${companyName}.`;
+}
+
+function resolveSafeTitle(row: ScheduledJobUploadRow) {
+  const fromTitle = row.title.trim();
+  if (fromTitle) return fromTitle;
+  return row.seoTitle.trim();
+}
+
+function resolveSafeCompanyName(row: ScheduledJobUploadRow, fallback: string) {
+  const fromRow = row.companyName.trim();
+  return fromRow || fallback;
+}
+
+function normalizeScheduledImportRawValue(value: unknown) {
+  if (value === null || value === undefined) return null;
+  const text = String(value).trim();
+  return text || null;
+}
+
+async function upsertScheduledDraftJob(row: ScheduledJobUploadRow, context: PublicationContext, companyNameFallback: string) {
   const stateInput = row.stateName.trim();
   const cityInput = row.cityName.trim();
-  const companyInput = row.companyName.trim();
-  const title = row.title.trim();
-  const externalId = row.externalId?.trim() || null;
+  const title = resolveSafeTitle(row);
+  const companyInput = resolveSafeCompanyName(row, companyNameFallback);
+  const externalId = ensureUniqueExternalId(row.externalId?.trim() || null, context.usedExternalIds);
   const summary = row.summary.trim() || buildSummary(title, cityInput, stateInput);
   const description = row.descriptionHtml.trim();
   const sourceUrl = row.sourceUrl?.trim() || row.applyUrl.trim();
-  const slugBase = normalizeSlug(row.slug || row.title);
+  const slugBase = normalizeSlug(row.slug || row.title || row.seoTitle);
   const importDecision = resolveScheduledImportStatus(row.dataHoraPublicacao);
 
   const { state, city } = await resolveStateAndCityCached(context, stateInput, cityInput);
@@ -288,19 +302,12 @@ async function upsertScheduledDraftJob(row: ScheduledJobUploadRow, context: Publ
     stateId: state.id,
     cityId: city.id,
     websiteUrl: sourceUrl || null,
-    summary: `Veja vagas de Jovem Aprendiz ligadas a ${companyInput}.`
+    summary: buildCompanySummary(companyInput)
   });
 
-  const existingByExternalId = externalId ? context.jobsByExternalId.get(externalId) ?? null : null;
-  const existingBySlug = context.jobsBySlug.get(slugBase) ?? null;
-  const existing = existingByExternalId ?? (!externalId ? existingBySlug : null);
-  const keepCurrentSlug = existingByExternalId?.slug ?? (!externalId ? existingBySlug?.slug : undefined);
-
-  if (existing?.publicationStatus === JobPublicationStatus.OK && existing.isActive) {
-    throw new Error("Esta vaga ja esta publicada (status OK). Use outro externalId ou slug para novo agendamento.");
-  }
-
-  const finalSlug = ensureUniqueJobSlug(slugBase, context.usedSlugs, keepCurrentSlug);
+  const finalSlug = ensureUniqueJobSlug(slugBase, context.usedSlugs);
+  const seoTitle = row.seoTitle.trim() || title;
+  const seoDescription = row.seoDescription.trim() || buildSeoDescription(title, city.name, state.code);
 
   const jobData = {
     title,
@@ -325,8 +332,8 @@ async function upsertScheduledDraftJob(row: ScheduledJobUploadRow, context: Publ
     sourceName: row.sourceName?.trim() || "Planilha agendada",
     sourceUrl: sourceUrl || null,
     locationType: normalizeLocationType(row.locationType),
-    seoTitle: row.seoTitle.trim() || buildSeoTitle(title, city.name, state.code),
-    seoDescription: row.seoDescription.trim() || buildSeoDescription(title, city.name, state.code),
+    seoTitle,
+    seoDescription,
     featured: row.featured,
     externalId,
     publishedAt: null,
@@ -341,44 +348,14 @@ async function upsertScheduledDraftJob(row: ScheduledJobUploadRow, context: Publ
     status: importDecision.status,
     scheduledAt: importDecision.scheduledAt,
     scheduleSource: JobScheduleSource.PLANILHA,
-    scheduledImportRawValue: row.dataHoraPublicacao == null ? null : String(row.dataHoraPublicacao),
+    scheduledImportRawValue: normalizeScheduledImportRawValue(row.dataHoraPublicacao),
     importError: importDecision.importError,
     indexingStatus: importDecision.status === JobStatus.ERROR ? JobIndexingStatus.SKIPPED : JobIndexingStatus.NOT_SENT,
     indexingError: importDecision.importError,
     indexingLastSubmittedAt: null
   };
 
-  const job = externalId
-    ? await prisma.job.upsert({
-        where: { externalId },
-        create: jobData,
-        update: jobData
-      })
-    : await prisma.job.upsert({
-        where: { slug: existing?.slug ?? finalSlug },
-        create: jobData,
-        update: jobData
-      });
-
-  context.jobsBySlug.set(job.slug, {
-    id: job.id,
-    slug: job.slug,
-    publishedAt: job.publishedAt,
-    externalId: job.externalId,
-    publicationStatus: job.publicationStatus,
-    isActive: job.isActive
-  });
-
-  if (job.externalId) {
-    context.jobsByExternalId.set(job.externalId, {
-      id: job.id,
-      slug: job.slug,
-      publishedAt: job.publishedAt,
-      externalId: job.externalId,
-      publicationStatus: job.publicationStatus,
-      isActive: job.isActive
-    });
-  }
+  const job = await prisma.job.create({ data: jobData });
 
   try {
     await ensureLocationEnrichment({ companyName: company.name, city: city.name, state: state.code });
@@ -405,13 +382,14 @@ export async function importScheduledJobsFromUploadRows(
   }
 ): Promise<ScheduledUploadResult> {
   const context = await createPublicationContext(rows);
+  const companyNameFallback = await findCompanyNameFallback();
   const imported: string[] = [];
   const errors: Array<{ line: number; message: string }> = [];
 
   for (const [index, row] of rows.entries()) {
     const line = index + 2;
     try {
-      const job = await upsertScheduledDraftJob(row, context);
+      const job = await upsertScheduledDraftJob(row, context, companyNameFallback);
       imported.push(job.slug);
       if (job.status === JobStatus.ERROR) {
         errors.push({

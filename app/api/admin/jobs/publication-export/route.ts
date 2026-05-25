@@ -6,7 +6,7 @@ import * as XLSX from "xlsx";
 import { requireApiRole } from "@/lib/authz";
 import { prisma } from "@/lib/db";
 import { getSiteUrl } from "@/lib/site-url";
-import { formatDateTimeSpreadsheetValue, normalizeScheduledAtValue } from "@/lib/timezone";
+import { formatDateTimeSpreadsheetValueMinutes } from "@/lib/timezone";
 
 
 export const runtime = "nodejs";
@@ -48,12 +48,12 @@ export async function GET() {
   const rows = jobs.map((job) => {
     const publishedUrl = job.publishedPublicUrl || (job.slug ? getSiteUrl(`/vagas/${job.slug}`) : "");
     return {
-      scheduledAt: job.scheduledPublishAt ? normalizeScheduledAtValue(job.scheduledPublishAt) ?? "" : "",
+      dataHoraPublicacao: job.scheduledPublishAt ? formatDateTimeSpreadsheetValueMinutes(job.scheduledPublishAt) : "",
       publishStatus: sheetPublishStatus(job.publicationStatus),
       publishedUrl: publishedUrl || "",
-      publishedAt: job.publishedAt ? formatDateTimeSpreadsheetValue(job.publishedAt) : "",
+      publishedAt: job.publishedAt ? formatDateTimeSpreadsheetValueMinutes(job.publishedAt) : "",
       googleIndexingStatus: job.googleIndexingStatus ?? "",
-      googleIndexedAt: job.googleIndexedAt ? formatDateTimeSpreadsheetValue(job.googleIndexedAt) : "",
+      googleIndexedAt: job.googleIndexedAt ? formatDateTimeSpreadsheetValueMinutes(job.googleIndexedAt) : "",
       googleIndexingMessage: job.googleIndexingMessage ?? "",
       title: job.title,
       externalId: job.externalId ?? ""
