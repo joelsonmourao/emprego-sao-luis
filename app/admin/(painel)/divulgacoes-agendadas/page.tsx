@@ -46,25 +46,25 @@ export default async function DivulgacoesAgendadasPage({ searchParams }: PagePro
   if (filter === "google-sent") where.indexingStatus = JobIndexingStatus.SENT;
   if (filter === "indexing-error") where.indexingStatus = JobIndexingStatus.ERROR;
   if (filter === "today") where.publishedAt = { gte: todayStart };
-  if (filter === "next-7-days") where.scheduledAt = { gte: now, lte: in7Days };
-  if (filter === "overdue") where.AND = [{ status: JobStatus.SCHEDULED }, { scheduledAt: { lt: now } }];
+  if (filter === "next-7-days") where.scheduledPublishAt = { gte: now, lte: in7Days };
+  if (filter === "overdue") where.AND = [{ status: JobStatus.SCHEDULED }, { scheduledPublishAt: { lt: now } }];
 
   const [rows, totalScheduled, pendingPublication, publishedToday, publishedLast7d, sentToGoogle, indexingErrors, publicationErrors, draftsWithoutSchedule] =
     await Promise.all([
       prisma.job.findMany({
         where,
         include: { city: true, state: true },
-        orderBy: [{ scheduledAt: "asc" }, { updatedAt: "desc" }],
+        orderBy: [{ scheduledPublishAt: "asc" }, { updatedAt: "desc" }],
         take: 200
       }),
       prisma.job.count({ where: { status: JobStatus.SCHEDULED } }),
-      prisma.job.count({ where: { status: JobStatus.SCHEDULED, scheduledAt: { lte: now } } }),
+      prisma.job.count({ where: { status: JobStatus.SCHEDULED, scheduledPublishAt: { lte: now } } }),
       prisma.job.count({ where: { status: JobStatus.PUBLISHED, publishedAt: { gte: todayStart } } }),
       prisma.job.count({ where: { status: JobStatus.PUBLISHED, publishedAt: { gte: sevenDaysAgo } } }),
       prisma.job.count({ where: { indexingStatus: JobIndexingStatus.SENT } }),
       prisma.job.count({ where: { indexingStatus: JobIndexingStatus.ERROR } }),
       prisma.job.count({ where: { status: JobStatus.ERROR } }),
-      prisma.job.count({ where: { status: JobStatus.DRAFT, scheduledAt: null } })
+      prisma.job.count({ where: { status: JobStatus.DRAFT, scheduledPublishAt: null } })
     ]);
 
   const cards = [
@@ -122,7 +122,7 @@ export default async function DivulgacoesAgendadasPage({ searchParams }: PagePro
           city: job.city.name,
           state: job.state.code,
           status: job.status,
-          scheduledAt: job.scheduledAt ? formatBrazilDateTime(job.scheduledAt) : "-",
+          scheduledAt: job.scheduledPublishAt ? formatBrazilDateTime(job.scheduledPublishAt) : "-",
           scheduleSource: job.scheduleSource ?? "-",
           publishedAt: job.publishedAt ? formatBrazilDateTime(job.publishedAt) : "-",
           indexingStatus: job.indexingStatus,

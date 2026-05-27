@@ -3,7 +3,7 @@ import { z } from "zod";
 const optionalString = z.preprocess((value) => (value === null || value === undefined ? "" : String(value).trim()), z.string());
 
 export const scheduledJobUploadRowSchema = z.object({
-  title: optionalString.optional().default(""),
+  title: z.preprocess((value) => (value === null || value === undefined ? "" : String(value).trim()), z.string().min(1, "title vazio.")),
   slug: optionalString.optional().default(""),
   companyName: optionalString.optional().default(""),
   cityName: z.preprocess((value) => (value === null || value === undefined ? "" : String(value).trim()), z.string().min(2, "Cidade obrigatoria.")),
@@ -34,21 +34,24 @@ export const scheduledJobUploadRowSchema = z.object({
     (value) => (value === null || value === undefined ? "ONSITE" : String(value).trim().toUpperCase()),
     z.enum(["ONSITE", "REMOTE", "HYBRID"]).default("ONSITE")
   ),
-  seoTitle: z.preprocess(
-    (value) => (value === null || value === undefined ? "" : String(value).trim()),
-    z.string().min(1, "seoTitle obrigatorio.")
-  ),
-  seoDescription: z.preprocess(
-    (value) => (value === null || value === undefined ? "" : String(value).trim()),
-    z.string().min(1, "seoDescription obrigatorio.")
-  ),
+  seoTitle: optionalString.optional().default(""),
+  seoDescription: optionalString.optional().default(""),
   featured: z.boolean().optional().default(false),
-  externalId: optionalString.optional().default(""),
+  externalId: z.preprocess(
+    (value) => (value === null || value === undefined ? "" : String(value).trim()),
+    z.string().min(1, "externalId vazio.")
+  ),
   dataHoraPublicacao: z.union([z.string(), z.number(), z.date()]).optional().nullable()
 });
 
+export const scheduledJobUploadItemSchema = z.object({
+  numeroLinhaExcel: z.number().int().min(2),
+  row: z.record(z.string(), z.unknown())
+});
+
 export const scheduledJobUploadPayloadSchema = z.object({
-  rows: z.array(scheduledJobUploadRowSchema).min(1, "Envie ao menos uma linha.")
+  rows: z.array(scheduledJobUploadItemSchema).min(1, "Envie ao menos uma linha.")
 });
 
 export type ScheduledJobUploadRow = z.infer<typeof scheduledJobUploadRowSchema>;
+export type ScheduledJobUploadItem = z.infer<typeof scheduledJobUploadItemSchema>;

@@ -7,7 +7,7 @@ import { AlertTriangle, CalendarClock, CheckCircle2, Download, FileSpreadsheet, 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { normalizeSlug, parseBooleanLike, parseOptionalNumber } from "@/lib/admin/content";
-import { scheduledJobUploadRowSchema, type ScheduledJobUploadRow } from "@/lib/schemas/scheduled-job-upload";
+import { scheduledJobUploadRowSchema, type ScheduledJobUploadItem, type ScheduledJobUploadRow } from "@/lib/schemas/scheduled-job-upload";
 import { formatScheduledAtDisplay } from "@/lib/timezone";
 
 const aliases: Record<string, string> = {
@@ -58,19 +58,36 @@ type ParsedPreview = {
   index: number;
   valid: boolean;
   errors: string[];
+  uploadItem: ScheduledJobUploadItem;
   data?: ScheduledJobUploadRow;
+};
+
+type UploadAuditResult = {
+  numeroLinhaExcel: number;
+  externalId: string;
+  title: string;
+  companyName: string;
+  city: string;
+  state: string;
+  dataHoraPublicacaoOriginal: string;
+  dataHoraPublicacaoConvertida: string;
+  resultado: "AGENDADA" | "PUBLICADA_IMEDIATAMENTE" | "ATUALIZADA" | "IGNORADA_DUPLICADA" | "ERRO";
+  motivo: string;
+  jobId: string;
+  slug: string;
 };
 
 type UploadApiResponse = {
   ok: boolean;
   error?: string;
-  summary?: {
-    totalRows: number;
-    saved: number;
-    errors: number;
-  };
-  imported?: string[];
-  issues?: Array<{ line: number; message: string }>;
+  totalRows?: number;
+  validRows?: number;
+  scheduled?: number;
+  publishedImmediately?: number;
+  updated?: number;
+  ignored?: number;
+  errors?: number;
+  results?: UploadAuditResult[];
 };
 
 function normalizeHeader(header: string) {
@@ -109,6 +126,7 @@ export function AdminScheduledJobUpload() {
   const [fileName, setFileName] = useState("");
   const [resultMessage, setResultMessage] = useState("");
   const [isUploading, setIsUploading] = useState(false);
+  const [auditRows, setAuditRows] = useState<UploadAuditResult[]>([]);
 
   const validRows = useMemo(
     () => rows.filter((row) => row.valid && row.data).map((row) => row.data as ScheduledJobUploadRow),
@@ -172,6 +190,10 @@ export function AdminScheduledJobUpload() {
         index: index + 2,
         valid: parsedRow.success,
         errors: parsedRow.success ? [] : parsedRow.error.issues.map((issue) => `${issue.path.join(".")}: ${issue.message}`),
+        uploadItem: {
+          numeroLinhaExcel: index + 2,
+          row: candidate
+        },
         data: parsedRow.success ? parsedRow.data : undefined
       };
     });
@@ -180,8 +202,8 @@ export function AdminScheduledJobUpload() {
   }
 
   async function handleUpload() {
-    if (!validRows.length) {
-      setResultMessage("Nenhuma linha valida para enviar.");
+    if (!rows.length) {
+      setResultMessage("Nenhuma linha encontrada para enviar.");
       return;
     }
 
@@ -192,7 +214,7 @@ export function AdminScheduledJobUpload() {
       const response = await fetch("/api/admin/jobs/scheduled-upload", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ rows: validRows })
+        body: JSON.stringify({ rows: rows.map((item) => item.uploadItem) })
       });
 
       const result = await parseUploadResponse(response);
@@ -202,30 +224,51 @@ export function AdminScheduledJobUpload() {
         return;
       }
 
-      if (!result.ok) {
-        const summary = result.summary;
-        const msg = [
-          result.error ?? "Upload concluido com erros em parte das linhas.",
-          summary ? `Salvas: ${summary.saved}. Falhas: ${summary.errors}.` : ""
-        ]
-          .filter(Boolean)
-          .join(" ");
-        setResultMessage(msg);
-        if (result.issues?.length) {
-          console.error("Linhas com problema:", result.issues);
-        }
-        return;
-      }
-
-      const summary = result.summary ?? { totalRows: validRows.length, saved: 0, errors: 0 };
+      const summary = {
+        totalRows: result.totalRows ?? rows.length,
+        validRows: result.validRows ?? 0,
+        scheduled: result.scheduled ?? 0,
+        publishedImmediately: result.publishedImmediately ?? 0,
+        updated: result.updated ?? 0,
+        ignored: result.ignored ?? 0,
+        errors: result.errors ?? 0
+      };
+      setAuditRows(result.results ?? []);
       setResultMessage(
-        `Processamento concluido: ${summary.saved} vaga(s) importada(s). Revise os status SCHEDULED, DRAFT ou ERROR na tela de divulgacoes agendadas.`
+        `Importacao concluida.\nTotal lidas: ${summary.totalRows}\nValidas: ${summary.validRows}\nAgendadas: ${summary.scheduled}\nPublicadas imediatamente: ${summary.publishedImmediately}\nAtualizadas: ${summary.updated}\nIgnoradas: ${summary.ignored}\nErros: ${summary.errors}`
       );
     } catch (error) {
       setResultMessage(`ERRO DE REDE: ${error instanceof Error ? error.message : "Falha na comunicacao."}`);
     } finally {
       setIsUploading(false);
     }
+  }
+
+  function handleDownloadAudit() {
+    if (!auditRows.length) {
+      setResultMessage("Nenhuma auditoria disponivel para exportar.");
+      return;
+    }
+
+    const exportRows = auditRows.map((row) => ({
+      linha: row.numeroLinhaExcel,
+      externalId: row.externalId,
+      title: row.title,
+      companyName: row.companyName,
+      city: row.city,
+      state: row.state,
+      dataHoraPublicacaoOriginal: row.dataHoraPublicacaoOriginal,
+      dataHoraPublicacaoConvertida: row.dataHoraPublicacaoConvertida,
+      resultado: row.resultado,
+      motivo: row.motivo,
+      jobId: row.jobId,
+      slug: row.slug
+    }));
+
+    const sheet = XLSX.utils.json_to_sheet(exportRows);
+    const book = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(book, sheet, "Auditoria");
+    XLSX.writeFile(book, `auditoria-importacao-agendada-${new Date().toISOString().slice(0, 10)}.xlsx`);
   }
 
   return (
@@ -264,24 +307,56 @@ export function AdminScheduledJobUpload() {
         </div>
 
         <div className="flex flex-wrap gap-3">
-          <Button type="button" size="lg" onClick={handleUpload} disabled={isUploading || !validRows.length}>
+          <Button type="button" size="lg" onClick={handleUpload} disabled={isUploading || !rows.length}>
             {isUploading ? "Salvando..." : "Salvar vagas agendadas no banco"}
           </Button>
-          <Button asChild type="button" size="lg" variant="outline">
-            <a href="/api/admin/jobs/publication-export">
-              <span className="inline-flex items-center gap-2">
-                <Download className="h-4 w-4" />
-                Baixar Excel de auditoria
-              </span>
-            </a>
+          <Button type="button" size="lg" variant="outline" onClick={handleDownloadAudit} disabled={!auditRows.length}>
+            <span className="inline-flex items-center gap-2">
+              <Download className="h-4 w-4" />
+              Baixar Excel de auditoria
+            </span>
           </Button>
         </div>
         <p className="text-xs text-slate-500">
-          O arquivo exportado inclui: dataHoraPublicacao, publishStatus (AGUARDANDO, PUBLICADA, ERRO), publishedUrl, publishedAt,
-          googleIndexingStatus, googleIndexedAt, googleIndexingMessage, title e externalId.
+          O Excel de auditoria exporta o mesmo relatorio linha a linha exibido abaixo: linha, externalId, titulo, cidade/UF, data de publicacao,
+          resultado e motivo.
         </p>
 
-        {resultMessage ? <p className="rounded-2xl bg-slate-100 px-4 py-3 text-sm text-slate-700">{resultMessage}</p> : null}
+        {resultMessage ? <p className="whitespace-pre-line rounded-2xl bg-slate-100 px-4 py-3 text-sm text-slate-700">{resultMessage}</p> : null}
+
+        {auditRows.length ? (
+          <div className="rounded-2xl border border-slate-200 bg-white p-4">
+            <p className="mb-3 text-sm font-semibold text-slate-900">Auditoria da importacao</p>
+            <div className="max-h-[360px] overflow-auto rounded-xl border border-slate-200">
+              <table className="min-w-full text-xs">
+                <thead className="bg-slate-100 text-slate-700">
+                  <tr>
+                    <th className="px-3 py-2 text-left">Linha</th>
+                    <th className="px-3 py-2 text-left">External ID</th>
+                    <th className="px-3 py-2 text-left">Titulo</th>
+                    <th className="px-3 py-2 text-left">Cidade/UF</th>
+                    <th className="px-3 py-2 text-left">Data publicacao</th>
+                    <th className="px-3 py-2 text-left">Resultado</th>
+                    <th className="px-3 py-2 text-left">Motivo</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {auditRows.map((row) => (
+                    <tr key={`${row.numeroLinhaExcel}-${row.externalId}-${row.resultado}`} className="border-t border-slate-100">
+                      <td className="px-3 py-2">{row.numeroLinhaExcel}</td>
+                      <td className="px-3 py-2">{row.externalId || "-"}</td>
+                      <td className="px-3 py-2">{row.title || "-"}</td>
+                      <td className="px-3 py-2">{row.city && row.state ? `${row.city}/${row.state}` : "-"}</td>
+                      <td className="px-3 py-2">{row.dataHoraPublicacaoConvertida || row.dataHoraPublicacaoOriginal || "-"}</td>
+                      <td className="px-3 py-2">{row.resultado}</td>
+                      <td className="px-3 py-2">{row.motivo || "-"}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        ) : null}
 
         {rows.length ? (
           <div className="rounded-2xl border border-slate-200 p-4">

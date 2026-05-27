@@ -24,7 +24,8 @@ import { ensureLocationEnrichment } from "@/lib/location/location-enrichment-ser
 import { notifyGoogleIndexing } from "@/lib/google-indexing";
 import { appendPublicationAuditLog } from "@/lib/publication-audit-log";
 import { parseScheduledAtInputToUtc } from "@/lib/scheduled-at-utc";
-import type { ScheduledJobUploadRow } from "@/lib/schemas/scheduled-job-upload";
+import type { ScheduledJobUploadItem, ScheduledJobUploadRow } from "@/lib/schemas/scheduled-job-upload";
+import { scheduledJobUploadRowSchema } from "@/lib/schemas/scheduled-job-upload";
 import { getSiteUrl } from "@/lib/site-url";
 import {
   formatDateTimeKeyInTimeZone,
@@ -38,7 +39,6 @@ type PublicationContext = {
   citiesByKey: Map<string, City>;
   companiesByKey: Map<string, Company>;
   usedSlugs: Set<string>;
-  usedExternalIds: Set<string>;
 };
 
 function normalizeKey(input: string) {
@@ -112,36 +112,12 @@ function ensureUniqueJobSlug(baseSlug: string, usedSlugs: Set<string>, currentSl
   return nextSlug;
 }
 
-function buildInternalExternalId() {
-  return `sheet-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
-}
-
-function ensureUniqueExternalId(rawExternalId: string | null, usedExternalIds: Set<string>) {
-  const base = rawExternalId?.trim() || buildInternalExternalId();
-
-  if (!usedExternalIds.has(base)) {
-    usedExternalIds.add(base);
-    return base;
-  }
-
-  let suffix = 2;
-  while (usedExternalIds.has(`${base}-${suffix}`)) {
-    suffix += 1;
-  }
-
-  const next = `${base}-${suffix}`;
-  usedExternalIds.add(next);
-  return next;
-}
-
 async function createPublicationContext(rows: ScheduledJobUploadRow[]) {
-  const externalIds = Array.from(new Set(rows.map((row) => row.externalId?.trim()).filter(Boolean))) as string[];
   const baseSlugs = Array.from(
     new Set(rows.map((row) => normalizeSlug(row.slug || row.title || row.seoTitle).trim()).filter(Boolean))
   );
 
   const usedSlugs = new Set<string>();
-  const usedExternalIds = new Set<string>();
 
   if (baseSlugs.length) {
     const existingBySlug = await prisma.job.findMany({
@@ -153,24 +129,11 @@ async function createPublicationContext(rows: ScheduledJobUploadRow[]) {
     }
   }
 
-  if (externalIds.length) {
-    const existingByExternalId = await prisma.job.findMany({
-      where: { externalId: { in: externalIds } },
-      select: { externalId: true }
-    });
-    for (const job of existingByExternalId) {
-      if (job.externalId) {
-        usedExternalIds.add(job.externalId);
-      }
-    }
-  }
-
   return {
     statesByInput: new Map<string, State>(),
     citiesByKey: new Map<string, City>(),
     companiesByKey: new Map<string, Company>(),
-    usedSlugs,
-    usedExternalIds
+    usedSlugs
   } satisfies PublicationContext;
 }
 
@@ -216,50 +179,56 @@ async function resolveCompanyCached(
   return company;
 }
 
-function resolveScheduledImportStatus(value: unknown) {
+type ScheduledLineResultado = "AGENDADA" | "PUBLICADA_IMEDIATAMENTE" | "ATUALIZADA" | "IGNORADA_DUPLICADA" | "ERRO";
+
+export type ScheduledUploadLineResult = {
+  numeroLinhaExcel: number;
+  externalId: string;
+  title: string;
+  companyName: string;
+  city: string;
+  state: string;
+  dataHoraPublicacaoOriginal: string;
+  dataHoraPublicacaoConvertida: string;
+  resultado: ScheduledLineResultado;
+  motivo: string;
+  jobId: string;
+  slug: string;
+};
+
+function resolveScheduledPublicationDecision(value: unknown, now: Date) {
   const rawValue = value === null || value === undefined ? "" : String(value).trim();
   if (!rawValue) {
-    return {
-      status: JobStatus.DRAFT,
-      scheduledAt: null as Date | null,
-      importError: null as string | null,
-      publicationStatus: JobPublicationStatus.AGUARDANDO_AGENDAMENTO
-    };
+    return { ok: false as const, motivo: "dataHoraPublicacao vazia." };
   }
-
   const scheduledUtc = parseScheduledAtInputToUtc(value);
   if (!scheduledUtc) {
+    return { ok: false as const, motivo: "Formato invalido em dataHoraPublicacao. Use dd/MM/yyyy HH:mm." };
+  }
+  if (scheduledUtc.getTime() <= now.getTime()) {
     return {
-      status: JobStatus.ERROR,
-      scheduledAt: null as Date | null,
-      importError: "Formato invalido em dataHoraPublicacao. Use dd/MM/yyyy HH:mm.",
-      publicationStatus: JobPublicationStatus.ERRO
+      ok: true as const,
+      resultado: "PUBLICADA_IMEDIATAMENTE" as const,
+      scheduledPublishAt: null as Date | null,
+      converted: formatDateTimeKeyInTimeZone(scheduledUtc),
+      status: JobStatus.PUBLISHED,
+      publicationStatus: JobPublicationStatus.OK,
+      isActive: true
     };
   }
-
-  if (scheduledUtc.getTime() <= Date.now()) {
-    return {
-      status: JobStatus.ERROR,
-      scheduledAt: null as Date | null,
-      importError: "Data/hora de publicacao esta no passado. Ajuste dataHoraPublicacao ou use Publicar agora.",
-      publicationStatus: JobPublicationStatus.ERRO
-    };
-  }
-
   return {
+    ok: true as const,
+    resultado: "AGENDADA" as const,
+    scheduledPublishAt: scheduledUtc,
+    converted: formatDateTimeKeyInTimeZone(scheduledUtc),
     status: JobStatus.SCHEDULED,
-    scheduledAt: scheduledUtc,
-    importError: null as string | null,
-    publicationStatus: JobPublicationStatus.AGUARDANDO_AGENDAMENTO
+    publicationStatus: JobPublicationStatus.AGUARDANDO_AGENDAMENTO,
+    isActive: false
   };
 }
 
 async function findCompanyNameFallback() {
-  const existing = await prisma.company.findFirst({
-    select: { name: true },
-    orderBy: { createdAt: "asc" }
-  });
-
+  const existing = await prisma.company.findFirst({ select: { name: true }, orderBy: { createdAt: "asc" } });
   return existing?.name || "Empresa nao informada";
 }
 
@@ -284,18 +253,62 @@ function normalizeScheduledImportRawValue(value: unknown) {
   return text || null;
 }
 
-async function upsertScheduledDraftJob(row: ScheduledJobUploadRow, context: PublicationContext, companyNameFallback: string) {
+function createLineResult(input: {
+  numeroLinhaExcel: number;
+  row: Partial<ScheduledJobUploadRow>;
+  resultado: ScheduledLineResultado;
+  motivo: string;
+  jobId?: string | null;
+  slug?: string | null;
+  dataHoraPublicacaoConvertida?: string;
+}): ScheduledUploadLineResult {
+  return {
+    numeroLinhaExcel: input.numeroLinhaExcel,
+    externalId: String(input.row.externalId ?? "").trim(),
+    title: String(input.row.title ?? "").trim(),
+    companyName: String(input.row.companyName ?? "").trim(),
+    city: String(input.row.cityName ?? "").trim(),
+    state: String(input.row.stateName ?? "").trim(),
+    dataHoraPublicacaoOriginal: normalizeScheduledImportRawValue(input.row.dataHoraPublicacao) ?? "",
+    dataHoraPublicacaoConvertida: input.dataHoraPublicacaoConvertida ?? "",
+    resultado: input.resultado,
+    motivo: input.motivo,
+    jobId: input.jobId ?? "",
+    slug: input.slug ?? ""
+  };
+}
+
+function jsonEquals(left: unknown, right: unknown) {
+  return JSON.stringify(left ?? null) === JSON.stringify(right ?? null);
+}
+
+async function processScheduledUploadRow(item: ScheduledJobUploadItem, context: PublicationContext, companyNameFallback: string) {
+  const parsed = scheduledJobUploadRowSchema.safeParse(item.row);
+  if (!parsed.success) {
+    return createLineResult({
+      numeroLinhaExcel: item.numeroLinhaExcel,
+      row: (item.row ?? {}) as Partial<ScheduledJobUploadRow>,
+      resultado: "ERRO",
+      motivo: parsed.error.issues.map((issue) => issue.message).join(" | ")
+    });
+  }
+
+  const row = parsed.data;
+  const now = new Date();
+  const publicationDecision = resolveScheduledPublicationDecision(row.dataHoraPublicacao, now);
+  if (!publicationDecision.ok) {
+    return createLineResult({ numeroLinhaExcel: item.numeroLinhaExcel, row, resultado: "ERRO", motivo: publicationDecision.motivo });
+  }
+
   const stateInput = row.stateName.trim();
   const cityInput = row.cityName.trim();
   const title = resolveSafeTitle(row);
   const companyInput = resolveSafeCompanyName(row, companyNameFallback);
-  const externalId = ensureUniqueExternalId(row.externalId?.trim() || null, context.usedExternalIds);
+  const externalId = row.externalId.trim();
   const summary = row.summary.trim() || buildSummary(title, cityInput, stateInput);
   const description = row.descriptionHtml.trim();
   const sourceUrl = row.sourceUrl?.trim() || row.applyUrl.trim();
   const slugBase = normalizeSlug(row.slug || row.title || row.seoTitle);
-  const importDecision = resolveScheduledImportStatus(row.dataHoraPublicacao);
-
   const { state, city } = await resolveStateAndCityCached(context, stateInput, cityInput);
   const company = await resolveCompanyCached(context, {
     companyName: companyInput,
@@ -305,21 +318,72 @@ async function upsertScheduledDraftJob(row: ScheduledJobUploadRow, context: Publ
     summary: buildCompanySummary(companyInput)
   });
 
-  const finalSlug = ensureUniqueJobSlug(slugBase, context.usedSlugs);
   const seoTitle = row.seoTitle.trim() || title;
   const seoDescription = row.seoDescription.trim() || buildSeoDescription(title, city.name, state.code);
+  const normalizedRequirements = normalizeLines(row.requirementsText);
+  const normalizedBenefits = normalizeLines(row.benefitsText ?? "");
+  const normalizedRawDate = normalizeScheduledImportRawValue(row.dataHoraPublicacao);
+  const slugCandidate = normalizeSlug(row.slug || row.title || row.seoTitle);
 
-  const jobData = {
-    title,
-    slug: finalSlug,
+  const existing = await prisma.job.findUnique({
+    where: { externalId },
+    select: {
+      id: true,
+      slug: true,
+      status: true,
+      publishedAt: true,
+      companyId: true,
+      companyName: true,
+      summary: true,
+      descriptionHtml: true,
+      requirements: true,
+      benefits: true,
+      salaryMin: true,
+      salaryMax: true,
+      employmentType: true,
+      workHours: true,
+      applyUrl: true,
+      sourceName: true,
+      sourceUrl: true,
+      locationType: true,
+      seoDescription: true,
+      featured: true,
+      stateId: true,
+      cityId: true,
+      publicationStatus: true,
+      isActive: true,
+      scheduledPublishAt: true,
+      scheduledImportRawValue: true
+    }
+  });
+
+  if (!existing && slugCandidate) {
+    const existingBySlug = await prisma.job.findUnique({
+      where: { slug: slugCandidate },
+      select: { id: true, slug: true }
+    });
+    if (existingBySlug) {
+      return createLineResult({
+        numeroLinhaExcel: item.numeroLinhaExcel,
+        row,
+        resultado: "IGNORADA_DUPLICADA",
+        motivo: "Vaga ja existente por slug; linha ignorada para evitar duplicidade.",
+        jobId: existingBySlug.id,
+        slug: existingBySlug.slug,
+        dataHoraPublicacaoConvertida: publicationDecision.converted
+      });
+    }
+  }
+
+  const commonData = {
     companyId: company.id,
     companyName: company.name,
     companyLogoUrl: company.logoUrl,
     companyWebsiteUrl: company.websiteUrl,
     summary,
     descriptionHtml: richTextFromInput(description, { baseHeadingLevel: 2 }),
-    requirements: normalizeLines(row.requirementsText),
-    benefits: normalizeLines(row.benefitsText ?? ""),
+    requirements: normalizedRequirements,
+    benefits: normalizedBenefits,
     salaryMin: row.salaryMin ? Math.round(row.salaryMin) : null,
     salaryMax: row.salaryMax ? Math.round(row.salaryMax) : null,
     salaryCurrency: "BRL",
@@ -328,34 +392,106 @@ async function upsertScheduledDraftJob(row: ScheduledJobUploadRow, context: Publ
     expiresAt: parseOptionalDate(row.expiresAt),
     validThrough: parseOptionalDate(row.validThrough),
     applyUrl: row.applyUrl.trim(),
-    isActive: false,
     sourceName: row.sourceName?.trim() || "Planilha agendada",
     sourceUrl: sourceUrl || null,
     locationType: normalizeLocationType(row.locationType),
-    seoTitle,
     seoDescription,
     featured: row.featured,
-    externalId,
-    publishedAt: null,
     stateId: state.id,
     cityId: city.id,
-    scheduledPublishAt: importDecision.scheduledAt,
-    publicationStatus: importDecision.publicationStatus,
-    googleIndexingStatus: null,
-    googleIndexingMessage: null,
-    googleIndexedAt: null,
-    publishedPublicUrl: null,
-    status: importDecision.status,
-    scheduledAt: importDecision.scheduledAt,
+    publicationStatus: publicationDecision.publicationStatus,
+    status: publicationDecision.status,
+    isActive: publicationDecision.isActive,
+    scheduledPublishAt: publicationDecision.scheduledPublishAt,
+    scheduledAt: null as Date | null,
     scheduleSource: JobScheduleSource.PLANILHA,
-    scheduledImportRawValue: normalizeScheduledImportRawValue(row.dataHoraPublicacao),
-    importError: importDecision.importError,
-    indexingStatus: importDecision.status === JobStatus.ERROR ? JobIndexingStatus.SKIPPED : JobIndexingStatus.NOT_SENT,
-    indexingError: importDecision.importError,
-    indexingLastSubmittedAt: null
+    scheduledImportRawValue: normalizedRawDate,
+    importError: null as string | null,
+    indexingStatus: JobIndexingStatus.NOT_SENT,
+    indexingError: null as string | null,
+    indexingLastSubmittedAt: null as Date | null
   };
 
-  const job = await prisma.job.create({ data: jobData });
+  if (existing) {
+    if (existing.status === JobStatus.PUBLISHED && publicationDecision.resultado === "AGENDADA") {
+      return createLineResult({
+        numeroLinhaExcel: item.numeroLinhaExcel,
+        row,
+        resultado: "IGNORADA_DUPLICADA",
+        motivo: "Vaga ja publicada; agendamento futuro ignorado para preservar publicacao existente.",
+        jobId: existing.id,
+        slug: existing.slug,
+        dataHoraPublicacaoConvertida: publicationDecision.converted
+      });
+    }
+
+    const isNoChange =
+      existing.companyId === commonData.companyId &&
+      existing.companyName === commonData.companyName &&
+      existing.summary === commonData.summary &&
+      existing.descriptionHtml === commonData.descriptionHtml &&
+      jsonEquals(existing.requirements, commonData.requirements) &&
+      jsonEquals(existing.benefits, commonData.benefits) &&
+      existing.salaryMin === commonData.salaryMin &&
+      existing.salaryMax === commonData.salaryMax &&
+      existing.employmentType === commonData.employmentType &&
+      existing.workHours === commonData.workHours &&
+      existing.applyUrl === commonData.applyUrl &&
+      existing.sourceName === commonData.sourceName &&
+      (existing.sourceUrl ?? "") === (commonData.sourceUrl ?? "") &&
+      existing.locationType === commonData.locationType &&
+      (existing.seoDescription ?? "") === (commonData.seoDescription ?? "") &&
+      existing.featured === commonData.featured &&
+      existing.stateId === commonData.stateId &&
+      existing.cityId === commonData.cityId &&
+      existing.publicationStatus === commonData.publicationStatus &&
+      existing.status === commonData.status &&
+      existing.isActive === commonData.isActive &&
+      (existing.scheduledPublishAt?.getTime() ?? 0) === (commonData.scheduledPublishAt?.getTime() ?? 0) &&
+      (existing.scheduledImportRawValue ?? "") === (commonData.scheduledImportRawValue ?? "");
+
+    if (isNoChange) {
+      return createLineResult({
+        numeroLinhaExcel: item.numeroLinhaExcel,
+        row,
+        resultado: "IGNORADA_DUPLICADA",
+        motivo: "Mesmo externalId ja importado sem mudancas relevantes.",
+        jobId: existing.id,
+        slug: existing.slug,
+        dataHoraPublicacaoConvertida: publicationDecision.converted
+      });
+    }
+
+    const updated = await prisma.job.update({
+      where: { id: existing.id },
+      data: {
+        ...commonData,
+        publishedAt: existing.publishedAt ?? (publicationDecision.resultado === "PUBLICADA_IMEDIATAMENTE" ? now : null)
+      }
+    });
+
+    return createLineResult({
+      numeroLinhaExcel: item.numeroLinhaExcel,
+      row,
+      resultado: "ATUALIZADA",
+      motivo: "Vaga existente atualizada por externalId.",
+      jobId: updated.id,
+      slug: updated.slug,
+      dataHoraPublicacaoConvertida: publicationDecision.converted
+    });
+  }
+
+  const finalSlug = ensureUniqueJobSlug(slugBase, context.usedSlugs);
+  const created = await prisma.job.create({
+    data: {
+      title,
+      slug: finalSlug,
+      externalId,
+      seoTitle,
+      publishedAt: publicationDecision.resultado === "PUBLICADA_IMEDIATAMENTE" ? now : null,
+      ...commonData
+    }
+  });
 
   try {
     await ensureLocationEnrichment({ companyName: company.name, city: city.name, state: state.code });
@@ -363,57 +499,91 @@ async function upsertScheduledDraftJob(row: ScheduledJobUploadRow, context: Publ
     console.warn(`[location-enrichment] Falha no upload agendado (${company.name} / ${city.name}):`, error);
   }
 
-  return job;
+  return createLineResult({
+    numeroLinhaExcel: item.numeroLinhaExcel,
+    row,
+    resultado: publicationDecision.resultado,
+    motivo:
+      publicationDecision.resultado === "AGENDADA"
+        ? "Vaga agendada com sucesso."
+        : "Vaga publicada imediatamente por dataHoraPublicacao <= agora.",
+    jobId: created.id,
+    slug: created.slug,
+    dataHoraPublicacaoConvertida: publicationDecision.converted
+  });
 }
 
 export type ScheduledUploadResult = {
   ok: boolean;
-  imported: string[];
-  errors: Array<{ line: number; message: string }>;
+  totalRows: number;
+  validRows: number;
+  scheduled: number;
+  publishedImmediately: number;
+  updated: number;
+  ignored: number;
+  errors: number;
+  results: ScheduledUploadLineResult[];
 };
 
 export async function importScheduledJobsFromUploadRows(
-  rows: ScheduledJobUploadRow[],
-  options?: {
-    actorId?: string;
-    actorName?: string;
-    actorEmail?: string;
-    actorRole?: AdminRole;
-  }
+  items: ScheduledJobUploadItem[],
+  options?: { actorId?: string; actorName?: string; actorEmail?: string; actorRole?: AdminRole }
 ): Promise<ScheduledUploadResult> {
-  const context = await createPublicationContext(rows);
-  const companyNameFallback = await findCompanyNameFallback();
-  const imported: string[] = [];
-  const errors: Array<{ line: number; message: string }> = [];
+  const parsedRows = items
+    .map((item) => scheduledJobUploadRowSchema.safeParse(item.row))
+    .filter((item): item is { success: true; data: ScheduledJobUploadRow } => item.success)
+    .map((item) => item.data);
 
-  for (const [index, row] of rows.entries()) {
-    const line = index + 2;
+  const context = await createPublicationContext(parsedRows);
+  const companyNameFallback = await findCompanyNameFallback();
+  const results: ScheduledUploadLineResult[] = [];
+  let validRows = 0;
+  let scheduled = 0;
+  let publishedImmediately = 0;
+  let updated = 0;
+  let ignored = 0;
+  let errors = 0;
+
+  for (const item of items) {
     try {
-      const job = await upsertScheduledDraftJob(row, context, companyNameFallback);
-      imported.push(job.slug);
-      if (job.status === JobStatus.ERROR) {
-        errors.push({
-          line,
-          message: job.importError ?? "Erro ao interpretar dataHoraPublicacao."
+      const lineResult = await processScheduledUploadRow(item, context, companyNameFallback);
+      results.push(lineResult);
+      if (lineResult.resultado !== "ERRO") validRows += 1;
+      if (lineResult.resultado === "AGENDADA") scheduled += 1;
+      if (lineResult.resultado === "PUBLICADA_IMEDIATAMENTE") publishedImmediately += 1;
+      if (lineResult.resultado === "ATUALIZADA") updated += 1;
+      if (lineResult.resultado === "IGNORADA_DUPLICADA") ignored += 1;
+      if (lineResult.resultado === "ERRO") errors += 1;
+
+      console.info(
+        `[import-agendada] linha ${lineResult.numeroLinhaExcel} externalId ${lineResult.externalId || "-"} resultado ${lineResult.resultado} motivo ${lineResult.motivo || "-"}`
+      );
+
+      if (lineResult.jobId) {
+        await appendPublicationAuditLog({
+          phase: "upload",
+          jobId: lineResult.jobId,
+          slug: lineResult.slug || undefined,
+          externalId: lineResult.externalId || undefined,
+          message: `Linha ${lineResult.numeroLinhaExcel}: ${lineResult.resultado}. ${lineResult.motivo}`,
+          extra: {
+            resultado: lineResult.resultado,
+            dataHoraPublicacaoOriginal: lineResult.dataHoraPublicacaoOriginal,
+            dataHoraPublicacaoConvertida: lineResult.dataHoraPublicacaoConvertida
+          }
         });
       }
-      await appendPublicationAuditLog({
-        phase: "upload",
-        jobId: job.id,
-        slug: job.slug,
-        externalId: job.externalId,
-        message: `Linha importada com status ${job.status} (upload planilha com dataHoraPublicacao).`,
-        extra: {
-          status: job.status,
-          scheduledAt: job.scheduledAt,
-          importError: job.importError
-        }
-      });
     } catch (error) {
-      errors.push({
-        line,
-        message: error instanceof Error ? error.message : "Erro ao salvar a linha."
+      const motivo = error instanceof Error ? error.message : "Erro inesperado ao processar linha.";
+      const fallbackResult = createLineResult({
+        numeroLinhaExcel: item.numeroLinhaExcel,
+        row: (item.row ?? {}) as Partial<ScheduledJobUploadRow>,
+        resultado: "ERRO",
+        motivo
       });
+      results.push(fallbackResult);
+      errors += 1;
+      console.info(`[import-agendada] linha ${fallbackResult.numeroLinhaExcel} externalId - resultado ERRO motivo ${motivo}`);
     }
   }
 
@@ -424,15 +594,11 @@ export async function importScheduledJobsFromUploadRows(
     actorRole: options?.actorRole,
     action: AuditAction.IMPORT,
     entityType: "scheduled-job-upload",
-    summary: `Upload de planilha agendada: ${imported.length} vaga(s) em AGUARDANDO_AGENDAMENTO`,
-    after: { imported, errorCount: errors.length, errors }
+    summary: `Importacao agendada: total ${items.length}, agendadas ${scheduled}, publicadas imediatamente ${publishedImmediately}, atualizadas ${updated}, ignoradas ${ignored}, erros ${errors}`,
+    after: { totalRows: items.length, validRows, scheduled, publishedImmediately, updated, ignored, errors, results }
   });
 
-  return {
-    ok: errors.length === 0,
-    imported,
-    errors
-  };
+  return { ok: errors === 0, totalRows: items.length, validRows, scheduled, publishedImmediately, updated, ignored, errors, results };
 }
 
 function getDefaultLogDir() {

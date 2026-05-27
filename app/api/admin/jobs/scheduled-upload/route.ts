@@ -35,13 +35,14 @@ export async function POST(request: Request) {
     return NextResponse.json(
       {
         ok: result.ok,
-        summary: {
-          totalRows: payload.rows.length,
-          saved: result.imported.length,
-          errors: result.errors.length
-        },
-        imported: result.imported,
-        issues: result.errors
+        totalRows: result.totalRows,
+        validRows: result.validRows,
+        scheduled: result.scheduled,
+        publishedImmediately: result.publishedImmediately,
+        updated: result.updated,
+        ignored: result.ignored,
+        errors: result.errors,
+        results: result.results
       },
       { status: result.ok ? 200 : 207, headers: RESPONSE_HEADERS }
     );
