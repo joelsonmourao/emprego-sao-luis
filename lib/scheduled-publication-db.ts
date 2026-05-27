@@ -602,7 +602,12 @@ export async function importScheduledJobsFromUploadRows(
 }
 
 function getDefaultLogDir() {
-  if (process.env.VERCEL) {
+  const configured = process.env.SCHEDULED_JOBS_LOG_DIR?.trim();
+  if (configured) {
+    return path.join(configured, "scheduled-job-publication");
+  }
+
+  if (process.env.VERCEL || process.env.COOLIFY || process.env.NODE_ENV === "production") {
     return path.join(os.tmpdir(), "scheduled-job-publication-logs");
   }
 
