@@ -179,11 +179,21 @@ async function resolveCompanyCached(
   return company;
 }
 
-type ScheduledLineResultado = "AGENDADA" | "PUBLICADA_IMEDIATAMENTE" | "ATUALIZADA" | "IGNORADA_DUPLICADA" | "ERRO";
+type ScheduledLineResultado =
+  | "AGENDADA"
+  | "PUBLICADA_IMEDIATAMENTE"
+  | "ATUALIZADA"
+  | "IGNORADA_SEM_MUDANCA"
+  | "JA_PUBLICADA_PRESERVADA"
+  | "ERRO";
 
 export type ScheduledUploadLineResult = {
   numeroLinhaExcel: number;
-  externalId: string;
+  externalIdOriginal: string;
+  externalIdFinal: string;
+  applyUrl: string;
+  slugOriginal: string;
+  slugFinal: string;
   title: string;
   companyName: string;
   city: string;
@@ -193,7 +203,6 @@ export type ScheduledUploadLineResult = {
   resultado: ScheduledLineResultado;
   motivo: string;
   jobId: string;
-  slug: string;
 };
 
 function resolveScheduledPublicationDecision(value: unknown, now: Date) {
@@ -259,12 +268,20 @@ function createLineResult(input: {
   resultado: ScheduledLineResultado;
   motivo: string;
   jobId?: string | null;
-  slug?: string | null;
+  slugFinal?: string | null;
+  slugOriginal?: string | null;
+  externalIdFinal?: string | null;
   dataHoraPublicacaoConvertida?: string;
 }): ScheduledUploadLineResult {
   return {
     numeroLinhaExcel: input.numeroLinhaExcel,
-    externalId: String(input.row.externalId ?? "").trim(),
+    externalIdOriginal: String(input.row.externalId ?? "").trim(),
+    externalIdFinal: String(input.externalIdFinal ?? input.row.externalId ?? "").trim(),
+    applyUrl: String(input.row.applyUrl ?? "").trim(),
+    slugOriginal:
+      String(input.slugOriginal ?? "").trim() ||
+      normalizeSlug(String(input.row.slug ?? "").trim() || String(input.row.title ?? "").trim() || String(input.row.seoTitle ?? "").trim()),
+    slugFinal: String(input.slugFinal ?? "").trim(),
     title: String(input.row.title ?? "").trim(),
     companyName: String(input.row.companyName ?? "").trim(),
     city: String(input.row.cityName ?? "").trim(),
@@ -273,13 +290,67 @@ function createLineResult(input: {
     dataHoraPublicacaoConvertida: input.dataHoraPublicacaoConvertida ?? "",
     resultado: input.resultado,
     motivo: input.motivo,
-    jobId: input.jobId ?? "",
-    slug: input.slug ?? ""
+    jobId: input.jobId ?? ""
   };
 }
 
 function jsonEquals(left: unknown, right: unknown) {
   return JSON.stringify(left ?? null) === JSON.stringify(right ?? null);
+}
+
+function shortHash(input: string) {
+  let hash = 0;
+  for (let index = 0; index < input.length; index += 1) {
+    hash = (hash * 31 + input.charCodeAt(index)) >>> 0;
+  }
+  return hash.toString(36).slice(0, 6);
+}
+
+async function ensureUniqueExternalIdForRow(rawExternalId: string, lineNumber: number, fingerprint: string) {
+  const normalized = rawExternalId.trim();
+  if (!normalized) {
+    return `AUTO-${shortHash(`${fingerprint}-${lineNumber}-${Date.now()}`)}-${lineNumber}`;
+  }
+
+  const existing = await prisma.job.findUnique({
+    where: { externalId: normalized },
+    select: { id: true }
+  });
+  if (!existing) {
+    return normalized;
+  }
+
+  let candidate = `${normalized}-DUP-${lineNumber}`;
+  let suffix = 2;
+  while (true) {
+    const duplicate = await prisma.job.findUnique({
+      where: { externalId: candidate },
+      select: { id: true }
+    });
+    if (!duplicate) return candidate;
+    candidate = `${normalized}-DUP-${lineNumber}-${suffix}`;
+    suffix += 1;
+  }
+}
+
+function buildLineFingerprint(input: {
+  title: string;
+  companyName: string;
+  city: string;
+  state: string;
+  applyUrl: string;
+  dataHoraPublicacaoOriginal: string;
+  sourceUrl: string;
+}) {
+  return [
+    normalizeKey(input.title),
+    normalizeKey(input.companyName),
+    normalizeKey(input.city),
+    normalizeKey(input.state),
+    input.applyUrl.trim().toLowerCase(),
+    input.dataHoraPublicacaoOriginal.trim(),
+    input.sourceUrl.trim().toLowerCase()
+  ].join("||");
 }
 
 async function processScheduledUploadRow(item: ScheduledJobUploadItem, context: PublicationContext, companyNameFallback: string) {
@@ -304,11 +375,21 @@ async function processScheduledUploadRow(item: ScheduledJobUploadItem, context: 
   const cityInput = row.cityName.trim();
   const title = resolveSafeTitle(row);
   const companyInput = resolveSafeCompanyName(row, companyNameFallback);
-  const externalId = row.externalId.trim();
   const summary = row.summary.trim() || buildSummary(title, cityInput, stateInput);
   const description = row.descriptionHtml.trim();
   const sourceUrl = row.sourceUrl?.trim() || row.applyUrl.trim();
   const slugBase = normalizeSlug(row.slug || row.title || row.seoTitle);
+  const slugOriginal = normalizeSlug(row.slug || row.title || row.seoTitle);
+  const dataHoraOriginal = normalizeScheduledImportRawValue(row.dataHoraPublicacao) ?? "";
+  const fingerprint = buildLineFingerprint({
+    title,
+    companyName: companyInput,
+    city: cityInput,
+    state: stateInput,
+    applyUrl: row.applyUrl.trim(),
+    dataHoraPublicacaoOriginal: dataHoraOriginal,
+    sourceUrl
+  });
   const { state, city } = await resolveStateAndCityCached(context, stateInput, cityInput);
   const company = await resolveCompanyCached(context, {
     companyName: companyInput,
@@ -323,14 +404,22 @@ async function processScheduledUploadRow(item: ScheduledJobUploadItem, context: 
   const normalizedRequirements = normalizeLines(row.requirementsText);
   const normalizedBenefits = normalizeLines(row.benefitsText ?? "");
   const normalizedRawDate = normalizeScheduledImportRawValue(row.dataHoraPublicacao);
-  const slugCandidate = normalizeSlug(row.slug || row.title || row.seoTitle);
-
-  const existing = await prisma.job.findUnique({
-    where: { externalId },
+  const existing = await prisma.job.findFirst({
+    where: {
+      title,
+      companyName: companyInput,
+      cityId: city.id,
+      stateId: state.id,
+      applyUrl: row.applyUrl.trim(),
+      scheduledImportRawValue: dataHoraOriginal,
+      sourceUrl: sourceUrl || null
+    },
     select: {
       id: true,
       slug: true,
+      externalId: true,
       status: true,
+      title: true,
       publishedAt: true,
       companyId: true,
       companyName: true,
@@ -357,23 +446,10 @@ async function processScheduledUploadRow(item: ScheduledJobUploadItem, context: 
     }
   });
 
-  if (!existing && slugCandidate) {
-    const existingBySlug = await prisma.job.findUnique({
-      where: { slug: slugCandidate },
-      select: { id: true, slug: true }
-    });
-    if (existingBySlug) {
-      return createLineResult({
-        numeroLinhaExcel: item.numeroLinhaExcel,
-        row,
-        resultado: "IGNORADA_DUPLICADA",
-        motivo: "Vaga ja existente por slug; linha ignorada para evitar duplicidade.",
-        jobId: existingBySlug.id,
-        slug: existingBySlug.slug,
-        dataHoraPublicacaoConvertida: publicationDecision.converted
-      });
-    }
-  }
+  const applyUrlAlreadyUsed =
+    (await prisma.job.count({
+      where: { applyUrl: row.applyUrl.trim() }
+    })) > 0;
 
   const commonData = {
     companyId: company.id,
@@ -413,14 +489,16 @@ async function processScheduledUploadRow(item: ScheduledJobUploadItem, context: 
   };
 
   if (existing) {
-    if (existing.status === JobStatus.PUBLISHED && publicationDecision.resultado === "AGENDADA") {
+    if (existing.publishedAt || existing.publicationStatus === JobPublicationStatus.OK) {
       return createLineResult({
         numeroLinhaExcel: item.numeroLinhaExcel,
         row,
-        resultado: "IGNORADA_DUPLICADA",
-        motivo: "Vaga ja publicada; agendamento futuro ignorado para preservar publicacao existente.",
+        resultado: "JA_PUBLICADA_PRESERVADA",
+        motivo: "Vaga ja publicada anteriormente. Publicacao preservada.",
         jobId: existing.id,
-        slug: existing.slug,
+        slugFinal: existing.slug,
+        slugOriginal,
+        externalIdFinal: existing.externalId ?? row.externalId.trim(),
         dataHoraPublicacaoConvertida: publicationDecision.converted
       });
     }
@@ -454,10 +532,12 @@ async function processScheduledUploadRow(item: ScheduledJobUploadItem, context: 
       return createLineResult({
         numeroLinhaExcel: item.numeroLinhaExcel,
         row,
-        resultado: "IGNORADA_DUPLICADA",
-        motivo: "Mesmo externalId ja importado sem mudancas relevantes.",
+        resultado: "IGNORADA_SEM_MUDANCA",
+        motivo: "Mesma vaga ja importada anteriormente, sem mudancas relevantes.",
         jobId: existing.id,
-        slug: existing.slug,
+        slugFinal: existing.slug,
+        slugOriginal,
+        externalIdFinal: existing.externalId ?? row.externalId.trim(),
         dataHoraPublicacaoConvertida: publicationDecision.converted
       });
     }
@@ -474,19 +554,24 @@ async function processScheduledUploadRow(item: ScheduledJobUploadItem, context: 
       numeroLinhaExcel: item.numeroLinhaExcel,
       row,
       resultado: "ATUALIZADA",
-      motivo: "Vaga existente atualizada por externalId.",
+      motivo: "Mesma vaga identificada por fingerprint; registro atualizado.",
       jobId: updated.id,
-      slug: updated.slug,
+      slugFinal: updated.slug,
+      slugOriginal,
+      externalIdFinal: updated.externalId ?? row.externalId.trim(),
       dataHoraPublicacaoConvertida: publicationDecision.converted
     });
   }
 
   const finalSlug = ensureUniqueJobSlug(slugBase, context.usedSlugs);
+  const finalExternalId = await ensureUniqueExternalIdForRow(row.externalId.trim(), item.numeroLinhaExcel, fingerprint);
+  const externalIdAdjusted = finalExternalId !== row.externalId.trim();
+  const slugAdjusted = finalSlug !== slugOriginal;
   const created = await prisma.job.create({
     data: {
       title,
       slug: finalSlug,
-      externalId,
+      externalId: finalExternalId,
       seoTitle,
       publishedAt: publicationDecision.resultado === "PUBLICADA_IMEDIATAMENTE" ? now : null,
       ...commonData
@@ -503,12 +588,20 @@ async function processScheduledUploadRow(item: ScheduledJobUploadItem, context: 
     numeroLinhaExcel: item.numeroLinhaExcel,
     row,
     resultado: publicationDecision.resultado,
-    motivo:
+    motivo: [
       publicationDecision.resultado === "AGENDADA"
         ? "Vaga agendada com sucesso."
         : "Vaga publicada imediatamente por dataHoraPublicacao <= agora.",
+      externalIdAdjusted ? "externalId repetido, novo externalId gerado automaticamente." : "",
+      applyUrlAlreadyUsed ? "applyUrl repetida, mas linha mantida por possuir dados proprios de cidade/titulo/empresa." : "",
+      slugAdjusted ? "slug repetido, novo slug gerado automaticamente." : ""
+    ]
+      .filter(Boolean)
+      .join(" "),
     jobId: created.id,
-    slug: created.slug,
+    slugFinal: created.slug,
+    slugOriginal,
+    externalIdFinal: finalExternalId,
     dataHoraPublicacaoConvertida: publicationDecision.converted
   });
 }
@@ -521,6 +614,7 @@ export type ScheduledUploadResult = {
   publishedImmediately: number;
   updated: number;
   ignored: number;
+  preservedPublished: number;
   errors: number;
   results: ScheduledUploadLineResult[];
 };
@@ -542,6 +636,7 @@ export async function importScheduledJobsFromUploadRows(
   let publishedImmediately = 0;
   let updated = 0;
   let ignored = 0;
+  let preservedPublished = 0;
   let errors = 0;
 
   for (const item of items) {
@@ -552,22 +647,27 @@ export async function importScheduledJobsFromUploadRows(
       if (lineResult.resultado === "AGENDADA") scheduled += 1;
       if (lineResult.resultado === "PUBLICADA_IMEDIATAMENTE") publishedImmediately += 1;
       if (lineResult.resultado === "ATUALIZADA") updated += 1;
-      if (lineResult.resultado === "IGNORADA_DUPLICADA") ignored += 1;
+      if (lineResult.resultado === "IGNORADA_SEM_MUDANCA") ignored += 1;
+      if (lineResult.resultado === "JA_PUBLICADA_PRESERVADA") preservedPublished += 1;
       if (lineResult.resultado === "ERRO") errors += 1;
 
       console.info(
-        `[import-agendada] linha ${lineResult.numeroLinhaExcel} externalId ${lineResult.externalId || "-"} resultado ${lineResult.resultado} motivo ${lineResult.motivo || "-"}`
+        `[import-agendada] linha ${lineResult.numeroLinhaExcel} externalIdOriginal ${lineResult.externalIdOriginal || "-"} externalIdFinal ${lineResult.externalIdFinal || "-"} resultado ${lineResult.resultado} motivo ${lineResult.motivo || "-"}`
       );
 
       if (lineResult.jobId) {
         await appendPublicationAuditLog({
           phase: "upload",
           jobId: lineResult.jobId,
-          slug: lineResult.slug || undefined,
-          externalId: lineResult.externalId || undefined,
+          slug: lineResult.slugFinal || undefined,
+          externalId: lineResult.externalIdFinal || undefined,
           message: `Linha ${lineResult.numeroLinhaExcel}: ${lineResult.resultado}. ${lineResult.motivo}`,
           extra: {
             resultado: lineResult.resultado,
+            externalIdOriginal: lineResult.externalIdOriginal,
+            externalIdFinal: lineResult.externalIdFinal,
+            slugOriginal: lineResult.slugOriginal,
+            slugFinal: lineResult.slugFinal,
             dataHoraPublicacaoOriginal: lineResult.dataHoraPublicacaoOriginal,
             dataHoraPublicacaoConvertida: lineResult.dataHoraPublicacaoConvertida
           }
@@ -594,11 +694,22 @@ export async function importScheduledJobsFromUploadRows(
     actorRole: options?.actorRole,
     action: AuditAction.IMPORT,
     entityType: "scheduled-job-upload",
-    summary: `Importacao agendada: total ${items.length}, agendadas ${scheduled}, publicadas imediatamente ${publishedImmediately}, atualizadas ${updated}, ignoradas ${ignored}, erros ${errors}`,
-    after: { totalRows: items.length, validRows, scheduled, publishedImmediately, updated, ignored, errors, results }
+    summary: `Importacao agendada: total ${items.length}, agendadas ${scheduled}, publicadas imediatamente ${publishedImmediately}, atualizadas ${updated}, ignoradas sem mudanca ${ignored}, ja publicadas preservadas ${preservedPublished}, erros ${errors}`,
+    after: { totalRows: items.length, validRows, scheduled, publishedImmediately, updated, ignored, preservedPublished, errors, results }
   });
 
-  return { ok: errors === 0, totalRows: items.length, validRows, scheduled, publishedImmediately, updated, ignored, errors, results };
+  return {
+    ok: errors === 0,
+    totalRows: items.length,
+    validRows,
+    scheduled,
+    publishedImmediately,
+    updated,
+    ignored,
+    preservedPublished,
+    errors,
+    results
+  };
 }
 
 function getDefaultLogDir() {

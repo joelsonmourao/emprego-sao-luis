@@ -9,10 +9,7 @@ export const scheduledJobUploadRowSchema = z.object({
   cityName: z.preprocess((value) => (value === null || value === undefined ? "" : String(value).trim()), z.string().min(2, "Cidade obrigatoria.")),
   stateName: z.preprocess((value) => (value === null || value === undefined ? "" : String(value).trim()), z.string().min(2, "Estado obrigatorio.")),
   summary: optionalString.optional().default(""),
-  descriptionHtml: z.preprocess(
-    (value) => (value === null || value === undefined ? "" : String(value).trim()),
-    z.string().min(1, "Descricao obrigatoria.")
-  ),
+  descriptionHtml: optionalString.optional().default(""),
   requirementsText: optionalString.optional().default(""),
   benefitsText: optionalString.optional().default(""),
   area: optionalString.optional().default(""),
@@ -37,10 +34,7 @@ export const scheduledJobUploadRowSchema = z.object({
   seoTitle: optionalString.optional().default(""),
   seoDescription: optionalString.optional().default(""),
   featured: z.boolean().optional().default(false),
-  externalId: z.preprocess(
-    (value) => (value === null || value === undefined ? "" : String(value).trim()),
-    z.string().min(1, "externalId vazio.")
-  ),
+  externalId: optionalString.optional().default(""),
   dataHoraPublicacao: z.union([z.string(), z.number(), z.date()]).optional().nullable()
 });
 

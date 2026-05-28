@@ -64,17 +64,20 @@ type ParsedPreview = {
 
 type UploadAuditResult = {
   numeroLinhaExcel: number;
-  externalId: string;
+  externalIdOriginal: string;
+  externalIdFinal: string;
+  applyUrl: string;
+  slugOriginal: string;
+  slugFinal: string;
   title: string;
   companyName: string;
   city: string;
   state: string;
   dataHoraPublicacaoOriginal: string;
   dataHoraPublicacaoConvertida: string;
-  resultado: "AGENDADA" | "PUBLICADA_IMEDIATAMENTE" | "ATUALIZADA" | "IGNORADA_DUPLICADA" | "ERRO";
+  resultado: "AGENDADA" | "PUBLICADA_IMEDIATAMENTE" | "ATUALIZADA" | "IGNORADA_SEM_MUDANCA" | "JA_PUBLICADA_PRESERVADA" | "ERRO";
   motivo: string;
   jobId: string;
-  slug: string;
 };
 
 type UploadApiResponse = {
@@ -86,6 +89,7 @@ type UploadApiResponse = {
   publishedImmediately?: number;
   updated?: number;
   ignored?: number;
+  preservedPublished?: number;
   errors?: number;
   results?: UploadAuditResult[];
 };
@@ -127,12 +131,19 @@ export function AdminScheduledJobUpload() {
   const [resultMessage, setResultMessage] = useState("");
   const [isUploading, setIsUploading] = useState(false);
   const [auditRows, setAuditRows] = useState<UploadAuditResult[]>([]);
+  const [auditFilter, setAuditFilter] = useState<
+    "ALL" | "AGENDADA" | "PUBLICADA_IMEDIATAMENTE" | "ATUALIZADA" | "IGNORADA_SEM_MUDANCA" | "JA_PUBLICADA_PRESERVADA" | "ERRO"
+  >("ALL");
 
   const validRows = useMemo(
     () => rows.filter((row) => row.valid && row.data).map((row) => row.data as ScheduledJobUploadRow),
     [rows]
   );
   const invalidRows = rows.filter((row) => !row.valid);
+  const filteredAuditRows = useMemo(
+    () => (auditFilter === "ALL" ? auditRows : auditRows.filter((row) => row.resultado === auditFilter)),
+    [auditRows, auditFilter]
+  );
 
   async function handleFileChange(event: React.ChangeEvent<HTMLInputElement>) {
     const file = event.target.files?.[0];
@@ -155,7 +166,7 @@ export function AdminScheduledJobUpload() {
       }
 
       const candidate = {
-        title: String(normalized.title ?? normalized.seoTitle ?? "").trim(),
+        title: String(normalized.title ?? "").trim(),
         slug:
           String(normalized.slug ?? "").trim() ||
           normalizeSlug(String(normalized.title ?? normalized.seoTitle ?? "")),
@@ -231,11 +242,12 @@ export function AdminScheduledJobUpload() {
         publishedImmediately: result.publishedImmediately ?? 0,
         updated: result.updated ?? 0,
         ignored: result.ignored ?? 0,
+        preservedPublished: result.preservedPublished ?? 0,
         errors: result.errors ?? 0
       };
       setAuditRows(result.results ?? []);
       setResultMessage(
-        `Importacao concluida.\nTotal lidas: ${summary.totalRows}\nValidas: ${summary.validRows}\nAgendadas: ${summary.scheduled}\nPublicadas imediatamente: ${summary.publishedImmediately}\nAtualizadas: ${summary.updated}\nIgnoradas: ${summary.ignored}\nErros: ${summary.errors}`
+        `Importacao concluida.\nTotal lidas: ${summary.totalRows}\nValidas: ${summary.validRows}\nAgendadas: ${summary.scheduled}\nPublicadas imediatamente: ${summary.publishedImmediately}\nAtualizadas: ${summary.updated}\nIgnoradas sem mudanca: ${summary.ignored}\nJa publicadas preservadas: ${summary.preservedPublished}\nErros: ${summary.errors}`
       );
     } catch (error) {
       setResultMessage(`ERRO DE REDE: ${error instanceof Error ? error.message : "Falha na comunicacao."}`);
@@ -245,14 +257,18 @@ export function AdminScheduledJobUpload() {
   }
 
   function handleDownloadAudit() {
-    if (!auditRows.length) {
+    if (!filteredAuditRows.length) {
       setResultMessage("Nenhuma auditoria disponivel para exportar.");
       return;
     }
 
-    const exportRows = auditRows.map((row) => ({
+    const exportRows = filteredAuditRows.map((row) => ({
       linha: row.numeroLinhaExcel,
-      externalId: row.externalId,
+      externalIdOriginal: row.externalIdOriginal,
+      externalIdFinal: row.externalIdFinal,
+      applyUrl: row.applyUrl,
+      slugOriginal: row.slugOriginal,
+      slugFinal: row.slugFinal,
       title: row.title,
       companyName: row.companyName,
       city: row.city,
@@ -261,8 +277,7 @@ export function AdminScheduledJobUpload() {
       dataHoraPublicacaoConvertida: row.dataHoraPublicacaoConvertida,
       resultado: row.resultado,
       motivo: row.motivo,
-      jobId: row.jobId,
-      slug: row.slug
+      jobId: row.jobId
     }));
 
     const sheet = XLSX.utils.json_to_sheet(exportRows);
@@ -310,7 +325,7 @@ export function AdminScheduledJobUpload() {
           <Button type="button" size="lg" onClick={handleUpload} disabled={isUploading || !rows.length}>
             {isUploading ? "Salvando..." : "Salvar vagas agendadas no banco"}
           </Button>
-          <Button type="button" size="lg" variant="outline" onClick={handleDownloadAudit} disabled={!auditRows.length}>
+          <Button type="button" size="lg" variant="outline" onClick={handleDownloadAudit} disabled={!filteredAuditRows.length}>
             <span className="inline-flex items-center gap-2">
               <Download className="h-4 w-4" />
               Baixar Excel de auditoria
@@ -318,21 +333,41 @@ export function AdminScheduledJobUpload() {
           </Button>
         </div>
         <p className="text-xs text-slate-500">
-          O Excel de auditoria exporta o mesmo relatorio linha a linha exibido abaixo: linha, externalId, titulo, cidade/UF, data de publicacao,
-          resultado e motivo.
+          O Excel de auditoria exporta o mesmo relatorio linha a linha exibido abaixo.
         </p>
 
         {resultMessage ? <p className="whitespace-pre-line rounded-2xl bg-slate-100 px-4 py-3 text-sm text-slate-700">{resultMessage}</p> : null}
 
         {auditRows.length ? (
           <div className="rounded-2xl border border-slate-200 bg-white p-4">
-            <p className="mb-3 text-sm font-semibold text-slate-900">Auditoria da importacao</p>
+            <div className="mb-3 flex flex-wrap items-center gap-3">
+              <p className="text-sm font-semibold text-slate-900">Auditoria da importacao</p>
+              <select
+                value={auditFilter}
+                onChange={(event) =>
+                  setAuditFilter(
+                    event.target.value as "ALL" | "AGENDADA" | "PUBLICADA_IMEDIATAMENTE" | "ATUALIZADA" | "IGNORADA_SEM_MUDANCA" | "JA_PUBLICADA_PRESERVADA" | "ERRO"
+                  )
+                }
+                className="h-9 rounded-xl border border-slate-200 px-3 text-xs"
+              >
+                <option value="ALL">Todas</option>
+                <option value="AGENDADA">Agendadas</option>
+                <option value="PUBLICADA_IMEDIATAMENTE">Publicadas imediatamente</option>
+                <option value="ATUALIZADA">Atualizadas</option>
+                <option value="IGNORADA_SEM_MUDANCA">Ignoradas sem mudanca</option>
+                <option value="JA_PUBLICADA_PRESERVADA">Ja publicadas preservadas</option>
+                <option value="ERRO">Erros</option>
+              </select>
+            </div>
             <div className="max-h-[360px] overflow-auto rounded-xl border border-slate-200">
               <table className="min-w-full text-xs">
                 <thead className="bg-slate-100 text-slate-700">
                   <tr>
                     <th className="px-3 py-2 text-left">Linha</th>
-                    <th className="px-3 py-2 text-left">External ID</th>
+                    <th className="px-3 py-2 text-left">External ID original/final</th>
+                    <th className="px-3 py-2 text-left">Slug original/final</th>
+                    <th className="px-3 py-2 text-left">Apply URL</th>
                     <th className="px-3 py-2 text-left">Titulo</th>
                     <th className="px-3 py-2 text-left">Cidade/UF</th>
                     <th className="px-3 py-2 text-left">Data publicacao</th>
@@ -341,10 +376,18 @@ export function AdminScheduledJobUpload() {
                   </tr>
                 </thead>
                 <tbody>
-                  {auditRows.map((row) => (
-                    <tr key={`${row.numeroLinhaExcel}-${row.externalId}-${row.resultado}`} className="border-t border-slate-100">
+                  {filteredAuditRows.map((row) => (
+                    <tr key={`${row.numeroLinhaExcel}-${row.externalIdFinal}-${row.resultado}`} className="border-t border-slate-100">
                       <td className="px-3 py-2">{row.numeroLinhaExcel}</td>
-                      <td className="px-3 py-2">{row.externalId || "-"}</td>
+                      <td className="px-3 py-2">
+                        <div>{row.externalIdOriginal || "-"}</div>
+                        <div className="text-slate-500">{row.externalIdFinal || "-"}</div>
+                      </td>
+                      <td className="px-3 py-2">
+                        <div>{row.slugOriginal || "-"}</div>
+                        <div className="text-slate-500">{row.slugFinal || "-"}</div>
+                      </td>
+                      <td className="px-3 py-2">{row.applyUrl || "-"}</td>
                       <td className="px-3 py-2">{row.title || "-"}</td>
                       <td className="px-3 py-2">{row.city && row.state ? `${row.city}/${row.state}` : "-"}</td>
                       <td className="px-3 py-2">{row.dataHoraPublicacaoConvertida || row.dataHoraPublicacaoOriginal || "-"}</td>

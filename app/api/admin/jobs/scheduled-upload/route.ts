@@ -41,6 +41,7 @@ export async function POST(request: Request) {
         publishedImmediately: result.publishedImmediately,
         updated: result.updated,
         ignored: result.ignored,
+        preservedPublished: result.preservedPublished,
         errors: result.errors,
         results: result.results
       },
