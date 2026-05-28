@@ -1,4 +1,4 @@
-import { JobIndexingStatus, JobScheduleSource, JobStatus, Prisma } from "@prisma/client";
+import { JobIndexingStatus, JobPublicationStatus, JobScheduleSource, JobStatus, Prisma } from "@prisma/client";
 
 import { prisma } from "@/lib/db";
 import { notifyGoogleIndexing, validateJobForGoogleIndexing } from "@/lib/google-indexing";
@@ -150,6 +150,7 @@ export async function publishJobNow(jobId: string, source: JobScheduleSource = J
   const job = await prisma.job.update({
     where: { id: jobId },
     data: {
+      publicationStatus: JobPublicationStatus.OK,
       status: JobStatus.PUBLISHED,
       isActive: true,
       publishedAt: now,
@@ -214,7 +215,25 @@ export async function cancelScheduledPublication(jobId: string) {
 
 const CRON_PUBLISH_LIMIT = 50;
 
+export async function reconcilePublishedJobsPublicationStatus() {
+  const result = await prisma.job.updateMany({
+    where: {
+      publicationStatus: JobPublicationStatus.AGUARDANDO_AGENDAMENTO,
+      status: JobStatus.PUBLISHED,
+      publishedAt: { not: null },
+      isActive: true
+    },
+    data: {
+      publicationStatus: JobPublicationStatus.OK
+    }
+  });
+
+  return result.count;
+}
+
 export async function processDueScheduledJobs(limit = CRON_PUBLISH_LIMIT) {
+  await reconcilePublishedJobsPublicationStatus();
+
   const now = new Date();
   const due = await prisma.job.findMany({
     where: {
@@ -249,6 +268,7 @@ export async function processDueScheduledJobs(limit = CRON_PUBLISH_LIMIT) {
     await tx.job.updateMany({
       where: { id: { in: ids } },
       data: {
+        publicationStatus: JobPublicationStatus.OK,
         status: JobStatus.PUBLISHED,
         isActive: true,
         publishedAt: now,
