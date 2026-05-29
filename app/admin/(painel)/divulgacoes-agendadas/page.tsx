@@ -1,4 +1,4 @@
-import { JobIndexingStatus, JobStatus, Prisma } from "@prisma/client";
+import { JobIndexingStatus, JobPublicationStatus, JobStatus, Prisma } from "@prisma/client";
 
 import { prisma } from "@/lib/db";
 import { formatBrazilDateTime } from "@/lib/date-utils";
@@ -40,14 +40,27 @@ export default async function DivulgacoesAgendadasPage({ searchParams }: PagePro
   }
 
   if (filter === "draft") where.status = JobStatus.DRAFT;
-  if (filter === "scheduled") where.status = JobStatus.SCHEDULED;
+  const scheduledBaseWhere: Prisma.JobWhereInput = {
+    publishedAt: null,
+    scheduledPublishAt: { not: null },
+    OR: [{ status: JobStatus.SCHEDULED }, { publicationStatus: JobPublicationStatus.AGUARDANDO_AGENDAMENTO }]
+  };
+
+  if (filter === "scheduled") {
+    const currentAnd = Array.isArray(where.AND) ? where.AND : where.AND ? [where.AND] : [];
+    where.AND = [...currentAnd, scheduledBaseWhere];
+  }
   if (filter === "published") where.status = JobStatus.PUBLISHED;
   if (filter === "error") where.status = JobStatus.ERROR;
   if (filter === "google-sent") where.indexingStatus = JobIndexingStatus.SENT;
   if (filter === "indexing-error") where.indexingStatus = JobIndexingStatus.ERROR;
   if (filter === "today") where.publishedAt = { gte: todayStart };
-  if (filter === "next-7-days") where.scheduledPublishAt = { gte: now, lte: in7Days };
-  if (filter === "overdue") where.AND = [{ status: JobStatus.SCHEDULED }, { scheduledPublishAt: { lt: now } }];
+  if (filter === "next-7-days") {
+    where.AND = [scheduledBaseWhere, { scheduledPublishAt: { gte: now, lte: in7Days } }];
+  }
+  if (filter === "overdue") {
+    where.AND = [scheduledBaseWhere, { scheduledPublishAt: { lte: now } }];
+  }
 
   const [rows, totalScheduled, pendingPublication, publishedToday, publishedLast7d, sentToGoogle, indexingErrors, publicationErrors, draftsWithoutSchedule] =
     await Promise.all([
@@ -57,8 +70,8 @@ export default async function DivulgacoesAgendadasPage({ searchParams }: PagePro
         orderBy: [{ scheduledPublishAt: "asc" }, { updatedAt: "desc" }],
         take: 200
       }),
-      prisma.job.count({ where: { status: JobStatus.SCHEDULED } }),
-      prisma.job.count({ where: { status: JobStatus.SCHEDULED, scheduledPublishAt: { lte: now } } }),
+      prisma.job.count({ where: scheduledBaseWhere }),
+      prisma.job.count({ where: { ...scheduledBaseWhere, scheduledPublishAt: { not: null, lte: now } } }),
       prisma.job.count({ where: { status: JobStatus.PUBLISHED, publishedAt: { gte: todayStart } } }),
       prisma.job.count({ where: { status: JobStatus.PUBLISHED, publishedAt: { gte: sevenDaysAgo } } }),
       prisma.job.count({ where: { indexingStatus: JobIndexingStatus.SENT } }),

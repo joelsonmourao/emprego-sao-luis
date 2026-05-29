@@ -40,6 +40,7 @@ export async function GET(request: Request) {
         limit: result.limit,
         published: result.published,
         sentToIndexing: result.sentToIndexing,
+        dueScheduled: result.dueScheduled,
         remainingScheduled: result.remainingScheduled,
         indexingErrors: result.indexingErrors,
         publicationErrors: result.publicationErrors

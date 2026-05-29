@@ -1,7 +1,17 @@
-export const BRAZIL_TIME_ZONE = "America/Fortaleza";
+export const DEFAULT_SITE_TIME_ZONE = "America/Sao_Paulo";
 
-/** Fuso do portal e da planilha de publicacao: sempre Brasilia (nao configuravel por env). */
-export const SITE_TIME_ZONE = BRAZIL_TIME_ZONE;
+function resolveSiteTimeZone() {
+  const configured = (process.env.APP_TIME_ZONE || DEFAULT_SITE_TIME_ZONE).trim();
+  try {
+    Intl.DateTimeFormat("pt-BR", { timeZone: configured }).format(new Date());
+    return configured;
+  } catch {
+    return DEFAULT_SITE_TIME_ZONE;
+  }
+}
+
+/** Fuso oficial do site para entrada/saida humana; persistencia continua em UTC no banco. */
+export const SITE_TIME_ZONE = resolveSiteTimeZone();
 
 type DateTimeParts = {
   year: number;

@@ -1,4 +1,4 @@
-import { EmploymentType, JobIndexingStatus, JobScheduleSource, JobStatus, LocationType, Prisma } from "@prisma/client";
+import { EmploymentType, JobIndexingStatus, JobPublicationStatus, JobScheduleSource, JobStatus, LocationType, Prisma } from "@prisma/client";
 
 import { normalizeLines, normalizeSlug, parseOptionalDate, richTextFromInput, sanitizeHtml } from "@/lib/admin/content";
 import { getBrazilNow, parseFlexibleDateToUtc } from "@/lib/date-utils";
@@ -198,8 +198,15 @@ export async function upsertJobFromForm(input: unknown, existingId?: string) {
 
   const publicationFields = {
     status: parsed.status as JobStatus,
+    publicationStatus:
+      parsed.status === "PUBLISHED"
+        ? JobPublicationStatus.OK
+        : parsed.status === "SCHEDULED"
+          ? JobPublicationStatus.AGUARDANDO_AGENDAMENTO
+          : JobPublicationStatus.AGUARDANDO_AGENDAMENTO,
     isActive: parsed.status === "PUBLISHED" ? true : parsed.isActive,
     scheduledAt: parsed.status === "SCHEDULED" ? scheduledAt : null,
+    scheduledPublishAt: parsed.status === "SCHEDULED" ? scheduledAt : null,
     scheduleSource: parsed.status === "SCHEDULED" ? JobScheduleSource.ADMIN : JobScheduleSource.MANUAL,
     publishedAt: parsed.status === "PUBLISHED" ? new Date() : null,
     indexingStatus: parsed.status === "PUBLISHED" ? JobIndexingStatus.NOT_SENT : JobIndexingStatus.SKIPPED,

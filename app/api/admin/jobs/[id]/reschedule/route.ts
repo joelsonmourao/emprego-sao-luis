@@ -1,4 +1,5 @@
 import { AuditAction, JobIndexingStatus, JobScheduleSource, JobStatus } from "@prisma/client";
+import { JobPublicationStatus } from "@prisma/client";
 import { NextResponse } from "next/server";
 import { z } from "zod";
 
@@ -36,8 +37,10 @@ export async function POST(request: Request, context: Context) {
       where: { id },
       data: {
         status: JobStatus.SCHEDULED,
+        publicationStatus: JobPublicationStatus.AGUARDANDO_AGENDAMENTO,
         isActive: false,
         scheduledAt,
+        scheduledPublishAt: scheduledAt,
         publishedAt: null,
         scheduleSource: JobScheduleSource.MANUAL,
         importError: null,
@@ -45,7 +48,7 @@ export async function POST(request: Request, context: Context) {
         indexingError: null,
         indexingLastSubmittedAt: null
       },
-      select: { id: true, title: true, scheduledAt: true }
+      select: { id: true, title: true, scheduledPublishAt: true }
     });
 
     await writeAuditLog({
@@ -58,7 +61,7 @@ export async function POST(request: Request, context: Context) {
       entityId: job.id,
       entityLabel: job.title,
       summary: "Vaga reagendada manualmente",
-      after: { status: JobStatus.SCHEDULED, scheduledAt: job.scheduledAt }
+      after: { status: JobStatus.SCHEDULED, scheduledPublishAt: job.scheduledPublishAt }
     });
 
     return NextResponse.json({ ok: true });

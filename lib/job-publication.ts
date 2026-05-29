@@ -5,6 +5,7 @@ import { notifyGoogleIndexing, validateJobForGoogleIndexing } from "@/lib/google
 import { revalidatePublicSurfacesForJob } from "@/lib/public-revalidate";
 import { getSiteUrl } from "@/lib/site-url";
 import { parseScheduledAtInputToUtc } from "@/lib/scheduled-at-utc";
+import { formatDateTimeLabelInTimeZone, SITE_TIME_ZONE } from "@/lib/timezone";
 
 type IndexingLogStatus = "SUCCESS" | "ERROR" | "SKIPPED" | "RETRY";
 
@@ -155,6 +156,7 @@ export async function publishJobNow(jobId: string, source: JobScheduleSource = J
       isActive: true,
       publishedAt: now,
       scheduledAt: null,
+      scheduledPublishAt: null,
       scheduleSource: source,
       importError: null
     },
@@ -206,6 +208,8 @@ export async function cancelScheduledPublication(jobId: string) {
     data: {
       status: JobStatus.DRAFT,
       scheduledAt: null,
+      scheduledPublishAt: null,
+      publicationStatus: JobPublicationStatus.AGUARDANDO_AGENDAMENTO,
       scheduleSource: JobScheduleSource.MANUAL,
       importError: null
     }
@@ -214,6 +218,30 @@ export async function cancelScheduledPublication(jobId: string) {
 }
 
 const CRON_PUBLISH_LIMIT = 50;
+
+function getDueScheduledWhere(now: Date): Prisma.JobWhereInput {
+  return {
+    publishedAt: null,
+    scheduledPublishAt: { not: null, lte: now },
+    OR: [{ status: JobStatus.SCHEDULED }, { publicationStatus: JobPublicationStatus.AGUARDANDO_AGENDAMENTO }]
+  };
+}
+
+function getFutureScheduledWhere(now: Date): Prisma.JobWhereInput {
+  return {
+    publishedAt: null,
+    scheduledPublishAt: { not: null, gt: now },
+    OR: [{ status: JobStatus.SCHEDULED }, { publicationStatus: JobPublicationStatus.AGUARDANDO_AGENDAMENTO }]
+  };
+}
+
+function getTotalScheduledWhere(): Prisma.JobWhereInput {
+  return {
+    publishedAt: null,
+    scheduledPublishAt: { not: null },
+    OR: [{ status: JobStatus.SCHEDULED }, { publicationStatus: JobPublicationStatus.AGUARDANDO_AGENDAMENTO }]
+  };
+}
 
 export async function reconcilePublishedJobsPublicationStatus() {
   const result = await prisma.job.updateMany({
@@ -232,32 +260,56 @@ export async function reconcilePublishedJobsPublicationStatus() {
 }
 
 export async function processDueScheduledJobs(limit = CRON_PUBLISH_LIMIT) {
-  await reconcilePublishedJobsPublicationStatus();
-
   const now = new Date();
+  const reconciled = await reconcilePublishedJobsPublicationStatus();
+  const dueWhere = getDueScheduledWhere(now);
+  const futureWhere = getFutureScheduledWhere(now);
+  const totalWhere = getTotalScheduledWhere();
+
+  const [totalScheduled, dueScheduled, futureScheduled, sampleScheduled] = await Promise.all([
+    prisma.job.count({ where: totalWhere }),
+    prisma.job.count({ where: dueWhere }),
+    prisma.job.count({ where: futureWhere }),
+    prisma.job.findMany({
+      where: totalWhere,
+      orderBy: [{ scheduledPublishAt: "asc" }, { createdAt: "asc" }],
+      take: 10,
+      select: { id: true, slug: true, scheduledPublishAt: true, status: true, publicationStatus: true }
+    })
+  ]);
+
+  console.info("[cron publish-scheduled-jobs] diagnostics", {
+    siteTimeZone: SITE_TIME_ZONE,
+    nowUtcIso: now.toISOString(),
+    nowSiteTime: formatDateTimeLabelInTimeZone(now),
+    reconciledPublicationStatus: reconciled,
+    totalScheduled,
+    dueScheduled,
+    futureScheduled,
+    sample: sampleScheduled.map((job) => ({
+      id: job.id,
+      slug: job.slug,
+      status: job.status,
+      publicationStatus: job.publicationStatus,
+      scheduledPublishAtUtc: job.scheduledPublishAt?.toISOString() ?? null,
+      scheduledPublishAtSiteTime: job.scheduledPublishAt ? formatDateTimeLabelInTimeZone(job.scheduledPublishAt) : null
+    }))
+  });
+
   const due = await prisma.job.findMany({
-    where: {
-      status: JobStatus.SCHEDULED,
-      scheduledAt: { not: null, lte: now }
-    },
-    orderBy: [{ scheduledAt: "asc" }, { createdAt: "asc" }],
+    where: dueWhere,
+    orderBy: [{ scheduledPublishAt: "asc" }, { createdAt: "asc" }],
     take: limit,
     select: { id: true }
   });
 
   if (!due.length) {
-    const remainingScheduled = await prisma.job.count({
-      where: {
-        status: JobStatus.SCHEDULED,
-        scheduledAt: { not: null, lte: now }
-      }
-    });
-
     return {
       limit,
       published: 0,
       sentToIndexing: 0,
-      remainingScheduled,
+      dueScheduled,
+      remainingScheduled: futureScheduled,
       indexingErrors: 0,
       publicationErrors: 0
     };
@@ -273,6 +325,7 @@ export async function processDueScheduledJobs(limit = CRON_PUBLISH_LIMIT) {
         isActive: true,
         publishedAt: now,
         scheduledAt: null,
+        scheduledPublishAt: null,
         scheduleSource: JobScheduleSource.AUTOMATICO,
         importError: null
       }
@@ -335,16 +388,14 @@ export async function processDueScheduledJobs(limit = CRON_PUBLISH_LIMIT) {
   });
 
   const remainingScheduled = await prisma.job.count({
-    where: {
-      status: JobStatus.SCHEDULED,
-      scheduledAt: { not: null, lte: now }
-    }
+    where: getFutureScheduledWhere(new Date())
   });
 
   return {
     limit,
     published,
     sentToIndexing,
+    dueScheduled,
     remainingScheduled,
     indexingErrors,
     publicationErrors
@@ -389,6 +440,8 @@ export async function fixScheduledImportPublication() {
             status: JobStatus.SCHEDULED,
             isActive: false,
             scheduledAt: parsed,
+            scheduledPublishAt: parsed,
+            publicationStatus: JobPublicationStatus.AGUARDANDO_AGENDAMENTO,
             publishedAt: null,
             indexingStatus: JobIndexingStatus.NOT_SENT,
             indexingError: null,
