@@ -151,9 +151,9 @@ export function SiteIntegrations({ consentBanner, google, initialConsentValue }:
           <Script
             id="ga4-src"
             src={`https://www.googletagmanager.com/gtag/js?id=${google.ga4MeasurementId}`}
-            strategy="afterInteractive"
+            strategy="lazyOnload"
           />
-          <Script id="ga4-config" strategy="afterInteractive">
+          <Script id="ga4-config" strategy="lazyOnload">
             {`
               window.gtag = window.gtag || function(){window.dataLayer = window.dataLayer || []; window.dataLayer.push(arguments);};
               window.gtag('js', new Date());
@@ -164,7 +164,7 @@ export function SiteIntegrations({ consentBanner, google, initialConsentValue }:
       ) : null}
 
       {shouldLoadGtm ? (
-        <Script id="gtm-script" strategy="afterInteractive">
+        <Script id="gtm-script" strategy="lazyOnload">
           {`
             (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
             new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],

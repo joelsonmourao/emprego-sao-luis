@@ -124,7 +124,7 @@ export default async function HomePage() {
     quickAccess: (
       <section className="mx-auto max-w-7xl px-4 py-6 sm:px-6 sm:py-8 lg:px-8 lg:py-10">
         <div className="grid gap-4 lg:grid-cols-2 sm:gap-6">
-          <Link href="/vagas" className="brand-chip rounded-[1.5rem] p-5 transition hover:-translate-y-1 hover:shadow-[0_28px_80px_-52px_rgba(26,43,76,0.4)] sm:rounded-[2rem] sm:p-7">
+          <Link prefetch={false} href="/vagas" className="brand-chip rounded-[1.5rem] p-5 transition hover:-translate-y-1 hover:shadow-[0_28px_80px_-52px_rgba(26,43,76,0.4)] sm:rounded-[2rem] sm:p-7">
             <div className="flex items-start justify-between gap-3 sm:gap-4">
               <div>
                 <p className="text-[10px] font-semibold uppercase tracking-[0.24em] text-[var(--brand-orange)] sm:text-xs sm:tracking-[0.28em]">
@@ -139,6 +139,7 @@ export default async function HomePage() {
 
           <Link
             href="/blog"
+            prefetch={false}
             className="rounded-[1.5rem] border border-[color:rgba(255,109,0,0.18)] bg-[linear-gradient(145deg,#1a2b4c_0%,#21406e_56%,#2f6fed_100%)] p-5 text-white shadow-[0_30px_90px_-55px_rgba(26,43,76,0.68)] transition hover:-translate-y-1 sm:rounded-[2rem] sm:p-7"
           >
             <div className="flex items-start justify-between gap-3 sm:gap-4">
@@ -175,7 +176,7 @@ export default async function HomePage() {
           
           <div className="flex flex-wrap gap-3 sm:gap-4">
             <Button asChild size="lg" className="gap-2">
-              <Link href="/vagas">
+              <Link href="/vagas" prefetch={false}>
                 Ver todas as vagas
                 <ArrowRight className="h-4 w-4" />
               </Link>
@@ -191,6 +192,7 @@ export default async function HomePage() {
                 <Link
                   key={state.id}
                   href={`/vagas/estado/${state.slug}`}
+                  prefetch={false}
                   className="rounded-full border border-[color:rgba(26,43,76,0.1)] bg-white px-3 py-1.5 text-xs font-medium text-[var(--brand-text-secondary)] transition hover:border-[color:rgba(255,109,0,0.26)] hover:text-[var(--brand-orange)] sm:px-4 sm:py-2 sm:text-sm"
                 >
                   {state.name} ({state._count.jobs})
@@ -208,6 +210,7 @@ export default async function HomePage() {
                 <Link
                   key={city.id}
                   href={getCityJobsPath(city.slug)}
+                  prefetch={false}
                   className="rounded-full border border-[color:rgba(26,43,76,0.1)] bg-white px-3 py-1.5 text-xs font-medium text-[var(--brand-text-secondary)] transition hover:border-[color:rgba(255,109,0,0.26)] hover:text-[var(--brand-orange)] sm:px-4 sm:py-2 sm:text-sm"
                 >
                   {city.name}, {city.state.code}
@@ -233,7 +236,7 @@ export default async function HomePage() {
         
         <div className="flex flex-wrap gap-3 sm:gap-4">
           <Button asChild size="lg" variant="outline" className="rounded-2xl">
-            <Link href="/blog">Acessar blog</Link>
+            <Link href="/blog" prefetch={false}>Acessar blog</Link>
           </Button>
         </div>
       </section>
@@ -269,6 +272,7 @@ export default async function HomePage() {
                 <Link
                   key={city.id}
                   href={getCityJobsPath(city.slug)}
+                  prefetch={false}
                   className="rounded-full border border-[color:rgba(26,43,76,0.1)] bg-white px-3 py-1.5 text-xs font-medium text-[var(--brand-text-secondary)] transition hover:border-[color:rgba(255,109,0,0.28)] hover:text-[var(--brand-orange)] sm:px-4 sm:py-2 sm:text-sm"
                 >
                   {city.name}, {city.state.code}
@@ -308,7 +312,7 @@ export default async function HomePage() {
             const Icon = iconMap[item.iconKey as keyof typeof iconMap] ?? ArrowRight;
 
             return (
-              <Link key={item.title} href={item.href as Route} className="brand-chip rounded-[1.5rem] p-4 transition hover:-translate-y-1 sm:rounded-[2rem] sm:p-6">
+              <Link key={item.title} href={item.href as Route} prefetch={false} className="brand-chip rounded-[1.5rem] p-4 transition hover:-translate-y-1 sm:rounded-[2rem] sm:p-6">
                 <Icon className="h-7 w-7 text-[var(--brand-orange)] sm:h-8 sm:w-8" />
                 <h3 className="mt-4 text-xl font-black text-[var(--brand-navy)] leading-tight sm:mt-5 sm:text-2xl">{item.title}</h3>
                 <p className="mt-2 text-sm leading-6 text-[var(--brand-text-secondary)] sm:leading-7">{item.description}</p>
@@ -329,6 +333,7 @@ export default async function HomePage() {
                 <Link
                   key={company.slug}
                     href={getCompanyJobsPath(company.slug)}
+                  prefetch={false}
                   className="rounded-[1.25rem] border border-[color:rgba(26,43,76,0.1)] bg-white px-3 py-3 text-sm text-[var(--brand-text-secondary)] transition hover:border-[color:rgba(255,109,0,0.24)] hover:text-[var(--brand-orange)] sm:px-4 sm:py-4"
                 >
                   <span className="block font-semibold text-[var(--brand-navy)]">{company.name}</span>
@@ -353,6 +358,7 @@ export default async function HomePage() {
                 <Link
                   key={city.id}
                   href={getCityJobsPath(city.slug)}
+                  prefetch={false}
                   className="rounded-full border border-white/18 bg-white/10 px-3 py-1.5 text-xs font-medium text-white transition hover:bg-white/16 sm:px-4 sm:py-2 sm:text-sm"
                 >
                   {city.name}
@@ -370,6 +376,7 @@ export default async function HomePage() {
                     <Link
                       key={`${row.citySlug}-${row.stateCode}`}
                       href={buildJovemAprendizCityUfPath(row.citySlug, row.stateCode) as Route}
+                      prefetch={false}
                       className="rounded-full border border-white/18 bg-white/10 px-3 py-1.5 text-xs font-medium text-white transition hover:bg-white/16 sm:px-4 sm:py-2 sm:text-sm"
                     >
                       {`Jovem Aprendiz em ${row.cityName}, ${row.stateCode}`}
@@ -418,10 +425,10 @@ export default async function HomePage() {
   return (
     <div className="pb-20">
       <JsonLd data={buildFaqJsonLd(siteContent.faq.home)} />
-      <section className="relative overflow-hidden border-b border-slate-200 bg-[linear-gradient(138deg,#1a2b4c_0%,#21406e_42%,#2f6fed_82%,#ff6d00_100%)] text-white">
+      <section className="relative min-h-[640px] overflow-hidden border-b border-slate-200 bg-[linear-gradient(138deg,#1a2b4c_0%,#21406e_42%,#2f6fed_82%,#ff6d00_100%)] text-white sm:min-h-[720px] lg:min-h-[640px]">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_22%,rgba(255,255,255,0.14),transparent_22%),radial-gradient(circle_at_84%_16%,rgba(255,179,71,0.12),transparent_20%)]" />
-        <div className="mx-auto grid max-w-7xl gap-4 px-4 py-8 sm:gap-6 sm:px-6 sm:py-12 lg:grid-cols-[1.08fr_0.92fr] lg:px-8 lg:py-16">
-          <div className="relative space-y-5">
+        <div className="mx-auto grid min-h-[600px] max-w-7xl gap-4 px-4 py-8 sm:min-h-[660px] sm:gap-6 sm:px-6 sm:py-12 lg:min-h-[600px] lg:grid-cols-[1.08fr_0.92fr] lg:px-8 lg:py-16">
+          <div className="relative min-h-[540px] space-y-5 sm:min-h-[560px]">
             <div className="inline-flex rounded-full border border-white/18 bg-white/10 px-2.5 py-1 text-[9px] font-semibold uppercase tracking-[0.2em] text-orange-50 sm:px-4 sm:py-1.5 sm:text-[10px] sm:tracking-[0.28em]">
               {siteContent.home.heroBadge}
             </div>
@@ -430,16 +437,18 @@ export default async function HomePage() {
               <p className="max-w-3xl text-[14px] leading-6 text-white/86 sm:text-base sm:leading-7">{siteContent.home.heroDescription}</p>
             </div>
 
-            <HomeSearchForm
-              states={searchStates}
-              action="/vagas"
-              submitLabel="Ver vagas"
-              helperText={siteContent.home.searchHelperText}
-              footerLinkHref="/vagas"
-              footerLinkLabel="Abrir todas as vagas"
-            />
+            <div className="min-h-[220px]">
+              <HomeSearchForm
+                states={searchStates}
+                action="/vagas"
+                submitLabel="Ver vagas"
+                helperText={siteContent.home.searchHelperText}
+                footerLinkHref="/vagas"
+                footerLinkLabel="Abrir todas as vagas"
+              />
+            </div>
 
-            <div className="flex flex-col gap-2.5 sm:flex-row sm:flex-wrap sm:gap-4">
+            <div className="flex min-h-[146px] flex-col gap-2.5 sm:min-h-[56px] sm:flex-row sm:flex-wrap sm:gap-4">
               <Button asChild size="lg" className="gap-2">
                 <Link href={siteContent.home.primaryButton.href as Route}>
                   {siteContent.home.primaryButton.label}

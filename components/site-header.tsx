@@ -15,7 +15,7 @@ export async function SiteHeader() {
   return (
     <header className="z-40 border-b border-[color:rgba(255,255,255,0.08)] bg-[var(--brand-navy)] text-white shadow-[0_18px_50px_-35px_rgba(26,43,76,0.7)] backdrop-blur-2xl md:sticky md:top-0">
       <div className="border-b border-white/10 bg-[linear-gradient(90deg,rgba(26,43,76,0.98)_0%,rgba(34,56,99,0.98)_58%,rgba(47,111,237,0.92)_100%)]">
-        <div className="mx-auto flex max-w-7xl items-center justify-between gap-2 px-4 py-1.5 text-[10px] font-medium text-white/78 sm:px-6 sm:py-2 sm:text-xs lg:px-8">
+        <div className="mx-auto flex min-h-[30px] max-w-7xl items-center justify-between gap-2 px-4 py-1.5 text-[10px] font-medium text-white/78 sm:min-h-[36px] sm:px-6 sm:py-2 sm:text-xs lg:px-8">
           <p className="flex min-w-0 items-start gap-1.5 leading-4 sm:gap-2 sm:leading-5">
             <Sparkles className="mt-0.5 h-3 w-3 shrink-0 text-[var(--brand-orange)] sm:h-4 sm:w-4" />
             <span className="line-clamp-2 sm:line-clamp-1">{siteContent.navigation.topBarText}</span>
