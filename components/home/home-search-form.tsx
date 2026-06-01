@@ -1,4 +1,7 @@
+"use client";
+
 import Link from "next/link";
+import { useEffect, useMemo, useState } from "react";
 import { MapPinned, Search, SlidersHorizontal } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -38,14 +41,26 @@ export function HomeSearchForm({
   initialCity?: string;
   hiddenFields?: Record<string, string | undefined>;
 }) {
-  const cities = states.flatMap((state) =>
-    state.cities.map((city) => ({
-      id: city.id,
-      name: city.name,
-      slug: city.slug,
-      stateCode: state.code
-    }))
-  );
+  const stateMap = useMemo(() => new Map(states.map((state) => [state.slug, state])), [states]);
+  const stateCodeMap = useMemo(() => new Map(states.map((state) => [state.code.toLowerCase(), state.slug])), [states]);
+  const normalizedInitialState = useMemo(() => {
+    const candidate = initialState.trim();
+    if (!candidate) return "";
+    if (stateMap.has(candidate)) return candidate;
+    return stateCodeMap.get(candidate.toLowerCase()) ?? "";
+  }, [initialState, stateCodeMap, stateMap]);
+  const [selectedState, setSelectedState] = useState(normalizedInitialState);
+  const [selectedCity, setSelectedCity] = useState(initialCity);
+
+  const currentState = stateMap.get(selectedState) ?? null;
+  const availableCities = currentState?.cities ?? [];
+
+  useEffect(() => {
+    const hasSelectedCityInState = availableCities.some((city) => city.slug === selectedCity);
+    if (!hasSelectedCityInState && selectedCity) {
+      setSelectedCity("");
+    }
+  }, [availableCities, selectedCity]);
 
   return (
     <form
@@ -70,14 +85,15 @@ export function HomeSearchForm({
           <MapPinned className="h-5 w-5 text-[var(--brand-blue)]" />
           <select
             name="estado"
-            defaultValue={initialState}
+            value={selectedState}
+            onChange={(event) => setSelectedState(event.target.value)}
             aria-label="Estado"
             className="h-11 w-full bg-transparent text-sm text-[var(--brand-navy)] outline-none sm:h-12"
           >
             <option value="">Todos os estados</option>
             {states.map((state) => (
               <option key={state.id} value={state.slug}>
-                {state.name}
+                {state.name} ({state.code})
               </option>
             ))}
           </select>
@@ -88,14 +104,16 @@ export function HomeSearchForm({
           <MapPinned className="h-5 w-5 text-[var(--brand-blue)]" />
           <select
             name="cidade"
-            defaultValue={initialCity}
+            value={selectedCity}
+            onChange={(event) => setSelectedCity(event.target.value)}
             aria-label="Cidade"
             className="h-11 w-full bg-transparent text-sm text-[var(--brand-navy)] outline-none sm:h-12"
+            disabled={!selectedState}
           >
-            <option value="">Todas as cidades</option>
-            {cities.map((city) => (
+            <option value="">{selectedState ? "Todas as cidades" : "Selecione um estado primeiro"}</option>
+            {availableCities.map((city) => (
               <option key={city.id} value={city.slug}>
-                {city.name} ({city.stateCode})
+                {city.name}
               </option>
             ))}
           </select>

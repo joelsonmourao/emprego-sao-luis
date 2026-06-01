@@ -55,9 +55,9 @@ export async function generateMetadata({
 }) {
   const raw = await searchParams;
   const normalizedInput = {
-    q: typeof raw.q === "string" ? raw.q : undefined,
-    estado: typeof raw.estado === "string" ? raw.estado : undefined,
-    cidade: typeof raw.cidade === "string" ? raw.cidade : undefined,
+    q: typeof raw.q === "string" ? raw.q : typeof raw.query === "string" ? raw.query : undefined,
+    estado: typeof raw.estado === "string" ? raw.estado : typeof raw.state === "string" ? raw.state : undefined,
+    cidade: typeof raw.cidade === "string" ? raw.cidade : typeof raw.city === "string" ? raw.city : undefined,
     empresa: typeof raw.empresa === "string" ? raw.empresa : undefined,
     order: typeof raw.order === "string" ? raw.order : undefined,
     page: typeof raw.page === "string" ? raw.page : undefined
@@ -124,9 +124,9 @@ export default async function JobsPage({
 }) {
   const raw = await searchParams;
   const normalizedInput = {
-    q: typeof raw.q === "string" ? raw.q : undefined,
-    estado: typeof raw.estado === "string" ? raw.estado : undefined,
-    cidade: typeof raw.cidade === "string" ? raw.cidade : undefined,
+    q: typeof raw.q === "string" ? raw.q : typeof raw.query === "string" ? raw.query : undefined,
+    estado: typeof raw.estado === "string" ? raw.estado : typeof raw.state === "string" ? raw.state : undefined,
+    cidade: typeof raw.cidade === "string" ? raw.cidade : typeof raw.city === "string" ? raw.city : undefined,
     empresa: typeof raw.empresa === "string" ? raw.empresa : undefined,
     order: typeof raw.order === "string" ? raw.order : undefined,
     page: typeof raw.page === "string" ? raw.page : undefined
