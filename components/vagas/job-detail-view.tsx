@@ -93,6 +93,10 @@ export async function JobDetailView({ job, displayTitle }: { job: JobWithRelatio
                               <img
                                 src={job.company?.logoUrl ?? job.companyLogoUrl ?? ""}
                                 alt={job.companyName}
+                                width={36}
+                                height={36}
+                                loading="lazy"
+                                decoding="async"
                                 className="h-7 w-7 rounded-2xl border border-[color:rgba(26,43,76,0.1)] bg-white object-cover p-1 sm:h-9 sm:w-9"
                               />
                               <span className="truncate">{job.companyName}</span>
@@ -148,14 +152,22 @@ export async function JobDetailView({ job, displayTitle }: { job: JobWithRelatio
                         </ul>
                       </div>
                       {job.heroImageUrl ? (
-                        <div className="overflow-hidden rounded-[1.5rem] border border-slate-200 bg-white/70 shadow-sm sm:rounded-[2rem]">
-                          <img src={job.heroImageUrl} alt={headingTitle} className="h-full max-h-[200px] w-full object-cover sm:max-h-[280px]" />
+                        <div className="aspect-[16/10] min-h-[200px] overflow-hidden rounded-[1.5rem] border border-slate-200 bg-white/70 shadow-sm sm:min-h-[260px] sm:rounded-[2rem]">
+                          <img
+                            src={job.heroImageUrl}
+                            alt={headingTitle}
+                            width={960}
+                            height={600}
+                            loading="eager"
+                            decoding="async"
+                            className="h-full w-full object-cover"
+                          />
                         </div>
                       ) : null}
                     </div>
                   </div>
 
-                  <div className="rounded-[1.25rem] border border-slate-200 bg-white/80 p-3 sm:p-4">
+                  <div className="min-h-[140px] rounded-[1.25rem] border border-slate-200 bg-white/80 p-3 sm:min-h-[160px] sm:p-4">
                     <PublicAdSlot slotSlug="job-after-hero" format="horizontal" fullWidthResponsive />
                   </div>
 
@@ -168,7 +180,7 @@ export async function JobDetailView({ job, displayTitle }: { job: JobWithRelatio
                         />
                       </div>
 
-                    <div className="my-4 sm:my-6">
+                    <div className="my-4 min-h-[250px] sm:my-6">
                       <PublicAdSlot slotSlug="job-after-description" format="rectangle" fullWidthResponsive />
                     </div>
 
@@ -237,7 +249,9 @@ export async function JobDetailView({ job, displayTitle }: { job: JobWithRelatio
                       <p className="mt-3 text-xs leading-5 text-[var(--brand-text-secondary)] sm:mt-4 sm:text-sm">Fonte: {sourceSiteLabel}</p>
                     </div>
 
-                    <PublicAdSlot slotSlug="job-sidebar" format="rectangle" fullWidthResponsive />
+                    <div className="min-h-[250px]">
+                      <PublicAdSlot slotSlug="job-sidebar" format="rectangle" fullWidthResponsive />
+                    </div>
 
                     <div className="space-y-3 sm:space-y-4">
                       <h2 className="text-base font-black text-[var(--brand-navy)] sm:text-lg">Vagas relacionadas</h2>

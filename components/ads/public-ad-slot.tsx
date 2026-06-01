@@ -43,7 +43,7 @@ export async function PublicAdSlot({
 
   const trimmedCode = slot.code.trim();
   if (trimmedCode.includes("<") && (trimmedCode.includes("ins") || trimmedCode.includes("script"))) {
-    return <AdSlotSnippetClient html={trimmedCode} className={className} />;
+    return <AdSlotSnippetClient html={trimmedCode} className={cn(minHeightClass, className)} />;
   }
 
   const dataSlot = slot.adsenseSlotId?.trim() || extractSlotFromHtml(trimmedCode) || "";

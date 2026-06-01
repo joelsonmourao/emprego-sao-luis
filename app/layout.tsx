@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Suspense, type ReactNode } from "react";
+import Script from "next/script";
 import "./globals.css";
 
 import { SiteHeader } from "@/components/site-header";
@@ -76,24 +77,32 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function RootLayout({ children }: Readonly<{ children: ReactNode }>) {
   const settings = await getSiteSettings();
   const adsensePublisherId = normalizeAdsensePublisherId(settings.google.adsensePublisherId) ?? "ca-pub-4279201625870524";
+  const shouldLoadAdsense = Boolean(settings.google.adsenseEnabled && adsensePublisherId);
+  const shouldEnableAutoAds = Boolean(shouldLoadAdsense && settings.google.adsenseAutoAds);
 
   return (
     <html lang="pt-BR">
       <head>
-        <meta name="google-adsense-account" content={adsensePublisherId} />
-        <script
-          async
-          src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${adsensePublisherId}`}
-          crossOrigin="anonymous"
-        />
-        <script
-          id="adsense-auto-ads-bootstrap"
-          dangerouslySetInnerHTML={{
-            __html: `(window.adsbygoogle = window.adsbygoogle || []).push({ google_ad_client: "${adsensePublisherId}", enable_page_level_ads: false });`
-          }}
-        />
+        {shouldLoadAdsense ? <meta name="google-adsense-account" content={adsensePublisherId} /> : null}
       </head>
       <body className="min-h-screen antialiased overflow-x-hidden">
+        {shouldLoadAdsense ? (
+          <Script
+            id="adsense-script"
+            src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${adsensePublisherId}`}
+            strategy="afterInteractive"
+            crossOrigin="anonymous"
+          />
+        ) : null}
+        {shouldEnableAutoAds ? (
+          <Script
+            id="adsense-auto-ads-bootstrap"
+            strategy="afterInteractive"
+            dangerouslySetInnerHTML={{
+              __html: `(window.adsbygoogle = window.adsbygoogle || []).push({ google_ad_client: "${adsensePublisherId}", enable_page_level_ads: true });`
+            }}
+          />
+        ) : null}
         <ConsentBootstrap />
         <JsonLd data={buildOrganizationJsonLd({ name: siteConfig.name, logoUrl: settings.logoUrl })} />
         <JsonLd data={buildWebsiteJsonLd({ name: siteConfig.name })} />

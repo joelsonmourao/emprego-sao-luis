@@ -7,11 +7,13 @@ import { getSiteSettings } from "@/lib/site-settings";
 export async function SiteLogo({
   className,
   compact = false,
-  withTagline = true
+  withTagline = true,
+  priority = false
 }: {
   className?: string;
   compact?: boolean;
   withTagline?: boolean;
+  priority?: boolean;
 }) {
   const settings = await getSiteSettings();
 
@@ -22,7 +24,7 @@ export async function SiteLogo({
         alt={settings.siteName}
         width={compact ? 52 : 260}
         height={compact ? 52 : 68}
-        priority
+        priority={priority}
         className={compact ? "h-12 w-12" : "h-9 w-auto max-w-full sm:h-12 lg:h-14"}
       />
       {compact && withTagline ? (

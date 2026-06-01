@@ -27,16 +27,29 @@ export function AdSlotClient({
   fullWidthResponsive = true
 }: AdSlotClientProps) {
   const initializedRef = useRef(false);
+  const slotRef = useRef<HTMLElement | null>(null);
+  const reserveHeightClass =
+    format === "horizontal"
+      ? "min-h-[120px]"
+      : format === "fluid"
+        ? "min-h-[180px]"
+        : format === "rectangle"
+          ? "min-h-[250px]"
+          : "min-h-[200px]";
 
   useEffect(() => {
-    if (!publisherId || !slot || initializedRef.current) return;
+    const slotElement = slotRef.current;
+    if (!publisherId || !slot || initializedRef.current || !slotElement) return;
+    if (slotElement.dataset.adInitialized === "true") return;
 
     try {
       // Push immediately; adsbygoogle queue is safe before script fully initializes.
       (window.adsbygoogle = window.adsbygoogle || []).push({});
       initializedRef.current = true;
+      slotElement.dataset.adInitialized = "true";
     } catch {
       initializedRef.current = false;
+      slotElement.dataset.adInitialized = "false";
     }
   }, [publisherId, slot, format, fullWidthResponsive]);
 
@@ -51,7 +64,10 @@ export function AdSlotClient({
     >
       <div className="px-3 pb-2 pt-1 text-[10px] font-semibold uppercase tracking-[0.26em] text-slate-400">Publicidade</div>
       <ins
-        className="adsbygoogle block min-h-[250px] w-full"
+        ref={(node) => {
+          slotRef.current = node;
+        }}
+        className={`adsbygoogle block w-full ${reserveHeightClass}`}
         style={{ display: "block" }}
         data-ad-client={publisherId}
         data-ad-slot={slot}
@@ -72,6 +88,15 @@ export function AdSlotSnippetClient({ html, className }: { html: string; classNa
     el.innerHTML = html;
     const scripts = el.querySelectorAll("script");
     scripts.forEach((oldScript) => {
+      const src = oldScript.getAttribute("src") ?? "";
+      const body = oldScript.textContent ?? "";
+      const isAdsenseBootstrap =
+        /googlesyndication|adsbygoogle\.js|pagead2\.googlesyndication\.com|enable_page_level_ads|google_ad_client/i.test(src) ||
+        /enable_page_level_ads|google_ad_client/i.test(body);
+      if (isAdsenseBootstrap) {
+        oldScript.remove();
+        return;
+      }
       const s = document.createElement("script");
       [...oldScript.attributes].forEach((attr) => s.setAttribute(attr.name, attr.value));
       s.textContent = oldScript.textContent;
@@ -81,5 +106,5 @@ export function AdSlotSnippetClient({ html, className }: { html: string; classNa
 
   if (!html.trim()) return null;
 
-  return <div ref={ref} className={cn("ad-snippet-root min-h-[120px] w-full", className)} />;
+  return <div ref={ref} className={cn("ad-snippet-root min-h-[250px] w-full overflow-hidden", className)} />;
 }

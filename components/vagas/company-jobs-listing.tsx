@@ -99,7 +99,17 @@ export async function CompanyJobsListing({
       <div className="brand-page-hero rounded-[2rem] border border-slate-200 px-5 py-6 shadow-[0_35px_120px_-70px_rgba(26,43,76,0.22)] sm:px-8 sm:py-8">
         <div className="space-y-4">
           <div className="flex flex-wrap items-center gap-3 text-sm">
-            {company.logoUrl ? <img src={company.logoUrl} alt={company.name} className="h-12 w-12 rounded-2xl border border-slate-200 bg-white object-cover p-1" /> : null}
+            {company.logoUrl ? (
+              <img
+                src={company.logoUrl}
+                alt={company.name}
+                width={48}
+                height={48}
+                loading="lazy"
+                decoding="async"
+                className="h-12 w-12 rounded-2xl border border-slate-200 bg-white object-cover p-1"
+              />
+            ) : null}
             <span className="rounded-full bg-white px-4 py-2 font-semibold text-[var(--brand-orange)]">
               {jobs.total} {jobs.total === 1 ? "vaga ativa" : "vagas ativas"}
             </span>

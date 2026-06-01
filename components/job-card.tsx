@@ -34,7 +34,7 @@ export function JobCard({ job }: JobCardProps) {
   const cardSummary = buildCardSummary(job);
 
   return (
-    <Card className="group h-full overflow-hidden rounded-[2rem] border-[var(--brand-line)] bg-white shadow-[0_25px_90px_-55px_rgba(26,43,76,0.12)] transition duration-300 hover:-translate-y-1 hover:shadow-[0_35px_100px_-50px_rgba(26,43,76,0.18)]">
+    <Card className="group flex h-full flex-col overflow-hidden rounded-[2rem] border-[var(--brand-line)] bg-white shadow-[0_25px_90px_-55px_rgba(26,43,76,0.12)] transition duration-300 hover:-translate-y-1 hover:shadow-[0_35px_100px_-50px_rgba(26,43,76,0.18)]">
       <CardHeader className="relative overflow-hidden pb-4">
         <div className="absolute inset-x-0 top-0 h-28 bg-[linear-gradient(135deg,rgba(26,43,76,0.08)_0%,rgba(47,111,237,0.08)_60%,rgba(255,109,0,0.1)_100%)]" />
         <div className="relative flex items-start justify-between gap-4">
@@ -49,7 +49,7 @@ export function JobCard({ job }: JobCardProps) {
                 </span>
               ) : null}
             </div>
-            <CardTitle className="text-lg leading-snug sm:text-[1.35rem] sm:leading-tight md:text-[1.5rem]">
+            <CardTitle className="min-h-[3.4rem] text-lg leading-snug sm:min-h-[3.8rem] sm:text-[1.35rem] sm:leading-tight md:min-h-[4.2rem] md:text-[1.5rem]">
               <TrackedLink href={`/vagas/${job.slug}`} eventName="job_click" entityType="job" entitySlug={job.slug}>
                 {job.title}
               </TrackedLink>
@@ -62,7 +62,15 @@ export function JobCard({ job }: JobCardProps) {
         <CardDescription className="relative mt-1 flex flex-col gap-2 text-sm">
           <span className="inline-flex items-center gap-2">
             {job.companyLogoUrl ? (
-              <img src={job.companyLogoUrl} alt={job.companyName} className="h-7 w-7 rounded-xl border border-slate-200 bg-white object-cover p-1" />
+              <img
+                src={job.companyLogoUrl}
+                alt={job.companyName}
+                width={28}
+                height={28}
+                loading="lazy"
+                decoding="async"
+                className="h-7 w-7 rounded-xl border border-slate-200 bg-white object-cover p-1"
+              />
             ) : (
               <Building2 className="h-4 w-4 text-[var(--brand-blue)]" />
             )}
@@ -82,8 +90,8 @@ export function JobCard({ job }: JobCardProps) {
           </span>
         </CardDescription>
       </CardHeader>
-      <CardContent className="space-y-5">
-        <p className="line-clamp-3 text-sm leading-7 text-[var(--brand-text-secondary)]">{cardSummary}</p>
+      <CardContent className="mt-auto space-y-5">
+        <p className="line-clamp-3 min-h-[5.25rem] text-sm leading-7 text-[var(--brand-text-secondary)]">{cardSummary}</p>
         <div className="flex items-center justify-between gap-3 rounded-2xl bg-[linear-gradient(135deg,rgba(244,247,246,0.98),rgba(255,248,241,0.98))] px-4 py-3">
           <span className="inline-flex items-center gap-2 text-xs font-medium text-[var(--brand-text-secondary)]">
             <Clock3 className="h-4 w-4" />

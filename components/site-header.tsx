@@ -25,11 +25,8 @@ export async function SiteHeader() {
           </Link>
         </div>
       </div>
-      <div className="mx-auto flex max-w-7xl flex-col items-center gap-3 px-4 py-2.5 sm:flex-row sm:gap-6 sm:px-6 sm:py-4 lg:px-8">
-        <div className="min-w-0 flex-1 sm:hidden">
-          <SiteLogo compact withTagline={false} />
-        </div>
-        <SiteLogo className="hidden min-w-0 flex-1 sm:flex" />
+      <div className="mx-auto flex min-h-[72px] max-w-7xl flex-col items-center gap-3 px-4 py-2.5 sm:min-h-[84px] sm:flex-row sm:gap-6 sm:px-6 sm:py-4 lg:px-8">
+        <SiteLogo className="min-w-0 flex-1" withTagline={false} priority />
 
         <nav className="hidden items-center gap-3 md:flex">
           {navItems.map((item) => (
