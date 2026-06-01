@@ -11,7 +11,7 @@ import { formatBrazilDateTime } from "@/lib/date-utils";
 import { sanitizeRichTextHtml } from "@/lib/rich-text";
 import { getSiteSettings } from "@/lib/site-settings";
 import { getCityJobsPath, getCompanyJobsPath, getStateJobsPath } from "@/lib/seo/jobs-pages";
-import { getRelatedPosts } from "@/lib/repositories/blog";
+import { getRecentPosts } from "@/lib/repositories/blog";
 import { getJobBySlug, getRelatedJobs } from "@/lib/repositories/jobs";
 import { formatDate } from "@/lib/utils";
 
@@ -36,7 +36,7 @@ export async function JobDetailView({ job, displayTitle }: { job: JobWithRelatio
   const mergedDescriptionHtml = job.descriptionHtml ?? "";
 
   let relatedJobs: Awaited<ReturnType<typeof getRelatedJobs>> = [];
-  let relatedPosts: Awaited<ReturnType<typeof getRelatedPosts>> = [];
+  let relatedPosts: Awaited<ReturnType<typeof getRecentPosts>> = [];
   try {
     const pair = await Promise.all([
       getRelatedJobs({
@@ -46,10 +46,18 @@ export async function JobDetailView({ job, displayTitle }: { job: JobWithRelatio
         companySlug: job.company?.slug,
         limit: 3
       }),
-      getRelatedPosts({ limit: 3 })
+      getRecentPosts()
     ]);
     relatedJobs = pair[0];
-    relatedPosts = pair[1];
+    const cityNeedle = job.city.name.toLowerCase();
+    const stateCodeNeedle = job.state.code.toLowerCase();
+    const stateNameNeedle = job.state.name.toLowerCase();
+    const localizedPosts = pair[1].filter((post) => {
+      const haystack = `${post.title} ${post.excerpt}`.toLowerCase();
+      return haystack.includes(cityNeedle) || haystack.includes(stateCodeNeedle) || haystack.includes(stateNameNeedle);
+    });
+    const fallbackPosts = pair[1].filter((post) => !localizedPosts.some((localPost) => localPost.id === post.id));
+    relatedPosts = [...localizedPosts, ...fallbackPosts].slice(0, 3);
   } catch {
     relatedJobs = [];
     relatedPosts = [];

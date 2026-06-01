@@ -102,6 +102,7 @@ export default async function HomePage() {
   const states = featuredStatesSelected.length ? featuredStatesSelected : statesDefault;
   const cities = featuredCitiesSelected.length ? featuredCitiesSelected : citiesDefault;
   const companies = featuredCompaniesSelected.length ? featuredCompaniesSelected : companiesDefault;
+  const companiesWithPublishedJobs = companies.filter((company) => company._count.jobs > 0);
   const sectionsEnabled = siteContent.home.blocks;
   const validOrder = siteContent.home.blockOrder.filter((key) => homeBlockKeys.includes(key));
   const orderedBlocks = [...validOrder, ...homeBlockKeys.filter((key) => !validOrder.includes(key))];
@@ -324,7 +325,7 @@ export default async function HomePage() {
             <h2 className="text-base font-black text-[var(--brand-navy)] sm:text-lg">{siteContent.home.companiesTitle}</h2>
             <p className="mt-2 text-sm leading-6 text-[var(--brand-text-secondary)] sm:leading-7">{siteContent.home.companiesDescription}</p>
             <div className="mt-4 grid gap-3 sm:mt-5">
-              {companies.slice(0, 6).map((company) => (
+              {companiesWithPublishedJobs.slice(0, 6).map((company) => (
                 <Link
                   key={company.slug}
                     href={getCompanyJobsPath(company.slug)}

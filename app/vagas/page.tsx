@@ -4,8 +4,8 @@ import { cache } from "react";
 import { Breadcrumbs } from "@/components/breadcrumbs";
 import { EmptyState } from "@/components/empty-state";
 import { FaqList } from "@/components/faq-list";
+import { HomeSearchForm } from "@/components/home/home-search-form";
 import { JsonLd } from "@/components/json-ld";
-import { JobSearchFilterBar } from "@/components/vagas/job-search-filter-bar";
 import { PaginationNav } from "@/components/pagination-nav";
 import { SectionHeading } from "@/components/section-heading";
 import {
@@ -206,13 +206,29 @@ export default async function JobsPage({
     return `/vagas?${query}`;
   };
 
+  const searchHiddenFields = {
+    order: parsed.order,
+    empresa: parsed.empresa
+  };
+
   return (
     <section className="mx-auto max-w-7xl space-y-6 px-4 py-6 sm:px-6 sm:py-8 sm:space-y-8 lg:px-8 lg:py-10">
       <JsonLd data={buildBreadcrumbJsonLd([{ name: "Home", path: "/" }, { name: "Vagas", path: "/vagas" }])} />
       <JsonLd data={buildFaqJsonLd(faq)} />
       <Breadcrumbs items={[{ label: "Home", href: "/" }, { label: "Vagas", href: "/vagas" }]} />
 
-      <JobSearchFilterBar states={states} className="min-h-[5.5rem]" />
+      <HomeSearchForm
+        states={states}
+        action="/vagas"
+        submitLabel="Buscar vagas"
+        helperText="Filtre por cargo, estado e cidade para encontrar vagas mais rápido."
+        footerLinkHref="/vagas"
+        footerLinkLabel="Ver todas as vagas"
+        initialQuery={parsed.q ?? ""}
+        initialState={parsed.estado ?? ""}
+        initialCity={parsed.cidade ?? ""}
+        hiddenFields={searchHiddenFields}
+      />
 
       <div className="brand-page-hero rounded-[1.5rem] border border-slate-200 px-4 py-5 shadow-[0_35px_120px_-70px_rgba(26,43,76,0.22)] sm:rounded-[2rem] sm:px-5 sm:py-6 sm:rounded-[2.2rem] sm:px-8 sm:py-8">
         <div className="space-y-3 sm:space-y-4">

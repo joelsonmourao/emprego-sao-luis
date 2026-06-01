@@ -269,7 +269,12 @@ export async function getJobsList(params: {
 
 async function fetchFeaturedCompanies() {
   return prisma.company.findMany({
-    where: { isActive: true },
+    where: {
+      isActive: true,
+      jobs: {
+        some: publishedJobWhere
+      }
+    },
     select: companyHubListSelect,
     orderBy: [{ featured: "desc" }, { updatedAt: "desc" }],
     take: 8
@@ -288,7 +293,10 @@ const getFeaturedCompaniesBySlugsCached = unstable_cache(async (slugKey: string)
   const companies = await prisma.company.findMany({
     where: {
       isActive: true,
-      slug: { in: slugs }
+      slug: { in: slugs },
+      jobs: {
+        some: publishedJobWhere
+      }
     },
     select: companyHubListSelect
   });
@@ -315,27 +323,62 @@ const getRelatedJobsCached = unstable_cache(async (key: string) => {
     limit?: number;
   };
 
-  const orFilters: Prisma.JobWhereInput[] = [];
-  if (params.citySlug) orFilters.push({ city: { slug: params.citySlug } });
-  if (params.stateSlug) orFilters.push({ state: { slug: params.stateSlug } });
-  if (params.companySlug) orFilters.push({ company: { slug: params.companySlug } });
-
-  if (!orFilters.length) {
+  const limit = params.limit ?? 6;
+  if (!params.citySlug && !params.stateSlug && !params.companySlug) {
     return [];
   }
+  const baseWhere: Prisma.JobWhereInput = {
+    ...publishedJobWhere,
+    ...(params.excludeSlug ? { slug: { not: params.excludeSlug } } : {})
+  };
 
-  const related = await prisma.job.findMany({
+  const candidates = await prisma.job.findMany({
     where: {
-      ...publishedJobWhere,
-      ...(params.excludeSlug ? { slug: { not: params.excludeSlug } } : {}),
-      OR: orFilters
+      ...baseWhere,
+      OR: [
+        params.citySlug ? { city: { slug: params.citySlug } } : undefined,
+        params.stateSlug ? { state: { slug: params.stateSlug } } : undefined,
+        params.companySlug ? { company: { slug: params.companySlug } } : undefined
+      ].filter(Boolean) as Prisma.JobWhereInput[]
     },
     select: jobListingSelect,
     orderBy: [{ featured: "desc" }, { publishedAt: "desc" }],
-    take: params.limit ?? 6
+    take: Math.max(limit * 3, 12)
   });
 
-  return related;
+  const ranked = candidates
+    .map((item) => {
+      const sameCity = Boolean(params.citySlug && item.city.slug === params.citySlug);
+      const sameState = Boolean(params.stateSlug && item.state.slug === params.stateSlug);
+      const sameCompany = Boolean(params.companySlug && item.company?.slug === params.companySlug);
+      const priority = (sameCity ? 100 : 0) + (sameState ? 10 : 0) + (sameCompany ? 1 : 0);
+      return { item, priority };
+    })
+    .sort((a, b) => {
+      if (b.priority !== a.priority) return b.priority - a.priority;
+      if (a.item.featured !== b.item.featured) return a.item.featured ? -1 : 1;
+      const aDate = a.item.publishedAt ? a.item.publishedAt.getTime() : 0;
+      const bDate = b.item.publishedAt ? b.item.publishedAt.getTime() : 0;
+      return bDate - aDate;
+    })
+    .map((entry) => entry.item);
+
+  if (ranked.length >= limit) {
+    return ranked.slice(0, limit);
+  }
+
+  const remaining = limit - ranked.length;
+  const fallback = await prisma.job.findMany({
+    where: {
+      ...baseWhere,
+      id: { notIn: ranked.map((item) => item.id) }
+    },
+    select: jobListingSelect,
+    orderBy: [{ featured: "desc" }, { publishedAt: "desc" }],
+    take: remaining
+  });
+
+  return [...ranked, ...fallback];
 }, ["related-jobs-v1"], {
   revalidate: 1800,
   tags: [PUBLIC_JOBS_CACHE_TAG]

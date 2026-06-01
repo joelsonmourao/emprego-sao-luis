@@ -14,12 +14,8 @@ export type PublicAdSlotProps = {
 };
 
 function extractSlotFromHtml(html: string): string | null {
-  const m = html.match(/data-ad-slot=["'](\d+)["']/i);
+  const m = html.match(/data-ad-slot=["']([^"']+)["']/i);
   return m?.[1] ?? null;
-}
-
-function hasForbiddenAdsenseBootstrap(html: string): boolean {
-  return /enable_page_level_ads|google_ad_client|adsbygoogle\.js|pagead2\.googlesyndication\.com|googlesyndication/i.test(html);
 }
 
 export async function PublicAdSlot({
@@ -47,13 +43,24 @@ export async function PublicAdSlot({
 
   const trimmedCode = slot.code.trim();
   const dataSlot = slot.adsenseSlotId?.trim() || extractSlotFromHtml(trimmedCode) || "";
-  const hasForbiddenBootstrap = hasForbiddenAdsenseBootstrap(trimmedCode);
-  if (trimmedCode.includes("<") && (trimmedCode.includes("ins") || trimmedCode.includes("script")) && !hasForbiddenBootstrap) {
-    return <AdSlotSnippetClient html={trimmedCode} className={cn(minHeightClass, className)} />;
+  if (trimmedCode.includes("<") && (trimmedCode.includes("ins") || trimmedCode.includes("script"))) {
+    if (!dataSlot) {
+      console.warn(`[ads] Slot sem data-ad-slot valido: ${slotSlug}`);
+      return null;
+    }
+    return (
+      <AdSlotSnippetClient
+        html={trimmedCode}
+        className={cn(minHeightClass, className)}
+        publisherId={publisherId}
+        fallbackSlot={dataSlot}
+      />
+    );
   }
 
   if (!dataSlot) {
-    return <div className={cn("w-full", minHeightClass)} aria-hidden data-ad-slot-missing-id={slotSlug} />;
+    console.warn(`[ads] Slot sem data-ad-slot valido: ${slotSlug}`);
+    return null;
   }
 
   return (

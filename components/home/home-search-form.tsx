@@ -7,6 +7,7 @@ type SearchState = {
   id: string;
   name: string;
   slug: string;
+  code: string;
   cities: Array<{
     id: string;
     name: string;
@@ -20,7 +21,11 @@ export function HomeSearchForm({
   submitLabel = "Ver vagas",
   helperText,
   footerLinkHref = "/vagas",
-  footerLinkLabel = "Abrir todas as vagas"
+  footerLinkLabel = "Abrir todas as vagas",
+  initialQuery = "",
+  initialState = "",
+  initialCity = "",
+  hiddenFields
 }: {
   states: SearchState[];
   action?: string;
@@ -28,13 +33,17 @@ export function HomeSearchForm({
   helperText?: string;
   footerLinkHref?: string;
   footerLinkLabel?: string;
+  initialQuery?: string;
+  initialState?: string;
+  initialCity?: string;
+  hiddenFields?: Record<string, string | undefined>;
 }) {
   const cities = states.flatMap((state) =>
     state.cities.map((city) => ({
       id: city.id,
       name: city.name,
       slug: city.slug,
-      stateCode: state.slug.toUpperCase()
+      stateCode: state.code
     }))
   );
 
@@ -49,6 +58,7 @@ export function HomeSearchForm({
           <Search className="h-5 w-5 text-[var(--brand-orange)]" />
           <input
             name="q"
+            defaultValue={initialQuery}
             placeholder="Cargo, empresa ou palavra-chave"
             aria-label="Cargo, empresa ou palavra-chave"
             className="h-11 w-full bg-transparent text-sm text-[var(--brand-navy)] outline-none placeholder:text-[var(--brand-text-secondary)] sm:h-12"
@@ -58,7 +68,12 @@ export function HomeSearchForm({
         <label className="flex items-center gap-3 rounded-[1.15rem] border border-[var(--brand-line)] bg-[linear-gradient(180deg,rgba(255,255,255,0.99),rgba(244,247,246,0.98))] px-4 sm:rounded-2xl">
           <span className="sr-only">Estado</span>
           <MapPinned className="h-5 w-5 text-[var(--brand-blue)]" />
-          <select name="estado" defaultValue="" aria-label="Estado" className="h-11 w-full bg-transparent text-sm text-[var(--brand-navy)] outline-none sm:h-12">
+          <select
+            name="estado"
+            defaultValue={initialState}
+            aria-label="Estado"
+            className="h-11 w-full bg-transparent text-sm text-[var(--brand-navy)] outline-none sm:h-12"
+          >
             <option value="">Todos os estados</option>
             {states.map((state) => (
               <option key={state.id} value={state.slug}>
@@ -71,7 +86,12 @@ export function HomeSearchForm({
         <label className="flex items-center gap-3 rounded-[1.15rem] border border-[var(--brand-line)] bg-[linear-gradient(180deg,rgba(255,255,255,0.99),rgba(244,247,246,0.98))] px-4 sm:rounded-2xl">
           <span className="sr-only">Cidade</span>
           <MapPinned className="h-5 w-5 text-[var(--brand-blue)]" />
-          <select name="cidade" defaultValue="" aria-label="Cidade" className="h-11 w-full bg-transparent text-sm text-[var(--brand-navy)] outline-none sm:h-12">
+          <select
+            name="cidade"
+            defaultValue={initialCity}
+            aria-label="Cidade"
+            className="h-11 w-full bg-transparent text-sm text-[var(--brand-navy)] outline-none sm:h-12"
+          >
             <option value="">Todas as cidades</option>
             {cities.map((city) => (
               <option key={city.id} value={city.slug}>
@@ -85,6 +105,12 @@ export function HomeSearchForm({
           {submitLabel}
         </Button>
       </div>
+
+      {hiddenFields
+        ? Object.entries(hiddenFields).map(([name, value]) =>
+            value ? <input key={name} type="hidden" name={name} value={value} /> : null
+          )
+        : null}
 
       <div className="mt-3 flex flex-col gap-2 text-[11px] text-[var(--brand-text-secondary)] md:mt-4 md:flex-row md:items-center md:justify-between md:text-xs">
         <p className="inline-flex items-start gap-2 leading-5">
