@@ -1,0 +1,47 @@
+.tiptap-editor p.is-editor-empty:first-child::before {
+  content: attr(data-placeholder);
+  color: #94a3b8;
+  float: left;
+  height: 0;
+  pointer-events: none;
+}
+
+.tiptap-editor ul,
+.tiptap-editor ol {
+  padding-left: 1.5rem;
+}
+
+.tiptap-editor ul {
+  list-style: disc;
+}
+
+.tiptap-editor ol {
+  list-style: decimal;
+}
+
+.tiptap-editor h2,
+.tiptap-editor h3 {
+  margin: 1.25rem 0 0.75rem;
+  font-weight: 800;
+  line-height: 1.25;
+}
+
+.tiptap-editor h2 {
+  font-size: 1.5rem;
+}
+
+.tiptap-editor h3 {
+  font-size: 1.25rem;
+}
+
+.tiptap-editor a {
+  color: var(--brand-blue);
+  text-decoration: underline;
+}
+
+.brand-admin-panel {
+  background:
+    radial-gradient(circle at top right, rgba(47, 111, 237, 0.12), transparent 22%),
+    radial-gradient(circle at left bottom, rgba(255, 109, 0, 0.08), transparent 24%),
+    linear-gradient(180deg, rgba(255,255,255,0.99), rgba(244,247,246,0.98));
+}

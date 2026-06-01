@@ -41,7 +41,13 @@ export function BlogCard({ post }: BlogCardProps) {
       <CardContent className="space-y-5">
         <p className="line-clamp-4 text-sm leading-7 text-[var(--brand-text-secondary)]">{post.excerpt}</p>
         <Button asChild variant="outline" className="gap-2 rounded-2xl">
-          <TrackedLink href={`/blog/${post.slug}`} eventName="blog_click" entityType="post" entitySlug={post.slug}>
+          <TrackedLink
+            href={`/blog/${post.slug}`}
+            eventName="blog_click"
+            entityType="post"
+            entitySlug={post.slug}
+            aria-label={`Ler no blog: ${post.title}`}
+          >
             Ler no blog
             <ArrowUpRight className="h-4 w-4" />
           </TrackedLink>

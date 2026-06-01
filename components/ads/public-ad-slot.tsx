@@ -18,6 +18,10 @@ function extractSlotFromHtml(html: string): string | null {
   return m?.[1] ?? null;
 }
 
+function hasForbiddenAdsenseBootstrap(html: string): boolean {
+  return /enable_page_level_ads|google_ad_client|adsbygoogle\.js|pagead2\.googlesyndication\.com|googlesyndication/i.test(html);
+}
+
 export async function PublicAdSlot({
   slotSlug,
   format = "auto",
@@ -42,11 +46,12 @@ export async function PublicAdSlot({
   }
 
   const trimmedCode = slot.code.trim();
-  if (trimmedCode.includes("<") && (trimmedCode.includes("ins") || trimmedCode.includes("script"))) {
+  const dataSlot = slot.adsenseSlotId?.trim() || extractSlotFromHtml(trimmedCode) || "";
+  const hasForbiddenBootstrap = hasForbiddenAdsenseBootstrap(trimmedCode);
+  if (trimmedCode.includes("<") && (trimmedCode.includes("ins") || trimmedCode.includes("script")) && !hasForbiddenBootstrap) {
     return <AdSlotSnippetClient html={trimmedCode} className={cn(minHeightClass, className)} />;
   }
 
-  const dataSlot = slot.adsenseSlotId?.trim() || extractSlotFromHtml(trimmedCode) || "";
   if (!dataSlot) {
     return <div className={cn("w-full", minHeightClass)} aria-hidden data-ad-slot-missing-id={slotSlug} />;
   }

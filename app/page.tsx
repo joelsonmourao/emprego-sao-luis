@@ -14,8 +14,8 @@ import {
 import { PublicAdSlot } from "@/components/ads/public-ad-slot";
 import { BlogCard } from "@/components/blog-card";
 import { FaqList } from "@/components/faq-list";
+import { HomeSearchForm } from "@/components/home/home-search-form";
 import { JobCard } from "@/components/job-card";
-import { JobSearchForm } from "@/components/job-search-form";
 import { JsonLd } from "@/components/json-ld";
 import { SectionHeading } from "@/components/section-heading";
 import { Button } from "@/components/ui/button";
@@ -334,7 +334,7 @@ export default async function HomePage() {
                   <span className="mt-1 block text-[var(--brand-text-secondary)]">
                     {company.city.name}, {company.state.code}
                   </span>
-                  <span className="mt-2 block text-xs font-semibold text-[var(--brand-orange)]">
+                  <span className="mt-2 block text-xs font-semibold text-[var(--brand-orange-strong)]">
                     {company._count.jobs} vaga(s) publicada(s)
                   </span>
                 </Link>
@@ -417,8 +417,8 @@ export default async function HomePage() {
   return (
     <div className="pb-20">
       <JsonLd data={buildFaqJsonLd(siteContent.faq.home)} />
-      <section className="relative overflow-hidden border-b border-slate-200 bg-[linear-gradient(135deg,#1a2b4c_0%,#21406e_34%,#2f6fed_76%,#ff6d00_100%)] text-white">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_18%_20%,rgba(255,255,255,0.16),transparent_16%),radial-gradient(circle_at_88%_14%,rgba(255,179,71,0.16),transparent_14%),radial-gradient(circle_at_72%_80%,rgba(255,255,255,0.12),transparent_18%)]" />
+      <section className="relative overflow-hidden border-b border-slate-200 bg-[linear-gradient(138deg,#1a2b4c_0%,#21406e_42%,#2f6fed_82%,#ff6d00_100%)] text-white">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_22%,rgba(255,255,255,0.14),transparent_22%),radial-gradient(circle_at_84%_16%,rgba(255,179,71,0.12),transparent_20%)]" />
         <div className="mx-auto grid max-w-7xl gap-4 px-4 py-8 sm:gap-6 sm:px-6 sm:py-12 lg:grid-cols-[1.08fr_0.92fr] lg:px-8 lg:py-16">
           <div className="relative space-y-5">
             <div className="inline-flex rounded-full border border-white/18 bg-white/10 px-2.5 py-1 text-[9px] font-semibold uppercase tracking-[0.2em] text-orange-50 sm:px-4 sm:py-1.5 sm:text-[10px] sm:tracking-[0.28em]">
@@ -429,7 +429,7 @@ export default async function HomePage() {
               <p className="max-w-3xl text-[14px] leading-6 text-white/86 sm:text-base sm:leading-7">{siteContent.home.heroDescription}</p>
             </div>
 
-            <JobSearchForm
+            <HomeSearchForm
               states={searchStates}
               action="/vagas"
               submitLabel="Ver vagas"
