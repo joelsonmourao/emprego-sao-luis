@@ -8,7 +8,7 @@ export const revalidate = 0;
 export async function GET() {
   return NextResponse.json({
     status: "ok",
-    service: "jovem-aprendiz-vagas-next",
+    service: "emprego-sao-luis-next",
     timestamp: new Date().toISOString()
   });
 }

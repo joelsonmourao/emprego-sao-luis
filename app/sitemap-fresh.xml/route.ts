@@ -2,11 +2,13 @@ import { buildEmptyUrlSetXml, buildUrlSetXml, createXmlResponse, getSitemapManif
 
 export const dynamic = "force-dynamic";
 
+const FRESH_CATEGORIES = new Set(["jobs", "blog"]);
+
 export async function GET() {
   try {
     const manifest = await getSitemapManifest();
     const freshEntries = manifest.files
-      .filter((file) => file.category === "fresh")
+      .filter((file) => FRESH_CATEGORIES.has(file.category))
       .flatMap((file) => file.entries);
 
     return createXmlResponse(buildUrlSetXml(freshEntries));

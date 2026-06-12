@@ -2,9 +2,11 @@ import { cache } from "react";
 
 import { prisma } from "@/lib/db";
 import { deepMergeDefaults } from "@/lib/merge-defaults";
-import { defaultSiteContent, siteContentSchema, type SiteContent, type SiteFaqEntry } from "@/lib/schemas/site-admin";
+import { empregoSaoLuisSiteContent } from "@/lib/emprego-sao-luis-site-content";
+import { siteContentSchema, type SiteContent, type SiteFaqEntry } from "@/lib/schemas/site-admin";
 
-export { defaultSiteContent, siteContentSchema };
+export const defaultSiteContent: SiteContent = empregoSaoLuisSiteContent;
+export { siteContentSchema };
 export type { SiteContent, SiteFaqEntry };
 
 export const getSiteContent = cache(async (): Promise<SiteContent> => {

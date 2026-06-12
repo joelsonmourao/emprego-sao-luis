@@ -129,7 +129,7 @@ export async function resolveCompanyByName(input: {
         slug,
         logoUrl: input.logoUrl?.trim() || null,
         websiteUrl: input.websiteUrl?.trim() || null,
-        summary: input.summary?.trim() || `Veja vagas de Jovem Aprendiz ligadas a ${name}.`,
+        summary: input.summary?.trim() || `Veja vagas divulgadas pela ${name} no Emprego São Luís.`,
         stateId: input.stateId,
         cityId: input.cityId,
         isActive: true

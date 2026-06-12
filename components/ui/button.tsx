@@ -5,16 +5,15 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center whitespace-nowrap rounded-full text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--brand-blue)] disabled:pointer-events-none disabled:opacity-50",
+  "inline-flex items-center justify-center whitespace-nowrap rounded-xl text-sm font-bold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-orange)] focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
   {
     variants: {
       variant: {
-        default:
-          "bg-[linear-gradient(135deg,#ff6d00_0%,#ff7f11_100%)] text-white shadow-[0_18px_40px_-24px_rgba(255,109,0,0.55)] hover:bg-[linear-gradient(135deg,#e86300_0%,#f97316_100%)] hover:shadow-[0_22px_42px_-24px_rgba(255,109,0,0.62)]",
-        secondary: "bg-[var(--brand-navy)] text-white hover:bg-[#15233f]",
+        default: "bg-[var(--brand-brick)] text-white shadow-[0_14px_32px_-18px_rgba(123,44,40,0.5)] hover:bg-[#65231f]",
+        secondary: "bg-[var(--brand-orange)] text-white hover:bg-[var(--brand-orange-strong)]",
         outline:
-          "border border-[color:var(--brand-line-strong)] bg-white text-[var(--brand-navy)] hover:bg-[var(--brand-soft)] hover:text-[var(--brand-blue)]",
-        ghost: "text-[var(--brand-navy)] hover:bg-[var(--brand-mist)]"
+          "border border-[var(--brand-line-strong)] bg-white text-[var(--brand-green)] hover:border-[var(--brand-orange)]/35 hover:bg-[var(--brand-mist)]",
+        ghost: "text-[var(--brand-green)] hover:bg-[var(--brand-mist)]"
       },
       size: {
         default: "h-11 px-5",

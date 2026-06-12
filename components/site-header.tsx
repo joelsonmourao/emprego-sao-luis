@@ -1,44 +1,50 @@
 import type { Route } from "next";
 import Link from "next/link";
-import { ArrowRight, Sparkles } from "lucide-react";
+import { ArrowRight, Instagram } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { SiteLogo } from "@/components/site-logo";
-import { getSiteContent } from "@/lib/site-content";
+import { siteConfig } from "@/lib/constants";
+
+const navItems = [
+  { href: "/vagas", label: "Vagas" },
+  { href: "/empresas", label: "Empresas" },
+  { href: "/categorias", label: "Categorias" },
+  { href: "/blog", label: "Blog" },
+  { href: "/contato", label: "Contato" }
+] as const;
 
 export async function SiteHeader() {
-  const siteContent = await getSiteContent();
-  const navItems = siteContent.navigation.main.some((item) => item.href === "/menor-aprendiz")
-    ? siteContent.navigation.main
-    : [...siteContent.navigation.main, { href: "/menor-aprendiz", label: "Menor Aprendiz" }];
-
   return (
-    <header className="z-40 border-b border-[color:rgba(255,255,255,0.08)] bg-[var(--brand-navy)] text-white shadow-[0_18px_50px_-35px_rgba(26,43,76,0.7)] backdrop-blur-2xl md:sticky md:top-0">
-      <div className="border-b border-white/10 bg-[linear-gradient(90deg,rgba(26,43,76,0.98)_0%,rgba(34,56,99,0.98)_58%,rgba(47,111,237,0.92)_100%)]">
-        <div className="mx-auto flex min-h-[30px] max-w-7xl items-center justify-between gap-2 px-4 py-1.5 text-[10px] font-medium text-white/78 sm:min-h-[36px] sm:px-6 sm:py-2 sm:text-xs lg:px-8">
-          <p className="flex min-w-0 items-start gap-1.5 leading-4 sm:gap-2 sm:leading-5">
-            <Sparkles className="mt-0.5 h-3 w-3 shrink-0 text-[var(--brand-orange)] sm:h-4 sm:w-4" />
-            <span className="line-clamp-2 sm:line-clamp-1">{siteContent.navigation.topBarText}</span>
-          </p>
-          <Link href={siteContent.navigation.topBarLinkHref as Route} className="hidden text-white md:inline-flex hover:text-[var(--brand-orange)]">
-            {siteContent.navigation.topBarLinkLabel}
-          </Link>
+    <header className="z-40 border-b border-white/10 bg-[var(--brand-green)] text-white shadow-[0_12px_40px_-24px_rgba(26,26,26,0.55)] md:sticky md:top-0">
+      <div className="border-b border-white/8 bg-[linear-gradient(90deg,#1f2b24_0%,#243328_55%,#1a1a1a_100%)]">
+        <div className="mx-auto flex min-h-[34px] max-w-7xl items-center justify-between gap-3 px-4 py-1.5 text-[11px] text-white/80 sm:px-6 lg:px-8">
+          <p className="line-clamp-1 font-medium">Portal de vagas em São Luís e Maranhão · Gratuito para candidatos</p>
+          <a
+            href="https://instagram.com/empregosaoluis"
+            target="_blank"
+            rel="noreferrer"
+            aria-label={`Instagram ${siteConfig.instagram}`}
+            className="inline-flex shrink-0 items-center gap-1.5 rounded-full border border-white/12 bg-white/6 px-3 py-1 font-semibold text-white transition hover:border-[var(--brand-orange)]/40 hover:text-[var(--brand-orange)]"
+          >
+            <Instagram className="h-3.5 w-3.5" />
+            {siteConfig.instagram}
+          </a>
         </div>
       </div>
-      <div className="mx-auto flex min-h-[72px] max-w-7xl flex-col items-center gap-3 px-4 py-2.5 sm:min-h-[84px] sm:flex-row sm:gap-6 sm:px-6 sm:py-4 lg:px-8">
-        <SiteLogo className="min-w-0 flex-1" withTagline={false} priority />
 
-        <nav className="hidden items-center gap-3 md:flex">
+      <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-3 sm:px-6 lg:px-8">
+        <SiteLogo className="min-w-0 shrink" withTagline={false} priority />
+
+        <nav className="hidden items-center gap-1 lg:flex" aria-label="Menu principal">
           {navItems.map((item) => (
             <Link
               key={item.href}
               href={item.href as Route}
               className={
                 item.href === "/vagas"
-                  ? "rounded-full bg-white px-4 py-2 text-sm font-semibold text-[var(--brand-navy)] transition hover:bg-[var(--brand-soft)]"
-                  : item.href === "/blog"
-                    ? "rounded-full border border-[rgba(255,109,0,0.28)] bg-[rgba(255,109,0,0.14)] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[rgba(255,109,0,0.2)]"
-                    : "rounded-full px-4 py-2 text-sm font-medium text-white/82 transition hover:bg-white/10 hover:text-white"
+                  ? "rounded-xl bg-white px-4 py-2 text-sm font-bold text-[var(--brand-green)] shadow-sm"
+                  : "rounded-xl px-4 py-2 text-sm font-medium text-white/88 transition hover:bg-white/10 hover:text-white"
               }
             >
               {item.label}
@@ -46,32 +52,42 @@ export async function SiteHeader() {
           ))}
         </nav>
 
-        <Button asChild size="sm" className="max-w-[6.6rem] shrink-0 gap-1 rounded-2xl px-2 text-[10px] sm:max-w-none sm:gap-2 sm:px-4 sm:text-sm">
-          <Link href={siteContent.navigation.headerCtaHref as Route}>
-            <span className="truncate">{siteContent.navigation.headerCtaLabel}</span>
-            <ArrowRight className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-          </Link>
-        </Button>
+        <div className="flex shrink-0 items-center gap-2">
+          <a
+            href="https://instagram.com/empregosaoluis"
+            target="_blank"
+            rel="noreferrer"
+            aria-label="Instagram Emprego São Luís"
+            className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-white/12 bg-white/6 text-white transition hover:border-[var(--brand-orange)]/40 hover:text-[var(--brand-orange)] lg:hidden"
+          >
+            <Instagram className="h-4 w-4" />
+          </a>
+          <Button asChild size="sm" className="gap-1.5 rounded-xl bg-[var(--brand-orange)] px-4 text-sm font-bold hover:bg-[var(--brand-orange-strong)]">
+            <Link href="/anunciar-vaga" aria-label="Publicar vaga no portal">
+              Publicar vaga
+              <ArrowRight className="h-4 w-4" />
+            </Link>
+          </Button>
+        </div>
       </div>
-      <div className="border-t border-white/10 md:hidden">
+
+      <div className="border-t border-white/8 lg:hidden">
         <div className="mx-auto max-w-7xl px-4 py-2 sm:px-6">
-          <div className="no-scrollbar flex items-center gap-2 overflow-x-auto pb-1">
+          <nav className="no-scrollbar flex items-center gap-2 overflow-x-auto pb-1" aria-label="Menu mobile">
             {navItems.map((item) => (
               <Link
                 key={item.href}
                 href={item.href as Route}
                 className={
                   item.href === "/vagas"
-                    ? "whitespace-nowrap rounded-full bg-white px-3 py-1.5 text-[11px] font-semibold text-[var(--brand-navy)]"
-                    : item.href === "/blog"
-                      ? "whitespace-nowrap rounded-full border border-[rgba(255,109,0,0.28)] bg-[rgba(255,109,0,0.14)] px-3 py-1.5 text-[11px] font-semibold text-white"
-                      : "whitespace-nowrap rounded-full border border-white/10 bg-white/6 px-3 py-1.5 text-[11px] font-medium text-white/82"
+                    ? "whitespace-nowrap rounded-full bg-white px-3 py-1.5 text-[11px] font-bold text-[var(--brand-green)]"
+                    : "whitespace-nowrap rounded-full border border-white/12 bg-white/6 px-3 py-1.5 text-[11px] font-medium text-white/86"
                 }
               >
                 {item.label}
               </Link>
             ))}
-          </div>
+          </nav>
         </div>
       </div>
     </header>

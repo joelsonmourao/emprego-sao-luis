@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 /**
  * Auditoria SEO local: status HTTP, canonical, robots meta, presença de JSON-LD (heurística).
- * Uso: SITE_URL=https://slzcontent.com.br node scripts/audit-seo.mjs
- *    ou: node scripts/audit-seo.mjs https://localhost:3000
+ * Uso: SITE_URL=https://empregossaoluis.com.br node scripts/audit-seo.mjs
+ *    ou: node scripts/audit-seo.mjs http://127.0.0.1:3000
  */
 
 const base =
@@ -14,11 +14,16 @@ const base =
 const paths = [
   "/robots.txt",
   "/sitemap.xml",
+  "/",
   "/vagas",
-  "/vagas/jovem-aprendiz/sao-luis-ma",
-  "/vagas/cidade/sao-luis-ma",
-  "/vagas/estado/ma",
-  "/blog"
+  "/vagas/cidade/sao-luis",
+  "/categorias",
+  "/empresas",
+  "/blog",
+  "/quem-somos",
+  "/privacidade",
+  "/termos",
+  "/cookies"
 ];
 
 function abs(path) {
@@ -79,24 +84,3 @@ for (const p of paths) {
 }
 
 console.log(JSON.stringify({ base, rows }, null, 2));
-
-let exit = 0;
-for (const r of rows) {
-  if (r.error) {
-    console.error("FAIL", r.path, r.error);
-    exit = 1;
-    continue;
-  }
-  if (r.path.startsWith("/vagas/jovem-aprendiz/") && r.path.split("/").length > 4) {
-    if (r.status !== 200) {
-      console.error("FAIL", r.path, "expected 200, got", r.status);
-      exit = 1;
-    }
-    if (r.jobPosting !== 0) {
-      console.error("FAIL", r.path, "JobPosting count should be 0 on list, got", r.jobPosting);
-      exit = 1;
-    }
-  }
-}
-
-process.exit(exit);

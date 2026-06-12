@@ -178,7 +178,10 @@ export default async function VagasCatchAllPage({
       validThrough: job.validThrough ?? null,
       salaryMin: job.salaryMin,
       locationEnrichment,
-      employmentType: job.employmentType
+      employmentType: job.employmentType,
+      categoryName: job.categoryName,
+      requirements: Array.isArray(job.requirements) ? job.requirements.filter((item): item is string => typeof item === "string") : undefined,
+      benefits: Array.isArray(job.benefits) ? job.benefits.filter((item): item is string => typeof item === "string") : undefined
     };
 
     const breadcrumbItems = [

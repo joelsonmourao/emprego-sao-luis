@@ -1,499 +1,297 @@
-import type { ReactNode } from "react";
 import type { Route } from "next";
 import Link from "next/link";
 import {
   ArrowRight,
-  BookOpenText,
   BriefcaseBusiness,
   Building2,
-  GraduationCap,
+  CheckCircle2,
+  MapPinned,
   Newspaper,
-  TrendingUp
+  ShieldCheck,
+  Sparkles,
+  Users
 } from "lucide-react";
 
-import { PublicAdSlot } from "@/components/ads/public-ad-slot";
+import { AdUnit } from "@/components/ads/AdUnit";
 import { BlogCard } from "@/components/blog-card";
-import { FaqList } from "@/components/faq-list";
 import { HomeSearchForm } from "@/components/home/home-search-form";
 import { JobCard } from "@/components/job-card";
-import { JsonLd } from "@/components/json-ld";
 import { SectionHeading } from "@/components/section-heading";
 import { Button } from "@/components/ui/button";
+import { JOB_CATEGORIES } from "@/lib/job-categories";
+import { getCategoryIcon } from "@/lib/category-icons";
+import { getRecentPosts } from "@/lib/repositories/blog";
+import { getRecentJobs } from "@/lib/repositories/jobs";
+import { getSearchGeoData } from "@/lib/repositories/geo";
 import { buildSiteMetadata } from "@/lib/seo/metadata";
-import { buildJovemAprendizCityUfPath } from "@/lib/seo/jovem-aprendiz-city-uf-slug";
-import { getCityJobsPath, getCompanyJobsPath } from "@/lib/seo/jobs-pages";
-import { buildFaqJsonLd } from "@/lib/seo/json-ld";
-import { getPostsBySlugs, getRecentPosts } from "@/lib/repositories/blog";
-import { getApprenticeCityUfSitemapRows, getFeaturedCompanies, getFeaturedCompaniesBySlugs, getFeaturedJobs, getJobsBySlugs } from "@/lib/repositories/jobs";
-import { getCities, getCitiesBySlugs, getSearchGeoData, getStates, getStatesBySlugs } from "@/lib/repositories/geo";
-import { defaultSiteContent, getSiteContent } from "@/lib/site-content";
-import { homeBlockKeys } from "@/lib/schemas/site-admin";
+import { getCityJobsPath } from "@/lib/seo/jobs-pages";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
+const HOME_CITIES = [
+  { name: "São Luís", slug: "sao-luis" },
+  { name: "São José de Ribamar", slug: "sao-jose-de-ribamar" },
+  { name: "Paço do Lumiar", slug: "paco-do-lumiar" },
+  { name: "Raposa", slug: "raposa" },
+  { name: "Imperatriz", slug: "imperatriz" },
+  { name: "Timon", slug: "timon" },
+  { name: "Caxias", slug: "caxias" },
+  { name: "Bacabal", slug: "bacabal" }
+] as const;
+
+const trustCards = [
+  { title: "Vagas atualizadas", description: "Oportunidades reunidas e organizadas para facilitar sua busca.", icon: BriefcaseBusiness },
+  { title: "Foco em São Luís e região", description: "Prioridade para a capital, Região Metropolitana e Maranhão.", icon: MapPinned },
+  { title: "Conteúdo gratuito", description: "Consulte vagas, empresas e artigos sem pagar pelo portal.", icon: ShieldCheck },
+  { title: "Por cidade e categoria", description: "Filtre por localidade e área para encontrar vagas relevantes.", icon: Users }
+];
+
 export async function generateMetadata() {
   return buildSiteMetadata({
-    title: "Vagas de Jovem Aprendiz e Menor Aprendiz no Brasil",
+    title: "Emprego São Luís - Vagas de Emprego em São Luís e Maranhão",
     description:
-      "Encontre vagas de Jovem Aprendiz e Menor Aprendiz por cidade e estado, veja empresas que contratam e acesse dicas para currículo, entrevista e primeiro emprego.",
+      "Encontre vagas de emprego em São Luís, Região Metropolitana e cidades do Maranhão. Oportunidades atualizadas para diversas áreas.",
     pathname: "/"
   });
 }
 
-const iconMap = {
-  compass: Building2,
-  "file-text": BookOpenText,
-  messages: Newspaper,
-  briefcase: BriefcaseBusiness,
-  graduation: GraduationCap,
-  trending: TrendingUp,
-  handshake: Newspaper,
-  target: ArrowRight
-} as const;
-
 export default async function HomePage() {
-  let featuredJobsDefault = [] as Awaited<ReturnType<typeof getFeaturedJobs>>;
-  let recentPostsDefault = [] as Awaited<ReturnType<typeof getRecentPosts>>;
-  let statesDefault = [] as Awaited<ReturnType<typeof getStates>>;
-  let citiesDefault = [] as Awaited<ReturnType<typeof getCities>>;
-  let searchStates = [] as Awaited<ReturnType<typeof getSearchGeoData>>;
-  let companiesDefault = [] as Awaited<ReturnType<typeof getFeaturedCompanies>>;
-  let siteContent = defaultSiteContent;
-  let apprenticeSeoRows = [] as Awaited<ReturnType<typeof getApprenticeCityUfSitemapRows>>;
+  let recentJobs: Awaited<ReturnType<typeof getRecentJobs>> = [];
+  let recentPosts: Awaited<ReturnType<typeof getRecentPosts>> = [];
+  let searchStates: Awaited<ReturnType<typeof getSearchGeoData>> = [];
 
   try {
-    [featuredJobsDefault, recentPostsDefault, statesDefault, citiesDefault, searchStates, companiesDefault, siteContent, apprenticeSeoRows] =
-      await Promise.all([
-        getFeaturedJobs(),
-        getRecentPosts(),
-        getStates(),
-        getCities(),
-        getSearchGeoData(),
-        getFeaturedCompanies(),
-        getSiteContent(),
-        getApprenticeCityUfSitemapRows()
-      ]);
+    [recentJobs, recentPosts, searchStates] = await Promise.all([
+      getRecentJobs(),
+      getRecentPosts(),
+      getSearchGeoData()
+    ]);
   } catch (error) {
-    console.error("[home] Falha ao carregar dados iniciais da home. Renderizando fallback seguro.", error);
+    console.error("[home] Falha ao carregar dados.", error);
   }
 
-  let featuredJobsSelected = [] as Awaited<ReturnType<typeof getJobsBySlugs>>;
-  let featuredPostsSelected = [] as Awaited<ReturnType<typeof getPostsBySlugs>>;
-  let featuredStatesSelected = [] as Awaited<ReturnType<typeof getStatesBySlugs>>;
-  let featuredCitiesSelected = [] as Awaited<ReturnType<typeof getCitiesBySlugs>>;
-  let featuredCompaniesSelected = [] as Awaited<ReturnType<typeof getFeaturedCompaniesBySlugs>>;
-
-  try {
-    [featuredJobsSelected, featuredPostsSelected, featuredStatesSelected, featuredCitiesSelected, featuredCompaniesSelected] =
-      await Promise.all([
-        getJobsBySlugs(siteContent.home.featured.jobSlugs),
-        getPostsBySlugs(siteContent.home.featured.postSlugs),
-        getStatesBySlugs(siteContent.home.featured.stateSlugs),
-        getCitiesBySlugs(siteContent.home.featured.citySlugs),
-        getFeaturedCompaniesBySlugs(siteContent.home.featured.companySlugs)
-      ]);
-  } catch (error) {
-    console.error("[home] Falha ao carregar selecoes em destaque. Mantendo dados padrao.", error);
-  }
-
-  const featuredJobs = featuredJobsSelected.length ? featuredJobsSelected : featuredJobsDefault;
-  const recentPosts = featuredPostsSelected.length ? featuredPostsSelected : recentPostsDefault;
-  const states = featuredStatesSelected.length ? featuredStatesSelected : statesDefault;
-  const cities = featuredCitiesSelected.length ? featuredCitiesSelected : citiesDefault;
-  const companies = featuredCompaniesSelected.length ? featuredCompaniesSelected : companiesDefault;
-  const companiesWithPublishedJobs = companies.filter((company) => company._count.jobs > 0);
-  const sectionsEnabled = siteContent.home.blocks;
-  const validOrder = siteContent.home.blockOrder.filter((key) => homeBlockKeys.includes(key));
-  const orderedBlocks = [...validOrder, ...homeBlockKeys.filter((key) => !validOrder.includes(key))];
-
-  const cityKeyToMeta = new Map(
-    citiesDefault.map((c) => [`${c.slug}__${c.state.code}`, { name: c.name, slug: c.slug, code: c.state.code }])
-  );
-  const apprenticeSeoCityLinks = apprenticeSeoRows
-    .map((row) => {
-      const meta = cityKeyToMeta.get(`${row.citySlug}__${row.stateCode}`);
-      if (!meta) return null;
-      return { ...row, cityName: meta.name, stateCode: meta.code };
-    })
-    .filter((item): item is NonNullable<typeof item> => Boolean(item))
-    .sort((a, b) => new Date(b.lastmod).getTime() - new Date(a.lastmod).getTime())
-    .slice(0, 24);
-
-  const pageSections: Record<(typeof homeBlockKeys)[number], ReactNode> = {
-    quickAccess: (
-      <section className="mx-auto max-w-7xl px-4 py-6 sm:px-6 sm:py-8 lg:px-8 lg:py-10">
-        <div className="grid gap-4 lg:grid-cols-2 sm:gap-6">
-          <Link prefetch={false} href="/vagas" className="brand-chip rounded-[1.5rem] p-5 transition hover:-translate-y-1 hover:shadow-[0_28px_80px_-52px_rgba(26,43,76,0.4)] sm:rounded-[2rem] sm:p-7">
-            <div className="flex items-start justify-between gap-3 sm:gap-4">
-              <div>
-                <p className="text-[10px] font-semibold uppercase tracking-[0.24em] text-[var(--brand-orange)] sm:text-xs sm:tracking-[0.28em]">
-                  {siteContent.home.quickJobsEyebrow}
-                </p>
-                <h2 className="mt-2 text-2xl font-black text-[var(--brand-navy)] leading-tight sm:mt-3 sm:text-3xl">{siteContent.home.quickJobsTitle}</h2>
-                <p className="mt-2 max-w-xl text-sm leading-6 text-[var(--brand-text-secondary)] sm:mt-3 sm:text-base sm:leading-7">{siteContent.home.quickJobsDescription}</p>
-              </div>
-              <BriefcaseBusiness className="h-8 w-8 text-[var(--brand-orange)] sm:h-10 sm:w-10" />
-            </div>
-          </Link>
-
-          <Link
-            href="/blog"
-            prefetch={false}
-            className="rounded-[1.5rem] border border-[color:rgba(255,109,0,0.18)] bg-[linear-gradient(145deg,#1a2b4c_0%,#21406e_56%,#2f6fed_100%)] p-5 text-white shadow-[0_30px_90px_-55px_rgba(26,43,76,0.68)] transition hover:-translate-y-1 sm:rounded-[2rem] sm:p-7"
-          >
-            <div className="flex items-start justify-between gap-3 sm:gap-4">
-              <div>
-                <p className="text-[10px] font-semibold uppercase tracking-[0.24em] text-orange-100 sm:text-xs sm:tracking-[0.28em]">
-                  {siteContent.home.quickBlogEyebrow}
-                </p>
-                <h2 className="mt-2 text-2xl font-black leading-tight sm:mt-3 sm:text-3xl">{siteContent.home.quickBlogTitle}</h2>
-                <p className="mt-2 max-w-xl text-sm leading-6 text-white/86 sm:mt-3 sm:text-base sm:leading-7">{siteContent.home.quickBlogDescription}</p>
-              </div>
-              <Newspaper className="h-8 w-8 text-[var(--brand-orange)] sm:h-10 sm:w-10" />
-            </div>
-          </Link>
-        </div>
-        
-        <div className="mt-4 sm:mt-6">
-          <PublicAdSlot slotSlug="home-after-quicklinks" format="auto" fullWidthResponsive />
-        </div>
-      </section>
-    ),
-    featuredJobs: (
-      <section className="mx-auto max-w-7xl gap-6 px-4 py-6 sm:px-6 sm:py-8 lg:grid-cols-[1fr_320px] lg:px-8 lg:py-10">
-        <div className="space-y-6">
-          <SectionHeading eyebrow="Vagas em destaque" title={siteContent.home.featuredTitle} description={siteContent.home.featuredDescription} />
-          <div className="grid gap-4 sm:gap-6 lg:grid-cols-2">
-            {featuredJobs.map((job) => (
-              <JobCard key={job.id} job={job} />
-            ))}
-          </div>
-          
-          <div className="my-4 sm:my-6">
-            <PublicAdSlot slotSlug="home-featured-mid" format="auto" fullWidthResponsive />
-          </div>
-          
-          <div className="flex flex-wrap gap-3 sm:gap-4">
-            <Button asChild size="lg" className="gap-2">
-              <Link href="/vagas" prefetch={false}>
-                Ver todas as vagas
-                <ArrowRight className="h-4 w-4" />
-              </Link>
-            </Button>
-          </div>
-        </div>
-
-        <aside className="space-y-4 sm:space-y-6">
-          <div className="brand-chip rounded-[1.5rem] p-4 sm:rounded-[2rem] sm:p-6">
-            <h2 className="text-base font-black text-[var(--brand-navy)] sm:text-lg">Estados em destaque</h2>
-            <div className="mt-3 flex flex-wrap gap-2 sm:mt-4 sm:gap-3">
-              {states.slice(0, 8).map((state) => (
-                <Link
-                  key={state.id}
-                  href={`/vagas/estado/${state.slug}`}
-                  prefetch={false}
-                  className="rounded-full border border-[color:rgba(26,43,76,0.1)] bg-white px-3 py-1.5 text-xs font-medium text-[var(--brand-text-secondary)] transition hover:border-[color:rgba(255,109,0,0.26)] hover:text-[var(--brand-orange)] sm:px-4 sm:py-2 sm:text-sm"
-                >
-                  {state.name} ({state._count.jobs})
-                </Link>
-              ))}
-            </div>
-          </div>
-          <div className="brand-panel rounded-[1.5rem] border border-slate-200 p-4 shadow-[0_25px_80px_-50px_rgba(26,43,76,0.2)] sm:rounded-[2rem] sm:p-6">
-            <h2 className="text-base font-black text-[var(--brand-navy)] sm:text-lg">Cidades que estao puxando novas vagas</h2>
-            <p className="mt-2 text-sm leading-6 text-[var(--brand-text-secondary)] sm:leading-7">
-              Explore cidades com movimentacao recente para encontrar oportunidades mais perto da sua rotina.
-            </p>
-            <div className="mt-3 flex flex-wrap gap-2 sm:mt-4 sm:gap-3">
-              {cities.slice(0, 6).map((city) => (
-                <Link
-                  key={city.id}
-                  href={getCityJobsPath(city.slug)}
-                  prefetch={false}
-                  className="rounded-full border border-[color:rgba(26,43,76,0.1)] bg-white px-3 py-1.5 text-xs font-medium text-[var(--brand-text-secondary)] transition hover:border-[color:rgba(255,109,0,0.26)] hover:text-[var(--brand-orange)] sm:px-4 sm:py-2 sm:text-sm"
-                >
-                  {city.name}, {city.state.code}
-                </Link>
-              ))}
-            </div>
-          </div>
-        </aside>
-      </section>
-    ),
-    blog: (
-      <section className="mx-auto max-w-7xl space-y-6 px-4 py-6 sm:px-6 sm:py-8 sm:space-y-8 lg:px-8 lg:py-10">
-        <SectionHeading eyebrow="Blog" title={siteContent.home.blogTitle} description={siteContent.home.blogDescription} />
-        <div className="grid gap-4 sm:gap-6 lg:grid-cols-3">
-          {recentPosts.slice(0, 3).map((post) => (
-            <BlogCard key={post.id} post={post} />
-          ))}
-        </div>
-        
-        <div className="my-4 sm:my-6">
-          <PublicAdSlot slotSlug="home-blog" format="auto" fullWidthResponsive />
-        </div>
-        
-        <div className="flex flex-wrap gap-3 sm:gap-4">
-          <Button asChild size="lg" variant="outline" className="rounded-2xl">
-            <Link href="/blog" prefetch={false}>Acessar blog</Link>
-          </Button>
-        </div>
-      </section>
-    ),
-    howItWorks: (
-      <section className="mx-auto max-w-7xl space-y-6 px-4 py-6 sm:px-6 sm:py-8 sm:space-y-8 lg:px-8 lg:py-10">
-        <div className="grid gap-4 sm:gap-6 lg:grid-cols-3">
-          {siteContent.home.howItWorksSteps.map((step) => {
-            const Icon = iconMap[step.iconKey as keyof typeof iconMap] ?? Building2;
-
-            return (
-              <div key={step.title} className="brand-chip rounded-[1.5rem] p-4 sm:rounded-[1.75rem] sm:p-6">
-                <Icon className="h-6 w-6 text-[var(--brand-orange)] sm:h-7 sm:w-7" />
-                <h2 className="mt-3 text-xl font-black text-[var(--brand-navy)] leading-tight sm:mt-4 sm:text-2xl">{step.title}</h2>
-                <p className="mt-2 text-sm leading-6 text-[var(--brand-text-secondary)] sm:leading-7">{step.description}</p>
-              </div>
-            );
-          })}
-        </div>
-      </section>
-    ),
-    citiesAndBenefits: (
-      <section className="mx-auto max-w-7xl space-y-6 px-4 py-6 sm:px-6 sm:py-8 sm:space-y-8 lg:px-8 lg:py-10">
-        <div className="grid gap-6 sm:gap-8 lg:grid-cols-2">
-          <div className="brand-panel rounded-[1.5rem] border border-slate-200 p-5 shadow-[0_25px_90px_-54px_rgba(26,43,76,0.24)] sm:rounded-[2rem] sm:p-8">
-            <SectionHeading
-              eyebrow="Cidades em destaque"
-              title={siteContent.home.citiesTitle}
-              description={siteContent.home.citiesDescription}
-            />
-            <div className="mt-4 flex flex-wrap gap-2 sm:mt-6 sm:gap-3">
-              {cities.slice(0, 8).map((city) => (
-                <Link
-                  key={city.id}
-                  href={getCityJobsPath(city.slug)}
-                  prefetch={false}
-                  className="rounded-full border border-[color:rgba(26,43,76,0.1)] bg-white px-3 py-1.5 text-xs font-medium text-[var(--brand-text-secondary)] transition hover:border-[color:rgba(255,109,0,0.28)] hover:text-[var(--brand-orange)] sm:px-4 sm:py-2 sm:text-sm"
-                >
-                  {city.name}, {city.state.code}
-                </Link>
-              ))}
-            </div>
-          </div>
-
-          <div className="brand-dark-panel rounded-[1.5rem] p-5 text-white shadow-[0_30px_100px_-50px_rgba(26,43,76,0.8)] sm:rounded-[2rem] sm:p-8">
-            <SectionHeading
-              eyebrow="Beneficios do programa"
-              title={siteContent.home.benefitsTitle}
-              description={siteContent.home.benefitsDescription}
-              tone="light"
-            />
-            <div className="mt-4 grid gap-4 sm:mt-6 sm:gap-5">
-              {siteContent.home.benefits.slice(0, 3).map((item) => {
-                const Icon = iconMap[item.iconKey as keyof typeof iconMap] ?? GraduationCap;
-
-                return (
-                  <div key={item.title} className="rounded-[1.5rem] border border-white/18 bg-white/10 p-4 shadow-[0_18px_50px_-35px_rgba(15,23,42,0.4)] backdrop-blur sm:p-5">
-                    <Icon className="h-6 w-6 text-[var(--brand-orange)] sm:h-7 sm:w-7" />
-                    <h3 className="mt-3 text-lg font-black text-white leading-tight sm:mt-4 sm:text-xl">{item.title}</h3>
-                    <p className="mt-2 text-sm leading-6 text-white/88 sm:leading-7">{item.description}</p>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        </div>
-      </section>
-    ),
-    careerCtas: (
-      <section className="mx-auto max-w-7xl space-y-6 px-4 py-6 sm:px-6 sm:py-8 sm:space-y-8 lg:px-8 lg:py-10">
-        <div className="grid gap-4 sm:gap-6 lg:grid-cols-3">
-          {siteContent.home.careerCtas.map((item) => {
-            const Icon = iconMap[item.iconKey as keyof typeof iconMap] ?? ArrowRight;
-
-            return (
-              <Link key={item.title} href={item.href as Route} prefetch={false} className="brand-chip rounded-[1.5rem] p-4 transition hover:-translate-y-1 sm:rounded-[2rem] sm:p-6">
-                <Icon className="h-7 w-7 text-[var(--brand-orange)] sm:h-8 sm:w-8" />
-                <h3 className="mt-4 text-xl font-black text-[var(--brand-navy)] leading-tight sm:mt-5 sm:text-2xl">{item.title}</h3>
-                <p className="mt-2 text-sm leading-6 text-[var(--brand-text-secondary)] sm:leading-7">{item.description}</p>
-              </Link>
-            );
-          })}
-        </div>
-      </section>
-    ),
-    companies: (
-      <section className="mx-auto max-w-7xl space-y-6 px-4 py-6 sm:px-6 sm:py-8 sm:space-y-8 lg:px-8 lg:py-10">
-        <div className="grid gap-6 sm:gap-8 lg:grid-cols-[0.9fr_1.1fr]">
-          <div className="brand-chip rounded-[1.5rem] p-4 sm:rounded-[2rem] sm:p-6">
-            <h2 className="text-base font-black text-[var(--brand-navy)] sm:text-lg">{siteContent.home.companiesTitle}</h2>
-            <p className="mt-2 text-sm leading-6 text-[var(--brand-text-secondary)] sm:leading-7">{siteContent.home.companiesDescription}</p>
-            <div className="mt-4 grid gap-3 sm:mt-5">
-              {companiesWithPublishedJobs.slice(0, 6).map((company) => (
-                <Link
-                  key={company.slug}
-                    href={getCompanyJobsPath(company.slug)}
-                  prefetch={false}
-                  className="rounded-[1.25rem] border border-[color:rgba(26,43,76,0.1)] bg-white px-3 py-3 text-sm text-[var(--brand-text-secondary)] transition hover:border-[color:rgba(255,109,0,0.24)] hover:text-[var(--brand-orange)] sm:px-4 sm:py-4"
-                >
-                  <span className="block font-semibold text-[var(--brand-navy)]">{company.name}</span>
-                  <span className="mt-1 block text-[var(--brand-text-secondary)]">
-                    {company.city.name}, {company.state.code}
-                  </span>
-                  <span className="mt-2 block text-xs font-semibold text-[var(--brand-orange-strong)]">
-                    {company._count.jobs} vaga(s) publicada(s)
-                  </span>
-                </Link>
-              ))}
-            </div>
-          </div>
-
-          <div className="brand-dark-panel rounded-[1.5rem] p-5 text-white shadow-[0_30px_100px_-50px_rgba(26,43,76,0.78)] sm:rounded-[2rem] sm:p-7">
-            <h2 className="text-lg font-black leading-tight sm:text-xl">Oportunidades por cidade ajudam a filtrar mais rápido</h2>
-            <p className="mt-2 text-sm leading-6 text-white/84 sm:mt-3 sm:leading-7">
-              Quando você entra por cidade ou empresa, a navegação fica menos genérica e o portal mostra oportunidades mais perto do seu contexto.
-            </p>
-            <div className="mt-4 flex flex-wrap gap-2 sm:mt-5 sm:gap-3">
-              {cities.slice(0, 5).map((city) => (
-                <Link
-                  key={city.id}
-                  href={getCityJobsPath(city.slug)}
-                  prefetch={false}
-                  className="rounded-full border border-white/18 bg-white/10 px-3 py-1.5 text-xs font-medium text-white transition hover:bg-white/16 sm:px-4 sm:py-2 sm:text-sm"
-                >
-                  {city.name}
-                </Link>
-              ))}
-            </div>
-            {apprenticeSeoCityLinks.length ? (
-              <div className="mt-6 border-t border-white/14 pt-5">
-                <h3 className="text-base font-black text-white sm:text-lg">Vagas de Jovem Aprendiz por cidade</h3>
-                <p className="mt-2 text-xs leading-5 text-white/80 sm:text-sm">
-                  Páginas com vagas ativas de Jovem Aprendiz divulgadas por empresas na região.
-                </p>
-                <div className="mt-3 flex flex-wrap gap-2 sm:mt-4 sm:gap-3">
-                  {apprenticeSeoCityLinks.map((row) => (
-                    <Link
-                      key={`${row.citySlug}-${row.stateCode}`}
-                      href={buildJovemAprendizCityUfPath(row.citySlug, row.stateCode) as Route}
-                      prefetch={false}
-                      className="rounded-full border border-white/18 bg-white/10 px-3 py-1.5 text-xs font-medium text-white transition hover:bg-white/16 sm:px-4 sm:py-2 sm:text-sm"
-                    >
-                      {`Jovem Aprendiz em ${row.cityName}, ${row.stateCode}`}
-                    </Link>
-                  ))}
-                </div>
-              </div>
-            ) : null}
-          </div>
-        </div>
-      </section>
-    ),
-    faq: (
-      <section className="mx-auto max-w-7xl space-y-6 px-4 py-6 sm:px-6 sm:py-8 sm:space-y-8 lg:px-8 lg:py-10">
-        <SectionHeading eyebrow="FAQ" title={siteContent.home.faqTitle} description={siteContent.home.faqDescription} />
-        <FaqList />
-        
-        <div className="mt-4 sm:mt-6">
-          <PublicAdSlot slotSlug="home-faq" format="auto" fullWidthResponsive />
-        </div>
-      </section>
-    ),
-    finalCta: (
-      <section className="mx-auto max-w-7xl px-4 py-6 sm:px-6 sm:py-8 lg:px-8 lg:py-10">
-        <div className="rounded-[1.5rem] bg-[linear-gradient(135deg,#1a2b4c_0%,#21406e_44%,#2f6fed_100%)] p-5 text-white sm:rounded-[2rem] sm:p-8">
-          <div className="grid gap-4 lg:grid-cols-[1.2fr_0.8fr] lg:items-center sm:gap-6">
-            <div>
-              <p className="text-[10px] font-semibold uppercase tracking-[0.24em] text-orange-100 sm:text-xs sm:tracking-[0.28em]">{siteContent.home.finalCtaEyebrow}</p>
-              <h2 className="mt-2 text-2xl font-black tracking-tight leading-tight sm:mt-4 sm:text-4xl">{siteContent.home.finalCtaTitle}</h2>
-              <p className="mt-2 max-w-3xl text-sm leading-6 text-white/86 sm:mt-4 sm:text-base sm:leading-8">{siteContent.home.finalCtaDescription}</p>
-            </div>
-            <div className="flex flex-col gap-3 sm:gap-4">
-              <Button asChild size="lg" className="bg-[var(--brand-orange)] text-white hover:bg-[#e56200]">
-                <Link href={siteContent.home.primaryButton.href as Route}>{siteContent.home.primaryButton.label}</Link>
-              </Button>
-              <Button asChild variant="outline" size="lg" className="border-white/30 bg-transparent text-white hover:bg-white/10">
-                <Link href={siteContent.home.secondaryButton.href as Route}>{siteContent.home.secondaryButton.label}</Link>
-              </Button>
-            </div>
-          </div>
-        </div>
-      </section>
-    )
-  };
+  const maranhaoStates = searchStates.filter((state) => state.code === "MA");
+  const displayCategories = JOB_CATEGORIES.filter((item) => item.slug !== "geral");
 
   return (
-    <div className="pb-20">
-      <JsonLd data={buildFaqJsonLd(siteContent.faq.home)} />
-      <section className="relative min-h-[640px] overflow-hidden border-b border-slate-200 bg-[linear-gradient(138deg,#1a2b4c_0%,#21406e_42%,#2f6fed_82%,#ff6d00_100%)] text-white sm:min-h-[720px] lg:min-h-[640px]">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_22%,rgba(255,255,255,0.14),transparent_22%),radial-gradient(circle_at_84%_16%,rgba(255,179,71,0.12),transparent_20%)]" />
-        <div className="mx-auto grid min-h-[600px] max-w-7xl gap-4 px-4 py-8 sm:min-h-[660px] sm:gap-6 sm:px-6 sm:py-12 lg:min-h-[600px] lg:grid-cols-[1.08fr_0.92fr] lg:px-8 lg:py-16">
-          <div className="relative min-h-[540px] space-y-5 sm:min-h-[560px]">
-            <div className="inline-flex rounded-full border border-white/18 bg-white/10 px-2.5 py-1 text-[9px] font-semibold uppercase tracking-[0.2em] text-orange-50 sm:px-4 sm:py-1.5 sm:text-[10px] sm:tracking-[0.28em]">
-              {siteContent.home.heroBadge}
+    <div className="pb-16">
+      <section className="relative overflow-hidden border-b border-[var(--brand-line)] bg-[var(--brand-green)] text-white">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_14%_18%,rgba(242,140,27,0.2),transparent_28%),radial-gradient(circle_at_88%_8%,rgba(123,44,40,0.16),transparent_22%)]" />
+        <div className="relative mx-auto grid max-w-7xl gap-10 px-4 py-12 sm:px-6 lg:grid-cols-[1.15fr_0.85fr] lg:items-center lg:px-8 lg:py-16">
+          <div>
+            <div className="inline-flex items-center gap-2 rounded-full border border-white/14 bg-white/8 px-3 py-1 text-[11px] font-bold uppercase tracking-wide text-orange-100">
+              <Sparkles className="h-3.5 w-3.5 text-[var(--brand-orange)]" />
+              Gratuito para candidatos
             </div>
-            <div className="space-y-3">
-              <h1 className="max-w-4xl text-[1.75rem] font-black tracking-tight leading-[1.1] sm:text-4xl sm:leading-[1.08] xl:text-6xl">{siteContent.home.heroTitle}</h1>
-              <p className="max-w-3xl text-[14px] leading-6 text-white/86 sm:text-base sm:leading-7">{siteContent.home.heroDescription}</p>
-            </div>
+            <h1 className="mt-5 text-3xl font-extrabold leading-tight sm:text-4xl lg:text-[2.65rem]">
+              Vagas de emprego em São Luís e no Maranhão
+            </h1>
+            <p className="mt-4 max-w-2xl text-sm leading-7 text-white/88 sm:text-base">
+              Encontre oportunidades atualizadas em São Luís, Região Metropolitana e cidades do Maranhão. Busque por cargo, filtre por cidade e candidate-se com segurança.
+            </p>
 
-            <div className="min-h-[220px]">
+            <div className="mt-8 max-w-xl rounded-2xl border border-white/12 bg-white/95 p-1 shadow-[0_24px_60px_-32px_rgba(26,26,26,0.45)]">
               <HomeSearchForm
-                states={searchStates}
+                states={maranhaoStates.length ? maranhaoStates : searchStates}
                 action="/vagas"
-                submitLabel="Ver vagas"
-                helperText={siteContent.home.searchHelperText}
+                submitLabel="Buscar vagas"
+                helperText="Pesquise por cargo ou palavra-chave e filtre por cidade."
                 footerLinkHref="/vagas"
-                footerLinkLabel="Abrir todas as vagas"
+                footerLinkLabel="Ver todas as vagas"
               />
             </div>
 
-            <div className="flex min-h-[146px] flex-col gap-2.5 sm:min-h-[56px] sm:flex-row sm:flex-wrap sm:gap-4">
-              <Button asChild size="lg" className="gap-2">
-                <Link href={siteContent.home.primaryButton.href as Route}>
-                  {siteContent.home.primaryButton.label}
+            <div className="mt-6 flex flex-wrap gap-3">
+              <Button asChild size="lg" variant="secondary" className="gap-2">
+                <Link href="/vagas" aria-label="Ver vagas disponíveis">
+                  Ver vagas disponíveis
                   <ArrowRight className="h-4 w-4" />
                 </Link>
               </Button>
-              <Button asChild variant="secondary" size="lg" className="rounded-2xl">
-                <Link href={"/menor-aprendiz" as Route}>Guia de Menor Aprendiz</Link>
-              </Button>
-              <Button asChild variant="outline" size="lg" className="rounded-2xl border-white/30 bg-white/10 text-white hover:bg-white/16">
-                <Link href={siteContent.home.secondaryButton.href as Route}>{siteContent.home.secondaryButton.label}</Link>
+              <Button asChild variant="outline" size="lg" className="border-white/24 bg-white/8 text-white hover:bg-white/14">
+                <Link href="/anunciar-vaga">Publicar vaga</Link>
               </Button>
             </div>
           </div>
 
           <div className="relative hidden lg:block">
-            <div className="mesh-surface rounded-[2rem] border border-white/20 p-4 shadow-[0_40px_120px_-50px_rgba(26,43,76,0.72)] sm:rounded-[2.5rem] sm:p-6">
-              <div className="grid gap-3 sm:grid-cols-2 sm:gap-4">
-                {siteContent.home.heroHighlights.slice(0, 4).map((item, index) => {
-                  const Icon = iconMap[item.iconKey as keyof typeof iconMap] ?? BriefcaseBusiness;
-                  const featured = index === 1;
-
-                  return (
-                    <Link
-                      key={`${item.title}-${item.href}`}
-                      href={item.href as Route}
-                      className={
-                        featured
-                          ? "rounded-[1.5rem] bg-[linear-gradient(145deg,#1a2b4c_0%,#21406e_54%,#2f6fed_100%)] p-4 text-white shadow-[0_20px_50px_-30px_rgba(26,43,76,0.72)] transition hover:-translate-y-1 sm:rounded-[1.75rem] sm:p-5"
-                          : "rounded-[1.5rem] bg-white p-4 text-[var(--brand-navy)] shadow-sm transition hover:-translate-y-1 sm:rounded-[1.75rem] sm:p-5"
-                      }
-                    >
-                      <Icon className={`h-8 w-8 ${featured ? "text-[var(--brand-orange)]" : "text-[var(--brand-blue)]"}`} />
-                      <h2 className="mt-3 text-lg font-black leading-tight sm:mt-4 sm:text-xl">{item.title}</h2>
-                      <p className={`mt-2 text-sm leading-6 ${featured ? "text-white/84" : "text-[var(--brand-text-secondary)]"}`}>{item.description}</p>
-                    </Link>
-                  );
-                })}
+            <div className="rounded-3xl border border-white/12 bg-[linear-gradient(145deg,rgba(255,255,255,0.1),rgba(255,255,255,0.04))] p-8 backdrop-blur-sm">
+              <div className="mx-auto flex h-28 w-28 items-center justify-center rounded-3xl bg-[var(--brand-orange)] text-4xl font-black text-white shadow-lg">
+                ES
+              </div>
+              <p className="mt-6 text-center text-sm font-bold uppercase tracking-[0.2em] text-orange-100">Emprego São Luís</p>
+              <p className="mt-2 text-center text-sm leading-7 text-white/80">
+                Portal regional de vagas com foco em São Luís, Região Metropolitana e cidades do Maranhão.
+              </p>
+              <div className="mt-6 grid grid-cols-2 gap-3 text-center text-xs">
+                <div className="rounded-2xl bg-white/8 px-3 py-3 font-semibold">Vagas por cidade</div>
+                <div className="rounded-2xl bg-white/8 px-3 py-3 font-semibold">Blog com dicas</div>
+                <div className="rounded-2xl bg-white/8 px-3 py-3 font-semibold">Empresas locais</div>
+                <div className="rounded-2xl bg-white/8 px-3 py-3 font-semibold">Anuncie grátis*</div>
               </div>
             </div>
           </div>
         </div>
       </section>
 
-      {orderedBlocks.map((blockKey) => (sectionsEnabled[blockKey] ? <div key={blockKey}>{pageSections[blockKey]}</div> : null))}
+      <section className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {trustCards.map((item) => {
+            const Icon = item.icon;
+            return (
+              <div key={item.title} className="brand-chip es-card-hover rounded-2xl p-5">
+                <div className="inline-flex h-11 w-11 items-center justify-center rounded-xl bg-[rgba(242,140,27,0.12)] text-[var(--brand-orange)]">
+                  <Icon className="h-5 w-5" />
+                </div>
+                <h2 className="mt-4 text-lg font-extrabold text-[var(--brand-charcoal)]">{item.title}</h2>
+                <p className="mt-2 text-sm leading-6 text-[var(--brand-text-secondary)]">{item.description}</p>
+              </div>
+            );
+          })}
+        </div>
+      </section>
+
+      <AdUnit className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8" />
+
+      <section className="mx-auto max-w-7xl space-y-6 px-4 py-8 sm:px-6 lg:px-8">
+        <SectionHeading
+          eyebrow="Vagas recentes"
+          title="Oportunidades publicadas recentemente"
+          description="Confira vagas divulgadas em São Luís e no Maranhão com empresa, cidade e link de candidatura."
+        />
+        {recentJobs.length ? (
+          <div className="grid gap-5 lg:grid-cols-2">
+            {recentJobs.slice(0, 6).map((job) => (
+              <JobCard key={job.id} job={job} />
+            ))}
+          </div>
+        ) : (
+          <div className="rounded-2xl border border-dashed border-[var(--brand-line)] bg-white px-6 py-10 text-sm leading-7 text-[var(--brand-text-secondary)]">
+            Ainda não há vagas publicadas no momento. Volte em breve ou divulgue uma oportunidade.
+          </div>
+        )}
+        <Button asChild size="lg" className="gap-2">
+          <Link href="/vagas">Ver todas as vagas</Link>
+        </Button>
+      </section>
+
+      <section className="mx-auto max-w-7xl space-y-6 px-4 py-8 sm:px-6 lg:px-8">
+        <SectionHeading eyebrow="Cidades" title="Busque vagas por cidade" description="Principais cidades do Maranhão com oportunidades no portal." />
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {HOME_CITIES.map((city) => (
+            <Link
+              key={city.slug}
+              href={getCityJobsPath(city.slug)}
+              className="es-city-card es-card-hover rounded-2xl border border-[var(--brand-line)] p-5 shadow-[0_16px_40px_-30px_rgba(26,26,26,0.18)]"
+            >
+              <MapPinned className="h-5 w-5 text-[var(--brand-orange)]" />
+              <h3 className="mt-3 text-lg font-extrabold text-[var(--brand-charcoal)]">{city.name}</h3>
+              <p className="mt-1 text-sm text-[var(--brand-text-secondary)]">Ver vagas em {city.name}, MA</p>
+            </Link>
+          ))}
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-7xl space-y-6 px-4 py-8 sm:px-6 lg:px-8">
+        <SectionHeading eyebrow="Categorias" title="Vagas por área de atuação" description="Encontre oportunidades alinhadas ao seu perfil profissional." />
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          {displayCategories.map((category) => {
+            const Icon = getCategoryIcon(category.slug);
+            return (
+              <Link
+                key={category.slug}
+                href={`/vagas/categoria/${category.slug}` as Route}
+                className="brand-chip es-card-hover flex items-start gap-3 rounded-2xl px-4 py-4"
+              >
+                <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[rgba(123,44,40,0.08)] text-[var(--brand-brick)]">
+                  <Icon className="h-5 w-5" />
+                </span>
+                <span>
+                  <span className="block font-bold text-[var(--brand-charcoal)]">{category.name}</span>
+                  <span className="mt-1 block text-xs leading-5 text-[var(--brand-text-secondary)]">{category.description}</span>
+                </span>
+              </Link>
+            );
+          })}
+        </div>
+        <Button asChild variant="outline" size="lg">
+          <Link href="/categorias">Ver todas as categorias</Link>
+        </Button>
+      </section>
+
+      <section className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+        <div className="brand-dark-panel rounded-3xl p-6 text-white sm:p-10">
+          <div className="grid gap-6 lg:grid-cols-[1.2fr_0.8fr] lg:items-center">
+            <div>
+              <p className="text-xs font-bold uppercase tracking-[0.2em] text-orange-100">Para empresas</p>
+              <h2 className="mt-3 text-2xl font-extrabold sm:text-3xl">Sua empresa está contratando?</h2>
+              <p className="mt-3 max-w-2xl text-sm leading-7 text-white/86 sm:text-base">
+                Divulgue oportunidades para candidatos de São Luís, Região Metropolitana e Maranhão.
+              </p>
+            </div>
+            <Button asChild size="lg" variant="secondary" className="w-full justify-center lg:w-auto">
+              <Link href="/anunciar-vaga">
+                Publicar uma vaga
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </Link>
+            </Button>
+          </div>
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-7xl space-y-6 px-4 py-8 sm:px-6 lg:px-8">
+        <SectionHeading
+          eyebrow="Blog"
+          title="Artigos úteis para sua carreira"
+          description="Conteúdos sobre currículo, entrevista, segurança digital e mercado de trabalho no Maranhão."
+        />
+        {recentPosts.length ? (
+          <div className="grid gap-6 lg:grid-cols-3">
+            {recentPosts.slice(0, 3).map((post, index) => (
+              <div key={post.id} className={index === 0 ? "lg:col-span-3" : undefined}>
+                <BlogCard post={post} featured={index === 0} />
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="rounded-2xl border border-dashed border-[var(--brand-line)] bg-white px-6 py-10 text-sm text-[var(--brand-text-secondary)]">
+            Em breve novos artigos serão publicados no blog.
+          </div>
+        )}
+        <div className="flex flex-wrap gap-3">
+          <Button asChild variant="outline" size="lg">
+            <Link href="/blog">
+              <Newspaper className="mr-2 h-4 w-4" />
+              Acessar blog
+            </Link>
+          </Button>
+          <Button asChild variant="ghost" size="lg" className="text-[var(--brand-brick)]">
+            <Link href="/empresas">
+              <Building2 className="mr-2 h-4 w-4" />
+              Ver empresas
+            </Link>
+          </Button>
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-7xl px-4 py-4 sm:px-6 lg:px-8">
+        <div className="brand-panel rounded-3xl border border-[var(--brand-line)] p-6 sm:p-8">
+          <SectionHeading eyebrow="Como funciona" title="Busque, compare e candidate-se com segurança" description="O Emprego São Luís organiza oportunidades — a contratação é de responsabilidade da empresa anunciante." />
+          <div className="mt-6 grid gap-4 sm:grid-cols-3">
+            {[
+              "Busque por cargo, cidade ou categoria",
+              "Leia descrição, requisitos e data da vaga",
+              "Acesse o link oficial de candidatura"
+            ].map((text) => (
+              <div key={text} className="flex items-start gap-3 rounded-2xl bg-white px-4 py-4 text-sm leading-6 text-[var(--brand-text-secondary)]">
+                <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-[var(--brand-orange)]" />
+                <span>{text}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
     </div>
   );
 }

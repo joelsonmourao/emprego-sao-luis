@@ -82,11 +82,11 @@ function normalizeLocationType(value: unknown): LocationType {
 }
 
 function buildSeoDescription(title: string, city: string, state: string) {
-  return `${title || "Vaga de Jovem Aprendiz"}. Veja requisitos, beneficios e jornada em ${city}/${state}.`;
+  return `${title || "Vaga de emprego"}. Veja requisitos, beneficios e jornada em ${city}/${state}.`;
 }
 
 function buildSummary(title: string, city: string, state: string) {
-  return title || `Jovem Aprendiz em ${city} ${state}`;
+  return title || `Vaga em ${city} ${state}`;
 }
 
 function ensureUniqueJobSlug(baseSlug: string, usedSlugs: Set<string>, currentSlug?: string) {
@@ -242,7 +242,7 @@ async function findCompanyNameFallback() {
 }
 
 function buildCompanySummary(companyName: string) {
-  return `Veja vagas de Jovem Aprendiz ligadas a ${companyName}.`;
+  return `Veja vagas divulgadas pela ${companyName} no Emprego São Luís.`;
 }
 
 function resolveSafeTitle(row: ScheduledJobUploadRow) {

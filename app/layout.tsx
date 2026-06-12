@@ -1,12 +1,21 @@
 import type { Metadata, Viewport } from "next";
+import { Plus_Jakarta_Sans } from "next/font/google";
 import { Suspense, type ReactNode } from "react";
 import Script from "next/script";
 import "./globals.css";
+
+const plusJakarta = Plus_Jakarta_Sans({
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-plus-jakarta",
+  weight: ["400", "500", "600", "700", "800"]
+});
 
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { PublicChrome } from "@/components/public-chrome";
 import { JsonLd } from "@/components/json-ld";
+import { AdSenseScript } from "@/components/ads/AdSenseScript";
 import { ConsentBootstrap } from "@/components/analytics/consent-bootstrap";
 import { SiteIntegrations } from "@/components/analytics/site-integrations";
 import { buildOrganizationJsonLd, buildWebsiteJsonLd } from "@/lib/seo/json-ld";
@@ -31,18 +40,18 @@ export async function generateMetadata(): Promise<Metadata> {
   return {
     metadataBase: new URL(getSiteOrigin()),
     title: {
-      default: `${settings.siteName} | Vagas e dicas para o primeiro emprego`,
+      default: `${settings.siteName} - Vagas de Emprego em São Luís e Maranhão`,
       template: `%s | ${settings.siteName}`
     },
     description: settings.shortDescription || siteConfig.description,
     applicationName: settings.siteName,
     icons: {
-      icon: [settings.faviconUrl],
-      shortcut: [settings.faviconUrl],
-      apple: [settings.logoCompactUrl]
+      icon: [settings.faviconUrl || "/favicon.ico"],
+      shortcut: [settings.faviconUrl || "/favicon.ico"],
+      apple: [settings.logoCompactUrl || "/logo.png"]
     },
     other: {
-      "theme-color": "#1A2B4C"
+      "theme-color": "#1F2B24"
     },
     verification: settings.google.searchConsoleVerification
       ? {
@@ -76,18 +85,20 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function RootLayout({ children }: Readonly<{ children: ReactNode }>) {
   const settings = await getSiteSettings();
-  const adsensePublisherId = normalizeAdsensePublisherId(settings.google.adsensePublisherId) ?? "ca-pub-4279201625870524";
-  const shouldLoadAdsense = Boolean(settings.google.adsenseEnabled && adsensePublisherId);
+  const envAdsenseClient = process.env.NEXT_PUBLIC_ADSENSE_CLIENT_ID?.trim();
+  const adsensePublisherId = normalizeAdsensePublisherId(envAdsenseClient || settings.google.adsensePublisherId);
+  const shouldLoadAdsense = Boolean(adsensePublisherId && (envAdsenseClient || settings.google.adsenseEnabled));
 
   return (
-    <html lang="pt-BR">
+    <html lang="pt-BR" className={plusJakarta.variable}>
       <head>
-        {shouldLoadAdsense ? <meta name="google-adsense-account" content={adsensePublisherId} /> : null}
+        {shouldLoadAdsense && adsensePublisherId ? <meta name="google-adsense-account" content={adsensePublisherId} /> : null}
       </head>
       <body className="min-h-screen antialiased overflow-x-hidden">
-        {shouldLoadAdsense ? (
+        {envAdsenseClient ? <AdSenseScript /> : null}
+        {!envAdsenseClient && shouldLoadAdsense && adsensePublisherId ? (
           <Script
-            id="adsense-script"
+            id="adsense-script-admin"
             src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${adsensePublisherId}`}
             strategy="afterInteractive"
             crossOrigin="anonymous"

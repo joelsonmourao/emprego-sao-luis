@@ -14,7 +14,7 @@ type JobRow = {
   slug: string;
   companyName: string;
   isActive: boolean;
-  status: "DRAFT" | "SCHEDULED" | "PUBLISHED" | "EXPIRED" | "ERROR";
+  status: "DRAFT" | "SCHEDULED" | "PUBLISHED" | "EXPIRED" | "ERROR" | "ARCHIVED";
   publishedAt: string;
   cityName: string;
   stateCode: string;

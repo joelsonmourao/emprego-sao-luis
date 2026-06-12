@@ -14,7 +14,7 @@ function resolveAuditLogDir() {
   }
 
   if (process.env.VERCEL || process.env.COOLIFY || process.env.NODE_ENV === "production") {
-    return path.join(os.tmpdir(), "jovem-aprendiz-publication-audit");
+    return path.join(os.tmpdir(), "emprego-sao-luis-publication-audit");
   }
 
   return path.join(process.cwd(), "logs", LOG_SUBDIR);

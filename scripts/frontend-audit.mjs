@@ -4,7 +4,7 @@ import path from "node:path";
 
 const EDGE_PATH = "C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe";
 const OUTPUT_DIR = path.resolve(process.cwd(), "..", "..", "artifacts", "frontend-audit");
-const BASE_URL = process.env.FRONTEND_AUDIT_BASE_URL ?? "https://slzcontent.com.br";
+const BASE_URL = process.env.FRONTEND_AUDIT_BASE_URL ?? "https://empregossaoluis.com.br";
 const DEBUG_PORT = Number(process.env.FRONTEND_AUDIT_PORT ?? "9333");
 
 async function ensureDir(dir) {

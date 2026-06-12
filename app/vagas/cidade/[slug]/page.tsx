@@ -9,13 +9,12 @@ import { JobCard } from "@/components/job-card";
 import { JsonLd } from "@/components/json-ld";
 import { PaginationNav } from "@/components/pagination-nav";
 import { SectionHeading } from "@/components/section-heading";
-import { buildJovemAprendizCityUfPath } from "@/lib/seo/jovem-aprendiz-city-uf-slug";
 import { buildListingFaq, buildListingCollectionPageJsonLd, buildCityListingSeo, getCityJobsPath, getCompanyJobsPath, getStateJobsPath } from "@/lib/seo/jobs-pages";
 import { shouldIndexPage } from "@/lib/seo/indexing";
 import { buildSiteMetadata } from "@/lib/seo/metadata";
 import { buildBreadcrumbJsonLd, buildFaqJsonLd } from "@/lib/seo/json-ld";
 import { getCityBySlug, getSearchGeoData, getStateBySlug } from "@/lib/repositories/geo";
-import { getApprenticeCityUfSitemapRows, getCompanyHubsByCity, getJobsList } from "@/lib/repositories/jobs";
+import { getCompanyHubsByCity, getJobsList } from "@/lib/repositories/jobs";
 import { jobSearchParamsSchema } from "@/lib/schemas/search";
 import type { JobSearchFilterGeoState } from "@/lib/vagas/job-search-filter-resolve";
 
@@ -118,10 +117,9 @@ export default async function JobsByCityCleanPage({
     notFound();
   }
 
-  const [state, companiesInCity, apprenticeCityRows, geoRaw] = await Promise.all([
+  const [state, companiesInCity, geoRaw] = await Promise.all([
     getStateBySlug(city.state.slug),
     getCompanyHubsByCity(city.slug, 8),
-    getApprenticeCityUfSitemapRows(),
     getSearchGeoData()
   ]);
   const geoStates: JobSearchFilterGeoState[] = geoRaw.map((s) => ({
@@ -132,7 +130,6 @@ export default async function JobsByCityCleanPage({
     cities: s.cities.map((c) => ({ id: c.id, name: c.name, slug: c.slug }))
   }));
   const jobs = listingData.jobs;
-  const hasApprenticeSeoHub = apprenticeCityRows.some((r) => r.citySlug === city.slug && r.stateCode === city.state.code);
 
   if (!state) {
     notFound();
@@ -210,8 +207,8 @@ export default async function JobsByCityCleanPage({
           <div className="rounded-[1.8rem] border border-slate-200 bg-white p-6 shadow-sm">
             <SectionHeading
               eyebrow="Busca local"
-              title={`Empresas e oportunidades de Jovem Aprendiz em ${city.name}`}
-              description={`Use esta página para acompanhar vagas por empresa, comparar oportunidades recentes e navegar para o estado de ${state.name} e cidades próximas com mais contratações.`}
+              title={`Empresas e vagas de emprego em ${city.name}`}
+              description={`Use esta página para acompanhar vagas por empresa, comparar oportunidades recentes e navegar para outras cidades do ${state.name} com mais contratações.`}
             />
           </div>
 
@@ -233,8 +230,8 @@ export default async function JobsByCityCleanPage({
           <div className="rounded-[1.8rem] border border-slate-200 bg-white p-6 shadow-sm">
             <SectionHeading
               eyebrow="Mais contexto"
-              title={`Como usar esta página para encontrar Jovem Aprendiz em ${city.name}`}
-              description={`Acompanhe novas vagas, veja empresas contratando em ${city.name}, ${city.state.code}, compare requisitos frequentes e continue a busca por oportunidades semelhantes no estado.`}
+              title={`Como usar esta página para encontrar emprego em ${city.name}`}
+              description={`Acompanhe novas vagas, veja empresas contratando em ${city.name}, ${city.state.code}, compare requisitos frequentes e continue a busca por oportunidades semelhantes no Maranhão.`}
             />
           </div>
         </div>
@@ -254,16 +251,8 @@ export default async function JobsByCityCleanPage({
           <div className="brand-panel rounded-[1.8rem] border border-slate-200 p-6 shadow-sm">
             <h2 className="text-lg font-black text-[var(--brand-navy)]">Continue pelo estado</h2>
             <div className="mt-4 space-y-3">
-              {hasApprenticeSeoHub ? (
-                <Link
-                  href={buildJovemAprendizCityUfPath(city.slug, city.state.code)}
-                  className="block rounded-2xl border border-[color:rgba(26,43,76,0.1)] bg-white px-4 py-3 text-sm font-semibold text-[var(--brand-text-secondary)] transition hover:text-[var(--brand-orange)]"
-                >
-                  {`Vagas de Jovem Aprendiz em ${city.name}, ${city.state.code}`}
-                </Link>
-              ) : null}
               <Link href={getStateJobsPath(state.slug)} className="block rounded-2xl border border-[color:rgba(26,43,76,0.1)] bg-white px-4 py-3 text-sm font-semibold text-[var(--brand-text-secondary)] transition hover:text-[var(--brand-orange)]">
-                Ver vagas de Jovem Aprendiz no {state.name}
+                Ver vagas no {state.name}
               </Link>
               {siblingCities.map((relatedCity) => (
                 <Link key={relatedCity.id} href={getCityJobsPath(relatedCity.slug)} className="block rounded-2xl border border-[color:rgba(26,43,76,0.1)] bg-white px-4 py-3 text-sm font-medium text-[var(--brand-text-secondary)] transition hover:text-[var(--brand-orange)]">
@@ -285,7 +274,7 @@ export default async function JobsByCityCleanPage({
       </div>
 
       <div className="space-y-6">
-      <SectionHeading eyebrow="Perguntas frequentes" title={`FAQ sobre Jovem Aprendiz em ${city.name}, ${city.state.code}`} description="Respostas objetivas para fortalecer a navegação e a intenção de busca desta página." />
+      <SectionHeading eyebrow="Perguntas frequentes" title={`FAQ sobre vagas em ${city.name}, ${city.state.code}`} description="Respostas objetivas para quem busca emprego nesta cidade." />
         <FaqList items={faq} />
       </div>
     </section>

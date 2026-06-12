@@ -1,11 +1,12 @@
 import Link from "next/link";
+import { AlertTriangle, Building2, MapPin, ShieldCheck } from "lucide-react";
 
 import { PublicAdSlot } from "@/components/ads/public-ad-slot";
 import { TrackedExternalLink } from "@/components/analytics/tracked-external-link";
 import { BlogCard } from "@/components/blog-card";
 import { Breadcrumbs } from "@/components/breadcrumbs";
 import { JobCard } from "@/components/job-card";
-import { SectionHeading } from "@/components/section-heading";
+import { JobApplyPanel } from "@/components/vagas/job-apply-panel";
 import { Button } from "@/components/ui/button";
 import { formatBrazilDateTime } from "@/lib/date-utils";
 import { sanitizeRichTextHtml } from "@/lib/rich-text";
@@ -18,15 +19,24 @@ import { formatDate } from "@/lib/utils";
 type JobWithRelations = NonNullable<Awaited<ReturnType<typeof getJobBySlug>>>;
 
 const chipClass =
-  "rounded-full border border-[color:rgba(26,43,76,0.1)] bg-white px-2.5 py-1 text-[10px] font-medium text-[var(--brand-text-secondary)] sm:px-3 sm:py-1.5 sm:text-xs";
+  "rounded-full border border-[var(--brand-line)] bg-white px-3 py-1.5 text-xs font-semibold text-[var(--brand-charcoal)]";
 
-function jobListingRegionBodyClass(job: JobWithRelations) {
-  return `${job.state.slug}-${job.city.slug}`.replace(/[^a-z0-9-]/gi, "");
-}
-
-function jobEmploymentSlug(job: JobWithRelations) {
-  if (job.employmentType === "APPRENTICESHIP") return "jovem-aprendiz";
-  return job.employmentType.toLowerCase().replace(/_/g, "-");
+function jobEmploymentLabel(job: JobWithRelations) {
+  if (job.categoryName?.trim()) return job.categoryName.trim();
+  switch (job.employmentType) {
+    case "APPRENTICESHIP":
+      return "Jovem Aprendiz";
+    case "INTERNSHIP":
+      return "Estágio";
+    case "PART_TIME":
+      return "Meio período";
+    case "CONTRACTOR":
+      return "Contrato";
+    case "TEMPORARY":
+      return "Temporário";
+    default:
+      return "CLT";
+  }
 }
 
 export async function JobDetailView({ job, displayTitle }: { job: JobWithRelations; displayTitle?: string | null }) {
@@ -64,223 +74,174 @@ export async function JobDetailView({ job, displayTitle }: { job: JobWithRelatio
   }
 
   const validityDate = job.validThrough ?? job.expiresAt;
-  const listingTypeSlug = job.employmentType.toLowerCase().replace(/_/g, "-");
-  const employmentSlug = jobEmploymentSlug(job);
-  const regionBody = jobListingRegionBodyClass(job);
-
-  const articleClassName = [
-    `post-${job.id}`,
-    "job_listing",
-    "type-job_listing",
-    "status-publish",
-    "hentry",
-    `job_listing_region-${regionBody}`,
-    `job_listing_type-${listingTypeSlug}`,
-    `job-type-${employmentSlug}`
-  ].join(" ");
+  const salaryLabel =
+    job.salaryMin && job.salaryMax
+      ? `R$ ${job.salaryMin.toLocaleString("pt-BR")} a R$ ${job.salaryMax.toLocaleString("pt-BR")}`
+      : job.salaryMin
+        ? `A partir de R$ ${job.salaryMin.toLocaleString("pt-BR")}`
+        : job.salaryMax
+          ? `Até R$ ${job.salaryMax.toLocaleString("pt-BR")}`
+          : job.salaryDisplay?.trim() || "Não informado";
 
   return (
-    <div
-      id="content"
-      className="site-content mx-auto max-w-7xl space-y-6 px-4 py-6 sm:space-y-8 sm:px-6 sm:py-8 lg:px-8 lg:py-10"
-    >
-      <div className="container w-full max-w-none">
-        <div id="primary" className="content-area min-w-0">
-          <main id="main" className="site-main min-w-0">
-            <Breadcrumbs items={[{ label: "Home", href: "/" }, { label: "Vagas", href: "/vagas" }, { label: headingTitle }]} />
+    <div className="mx-auto max-w-7xl space-y-8 px-4 py-6 sm:px-6 sm:py-8 lg:px-8 lg:py-10">
+      <Breadcrumbs items={[{ label: "Home", href: "/" }, { label: "Vagas", href: "/vagas" }, { label: headingTitle }]} />
 
-            <article id={`post-${job.id}`} className={articleClassName}>
-              <div className="entry-content" itemProp="text">
-                <div className="single_job_listing space-y-4 sm:space-y-6">
-                  <div className="brand-page-hero rounded-[1.5rem] border border-slate-200 px-4 py-5 shadow-[0_35px_120px_-70px_rgba(26,43,76,0.22)] sm:rounded-[2rem] sm:px-5 sm:py-6 sm:rounded-[2.2rem] sm:px-8 sm:py-8">
-                    <div className={`grid gap-4 ${job.heroImageUrl ? "lg:grid-cols-[1.15fr_0.85fr]" : "grid-cols-1"} sm:gap-6`}>
-                      <div className="min-w-0 space-y-4 sm:space-y-5">
-                        {job.company?.logoUrl || job.companyLogoUrl ? (
-                          <div className="company">
-                            <div className="inline-flex max-w-full items-center gap-2.5 rounded-full border border-[color:rgba(26,43,76,0.1)] bg-white px-2.5 py-1 text-[10px] font-semibold text-[var(--brand-text-secondary)] shadow-sm sm:gap-3 sm:px-3 sm:py-1.5 sm:text-xs">
-                              <img
-                                src={job.company?.logoUrl ?? job.companyLogoUrl ?? ""}
-                                alt={job.companyName}
-                                width={36}
-                                height={36}
-                                loading="lazy"
-                                decoding="async"
-                                className="h-7 w-7 rounded-2xl border border-[color:rgba(26,43,76,0.1)] bg-white object-cover p-1 sm:h-9 sm:w-9"
-                              />
-                              <span className="truncate">{job.companyName}</span>
-                            </div>
-                          </div>
-                        ) : null}
-                        <header className="entry-header">
-                          <SectionHeading
-                            titleLevel="h1"
-                            titleClassName="entry-title"
-                            eyebrow={`${job.city.name}, ${job.state.code}`}
-                            title={headingTitle}
-                            description={`${job.companyName} • publicada em ${formatBrazilDateTime(job.publishedAt)} • candidatura no link oficial da empresa`}
-                          />
-                        </header>
-                        <ul className="job-listing-meta meta m-0 flex list-none flex-wrap gap-2 p-0 sm:gap-2.5 sm:gap-3">
-                          {job.locationType ? (
-                            <li className="list-none">
-                              <span className={chipClass}>
-                                {job.locationType === "REMOTE" ? "Remoto" : job.locationType === "HYBRID" ? "Hibrido" : "Presencial"}
-                              </span>
-                            </li>
-                          ) : null}
-                          {job.workHours ? (
-                            <li className="list-none">
-                              <span className={chipClass}>{job.workHours}</span>
-                            </li>
-                          ) : null}
-                          {job.salaryMin || job.salaryMax ? (
-                            <li className="list-none">
-                              <span className={chipClass}>
-                                {job.salaryMin && job.salaryMax
-                                  ? `Faixa salarial estimada: R$ ${job.salaryMin.toLocaleString("pt-BR")} a R$ ${job.salaryMax.toLocaleString("pt-BR")}`
-                                  : job.salaryMin
-                                    ? `Faixa salarial estimada: a partir de R$ ${job.salaryMin.toLocaleString("pt-BR")}`
-                                    : `Faixa salarial estimada: até R$ ${job.salaryMax?.toLocaleString("pt-BR")}`}
-                              </span>
-                            </li>
-                          ) : (
-                            <li className="list-none">
-                              <span className={chipClass}>Salário: Não informado</span>
-                            </li>
-                          )}
-                          {validityDate ? (
-                            <li className="list-none">
-                              <span className={chipClass}>Validade: {formatDate(validityDate)}</span>
-                            </li>
-                          ) : (
-                            <li className="list-none">
-                              <span className={chipClass}>Validade: Não informada</span>
-                            </li>
-                          )}
-                        </ul>
-                      </div>
-                      {job.heroImageUrl ? (
-                        <div className="aspect-[16/10] min-h-[200px] overflow-hidden rounded-[1.5rem] border border-slate-200 bg-white/70 shadow-sm sm:min-h-[260px] sm:rounded-[2rem]">
-                          <img
-                            src={job.heroImageUrl}
-                            alt={headingTitle}
-                            width={960}
-                            height={600}
-                            loading="eager"
-                            decoding="async"
-                            className="h-full w-full object-cover"
-                          />
-                        </div>
-                      ) : null}
-                    </div>
-                  </div>
-
-                  <div className="min-h-[140px] rounded-[1.25rem] border border-slate-200 bg-white/80 p-3 sm:min-h-[160px] sm:p-4">
-                    <PublicAdSlot slotSlug="job-after-hero" format="horizontal" fullWidthResponsive />
-                  </div>
-
-                  <div className="grid gap-4 sm:gap-6 lg:grid-cols-[1.08fr_0.92fr]">
-                    <div className="space-y-4 sm:space-y-6">
-                      <div className="job_description rounded-[1.5rem] border border-slate-200 bg-white p-4 shadow-sm sm:rounded-[1.8rem] sm:p-5 sm:rounded-3xl sm:p-8">
-                        <div
-                          className="prose-content text-slate-700"
-                          dangerouslySetInnerHTML={{ __html: sanitizeRichTextHtml(mergedDescriptionHtml) }}
-                        />
-                      </div>
-
-                    <div className="my-4 min-h-[250px] sm:my-6">
-                      <PublicAdSlot slotSlug="job-after-description" format="rectangle" fullWidthResponsive />
-                    </div>
-
-                    <div className="brand-panel rounded-[1.5rem] border border-slate-200 p-4 shadow-[0_25px_80px_-50px_rgba(26,43,76,0.2)] sm:rounded-[1.8rem] sm:p-6 sm:rounded-[2rem] sm:p-8">
-                      <h2 className="text-xl font-black text-[var(--brand-navy)] leading-tight sm:text-2xl">Veja mais vagas parecidas</h2>
-                      <p className="mt-2 text-sm leading-6 text-[var(--brand-text-secondary)] sm:mt-3 sm:text-base sm:leading-8">
-                        Se esta oportunidade chamou a sua atencao, aproveite para ver outras vagas em {job.city.name} e mais oportunidades
-                        ligadas a empresas parecidas.
-                      </p>
-                      <div className="mt-4 flex flex-wrap gap-2 sm:mt-5 sm:gap-3">
-                        <Link
-                          href={getCityJobsPath(job.city.slug)}
-                          className="rounded-full border border-[color:rgba(26,43,76,0.1)] bg-white px-3 py-1.5 text-xs font-medium text-[var(--brand-text-secondary)] transition hover:border-[color:rgba(255,109,0,0.24)] hover:text-[var(--brand-orange)] sm:px-4 sm:py-2 sm:text-sm"
-                        >
-                          Mais vagas em {job.city.name}
-                        </Link>
-                        <Link
-                          href={getStateJobsPath(job.state.slug)}
-                          className="rounded-full border border-[color:rgba(26,43,76,0.1)] bg-white px-3 py-1.5 text-xs font-medium text-[var(--brand-text-secondary)] transition hover:border-[color:rgba(255,109,0,0.24)] hover:text-[var(--brand-orange)] sm:px-4 sm:py-2 sm:text-sm"
-                        >
-                          Mais vagas no {job.state.name}
-                        </Link>
-                        {job.company?.slug ? (
-                          <Link
-                            href={getCompanyJobsPath(job.company.slug)}
-                            className="rounded-full border border-[color:rgba(26,43,76,0.1)] bg-white px-3 py-1.5 text-xs font-medium text-[var(--brand-text-secondary)] transition hover:border-[color:rgba(255,109,0,0.24)] hover:text-[var(--brand-orange)] sm:px-4 sm:py-2 sm:text-sm"
-                          >
-                            Mais vagas da {job.company.name}
-                          </Link>
-                        ) : null}
-                      </div>
-                    </div>
-                  </div>
-
-                  <aside className="space-y-4 sm:space-y-6">
-                    <div className="brand-soft-panel rounded-[1.5rem] border border-slate-200 p-4 shadow-[0_28px_100px_-60px_rgba(26,43,76,0.18)] sm:rounded-[1.8rem] sm:p-5 sm:rounded-[2rem] sm:p-6">
-                      <h2 className="text-xl font-black text-[var(--brand-navy)] leading-tight sm:text-2xl">Candidatura</h2>
-                      <p className="mt-2 text-sm leading-6 text-[var(--brand-text-secondary)] sm:mt-3 sm:leading-7">
-                        Leia os requisitos com calma, atualize o currículo e envie sua candidatura pelo link oficial da empresa.
-                      </p>
-                      <Button asChild size="lg" className="mt-4 w-full rounded-2xl sm:mt-5">
-                        <TrackedExternalLink
-                          href={job.applyUrl?.trim() || "#"}
-                          target="_blank"
-                          rel="noreferrer"
-                          eventName="apply_click"
-                          entityType="job"
-                          entitySlug={job.slug}
-                        >
-                          Candidatar-se
-                        </TrackedExternalLink>
-                      </Button>
-                      {job.company?.websiteUrl || job.companyWebsiteUrl ? (
-                        <TrackedExternalLink
-                          href={job.company?.websiteUrl ?? job.companyWebsiteUrl ?? ""}
-                          target="_blank"
-                          rel="noreferrer"
-                          eventName="company_site_click"
-                          entityType="company"
-                          entitySlug={job.company?.slug ?? job.slug}
-                          className="mt-3 inline-flex text-sm font-semibold text-[var(--brand-blue)] transition hover:text-[var(--brand-orange)] sm:mt-4"
-                        >
-                          Conhecer a empresa
-                        </TrackedExternalLink>
-                      ) : null}
-                      <p className="mt-3 text-xs leading-5 text-[var(--brand-text-secondary)] sm:mt-4 sm:text-sm">Fonte: {sourceSiteLabel}</p>
-                    </div>
-
-                    <div className="min-h-[250px]">
-                      <PublicAdSlot slotSlug="job-sidebar" format="rectangle" fullWidthResponsive />
-                    </div>
-
-                    <div className="space-y-3 sm:space-y-4">
-                      <h2 className="text-base font-black text-[var(--brand-navy)] sm:text-lg">Vagas relacionadas</h2>
-                      {relatedJobs.map((relatedJob) => (
-                        <JobCard key={relatedJob.id} job={relatedJob} />
-                      ))}
-                    </div>
-
-                    <div className="space-y-4">
-                      <h2 className="text-lg font-black text-[var(--brand-navy)]">Conteudos relacionados</h2>
-                      {relatedPosts.map((post) => (
-                        <BlogCard key={post.id} post={post} />
-                      ))}
-                    </div>
-                  </aside>
-                </div>
-                </div>
+      <div className="grid gap-8 lg:grid-cols-[1.08fr_0.92fr] lg:items-start">
+        <div className="space-y-6">
+          <section className="overflow-hidden rounded-3xl border border-[var(--brand-line)] bg-white shadow-[0_24px_70px_-40px_rgba(26,26,26,0.22)]">
+            <div className="h-2 bg-[linear-gradient(90deg,var(--brand-orange)_0%,var(--brand-brick)_100%)]" />
+            <div className="space-y-5 p-5 sm:p-8">
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="rounded-full bg-[rgba(242,140,27,0.12)] px-3 py-1 text-[11px] font-bold uppercase tracking-wide text-[var(--brand-orange)]">
+                  {jobEmploymentLabel(job)}
+                </span>
+                {job.locationType ? (
+                  <span className={chipClass}>
+                    {job.locationType === "REMOTE" ? "Remoto" : job.locationType === "HYBRID" ? "Híbrido" : "Presencial"}
+                  </span>
+                ) : null}
               </div>
-            </article>
-          </main>
+
+              <div className="space-y-3">
+                <p className="inline-flex items-center gap-2 text-sm font-semibold text-[var(--brand-brick)]">
+                  <MapPin className="h-4 w-4" />
+                  {job.city.name}, {job.state.code}
+                </p>
+                <h1 className="text-2xl font-extrabold leading-tight text-[var(--brand-charcoal)] sm:text-3xl lg:text-4xl">{headingTitle}</h1>
+                <p className="inline-flex items-center gap-2 text-sm text-[var(--brand-text-secondary)]">
+                  <Building2 className="h-4 w-4 text-[var(--brand-green)]" />
+                  {job.companyName}
+                  <span aria-hidden>•</span>
+                  Publicada em {formatBrazilDateTime(job.publishedAt)}
+                </p>
+              </div>
+
+              <ul className="flex flex-wrap gap-2">
+                <li>
+                  <span className={chipClass}>Salário: {salaryLabel}</span>
+                </li>
+                {job.workHours ? (
+                  <li>
+                    <span className={chipClass}>{job.workHours}</span>
+                  </li>
+                ) : null}
+                <li>
+                  <span className={chipClass}>Validade: {validityDate ? formatDate(validityDate) : "Não informada"}</span>
+                </li>
+              </ul>
+
+              {job.heroImageUrl ? (
+                <div className="aspect-[16/9] overflow-hidden rounded-2xl border border-[var(--brand-line)]">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={job.heroImageUrl} alt={headingTitle} width={960} height={540} className="h-full w-full object-cover" />
+                </div>
+              ) : null}
+
+              {job.company?.websiteUrl || job.companyWebsiteUrl ? (
+                <TrackedExternalLink
+                  href={job.company?.websiteUrl ?? job.companyWebsiteUrl ?? ""}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  eventName="company_site_click"
+                  entityType="company"
+                  entitySlug={job.company?.slug ?? job.slug}
+                  className="inline-flex text-sm font-semibold text-[var(--brand-brick)] transition hover:text-[var(--brand-orange)]"
+                >
+                  Conhecer a empresa
+                </TrackedExternalLink>
+              ) : null}
+            </div>
+          </section>
+
+          <PublicAdSlot slotSlug="job-after-hero" format="horizontal" fullWidthResponsive />
+
+          <section className="rounded-3xl border border-[var(--brand-line)] bg-white p-5 shadow-sm sm:p-8">
+            <h2 className="text-xl font-extrabold text-[var(--brand-charcoal)]">Descrição da vaga</h2>
+            <div
+              className="prose-content mt-5 text-[var(--brand-text-secondary)]"
+              dangerouslySetInnerHTML={{ __html: sanitizeRichTextHtml(mergedDescriptionHtml) }}
+            />
+          </section>
+
+          <PublicAdSlot slotSlug="job-after-description" format="rectangle" fullWidthResponsive />
+
+          <section className="rounded-3xl border border-[rgba(242,140,27,0.22)] bg-[rgba(242,140,27,0.08)] p-5 sm:p-6">
+            <div className="flex items-start gap-3">
+              <ShieldCheck className="mt-0.5 h-5 w-5 shrink-0 text-[var(--brand-brick)]" />
+              <div>
+                <h2 className="text-lg font-extrabold text-[var(--brand-charcoal)]">Aviso do agregador</h2>
+                <p className="mt-2 text-sm leading-7 text-[var(--brand-text-secondary)]">
+                  O {sourceSiteLabel} organiza e divulga oportunidades de emprego em São Luís e no Maranhão. A contratação, triagem e comunicação com candidatos são de responsabilidade exclusiva da empresa anunciante. Confira sempre os dados da vaga antes de se candidatar e desconfie de pedidos de pagamento ou dados bancários.
+                </p>
+              </div>
+            </div>
+          </section>
+
+          <section className="rounded-3xl border border-[var(--brand-line)] bg-white p-5 shadow-[0_20px_60px_-36px_rgba(26,26,26,0.18)] sm:p-8">
+            <h2 className="text-xl font-extrabold text-[var(--brand-charcoal)]">Candidatar-se a esta vaga</h2>
+            <p className="mt-2 text-sm leading-6 text-[var(--brand-text-secondary)]">
+              A candidatura é feita pelo canal oficial da empresa. O Emprego São Luís apenas divulga a oportunidade.
+            </p>
+            <div className="mt-5">
+              <JobApplyPanel applyUrl={job.applyUrl} jobSlug={job.slug} />
+            </div>
+            <p className="mt-4 text-xs text-[var(--brand-text-secondary)]">Fonte: {sourceSiteLabel}</p>
+          </section>
+
+          <section className="brand-dark-panel rounded-3xl p-5 text-white sm:p-8">
+            <h2 className="text-xl font-extrabold">Veja mais vagas parecidas</h2>
+            <p className="mt-3 text-sm leading-7 text-white/84">
+              Explore outras oportunidades em {job.city.name}, no {job.state.name} ou na {job.companyName}.
+            </p>
+            <div className="mt-5 flex flex-wrap gap-2">
+              <Link href={getCityJobsPath(job.city.slug)} className="rounded-full border border-white/14 bg-white/8 px-4 py-2 text-sm font-semibold hover:border-[var(--brand-orange)]">
+                Mais vagas em {job.city.name}
+              </Link>
+              <Link href={getStateJobsPath(job.state.slug)} className="rounded-full border border-white/14 bg-white/8 px-4 py-2 text-sm font-semibold hover:border-[var(--brand-orange)]">
+                Mais vagas no {job.state.name}
+              </Link>
+              {job.company?.slug ? (
+                <Link href={getCompanyJobsPath(job.company.slug)} className="rounded-full border border-white/14 bg-white/8 px-4 py-2 text-sm font-semibold hover:border-[var(--brand-orange)]">
+                  Mais vagas da {job.company.name}
+                </Link>
+              ) : null}
+            </div>
+          </section>
         </div>
+
+        <aside className="space-y-6 lg:sticky lg:top-24">
+          <PublicAdSlot slotSlug="job-sidebar" format="rectangle" fullWidthResponsive />
+
+          <section className="space-y-4">
+            <h2 className="text-lg font-extrabold text-[var(--brand-charcoal)]">Vagas relacionadas</h2>
+            {relatedJobs.length ? (
+              relatedJobs.map((relatedJob) => <JobCard key={relatedJob.id} job={relatedJob} />)
+            ) : (
+              <p className="rounded-2xl border border-dashed border-[var(--brand-line)] bg-white px-4 py-5 text-sm text-[var(--brand-text-secondary)]">
+                Nenhuma vaga relacionada no momento.
+              </p>
+            )}
+          </section>
+
+          <section className="space-y-4">
+            <h2 className="text-lg font-extrabold text-[var(--brand-charcoal)]">Conteúdos relacionados</h2>
+            {relatedPosts.map((post) => (
+              <BlogCard key={post.id} post={post} />
+            ))}
+          </section>
+
+          <div className="rounded-2xl border border-[rgba(123,44,40,0.18)] bg-[rgba(123,44,40,0.06)] p-4 text-sm leading-6 text-[var(--brand-text-secondary)]">
+            <p className="inline-flex items-center gap-2 font-semibold text-[var(--brand-brick)]">
+              <AlertTriangle className="h-4 w-4" />
+              Evite golpes
+            </p>
+            <p className="mt-2">Empresas sérias não pedem pagamento para contratar. Desconfie de mensagens urgentes pedindo PIX, senhas ou documentos fora do canal oficial.</p>
+            <Button asChild variant="ghost" size="sm" className="mt-3 px-0 text-[var(--brand-brick)]">
+              <Link href="/blog/como-evitar-golpes-em-falsas-vagas-de-emprego">Ler dicas de segurança</Link>
+            </Button>
+          </div>
+        </aside>
       </div>
     </div>
   );

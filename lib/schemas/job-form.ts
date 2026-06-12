@@ -1,5 +1,7 @@
 import { z } from "zod";
 
+import { isValidApplyDestination } from "@/lib/apply-destination";
+
 export const jobFormSchema = z.object({
   title: z.string().min(5, "Informe o titulo da vaga."),
   slug: z.string().min(5, "Informe o slug."),
@@ -26,7 +28,10 @@ export const jobFormSchema = z.object({
   salaryMin: z.coerce.number().int().nonnegative().nullable().optional(),
   salaryMax: z.coerce.number().int().nonnegative().nullable().optional(),
   workHours: z.string().optional().default(""),
-  applyUrl: z.string().url("Informe uma URL valida."),
+  applyUrl: z
+    .string()
+    .min(3, "Informe um link, e-mail ou WhatsApp.")
+    .refine((value) => isValidApplyDestination(value), "Informe um link, e-mail ou WhatsApp valido."),
   expiresAt: z.string().optional().default(""),
   validThrough: z.string().optional().default(""),
   validThroughMonths: z.coerce.number().int().min(1).max(24).nullable().optional(),
@@ -34,7 +39,7 @@ export const jobFormSchema = z.object({
   seoDescription: z.string().min(30, "Defina uma description mais completa."),
   featured: z.boolean().default(false),
   isActive: z.boolean().default(true),
-  status: z.enum(["DRAFT", "SCHEDULED", "PUBLISHED", "EXPIRED", "ERROR"]).default("DRAFT"),
+  status: z.enum(["DRAFT", "SCHEDULED", "PUBLISHED", "EXPIRED", "ERROR", "ARCHIVED"]).default("DRAFT"),
   scheduledAt: z.string().optional().default(""),
   autoSubmitToIndexing: z.boolean().default(true)
 });

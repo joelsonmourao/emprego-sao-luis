@@ -3,7 +3,7 @@ import type { ReactNode } from "react";
 import "./admin.css";
 
 export const metadata: Metadata = {
-  title: "Admin | Jovem Aprendiz Vagas",
+  title: "Admin | Emprego São Luís",
   robots: {
     index: false,
     follow: false

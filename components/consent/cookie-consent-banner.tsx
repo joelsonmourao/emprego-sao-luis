@@ -98,7 +98,7 @@ export function CookieConsentBanner({ config, initialConsentValue = null }: { co
               <h2 className="text-xl font-black text-slate-950">{config.title}</h2>
               <p className="text-sm leading-7 text-slate-600">
                 {config.description}{" "}
-                <Link href={config.policyHref as never} className="font-semibold text-[var(--brand-blue)] underline-offset-4 hover:text-[var(--brand-orange)] hover:underline">
+                <Link href={config.policyHref as never} className="font-semibold text-[var(--brand-brick)] underline-offset-4 hover:text-[var(--brand-orange)] hover:underline">
             Ver política de cookies
                 </Link>
               </p>
@@ -131,7 +131,7 @@ export function CookieConsentBanner({ config, initialConsentValue = null }: { co
                       <p className="text-sm font-semibold text-slate-950">{config.analyticsLabel}</p>
                       <p className="mt-2 text-sm leading-6 text-slate-600">Ajuda a entender paginas mais acessadas, buscas usadas e pontos que podem ser melhorados no portal.</p>
                     </div>
-                    <input type="checkbox" checked={analyticsEnabled} onChange={(event) => setAnalyticsEnabled(event.target.checked)} className="mt-1 h-4 w-4 accent-[var(--brand-blue)]" />
+                    <input type="checkbox" checked={analyticsEnabled} onChange={(event) => setAnalyticsEnabled(event.target.checked)} className="mt-1 h-4 w-4 accent-[var(--brand-brick)]" />
                   </div>
                 </label>
                 <label className="rounded-[1.5rem] border border-slate-200 bg-white p-4">
@@ -173,7 +173,7 @@ export function CookieConsentBanner({ config, initialConsentValue = null }: { co
           <div className="mt-4 space-y-3">
             <label className="flex items-center justify-between gap-3 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3">
               <span className="text-sm font-medium text-slate-900">{config.analyticsLabel}</span>
-              <input type="checkbox" checked={analyticsEnabled} onChange={(event) => setAnalyticsEnabled(event.target.checked)} className="h-4 w-4 accent-[var(--brand-blue)]" />
+              <input type="checkbox" checked={analyticsEnabled} onChange={(event) => setAnalyticsEnabled(event.target.checked)} className="h-4 w-4 accent-[var(--brand-brick)]" />
             </label>
             <label className="flex items-center justify-between gap-3 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3">
               <span className="text-sm font-medium text-slate-900">{config.advertisingLabel}</span>

@@ -32,13 +32,78 @@ const nextConfig = {
         permanent: true
       },
       {
+        source: "/menor-aprendiz",
+        destination: "/vagas",
+        permanent: true
+      },
+      {
+        source: "/vagas/jovem-aprendiz/:path*",
+        destination: "/vagas",
+        permanent: true
+      },
+      {
+        source: "/vagas/jovem-aprendiz-comercial-sao-luis-ma",
+        destination: "/vagas/jovem-aprendiz-comercial",
+        permanent: true
+      },
+      {
+        source: "/cidades",
+        destination: "/vagas",
+        permanent: true
+      },
+      {
+        source: "/estados",
+        destination: "/vagas",
+        permanent: true
+      },
+      {
+        source: "/estados/:path*",
+        destination: "/vagas",
+        permanent: true
+      },
+      {
+        source: "/vagas/estado/:path*",
+        destination: "/vagas",
+        permanent: true
+      },
+      {
         source: "/ceara-ce",
-        destination: "/vagas/estado/ce",
+        destination: "/vagas",
+        permanent: true
+      },
+      {
+        source: "/empresa/:slug/jovem-aprendiz",
+        destination: "/empresas/:slug",
         permanent: true
       },
       {
         source: "/empresa/:slug",
-        destination: "/empresa/:slug/jovem-aprendiz",
+        destination: "/empresas/:slug",
+        permanent: true
+      },
+      {
+        source: "/politica-de-privacidade",
+        destination: "/privacidade",
+        permanent: true
+      },
+      {
+        source: "/politica-de-cookies",
+        destination: "/cookies",
+        permanent: true
+      },
+      {
+        source: "/termos-de-uso",
+        destination: "/termos",
+        permanent: true
+      },
+      {
+        source: "/admin/importacao",
+        destination: "/admin/importar",
+        permanent: false
+      },
+      {
+        source: "/blog/como-conseguir-vaga-de-jovem-aprendiz-em-sao-luis",
+        destination: "/blog/como-buscar-vagas-de-jovem-aprendiz-em-sao-luis",
         permanent: true
       }
     ];

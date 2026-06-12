@@ -5,18 +5,14 @@ Disallow: /admin
 Disallow: /admin/
 Disallow: /api/admin
 Disallow: /api/internal
-Disallow: /login
-Disallow: /dashboard
+Disallow: /gestao
 
 Disallow: /*?utm_
 Disallow: /*?fbclid=
 Disallow: /*?gclid=
 Disallow: /*?msclkid=
-Disallow: /*?sort=
-Disallow: /*?filter=
-Disallow: /*?page=
 
 User-agent: Mediapartners-Google
 Allow: /
 
-Sitemap: https://slzcontent.com.br/sitemap.xml
+Sitemap: https://empregossaoluis.com.br/sitemap.xml

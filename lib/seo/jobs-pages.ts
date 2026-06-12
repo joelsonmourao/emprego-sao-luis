@@ -35,7 +35,7 @@ function formatVacancyCount(totalJobs: number) {
 }
 
 export function getStateJobsPath(stateSlug: string) {
-  return `/vagas/estado/${stateSlug}`;
+  return `/vagas?estado=${stateSlug}`;
 }
 
 export function getCityJobsPath(citySlug: string) {
@@ -43,12 +43,11 @@ export function getCityJobsPath(citySlug: string) {
 }
 
 export function getCompanyJobsPath(companySlug: string) {
-  return `/empresa/${companySlug}/jovem-aprendiz`;
+  return `/empresas/${companySlug}`;
 }
 
-/** Hub de empresa sob /vagas (SEO complementar, sem alterar URLs canonicas existentes de vaga). */
 export function getVagasEmpresaPath(companySlug: string) {
-  return `/vagas/empresa/${companySlug}`;
+  return `/empresas/${companySlug}`;
 }
 
 export function getJobPath(slug: string) {
@@ -58,12 +57,11 @@ export function getJobPath(slug: string) {
 export function buildStateListingSeo(input: StateSeoInput) {
   const countLabel = formatVacancyCount(input.totalJobs);
   return {
-    title: `${countLabel} de Jovem Aprendiz no ${input.stateCode}`,
-    description: `Veja ${countLabel} de Jovem Aprendiz no ${input.stateName} (${input.stateCode}), compare empresas contratando e encontre oportunidades com candidatura oficial.`,
-    h1: `Vagas de Jovem Aprendiz no ${input.stateCode}`,
+    title: `Vagas de Emprego no ${input.stateName} (${input.stateCode}) - Emprego São Luís`,
+    description: `Veja ${countLabel} de emprego no ${input.stateName}. Oportunidades divulgadas em São Luís, Região Metropolitana e cidades do Maranhão.`,
+    h1: `Vagas de emprego no ${input.stateName}`,
     intro:
-      `Encontre vagas de Jovem Aprendiz no ${input.stateName} em empresas de diferentes segmentos. ` +
-      `Veja oportunidades atualizadas, empresas contratando e requisitos comuns para iniciar no mercado de trabalho.`,
+      `Encontre vagas de emprego no ${input.stateName}. O Emprego São Luís reúne oportunidades divulgadas por empresas e fontes de recrutamento no estado.`,
     canonicalPath: getStateJobsPath(input.stateSlug)
   };
 }
@@ -71,40 +69,30 @@ export function buildStateListingSeo(input: StateSeoInput) {
 export function buildCityListingSeo(input: CitySeoInput) {
   const countLabel = formatVacancyCount(input.totalJobs);
   return {
-    title: `${countLabel} em ${input.cityName}, ${input.stateCode}`,
-    description: `${input.cityName} (${input.stateCode}): ${countLabel} de Jovem Aprendiz com empresas, requisitos e candidatura. Página focada em primeiro emprego na região.`,
-    h1: `Vagas de Jovem Aprendiz em ${input.cityName}, ${input.stateCode}`,
+    title: `Vagas em ${input.cityName}, ${input.stateCode} - Emprego São Luís`,
+    description: `${countLabel} de emprego divulgadas em ${input.cityName}, ${input.stateCode}. Confira oportunidades e candidate-se pelo link oficial da empresa.`,
+    h1: `Vagas de emprego em ${input.cityName}, ${input.stateCode}`,
     intro:
-      `Confira vagas de Jovem Aprendiz em ${input.cityName}, ${input.stateCode}, com oportunidades atualizadas por empresa e area. ` +
-      `Veja requisitos comuns e acompanhe novas vagas para o primeiro emprego.`,
+      `Confira vagas de emprego divulgadas em ${input.cityName}, ${input.stateCode}. O portal atua como divulgador de oportunidades — a contratação é de responsabilidade da empresa anunciante.`,
     canonicalPath: getCityJobsPath(input.citySlug)
   };
 }
 
-export function buildCompanyListingSeo(
-  input: CompanySeoInput,
-  options?: { variant?: "default" | "vagas-hub" }
-) {
-  const countDrivenTitle =
-    input.totalJobs >= 3 ? `${formatVacancyCount(input.totalJobs)} no ${input.companyName}` : null;
-
-  const canonicalPath =
-    options?.variant === "vagas-hub" ? getVagasEmpresaPath(input.companySlug) : getCompanyJobsPath(input.companySlug);
-
+export function buildCompanyListingSeo(input: CompanySeoInput) {
+  const countLabel = formatVacancyCount(input.totalJobs);
   return {
-    title: countDrivenTitle ?? `${input.companyName}: vagas de Jovem Aprendiz e candidatura`,
-    description: `Oportunidades de Jovem Aprendiz no ${input.companyName}: requisitos, perfil buscado, cidades e como se candidatar. ${formatVacancyCount(input.totalJobs)} listadas nesta página.`,
-    h1: `Jovem Aprendiz no ${input.companyName}`,
-    intro:
-      `Confira oportunidades de Jovem Aprendiz no ${input.companyName}, veja requisitos frequentes, cidades com vagas e orientações para acompanhar novas oportunidades.`,
-    canonicalPath
+    title: `${input.companyName}: vagas em São Luís e Maranhão - Emprego São Luís`,
+    description: `Veja ${countLabel} divulgadas pela ${input.companyName}. Requisitos, cidades e link de candidatura.`,
+    h1: `Vagas na ${input.companyName}`,
+    intro: `Oportunidades divulgadas pela ${input.companyName} no Emprego São Luís. Candidatos interessados devem acessar o link oficial informado em cada vaga.`,
+    canonicalPath: getCompanyJobsPath(input.companySlug)
   };
 }
 
 export function buildJobDetailSeo(input: JobSeoInput) {
   return {
-    title: `${input.title} | ${input.companyName} — ${input.cityName}, ${input.stateCode}`,
-    description: `Vaga de Jovem Aprendiz: ${input.title} na ${input.companyName} (${input.cityName}, ${input.stateCode}). Resumo, requisitos, benefícios e link oficial para candidatura.`,
+    title: `${input.title} em ${input.cityName} ${input.stateCode} - Emprego São Luís`,
+    description: `Vaga divulgada: ${input.title} na ${input.companyName} (${input.cityName}, ${input.stateCode}). Veja descrição, requisitos e link de candidatura.`,
     canonicalPath: getJobPath(input.slug)
   };
 }
@@ -124,22 +112,22 @@ export function buildListingFaq(input: { name: string; totalJobs: number; type: 
     input.type === "company"
       ? [
           {
-            question: `Como acompanhar novas vagas de Jovem Aprendiz no ${input.name}?`,
-            answer: `Acompanhe a página do ${input.name} para ver novas oportunidades, cidades com vagas e atualizações recentes do portal.`
+            question: `Como acompanhar vagas na ${input.name}?`,
+            answer: `Acompanhe esta página para ver novas oportunidades divulgadas pela ${input.name} no portal.`
           },
           {
-            question: `O ${input.name} esta contratando Jovem Aprendiz agora?`,
-            answer: `Hoje o portal mostra ${formatVacancyCount(input.totalJobs)} relacionadas ao ${input.name}. As vagas ativas podem mudar conforme novas publicacoes entram no portal.`
+            question: `A ${input.name} está contratando agora?`,
+            answer: `Hoje o portal mostra ${formatVacancyCount(input.totalJobs)} relacionadas à ${input.name}. As vagas podem mudar conforme novas publicações entram no site.`
           }
         ]
       : [
           {
-            question: `Quantas vagas de Jovem Aprendiz existem em ${input.name}?`,
-            answer: `Hoje o portal mostra ${formatVacancyCount(input.totalJobs)} ligadas a ${input.name}, com detalhes de empresa, requisitos e candidatura.`
+            question: `Quantas vagas existem em ${input.name}?`,
+            answer: `Hoje o portal mostra ${formatVacancyCount(input.totalJobs)} ligadas a ${input.name}, com detalhes de empresa e candidatura.`
           },
           {
-            question: `Como encontrar empresas com vagas de Jovem Aprendiz em ${input.name}?`,
-            answer: `Use os blocos de empresas da página para acessar marcas com vagas abertas e continuar a busca pelas oportunidades mais recentes.`
+            question: `O Emprego São Luís contrata diretamente?`,
+            answer: `Não. O portal divulga oportunidades. A contratação é de responsabilidade da empresa anunciante.`
           }
         ];
 

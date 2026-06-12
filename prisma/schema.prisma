@@ -62,7 +62,15 @@ enum JobStatus {
   SCHEDULED
   PUBLISHED
   EXPIRED
+  ARCHIVED
   ERROR
+}
+
+enum InboxMessageStatus {
+  NEW
+  READ
+  REPLIED
+  ARCHIVED
 }
 
 enum JobIndexingStatus {
@@ -178,6 +186,16 @@ model LocationEnrichmentCache {
   @@index([matchStatus])
 }
 
+model JobCategory {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  slug      String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  jobs Job[]
+}
+
 model Job {
   id                String         @id @default(cuid())
   externalId        String?        @unique
@@ -197,7 +215,10 @@ model Job {
   benefits          Json?
   salaryMin         Int?
   salaryMax         Int?
+  salaryDisplay     String?
   salaryCurrency    String         @default("BRL")
+  categoryId        String?
+  categoryName      String?
   employmentType    EmploymentType @default(APPRENTICESHIP)
   workHours         String?
   publishedAt       DateTime?
@@ -234,7 +255,10 @@ model Job {
   state State @relation(fields: [stateId], references: [id], onDelete: Restrict)
   city  City  @relation(fields: [cityId], references: [id], onDelete: Restrict)
   company Company? @relation(fields: [companyId], references: [id], onDelete: SetNull)
+  category JobCategory? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
   indexingLogs IndexingLog[]
+
+  @@index([categoryId, isActive])
 
   @@index([slug])
   @@index([isActive, publishedAt(sort: Desc)])
@@ -425,6 +449,37 @@ model AdSettings {
   id            String   @id @default("singleton")
   globalEnabled Boolean  @default(true)
   updatedAt     DateTime @updatedAt
+}
+
+model ContactMessage {
+  id        String             @id @default(cuid())
+  name      String
+  email     String
+  subject   String
+  message   String             @db.Text
+  status    InboxMessageStatus @default(NEW)
+  createdAt DateTime           @default(now())
+  updatedAt DateTime           @updatedAt
+
+  @@index([status, createdAt(sort: Desc)])
+}
+
+model JobSubmission {
+  id          String             @id @default(cuid())
+  companyName String
+  contactName String
+  email       String
+  phone       String?
+  jobTitle    String
+  city        String
+  description String             @db.Text
+  applyUrl    String?
+  message     String?            @db.Text
+  status      InboxMessageStatus @default(NEW)
+  createdAt   DateTime           @default(now())
+  updatedAt   DateTime           @updatedAt
+
+  @@index([status, createdAt(sort: Desc)])
 }
 
 model AdSlot {

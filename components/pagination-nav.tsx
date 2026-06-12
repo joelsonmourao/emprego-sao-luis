@@ -38,7 +38,7 @@ export function PaginationNav({ page, totalPages, buildHref }: PaginationNavProp
 
       {page < totalPages ? (
       <Link href={buildHref(page + 1) as never} className="rounded-full border border-[color:rgba(26,43,76,0.1)] bg-white px-4 py-2 text-sm font-medium text-[var(--brand-text-secondary)] transition hover:border-[color:rgba(255,109,0,0.22)] hover:text-[var(--brand-orange)]">
-          Proxima
+          Próxima
         </Link>
       ) : null}
     </nav>

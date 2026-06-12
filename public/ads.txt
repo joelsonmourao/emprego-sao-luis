@@ -1,0 +1,2 @@
+# Adicione aqui a linha do Google AdSense após aprovação, por exemplo:
+# google.com, pub-XXXXXXXXXXXXXXXX, DIRECT, f08c47fec0942fa0

@@ -7,16 +7,17 @@ import { cleanJobDescriptionForSchema } from "@/lib/jobs/job-posting-description
 import { validateJobPostingMinimum } from "@/lib/jobs/job-posting-validate";
 import type { TrustedLocationEnrichment } from "@/lib/location/types";
 import { parseSalaryMinForJobPostingSchema } from "@/lib/seo/salary-min-schema";
-import { getVagasEmpresaPath } from "@/lib/seo/jobs-pages";
+import { mapEmploymentTypeForJobPostingSchema } from "@/lib/seo/job-posting-employment-type";
+import { getJobPath } from "@/lib/seo/jobs-pages";
 import { absoluteUrl } from "@/lib/utils";
 
 export function buildOrganizationJsonLd(input?: { name?: string; logoUrl?: string }) {
   return {
     "@context": "https://schema.org",
     "@type": "Organization",
-    name: input?.name ?? "Jovem Aprendiz Vagas",
+    name: input?.name ?? siteConfig.name,
     url: absoluteUrl("/"),
-    logo: absoluteUrl(input?.logoUrl ?? "/brand-logo.svg")
+    logo: absoluteUrl(input?.logoUrl ?? "/emprego-logo-mark.svg")
   };
 }
 
@@ -24,7 +25,7 @@ export function buildWebsiteJsonLd(input?: { name?: string }) {
   return {
     "@context": "https://schema.org",
     "@type": "WebSite",
-    name: input?.name ?? "Jovem Aprendiz Vagas",
+    name: input?.name ?? siteConfig.name,
     url: absoluteUrl("/"),
     potentialAction: {
       "@type": "SearchAction",
@@ -72,6 +73,38 @@ export function buildWebPageJsonLd(input: { name: string; description: string; p
   };
 }
 
+export function buildArticleJsonLd(input: {
+  title: string;
+  description: string;
+  path: string;
+  publishedAt?: Date | string | null;
+  coverImageUrl?: string | null;
+}) {
+  const published = input.publishedAt ? new Date(input.publishedAt).toISOString() : undefined;
+  return {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    headline: input.title,
+    description: input.description,
+    url: absoluteUrl(input.path),
+    datePublished: published,
+    dateModified: published,
+    image: input.coverImageUrl ? absoluteUrl(input.coverImageUrl) : absoluteUrl("/og-image.jpg"),
+    author: {
+      "@type": "Organization",
+      name: siteConfig.name
+    },
+    publisher: {
+      "@type": "Organization",
+      name: siteConfig.name,
+      logo: {
+        "@type": "ImageObject",
+        url: absoluteUrl("/emprego-logo-mark.svg")
+      }
+    }
+  };
+}
+
 export function buildItemListJsonLdFromJobs(items: Array<{ position: number; name: string; path: string }>) {
   return {
     "@context": "https://schema.org",
@@ -100,9 +133,10 @@ export function buildPlaceJsonLdForCityLocality(input: { cityName: string; state
   };
 }
 
-const JOB_POSTING_EMPLOYMENT_TYPES = ["FULL_TIME", "PART_TIME"] as const;
-const IDENTIFIER_NAME = "Jovem Aprendiz Vagas";
-const DEFAULT_HIRING_ORGANIZATION_LOGO = "https://slzcontent.com.br/icon.svg";
+const IDENTIFIER_NAME = siteConfig.name;
+const DEFAULT_HIRING_ORGANIZATION_LOGO = absoluteUrl("/emprego-logo-mark.svg");
+
+const BLOCKED_EXTERNAL_HOST_FRAGMENTS = ["jovem-aprendiz-vagas", "vercel.app", "example.com", "slzcontent.com.br"];
 
 export type JobPostingJsonLdInput = {
   id: string;
@@ -127,8 +161,10 @@ export type JobPostingJsonLdInput = {
   salaryMin: number | null;
   /** Localização detalhada já persistida (cache); nunca preencher via API na página pública. */
   locationEnrichment?: TrustedLocationEnrichment | null;
-  /** Mantido para validação mínima legada; employmentType no schema é fixo. */
   employmentType: EmploymentType;
+  categoryName?: string | null;
+  requirements?: string[];
+  benefits?: string[];
 };
 
 export function sanitizeISODate(dateStr: string | undefined | null) {
@@ -161,25 +197,57 @@ function isValidHttpUrl(value: string) {
   }
 }
 
+function isBlockedExternalUrl(value: string) {
+  const low = value.toLowerCase();
+  return BLOCKED_EXTERNAL_HOST_FRAGMENTS.some((fragment) => low.includes(fragment));
+}
+
 function resolveHiringOrganizationLogo(companyLogoUrl?: string | null) {
   const u = companyLogoUrl?.trim();
   if (!u) return DEFAULT_HIRING_ORGANIZATION_LOGO;
-  if (u.startsWith("https://") || u.startsWith("http://")) return u;
-  if (u.startsWith("/")) return absoluteUrl(u);
+  if ((u.startsWith("https://") || u.startsWith("http://")) && !isBlockedExternalUrl(u)) return u;
+  if (u.startsWith("/") && !isBlockedExternalUrl(u)) return absoluteUrl(u);
   return DEFAULT_HIRING_ORGANIZATION_LOGO;
 }
 
-function resolveHiringOrganizationSameAs(input: {
-  companyWebsiteUrl?: string | null;
-  companySlug?: string | null;
-}) {
-  const website = input.companyWebsiteUrl?.trim();
-  if (website && isValidHttpUrl(website)) return website;
-
-  const slug = input.companySlug?.trim();
-  if (slug) return absoluteUrl(getVagasEmpresaPath(slug));
-
+function resolveHiringOrganizationSameAs(companyWebsiteUrl?: string | null) {
+  const website = companyWebsiteUrl?.trim();
+  if (website && isValidHttpUrl(website) && !isBlockedExternalUrl(website)) return website;
   return undefined;
+}
+
+function resolveHiringOrganizationName(companyName: string) {
+  const name = companyName.trim();
+  if (!name || isPlaceholderSentinel(name)) return "Empresa Confidencial";
+  return name;
+}
+
+function appendJobPostingDescriptionSections(job: JobPostingJsonLdInput, baseDescription: string) {
+  const parts = [baseDescription];
+
+  if (job.categoryName?.trim()) {
+    parts.push(`<p><strong>Tipo de vaga:</strong> ${escapeHtmlText(job.categoryName.trim())}</p>`);
+  }
+
+  if (job.requirements?.length) {
+    const items = job.requirements.map((item) => `<li>${escapeHtmlText(item)}</li>`).join("");
+    parts.push(`<h3>Requisitos</h3><ul>${items}</ul>`);
+  }
+
+  if (job.benefits?.length) {
+    const items = job.benefits.map((item) => `<li>${escapeHtmlText(item)}</li>`).join("");
+    parts.push(`<h3>Benefícios</h3><ul>${items}</ul>`);
+  }
+
+  parts.push(
+    `<p><em>Esta oportunidade é divulgada pelo ${escapeHtmlText(siteConfig.name)} em ${escapeHtmlText(job.cityName)}, ${escapeHtmlText(job.stateCode)}. O portal atua como agregador — a contratação e o processo seletivo são de responsabilidade da empresa anunciante.</em></p>`
+  );
+
+  return parts.join("");
+}
+
+function escapeHtmlText(value: string) {
+  return value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 }
 
 function buildBaseSalaryBlock(salaryMin: number | null) {
@@ -264,13 +332,10 @@ function buildJobLocationBlock(job: JobPostingJsonLdInput) {
 function buildHiringOrganizationBlock(job: JobPostingJsonLdInput) {
   const org: Record<string, unknown> = {
     "@type": "Organization",
-    name: job.companyName.trim()
+    name: resolveHiringOrganizationName(job.companyName)
   };
 
-  const sameAs = resolveHiringOrganizationSameAs({
-    companyWebsiteUrl: job.companyWebsiteUrl,
-    companySlug: job.companySlug
-  });
+  const sameAs = resolveHiringOrganizationSameAs(job.companyWebsiteUrl);
   if (sameAs) org.sameAs = sameAs;
 
   const logo = resolveHiringOrganizationLogo(job.companyLogoUrl);
@@ -283,11 +348,12 @@ export function buildJobPostingJsonLd(job: JobPostingJsonLdInput): Record<string
   const schemaPostingTitle = job.storedTitle.trim();
   if (!schemaPostingTitle) return null;
 
-  const descriptionHtml = cleanJobDescriptionForSchema(job.descriptionHtml, {
+  const baseDescription = cleanJobDescriptionForSchema(job.descriptionHtml, {
     slug: job.slug,
     id: job.id,
     title: schemaPostingTitle
   });
+  const descriptionHtml = appendJobPostingDescriptionSections(job, baseDescription);
 
   const datePostedSource = job.publishedAt ?? job.createdAt ?? null;
   const datePostedRaw = normalizeDatePostedForSchema(datePostedSource);
@@ -334,7 +400,8 @@ export function buildJobPostingJsonLd(job: JobPostingJsonLdInput): Record<string
   };
   data.datePosted = datePostedRaw;
   data.validThrough = validThroughRaw;
-  data.employmentType = [...JOB_POSTING_EMPLOYMENT_TYPES];
+  data.employmentType = mapEmploymentTypeForJobPostingSchema(job.employmentType);
+  data.url = absoluteUrl(getJobPath(job.slug));
   data.hiringOrganization = hiringOrganization;
   data.jobLocation = jobLocation;
   if (baseSalary) {

@@ -3,8 +3,11 @@ import { unstable_cache } from "next/cache";
 import { prisma } from "@/lib/db";
 import { PUBLIC_GEO_CACHE_TAG } from "@/lib/public-revalidate";
 
+const MARANHAO_STATE_CODE = "MA";
+
 async function fetchStates() {
   return prisma.state.findMany({
+    where: { code: MARANHAO_STATE_CODE },
     orderBy: [{ name: "asc" }],
     include: {
       _count: {
@@ -61,7 +64,7 @@ export const getCityByStateAndSlug = unstable_cache(async (stateSlug: string, ci
   tags: [PUBLIC_GEO_CACHE_TAG]
 });
 
-/** Cidade por slug + sigla da UF (ex.: `sao-luis` + `MA`) para URLs `/vagas/jovem-aprendiz/{slug}-{uf}`. */
+/** Cidade por slug + sigla da UF (ex.: `sao-luis` + `MA`). */
 export const getCityByStateCodeAndSlug = unstable_cache(async (stateCode: string, citySlug: string) => {
   const code = stateCode.trim().toUpperCase();
   const slug = citySlug.trim().toLowerCase();
@@ -86,7 +89,7 @@ export const getCityByStateCodeAndSlug = unstable_cache(async (stateCode: string
 
 export const getCityBySlug = unstable_cache(async (slug: string) => {
   const cities = await prisma.city.findMany({
-    where: { slug },
+    where: { slug, state: { code: MARANHAO_STATE_CODE } },
     include: {
       state: true,
       _count: {
@@ -107,6 +110,7 @@ export const getCityBySlug = unstable_cache(async (slug: string) => {
 
 async function fetchSearchGeoData() {
   const result = await prisma.state.findMany({
+    where: { code: MARANHAO_STATE_CODE },
     orderBy: [{ name: "asc" }],
     select: {
       id: true,
@@ -133,6 +137,7 @@ export const getSearchGeoData = unstable_cache(fetchSearchGeoData, ["search-geo-
 
 async function fetchCities() {
   return prisma.city.findMany({
+    where: { state: { code: MARANHAO_STATE_CODE } },
     include: {
       state: true,
       _count: {

@@ -41,18 +41,22 @@ export async function getPostsBySlugs(slugs: string[]) {
   return getPostsBySlugsCached(JSON.stringify(slugs));
 }
 
-const getPostsCached = unstable_cache(async (page: number) => {
+const getPostsCached = unstable_cache(async (key: string) => {
+  const { page, categorySlug } = JSON.parse(key) as { page: number; categorySlug: string | null };
+  const where = {
+    isPublished: true,
+    ...(categorySlug ? { category: { slug: categorySlug } } : {})
+  };
+
   const [items, total] = await Promise.all([
     prisma.blogPost.findMany({
-      where: { isPublished: true },
+      where,
       include: { category: true },
       orderBy: [{ publishedAt: "desc" }],
       take: pagination.blogPerPage,
       skip: (page - 1) * pagination.blogPerPage
     }),
-    prisma.blogPost.count({
-      where: { isPublished: true }
-    })
+    prisma.blogPost.count({ where })
   ]);
 
   return {
@@ -61,14 +65,34 @@ const getPostsCached = unstable_cache(async (page: number) => {
     page,
     totalPages: Math.max(1, Math.ceil(total / pagination.blogPerPage))
   };
-}, ["posts-list-v1"], {
+}, ["posts-list-v2"], {
   revalidate: 7200,
   tags: [PUBLIC_BLOG_CACHE_TAG]
 });
 
-export async function getPosts(params?: { page?: number }) {
-  return getPostsCached(params?.page ?? 1);
+export async function getPosts(params?: { page?: number; categorySlug?: string }) {
+  return getPostsCached(
+    JSON.stringify({
+      page: params?.page ?? 1,
+      categorySlug: params?.categorySlug?.trim() || null
+    })
+  );
 }
+
+export const getBlogCategories = unstable_cache(async () => {
+  return prisma.blogCategory.findMany({
+    where: { posts: { some: { isPublished: true } } },
+    orderBy: [{ name: "asc" }],
+    include: {
+      _count: {
+        select: { posts: { where: { isPublished: true } } }
+      }
+    }
+  });
+}, ["blog-categories-v1"], {
+  revalidate: 7200,
+  tags: [PUBLIC_BLOG_CACHE_TAG]
+});
 
 export const getPostBySlug = unstable_cache(async (slug: string) => {
   return prisma.blogPost.findUnique({

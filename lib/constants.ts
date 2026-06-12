@@ -1,20 +1,25 @@
 export const siteConfig = {
-  name: "Jovem Aprendiz Vagas",
-  legalName: "Jovem Aprendiz Vagas",
+  name: "Emprego São Luís",
+  legalName: "Emprego São Luís",
+  slogan: "Conectando talentos às oportunidades de São Luís.",
+  domain: "empregossaoluis.com.br",
+  instagram: "@empregosaoluis",
   description:
-    "Portal com vagas de Jovem Aprendiz, cidades, empresas e dicas para quem está buscando o primeiro emprego.",
+    "Encontre vagas de emprego em São Luís, Região Metropolitana e cidades do Maranhão. Oportunidades atualizadas para diversas áreas.",
   defaultLocale: "pt-BR",
   keywords: [
-    "jovem aprendiz",
-    "menor aprendiz",
-    "vaga de jovem aprendiz",
-    "vaga de menor aprendiz",
-    "primeiro emprego",
-    "curriculo para jovem aprendiz",
-    "curriculo para menor aprendiz",
-    "entrevista para jovem aprendiz",
-    "vagas por cidade",
-    "empresas que contratam jovem aprendiz"
+    "vagas em São Luís",
+    "empregos em São Luís",
+    "vagas de emprego São Luís",
+    "empregos Maranhão",
+    "vagas São Luís MA",
+    "jovem aprendiz São Luís",
+    "estágio São Luís",
+    "empregos região metropolitana São Luís",
+    "vagas em São José de Ribamar",
+    "vagas em Paço do Lumiar",
+    "vagas em Raposa",
+    "vagas no Maranhão"
   ]
 } as const;
 

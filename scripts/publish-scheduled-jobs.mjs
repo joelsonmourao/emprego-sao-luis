@@ -1,4 +1,4 @@
-const DEFAULT_SITE_URL = "https://slzcontent.com.br";
+const DEFAULT_SITE_URL = "https://empregossaoluis.com.br";
 
 function normalizeSiteUrl(input) {
   const base = (input || DEFAULT_SITE_URL).trim();

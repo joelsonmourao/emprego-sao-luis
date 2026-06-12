@@ -25,11 +25,11 @@ const siteBrandingSchema = z.object({
 export type SiteBranding = z.infer<typeof siteBrandingSchema>;
 
 export const defaultSiteBranding: SiteBranding = {
-  siteName: "Jovem Aprendiz Vagas",
-  shortDescription: "Vagas e dicas para o primeiro emprego.",
-  logoUrl: "/brand-logo.svg",
-  faviconUrl: "/icon.svg",
-  defaultOgImageUrl: "/brand-logo.svg",
+  siteName: "Emprego São Luís",
+  shortDescription: "Vagas de emprego em São Luís e Maranhão.",
+  logoUrl: "/emprego-logo-horizontal.svg",
+  faviconUrl: "/favicon.ico",
+  defaultOgImageUrl: "/og-image.jpg",
   email: "",
   phone: "",
   whatsapp: "",

@@ -3,9 +3,9 @@ import type { EmploymentType, LocationType, Prisma } from "@prisma/client";
 import { JobStatus } from "@prisma/client";
 
 import { markExpiredJobsInactive } from "@/lib/jobs/job-expiry";
-import { jovemAprendizHubOrKeywordsWhere } from "@/lib/jobs/jovem-aprendiz-hub-where";
 import { prisma } from "@/lib/db";
 import { pagination } from "@/lib/constants";
+import { getJobCategoryBySlug } from "@/lib/job-categories";
 import { PUBLIC_JOBS_CACHE_TAG } from "@/lib/public-revalidate";
 
 /** Full job graph for detalhe da vaga, JSON-LD e admin. */
@@ -30,6 +30,8 @@ export const jobListingSelect = {
   locationType: true,
   featured: true,
   employmentType: true,
+  categoryName: true,
+  salaryDisplay: true,
   salaryMin: true,
   salaryMax: true,
   city: { select: { name: true, slug: true } },
@@ -122,15 +124,21 @@ export const getRecentJobs = unstable_cache(fetchRecentJobs, ["recent-jobs-v1"],
   tags: [PUBLIC_JOBS_CACHE_TAG]
 });
 
-export const getJobBySlug = unstable_cache(async (slug: string) => {
+async function fetchJobBySlug(slug: string) {
+  await markExpiredJobsInactive();
   return prisma.job.findFirst({
-    where: { slug, status: JobStatus.PUBLISHED, isActive: true },
+    where: { slug, status: JobStatus.PUBLISHED, isActive: true, publishedAt: { not: null } },
     include: jobDetailInclude
   });
-}, ["job-by-slug-v1"], {
-  revalidate: 2700,
-  tags: [PUBLIC_JOBS_CACHE_TAG]
-});
+}
+
+export async function getJobBySlug(slug: string) {
+  const cached = unstable_cache(async () => fetchJobBySlug(slug), ["job-by-slug-v2", slug], {
+    revalidate: 2700,
+    tags: [PUBLIC_JOBS_CACHE_TAG, `job-slug-${slug}`]
+  });
+  return cached();
+}
 
 function jobsListCacheKey(params: {
   query?: string;
@@ -138,9 +146,8 @@ function jobsListCacheKey(params: {
   citySlug?: string;
   companySlug?: string;
   companyName?: string;
+  categorySlug?: string;
   employmentType?: EmploymentType;
-  /** Hub compacto: OR aprendizagem + palavras-chave no conteúdo. */
-  jovemAprendizHubExpanded?: boolean;
   locationType?: LocationType;
   order?: "relevance" | "date";
   page?: number;
@@ -151,8 +158,8 @@ function jobsListCacheKey(params: {
     citySlug: params.citySlug ?? null,
     companySlug: params.companySlug ?? null,
     companyName: params.companyName ?? null,
+    categorySlug: params.categorySlug ?? null,
     employmentType: params.employmentType ?? null,
-    jovemAprendizHubExpanded: params.jovemAprendizHubExpanded ?? false,
     locationType: params.locationType ?? null,
     order: params.order ?? "relevance",
     page: params.page ?? 1
@@ -167,8 +174,8 @@ const getJobsListCached = unstable_cache(async (key: string) => {
     citySlug?: string;
     companySlug?: string;
     companyName?: string;
+    categorySlug?: string;
     employmentType?: EmploymentType;
-    jovemAprendizHubExpanded?: boolean;
     locationType?: LocationType;
     order?: "relevance" | "date";
     page?: number;
@@ -177,11 +184,7 @@ const getJobsListCached = unstable_cache(async (key: string) => {
   const page = params.page ?? 1;
   const order = params.order ?? "relevance";
 
-  const typeScope: Prisma.JobWhereInput = params.jovemAprendizHubExpanded
-    ? jovemAprendizHubOrKeywordsWhere()
-    : params.employmentType
-      ? { employmentType: params.employmentType }
-      : {};
+  const typeScope: Prisma.JobWhereInput = params.employmentType ? { employmentType: params.employmentType } : {};
 
   const searchOr: Prisma.JobWhereInput | null = params.query
     ? {
@@ -219,7 +222,20 @@ const getJobsListCached = unstable_cache(async (key: string) => {
           }
         }
       : {}),
-    ...(params.locationType ? { locationType: params.locationType } : {})
+    ...(params.locationType ? { locationType: params.locationType } : {}),
+    ...(params.categorySlug
+      ? (() => {
+          const category = getJobCategoryBySlug(params.categorySlug!);
+          return {
+            OR: [
+              { category: { slug: params.categorySlug } },
+              ...(category
+                ? [{ categoryName: { equals: category.name, mode: "insensitive" as const } }]
+                : [])
+            ]
+          };
+        })()
+      : {})
   };
 
   const [items, total] = await Promise.all([
@@ -258,8 +274,8 @@ export async function getJobsList(params: {
   citySlug?: string;
   companySlug?: string;
   companyName?: string;
+  categorySlug?: string;
   employmentType?: EmploymentType;
-  jovemAprendizHubExpanded?: boolean;
   locationType?: LocationType;
   order?: "relevance" | "date";
   page?: number;
@@ -520,14 +536,15 @@ export async function getCompanyHubBySlug(slug: string) {
 
 export const getCompanyEntries = unstable_cache(async () => {
   return prisma.company.findMany({
-    where: { isActive: true },
+    where: { isActive: true, state: { code: "MA" } },
     select: {
       slug: true,
-      updatedAt: true
+      updatedAt: true,
+      state: { select: { code: true } }
     },
     orderBy: [{ updatedAt: "desc" }]
   });
-}, ["company-sitemap-entries-v1"], {
+}, ["company-sitemap-entries-v2"], {
   revalidate: 7200,
   tags: [PUBLIC_JOBS_CACHE_TAG]
 });
@@ -584,34 +601,3 @@ export async function getCompanyAdminOptions() {
   }));
 }
 
-/** Uma entrada por combinação cidade + UF com vaga ativa no hub Jovem Aprendiz (para sitemap compacto). */
-async function fetchApprenticeCityUfSitemapRows() {
-  await markExpiredJobsInactive();
-  const rows = await prisma.job.findMany({
-    where: { ...publishedJobWhere, ...jovemAprendizHubOrKeywordsWhere() },
-    select: {
-      updatedAt: true,
-      city: { select: { slug: true } },
-      state: { select: { code: true } }
-    }
-  });
-
-  const latest = new Map<string, Date>();
-  for (const row of rows) {
-    const key = `${row.city.slug}__${row.state.code}`;
-    const prev = latest.get(key);
-    if (!prev || row.updatedAt > prev) {
-      latest.set(key, row.updatedAt);
-    }
-  }
-
-  return [...latest.entries()].map(([key, lastmod]) => {
-    const [citySlug, stateCode] = key.split("__");
-    return { citySlug, stateCode, lastmod };
-  });
-}
-
-export const getApprenticeCityUfSitemapRows = unstable_cache(fetchApprenticeCityUfSitemapRows, ["apprentice-city-uf-sitemap-v1"], {
-  revalidate: 7200,
-  tags: [PUBLIC_JOBS_CACHE_TAG]
-});

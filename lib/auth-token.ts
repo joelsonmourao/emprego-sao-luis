@@ -1,8 +1,8 @@
 import { SignJWT } from "jose/jwt/sign";
 import { jwtVerify } from "jose/jwt/verify";
 
-export const ADMIN_AUTH_COOKIE = "jovem-aprendiz-admin-session";
-const ADMIN_AUTH_ISSUER = "jovem-aprendiz-vagas";
+export const ADMIN_AUTH_COOKIE = "emprego-sao-luis-admin-session";
+const ADMIN_AUTH_ISSUER = "emprego-sao-luis";
 const ADMIN_AUTH_AUDIENCE = "admin";
 const ADMIN_AUTH_TTL = 60 * 60 * 24 * 7;
 

@@ -5,7 +5,7 @@ import { getAdminSession } from "@/lib/auth";
 import { AdminLoginForm } from "@/components/admin/admin-login-form";
 
 export const metadata: Metadata = {
-  title: "Login do admin | Jovem Aprendiz Vagas",
+  title: "Login do admin | Emprego São Luís",
   robots: {
     index: false,
     follow: false
@@ -27,7 +27,7 @@ export default async function AdminLoginPage() {
             Area protegida
           </p>
           <div className="space-y-4">
-            <h1 className="max-w-2xl text-5xl font-black tracking-tight text-slate-950">Painel administrativo do portal Jovem Aprendiz Vagas</h1>
+            <h1 className="max-w-2xl text-5xl font-black tracking-tight text-slate-950">Painel administrativo do Emprego São Luís</h1>
             <p className="max-w-2xl text-lg leading-8 text-slate-600">
               Entre para cadastrar vagas, atualizar o blog, importar planilhas e cuidar do portal em um so lugar.
             </p>

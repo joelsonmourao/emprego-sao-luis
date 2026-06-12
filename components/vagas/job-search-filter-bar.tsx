@@ -7,7 +7,7 @@ import { MapPinned, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { trackPortalEvent } from "@/lib/analytics/client";
 import type { JobSearchFilterGeoState } from "@/lib/vagas/job-search-filter-resolve";
-import { buildVagasQueryFallback, resolveJovemAprendizCleanPath } from "@/lib/vagas/job-search-filter-resolve";
+import { buildVagasQueryFallback } from "@/lib/vagas/job-search-filter-resolve";
 import { cn } from "@/lib/utils";
 
 export type JobSearchFilterBarProps = {
@@ -40,11 +40,6 @@ export function JobSearchFilterBar({
     });
 
     const geo = JSON.parse(serialized) as JobSearchFilterGeoState[];
-    const clean = resolveJovemAprendizCleanPath(q, loc, geo);
-    if (clean) {
-      router.push(clean);
-      return;
-    }
     router.push(buildVagasQueryFallback(q, loc, geo));
   };
 

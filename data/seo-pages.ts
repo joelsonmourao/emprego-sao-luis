@@ -1,14 +1,14 @@
 export const staticPages = [
   "/",
   "/vagas",
-  "/estados",
-  "/cidades",
   "/empresas",
+  "/categorias",
   "/blog",
-  "/menor-aprendiz",
   "/sobre",
-  "/politica-de-privacidade",
-  "/politica-de-cookies",
-  "/termos-de-uso",
-  "/contato"
+  "/quem-somos",
+  "/contato",
+  "/anunciar-vaga",
+  "/privacidade",
+  "/termos",
+  "/cookies"
 ] as const;

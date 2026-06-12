@@ -1,56 +1,52 @@
 @import "tailwindcss";
 
 @theme {
-  --color-background: #f4f7f6;
-  --color-foreground: #1a2b4c;
+  --color-background: #f5f2eb;
+  --color-foreground: #1a1a1a;
   --color-card: #ffffff;
-  --color-card-foreground: #1a2b4c;
-  --color-primary: #ff6d00;
+  --color-card-foreground: #1a1a1a;
+  --color-primary: #7b2c28;
   --color-primary-foreground: #ffffff;
-  --color-secondary: #eff3f8;
-  --color-secondary-foreground: #1a2b4c;
-  --color-muted: #f4f7f6;
-  --color-muted-foreground: #5f6b7a;
-  --radius-xl: 1.5rem;
-  --radius-2xl: 1.75rem;
-  --radius-3xl: 2rem;
+  --color-secondary: #f28c1b;
+  --color-secondary-foreground: #ffffff;
+  --color-muted: #f5f2eb;
+  --color-muted-foreground: #5a5a5a;
+  --radius-xl: 1.25rem;
+  --radius-2xl: 1.5rem;
+  --radius-3xl: 1.75rem;
 }
 
-html, body {
+html,
+body {
   overflow-x: hidden !important;
   position: relative;
-  width: 100vw !important;
+  width: 100%;
   margin: 0;
   padding: 0;
 }
 
 :root {
-  --brand-navy: #1a2b4c;
-  --brand-blue: #2f6fed;
-  --brand-orange: #ff6d00;
-  --brand-orange-strong: #a14000;
+  --brand-charcoal: #1a1a1a;
+  --brand-green: #1f2b24;
+  --brand-brick: #7b2c28;
+  --brand-orange: #f28c1b;
+  --brand-orange-strong: #c46f0f;
+  --brand-beige: #f5f2eb;
   --brand-white: #ffffff;
-  --brand-soft: #f4f7f6;
-  --brand-text-secondary: #5f6b7a;
-  --brand-cobalt: #1a2b4c;
-  --brand-violet: #2f6fed;
-  --brand-sky: #2f6fed;
-  --brand-ink: #1a2b4c;
-  --brand-coral: #ff6d00;
-  --brand-sun: #ffb36b;
-  --brand-mist: #edf3fb;
-  --brand-lilac: #eef4ff;
-  --brand-cloud: #f4f7f6;
-  --brand-line: rgba(26, 43, 76, 0.12);
-  --brand-line-strong: rgba(26, 43, 76, 0.2);
+  --brand-navy: #1f2b24;
+  --brand-soft: #f5f2eb;
+  --brand-text-secondary: #5a5a5a;
+  --brand-ink: #1a1a1a;
+  --brand-mist: #faf8f4;
+  --brand-lilac: #faf8f4;
+  --brand-line: rgba(26, 26, 26, 0.1);
+  --brand-line-strong: rgba(26, 26, 26, 0.16);
+  --font-sans: var(--font-plus-jakarta), "Segoe UI", system-ui, sans-serif;
+  --font-display: var(--font-plus-jakarta), "Segoe UI", system-ui, sans-serif;
 }
 
 * {
-  border-color: rgb(226 232 240);
-}
-
-a, button {
-  flex-wrap: wrap;
+  border-color: rgba(26, 26, 26, 0.08);
 }
 
 html {
@@ -66,11 +62,11 @@ body {
   max-width: 100%;
   overflow-x: hidden;
   background:
-    radial-gradient(circle at top, rgb(47 111 237 / 0.08), transparent 28%),
-    radial-gradient(circle at right top, rgb(255 109 0 / 0.08), transparent 22%),
-    linear-gradient(180deg, #ffffff 0%, #f4f7f6 60%, #ffffff 100%);
-  color: #1a2b4c;
-  font-family: "Aptos", "Trebuchet MS", "Segoe UI", sans-serif;
+    radial-gradient(circle at 10% 0%, rgb(242 140 27 / 0.08), transparent 28%),
+    radial-gradient(circle at 92% 6%, rgb(123 44 40 / 0.06), transparent 24%),
+    linear-gradient(180deg, #faf8f4 0%, #f5f2eb 48%, #ffffff 100%);
+  color: var(--brand-charcoal);
+  font-family: var(--font-sans);
 }
 
 main {
@@ -99,12 +95,13 @@ h1,
 h2,
 h3,
 h4 {
-  font-family: "Aptos Display", "Segoe UI", "Trebuchet MS", sans-serif;
+  font-family: var(--font-display);
+  letter-spacing: -0.02em;
 }
 
 .prose-content p {
   margin-bottom: 1rem;
-  line-height: 1.75;
+  line-height: 1.8;
 }
 
 .prose-content ul {
@@ -121,59 +118,80 @@ h4 {
 
 .prose-content h2,
 .prose-content h3 {
-  margin: 1.5rem 0 0.75rem;
+  margin: 1.75rem 0 0.85rem;
   font-weight: 800;
-  color: var(--brand-navy);
+  color: var(--brand-charcoal);
 }
 
+.prose-content h2 {
+  font-size: 1.35rem;
+}
+
+.prose-content h3 {
+  font-size: 1.1rem;
+}
 
 .mesh-surface {
   background:
-    radial-gradient(circle at 12% 15%, rgba(47, 111, 237, 0.14), transparent 18%),
-    radial-gradient(circle at 86% 18%, rgba(255, 109, 0, 0.12), transparent 18%),
-    linear-gradient(180deg, rgba(255,255,255,0.98), rgba(244,247,246,0.98));
+    radial-gradient(circle at 12% 15%, rgba(242, 140, 27, 0.1), transparent 18%),
+    radial-gradient(circle at 86% 18%, rgba(123, 44, 40, 0.07), transparent 18%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(245, 242, 235, 0.98));
 }
 
 .brand-panel {
   background:
-    radial-gradient(circle at top left, rgba(47, 111, 237, 0.12), transparent 28%),
-    radial-gradient(circle at bottom right, rgba(255, 109, 0, 0.08), transparent 24%),
-    linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(244, 247, 246, 0.99));
+    radial-gradient(circle at top left, rgba(242, 140, 27, 0.07), transparent 28%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(245, 242, 235, 0.98));
 }
 
 .brand-dark-panel {
   background:
-    radial-gradient(circle at top left, rgba(47, 111, 237, 0.18), transparent 24%),
-    radial-gradient(circle at 82% 18%, rgba(255, 109, 0, 0.16), transparent 18%),
-    linear-gradient(145deg, #1a2b4c 0%, #223863 58%, #2f6fed 100%);
+    radial-gradient(circle at 18% 12%, rgba(242, 140, 27, 0.16), transparent 24%),
+    radial-gradient(circle at 82% 18%, rgba(123, 44, 40, 0.12), transparent 20%),
+    linear-gradient(145deg, #1f2b24 0%, #243328 58%, #1a1a1a 100%);
 }
 
 .brand-soft-panel {
-  background:
-    radial-gradient(circle at top left, rgba(47, 111, 237, 0.1), transparent 26%),
-    radial-gradient(circle at bottom right, rgba(255, 109, 0, 0.08), transparent 22%),
-    linear-gradient(180deg, rgba(255,255,255,0.99), rgba(244,247,246,0.98));
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(250, 248, 244, 0.98));
 }
 
 .brand-page-hero {
   background:
-    radial-gradient(circle at top left, rgba(47, 111, 237, 0.12), transparent 25%),
-    radial-gradient(circle at 85% 20%, rgba(255, 109, 0, 0.1), transparent 22%),
-    linear-gradient(180deg, rgba(255,255,255,0.99), rgba(244,247,246,0.98));
+    radial-gradient(circle at top left, rgba(242, 140, 27, 0.1), transparent 28%),
+    radial-gradient(circle at top right, rgba(31, 43, 36, 0.05), transparent 24%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(245, 242, 235, 0.97));
+}
+
+.es-city-card {
+  background:
+    linear-gradient(180deg, rgba(31, 43, 36, 0.04) 0%, rgba(255, 255, 255, 1) 38%),
+    #ffffff;
 }
 
 .brand-chip {
   border: 1px solid var(--brand-line);
-  background: linear-gradient(180deg, rgba(255,255,255,0.99), rgba(244,247,246,0.96));
-  box-shadow: 0 18px 50px -35px rgba(26, 43, 76, 0.18);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(250, 248, 244, 0.96));
+  box-shadow: 0 16px 40px -32px rgba(26, 26, 26, 0.18);
 }
 
 .brand-link {
-  color: var(--brand-blue);
+  color: var(--brand-brick);
 }
 
 .brand-link:hover {
   color: var(--brand-orange);
+}
+
+.es-card-hover {
+  transition:
+    transform 180ms ease,
+    box-shadow 180ms ease,
+    border-color 180ms ease;
+}
+
+.es-card-hover:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 22px 48px -28px rgba(26, 26, 26, 0.22);
 }
 
 a,

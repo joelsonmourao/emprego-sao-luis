@@ -40,9 +40,9 @@ export async function middleware(request: NextRequest) {
     }
   }
 
-  if (hostname === "www.slzcontent.com.br") {
+  if (hostname === "www.empregossaoluis.com.br") {
     const canonicalUrl = request.nextUrl.clone();
-    canonicalUrl.hostname = "slzcontent.com.br";
+    canonicalUrl.hostname = "empregossaoluis.com.br";
     canonicalUrl.protocol = "https:";
     return NextResponse.redirect(canonicalUrl, 301);
   }

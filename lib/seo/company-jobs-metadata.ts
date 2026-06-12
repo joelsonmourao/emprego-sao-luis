@@ -36,14 +36,11 @@ export async function resolveCompanyJobsPageMetadata(input: {
     page: parsed.page
   });
 
-  const seo = buildCompanyListingSeo(
-    {
-      companyName: company.name,
-      companySlug: company.slug,
-      totalJobs: jobs.total
-    },
-    { variant: input.variant === "vagas-hub" ? "vagas-hub" : "default" }
-  );
+  const seo = buildCompanyListingSeo({
+    companyName: company.name,
+    companySlug: company.slug,
+    totalJobs: jobs.total
+  });
 
   const shouldIndex = shouldIndexPage({
     kind: "company-listing",

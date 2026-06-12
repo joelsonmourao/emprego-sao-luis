@@ -64,14 +64,11 @@ export async function CompanyJobsListing({
     getCompanyHubs()
   ]);
 
-  const seo = buildCompanyListingSeo(
-    {
-      companyName: company.name,
-      companySlug: company.slug,
-      totalJobs: jobs.total
-    },
-    { variant: variant === "vagas-hub" ? "vagas-hub" : "default" }
-  );
+  const seo = buildCompanyListingSeo({
+    companyName: company.name,
+    companySlug: company.slug,
+    totalJobs: jobs.total
+  });
 
   const faq = buildListingFaq({ name: company.name, totalJobs: jobs.total, type: "company" });
   const relatedCompanies = allCompanies
@@ -160,7 +157,7 @@ export async function CompanyJobsListing({
           <div className="rounded-[1.8rem] border border-slate-200 bg-white p-6 shadow-sm">
             <SectionHeading
         eyebrow="Página de empresa"
-              title={`Como encontrar vagas de Jovem Aprendiz no ${company.name}`}
+              title={`Como encontrar vagas no ${company.name}`}
         description={`Use esta página para ver vagas atualizadas do ${company.name}, cidades onde a empresa está contratando e caminhos relacionados para ampliar a busca sem cair em filtros técnicos.`}
             />
           </div>
@@ -225,7 +222,7 @@ export async function CompanyJobsListing({
       </div>
 
       <div className="space-y-6">
-      <SectionHeading eyebrow="Perguntas frequentes" title={`FAQ sobre Jovem Aprendiz no ${company.name}`} description="Bloco de apoio para fortalecer a página de empresa com respostas públicas e úteis." />
+      <SectionHeading eyebrow="Perguntas frequentes" title={`FAQ sobre vagas no ${company.name}`} description="Respostas úteis para quem acompanha oportunidades desta empresa." />
         <FaqList items={faq} />
       </div>
     </section>

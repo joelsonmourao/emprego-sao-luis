@@ -33,12 +33,12 @@ export async function PublicAdSlot({
   }
 
   if (!shouldRenderPaidAds(ctx) || !slot || !slot.isActive) {
-    return <div className={cn("w-full", minHeightClass)} aria-hidden data-ad-slot-empty={slotSlug} />;
+    return null;
   }
 
   const publisherId = ctx.publisherId;
   if (!publisherId) {
-    return <div className={cn("w-full", minHeightClass)} aria-hidden />;
+    return null;
   }
 
   const trimmedCode = slot.code.trim();

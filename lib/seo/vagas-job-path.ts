@@ -1,5 +1,5 @@
 /** Primeiro segmento após `/vagas/` em URLs de listagem ou rotas reservadas (não é slug de vaga). */
-export const JOB_DETAIL_PATH_RESERVED_FIRST_SEGMENTS = new Set(["estado", "cidade", "empresa", "indisponivel", "jovem-aprendiz"]);
+export const JOB_DETAIL_PATH_RESERVED_FIRST_SEGMENTS = new Set(["estado", "cidade", "categoria", "empresa", "indisponivel"]);
 
 /**
  * Se `pathname` for página pública de detalhe de vaga (`/vagas/{slug}` com um único segmento),
