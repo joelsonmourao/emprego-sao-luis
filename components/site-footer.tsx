@@ -14,7 +14,7 @@ export async function SiteFooter() {
       <div className="mx-auto flex max-w-7xl flex-col gap-8 px-4 py-12 text-sm text-white/78 sm:px-6 lg:px-8">
         <div className="grid gap-8 md:grid-cols-4">
           <div>
-            <SiteLogo compact withTagline={false} />
+            <SiteLogo withTagline={false} />
             <p className="mt-4 leading-6">
               O Emprego São Luís divulga vagas de emprego em São Luís, Região Metropolitana e cidades do Maranhão, conectando candidatos a oportunidades reais.
             </p>
@@ -23,18 +23,18 @@ export async function SiteFooter() {
           <div>
             <h2 className="text-base font-semibold text-white">Navegação</h2>
             <div className="mt-3 flex flex-col gap-2">
-              <Link href="/vagas" className="hover:text-[var(--brand-orange)]">Vagas</Link>
-              <Link href="/empresas" className="hover:text-[var(--brand-orange)]">Empresas</Link>
-              <Link href="/categorias" className="hover:text-[var(--brand-orange)]">Categorias</Link>
-              <Link href="/blog" className="hover:text-[var(--brand-orange)]">Blog</Link>
-              <Link href="/anunciar-vaga" className="hover:text-[var(--brand-orange)]">Publicar vaga</Link>
+              <Link href="/vagas" className="hover:text-white">Vagas</Link>
+              <Link href="/empresas" className="hover:text-white">Empresas</Link>
+              <Link href="/categorias" className="hover:text-white">Categorias</Link>
+              <Link href="/blog" className="hover:text-white">Blog</Link>
+              <Link href="/anunciar-vaga" className="hover:text-white">Publicar vaga</Link>
             </div>
           </div>
           <div>
             <h2 className="text-base font-semibold text-white">Cidades</h2>
             <div className="mt-3 flex flex-col gap-2">
               {FEATURED_CITIES.slice(0, 8).map((city) => (
-                <Link key={city.slug} href={getCityJobsPath(city.slug)} className="hover:text-[var(--brand-orange)]">
+                <Link key={city.slug} href={getCityJobsPath(city.slug)} className="hover:text-white">
                   Vagas em {city.name}
                 </Link>
               ))}
@@ -43,19 +43,19 @@ export async function SiteFooter() {
           <div>
             <h2 className="text-base font-semibold text-white">Informações</h2>
             <div className="mt-3 flex flex-col gap-2">
-              <Link href="/sobre" className="hover:text-[var(--brand-orange)]">Sobre</Link>
-              <Link href="/quem-somos" className="hover:text-[var(--brand-orange)]">Quem Somos</Link>
-              <Link href="/contato" className="hover:text-[var(--brand-orange)]">Contato</Link>
-              <Link href="/privacidade" className="hover:text-[var(--brand-orange)]">Política de Privacidade</Link>
-              <Link href="/termos" className="hover:text-[var(--brand-orange)]">Termos de Uso</Link>
-              <Link href="/cookies" className="hover:text-[var(--brand-orange)]">Política de Cookies</Link>
+              <Link href="/sobre" className="hover:text-white">Sobre</Link>
+              <Link href="/quem-somos" className="hover:text-white">Quem Somos</Link>
+              <Link href="/contato" className="hover:text-white">Contato</Link>
+              <Link href="/privacidade" className="hover:text-white">Política de Privacidade</Link>
+              <Link href="/termos" className="hover:text-white">Termos de Uso</Link>
+              <Link href="/cookies" className="hover:text-white">Política de Cookies</Link>
             </div>
             <div className="mt-4 flex flex-col gap-2 text-xs">
-              <a href="https://instagram.com/empregosaoluis" target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 hover:text-[var(--brand-orange)]">
+              <a href="https://instagram.com/empregosaoluis" target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 hover:text-white">
                 <ExternalLink className="h-4 w-4" />
                 Instagram {siteConfig.instagram}
               </a>
-              <a href="mailto:contato@empregossaoluis.com.br" className="hover:text-[var(--brand-orange)]">
+              <a href="mailto:contato@empregossaoluis.com.br" className="hover:text-white">
                 contato@empregossaoluis.com.br
               </a>
             </div>
@@ -68,7 +68,7 @@ export async function SiteFooter() {
               <Link
                 key={category.slug}
                 href={`/vagas/categoria/${category.slug}` as Route}
-                className="rounded-full border border-white/12 bg-white/6 px-3 py-1.5 text-xs hover:border-[var(--brand-orange)] hover:text-white"
+                className="rounded-full border border-white/12 bg-white/6 px-3 py-1.5 text-xs hover:border-white/24 hover:text-white"
               >
                 {category.name}
               </Link>

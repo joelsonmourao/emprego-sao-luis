@@ -24,7 +24,7 @@ export function SectionHeading({
           className={
             tone === "light"
               ? "text-[10px] font-semibold uppercase tracking-[0.22em] text-orange-100 sm:text-xs sm:tracking-[0.28em]"
-              : "text-[10px] font-semibold uppercase tracking-[0.22em] text-[var(--brand-orange)] sm:text-xs sm:tracking-[0.28em]"
+              : "text-[10px] font-semibold uppercase tracking-[0.22em] text-[var(--brand-brick)] sm:text-xs sm:tracking-[0.28em]"
           }
         >
           {eyebrow}

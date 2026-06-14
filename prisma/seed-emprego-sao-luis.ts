@@ -14,7 +14,7 @@ const empregoSiteSettings = {
   shortDescription:
     "Encontre vagas de emprego em São Luís, Região Metropolitana e cidades do Maranhão. Oportunidades atualizadas para diversas áreas.",
   logoUrl: "/logo-horizontal.png",
-  logoCompactUrl: "/emprego-sao-luis-logo.png",
+  logoCompactUrl: "/logo.png",
   faviconUrl: "/favicon.ico",
   defaultSocialImageUrl: "/og-image.jpg",
   email: "contato@empregossaoluis.com.br",

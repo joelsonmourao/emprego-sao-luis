@@ -1,7 +1,7 @@
 import type { Route } from "next";
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowRight, BriefcaseBusiness, Building2, MapPinned, Newspaper, ShieldCheck, Sparkles, Users } from "lucide-react";
+import { ArrowRight, MapPinned, Newspaper } from "lucide-react";
 
 import { AdUnit } from "@/components/ads/AdUnit";
 import { BlogCard } from "@/components/blog-card";
@@ -41,13 +41,6 @@ const HOME_CATEGORY_SLUGS = [
   "vendas"
 ] as const;
 
-const trustCards = [
-  { title: "Vagas atualizadas", description: "Oportunidades reunidas e organizadas para facilitar sua busca.", icon: BriefcaseBusiness },
-  { title: "Foco em São Luís e região", description: "Prioridade para a capital, Região Metropolitana e Maranhão.", icon: MapPinned },
-  { title: "Conteúdo gratuito", description: "Consulte vagas, empresas e artigos sem pagar pelo portal.", icon: ShieldCheck },
-  { title: "Por cidade e categoria", description: "Filtre por localidade e área para encontrar vagas relevantes.", icon: Users }
-];
-
 export async function generateMetadata() {
   return buildSiteMetadata({
     title: "Emprego São Luís - Vagas de Emprego em São Luís e Maranhão",
@@ -80,31 +73,26 @@ export default async function HomePage() {
 
   return (
     <div className="pb-16">
-      <section className="relative overflow-hidden border-b border-[var(--brand-line)] bg-[var(--brand-green)] text-white">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_12%_20%,rgba(242,140,27,0.22),transparent_30%),radial-gradient(circle_at_90%_10%,rgba(123,44,40,0.18),transparent_24%)]" />
-        <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-[var(--brand-brick)] via-[var(--brand-orange)] to-[var(--brand-brick)]" />
-
-        <div className="relative mx-auto grid max-w-7xl gap-8 px-4 py-8 sm:px-6 lg:grid-cols-[1.05fr_0.95fr] lg:items-center lg:gap-10 lg:px-8 lg:py-12">
+      <section className="border-b border-[var(--brand-line)] bg-[var(--brand-beige)]">
+        <div className="mx-auto grid max-w-7xl gap-8 px-4 py-8 sm:px-6 lg:grid-cols-[1.08fr_0.92fr] lg:items-center lg:gap-10 lg:px-8 lg:py-10">
           <div className="min-w-0">
-            <div className="inline-flex items-center gap-2 rounded-full border border-white/14 bg-white/8 px-3 py-1 text-[11px] font-bold uppercase tracking-wide text-orange-100">
-              <Sparkles className="h-3.5 w-3.5 text-[var(--brand-orange)]" />
-              Gratuito para candidatos
-            </div>
-            <h1 className="mt-4 text-[1.75rem] font-extrabold leading-tight sm:text-4xl lg:text-[2.5rem]">
-              Vagas de emprego em São Luís e no Maranhão
+            <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-[var(--brand-brick)]">Emprego São Luís</p>
+            <h1 className="mt-3 text-[1.85rem] font-extrabold leading-tight text-[var(--brand-charcoal)] sm:text-4xl lg:text-[2.65rem]">
+              Vagas de emprego em <span className="text-[var(--brand-brick)]">São Luís</span> e no{" "}
+              <span className="text-[var(--brand-brick)]">Maranhão</span>
             </h1>
-            <p className="mt-3 max-w-xl text-sm leading-7 text-white/88 sm:text-base">
+            <p className="mt-3 max-w-xl text-sm leading-7 text-[var(--brand-text-secondary)] sm:text-base">
               Encontre oportunidades atualizadas na capital, Região Metropolitana e cidades do estado.
             </p>
 
-            <div className="mt-4 flex justify-center lg:hidden">
+            <div className="mt-4 flex justify-start lg:hidden">
               <Image
                 src="/logo-horizontal.png"
                 alt="Emprego São Luís"
-                width={280}
-                height={72}
+                width={320}
+                height={84}
                 priority
-                className="h-12 w-auto max-w-[min(100%,16rem)] object-contain sm:h-14"
+                className="h-14 w-auto max-w-full object-contain sm:h-16"
               />
             </div>
 
@@ -124,60 +112,30 @@ export default async function HomePage() {
           </div>
 
           <div className="relative hidden min-w-0 lg:block">
-            <div className="overflow-hidden rounded-3xl border border-white/14 bg-[var(--brand-beige)] text-[var(--brand-charcoal)] shadow-[0_28px_70px_-36px_rgba(26,26,26,0.55)]">
-              <div className="h-1.5 bg-gradient-to-r from-[var(--brand-brick)] via-[var(--brand-orange)] to-[var(--brand-brick)]" />
-              <div className="p-5 sm:p-6 lg:p-7">
-                <div className="relative mx-auto max-w-sm lg:max-w-none">
-                  <Image
-                    src="/logo-horizontal.png"
-                    alt="Emprego São Luís"
-                    width={560}
-                    height={148}
-                    priority
-                    className="h-auto w-full object-contain"
-                  />
-                </div>
-                <p className="mt-5 text-center text-xl font-extrabold text-[var(--brand-brick)] sm:text-2xl">Temos vagas para você</p>
+            <div className="overflow-hidden rounded-3xl border border-[rgba(123,44,40,0.18)] bg-white shadow-[0_24px_60px_-36px_rgba(123,44,40,0.28)]">
+              <div className="p-6 lg:p-8">
+                <Image
+                  src="/logo-horizontal.png"
+                  alt="Emprego São Luís"
+                  width={600}
+                  height={160}
+                  priority
+                  className="h-auto w-full object-contain"
+                />
+                <p className="mt-6 text-center text-2xl font-extrabold text-[var(--brand-brick)]">Temos vagas para você</p>
                 <p className="mx-auto mt-2 max-w-sm text-center text-sm leading-6 text-[var(--brand-text-secondary)]">
                   Portal regional com foco em São Luís, Região Metropolitana e cidades do Maranhão.
                 </p>
-                <div className="mt-5 flex flex-wrap justify-center gap-2">
-                  {["Vagas por cidade", "Blog com dicas", "Empresas locais"].map((label) => (
-                    <span
-                      key={label}
-                      className="rounded-full border border-[rgba(123,44,40,0.14)] bg-white px-3 py-1.5 text-xs font-semibold text-[var(--brand-brick)]"
-                    >
-                      {label}
-                    </span>
-                  ))}
-                </div>
               </div>
+              <div className="h-4 bg-[var(--brand-brick)]" />
             </div>
           </div>
         </div>
       </section>
 
-      <section className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {trustCards.map((item) => {
-            const Icon = item.icon;
-            return (
-              <div key={item.title} className="brand-chip es-card-hover overflow-hidden rounded-2xl p-5">
-                <div className="h-1 w-12 rounded-full bg-[var(--brand-orange)]" />
-                <div className="mt-4 inline-flex h-11 w-11 items-center justify-center rounded-xl bg-[rgba(242,140,27,0.12)] text-[var(--brand-orange)]">
-                  <Icon className="h-5 w-5" />
-                </div>
-                <h2 className="mt-4 text-lg font-extrabold text-[var(--brand-charcoal)]">{item.title}</h2>
-                <p className="mt-2 text-sm leading-6 text-[var(--brand-text-secondary)]">{item.description}</p>
-              </div>
-            );
-          })}
-        </div>
-      </section>
-
       <AdUnit className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8" />
 
-      <section className="mx-auto max-w-7xl space-y-6 px-4 py-6 sm:px-6 lg:px-8">
+      <section className="mx-auto max-w-7xl space-y-6 px-4 py-8 sm:px-6 lg:px-8">
         <SectionHeading
           eyebrow="Vagas recentes"
           title="Oportunidades publicadas recentemente"
@@ -194,7 +152,7 @@ export default async function HomePage() {
             Ainda não há vagas publicadas no momento. Volte em breve ou divulgue uma oportunidade.
           </div>
         )}
-        <Button asChild size="lg" variant="secondary" className="gap-2">
+        <Button asChild size="lg" className="gap-2">
           <Link href="/vagas">
             Ver todas as vagas
             <ArrowRight className="h-4 w-4" />
@@ -202,28 +160,20 @@ export default async function HomePage() {
         </Button>
       </section>
 
-      <section className="mx-auto max-w-7xl space-y-4 px-4 py-6 sm:px-6 lg:px-8">
-        <SectionHeading
-          eyebrow="Cidades"
-          title="Busque por cidade"
-          description="Principais cidades do Maranhão com vagas no portal."
-        />
+      <section className="mx-auto max-w-7xl space-y-4 px-4 py-4 sm:px-6 lg:px-8">
+        <SectionHeading eyebrow="Cidades" title="Busque por cidade" description="Principais cidades do Maranhão com vagas no portal." />
         <div className="flex flex-wrap gap-2">
           {HOME_CITIES.map((city) => (
             <Link key={city.slug} href={getCityJobsPath(city.slug)} className="brand-pill">
-              <MapPinned className="h-3.5 w-3.5 text-[var(--brand-orange)]" />
+              <MapPinned className="h-3.5 w-3.5 text-[var(--brand-brick)]" />
               {city.name}
             </Link>
           ))}
         </div>
       </section>
 
-      <section className="mx-auto max-w-7xl space-y-4 px-4 py-6 sm:px-6 lg:px-8">
-        <SectionHeading
-          eyebrow="Categorias"
-          title="Vagas por área de atuação"
-          description="Encontre oportunidades alinhadas ao seu perfil."
-        />
+      <section className="mx-auto max-w-7xl space-y-4 px-4 py-4 sm:px-6 lg:px-8">
+        <SectionHeading eyebrow="Categorias" title="Vagas por área de atuação" description="Encontre oportunidades alinhadas ao seu perfil." />
         <div className="flex flex-wrap gap-2">
           {homeCategories.map((category) => (
             <Link key={category.slug} href={`/vagas/categoria/${category.slug}` as Route} className="brand-pill">
@@ -231,23 +181,32 @@ export default async function HomePage() {
             </Link>
           ))}
         </div>
-        <Link href="/categorias" className="inline-flex text-sm font-semibold text-[var(--brand-brick)] hover:text-[var(--brand-orange)]">
+        <Link href="/categorias" className="inline-flex text-sm font-semibold text-[var(--brand-brick)] hover:text-[#65231f]">
           Ver todas as categorias →
         </Link>
       </section>
 
       <section className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
-        <div className="brand-dark-panel overflow-hidden rounded-3xl p-6 text-white sm:p-10">
-          <div className="h-1 w-16 rounded-full bg-[var(--brand-orange)]" />
-          <div className="mt-6 grid gap-6 lg:grid-cols-[1.2fr_0.8fr] lg:items-center">
-            <div>
-              <p className="text-xs font-bold uppercase tracking-[0.2em] text-[var(--brand-orange)]">Para empresas</p>
-              <h2 className="mt-3 text-2xl font-extrabold sm:text-3xl">Sua empresa está contratando?</h2>
-              <p className="mt-3 max-w-2xl text-sm leading-7 text-white/86 sm:text-base">
-                Divulgue oportunidades para candidatos de São Luís, Região Metropolitana e Maranhão.
-              </p>
+        <div className="overflow-hidden rounded-3xl bg-[var(--brand-brick)] text-white shadow-[0_28px_70px_-36px_rgba(123,44,40,0.45)]">
+          <div className="grid gap-6 p-6 sm:p-8 lg:grid-cols-[1fr_auto] lg:items-center lg:p-10">
+            <div className="flex items-start gap-5">
+              <Image
+                src="/logo.png"
+                alt=""
+                width={88}
+                height={88}
+                aria-hidden
+                className="hidden h-20 w-20 shrink-0 object-contain sm:block"
+              />
+              <div>
+                <p className="text-xs font-bold uppercase tracking-[0.2em] text-white/80">Para empresas</p>
+                <h2 className="mt-2 text-2xl font-extrabold sm:text-3xl">Sua empresa está contratando?</h2>
+                <p className="mt-3 max-w-2xl text-sm leading-7 text-white/88 sm:text-base">
+                  Divulgue oportunidades para candidatos de São Luís, Região Metropolitana e Maranhão. Rápido, fácil e gratuito.
+                </p>
+              </div>
             </div>
-            <Button asChild size="lg" variant="secondary" className="w-full justify-center lg:w-auto">
+            <Button asChild size="lg" variant="inverse" className="w-full justify-center lg:w-auto">
               <Link href="/anunciar-vaga">
                 Publicar uma vaga
                 <ArrowRight className="ml-2 h-4 w-4" />

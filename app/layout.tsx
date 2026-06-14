@@ -51,7 +51,7 @@ export async function generateMetadata(): Promise<Metadata> {
       apple: [settings.logoCompactUrl || "/logo.png"]
     },
     other: {
-      "theme-color": "#1F2B24"
+      "theme-color": "#7B2C28"
     },
     verification: settings.google.searchConsoleVerification
       ? {

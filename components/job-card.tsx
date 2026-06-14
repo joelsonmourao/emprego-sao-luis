@@ -51,15 +51,15 @@ export function JobCard({ job }: JobCardProps) {
   const cardSummary = buildCardSummary(job);
 
   return (
-    <article className="es-card-hover group flex h-full flex-col overflow-hidden rounded-2xl border border-[var(--brand-line)] bg-white shadow-[0_18px_48px_-30px_rgba(26,26,26,0.22)]">
-      <div className="h-2 bg-[linear-gradient(90deg,var(--brand-orange)_0%,var(--brand-brick)_55%,var(--brand-green)_100%)]" />
+    <article className="es-card-hover group flex h-full flex-col overflow-hidden rounded-2xl border border-[rgba(123,44,40,0.12)] bg-white shadow-[0_18px_48px_-30px_rgba(26,26,26,0.18)]">
+      <div className="h-1 bg-[var(--brand-brick)]" />
       <div className="flex flex-1 flex-col p-5 sm:p-6">
         <div className="flex flex-wrap gap-2">
-          <span className="rounded-full bg-[var(--brand-mist)] px-3 py-1 text-[11px] font-bold uppercase tracking-wide text-[var(--brand-green)]">
+          <span className="rounded-full border border-[rgba(123,44,40,0.14)] bg-[var(--brand-beige)] px-3 py-1 text-[11px] font-bold uppercase tracking-wide text-[var(--brand-brick)]">
             {getJobBadgeLabel(job)}
           </span>
           {job.locationType ? (
-            <span className="rounded-full bg-[rgba(242,140,27,0.12)] px-3 py-1 text-[11px] font-semibold text-[var(--brand-orange)]">
+            <span className="rounded-full border border-[rgba(123,44,40,0.1)] bg-white px-3 py-1 text-[11px] font-semibold text-[var(--brand-text-secondary)]">
               {job.locationType === "REMOTE" ? "Remoto" : job.locationType === "HYBRID" ? "Híbrido" : "Presencial"}
             </span>
           ) : null}
@@ -83,7 +83,7 @@ export function JobCard({ job }: JobCardProps) {
             )}
           </p>
           <p className="inline-flex items-center gap-2">
-            <MapPin className="h-4 w-4 shrink-0 text-[var(--brand-orange)]" />
+            <MapPin className="h-4 w-4 shrink-0 text-[var(--brand-brick)]" />
             <TrackedLink href={getCityJobsPath(job.city.slug)} eventName="city_click" entityType="city" entitySlug={job.city.slug}>
               {job.city.name}, {job.state.code}
             </TrackedLink>
@@ -97,7 +97,7 @@ export function JobCard({ job }: JobCardProps) {
             <Clock3 className="h-3.5 w-3.5" />
             {job.publishedAt ? formatDate(job.publishedAt) : "Recente"}
           </span>
-          <Button asChild size="sm" variant="secondary" className="gap-1.5">
+          <Button asChild size="sm" className="gap-1.5">
             <TrackedLink href={`/vagas/${job.slug}`} eventName="job_click" entityType="job" entitySlug={job.slug} aria-label={`Ver vaga ${job.title}`}>
               Ver vaga
               <ArrowUpRight className="h-4 w-4" />

@@ -95,7 +95,7 @@ export function HomeSearchForm({
       action={action}
       className={
         isHomeVariant
-          ? "w-full rounded-2xl border border-white/20 bg-white p-4 shadow-[0_24px_60px_-32px_rgba(26,26,26,0.35)] sm:rounded-3xl sm:p-5"
+          ? "w-full rounded-2xl border border-[rgba(123,44,40,0.14)] bg-white p-4 shadow-[0_20px_50px_-32px_rgba(123,44,40,0.18)] sm:rounded-3xl sm:p-5"
           : "rounded-[1.85rem] border border-white/60 bg-white/99 p-3.5 shadow-[0_30px_100px_-35px_rgba(26,43,76,0.24)] sm:rounded-[2.15rem] sm:p-4"
       }
     >
@@ -110,7 +110,7 @@ export function HomeSearchForm({
       >
         <label className={fieldClass}>
           <span className="sr-only">Cargo, empresa ou palavra-chave</span>
-          <Search className="h-5 w-5 shrink-0 text-[var(--brand-orange)]" />
+          <Search className="h-5 w-5 shrink-0 text-[var(--brand-brick)]" />
           <input
             name="q"
             defaultValue={initialQuery}
@@ -166,7 +166,7 @@ export function HomeSearchForm({
         {isHomeVariant && categories.length ? (
           <label className={fieldClass}>
             <span className="sr-only">Categoria ou área</span>
-            <Briefcase className="h-5 w-5 shrink-0 text-[var(--brand-orange)]" />
+            <Briefcase className="h-5 w-5 shrink-0 text-[var(--brand-brick)]" />
             <select
               name="categoria"
               value={selectedCategory}
@@ -186,7 +186,6 @@ export function HomeSearchForm({
 
         <Button
           type="submit"
-          variant="secondary"
           className={
             isHomeVariant
               ? "h-12 w-full rounded-2xl px-6 text-sm font-bold xl:w-auto xl:min-w-[9.5rem]"
@@ -205,13 +204,13 @@ export function HomeSearchForm({
 
       <div className="mt-3 flex flex-col gap-2 text-[11px] text-[var(--brand-text-secondary)] md:mt-4 md:flex-row md:items-center md:justify-between md:text-xs">
         <p className="inline-flex items-start gap-2 leading-5">
-          <SlidersHorizontal className="h-4 w-4 shrink-0 text-[var(--brand-orange)]" />
+          <SlidersHorizontal className="h-4 w-4 shrink-0 text-[var(--brand-brick)]" />
           {helperText ?? (isHomeVariant ? "Busque por cargo, cidade e categoria no Maranhão." : "Use cargo, cidade e estado para chegar mais rápido nas vagas.")}
         </p>
         <p>
           <Link
             href={footerLinkHref as never}
-            className="font-semibold text-[var(--brand-brick)] underline-offset-4 hover:text-[var(--brand-orange)] hover:underline"
+            className="font-semibold text-[var(--brand-brick)] underline-offset-4 hover:text-[#65231f] hover:underline"
           >
             {footerLinkLabel}
           </Link>

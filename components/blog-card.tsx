@@ -20,9 +20,9 @@ type BlogCardProps = {
 export function BlogCard({ post, featured = false }: BlogCardProps) {
   return (
     <article
-      className={`es-card-hover group flex h-full flex-col overflow-hidden rounded-2xl border border-[var(--brand-line)] bg-white shadow-[0_18px_50px_-36px_rgba(26,26,26,0.2)] ${featured ? "lg:flex-row lg:items-stretch" : ""}`}
+      className={`es-card-hover group flex h-full flex-col overflow-hidden rounded-2xl border border-[rgba(123,44,40,0.12)] bg-white shadow-[0_18px_50px_-36px_rgba(26,26,26,0.16)] ${featured ? "lg:flex-row lg:items-stretch" : ""}`}
     >
-      <div className={`relative overflow-hidden bg-[var(--brand-mist)] ${featured ? "lg:w-[42%]" : "aspect-[16/9]"}`}>
+      <div className={`relative overflow-hidden bg-[var(--brand-beige)] ${featured ? "lg:w-[42%]" : "aspect-[16/9]"}`}>
         <BlogCoverImage
           slug={post.slug}
           title={post.title}
@@ -35,7 +35,7 @@ export function BlogCard({ post, featured = false }: BlogCardProps) {
 
       <div className={`flex flex-1 flex-col p-5 sm:p-6 ${featured ? "lg:justify-center" : ""}`}>
         <div className="flex flex-wrap items-center gap-2 text-xs">
-          <span className="rounded-full bg-[rgba(242,140,27,0.12)] px-3 py-1 font-bold uppercase tracking-wide text-[var(--brand-orange)]">
+          <span className="rounded-full border border-[rgba(123,44,40,0.14)] bg-[var(--brand-beige)] px-3 py-1 font-bold uppercase tracking-wide text-[var(--brand-brick)]">
             {post.category.name}
           </span>
           <span className="inline-flex items-center gap-1.5 text-[var(--brand-text-secondary)]">
@@ -60,7 +60,7 @@ export function BlogCard({ post, featured = false }: BlogCardProps) {
           entityType="post"
           entitySlug={post.slug}
           aria-label={`Ler artigo: ${post.title}`}
-          className="mt-5 inline-flex items-center gap-2 text-sm font-bold text-[var(--brand-brick)] transition hover:text-[var(--brand-orange)]"
+          className="mt-5 inline-flex items-center gap-2 text-sm font-bold text-[var(--brand-brick)] transition hover:text-[#65231f]"
         >
           Ler artigo completo
           <ArrowUpRight className="h-4 w-4" />
