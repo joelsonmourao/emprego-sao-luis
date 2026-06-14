@@ -27,7 +27,7 @@ export type SiteBranding = z.infer<typeof siteBrandingSchema>;
 export const defaultSiteBranding: SiteBranding = {
   siteName: "Emprego São Luís",
   shortDescription: "Vagas de emprego em São Luís e Maranhão.",
-  logoUrl: "/emprego-logo-horizontal.svg",
+  logoUrl: "/logo-horizontal.png",
   faviconUrl: "/favicon.ico",
   defaultOgImageUrl: "/og-image.jpg",
   email: "",

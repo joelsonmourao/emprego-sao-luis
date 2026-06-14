@@ -14,6 +14,7 @@ type JobsSearchIndexingInput = {
   query?: string;
   stateSlug?: string;
   citySlug?: string;
+  categorySlug?: string;
   stateCode?: string;
   companySlug?: string;
   order?: "relevance" | "date";
@@ -96,6 +97,7 @@ export function buildJobsSearchCanonicalPath(input: JobsSearchIndexingInput) {
   if (query) params.set("q", query);
   if (input.stateSlug) params.set("estado", input.stateSlug);
   if (input.citySlug) params.set("cidade", input.citySlug);
+  if (input.categorySlug) params.set("categoria", input.categorySlug);
   if (input.companySlug) params.set("empresa", input.companySlug);
   if (!defaultOrder) params.set("order", input.order ?? "relevance");
   if (!firstPage) params.set("page", String(input.page));

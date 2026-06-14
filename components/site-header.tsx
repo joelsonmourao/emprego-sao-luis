@@ -17,6 +17,7 @@ const navItems = [
 export async function SiteHeader() {
   return (
     <header className="z-40 border-b border-white/10 bg-[var(--brand-green)] text-white shadow-[0_12px_40px_-24px_rgba(26,26,26,0.55)] md:sticky md:top-0">
+      <div className="h-1 bg-gradient-to-r from-[var(--brand-brick)] via-[var(--brand-orange)] to-[var(--brand-brick)]" />
       <div className="border-b border-white/8 bg-[linear-gradient(90deg,#1f2b24_0%,#243328_55%,#1a1a1a_100%)]">
         <div className="mx-auto flex min-h-[34px] max-w-7xl items-center justify-between gap-3 px-4 py-1.5 text-[11px] text-white/80 sm:px-6 lg:px-8">
           <p className="line-clamp-1 font-medium">Portal de vagas em São Luís e Maranhão · Gratuito para candidatos</p>
@@ -33,7 +34,7 @@ export async function SiteHeader() {
         </div>
       </div>
 
-      <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-3 sm:px-6 lg:px-8">
+      <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-3.5 sm:px-6 lg:px-8">
         <SiteLogo className="min-w-0 shrink" withTagline={false} priority />
 
         <nav className="hidden items-center gap-1 lg:flex" aria-label="Menu principal">

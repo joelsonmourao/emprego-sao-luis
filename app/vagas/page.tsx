@@ -38,6 +38,7 @@ const getJobsAndGeoForSearch = cache(
         query: parsed.q,
         stateSlug: parsed.estado,
         citySlug: parsed.cidade,
+        categorySlug: parsed.categoria,
         companySlug: parsed.empresa,
         order: parsed.order,
         page: parsed.page
@@ -58,6 +59,7 @@ export async function generateMetadata({
     q: typeof raw.q === "string" ? raw.q : typeof raw.query === "string" ? raw.query : undefined,
     estado: typeof raw.estado === "string" ? raw.estado : typeof raw.state === "string" ? raw.state : undefined,
     cidade: typeof raw.cidade === "string" ? raw.cidade : typeof raw.city === "string" ? raw.city : undefined,
+    categoria: typeof raw.categoria === "string" ? raw.categoria : undefined,
     empresa: typeof raw.empresa === "string" ? raw.empresa : undefined,
     order: typeof raw.order === "string" ? raw.order : undefined,
     page: typeof raw.page === "string" ? raw.page : undefined
@@ -71,6 +73,7 @@ export async function generateMetadata({
     !parsed.q &&
     !parsed.estado &&
     !parsed.cidade &&
+    !parsed.categoria &&
     !parsed.empresa &&
     (parsed.page ?? 1) === 1 &&
     (parsed.order ?? "relevance") === "relevance";
@@ -106,6 +109,7 @@ export async function generateMetadata({
       query: parsed.q,
       stateSlug: parsed.estado,
       citySlug: parsed.cidade,
+      categorySlug: parsed.categoria,
       stateCode: selectedState?.code,
       companySlug: parsed.empresa,
       order: parsed.order,
@@ -127,6 +131,7 @@ export default async function JobsPage({
     q: typeof raw.q === "string" ? raw.q : typeof raw.query === "string" ? raw.query : undefined,
     estado: typeof raw.estado === "string" ? raw.estado : typeof raw.state === "string" ? raw.state : undefined,
     cidade: typeof raw.cidade === "string" ? raw.cidade : typeof raw.city === "string" ? raw.city : undefined,
+    categoria: typeof raw.categoria === "string" ? raw.categoria : undefined,
     empresa: typeof raw.empresa === "string" ? raw.empresa : undefined,
     order: typeof raw.order === "string" ? raw.order : undefined,
     page: typeof raw.page === "string" ? raw.page : undefined
@@ -177,6 +182,7 @@ export default async function JobsPage({
     if (parsed.q) params.set("q", parsed.q);
     if (parsed.estado) params.set("estado", parsed.estado);
     if (parsed.cidade) params.set("cidade", parsed.cidade);
+    if (parsed.categoria) params.set("categoria", parsed.categoria);
     if (parsed.empresa) params.set("empresa", parsed.empresa);
     if (parsed.order) params.set("order", parsed.order);
     if (pageNumber > 1) params.set("page", String(pageNumber));
@@ -189,6 +195,7 @@ export default async function JobsPage({
     if (parsed.q) params.set("q", parsed.q);
     if (parsed.estado) params.set("estado", parsed.estado);
     if (parsed.cidade) params.set("cidade", parsed.cidade);
+    if (parsed.categoria) params.set("categoria", parsed.categoria);
     if (parsed.empresa) params.set("empresa", parsed.empresa);
     params.set("order", order);
     const query = params.toString();

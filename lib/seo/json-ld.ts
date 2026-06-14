@@ -17,7 +17,7 @@ export function buildOrganizationJsonLd(input?: { name?: string; logoUrl?: strin
     "@type": "Organization",
     name: input?.name ?? siteConfig.name,
     url: absoluteUrl("/"),
-    logo: absoluteUrl(input?.logoUrl ?? "/emprego-logo-mark.svg")
+    logo: absoluteUrl(input?.logoUrl ?? "/logo-horizontal.png")
   };
 }
 

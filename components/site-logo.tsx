@@ -4,9 +4,7 @@ import { BrandLogo } from "@/components/brand-logo";
 import { cn } from "@/lib/utils";
 import { getSiteSettings } from "@/lib/site-settings";
 
-const BRAND_LOGO_PATHS = new Set([
-  "/logo.png",
-  "/logo-horizontal.png",
+const BRAND_SVG_PATHS = new Set([
   "/brand-logo.svg",
   "/brand-mark.svg",
   "/logo.svg",
@@ -14,10 +12,14 @@ const BRAND_LOGO_PATHS = new Set([
   "/emprego-logo-mark.svg"
 ]);
 
+function isRasterLogo(path: string) {
+  return /\.(png|jpe?g|webp|avif)$/i.test(path);
+}
+
 export async function SiteLogo({
   className,
   compact = false,
-  withTagline = true,
+  withTagline = false,
   priority = false
 }: {
   className?: string;
@@ -27,31 +29,45 @@ export async function SiteLogo({
 }) {
   const settings = await getSiteSettings();
   const logoPath = compact ? settings.logoCompactUrl : settings.logoUrl;
-  const useBrandComponent = BRAND_LOGO_PATHS.has(logoPath) || logoPath.includes("jovem") || logoPath.includes("aprendiz");
+  const useRasterLogo = isRasterLogo(logoPath);
+  const useBrandSvg = !useRasterLogo && BRAND_SVG_PATHS.has(logoPath);
 
   return (
     <Link href="/" className={cn("flex min-w-0 items-center gap-2.5 sm:gap-3", className)} aria-label={settings.siteName}>
-      {useBrandComponent ? (
-        <>
-          <BrandLogo variant={compact ? "mark" : "horizontal"} />
-          {compact && withTagline ? (
-            <div className="hidden min-w-0 sm:block">
-              <div className="text-[11px] font-semibold uppercase tracking-[0.32em] text-[var(--brand-orange)]">Maranhão</div>
-              <div className="text-base font-black tracking-tight text-white">{settings.siteName}</div>
-            </div>
-          ) : null}
-        </>
+      {useRasterLogo ? (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
+          src={logoPath}
+          alt={settings.siteName}
+          width={compact ? 56 : 320}
+          height={compact ? 56 : 80}
+          fetchPriority={priority ? "high" : undefined}
+          className={
+            compact
+              ? "h-11 w-11 object-contain sm:h-12 sm:w-12"
+              : "h-11 w-auto max-w-[min(100%,18rem)] object-contain sm:h-14 sm:max-w-[20rem] lg:h-16 lg:max-w-[22rem]"
+          }
+        />
+      ) : useBrandSvg ? (
+        <BrandLogo variant={compact ? "mark" : "horizontal"} className={compact ? "h-11 w-11 sm:h-12 sm:w-12" : "h-11 sm:h-14 lg:h-16"} />
       ) : (
         // eslint-disable-next-line @next/next/no-img-element
         <img
           src={logoPath}
           alt={settings.siteName}
-          width={compact ? 52 : 260}
-          height={compact ? 52 : 68}
+          width={compact ? 56 : 320}
+          height={compact ? 56 : 80}
           fetchPriority={priority ? "high" : undefined}
-          className={compact ? "h-12 w-12 object-contain" : "h-9 w-auto max-w-full sm:h-12 lg:h-14"}
+          className={
+            compact
+              ? "h-11 w-11 object-contain sm:h-12 sm:w-12"
+              : "h-11 w-auto max-w-[min(100%,18rem)] object-contain sm:h-14 sm:max-w-[20rem] lg:h-16 lg:max-w-[22rem]"
+          }
         />
       )}
+      {withTagline && !compact ? (
+        <span className="hidden text-sm font-bold text-white/90 lg:inline">{settings.siteName}</span>
+      ) : null}
     </Link>
   );
 }

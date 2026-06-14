@@ -182,6 +182,32 @@ h4 {
   color: var(--brand-orange);
 }
 
+.brand-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  border-radius: 9999px;
+  border: 1px solid rgba(123, 44, 40, 0.14);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(250, 248, 244, 0.98));
+  padding: 0.55rem 0.95rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--brand-charcoal);
+  box-shadow: 0 10px 28px -22px rgba(26, 26, 26, 0.2);
+  transition:
+    transform 160ms ease,
+    border-color 160ms ease,
+    color 160ms ease,
+    box-shadow 160ms ease;
+}
+
+.brand-pill:hover {
+  transform: translateY(-1px);
+  border-color: rgba(242, 140, 27, 0.35);
+  color: var(--brand-brick);
+  box-shadow: 0 14px 32px -20px rgba(123, 44, 40, 0.22);
+}
+
 .es-card-hover {
   transition:
     transform 180ms ease,

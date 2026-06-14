@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
-import { MapPinned, Search, SlidersHorizontal } from "lucide-react";
+import { Briefcase, MapPinned, Search, SlidersHorizontal } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 
@@ -18,8 +18,16 @@ type SearchState = {
   }>;
 };
 
+type SearchCategory = {
+  slug: string;
+  name: string;
+};
+
 export function HomeSearchForm({
   states,
+  variant = "full",
+  categories = [],
+  fixedStateSlug = "maranhao",
   action = "/vagas",
   submitLabel = "Ver vagas",
   helperText,
@@ -28,9 +36,13 @@ export function HomeSearchForm({
   initialQuery = "",
   initialState = "",
   initialCity = "",
+  initialCategory = "",
   hiddenFields
 }: {
   states: SearchState[];
+  variant?: "full" | "home";
+  categories?: SearchCategory[];
+  fixedStateSlug?: string;
   action?: string;
   submitLabel?: string;
   helperText?: string;
@@ -39,21 +51,33 @@ export function HomeSearchForm({
   initialQuery?: string;
   initialState?: string;
   initialCity?: string;
+  initialCategory?: string;
   hiddenFields?: Record<string, string | undefined>;
 }) {
+  const isHomeVariant = variant === "home";
+
   const stateMap = useMemo(() => new Map(states.map((state) => [state.slug, state])), [states]);
   const stateCodeMap = useMemo(() => new Map(states.map((state) => [state.code.toLowerCase(), state.slug])), [states]);
   const normalizedInitialState = useMemo(() => {
+    if (isHomeVariant) return fixedStateSlug;
     const candidate = initialState.trim();
     if (!candidate) return "";
     if (stateMap.has(candidate)) return candidate;
     return stateCodeMap.get(candidate.toLowerCase()) ?? "";
-  }, [initialState, stateCodeMap, stateMap]);
+  }, [fixedStateSlug, initialState, isHomeVariant, stateCodeMap, stateMap]);
+
   const [selectedState, setSelectedState] = useState(normalizedInitialState);
   const [selectedCity, setSelectedCity] = useState(initialCity);
+  const [selectedCategory, setSelectedCategory] = useState(initialCategory);
 
   const currentState = stateMap.get(selectedState) ?? null;
   const availableCities = currentState?.cities ?? [];
+
+  useEffect(() => {
+    if (isHomeVariant && fixedStateSlug) {
+      setSelectedState(fixedStateSlug);
+    }
+  }, [fixedStateSlug, isHomeVariant]);
 
   useEffect(() => {
     const hasSelectedCityInState = availableCities.some((city) => city.slug === selectedCity);
@@ -62,55 +86,75 @@ export function HomeSearchForm({
     }
   }, [availableCities, selectedCity]);
 
+  const fieldClass =
+    "flex w-full min-w-0 items-center gap-3 rounded-2xl border border-[var(--brand-line)] bg-white px-4";
+  const inputClass = "h-12 w-full min-w-0 bg-transparent text-sm text-[var(--brand-charcoal)] outline-none placeholder:text-[var(--brand-text-secondary)]";
+
   return (
     <form
       action={action}
-      className="rounded-[1.85rem] border border-white/60 bg-white/99 p-3.5 shadow-[0_30px_100px_-35px_rgba(26,43,76,0.24)] sm:rounded-[2.15rem] sm:p-4"
+      className={
+        isHomeVariant
+          ? "w-full rounded-2xl border border-white/20 bg-white p-4 shadow-[0_24px_60px_-32px_rgba(26,26,26,0.35)] sm:rounded-3xl sm:p-5"
+          : "rounded-[1.85rem] border border-white/60 bg-white/99 p-3.5 shadow-[0_30px_100px_-35px_rgba(26,43,76,0.24)] sm:rounded-[2.15rem] sm:p-4"
+      }
     >
-      <div className="grid grid-cols-1 gap-2.5 lg:grid-cols-[1.8fr_1fr_1fr_auto]">
-        <label className="flex items-center gap-3 rounded-[1.15rem] border border-[var(--brand-line)] bg-[linear-gradient(180deg,rgba(255,255,255,0.99),rgba(244,247,246,0.98))] px-4 sm:rounded-2xl">
+      {isHomeVariant ? <input type="hidden" name="estado" value={fixedStateSlug} /> : null}
+
+      <div
+        className={
+          isHomeVariant
+            ? "grid w-full grid-cols-1 gap-3 sm:gap-3.5 lg:grid-cols-2 xl:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)_minmax(0,1fr)_auto]"
+            : "grid grid-cols-1 gap-2.5 lg:grid-cols-[1.8fr_1fr_1fr_auto]"
+        }
+      >
+        <label className={fieldClass}>
           <span className="sr-only">Cargo, empresa ou palavra-chave</span>
-          <Search className="h-5 w-5 text-[var(--brand-orange)]" />
+          <Search className="h-5 w-5 shrink-0 text-[var(--brand-orange)]" />
           <input
             name="q"
             defaultValue={initialQuery}
-            placeholder="Cargo, empresa ou palavra-chave"
+            placeholder="Cargo ou palavra-chave"
             aria-label="Cargo, empresa ou palavra-chave"
-            className="h-11 w-full bg-transparent text-sm text-[var(--brand-navy)] outline-none placeholder:text-[var(--brand-text-secondary)] sm:h-12"
+            className={inputClass}
           />
         </label>
 
-        <label className="flex items-center gap-3 rounded-[1.15rem] border border-[var(--brand-line)] bg-[linear-gradient(180deg,rgba(255,255,255,0.99),rgba(244,247,246,0.98))] px-4 sm:rounded-2xl">
-          <span className="sr-only">Estado</span>
-          <MapPinned className="h-5 w-5 text-[var(--brand-blue)]" />
-          <select
-            name="estado"
-            value={selectedState}
-            onChange={(event) => setSelectedState(event.target.value)}
-            aria-label="Estado"
-            className="h-11 w-full bg-transparent text-sm text-[var(--brand-navy)] outline-none sm:h-12"
-          >
-            <option value="">Todos os estados</option>
-            {states.map((state) => (
-              <option key={state.id} value={state.slug}>
-                {state.name} ({state.code})
-              </option>
-            ))}
-          </select>
-        </label>
+        {!isHomeVariant ? (
+          <label className={fieldClass}>
+            <span className="sr-only">Estado</span>
+            <MapPinned className="h-5 w-5 shrink-0 text-[var(--brand-brick)]" />
+            <select
+              name="estado"
+              value={selectedState}
+              onChange={(event) => setSelectedState(event.target.value)}
+              aria-label="Estado"
+              className={inputClass}
+            >
+              <option value="">Todos os estados</option>
+              {states.map((state) => (
+                <option key={state.id} value={state.slug}>
+                  {state.name} ({state.code})
+                </option>
+              ))}
+            </select>
+          </label>
+        ) : null}
 
-        <label className="flex items-center gap-3 rounded-[1.15rem] border border-[var(--brand-line)] bg-[linear-gradient(180deg,rgba(255,255,255,0.99),rgba(244,247,246,0.98))] px-4 sm:rounded-2xl">
+        <label className={fieldClass}>
           <span className="sr-only">Cidade</span>
-          <MapPinned className="h-5 w-5 text-[var(--brand-blue)]" />
+          <MapPinned className="h-5 w-5 shrink-0 text-[var(--brand-brick)]" />
           <select
             name="cidade"
             value={selectedCity}
             onChange={(event) => setSelectedCity(event.target.value)}
             aria-label="Cidade"
-            className="h-11 w-full bg-transparent text-sm text-[var(--brand-navy)] outline-none sm:h-12"
-            disabled={!selectedState}
+            className={inputClass}
+            disabled={!isHomeVariant && !selectedState}
           >
-            <option value="">{selectedState ? "Todas as cidades" : "Selecione um estado primeiro"}</option>
+            <option value="">
+              {isHomeVariant ? "Todas as cidades" : selectedState ? "Todas as cidades" : "Selecione um estado primeiro"}
+            </option>
             {availableCities.map((city) => (
               <option key={city.id} value={city.slug}>
                 {city.name}
@@ -119,7 +163,36 @@ export function HomeSearchForm({
           </select>
         </label>
 
-        <Button type="submit" className="h-11 rounded-[1.15rem] sm:h-12 sm:rounded-2xl">
+        {isHomeVariant && categories.length ? (
+          <label className={fieldClass}>
+            <span className="sr-only">Categoria ou área</span>
+            <Briefcase className="h-5 w-5 shrink-0 text-[var(--brand-orange)]" />
+            <select
+              name="categoria"
+              value={selectedCategory}
+              onChange={(event) => setSelectedCategory(event.target.value)}
+              aria-label="Categoria ou área"
+              className={inputClass}
+            >
+              <option value="">Todas as categorias</option>
+              {categories.map((category) => (
+                <option key={category.slug} value={category.slug}>
+                  {category.name}
+                </option>
+              ))}
+            </select>
+          </label>
+        ) : null}
+
+        <Button
+          type="submit"
+          variant="secondary"
+          className={
+            isHomeVariant
+              ? "h-12 w-full rounded-2xl px-6 text-sm font-bold xl:w-auto xl:min-w-[9.5rem]"
+              : "h-11 rounded-[1.15rem] sm:h-12 sm:rounded-2xl"
+          }
+        >
           {submitLabel}
         </Button>
       </div>
@@ -132,11 +205,14 @@ export function HomeSearchForm({
 
       <div className="mt-3 flex flex-col gap-2 text-[11px] text-[var(--brand-text-secondary)] md:mt-4 md:flex-row md:items-center md:justify-between md:text-xs">
         <p className="inline-flex items-start gap-2 leading-5">
-          <SlidersHorizontal className="h-4 w-4 text-[var(--brand-orange)]" />
-          {helperText ?? "Use cargo, cidade e estado para chegar mais rápido nas vagas."}
+          <SlidersHorizontal className="h-4 w-4 shrink-0 text-[var(--brand-orange)]" />
+          {helperText ?? (isHomeVariant ? "Busque por cargo, cidade e categoria no Maranhão." : "Use cargo, cidade e estado para chegar mais rápido nas vagas.")}
         </p>
         <p>
-          <Link href={footerLinkHref as never} className="font-semibold text-[var(--brand-blue)] underline-offset-4 hover:text-[var(--brand-orange)] hover:underline">
+          <Link
+            href={footerLinkHref as never}
+            className="font-semibold text-[var(--brand-brick)] underline-offset-4 hover:text-[var(--brand-orange)] hover:underline"
+          >
             {footerLinkLabel}
           </Link>
         </p>
