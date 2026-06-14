@@ -61,7 +61,7 @@ export function ContactForm() {
           <input
             required
             name="name"
-            className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 outline-none ring-[var(--brand-orange)] focus:ring-2"
+            className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 outline-none ring-[var(--brand-brick)] focus:ring-2"
             placeholder="Seu nome"
           />
         </label>
@@ -71,7 +71,7 @@ export function ContactForm() {
             required
             type="email"
             name="email"
-            className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 outline-none ring-[var(--brand-orange)] focus:ring-2"
+            className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 outline-none ring-[var(--brand-brick)] focus:ring-2"
             placeholder="seu@email.com"
           />
         </label>
@@ -81,7 +81,7 @@ export function ContactForm() {
         <input
           required
           name="subject"
-          className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 outline-none ring-[var(--brand-orange)] focus:ring-2"
+          className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 outline-none ring-[var(--brand-brick)] focus:ring-2"
           placeholder="Sobre o que você quer falar?"
         />
       </label>
@@ -91,7 +91,7 @@ export function ContactForm() {
           required
           name="message"
           rows={6}
-          className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 outline-none ring-[var(--brand-orange)] focus:ring-2"
+          className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 outline-none ring-[var(--brand-brick)] focus:ring-2"
           placeholder="Escreva sua mensagem com o máximo de detalhes possível."
         />
       </label>

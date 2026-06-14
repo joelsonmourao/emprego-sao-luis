@@ -189,7 +189,7 @@ export function JobApplyMobileBar({ applyUrl, jobSlug, jobTitle }: JobApplyMobil
       <div className="fixed inset-x-0 bottom-0 z-40 border-t border-[var(--brand-line)] bg-white/98 shadow-[0_-12px_40px_-20px_rgba(26,26,26,0.25)] backdrop-blur lg:hidden">
         <div className="mx-auto flex max-w-7xl items-center gap-3 px-4 py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
           <div className="min-w-0 flex-1">
-            <p className="text-[10px] font-bold uppercase tracking-wide text-[var(--brand-orange)]">Candidatura</p>
+            <p className="text-[10px] font-bold uppercase tracking-wide text-[var(--brand-brick)]">Candidatura</p>
             <p className="truncate text-sm font-bold text-[var(--brand-charcoal)]">{jobTitle}</p>
           </div>
           <div className="shrink-0">

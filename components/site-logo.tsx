@@ -4,7 +4,7 @@ import { cn } from "@/lib/utils";
 import { getSiteSettings } from "@/lib/site-settings";
 
 const FALLBACK_LOGO_HORIZONTAL = "/logo-horizontal.png";
-const FALLBACK_LOGO_MARK = "/logo.png";
+const FALLBACK_LOGO_MARK = "/icon.png";
 
 function isRasterLogo(path: string) {
   return /\.(png|jpe?g|webp|avif)$/i.test(path);
@@ -49,15 +49,15 @@ export async function SiteLogo({
       <img
         src={logoPath}
         alt={settings.siteName}
-        width={compact ? 56 : 360}
-        height={compact ? 56 : 88}
+        width={compact ? 96 : 527}
+        height={compact ? 96 : 335}
         fetchPriority={priority ? "high" : undefined}
         className={
           compact
-            ? "h-11 w-11 object-contain sm:h-12 sm:w-12"
+            ? "h-12 w-12 object-contain sm:h-14 sm:w-14"
             : inverted
-              ? "h-12 w-auto max-w-[min(100%,20rem)] object-contain sm:h-14 lg:h-[4.5rem] lg:max-w-[24rem]"
-              : "h-12 w-auto max-w-[min(100%,20rem)] object-contain sm:h-14 lg:h-[4.5rem] lg:max-w-[24rem]"
+              ? "h-14 w-auto max-w-[min(100%,18rem)] object-contain sm:h-16 lg:h-20 lg:max-w-[22rem]"
+              : "h-14 w-auto max-w-[min(100%,18rem)] object-contain sm:h-16 lg:h-20 lg:max-w-[22rem]"
         }
       />
       {withTagline && !compact ? (

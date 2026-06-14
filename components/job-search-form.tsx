@@ -79,7 +79,7 @@ export function JobSearchForm({
       <div className="grid gap-2.5 grid-cols-1 lg:grid-cols-[1.8fr_1fr_1fr_auto]">
         <label className="flex items-center gap-3 rounded-[1.15rem] border border-[var(--brand-line)] bg-[linear-gradient(180deg,rgba(255,255,255,0.99),rgba(244,247,246,0.98))] px-4 sm:rounded-2xl">
           <span className="sr-only">Cargo, empresa ou palavra-chave</span>
-          <Search className="h-5 w-5 text-[var(--brand-orange)]" />
+          <Search className="h-5 w-5 text-[var(--brand-brick)]" />
           <input
             name="q"
             defaultValue={initialQuery}
@@ -134,11 +134,11 @@ export function JobSearchForm({
 
       <div className="mt-3 flex flex-col gap-2 text-[11px] text-[var(--brand-text-secondary)] md:mt-4 md:flex-row md:items-center md:justify-between md:text-xs">
         <p className="inline-flex items-start gap-2 leading-5">
-          <SlidersHorizontal className="h-4 w-4 text-[var(--brand-orange)]" />
+          <SlidersHorizontal className="h-4 w-4 text-[var(--brand-brick)]" />
           {helperText}
         </p>
         <p>
-          <Link href={footerLinkHref as never} className="font-semibold text-[var(--brand-blue)] underline-offset-4 hover:text-[var(--brand-orange)] hover:underline">
+          <Link href={footerLinkHref as never} className="font-semibold text-[var(--brand-brick)] underline-offset-4 hover:text-[#65231f] hover:underline">
             {footerLinkLabel}
           </Link>
         </p>

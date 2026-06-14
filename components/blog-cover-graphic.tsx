@@ -38,7 +38,7 @@ export function BlogCoverGraphic({ title, category, slug, className }: BlogCover
       <div className="relative flex items-start justify-between gap-3">
         <div className="flex items-center gap-3">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/logo.png" alt="" aria-hidden className="h-12 w-12 shrink-0 object-contain" />
+          <img src="/logo-horizontal.png" alt="" aria-hidden className="h-14 w-24 shrink-0 object-contain" />
           <div>
             <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[var(--brand-brick)]">Emprego São Luís</p>
             <p className="text-xs font-semibold text-[var(--brand-text-secondary)]">Blog · Maranhão</p>

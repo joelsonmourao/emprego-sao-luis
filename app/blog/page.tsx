@@ -72,7 +72,7 @@ export default async function BlogPage({
           className={
             !categorySlug
               ? "rounded-full bg-[var(--brand-green)] px-4 py-2 text-sm font-bold text-white"
-              : "rounded-full border border-[var(--brand-line)] bg-white px-4 py-2 text-sm font-medium text-[var(--brand-text-secondary)] hover:border-[var(--brand-orange)]/35"
+              : "rounded-full border border-[var(--brand-line)] bg-white px-4 py-2 text-sm font-medium text-[var(--brand-text-secondary)] hover:border-[var(--brand-brick)]/35"
           }
         >
           Todos
@@ -84,7 +84,7 @@ export default async function BlogPage({
             className={
               categorySlug === category.slug
                 ? "rounded-full bg-[var(--brand-green)] px-4 py-2 text-sm font-bold text-white"
-                : "rounded-full border border-[var(--brand-line)] bg-white px-4 py-2 text-sm font-medium text-[var(--brand-text-secondary)] hover:border-[var(--brand-orange)]/35"
+                : "rounded-full border border-[var(--brand-line)] bg-white px-4 py-2 text-sm font-medium text-[var(--brand-text-secondary)] hover:border-[var(--brand-brick)]/35"
             }
           >
             {category.name} ({category._count.posts})

@@ -1,7 +1,7 @@
 import type { Route } from "next";
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowRight, MapPinned, Newspaper } from "lucide-react";
+import { ArrowRight, BriefcaseBusiness, MapPinned, Newspaper, ShieldCheck, UsersRound } from "lucide-react";
 
 import { AdUnit } from "@/components/ads/AdUnit";
 import { BlogCard } from "@/components/blog-card";
@@ -72,12 +72,12 @@ export default async function HomePage() {
   );
 
   return (
-    <div className="pb-16">
-      <section className="border-b border-[var(--brand-line)] bg-[var(--brand-beige)]">
-        <div className="mx-auto grid max-w-7xl gap-8 px-4 py-8 sm:px-6 lg:grid-cols-[1.08fr_0.92fr] lg:items-center lg:gap-10 lg:px-8 lg:py-10">
+    <div className="pb-14">
+      <section className="border-b border-[var(--brand-line)] bg-[linear-gradient(180deg,#ffffff_0%,#faf8f4_100%)]">
+        <div className="mx-auto grid max-w-7xl gap-7 px-4 py-7 sm:px-6 lg:grid-cols-[1.02fr_0.98fr] lg:items-center lg:gap-10 lg:px-8 lg:py-8">
           <div className="min-w-0">
             <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-[var(--brand-brick)]">Emprego São Luís</p>
-            <h1 className="mt-3 text-[1.85rem] font-extrabold leading-tight text-[var(--brand-charcoal)] sm:text-4xl lg:text-[2.65rem]">
+            <h1 className="text-[2rem] font-extrabold leading-tight text-[var(--brand-green)] sm:text-4xl lg:text-[2.85rem]">
               Vagas de emprego em <span className="text-[var(--brand-brick)]">São Luís</span> e no{" "}
               <span className="text-[var(--brand-brick)]">Maranhão</span>
             </h1>
@@ -96,12 +96,13 @@ export default async function HomePage() {
               />
             </div>
 
-            <div className="mt-5 w-full min-w-0 lg:mt-6">
+            <div className="mt-5 w-full min-w-0 lg:mt-7">
               <HomeSearchForm
                 variant="home"
                 states={maranhaoStates}
                 categories={homeCategories.map((item) => ({ slug: item.slug, name: item.name }))}
                 fixedStateSlug={maranhaoState?.slug ?? "maranhao"}
+                initialCity="sao-luis"
                 action="/vagas"
                 submitLabel="Buscar vagas"
                 helperText="Pesquise por cargo, cidade e categoria no Maranhão."
@@ -112,28 +113,41 @@ export default async function HomePage() {
           </div>
 
           <div className="relative hidden min-w-0 lg:block">
-            <div className="overflow-hidden rounded-3xl border border-[rgba(123,44,40,0.18)] bg-white shadow-[0_24px_60px_-36px_rgba(123,44,40,0.28)]">
-              <div className="p-6 lg:p-8">
+            <div className="overflow-hidden rounded-3xl border border-[rgba(123,44,40,0.18)] bg-[var(--brand-beige)] shadow-[0_24px_60px_-38px_rgba(123,44,40,0.34)]">
+              <div className="flex min-h-[270px] flex-col items-center justify-center px-8 py-9">
                 <Image
                   src="/logo-horizontal.png"
                   alt="Emprego São Luís"
                   width={600}
                   height={160}
                   priority
-                  className="h-auto w-full object-contain"
+                  className="h-auto w-full max-w-[520px] object-contain"
                 />
-                <p className="mt-6 text-center text-2xl font-extrabold text-[var(--brand-brick)]">Temos vagas para você</p>
-                <p className="mx-auto mt-2 max-w-sm text-center text-sm leading-6 text-[var(--brand-text-secondary)]">
-                  Portal regional com foco em São Luís, Região Metropolitana e cidades do Maranhão.
-                </p>
               </div>
-              <div className="h-4 bg-[var(--brand-brick)]" />
+              <div className="h-5 bg-[var(--brand-brick)]" />
             </div>
           </div>
         </div>
       </section>
 
       <AdUnit className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8" />
+
+      <section className="mx-auto max-w-7xl px-4 pt-6 sm:px-6 lg:px-8">
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          {[
+            { icon: UsersRound, title: "Vagas atualizadas", text: "Oportunidades reais de empresas de confianca." },
+            { icon: ShieldCheck, title: "100% gratuito", text: "Para candidatos. Sempre." },
+            { icon: MapPinned, title: "Foco em Sao Luis", text: "Capital, Regiao Metropolitana e Maranhao." },
+            { icon: BriefcaseBusiness, title: "Conteudo de carreira", text: "Dicas simples para voce se destacar." }
+          ].map((item) => (
+            <div key={item.title} className="rounded-2xl border border-[var(--brand-line)] bg-white p-5 shadow-[0_16px_42px_-34px_rgba(26,26,26,0.2)]">
+              <item.icon className="h-8 w-8 text-[var(--brand-brick)]" />
+              <p className="mt-3 text-sm font-extrabold text-[var(--brand-charcoal)]">{item.title}</p>
+              <p className="mt-1 text-xs leading-5 text-[var(--brand-text-secondary)]">{item.text}</p>
+            </div>
+          ))}
+        </div>
+      </section>
 
       <section className="mx-auto max-w-7xl space-y-6 px-4 py-8 sm:px-6 lg:px-8">
         <SectionHeading
@@ -142,7 +156,7 @@ export default async function HomePage() {
           description="Confira vagas divulgadas em São Luís e no Maranhão com empresa, cidade e link de candidatura."
         />
         {recentJobs.length ? (
-          <div className="grid gap-5 lg:grid-cols-2">
+          <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
             {recentJobs.slice(0, 6).map((job) => (
               <JobCard key={job.id} job={job} />
             ))}
@@ -191,7 +205,7 @@ export default async function HomePage() {
           <div className="grid gap-6 p-6 sm:p-8 lg:grid-cols-[1fr_auto] lg:items-center lg:p-10">
             <div className="flex items-start gap-5">
               <Image
-                src="/logo.png"
+                src="/icon.png"
                 alt=""
                 width={88}
                 height={88}

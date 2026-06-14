@@ -228,7 +228,7 @@ export default async function JobsPage({
 
       <div className="brand-page-hero rounded-[1.5rem] border border-slate-200 px-4 py-5 shadow-[0_35px_120px_-70px_rgba(26,43,76,0.22)] sm:rounded-[2rem] sm:px-5 sm:py-6 sm:rounded-[2.2rem] sm:px-8 sm:py-8">
         <div className="space-y-3 sm:space-y-4">
-          <p className="text-[10px] font-semibold uppercase tracking-[0.24em] text-[var(--brand-orange)] sm:text-xs sm:tracking-[0.28em]">
+          <p className="text-[10px] font-semibold uppercase tracking-[0.24em] text-[var(--brand-brick)] sm:text-xs sm:tracking-[0.28em]">
             {parsed.q ? "Busca filtrada" : "Vagas de emprego em São Luís e Maranhão"}
           </p>
           <h1 className="text-[1.75rem] font-black tracking-tight leading-[1.1] text-[var(--brand-navy)] sm:text-4xl sm:leading-[1.08]">{heading}</h1>
@@ -239,8 +239,8 @@ export default async function JobsPage({
               href={buildOrderHref("relevance") as never}
               className={
                 parsed.order === "relevance"
-                  ? "whitespace-nowrap rounded-full bg-[var(--brand-navy)] px-3 py-1.5 text-xs font-semibold text-white sm:px-4 sm:py-2 sm:text-sm"
-                  : "whitespace-nowrap rounded-full border border-[color:rgba(26,43,76,0.1)] bg-white px-3 py-1.5 text-xs font-medium text-[var(--brand-text-secondary)] transition hover:border-[color:rgba(255,109,0,0.22)] hover:text-[var(--brand-orange)] sm:px-4 sm:py-2 sm:text-sm"
+                  ? "whitespace-nowrap rounded-full bg-[var(--brand-brick)] px-3 py-1.5 text-xs font-semibold text-white sm:px-4 sm:py-2 sm:text-sm"
+                  : "whitespace-nowrap rounded-full border border-[rgba(123,44,40,0.16)] bg-white px-3 py-1.5 text-xs font-medium text-[var(--brand-text-secondary)] transition hover:border-[rgba(123,44,40,0.34)] hover:text-[var(--brand-brick)] sm:px-4 sm:py-2 sm:text-sm"
               }
             >
               Relevância
@@ -249,8 +249,8 @@ export default async function JobsPage({
               href={buildOrderHref("date") as never}
               className={
                 parsed.order === "date"
-                  ? "whitespace-nowrap rounded-full bg-[var(--brand-navy)] px-3 py-1.5 text-xs font-semibold text-white sm:px-4 sm:py-2 sm:text-sm"
-                  : "whitespace-nowrap rounded-full border border-[color:rgba(26,43,76,0.1)] bg-white px-3 py-1.5 text-xs font-medium text-[var(--brand-text-secondary)] transition hover:border-[color:rgba(255,109,0,0.22)] hover:text-[var(--brand-orange)] sm:px-4 sm:py-2 sm:text-sm"
+                  ? "whitespace-nowrap rounded-full bg-[var(--brand-brick)] px-3 py-1.5 text-xs font-semibold text-white sm:px-4 sm:py-2 sm:text-sm"
+                  : "whitespace-nowrap rounded-full border border-[rgba(123,44,40,0.16)] bg-white px-3 py-1.5 text-xs font-medium text-[var(--brand-text-secondary)] transition hover:border-[rgba(123,44,40,0.34)] hover:text-[var(--brand-brick)] sm:px-4 sm:py-2 sm:text-sm"
               }
             >
               Data
@@ -277,7 +277,7 @@ export default async function JobsPage({
           <h2 className="text-base font-black text-slate-950 sm:text-lg">Empresas com vagas recentes</h2>
           <div className="mt-3 flex flex-wrap gap-2 sm:mt-4 sm:gap-3">
             {featuredCompanies.slice(0, 8).map((company) => (
-              <Link key={company.slug} href={getCompanyJobsPath(company.slug)} className="rounded-full border border-[color:rgba(26,43,76,0.1)] bg-white px-3 py-1.5 text-xs font-medium text-[var(--brand-text-secondary)] transition hover:border-[color:rgba(255,109,0,0.22)] hover:text-[var(--brand-orange)] sm:px-4 sm:py-2 sm:text-sm">
+              <Link key={company.slug} href={getCompanyJobsPath(company.slug)} className="rounded-full border border-[rgba(123,44,40,0.14)] bg-white px-3 py-1.5 text-xs font-medium text-[var(--brand-text-secondary)] transition hover:border-[rgba(123,44,40,0.34)] hover:text-[var(--brand-brick)] sm:px-4 sm:py-2 sm:text-sm">
                 {company.name}
               </Link>
             ))}
@@ -295,7 +295,7 @@ export default async function JobsPage({
               <Link
                 key={state.id}
                 href={getStateJobsPath(state.slug)}
-                className="rounded-full border border-[color:rgba(26,43,76,0.1)] bg-white px-3 py-1.5 text-xs font-medium text-[var(--brand-text-secondary)] transition hover:border-[color:rgba(255,109,0,0.22)] hover:text-[var(--brand-orange)] sm:px-4 sm:py-2 sm:text-sm"
+                className="rounded-full border border-[rgba(123,44,40,0.14)] bg-white px-3 py-1.5 text-xs font-medium text-[var(--brand-text-secondary)] transition hover:border-[rgba(123,44,40,0.34)] hover:text-[var(--brand-brick)] sm:px-4 sm:py-2 sm:text-sm"
               >
                 {state.name}
               </Link>
@@ -306,7 +306,7 @@ export default async function JobsPage({
               <Link
                 key={city.slug}
                 href={getCityJobsPath(city.slug)}
-                className="rounded-full border border-[color:rgba(26,43,76,0.1)] bg-white px-3 py-1.5 text-xs font-medium text-[var(--brand-text-secondary)] transition hover:border-[color:rgba(255,109,0,0.22)] hover:text-[var(--brand-orange)] sm:px-4 sm:py-2 sm:text-sm"
+                className="rounded-full border border-[rgba(123,44,40,0.14)] bg-white px-3 py-1.5 text-xs font-medium text-[var(--brand-text-secondary)] transition hover:border-[rgba(123,44,40,0.34)] hover:text-[var(--brand-brick)] sm:px-4 sm:py-2 sm:text-sm"
               >
                 {`Vagas em ${city.name}, ${city.stateCode}`}
               </Link>

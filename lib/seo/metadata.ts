@@ -15,7 +15,7 @@ type BuildMetadataInput = {
 
 export function buildMetadata(input: BuildMetadataInput): Metadata {
   const canonical = absoluteUrl(input.canonicalUrl || input.pathname);
-  const socialImage = absoluteUrl(input.socialImageUrl || "/brand-logo.svg");
+  const socialImage = absoluteUrl(input.socialImageUrl || "/og-image.jpg");
 
   return {
     title: input.title,
@@ -62,7 +62,7 @@ export async function buildSiteMetadata(input: BuildMetadataInput): Promise<Meta
   const settings = await getSiteSettings();
   const siteName = settings.siteName || siteConfig.name;
   const canonical = absoluteUrl(input.canonicalUrl || input.pathname);
-  const socialImage = absoluteUrl(input.socialImageUrl || settings.defaultSocialImageUrl || "/brand-logo.svg");
+  const socialImage = absoluteUrl(input.socialImageUrl || settings.defaultSocialImageUrl || "/og-image.jpg");
   const titleWithBrand = input.title.includes("|") ? input.title.trim() : `${input.title.trim()} | ${siteName}`;
 
   return {

@@ -90,10 +90,10 @@ export async function JobDetailView({ job, displayTitle }: { job: JobWithRelatio
       <div className="grid gap-8 lg:grid-cols-[1.08fr_0.92fr] lg:items-start">
         <div className="space-y-6">
           <section className="overflow-hidden rounded-3xl border border-[var(--brand-line)] bg-white shadow-[0_24px_70px_-40px_rgba(26,26,26,0.22)]">
-            <div className="h-2 bg-[linear-gradient(90deg,var(--brand-orange)_0%,var(--brand-brick)_100%)]" />
+            <div className="h-2 bg-[var(--brand-brick)]" />
             <div className="space-y-5 p-5 sm:p-8">
               <div className="flex flex-wrap items-center gap-2">
-                <span className="rounded-full bg-[rgba(242,140,27,0.12)] px-3 py-1 text-[11px] font-bold uppercase tracking-wide text-[var(--brand-orange)]">
+                <span className="rounded-full border border-[rgba(123,44,40,0.16)] bg-[var(--brand-beige)] px-3 py-1 text-[11px] font-bold uppercase tracking-wide text-[var(--brand-brick)]">
                   {jobEmploymentLabel(job)}
                 </span>
                 {job.locationType ? (
@@ -146,7 +146,7 @@ export async function JobDetailView({ job, displayTitle }: { job: JobWithRelatio
                   eventName="company_site_click"
                   entityType="company"
                   entitySlug={job.company?.slug ?? job.slug}
-                  className="inline-flex text-sm font-semibold text-[var(--brand-brick)] transition hover:text-[var(--brand-orange)]"
+                  className="inline-flex text-sm font-semibold text-[var(--brand-brick)] transition hover:text-[#65231f]"
                 >
                   Conhecer a empresa
                 </TrackedExternalLink>
@@ -166,7 +166,7 @@ export async function JobDetailView({ job, displayTitle }: { job: JobWithRelatio
 
           <PublicAdSlot slotSlug="job-after-description" format="rectangle" fullWidthResponsive />
 
-          <section className="rounded-3xl border border-[rgba(242,140,27,0.22)] bg-[rgba(242,140,27,0.08)] p-5 sm:p-6">
+          <section className="rounded-3xl border border-[rgba(123,44,40,0.18)] bg-[rgba(123,44,40,0.06)] p-5 sm:p-6">
             <div className="flex items-start gap-3">
               <ShieldCheck className="mt-0.5 h-5 w-5 shrink-0 text-[var(--brand-brick)]" />
               <div>
@@ -195,14 +195,14 @@ export async function JobDetailView({ job, displayTitle }: { job: JobWithRelatio
               Explore outras oportunidades em {job.city.name}, no {job.state.name} ou na {job.companyName}.
             </p>
             <div className="mt-5 flex flex-wrap gap-2">
-              <Link href={getCityJobsPath(job.city.slug)} className="rounded-full border border-white/14 bg-white/8 px-4 py-2 text-sm font-semibold hover:border-[var(--brand-orange)]">
+              <Link href={getCityJobsPath(job.city.slug)} className="rounded-full border border-white/14 bg-white/8 px-4 py-2 text-sm font-semibold hover:border-white/45">
                 Mais vagas em {job.city.name}
               </Link>
-              <Link href={getStateJobsPath(job.state.slug)} className="rounded-full border border-white/14 bg-white/8 px-4 py-2 text-sm font-semibold hover:border-[var(--brand-orange)]">
+              <Link href={getStateJobsPath(job.state.slug)} className="rounded-full border border-white/14 bg-white/8 px-4 py-2 text-sm font-semibold hover:border-white/45">
                 Mais vagas no {job.state.name}
               </Link>
               {job.company?.slug ? (
-                <Link href={getCompanyJobsPath(job.company.slug)} className="rounded-full border border-white/14 bg-white/8 px-4 py-2 text-sm font-semibold hover:border-[var(--brand-orange)]">
+                <Link href={getCompanyJobsPath(job.company.slug)} className="rounded-full border border-white/14 bg-white/8 px-4 py-2 text-sm font-semibold hover:border-white/45">
                   Mais vagas da {job.company.name}
                 </Link>
               ) : null}

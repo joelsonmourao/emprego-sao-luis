@@ -91,14 +91,14 @@ export function CookieConsentBanner({ config, initialConsentValue = null }: { co
         <div className="fixed inset-x-0 bottom-0 z-50 border-t border-slate-200 bg-white/96 px-4 py-4 shadow-[0_-20px_50px_-35px_rgba(15,23,42,0.28)] backdrop-blur">
           <div className="mx-auto flex max-w-7xl flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
             <div className="max-w-3xl space-y-2">
-              <p className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.24em] text-[var(--brand-orange)]">
+              <p className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.24em] text-[var(--brand-brick)]">
                 <Cookie className="h-4 w-4" />
                 Cookies e privacidade
               </p>
               <h2 className="text-xl font-black text-slate-950">{config.title}</h2>
               <p className="text-sm leading-7 text-slate-600">
                 {config.description}{" "}
-                <Link href={config.policyHref as never} className="font-semibold text-[var(--brand-brick)] underline-offset-4 hover:text-[var(--brand-orange)] hover:underline">
+                <Link href={config.policyHref as never} className="font-semibold text-[var(--brand-brick)] underline-offset-4 hover:text-[#65231f] hover:underline">
             Ver política de cookies
                 </Link>
               </p>
@@ -140,7 +140,7 @@ export function CookieConsentBanner({ config, initialConsentValue = null }: { co
                       <p className="text-sm font-semibold text-slate-950">{config.advertisingLabel}</p>
                       <p className="mt-2 text-sm leading-6 text-slate-600">Permite recursos de publicidade quando o portal estiver com anuncios ativos e com essa categoria habilitada.</p>
                     </div>
-                    <input type="checkbox" checked={advertisingEnabled} onChange={(event) => setAdvertisingEnabled(event.target.checked)} className="mt-1 h-4 w-4 accent-[var(--brand-orange)]" />
+                    <input type="checkbox" checked={advertisingEnabled} onChange={(event) => setAdvertisingEnabled(event.target.checked)} className="mt-1 h-4 w-4 accent-[var(--brand-brick)]" />
                   </div>
                 </label>
               </div>
@@ -159,7 +159,7 @@ export function CookieConsentBanner({ config, initialConsentValue = null }: { co
         <button
           type="button"
           onClick={() => setShowPreferences((value) => !value)}
-          className="fixed bottom-4 left-4 z-40 inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-[var(--brand-text-secondary)] shadow-[0_16px_40px_-28px_rgba(15,23,42,0.35)] transition hover:text-[var(--brand-orange)]"
+          className="fixed bottom-4 left-4 z-40 inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-[var(--brand-text-secondary)] shadow-[0_16px_40px_-28px_rgba(15,23,42,0.35)] transition hover:text-[var(--brand-brick)]"
         >
           <Settings2 className="h-4 w-4" />
           {config.manageLabel}
@@ -177,7 +177,7 @@ export function CookieConsentBanner({ config, initialConsentValue = null }: { co
             </label>
             <label className="flex items-center justify-between gap-3 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3">
               <span className="text-sm font-medium text-slate-900">{config.advertisingLabel}</span>
-              <input type="checkbox" checked={advertisingEnabled} onChange={(event) => setAdvertisingEnabled(event.target.checked)} className="h-4 w-4 accent-[var(--brand-orange)]" />
+              <input type="checkbox" checked={advertisingEnabled} onChange={(event) => setAdvertisingEnabled(event.target.checked)} className="h-4 w-4 accent-[var(--brand-brick)]" />
             </label>
           </div>
           <div className="mt-4 flex flex-wrap gap-3">

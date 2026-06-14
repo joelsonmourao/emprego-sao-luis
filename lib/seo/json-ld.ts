@@ -99,7 +99,7 @@ export function buildArticleJsonLd(input: {
       name: siteConfig.name,
       logo: {
         "@type": "ImageObject",
-        url: absoluteUrl("/emprego-logo-mark.svg")
+        url: absoluteUrl("/icon.png")
       }
     }
   };
@@ -134,7 +134,7 @@ export function buildPlaceJsonLdForCityLocality(input: { cityName: string; state
 }
 
 const IDENTIFIER_NAME = siteConfig.name;
-const DEFAULT_HIRING_ORGANIZATION_LOGO = absoluteUrl("/emprego-logo-mark.svg");
+const DEFAULT_HIRING_ORGANIZATION_LOGO = absoluteUrl("/icon.png");
 
 const BLOCKED_EXTERNAL_HOST_FRAGMENTS = ["jovem-aprendiz-vagas", "vercel.app", "example.com", "slzcontent.com.br"];
 

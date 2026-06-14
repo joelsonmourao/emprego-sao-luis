@@ -43,15 +43,15 @@ export default async function CompaniesPage() {
         {companies.map((company) => (
           <Link key={company.slug} href={getCompanyJobsPath(company.slug)} className="brand-chip rounded-[1.75rem] border border-slate-200 bg-white p-6 shadow-sm transition hover:-translate-y-1">
             {company.logoUrl ? (
-              <img src={company.logoUrl} alt={company.name} className="h-12 w-12 rounded-2xl border border-slate-200 bg-white object-cover p-1" />
+              <img src={company.logoUrl} alt={company.name} className="h-12 w-12 rounded-2xl border border-[rgba(123,44,40,0.14)] bg-white object-cover p-1" />
             ) : (
-            <Building2 className="h-7 w-7 text-[var(--brand-orange)]" />
+            <Building2 className="h-7 w-7 text-[var(--brand-brick)]" />
             )}
             <h2 className="mt-4 text-2xl font-black text-slate-950">{company.name}</h2>
             <p className="mt-2 text-sm leading-6 text-slate-600">
               Empresa com presenca em {company.cityName}, {company.stateCode}.
             </p>
-                    <p className="mt-3 text-sm font-semibold text-[var(--brand-orange)]">{company.count} vaga(s) relacionada(s)</p>
+                    <p className="mt-3 text-sm font-semibold text-[var(--brand-brick)]">{company.count} vaga(s) relacionada(s)</p>
           </Link>
         ))}
       </div>

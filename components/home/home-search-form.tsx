@@ -87,7 +87,7 @@ export function HomeSearchForm({
   }, [availableCities, selectedCity]);
 
   const fieldClass =
-    "flex w-full min-w-0 items-center gap-3 rounded-2xl border border-[var(--brand-line)] bg-white px-4";
+    "flex w-full min-w-0 items-center gap-3 rounded-xl border border-[var(--brand-line)] bg-white px-4";
   const inputClass = "h-12 w-full min-w-0 bg-transparent text-sm text-[var(--brand-charcoal)] outline-none placeholder:text-[var(--brand-text-secondary)]";
 
   return (
@@ -95,7 +95,7 @@ export function HomeSearchForm({
       action={action}
       className={
         isHomeVariant
-          ? "w-full rounded-2xl border border-[rgba(123,44,40,0.14)] bg-white p-4 shadow-[0_20px_50px_-32px_rgba(123,44,40,0.18)] sm:rounded-3xl sm:p-5"
+          ? "w-full rounded-2xl border border-[rgba(123,44,40,0.16)] bg-white p-3 shadow-[0_18px_45px_-32px_rgba(123,44,40,0.2)] sm:p-4"
           : "rounded-[1.85rem] border border-white/60 bg-white/99 p-3.5 shadow-[0_30px_100px_-35px_rgba(26,43,76,0.24)] sm:rounded-[2.15rem] sm:p-4"
       }
     >
@@ -153,7 +153,7 @@ export function HomeSearchForm({
             disabled={!isHomeVariant && !selectedState}
           >
             <option value="">
-              {isHomeVariant ? "Todas as cidades" : selectedState ? "Todas as cidades" : "Selecione um estado primeiro"}
+              {isHomeVariant ? "Sao Luis, MA" : selectedState ? "Todas as cidades" : "Selecione um estado primeiro"}
             </option>
             {availableCities.map((city) => (
               <option key={city.id} value={city.slug}>

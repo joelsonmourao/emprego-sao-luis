@@ -1,10 +1,1 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 420 88" fill="none" role="img" aria-label="Emprego São Luís">
-  <rect x="4" y="8" width="72" height="72" rx="20" fill="#1F2B24"/>
-  <circle cx="40" cy="30" r="14" fill="#F28C1B"/>
-  <rect x="30" y="40" width="20" height="6" rx="3" fill="#F28C1B" opacity="0.9"/>
-  <path d="M22 52h36v5c0 7.5-6 13.5-13.5 13.5h-9c-7.5 0-13.5-6-13.5-13.5v-5z" fill="#FFFFFF" opacity="0.95"/>
-  <text x="40" y="68" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif" font-size="18" font-weight="800" fill="#F28C1B">ES</text>
-  <text x="92" y="38" font-family="Segoe UI, Arial, sans-serif" font-size="11" font-weight="700" fill="#F28C1B" letter-spacing="3">MARANHÃO</text>
-  <text x="92" y="62" font-family="Segoe UI, Arial, sans-serif" font-size="24" font-weight="800" fill="#1F2B24">EMPREGO SÃO LUÍS</text>
-  <text x="92" y="78" font-family="Segoe UI, Arial, sans-serif" font-size="11" fill="#5A5A5A">Vagas em São Luís e região</text>
-</svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 322 117" role="img" aria-label="Emprego Sao Luis"><image href="/logo-horizontal.png" width="322" height="117" preserveAspectRatio="xMidYMid meet"/></svg>

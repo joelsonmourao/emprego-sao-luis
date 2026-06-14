@@ -77,7 +77,7 @@ export default async function BlogDetailPage({ params }: { params: Promise<{ slu
         <div className="space-y-8">
           <header className="space-y-5">
             <div className="flex flex-wrap items-center gap-3 text-sm">
-              <span className="rounded-full bg-[rgba(242,140,27,0.12)] px-3 py-1 text-xs font-bold uppercase tracking-wide text-[var(--brand-orange)]">
+              <span className="rounded-full border border-[rgba(123,44,40,0.16)] bg-[var(--brand-beige)] px-3 py-1 text-xs font-bold uppercase tracking-wide text-[var(--brand-brick)]">
                 {post.category.name}
               </span>
               <span className="inline-flex items-center gap-1.5 text-[var(--brand-text-secondary)]">

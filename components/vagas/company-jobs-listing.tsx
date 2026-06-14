@@ -107,7 +107,7 @@ export async function CompanyJobsListing({
                 className="h-12 w-12 rounded-2xl border border-slate-200 bg-white object-cover p-1"
               />
             ) : null}
-            <span className="rounded-full bg-white px-4 py-2 font-semibold text-[var(--brand-orange)]">
+            <span className="rounded-full bg-white px-4 py-2 font-semibold text-[var(--brand-brick)]">
               {jobs.total} {jobs.total === 1 ? "vaga ativa" : "vagas ativas"}
             </span>
           </div>
@@ -190,10 +190,10 @@ export async function CompanyJobsListing({
           <div className="brand-chip rounded-[1.8rem] p-6">
             <h2 className="text-lg font-black text-[var(--brand-navy)]">Cidades com vagas da empresa</h2>
             <div className="mt-4 space-y-3">
-              <Link href={getCityJobsPath(company.city.slug)} className="block rounded-2xl border border-[color:rgba(26,43,76,0.1)] bg-white px-4 py-3 text-sm font-medium text-[var(--brand-text-secondary)] transition hover:text-[var(--brand-orange)]">
+              <Link href={getCityJobsPath(company.city.slug)} className="block rounded-2xl border border-[rgba(123,44,40,0.14)] bg-white px-4 py-3 text-sm font-medium text-[var(--brand-text-secondary)] transition hover:text-[var(--brand-brick)]">
                 {company.city.name}, {company.state.code}
               </Link>
-              <Link href={getStateJobsPath(company.state.slug)} className="block rounded-2xl border border-[color:rgba(26,43,76,0.1)] bg-white px-4 py-3 text-sm font-medium text-[var(--brand-text-secondary)] transition hover:text-[var(--brand-orange)]">
+              <Link href={getStateJobsPath(company.state.slug)} className="block rounded-2xl border border-[rgba(123,44,40,0.14)] bg-white px-4 py-3 text-sm font-medium text-[var(--brand-text-secondary)] transition hover:text-[var(--brand-brick)]">
                 {company.state.name}
               </Link>
             </div>
@@ -203,7 +203,7 @@ export async function CompanyJobsListing({
             <h2 className="text-lg font-black text-[var(--brand-navy)]">Empresas relacionadas</h2>
             <div className="mt-4 flex flex-wrap gap-3">
               {relatedCompanies.map((item) => (
-                <Link key={item.slug} href={relatedCompanyHref(item.slug)} className="rounded-full border border-[color:rgba(26,43,76,0.1)] bg-white px-4 py-2 text-sm font-medium text-[var(--brand-text-secondary)] transition hover:text-[var(--brand-orange)]">
+                <Link key={item.slug} href={relatedCompanyHref(item.slug)} className="rounded-full border border-[rgba(123,44,40,0.14)] bg-white px-4 py-2 text-sm font-medium text-[var(--brand-text-secondary)] transition hover:text-[var(--brand-brick)]">
                   {item.name}
                 </Link>
               ))}

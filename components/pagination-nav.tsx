@@ -16,7 +16,7 @@ export function PaginationNav({ page, totalPages, buildHref }: PaginationNavProp
   return (
     <nav aria-label="Paginacao" className="flex flex-wrap items-center justify-center gap-3">
       {page > 1 ? (
-      <Link href={buildHref(page - 1) as never} className="rounded-full border border-[color:rgba(26,43,76,0.1)] bg-white px-4 py-2 text-sm font-medium text-[var(--brand-text-secondary)] transition hover:border-[color:rgba(255,109,0,0.22)] hover:text-[var(--brand-orange)]">
+      <Link href={buildHref(page - 1) as never} className="rounded-full border border-[rgba(123,44,40,0.14)] bg-white px-4 py-2 text-sm font-medium text-[var(--brand-text-secondary)] transition hover:border-[rgba(123,44,40,0.34)] hover:text-[var(--brand-brick)]">
           Anterior
         </Link>
       ) : null}
@@ -28,8 +28,8 @@ export function PaginationNav({ page, totalPages, buildHref }: PaginationNavProp
           aria-current={pageNumber === page ? "page" : undefined}
           className={
             pageNumber === page
-            ? "rounded-full bg-[var(--brand-navy)] px-4 py-2 text-sm font-semibold text-white"
-            : "rounded-full border border-[color:rgba(26,43,76,0.1)] bg-white px-4 py-2 text-sm font-medium text-[var(--brand-text-secondary)] transition hover:border-[color:rgba(255,109,0,0.22)] hover:text-[var(--brand-orange)]"
+            ? "rounded-full bg-[var(--brand-brick)] px-4 py-2 text-sm font-semibold text-white"
+            : "rounded-full border border-[rgba(123,44,40,0.14)] bg-white px-4 py-2 text-sm font-medium text-[var(--brand-text-secondary)] transition hover:border-[rgba(123,44,40,0.34)] hover:text-[var(--brand-brick)]"
           }
         >
           {pageNumber}
@@ -37,7 +37,7 @@ export function PaginationNav({ page, totalPages, buildHref }: PaginationNavProp
       ))}
 
       {page < totalPages ? (
-      <Link href={buildHref(page + 1) as never} className="rounded-full border border-[color:rgba(26,43,76,0.1)] bg-white px-4 py-2 text-sm font-medium text-[var(--brand-text-secondary)] transition hover:border-[color:rgba(255,109,0,0.22)] hover:text-[var(--brand-orange)]">
+      <Link href={buildHref(page + 1) as never} className="rounded-full border border-[rgba(123,44,40,0.14)] bg-white px-4 py-2 text-sm font-medium text-[var(--brand-text-secondary)] transition hover:border-[rgba(123,44,40,0.34)] hover:text-[var(--brand-brick)]">
           Próxima
         </Link>
       ) : null}

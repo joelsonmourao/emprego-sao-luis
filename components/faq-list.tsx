@@ -12,7 +12,7 @@ export async function FaqList({ items }: { items?: readonly SiteFaqEntry[] }) {
       {faqItems.map((item) => (
         <Card key={item.question} className="brand-chip rounded-[1.75rem] border-[var(--brand-line)] shadow-[0_20px_60px_-45px_rgba(26,43,76,0.18)]">
           <CardHeader>
-            <div className="inline-flex h-11 w-11 items-center justify-center rounded-2xl bg-[linear-gradient(135deg,rgba(26,43,76,0.12),rgba(255,109,0,0.16))] text-[var(--brand-orange)]">
+            <div className="inline-flex h-11 w-11 items-center justify-center rounded-2xl border border-[rgba(123,44,40,0.14)] bg-[var(--brand-beige)] text-[var(--brand-brick)]">
               <MessageCircleQuestion className="h-5 w-5" />
             </div>
             <CardTitle className="text-xl">{item.question}</CardTitle>

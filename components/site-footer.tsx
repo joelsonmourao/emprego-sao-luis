@@ -14,7 +14,9 @@ export async function SiteFooter() {
       <div className="mx-auto flex max-w-7xl flex-col gap-8 px-4 py-12 text-sm text-white/78 sm:px-6 lg:px-8">
         <div className="grid gap-8 md:grid-cols-4">
           <div>
-            <SiteLogo withTagline={false} />
+            <div className="inline-flex rounded-2xl bg-white/96 px-3 py-2">
+              <SiteLogo withTagline={false} />
+            </div>
             <p className="mt-4 leading-6">
               O Emprego São Luís divulga vagas de emprego em São Luís, Região Metropolitana e cidades do Maranhão, conectando candidatos a oportunidades reais.
             </p>

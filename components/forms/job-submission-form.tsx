@@ -63,45 +63,45 @@ export function JobSubmissionForm() {
       <div className="grid gap-4 sm:grid-cols-2">
         <label className="block space-y-2 text-sm">
           <span className="font-semibold text-[var(--brand-charcoal)]">Nome da empresa</span>
-          <input required name="companyName" className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 outline-none ring-[var(--brand-orange)] focus:ring-2" />
+          <input required name="companyName" className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 outline-none ring-[var(--brand-brick)] focus:ring-2" />
         </label>
         <label className="block space-y-2 text-sm">
           <span className="font-semibold text-[var(--brand-charcoal)]">Nome do responsável</span>
-          <input required name="contactName" className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 outline-none ring-[var(--brand-orange)] focus:ring-2" />
+          <input required name="contactName" className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 outline-none ring-[var(--brand-brick)] focus:ring-2" />
         </label>
         <label className="block space-y-2 text-sm">
           <span className="font-semibold text-[var(--brand-charcoal)]">E-mail</span>
-          <input required type="email" name="email" className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 outline-none ring-[var(--brand-orange)] focus:ring-2" />
+          <input required type="email" name="email" className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 outline-none ring-[var(--brand-brick)] focus:ring-2" />
         </label>
         <label className="block space-y-2 text-sm">
           <span className="font-semibold text-[var(--brand-charcoal)]">Telefone/WhatsApp</span>
-          <input name="phone" className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 outline-none ring-[var(--brand-orange)] focus:ring-2" />
+          <input name="phone" className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 outline-none ring-[var(--brand-brick)] focus:ring-2" />
         </label>
         <label className="block space-y-2 text-sm">
           <span className="font-semibold text-[var(--brand-charcoal)]">Título da vaga</span>
-          <input required name="jobTitle" className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 outline-none ring-[var(--brand-orange)] focus:ring-2" />
+          <input required name="jobTitle" className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 outline-none ring-[var(--brand-brick)] focus:ring-2" />
         </label>
         <label className="block space-y-2 text-sm">
           <span className="font-semibold text-[var(--brand-charcoal)]">Cidade</span>
-          <input required name="city" className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 outline-none ring-[var(--brand-orange)] focus:ring-2" placeholder="Ex.: São Luís" />
+          <input required name="city" className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 outline-none ring-[var(--brand-brick)] focus:ring-2" placeholder="Ex.: São Luís" />
         </label>
       </div>
       <label className="block space-y-2 text-sm">
         <span className="font-semibold text-[var(--brand-charcoal)]">Descrição da vaga</span>
-        <textarea required name="description" rows={6} className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 outline-none ring-[var(--brand-orange)] focus:ring-2" />
+        <textarea required name="description" rows={6} className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 outline-none ring-[var(--brand-brick)] focus:ring-2" />
       </label>
       <label className="block space-y-2 text-sm">
         <span className="font-semibold text-[var(--brand-charcoal)]">Link de candidatura</span>
-        <input type="url" name="applyUrl" className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 outline-none ring-[var(--brand-orange)] focus:ring-2" placeholder="https://" />
+        <input type="url" name="applyUrl" className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 outline-none ring-[var(--brand-brick)] focus:ring-2" placeholder="https://" />
       </label>
       <label className="block space-y-2 text-sm">
         <span className="font-semibold text-[var(--brand-charcoal)]">Mensagem adicional</span>
-        <textarea name="message" rows={4} className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 outline-none ring-[var(--brand-orange)] focus:ring-2" />
+        <textarea name="message" rows={4} className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 outline-none ring-[var(--brand-brick)] focus:ring-2" />
       </label>
       {status === "error" ? (
         <p className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">{errorMessage}</p>
       ) : null}
-      <Button type="submit" size="lg" disabled={status === "loading"} className="rounded-2xl bg-[var(--brand-orange)] text-white hover:bg-[#d97a12]">
+      <Button type="submit" size="lg" disabled={status === "loading"} className="rounded-2xl bg-[var(--brand-brick)] text-white hover:bg-[#65231f]">
         {status === "loading" ? (
           <>
             <Loader2 className="mr-2 h-4 w-4 animate-spin" />

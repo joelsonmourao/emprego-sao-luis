@@ -181,7 +181,7 @@ export default async function JobsByCityCleanPage({
       <div className="brand-page-hero rounded-[2rem] border border-slate-200 px-5 py-6 shadow-[0_35px_120px_-70px_rgba(26,43,76,0.22)] sm:px-8 sm:py-8">
         <div className="space-y-4">
           <div className="flex flex-wrap items-center gap-3 text-sm">
-            <span className="rounded-full bg-white px-4 py-2 font-semibold text-[var(--brand-orange)]">
+            <span className="rounded-full bg-white px-4 py-2 font-semibold text-[var(--brand-brick)]">
               {jobs.total} {jobs.total === 1 ? "vaga ativa" : "vagas ativas"}
             </span>
             <span className="rounded-full border border-[color:rgba(26,43,76,0.1)] bg-white px-4 py-2 text-[var(--brand-text-secondary)]">
@@ -241,7 +241,7 @@ export default async function JobsByCityCleanPage({
             <h2 className="text-lg font-black text-[var(--brand-navy)]">Empresas com vagas nesta cidade</h2>
             <div className="mt-4 flex flex-wrap gap-3">
               {companiesInCity.map((company) => (
-                <Link key={company.slug} href={getCompanyJobsPath(company.slug)} className="rounded-full border border-[color:rgba(26,43,76,0.1)] bg-white px-4 py-2 text-sm font-medium text-[var(--brand-text-secondary)] transition hover:text-[var(--brand-orange)]">
+                <Link key={company.slug} href={getCompanyJobsPath(company.slug)} className="rounded-full border border-[rgba(123,44,40,0.14)] bg-white px-4 py-2 text-sm font-medium text-[var(--brand-text-secondary)] transition hover:text-[var(--brand-brick)]">
                   {company.name}
                 </Link>
               ))}
@@ -251,11 +251,11 @@ export default async function JobsByCityCleanPage({
           <div className="brand-panel rounded-[1.8rem] border border-slate-200 p-6 shadow-sm">
             <h2 className="text-lg font-black text-[var(--brand-navy)]">Continue pelo estado</h2>
             <div className="mt-4 space-y-3">
-              <Link href={getStateJobsPath(state.slug)} className="block rounded-2xl border border-[color:rgba(26,43,76,0.1)] bg-white px-4 py-3 text-sm font-semibold text-[var(--brand-text-secondary)] transition hover:text-[var(--brand-orange)]">
+              <Link href={getStateJobsPath(state.slug)} className="block rounded-2xl border border-[rgba(123,44,40,0.14)] bg-white px-4 py-3 text-sm font-semibold text-[var(--brand-text-secondary)] transition hover:text-[var(--brand-brick)]">
                 Ver vagas no {state.name}
               </Link>
               {siblingCities.map((relatedCity) => (
-                <Link key={relatedCity.id} href={getCityJobsPath(relatedCity.slug)} className="block rounded-2xl border border-[color:rgba(26,43,76,0.1)] bg-white px-4 py-3 text-sm font-medium text-[var(--brand-text-secondary)] transition hover:text-[var(--brand-orange)]">
+                <Link key={relatedCity.id} href={getCityJobsPath(relatedCity.slug)} className="block rounded-2xl border border-[rgba(123,44,40,0.14)] bg-white px-4 py-3 text-sm font-medium text-[var(--brand-text-secondary)] transition hover:text-[var(--brand-brick)]">
                   {relatedCity.name}, {state.code}
                 </Link>
               ))}
