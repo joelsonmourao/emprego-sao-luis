@@ -56,7 +56,7 @@ export function JobSearchForm({
   }, [availableCities, selectedCity]);
 
   const fieldClass =
-    "flex min-w-0 items-center gap-2.5 rounded-[1.15rem] border border-white/20 bg-[var(--brand-beige)] px-3.5 shadow-[0_10px_28px_-24px_rgba(26,26,26,0.35)] focus-within:border-white focus-within:ring-2 focus-within:ring-white/28 sm:gap-3 sm:rounded-2xl sm:px-4";
+    "flex min-w-0 items-center gap-2.5 rounded-[1.15rem] border border-white/20 bg-[var(--brand-beige)] px-3.5 shadow-[0_10px_28px_-24px_rgba(26,26,26,0.35)] focus-within:border-[var(--brand-brick)] focus-within:ring-2 focus-within:ring-white/28 sm:gap-3 sm:rounded-2xl sm:px-4";
   const inputClass =
     "h-11 w-full min-w-0 bg-transparent text-sm text-[var(--brand-charcoal)] outline-none placeholder:text-[var(--brand-text-secondary)] sm:h-12";
 

@@ -87,7 +87,7 @@ export function HomeSearchForm({
   }, [availableCities, selectedCity]);
 
   const fieldClass =
-    "flex w-full min-w-0 items-center gap-2.5 rounded-xl border border-white/20 bg-[var(--brand-beige)] px-3.5 shadow-[0_10px_28px_-24px_rgba(26,26,26,0.35)] focus-within:border-white focus-within:ring-2 focus-within:ring-white/28 sm:gap-3 sm:px-4";
+    "flex w-full min-w-0 items-center gap-2.5 rounded-xl border border-white/20 bg-[var(--brand-beige)] px-3.5 shadow-[0_10px_28px_-24px_rgba(26,26,26,0.35)] focus-within:border-[var(--brand-brick)] focus-within:ring-2 focus-within:ring-white/28 sm:gap-3 sm:px-4";
   const inputClass =
     "h-12 w-full min-w-0 bg-transparent text-sm text-[var(--brand-charcoal)] outline-none placeholder:text-[var(--brand-text-secondary)]";
 

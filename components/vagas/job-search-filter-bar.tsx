@@ -14,6 +14,7 @@ export type JobSearchFilterBarProps = {
   states: JobSearchFilterGeoState[];
   defaultQuery?: string;
   defaultLocation?: string;
+  categorySlug?: string;
   className?: string;
 };
 
@@ -21,6 +22,7 @@ export function JobSearchFilterBar({
   states,
   defaultQuery = "",
   defaultLocation = "",
+  categorySlug,
   className
 }: JobSearchFilterBarProps) {
   const router = useRouter();
@@ -40,11 +42,20 @@ export function JobSearchFilterBar({
     });
 
     const geo = JSON.parse(serialized) as JobSearchFilterGeoState[];
-    router.push(buildVagasQueryFallback(q, loc, geo));
+    const href = buildVagasQueryFallback(q, loc, geo);
+    if (!categorySlug) {
+      router.push(href);
+      return;
+    }
+
+    const [pathname, search = ""] = href.split("?");
+    const params = new URLSearchParams(search);
+    params.set("categoria", categorySlug);
+    router.push(`${pathname}?${params.toString()}`);
   };
 
   const fieldClass =
-    "flex min-h-[3.25rem] min-w-0 items-center gap-2.5 rounded-2xl border border-white/20 bg-[var(--brand-beige)] px-3.5 py-2 shadow-[0_10px_28px_-24px_rgba(26,26,26,0.35)] focus-within:border-white focus-within:ring-2 focus-within:ring-white/28 sm:gap-3 sm:px-4";
+    "flex min-h-[3.25rem] min-w-0 items-center gap-2.5 rounded-2xl border border-white/20 bg-[var(--brand-beige)] px-3.5 py-2 shadow-[0_10px_28px_-24px_rgba(26,26,26,0.35)] focus-within:border-[var(--brand-brick)] focus-within:ring-2 focus-within:ring-white/28 sm:gap-3 sm:px-4";
   const inputClass =
     "min-w-0 flex-1 bg-transparent text-sm text-[var(--brand-charcoal)] outline-none placeholder:text-[var(--brand-text-secondary)] sm:text-base";
 

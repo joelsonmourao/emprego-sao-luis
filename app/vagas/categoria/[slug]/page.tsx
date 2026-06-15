@@ -6,11 +6,14 @@ import { JobCard } from "@/components/job-card";
 import { JsonLd } from "@/components/json-ld";
 import { PaginationNav } from "@/components/pagination-nav";
 import { SectionHeading } from "@/components/section-heading";
+import { JobSearchFilterBar } from "@/components/vagas/job-search-filter-bar";
 import { getJobCategoryBySlug } from "@/lib/job-categories";
+import { getSearchGeoData } from "@/lib/repositories/geo";
 import { getJobsList } from "@/lib/repositories/jobs";
 import { jobSearchParamsSchema } from "@/lib/schemas/search";
 import { buildSiteMetadata } from "@/lib/seo/metadata";
 import { buildBreadcrumbJsonLd } from "@/lib/seo/json-ld";
+import type { JobSearchFilterGeoState } from "@/lib/vagas/job-search-filter-resolve";
 
 export const revalidate = 1800;
 
@@ -70,12 +73,22 @@ export default async function CategoryJobsPage({
   const category = getJobCategoryBySlug(slug);
   if (!category) notFound();
 
-  const jobs = await getJobsList({
-    categorySlug: category.slug,
-    stateSlug: "maranhao",
-    order: parsed.order,
-    page: parsed.page
-  });
+  const [jobs, geoRaw] = await Promise.all([
+    getJobsList({
+      categorySlug: category.slug,
+      stateSlug: "maranhao",
+      order: parsed.order,
+      page: parsed.page
+    }),
+    getSearchGeoData()
+  ]);
+  const geoStates: JobSearchFilterGeoState[] = geoRaw.map((state) => ({
+    id: state.id,
+    name: state.name,
+    slug: state.slug,
+    code: state.code,
+    cities: state.cities.map((city) => ({ id: city.id, name: city.name, slug: city.slug }))
+  }));
 
   const basePath = `/vagas/categoria/${slug}`;
 
@@ -105,6 +118,8 @@ export default async function CategoryJobsPage({
           Oportunidades divulgadas na categoria {category.name}. O Emprego São Luís atua como divulgador — confira os detalhes e acesse o link oficial de candidatura informado pela empresa anunciante.
         </p>
       </div>
+
+      <JobSearchFilterBar states={geoStates} categorySlug={category.slug} />
 
       {jobs.items.length ? (
         <div className="grid gap-4 sm:gap-6 lg:grid-cols-2">
