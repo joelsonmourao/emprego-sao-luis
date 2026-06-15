@@ -87,7 +87,7 @@ export function HomeSearchForm({
   }, [availableCities, selectedCity]);
 
   const fieldClass =
-    "flex w-full min-w-0 items-center gap-2.5 rounded-xl border border-[rgba(123,44,40,0.26)] bg-white px-3.5 shadow-[0_10px_28px_-24px_rgba(123,44,40,0.3)] focus-within:border-[var(--brand-brick)] focus-within:ring-2 focus-within:ring-[rgba(123,44,40,0.18)] sm:gap-3 sm:px-4";
+    "flex w-full min-w-0 items-center gap-2.5 rounded-xl border border-white/20 bg-[var(--brand-beige)] px-3.5 shadow-[0_10px_28px_-24px_rgba(26,26,26,0.35)] focus-within:border-white focus-within:ring-2 focus-within:ring-white/28 sm:gap-3 sm:px-4";
   const inputClass =
     "h-12 w-full min-w-0 bg-transparent text-sm text-[var(--brand-charcoal)] outline-none placeholder:text-[var(--brand-text-secondary)]";
 
@@ -96,8 +96,8 @@ export function HomeSearchForm({
       action={action}
       className={
         isHomeVariant
-          ? "w-full rounded-2xl border border-[rgba(123,44,40,0.42)] bg-white p-3 shadow-[0_20px_50px_-32px_rgba(123,44,40,0.34)] ring-1 ring-[rgba(123,44,40,0.08)] sm:p-4"
-          : "rounded-[1.85rem] border border-[rgba(123,44,40,0.3)] bg-white p-3.5 shadow-[0_30px_100px_-35px_rgba(123,44,40,0.24)] ring-1 ring-[rgba(123,44,40,0.06)] sm:rounded-[2.15rem] sm:p-4"
+          ? "w-full rounded-2xl border border-white/14 bg-[linear-gradient(135deg,#7B2C28_0%,#6f2724_58%,#1F2B24_100%)] p-3 shadow-[0_22px_54px_-32px_rgba(123,44,40,0.6)] ring-1 ring-[rgba(123,44,40,0.18)] sm:p-4"
+          : "rounded-[1.85rem] border border-white/14 bg-[linear-gradient(135deg,#7B2C28_0%,#6f2724_58%,#1F2B24_100%)] p-3.5 shadow-[0_30px_100px_-42px_rgba(123,44,40,0.58)] ring-1 ring-[rgba(123,44,40,0.18)] sm:rounded-[2.15rem] sm:p-4"
       }
     >
       {isHomeVariant ? <input type="hidden" name="estado" value={fixedStateSlug} /> : null}
@@ -189,8 +189,8 @@ export function HomeSearchForm({
           type="submit"
           className={
             isHomeVariant
-              ? "h-12 w-full rounded-2xl bg-[var(--brand-brick)] px-6 text-sm font-bold shadow-[0_16px_34px_-18px_rgba(123,44,40,0.55)] hover:bg-[#65231f] xl:w-auto xl:min-w-[9.5rem]"
-              : "h-11 w-full rounded-[1.15rem] bg-[var(--brand-brick)] shadow-[0_16px_34px_-18px_rgba(123,44,40,0.55)] hover:bg-[#65231f] sm:h-12 sm:rounded-2xl lg:w-auto"
+              ? "h-12 w-full rounded-2xl bg-[var(--brand-green)] px-6 text-sm font-bold text-white shadow-[0_16px_34px_-18px_rgba(26,26,26,0.65)] hover:bg-[var(--brand-charcoal)] xl:w-auto xl:min-w-[9.5rem]"
+              : "h-11 w-full rounded-[1.15rem] bg-[var(--brand-green)] text-white shadow-[0_16px_34px_-18px_rgba(26,26,26,0.65)] hover:bg-[var(--brand-charcoal)] sm:h-12 sm:rounded-2xl lg:w-auto"
           }
         >
           {submitLabel}
@@ -203,15 +203,15 @@ export function HomeSearchForm({
           )
         : null}
 
-      <div className="mt-3 border-t border-[rgba(123,44,40,0.14)] pt-3 flex flex-col gap-2 text-[11px] text-[var(--brand-text-secondary)] md:mt-4 md:flex-row md:items-center md:justify-between md:text-xs">
+      <div className="mt-3 flex flex-col gap-2 border-t border-white/18 pt-3 text-[11px] text-white/82 md:mt-4 md:flex-row md:items-center md:justify-between md:text-xs">
         <p className="inline-flex items-start gap-2 leading-5">
-          <SlidersHorizontal className="h-4 w-4 shrink-0 text-[var(--brand-brick)]" />
+          <SlidersHorizontal className="h-4 w-4 shrink-0 text-[var(--brand-beige)]" />
           {helperText ?? (isHomeVariant ? "Busque por cargo, cidade e categoria no Maranhão." : "Use cargo, cidade e estado para chegar mais rápido nas vagas.")}
         </p>
         <p>
           <Link
             href={footerLinkHref as never}
-            className="font-semibold text-[var(--brand-brick)] underline-offset-4 hover:text-[#65231f] hover:underline"
+            className="font-semibold text-white underline-offset-4 hover:text-[var(--brand-beige)] hover:underline"
           >
             {footerLinkLabel}
           </Link>

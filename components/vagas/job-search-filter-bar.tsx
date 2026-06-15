@@ -44,7 +44,7 @@ export function JobSearchFilterBar({
   };
 
   const fieldClass =
-    "flex min-h-[3.25rem] min-w-0 items-center gap-2.5 rounded-2xl border border-[rgba(123,44,40,0.26)] bg-white px-3.5 py-2 shadow-[0_10px_28px_-24px_rgba(123,44,40,0.3)] focus-within:border-[var(--brand-brick)] focus-within:ring-2 focus-within:ring-[rgba(123,44,40,0.18)] sm:gap-3 sm:px-4";
+    "flex min-h-[3.25rem] min-w-0 items-center gap-2.5 rounded-2xl border border-white/20 bg-[var(--brand-beige)] px-3.5 py-2 shadow-[0_10px_28px_-24px_rgba(26,26,26,0.35)] focus-within:border-white focus-within:ring-2 focus-within:ring-white/28 sm:gap-3 sm:px-4";
   const inputClass =
     "min-w-0 flex-1 bg-transparent text-sm text-[var(--brand-charcoal)] outline-none placeholder:text-[var(--brand-text-secondary)] sm:text-base";
 
@@ -52,7 +52,7 @@ export function JobSearchFilterBar({
     <form
       onSubmit={onSubmit}
       className={cn(
-        "w-full rounded-[1.75rem] border border-[rgba(123,44,40,0.38)] bg-white p-4 shadow-[0_20px_60px_-40px_rgba(123,44,40,0.3)] ring-1 ring-[rgba(123,44,40,0.06)] sm:rounded-[2rem] sm:p-6",
+        "w-full rounded-[1.75rem] border border-white/14 bg-[linear-gradient(135deg,#7B2C28_0%,#6f2724_58%,#1F2B24_100%)] p-4 shadow-[0_24px_70px_-40px_rgba(123,44,40,0.58)] ring-1 ring-[rgba(123,44,40,0.18)] sm:rounded-[2rem] sm:p-6",
         className
       )}
     >
@@ -82,7 +82,7 @@ export function JobSearchFilterBar({
         <Button
           type="submit"
           size="lg"
-          className="h-12 w-full shrink-0 rounded-2xl bg-[var(--brand-brick)] font-semibold shadow-[0_16px_34px_-18px_rgba(123,44,40,0.55)] hover:bg-[#65231f] md:h-auto md:w-auto md:min-w-[10.5rem]"
+          className="h-12 w-full shrink-0 rounded-2xl bg-[var(--brand-green)] font-semibold text-white shadow-[0_16px_34px_-18px_rgba(26,26,26,0.65)] hover:bg-[var(--brand-charcoal)] md:h-auto md:w-auto md:min-w-[10.5rem]"
         >
           Buscar vagas
         </Button>

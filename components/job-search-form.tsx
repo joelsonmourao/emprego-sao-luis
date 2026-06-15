@@ -56,7 +56,7 @@ export function JobSearchForm({
   }, [availableCities, selectedCity]);
 
   const fieldClass =
-    "flex min-w-0 items-center gap-2.5 rounded-[1.15rem] border border-[rgba(123,44,40,0.26)] bg-white px-3.5 shadow-[0_10px_28px_-24px_rgba(123,44,40,0.3)] focus-within:border-[var(--brand-brick)] focus-within:ring-2 focus-within:ring-[rgba(123,44,40,0.18)] sm:gap-3 sm:rounded-2xl sm:px-4";
+    "flex min-w-0 items-center gap-2.5 rounded-[1.15rem] border border-white/20 bg-[var(--brand-beige)] px-3.5 shadow-[0_10px_28px_-24px_rgba(26,26,26,0.35)] focus-within:border-white focus-within:ring-2 focus-within:ring-white/28 sm:gap-3 sm:rounded-2xl sm:px-4";
   const inputClass =
     "h-11 w-full min-w-0 bg-transparent text-sm text-[var(--brand-charcoal)] outline-none placeholder:text-[var(--brand-text-secondary)] sm:h-12";
 
@@ -77,8 +77,8 @@ export function JobSearchForm({
       }}
       className={
         compact
-          ? "rounded-[1.7rem] border border-[rgba(123,44,40,0.34)] bg-white p-3.5 shadow-[0_24px_70px_-40px_rgba(123,44,40,0.26)] ring-1 ring-[rgba(123,44,40,0.06)] sm:rounded-[2rem] sm:p-4"
-          : "rounded-[1.85rem] border border-[rgba(123,44,40,0.34)] bg-white p-3.5 shadow-[0_30px_100px_-35px_rgba(123,44,40,0.28)] ring-1 ring-[rgba(123,44,40,0.06)] sm:rounded-[2.15rem] sm:p-4"
+          ? "rounded-[1.7rem] border border-white/14 bg-[linear-gradient(135deg,#7B2C28_0%,#6f2724_58%,#1F2B24_100%)] p-3.5 shadow-[0_24px_70px_-40px_rgba(123,44,40,0.56)] ring-1 ring-[rgba(123,44,40,0.18)] sm:rounded-[2rem] sm:p-4"
+          : "rounded-[1.85rem] border border-white/14 bg-[linear-gradient(135deg,#7B2C28_0%,#6f2724_58%,#1F2B24_100%)] p-3.5 shadow-[0_30px_100px_-42px_rgba(123,44,40,0.58)] ring-1 ring-[rgba(123,44,40,0.18)] sm:rounded-[2.15rem] sm:p-4"
       }
     >
       <div className="grid gap-2.5 grid-cols-1 lg:grid-cols-[1.8fr_1fr_1fr_auto]">
@@ -134,19 +134,19 @@ export function JobSearchForm({
 
         <Button
           type="submit"
-          className="h-11 w-full rounded-[1.15rem] bg-[var(--brand-brick)] shadow-[0_16px_34px_-18px_rgba(123,44,40,0.55)] hover:bg-[#65231f] sm:h-12 sm:rounded-2xl lg:w-auto"
+          className="h-11 w-full rounded-[1.15rem] bg-[var(--brand-green)] text-white shadow-[0_16px_34px_-18px_rgba(26,26,26,0.65)] hover:bg-[var(--brand-charcoal)] sm:h-12 sm:rounded-2xl lg:w-auto"
         >
           {submitLabel}
         </Button>
       </div>
 
-      <div className="mt-3 flex flex-col gap-2 border-t border-[rgba(123,44,40,0.14)] pt-3 text-[11px] text-[var(--brand-text-secondary)] md:mt-4 md:flex-row md:items-center md:justify-between md:text-xs">
+      <div className="mt-3 flex flex-col gap-2 border-t border-white/18 pt-3 text-[11px] text-white/82 md:mt-4 md:flex-row md:items-center md:justify-between md:text-xs">
         <p className="inline-flex items-start gap-2 leading-5">
-          <SlidersHorizontal className="h-4 w-4 text-[var(--brand-brick)]" />
+          <SlidersHorizontal className="h-4 w-4 text-[var(--brand-beige)]" />
           {helperText}
         </p>
         <p>
-          <Link href={footerLinkHref as never} className="font-semibold text-[var(--brand-brick)] underline-offset-4 hover:text-[#65231f] hover:underline">
+          <Link href={footerLinkHref as never} className="font-semibold text-white underline-offset-4 hover:text-[var(--brand-beige)] hover:underline">
             {footerLinkLabel}
           </Link>
         </p>
