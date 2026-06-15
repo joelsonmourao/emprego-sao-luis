@@ -87,16 +87,17 @@ export function HomeSearchForm({
   }, [availableCities, selectedCity]);
 
   const fieldClass =
-    "flex w-full min-w-0 items-center gap-3 rounded-xl border border-[var(--brand-line)] bg-white px-4";
-  const inputClass = "h-12 w-full min-w-0 bg-transparent text-sm text-[var(--brand-charcoal)] outline-none placeholder:text-[var(--brand-text-secondary)]";
+    "flex w-full min-w-0 items-center gap-2.5 rounded-xl border border-[rgba(123,44,40,0.26)] bg-white px-3.5 shadow-[0_10px_28px_-24px_rgba(123,44,40,0.3)] focus-within:border-[var(--brand-brick)] focus-within:ring-2 focus-within:ring-[rgba(123,44,40,0.18)] sm:gap-3 sm:px-4";
+  const inputClass =
+    "h-12 w-full min-w-0 bg-transparent text-sm text-[var(--brand-charcoal)] outline-none placeholder:text-[var(--brand-text-secondary)]";
 
   return (
     <form
       action={action}
       className={
         isHomeVariant
-          ? "w-full rounded-2xl border border-[rgba(123,44,40,0.16)] bg-white p-3 shadow-[0_18px_45px_-32px_rgba(123,44,40,0.2)] sm:p-4"
-          : "rounded-[1.85rem] border border-white/60 bg-white/99 p-3.5 shadow-[0_30px_100px_-35px_rgba(26,43,76,0.24)] sm:rounded-[2.15rem] sm:p-4"
+          ? "w-full rounded-2xl border border-[rgba(123,44,40,0.42)] bg-white p-3 shadow-[0_20px_50px_-32px_rgba(123,44,40,0.34)] ring-1 ring-[rgba(123,44,40,0.08)] sm:p-4"
+          : "rounded-[1.85rem] border border-[rgba(123,44,40,0.3)] bg-white p-3.5 shadow-[0_30px_100px_-35px_rgba(123,44,40,0.24)] ring-1 ring-[rgba(123,44,40,0.06)] sm:rounded-[2.15rem] sm:p-4"
       }
     >
       {isHomeVariant ? <input type="hidden" name="estado" value={fixedStateSlug} /> : null}
@@ -153,7 +154,7 @@ export function HomeSearchForm({
             disabled={!isHomeVariant && !selectedState}
           >
             <option value="">
-              {isHomeVariant ? "Sao Luis, MA" : selectedState ? "Todas as cidades" : "Selecione um estado primeiro"}
+              {isHomeVariant ? "Cidade" : selectedState ? "Todas as cidades" : "Selecione um estado primeiro"}
             </option>
             {availableCities.map((city) => (
               <option key={city.id} value={city.slug}>
@@ -174,7 +175,7 @@ export function HomeSearchForm({
               aria-label="Categoria ou área"
               className={inputClass}
             >
-              <option value="">Todas as categorias</option>
+              <option value="">Categoria</option>
               {categories.map((category) => (
                 <option key={category.slug} value={category.slug}>
                   {category.name}
@@ -188,8 +189,8 @@ export function HomeSearchForm({
           type="submit"
           className={
             isHomeVariant
-              ? "h-12 w-full rounded-2xl px-6 text-sm font-bold xl:w-auto xl:min-w-[9.5rem]"
-              : "h-11 rounded-[1.15rem] sm:h-12 sm:rounded-2xl"
+              ? "h-12 w-full rounded-2xl bg-[var(--brand-brick)] px-6 text-sm font-bold shadow-[0_16px_34px_-18px_rgba(123,44,40,0.55)] hover:bg-[#65231f] xl:w-auto xl:min-w-[9.5rem]"
+              : "h-11 w-full rounded-[1.15rem] bg-[var(--brand-brick)] shadow-[0_16px_34px_-18px_rgba(123,44,40,0.55)] hover:bg-[#65231f] sm:h-12 sm:rounded-2xl lg:w-auto"
           }
         >
           {submitLabel}
@@ -202,7 +203,7 @@ export function HomeSearchForm({
           )
         : null}
 
-      <div className="mt-3 flex flex-col gap-2 text-[11px] text-[var(--brand-text-secondary)] md:mt-4 md:flex-row md:items-center md:justify-between md:text-xs">
+      <div className="mt-3 border-t border-[rgba(123,44,40,0.14)] pt-3 flex flex-col gap-2 text-[11px] text-[var(--brand-text-secondary)] md:mt-4 md:flex-row md:items-center md:justify-between md:text-xs">
         <p className="inline-flex items-start gap-2 leading-5">
           <SlidersHorizontal className="h-4 w-4 shrink-0 text-[var(--brand-brick)]" />
           {helperText ?? (isHomeVariant ? "Busque por cargo, cidade e categoria no Maranhão." : "Use cargo, cidade e estado para chegar mais rápido nas vagas.")}

@@ -85,16 +85,6 @@ export default async function HomePage() {
               Encontre oportunidades atualizadas na capital, Região Metropolitana e cidades do estado.
             </p>
 
-            <div className="mt-4 flex justify-start lg:hidden">
-              <Image
-                src="/logo-horizontal.png"
-                alt="Emprego São Luís"
-                width={320}
-                height={84}
-                priority
-                className="h-14 w-auto max-w-full object-contain sm:h-16"
-              />
-            </div>
 
             <div className="mt-5 w-full min-w-0 lg:mt-7">
               <HomeSearchForm
@@ -102,7 +92,6 @@ export default async function HomePage() {
                 states={maranhaoStates}
                 categories={homeCategories.map((item) => ({ slug: item.slug, name: item.name }))}
                 fixedStateSlug={maranhaoState?.slug ?? "maranhao"}
-                initialCity="sao-luis"
                 action="/vagas"
                 submitLabel="Buscar vagas"
                 helperText="Pesquise por cargo, cidade e categoria no Maranhão."

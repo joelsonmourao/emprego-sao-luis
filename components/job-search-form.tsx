@@ -55,6 +55,11 @@ export function JobSearchForm({
     }
   }, [availableCities, selectedCity]);
 
+  const fieldClass =
+    "flex min-w-0 items-center gap-2.5 rounded-[1.15rem] border border-[rgba(123,44,40,0.26)] bg-white px-3.5 shadow-[0_10px_28px_-24px_rgba(123,44,40,0.3)] focus-within:border-[var(--brand-brick)] focus-within:ring-2 focus-within:ring-[rgba(123,44,40,0.18)] sm:gap-3 sm:rounded-2xl sm:px-4";
+  const inputClass =
+    "h-11 w-full min-w-0 bg-transparent text-sm text-[var(--brand-charcoal)] outline-none placeholder:text-[var(--brand-text-secondary)] sm:h-12";
+
   return (
     <form
       action={action}
@@ -72,32 +77,32 @@ export function JobSearchForm({
       }}
       className={
         compact
-          ? "rounded-[1.7rem] border border-[var(--brand-line)] bg-white/98 p-3.5 shadow-[0_24px_70px_-40px_rgba(26,43,76,0.18)] sm:rounded-[2rem] sm:p-4"
-          : "rounded-[1.85rem] border border-white/60 bg-white/99 p-3.5 shadow-[0_30px_100px_-35px_rgba(26,43,76,0.24)] sm:rounded-[2.15rem] sm:p-4"
+          ? "rounded-[1.7rem] border border-[rgba(123,44,40,0.34)] bg-white p-3.5 shadow-[0_24px_70px_-40px_rgba(123,44,40,0.26)] ring-1 ring-[rgba(123,44,40,0.06)] sm:rounded-[2rem] sm:p-4"
+          : "rounded-[1.85rem] border border-[rgba(123,44,40,0.34)] bg-white p-3.5 shadow-[0_30px_100px_-35px_rgba(123,44,40,0.28)] ring-1 ring-[rgba(123,44,40,0.06)] sm:rounded-[2.15rem] sm:p-4"
       }
     >
       <div className="grid gap-2.5 grid-cols-1 lg:grid-cols-[1.8fr_1fr_1fr_auto]">
-        <label className="flex items-center gap-3 rounded-[1.15rem] border border-[var(--brand-line)] bg-[linear-gradient(180deg,rgba(255,255,255,0.99),rgba(244,247,246,0.98))] px-4 sm:rounded-2xl">
+        <label className={fieldClass}>
           <span className="sr-only">Cargo, empresa ou palavra-chave</span>
-          <Search className="h-5 w-5 text-[var(--brand-brick)]" />
+          <Search className="h-5 w-5 shrink-0 text-[var(--brand-brick)]" />
           <input
             name="q"
             defaultValue={initialQuery}
             placeholder="Cargo, empresa ou palavra-chave"
             aria-label="Cargo, empresa ou palavra-chave"
-            className="h-11 w-full bg-transparent text-sm text-[var(--brand-navy)] outline-none placeholder:text-[var(--brand-text-secondary)] sm:h-12"
+            className={inputClass}
           />
         </label>
 
-        <label className="flex items-center gap-3 rounded-[1.15rem] border border-[var(--brand-line)] bg-[linear-gradient(180deg,rgba(255,255,255,0.99),rgba(244,247,246,0.98))] px-4 sm:rounded-2xl">
+        <label className={fieldClass}>
           <span className="sr-only">Estado</span>
-          <MapPinned className="h-5 w-5 text-[var(--brand-blue)]" />
+          <MapPinned className="h-5 w-5 shrink-0 text-[var(--brand-brick)]" />
           <select
             name="estado"
             value={selectedState}
             onChange={(event) => setSelectedState(event.target.value)}
             aria-label="Estado"
-            className="h-11 w-full bg-transparent text-sm text-[var(--brand-navy)] outline-none sm:h-12"
+            className={inputClass}
           >
             <option value="">Todos os estados</option>
             {states.map((state) => (
@@ -108,15 +113,15 @@ export function JobSearchForm({
           </select>
         </label>
 
-        <label className="flex items-center gap-3 rounded-[1.15rem] border border-[var(--brand-line)] bg-[linear-gradient(180deg,rgba(255,255,255,0.99),rgba(244,247,246,0.98))] px-4 sm:rounded-2xl">
+        <label className={fieldClass}>
           <span className="sr-only">Cidade</span>
-          <MapPinned className="h-5 w-5 text-[var(--brand-blue)]" />
+          <MapPinned className="h-5 w-5 shrink-0 text-[var(--brand-brick)]" />
           <select
             name="cidade"
             value={selectedCity}
             onChange={(event) => setSelectedCity(event.target.value)}
             aria-label="Cidade"
-            className="h-11 w-full bg-transparent text-sm text-[var(--brand-navy)] outline-none sm:h-12"
+            className={inputClass}
           >
             <option value="">Todas as cidades</option>
             {availableCities.map((city) => (
@@ -127,12 +132,15 @@ export function JobSearchForm({
           </select>
         </label>
 
-        <Button type="submit" className="h-11 rounded-[1.15rem] sm:h-12 sm:rounded-2xl">
+        <Button
+          type="submit"
+          className="h-11 w-full rounded-[1.15rem] bg-[var(--brand-brick)] shadow-[0_16px_34px_-18px_rgba(123,44,40,0.55)] hover:bg-[#65231f] sm:h-12 sm:rounded-2xl lg:w-auto"
+        >
           {submitLabel}
         </Button>
       </div>
 
-      <div className="mt-3 flex flex-col gap-2 text-[11px] text-[var(--brand-text-secondary)] md:mt-4 md:flex-row md:items-center md:justify-between md:text-xs">
+      <div className="mt-3 flex flex-col gap-2 border-t border-[rgba(123,44,40,0.14)] pt-3 text-[11px] text-[var(--brand-text-secondary)] md:mt-4 md:flex-row md:items-center md:justify-between md:text-xs">
         <p className="inline-flex items-start gap-2 leading-5">
           <SlidersHorizontal className="h-4 w-4 text-[var(--brand-brick)]" />
           {helperText}
