@@ -34,7 +34,7 @@ export function BlogCoverImage({
   const alt = coverImageAlt || getBlogCoverAlt(title);
 
   if (!src || isLocalGeneratedCover(src)) {
-    return <BlogCoverGraphic slug={slug} title={title} category={category} className={className} />;
+    return <BlogCoverGraphic slug={slug} title={title} className={className} />;
   }
 
   if (isRemoteCover(src)) {

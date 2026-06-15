@@ -206,6 +206,96 @@ h4 {
   box-shadow: 0 14px 32px -20px rgba(123, 44, 40, 0.22);
 }
 
+.es-search-shell {
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: linear-gradient(135deg, #7b2c28 0%, #6f2724 58%, #1f2b24 100%);
+  box-shadow: 0 22px 54px -32px rgba(123, 44, 40, 0.6);
+}
+
+.es-search-field {
+  display: flex;
+  width: 100%;
+  min-width: 0;
+  align-items: center;
+  gap: 0.625rem;
+  border-radius: 0.75rem;
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  background: #ffffff;
+  padding: 0 0.875rem;
+  box-shadow: 0 8px 24px -20px rgba(26, 26, 26, 0.28);
+  transition:
+    border-color 160ms ease,
+    box-shadow 160ms ease;
+}
+
+.es-search-field:focus-within {
+  border-color: #7b2c28;
+  box-shadow: 0 0 0 2px rgba(123, 44, 40, 0.18);
+}
+
+.es-search-input {
+  height: 3rem;
+  width: 100%;
+  min-width: 0;
+  border: 0;
+  background: transparent;
+  font-size: 0.875rem;
+  color: #1a1a1a;
+  outline: none;
+}
+
+.es-search-input::placeholder {
+  color: #5a5a5a;
+}
+
+.es-search-input option {
+  color: #1a1a1a;
+  background: #ffffff;
+}
+
+.es-search-submit {
+  display: inline-flex;
+  height: 3rem;
+  width: 100%;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.75rem;
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  background: #ffffff;
+  padding: 0 1.5rem;
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: #1a1a1a;
+  box-shadow: 0 8px 24px -20px rgba(26, 26, 26, 0.28);
+  transition:
+    background-color 160ms ease,
+    border-color 160ms ease;
+}
+
+.es-search-submit:hover {
+  background: #f5f2eb;
+}
+
+.es-search-footer {
+  margin-top: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.18);
+  padding-top: 0.75rem;
+  font-size: 0.6875rem;
+  color: rgba(255, 255, 255, 0.88);
+}
+
+@media (min-width: 768px) {
+  .es-search-footer {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 0.75rem;
+  }
+}
+
 .es-card-hover {
   transition:
     transform 180ms ease,

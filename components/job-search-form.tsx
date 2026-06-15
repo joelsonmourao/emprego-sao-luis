@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { MapPinned, Search, SlidersHorizontal } from "lucide-react";
 
-import { Button } from "@/components/ui/button";
 import { trackPortalEvent } from "@/lib/analytics/client";
 
 type SearchState = {
@@ -55,11 +54,6 @@ export function JobSearchForm({
     }
   }, [availableCities, selectedCity]);
 
-  const fieldClass =
-    "flex min-w-0 items-center gap-2.5 rounded-[1.15rem] border border-white/20 bg-[var(--brand-beige)] px-3.5 shadow-[0_10px_28px_-24px_rgba(26,26,26,0.35)] focus-within:border-[var(--brand-brick)] focus-within:ring-2 focus-within:ring-white/28 sm:gap-3 sm:rounded-2xl sm:px-4";
-  const inputClass =
-    "h-11 w-full min-w-0 bg-transparent text-sm text-[var(--brand-charcoal)] outline-none placeholder:text-[var(--brand-text-secondary)] sm:h-12";
-
   return (
     <form
       action={action}
@@ -75,14 +69,10 @@ export function JobSearchForm({
           }
         });
       }}
-      className={
-        compact
-          ? "rounded-[1.7rem] border border-white/14 bg-[linear-gradient(135deg,#7B2C28_0%,#6f2724_58%,#1F2B24_100%)] p-3.5 shadow-[0_24px_70px_-40px_rgba(123,44,40,0.56)] ring-1 ring-[rgba(123,44,40,0.18)] sm:rounded-[2rem] sm:p-4"
-          : "rounded-[1.85rem] border border-white/14 bg-[linear-gradient(135deg,#7B2C28_0%,#6f2724_58%,#1F2B24_100%)] p-3.5 shadow-[0_30px_100px_-42px_rgba(123,44,40,0.58)] ring-1 ring-[rgba(123,44,40,0.18)] sm:rounded-[2.15rem] sm:p-4"
-      }
+      className={`es-search-shell w-full rounded-2xl p-3.5 sm:p-4 ${compact ? "" : "sm:rounded-[2.15rem]"}`}
     >
-      <div className="grid gap-2.5 grid-cols-1 lg:grid-cols-[1.8fr_1fr_1fr_auto]">
-        <label className={fieldClass}>
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)_minmax(0,1fr)_auto]">
+        <label className="es-search-field sm:col-span-2 lg:col-span-1">
           <span className="sr-only">Cargo, empresa ou palavra-chave</span>
           <Search className="h-5 w-5 shrink-0 text-[var(--brand-brick)]" />
           <input
@@ -90,11 +80,11 @@ export function JobSearchForm({
             defaultValue={initialQuery}
             placeholder="Cargo, empresa ou palavra-chave"
             aria-label="Cargo, empresa ou palavra-chave"
-            className={inputClass}
+            className="es-search-input"
           />
         </label>
 
-        <label className={fieldClass}>
+        <label className="es-search-field">
           <span className="sr-only">Estado</span>
           <MapPinned className="h-5 w-5 shrink-0 text-[var(--brand-brick)]" />
           <select
@@ -102,7 +92,7 @@ export function JobSearchForm({
             value={selectedState}
             onChange={(event) => setSelectedState(event.target.value)}
             aria-label="Estado"
-            className={inputClass}
+            className="es-search-input"
           >
             <option value="">Todos os estados</option>
             {states.map((state) => (
@@ -113,7 +103,7 @@ export function JobSearchForm({
           </select>
         </label>
 
-        <label className={fieldClass}>
+        <label className="es-search-field">
           <span className="sr-only">Cidade</span>
           <MapPinned className="h-5 w-5 shrink-0 text-[var(--brand-brick)]" />
           <select
@@ -121,7 +111,7 @@ export function JobSearchForm({
             value={selectedCity}
             onChange={(event) => setSelectedCity(event.target.value)}
             aria-label="Cidade"
-            className={inputClass}
+            className="es-search-input"
           >
             <option value="">Todas as cidades</option>
             {availableCities.map((city) => (
@@ -132,17 +122,14 @@ export function JobSearchForm({
           </select>
         </label>
 
-        <Button
-          type="submit"
-          className="h-11 w-full rounded-[1.15rem] bg-[var(--brand-green)] text-white shadow-[0_16px_34px_-18px_rgba(26,26,26,0.65)] hover:bg-[var(--brand-charcoal)] sm:h-12 sm:rounded-2xl lg:w-auto"
-        >
+        <button type="submit" className="es-search-submit lg:min-w-[9.5rem]">
           {submitLabel}
-        </Button>
+        </button>
       </div>
 
-      <div className="mt-3 flex flex-col gap-2 border-t border-white/18 pt-3 text-[11px] text-white/82 md:mt-4 md:flex-row md:items-center md:justify-between md:text-xs">
+      <div className="es-search-footer">
         <p className="inline-flex items-start gap-2 leading-5">
-          <SlidersHorizontal className="h-4 w-4 text-[var(--brand-beige)]" />
+          <SlidersHorizontal className="h-4 w-4 shrink-0 text-[var(--brand-beige)]" />
           {helperText}
         </p>
         <p>
