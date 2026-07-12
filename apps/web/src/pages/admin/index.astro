@@ -1,4 +1,21 @@
 ---
 import AdminLayout from "../../layouts/AdminLayout.astro";
+import { backgroundJobs, createDatabase, importBatches, jobs } from "@es/db";
+import { count, eq } from "drizzle-orm";
+
+let metrics = { published: 0, review: 0, imports: 0, failed: 0 };
+if (process.env.DATABASE_URL) {
+  const connection = createDatabase(process.env.DATABASE_URL);
+  try {
+    const [[published], [review], [imports], [failed]] = await Promise.all([
+      connection.db.select({ value: count() }).from(jobs).where(eq(jobs.publicationStatus, "PUBLISHED")),
+      connection.db.select({ value: count() }).from(jobs).where(eq(jobs.publicationStatus, "PENDING_REVIEW")),
+      connection.db.select({ value: count() }).from(importBatches),
+      connection.db.select({ value: count() }).from(backgroundJobs).where(eq(backgroundJobs.status, "FAILED"))
+    ]);
+    metrics = { published: published?.value ?? 0, review: review?.value ?? 0, imports: imports?.value ?? 0, failed: failed?.value ?? 0 };
+  } finally { await connection.close(); }
+}
+const cards = [["Vagas publicadas", metrics.published], ["Aguardando revisão", metrics.review], ["Importações", metrics.imports], ["Tarefas com erro", metrics.failed]];
 ---
-<AdminLayout title="Visão geral"><h1 class="text-3xl font-black">Visão geral</h1><p class="mt-3 text-slate-700">Acompanhe publicação, importações, integrações e saúde operacional.</p><div class="mt-8 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">{["Vagas publicadas", "Aguardando revisão", "Importações", "Tarefas com erro"].map((label) => <section class="rounded-2xl bg-white p-5"><p class="text-sm text-slate-600">{label}</p><strong class="mt-2 block text-3xl">—</strong></section>)}</div></AdminLayout>
+<AdminLayout title="Visão geral"><h1 class="text-3xl font-black">Visão geral</h1><p class="mt-3 text-slate-700">Acompanhe publicação, importações, integrações e saúde operacional.</p><div class="mt-8 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">{cards.map(([label, value]) => <section class="rounded-2xl bg-white p-5"><p class="text-sm text-slate-600">{label}</p><strong class="mt-2 block text-3xl">{value}</strong></section>)}</div><div class="mt-8 flex flex-wrap gap-3"><a class="rounded-lg bg-emerald-700 px-4 py-2 font-bold text-white" href="/admin/vagas/nova">Cadastrar vaga</a><a class="rounded-lg border border-slate-300 bg-white px-4 py-2" href="/admin/importacao">Nova importação</a><a class="rounded-lg border border-slate-300 bg-white px-4 py-2" href="/admin/social">Abrir estúdio social</a></div></AdminLayout>
