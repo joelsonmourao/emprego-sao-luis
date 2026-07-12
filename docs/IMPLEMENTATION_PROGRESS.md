@@ -1,32 +1,49 @@
 # Progresso da implementação
 
-Branch: `codex/reconstrucao-astro`. A branch `main` não é alterada automaticamente.
+## Visão geral
 
-## Concluído e validado
+Branch `codex/reconstrucao-astro`. Arquitetura Astro 7, Drizzle, PostgreSQL, Valkey/BullMQ e Docker preservada. A `main` não é alterada automaticamente.
 
-- Fundação Astro 7/Drizzle/PostgreSQL/Valkey/BullMQ e Docker/Coolify.
-- Migrations `0000` a `0011`, com job independente e relatório nominal.
-- Worker ESM com `node dist/index.js`, shutdown seguro e logs sanitizados.
-- Autenticação administrativa, RBAC, 2FA, recuperação de senha e sessões revogáveis.
-- Home dinâmica, `/vagas` com filtros, página de vaga, SEO base e rotas de descoberta.
-- Cadastro manual, importação assíncrona base, Social Studio base, alertas e monetização base.
+## Fases concluídas
 
-## Em execução
+- Fase 1 — segurança e autenticação administrativa.
+- Fase 2 — gestão ampliada de vagas.
+- Fase 3 — importação XLSX/CSV com mapeamento e processamento BullMQ.
+- Fase 4 — programação em blocos e publicação automática.
+- Fase 5 — empresas, categorias, cidades, bairros e redirecionamentos seguros.
 
-- Fase 3: fluxo de importação em duas etapas implementado com escolha de aba, sugestão e edição de mapeamento, modelos persistidos, prévia, estratégia de duplicidade e processamento BullMQ. Migration `0012_public_hex.sql` pendente de aplicação no Coolify.
-- Fase 4: programação em blocos implementada com janela, intervalos, prevenção de conflitos, prévia persistida, pausa, retomada, cancelamento e publicação automática pelo worker. Migration `0013_elite_lorna_dane.sql` pendente de aplicação no Coolify.
+## Fase em andamento
 
-## Commits recentes
+- Fase 6 — CMS editorial.
 
-- `c16b268`: identificação inequívoca do deployment Astro e 404 própria.
-- `c9c684a`: edição, duplicação e histórico de vagas.
-- `ee9aba3`: ações em lote de vagas.
-- `65619eb`: mapeamento e processamento administrável de planilhas.
+## Commits principais
 
-## Bloqueio externo confirmado
+- `ba658be` — segurança, recuperação de senha e sessões.
+- `c16b268` — identificação do deployment Astro, healthchecks e 404.
+- `c9c684a` — edição, duplicação e histórico de vagas.
+- `ee9aba3` — ações em lote de vagas.
+- `65619eb` — importação administrável de planilhas.
+- `d22dc6d` — programação em blocos.
 
-Em 12/07/2026, o domínio oficial respondeu com título do portal legado, `/api/health` sem marcador Astro e `/api/ready` como HTML 404. O código Astro possui `/api/ready`; portanto DNS/proxy/Coolify está roteando o domínio, total ou parcialmente, para outro recurso. No Coolify é necessário remover o domínio oficial do recurso antigo e mantê-lo somente no recurso criado com `Dockerfile.web`, depois limpar cache do proxy/CDN. Respostas do deployment novo carregam `X-ES-App: astro`.
+## Migrations
 
-## Próximas fases
+- `0012_public_hex.sql`, `0013_elite_lorna_dane.sql` e `0014_typical_terror.sql` aguardam aplicação pelo job de migration no Coolify.
+- Migrations são aditivas, versionadas e nunca executadas automaticamente no start do web.
 
-Administração completa de vagas; importação; programação; cadastros; CMS; mídia; configuração visual; SEO; social; alertas; anúncios; filas; usuários/admin; portal público; institucionais; qualidade final.
+## Testes atuais
+
+- lint, typecheck, migration check e build aprovados.
+- 23 testes unitários aprovados.
+- 9 testes E2E aprovados.
+
+## Bloqueios externos
+
+O domínio oficial ainda pode estar vinculado ao deployment legado. Deve ficar exclusivamente no recurso `Dockerfile.web`, seguido de limpeza do cache do proxy/Cloudflare e verificação de `X-ES-App: astro`. Isso não impede o desenvolvimento local.
+
+## Configurações pendentes
+
+Credenciais reais de Meta, Google, Resend, R2/S3, Sentry e AdSense devem permanecer apenas no Coolify. Os módulos usam variáveis e fallbacks sem inventar segredos.
+
+## Próximos itens internos
+
+Fase 6 em execução; depois mídia, configuração visual, SEO, social, alertas, publicidade, filas, usuários/admin, portal final, institucionais e auditoria final.
