@@ -18,8 +18,12 @@ if (!jsonLd) return Astro.redirect(`/vagas/indisponivel/${encodeURIComponent(slu
     <p class="mt-2 text-slate-600">{job.companyName} · {job.cityName}/{job.stateCode}</p>
     <p class="mt-4 text-lg text-slate-700">{record.summary}</p>
     <section class="prose mt-8 max-w-none" set:html={record.description} />
-    <a class="mt-10 inline-flex rounded-xl bg-red-700 px-6 py-4 font-bold text-white" href={record.applicationUrl} rel="nofollow noopener noreferrer">Candidatar-se</a>
-    <form class="mt-4" method="post" action="/api/account/saved-jobs"><input type="hidden" name="jobId" value={record.id}/><input type="hidden" name="action" value="save"/><button class="rounded-xl border px-5 py-3 font-bold">Salvar vaga</button></form>
-    <AdSlot slot="job-after-application" />
+    <AdSlot slot="job-content-mid" pageType="job" citySlug={job.cityName} companySlug={job.companyName} />
+    <div class="mt-10 rounded-2xl border-2 border-red-100 bg-red-50 p-6" id="candidatura">
+      <h2 class="text-xl font-black text-red-900">Candidatura</h2>
+      <a class="mt-4 inline-flex rounded-xl bg-red-700 px-6 py-4 font-bold text-white" href={record.applicationUrl} rel="nofollow noopener noreferrer">Candidatar-se</a>
+      <form class="mt-4" method="post" action="/api/account/saved-jobs"><input type="hidden" name="jobId" value={record.id}/><input type="hidden" name="action" value="save"/><button class="rounded-xl border px-5 py-3 font-bold">Salvar vaga</button></form>
+    </div>
+    <AdSlot slot="job-sidebar" pageType="job" citySlug={job.cityName} companySlug={job.companyName} />
   </article>
 </BaseLayout>

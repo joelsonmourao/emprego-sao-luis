@@ -1,9 +1,49 @@
 ---
-interface Props { slot: string; label?: string }
-const { slot, label = "Publicidade" } = Astro.props;
-const enabled = import.meta.env.PUBLIC_ADSENSE_ENABLED === "true";
-const client = import.meta.env.PUBLIC_ADSENSE_CLIENT_ID as string | undefined;
+import { CANDIDATURE_BLOCKED_SLOT_KEYS } from "@es/ads";
+import { resolveAdForSlot, type AdContext } from "../lib/ads";
+
+interface Props {
+  slot: string;
+  label?: string;
+  pageType?: string;
+  citySlug?: string;
+  categorySlug?: string;
+  companySlug?: string;
+  workplaceType?: string;
+}
+
+const { slot, label = "Publicidade", pageType = "global", citySlug, categorySlug, companySlug, workplaceType } = Astro.props;
+
+if (CANDIDATURE_BLOCKED_SLOT_KEYS.has(slot)) {
+  throw new Error(`Espaço publicitário bloqueado perto da candidatura: ${slot}`);
+}
+
+const context: AdContext = {
+  path: Astro.url.pathname,
+  pageType,
+  device: "all",
+  ...(citySlug ? { citySlug } : {}),
+  ...(categorySlug ? { categorySlug } : {}),
+  ...(companySlug ? { companySlug } : {}),
+  ...(workplaceType ? { workplaceType } : {})
+};
+
+const resolved = await resolveAdForSlot(slot, context);
 const consent = Astro.cookies.get("es_consent_ads")?.value === "yes";
-const show = enabled && Boolean(client) && consent;
 ---
-{show && <aside class="mt-10 min-h-[280px] border-t pt-6" aria-label={label}><p class="mb-2 text-center text-xs uppercase tracking-wide text-slate-500">{label}</p><ins class="adsbygoogle block" data-ad-client={client} data-ad-slot={slot} data-ad-format="auto" data-full-width-responsive="true"></ins><script is:inline>{`(adsbygoogle = window.adsbygoogle || []).push({});`}</script></aside>}
+{resolved?.type === "direct" && (
+  <aside class="es-ad-slot my-10 min-h-[120px] rounded-xl border border-slate-200 bg-slate-50 p-4" aria-label={label} data-ad-slot={slot}>
+    <p class="mb-2 text-center text-xs uppercase tracking-wide text-slate-500">{resolved.disclosure}</p>
+    <a href={`/api/ads/click?creative=${resolved.creative.id}&slot=${slot}&path=${encodeURIComponent(context.path)}`} rel="sponsored noopener noreferrer" target="_blank">
+      <img src={resolved.creative.imageUrl} alt={resolved.creative.altText} class="mx-auto max-h-[280px] w-full object-contain" loading="lazy" width={resolved.slot.width ?? undefined} height={resolved.slot.height ?? undefined} />
+    </a>
+    <img src={`/api/ads/impression?creative=${resolved.creative.id}&slot=${slot}&path=${encodeURIComponent(context.path)}`} alt="" class="sr-only" width="1" height="1" />
+  </aside>
+)}
+{resolved?.type === "adsense" && consent && (
+  <aside class="es-ad-slot my-10 min-h-[280px] border-t border-slate-200 pt-6" aria-label={label} data-ad-slot={slot} style={`min-height:${resolved.slot.reservedHeight}px`}>
+    <p class="mb-2 text-center text-xs uppercase tracking-wide text-slate-500">{label}</p>
+    <ins class="adsbygoogle block" data-ad-client={resolved.clientId} data-ad-slot={resolved.slot.adsenseSlotId} data-ad-format="auto" data-full-width-responsive="true"></ins>
+    <script is:inline>{`(adsbygoogle = window.adsbygoogle || []).push({});`}</script>
+  </aside>
+)}

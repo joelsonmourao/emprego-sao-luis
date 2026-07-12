@@ -1,0 +1,130 @@
+---
+import AdminLayout from "../../layouts/AdminLayout.astro";
+import { can } from "../../lib/auth";
+import { ensureDefaultAdSlots, getAdReportSummary, getAdSettings } from "../../lib/ads";
+import { adCreatives, adSlots, advertisers, campaigns, createDatabase } from "@es/db";
+import { asc, desc, eq } from "drizzle-orm";
+
+const auth = Astro.locals.auth!;
+if (!can(auth, "commercial.manage")) return new Response("Proibido", { status: 403 });
+
+await ensureDefaultAdSlots();
+const settings = await getAdSettings();
+const report = await getAdReportSummary(30);
+const saved = Astro.url.searchParams.get("saved") === "1";
+
+let slotRows: Array<typeof adSlots.$inferSelect> = [];
+let advertiserRows: Array<typeof advertisers.$inferSelect> = [];
+let campaignRows: Array<{ campaign: typeof campaigns.$inferSelect; advertiser: string; creative: string | null }> = [];
+
+if (process.env.DATABASE_URL) {
+  const connection = createDatabase(process.env.DATABASE_URL);
+  try {
+    slotRows = await connection.db.select().from(adSlots).orderBy(asc(adSlots.sortOrder), asc(adSlots.name));
+    advertiserRows = await connection.db.select().from(advertisers).orderBy(desc(advertisers.createdAt));
+    const rows = await connection.db
+      .select({ campaign: campaigns, advertiser: advertisers.name, creative: adCreatives.name })
+      .from(campaigns)
+      .innerJoin(advertisers, eq(campaigns.advertiserId, advertisers.id))
+      .leftJoin(adCreatives, eq(adCreatives.campaignId, campaigns.id))
+      .orderBy(desc(campaigns.createdAt))
+      .limit(30);
+    campaignRows = rows;
+  } finally {
+    await connection.close();
+  }
+}
+
+const envAdsense = import.meta.env.PUBLIC_ADSENSE_CLIENT_ID ?? "";
+---
+<AdminLayout title="Publicidade">
+  <h1 class="text-3xl font-black">Publicidade e monetização</h1>
+  <p class="mt-2 text-slate-600">Espaços, campanhas diretas, AdSense e relatórios reais.</p>
+  {saved && <p class="mt-4 rounded-xl border border-green-200 bg-green-50 p-4 text-green-800">Configurações salvas.</p>}
+
+  <section class="mt-8 grid gap-4 md:grid-cols-4">
+    <article class="rounded-2xl bg-white p-5"><p class="text-sm text-slate-500">Impressões (30d)</p><p class="mt-2 text-3xl font-black">{report.impressions}</p></article>
+    <article class="rounded-2xl bg-white p-5"><p class="text-sm text-slate-500">Cliques (30d)</p><p class="mt-2 text-3xl font-black">{report.clicks}</p></article>
+    <article class="rounded-2xl bg-white p-5"><p class="text-sm text-slate-500">CTR</p><p class="mt-2 text-3xl font-black">{report.ctr}%</p></article>
+    <article class="rounded-2xl bg-white p-5"><p class="text-sm text-slate-500">AdSense</p><p class="mt-2 text-lg font-bold">{settings.adsenseEnabled && (settings.adsenseClientId || envAdsense) ? "Ativo" : "Não configurado"}</p></article>
+  </section>
+
+  <div class="mt-8 grid gap-8 xl:grid-cols-2">
+    <form class="grid gap-4 rounded-2xl bg-white p-6" method="post" action="/api/admin/ads/settings">
+      <h2 class="text-xl font-black">Configuração global</h2>
+      <label class="flex gap-3"><input type="checkbox" name="globalEnabled" value="yes" checked={settings.globalEnabled} /><span>Publicidade global ativa</span></label>
+      <label class="flex gap-3"><input type="checkbox" name="adsenseEnabled" value="yes" checked={settings.adsenseEnabled} /><span>AdSense habilitado</span></label>
+      <label>ID do cliente AdSense<input class="mt-1 w-full rounded-lg border p-3" name="adsenseClientId" value={settings.adsenseClientId || envAdsense} placeholder="ca-pub-..." /></label>
+      <label class="flex gap-3"><input type="checkbox" name="consentRequired" value="yes" checked={settings.consentRequired} /><span>Exigir consentimento de cookies</span></label>
+      <button class="rounded-xl bg-red-700 p-4 font-bold text-white">Salvar configuração</button>
+    </form>
+
+    <form class="grid gap-4 rounded-2xl bg-white p-6" method="post" action="/api/admin/ads/slots">
+      <h2 class="text-xl font-black">Novo espaço</h2>
+      <label>Código interno<input class="mt-1 w-full rounded-lg border p-3" name="key" pattern="[a-z0-9]+(-[a-z0-9]+)*" required placeholder="home-top" /></label>
+      <label>Nome<input class="mt-1 w-full rounded-lg border p-3" name="name" required /></label>
+      <label>Página<select class="mt-1 w-full rounded-lg border p-3" name="pageType"><option value="home">Home</option><option value="jobs">Vagas</option><option value="job">Vaga</option><option value="news">Notícias</option><option value="blog">Blog</option><option value="global">Global</option></select></label>
+      <label>Posição<input class="mt-1 w-full rounded-lg border p-3" name="position" required /></label>
+      <label>Dispositivo<select class="mt-1 w-full rounded-lg border p-3" name="device"><option value="all">Todos</option><option value="mobile">Mobile</option><option value="desktop">Desktop</option></select></label>
+      <label>Slot AdSense<input class="mt-1 w-full rounded-lg border p-3" name="adsenseSlotId" /></label>
+      <label class="flex gap-3"><input type="checkbox" name="active" value="yes" /><span>Ativo</span></label>
+      <button class="rounded-xl bg-red-700 p-4 font-bold text-white">Salvar espaço</button>
+    </form>
+  </div>
+
+  <section class="mt-8 rounded-2xl bg-white p-6">
+    <div class="flex items-center justify-between gap-4"><h2 class="text-xl font-black">Espaços publicitários</h2><a class="rounded-lg border px-3 py-2 text-sm font-bold" href="/api/admin/ads/reports.csv">Exportar CSV</a></div>
+    <div class="mt-4 overflow-auto">
+      <table class="min-w-full text-sm">
+        <thead><tr class="text-left text-slate-500"><th class="py-2">Nome</th><th>Código</th><th>Página</th><th>Status</th><th>AdSense</th></tr></thead>
+        <tbody>{slotRows.map((slot) => <tr class="border-t"><td class="py-2 pr-3">{slot.name || slot.key}</td><td class="pr-3">{slot.key}</td><td class="pr-3">{slot.pageType}</td><td class="pr-3">{slot.active ? "Ativo" : "Inativo"}</td><td>{slot.adsenseSlotId ?? "—"}</td></tr>)}</tbody>
+      </table>
+    </div>
+  </section>
+
+  <div class="mt-8 grid gap-8 xl:grid-cols-2">
+    <form class="grid gap-4 rounded-2xl bg-white p-6" method="post" action="/api/admin/ads/advertisers">
+      <h2 class="text-xl font-black">Novo anunciante</h2>
+      <label>Nome<input class="mt-1 w-full rounded-lg border p-3" name="name" required /></label>
+      <label>E-mail<input class="mt-1 w-full rounded-lg border p-3" type="email" name="contactEmail" required /></label>
+      <label>Documento<input class="mt-1 w-full rounded-lg border p-3" name="document" /></label>
+      <button class="rounded-xl bg-red-700 p-4 font-bold text-white">Cadastrar anunciante</button>
+    </form>
+
+    <form class="grid gap-4 rounded-2xl bg-white p-6" method="post" action="/api/admin/ads/campaigns">
+      <h2 class="text-xl font-black">Nova campanha direta</h2>
+      <label>Anunciante<select class="mt-1 w-full rounded-lg border p-3" name="advertiserId" required><option value="">Selecione</option>{advertiserRows.map((row) => <option value={row.id}>{row.name}</option>)}</select></label>
+      <label>Nome da campanha<input class="mt-1 w-full rounded-lg border p-3" name="name" required /></label>
+      <label>Patrocinador<input class="mt-1 w-full rounded-lg border p-3" name="sponsorName" /></label>
+      <label>Espaço<select class="mt-1 w-full rounded-lg border p-3" name="slotId" required><option value="">Selecione</option>{slotRows.map((row) => <option value={row.id}>{row.name || row.key}</option>)}</select></label>
+      <label>Nome do criativo<input class="mt-1 w-full rounded-lg border p-3" name="creativeName" required /></label>
+      <label>URL da imagem<input class="mt-1 w-full rounded-lg border p-3" type="url" name="imageUrl" required /></label>
+      <label>URL de destino<input class="mt-1 w-full rounded-lg border p-3" type="url" name="destinationUrl" required /></label>
+      <label>Texto ALT<input class="mt-1 w-full rounded-lg border p-3" name="altText" required /></label>
+      <label>Início<input class="mt-1 w-full rounded-lg border p-3" type="datetime-local" name="startsAt" /></label>
+      <label>Término<input class="mt-1 w-full rounded-lg border p-3" type="datetime-local" name="endsAt" /></label>
+      <label>Status<select class="mt-1 w-full rounded-lg border p-3" name="status"><option value="DRAFT">Rascunho</option><option value="ACTIVE">Ativa</option><option value="PAUSED">Pausada</option></select></label>
+      <button class="rounded-xl bg-red-700 p-4 font-bold text-white">Criar campanha</button>
+    </form>
+  </div>
+
+  <section class="mt-8 rounded-2xl bg-white p-6">
+    <h2 class="text-xl font-black">Campanhas recentes</h2>
+    <div class="mt-4 overflow-auto">
+      <table class="min-w-full text-sm">
+        <thead><tr class="text-left text-slate-500"><th class="py-2">Campanha</th><th>Anunciante</th><th>Status</th><th>Criativo</th></tr></thead>
+        <tbody>{campaignRows.map((row) => <tr class="border-t"><td class="py-2 pr-3">{row.campaign.name}</td><td class="pr-3">{row.advertiser}</td><td class="pr-3">{row.campaign.status}</td><td>{row.creative ?? "—"}</td></tr>)}</tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="mt-8 rounded-2xl bg-white p-6">
+    <h2 class="text-xl font-black">Relatório por posição</h2>
+    <div class="mt-4 overflow-auto">
+      <table class="min-w-full text-sm">
+        <thead><tr class="text-left text-slate-500"><th class="py-2">Espaço</th><th>Impressões</th><th>Cliques</th></tr></thead>
+        <tbody>{report.bySlot.map((row) => <tr class="border-t"><td class="py-2 pr-3">{row.slotKey}</td><td class="pr-3">{row.impressions}</td><td>{row.clicks}</td></tr>)}</tbody>
+      </table>
+    </div>
+  </section>
+</AdminLayout>
