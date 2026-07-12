@@ -3,12 +3,16 @@ import { expect, test } from "@playwright/test";
 test("health endpoint reports healthy", async ({ request }) => {
   const response = await request.get("/api/health");
   expect(response.ok()).toBe(true);
+  expect(response.headers()["content-type"]).toContain("application/json");
+  expect(response.headers()["x-es-app"]).toBe("astro");
   await expect(response.json()).resolves.toMatchObject({ ok: true, service: "web" });
 });
 
 test("readiness fails closed without infrastructure", async ({ request }) => {
   const response = await request.get("/api/ready", { failOnStatusCode: false });
   expect(response.status()).toBe(503);
+  expect(response.headers()["content-type"]).toContain("application/json");
+  expect(response.headers()["x-es-app"]).toBe("astro");
   await expect(response.json()).resolves.toMatchObject({ ok: false, status: "not_ready" });
 });
 
@@ -26,4 +30,11 @@ test("admin is protected", async ({ request }) => {
   const response = await request.get("/admin");
   expect(response.url()).toContain("/admin/login");
   expect(await response.text()).toContain("Painel administrativo");
+});
+
+test("custom 404 belongs to the Astro portal", async ({ request }) => {
+  const response = await request.get("/rota-inexistente-e2e", { failOnStatusCode: false });
+  expect(response.status()).toBe(404);
+  expect(response.headers()["x-es-app"]).toBe("astro");
+  expect(await response.text()).toContain("Esta página não foi encontrada.");
 });

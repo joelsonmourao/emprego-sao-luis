@@ -1,0 +1,5 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+Astro.response.status = 404;
+---
+<BaseLayout title="Página não encontrada — Empregos São Luís" description="A página solicitada não foi encontrada."><section class="mx-auto max-w-3xl px-4 py-24 text-center"><p class="font-mono text-sm font-bold text-red-700">ERRO 404</p><h1 class="mt-3 text-4xl font-black">Esta página não foi encontrada.</h1><p class="mt-4 text-slate-600">O endereço pode ter mudado ou o conteúdo não está mais disponível.</p><div class="mt-8 flex justify-center gap-3"><a class="rounded-xl bg-red-700 px-5 py-3 font-bold text-white" href="/vagas">Ver vagas</a><a class="rounded-xl border px-5 py-3 font-bold" href="/">Voltar à página inicial</a></div></section></BaseLayout>
