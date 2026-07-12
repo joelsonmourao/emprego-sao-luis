@@ -1,4 +1,61 @@
 ---
-import BaseLayout from "../../layouts/BaseLayout.astro"; import { listPublishedArticles } from "../../lib/articles"; const items = await listPublishedArticles(50, undefined, "NEWS");
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import Breadcrumbs from "../../components/ui/Breadcrumbs.astro";
+import EmptyState from "../../components/ui/EmptyState.astro";
+import PageHero from "../../components/ui/PageHero.astro";
+import { listPublishedArticles } from "../../lib/articles";
+
+const items = await listPublishedArticles(50, undefined, "NEWS");
+const featured = items[0];
+const rest = items.slice(1);
 ---
-<BaseLayout title="Notícias de emprego — Empregos São Luís" description="Notícias sobre mercado de trabalho, concursos e oportunidades em São Luís e no Maranhão."><section class="mx-auto max-w-6xl px-4 py-12"><nav class="text-sm text-slate-600"><a href="/">Início</a> / Notícias</nav><h1 class="mt-4 text-4xl font-black">Notícias de emprego</h1>{items.length === 0 ? <p class="mt-8 rounded-xl border bg-white p-6">Nenhuma notícia publicada neste momento.</p> : <div class="mt-8 grid gap-5 md:grid-cols-2">{items.map(({ article, authorName }) => <article class="rounded-2xl border bg-white p-6"><p class="text-sm font-bold text-red-700">{article.section ?? "Notícia"}</p><h2 class="mt-2 text-2xl font-black"><a href={`/noticias/${article.slug}`}>{article.title}</a></h2><p class="mt-3 text-slate-600">{article.excerpt}</p><p class="mt-4 text-sm">Por {authorName} · {article.publishedAt?.toLocaleDateString("pt-BR")}</p></article>)}</div>}</section></BaseLayout>
+<BaseLayout title="Notícias de emprego — Empregos São Luís" description="Notícias sobre mercado de trabalho, concursos e oportunidades em São Luís e no Maranhão." breadcrumbs={[{ name: "Notícias", url: "/noticias" }]}>
+  <PageHero kicker="Editorial" title="Notícias e orientação profissional" description="Conteúdo sobre mercado de trabalho, carreira e oportunidades na região." pattern={false} />
+
+  <section class="es-section pt-0">
+    <div class="es-container">
+      <Breadcrumbs items={[{ name: "Início", url: "/" }, { name: "Notícias" }]} />
+
+      {items.length === 0 ? (
+        <div class="mt-8"><EmptyState title="Nenhuma notícia publicada" description="Volte em breve para conteúdos sobre carreira e mercado de trabalho." actionHref="/vagas" actionLabel="Ver vagas" /></div>
+      ) : (
+        <div class="mt-8 grid gap-6 lg:grid-cols-3">
+          {featured && (
+            <article class="es-card overflow-hidden lg:col-span-2">
+              {featured.article.coverImageUrl && <img src={featured.article.coverImageUrl} alt={featured.article.coverImageAlt ?? featured.article.title} class="h-56 w-full object-cover" loading="lazy" />}
+              <div class="p-6 sm:p-8">
+                <p class="es-kicker">{featured.article.section ?? "Notícia"}</p>
+                <h2 class="font-display mt-2 text-3xl font-black"><a href={`/noticias/${featured.article.slug}`}>{featured.article.title}</a></h2>
+                <p class="mt-3 text-[var(--es-muted)]">{featured.article.excerpt}</p>
+                <p class="mt-4 text-sm text-[var(--es-muted)]">Por {featured.authorName} · {featured.article.publishedAt?.toLocaleDateString("pt-BR")}</p>
+              </div>
+            </article>
+          )}
+          <div class="grid gap-4">
+            {rest.slice(0, 4).map(({ article, authorName }) => (
+              <article class="es-card p-5">
+                <p class="text-xs font-bold text-[var(--brand-primary)]">{article.section ?? "Notícia"}</p>
+                <h3 class="font-display mt-1 text-lg font-black"><a href={`/noticias/${article.slug}`}>{article.title}</a></h3>
+                <p class="mt-2 text-sm text-[var(--es-muted)]">{authorName} · {article.publishedAt?.toLocaleDateString("pt-BR")}</p>
+              </article>
+            ))}
+          </div>
+          {rest.length > 4 && (
+            <div class="grid gap-5 sm:grid-cols-2 lg:col-span-3">
+              {rest.slice(4).map(({ article, authorName }) => (
+                <article class="es-card overflow-hidden">
+                  {article.coverImageUrl && <img src={article.coverImageUrl} alt={article.coverImageAlt ?? article.title} class="h-40 w-full object-cover" loading="lazy" />}
+                  <div class="p-5">
+                    <h3 class="font-display text-xl font-black"><a href={`/noticias/${article.slug}`}>{article.title}</a></h3>
+                    <p class="mt-2 text-sm text-[var(--es-muted)]">{article.excerpt}</p>
+                    <p class="mt-3 text-xs text-[var(--es-muted)]">{authorName}</p>
+                  </div>
+                </article>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  </section>
+</BaseLayout>

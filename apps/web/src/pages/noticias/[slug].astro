@@ -1,4 +1,46 @@
 ---
-import BaseLayout from "../../layouts/BaseLayout.astro"; import { findPublishedArticle } from "../../lib/articles"; const result = await findPublishedArticle(Astro.params.slug!, "NEWS"); if (!result) return Astro.redirect("/404", 302); const { article, authorName } = result; const canonical = article.canonicalUrl ?? new URL(`/noticias/${article.slug}`, Astro.site).toString(); const jsonLd = { "@context": "https://schema.org", "@type": "NewsArticle", headline: article.title, description: article.metaDescription ?? article.excerpt, datePublished: article.publishedAt?.toISOString(), dateModified: article.updatedAt.toISOString(), mainEntityOfPage: canonical, author: { "@type": "Person", name: authorName }, publisher: { "@type": "Organization", name: "Empregos São Luís" }, ...(article.coverImageUrl ? { image: [article.coverImageUrl] } : {}) };
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import Breadcrumbs from "../../components/ui/Breadcrumbs.astro";
+import { findPublishedArticle } from "../../lib/articles";
+
+const result = await findPublishedArticle(Astro.params.slug!, "NEWS");
+if (!result) return Astro.redirect("/404", 302);
+const { article, authorName } = result;
+const canonical = article.canonicalUrl ?? new URL(`/noticias/${article.slug}`, Astro.site).toString();
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "NewsArticle",
+  headline: article.title,
+  description: article.metaDescription ?? article.excerpt,
+  datePublished: article.publishedAt?.toISOString(),
+  dateModified: article.updatedAt.toISOString(),
+  mainEntityOfPage: canonical,
+  author: { "@type": "Person", name: authorName },
+  publisher: { "@type": "Organization", name: "Empregos São Luís" },
+  ...(article.coverImageUrl ? { image: [article.coverImageUrl] } : {})
+};
 ---
-<BaseLayout title={`${article.seoTitle ?? article.title} — Empregos São Luís`} description={article.metaDescription ?? article.excerpt}><script is:inline type="application/ld+json" set:html={JSON.stringify(jsonLd)}/><article class="mx-auto max-w-3xl px-4 py-12"><nav class="text-sm text-slate-600"><a href="/">Início</a> / <a href="/noticias">Notícias</a></nav><p class="mt-6 font-bold text-red-700">{article.section ?? "Notícia"}</p><h1 class="mt-3 text-4xl font-black">{article.title}</h1>{article.subtitle && <p class="mt-4 text-xl text-slate-600">{article.subtitle}</p>}<p class="mt-4 text-slate-600">Por {authorName} · {article.publishedAt?.toLocaleDateString("pt-BR")}</p>{article.coverImageUrl && <figure class="mt-8"><img class="w-full rounded-2xl" src={article.coverImageUrl} alt={article.coverImageAlt ?? article.title}/>{article.coverImageCaption && <figcaption class="mt-2 text-sm text-slate-600">{article.coverImageCaption}</figcaption>}</figure>}<div class="prose mt-8 max-w-none" set:html={article.contentHtml}/>{article.sourceUrl && <p class="mt-8 text-sm">Fonte: <a class="underline" href={article.sourceUrl} rel="nofollow noopener">{article.sourceName ?? "fonte original"}</a></p>}</article></BaseLayout>
+<BaseLayout title={`${article.seoTitle ?? article.title} — Empregos São Luís`} description={article.metaDescription ?? article.excerpt} canonical={canonical} breadcrumbs={[{ name: "Notícias", url: "/noticias" }, { name: article.title, url: `/noticias/${article.slug}` }]}>
+  <script is:inline type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+  <article class="es-section">
+    <div class="es-container max-w-4xl">
+      <Breadcrumbs items={[{ name: "Início", url: "/" }, { name: "Notícias", url: "/noticias" }, { name: article.title }]} />
+      <p class="es-kicker mt-6">{article.section ?? "Notícia"}</p>
+      <h1 class="font-display mt-2 text-4xl font-black sm:text-5xl">{article.title}</h1>
+      {article.subtitle && <p class="mt-4 text-xl text-[var(--es-muted)]">{article.subtitle}</p>}
+      <p class="mt-4 text-sm text-[var(--es-muted)]">Por {authorName} · {article.publishedAt?.toLocaleDateString("pt-BR")}</p>
+      {article.coverImageUrl && (
+        <figure class="mt-8 overflow-hidden rounded-3xl">
+          <img class="w-full" src={article.coverImageUrl} alt={article.coverImageAlt ?? article.title} loading="lazy" />
+          {article.coverImageCaption && <figcaption class="mt-2 text-sm text-[var(--es-muted)]">{article.coverImageCaption}</figcaption>}
+        </figure>
+      )}
+      <div class="es-prose mt-8 max-w-none text-[1.05rem] leading-8" set:html={article.contentHtml} />
+      {article.sourceUrl && <p class="mt-8 text-sm">Fonte: <a class="underline" href={article.sourceUrl} rel="nofollow noopener">{article.sourceName ?? "fonte original"}</a></p>}
+      <div class="mt-8 flex flex-wrap gap-3">
+        <a class="es-btn es-btn-secondary" href={`https://wa.me/?text=${encodeURIComponent(`${article.title} - ${canonical}`)}`} rel="noopener noreferrer">Compartilhar</a>
+        <a class="es-btn es-btn-secondary" href="/noticias">Voltar às notícias</a>
+      </div>
+    </div>
+  </article>
+</BaseLayout>
