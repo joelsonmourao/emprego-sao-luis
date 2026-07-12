@@ -1,4 +1,5 @@
 import { z } from "zod";
+export * from "./publication-schedule.js";
 
 export const publicCodeSchema = z.string().regex(/^ES-\d{6}$/);
 

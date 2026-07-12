@@ -14,12 +14,14 @@ Branch: `codex/reconstrucao-astro`. A branch `main` não é alterada automaticam
 ## Em execução
 
 - Fase 3: fluxo de importação em duas etapas implementado com escolha de aba, sugestão e edição de mapeamento, modelos persistidos, prévia, estratégia de duplicidade e processamento BullMQ. Migration `0012_public_hex.sql` pendente de aplicação no Coolify.
+- Fase 4: programação em blocos implementada com janela, intervalos, prevenção de conflitos, prévia persistida, pausa, retomada, cancelamento e publicação automática pelo worker. Migration `0013_elite_lorna_dane.sql` pendente de aplicação no Coolify.
 
 ## Commits recentes
 
 - `c16b268`: identificação inequívoca do deployment Astro e 404 própria.
 - `c9c684a`: edição, duplicação e histórico de vagas.
 - `ee9aba3`: ações em lote de vagas.
+- `65619eb`: mapeamento e processamento administrável de planilhas.
 
 ## Bloqueio externo confirmado
 
