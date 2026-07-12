@@ -15,10 +15,24 @@ Branch `codex/reconstrucao-astro`. Arquitetura Astro 7, Drizzle, PostgreSQL, Val
 - Fase 7 — biblioteca de mídia R2/S3 e configuração visual auditável.
 - Fase 8 — SEO técnico, indexação, social studio e página `/instagram`.
 - Fase 9 — alertas multicanal (inscrição ampliada, painel administrativo, dispatch BullMQ, fallback de e-mail).
+- Fase 10 — publicidade e monetização (`@es/ads`, migration `0016`, painel `/admin/publicidade`).
+- Fase 11 — filas e monitoramento operacional (`/admin/operacao`, saúde de integrações).
 
 ## Fase atual
 
-- Fase 10 — publicidade e monetização.
+- Fase 12 — usuários e administradores.
+
+## Fase 11 — entregas
+
+- Painel `/admin/operacao` com filas BullMQ, indexação e saúde de integrações.
+- Lib `operations.ts` com sanitização de payload e ações retry/remove.
+- Lib `operational-health.ts` com estados: saudável, degradado, não configurado, indisponível.
+- APIs `/api/admin/operations/jobs/[queue]/[id]/retry` e `cancel` com auditoria.
+
+## Próximos itens internos (Fase 12)
+
+- Painéis `/admin/usuarios`, `/admin/administradores`, `/admin/permissoes`, `/admin/auditoria`.
+- Proteções RBAC, LGPD e escalada de privilégio.
 
 ## Commits principais
 
@@ -44,7 +58,7 @@ Branch `codex/reconstrucao-astro`. Arquitetura Astro 7, Drizzle, PostgreSQL, Val
 
 - `npm run lint` aprovado.
 - `npm run typecheck` aprovado.
-- `npm run test` aprovado: 31 testes unitários.
+- `npm run test` aprovado: 36 testes unitários.
 - `npm run migration:check` aprovado.
 - `npm run build` aprovado para web e worker.
 
@@ -107,7 +121,7 @@ Branch `codex/reconstrucao-astro`. Arquitetura Astro 7, Drizzle, PostgreSQL, Val
 - Worker `dispatchJobAlerts()` agendado a cada hora na fila `maintenance`.
 - Fallback seguro de e-mail quando `RESEND_API_KEY` não está configurado.
 
-## Próximos itens internos (Fase 10)
+## Próximos itens internos (Fase 10) — concluídos
 
 - Painel `/admin/publicidade` com anúncios diretos, AdSense e relatórios.
 - Slots, campanhas, impressões/cliques e regra de exclusão junto ao botão de candidatura.
