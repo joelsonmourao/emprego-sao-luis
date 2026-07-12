@@ -10,9 +10,12 @@
     "start": "node dist/index.js"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.850.0",
+    "@es/db": "*",
+    "@es/shared": "*",
     "bullmq": "^5.80.2",
-    "ioredis": "^5.7.0",
     "pino": "^9.7.0",
+    "xlsx": "^0.18.5",
     "zod": "^4.0.10"
   },
   "devDependencies": { "tsx": "^4.20.3", "typescript": "^5.8.2" }

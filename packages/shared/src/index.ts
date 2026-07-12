@@ -19,3 +19,22 @@ export const jobDraftSchema = z.object({
 });
 
 export type JobDraftInput = z.infer<typeof jobDraftSchema>;
+
+export const importModeSchema = z.enum(["DRAFT", "PENDING_REVIEW", "PUBLISHED"]);
+export const importJobRowSchema = z.object({
+  externalId: z.string().trim().max(200).optional(), title: z.string().trim().min(3).max(160),
+  company: z.string().trim().min(2).max(180), city: z.string().trim().min(2).max(120), state: z.string().trim().length(2).transform((v) => v.toUpperCase()),
+  category: z.string().trim().max(120).optional(), description: z.string().trim().min(80), applyUrl: z.url(),
+  source: z.string().trim().min(2).max(120), sourceUrl: z.url().optional(), expiresAt: z.coerce.date(),
+  employmentType: z.string().trim().min(2).max(50).default("FULL_TIME"), workplaceType: z.enum(["presencial", "hibrido", "remoto"]).default("presencial"),
+  salaryMin: z.coerce.number().nonnegative().optional(), salaryMax: z.coerce.number().nonnegative().optional()
+}).superRefine((value, context) => { if (value.salaryMin !== undefined && value.salaryMax !== undefined && value.salaryMax < value.salaryMin) context.addIssue({ code: "custom", path: ["salaryMax"], message: "Faixa salarial inválida." }); });
+
+const aliases: Record<string, string[]> = {
+  externalId: ["externalid", "id externo"], title: ["titulo", "título", "cargo", "title"], company: ["empresa", "company"], city: ["cidade", "city"], state: ["estado", "uf", "state"], category: ["categoria", "category"], description: ["descricao", "descrição", "description"], applyUrl: ["link", "link de candidatura", "applyurl", "url candidatura"], source: ["fonte", "source"], sourceUrl: ["url da fonte", "sourceurl"], expiresAt: ["validade", "data de validade", "expiresat", "validthrough"], employmentType: ["tipo de contrato", "employmenttype"], workplaceType: ["modalidade", "workplacetype"], salaryMin: ["salario minimo", "salário mínimo", "salarymin"], salaryMax: ["salario maximo", "salário máximo", "salarymax"]
+};
+const normalizeHeader = (value: string) => value.normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim().toLowerCase().replace(/[_-]+/g, " ").replace(/\s+/g, " ");
+export function normalizeImportRow(row: Record<string, unknown>) {
+  const normalizedEntries = new Map(Object.entries(row).map(([key, value]) => [normalizeHeader(key), value]));
+  return Object.fromEntries(Object.entries(aliases).map(([field, names]) => [field, names.map(normalizeHeader).map((name) => normalizedEntries.get(name)).find((value) => value !== undefined && value !== "")]).filter(([, value]) => value !== undefined));
+}
