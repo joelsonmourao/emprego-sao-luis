@@ -1,0 +1,38 @@
+---
+import AdminLayout from "../../layouts/AdminLayout.astro";
+---
+<AdminLayout title="Saúde da infraestrutura">
+  <h1 class="font-display text-3xl font-black">Saúde</h1>
+  <p class="mt-2 text-[var(--text-secondary)]">Status em tempo real do banco, filas e dependências.</p>
+  <div class="mt-8 grid gap-4 lg:grid-cols-2">
+    <section class="es-card rounded-2xl p-6">
+      <h2 class="text-lg font-bold">Readiness</h2>
+      <p class="mt-2 text-sm text-[var(--text-secondary)]">Consulta <code>/api/ready</code> sem cache.</p>
+      <pre id="ready-json" class="mt-4 max-h-80 overflow-auto rounded-xl bg-[var(--brand-background)] p-4 text-xs">Carregando…</pre>
+      <button class="es-btn es-btn-secondary mt-4" type="button" id="refresh-ready">Atualizar</button>
+    </section>
+    <section class="es-card rounded-2xl p-6">
+      <h2 class="text-lg font-bold">Atalhos</h2>
+      <ul class="mt-4 grid gap-2 text-sm">
+        <li><a class="font-bold text-[var(--brand-primary)]" href="/api/health" target="_blank">Health check</a></li>
+        <li><a class="font-bold text-[var(--brand-primary)]" href="/admin/operacao">Filas e jobs</a></li>
+        <li><a class="font-bold text-[var(--brand-primary)]" href="/admin/auditoria">Auditoria</a></li>
+      </ul>
+    </section>
+  </div>
+  <script is:inline>
+    async function loadReady() {
+      const el = document.getElementById("ready-json");
+      if (!el) return;
+      try {
+        const res = await fetch("/api/ready", { cache: "no-store" });
+        const data = await res.json();
+        el.textContent = JSON.stringify(data, null, 2);
+      } catch (e) {
+        el.textContent = String(e);
+      }
+    }
+    document.getElementById("refresh-ready")?.addEventListener("click", loadReady);
+    loadReady();
+  </script>
+</AdminLayout>

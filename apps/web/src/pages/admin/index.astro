@@ -1,9 +1,81 @@
 ---
 import AdminLayout from "../../layouts/AdminLayout.astro";
-import { articles, backgroundJobs, companies, createDatabase, importBatches, indexingEvents, jobs } from "@es/db";
-import { count, eq } from "drizzle-orm";
-const metrics: Record<string, number> = { published: 0, scheduled: 0, drafts: 0, expired: 0, review: 0, companies: 0, articles: 0, imports: 0, queuePending: 0, failed: 0, indexingPending: 0 };
-if (process.env.DATABASE_URL) { const connection = createDatabase(process.env.DATABASE_URL); try { const results = await Promise.all([connection.db.select({ value: count() }).from(jobs).where(eq(jobs.publicationStatus, "PUBLISHED")), connection.db.select({ value: count() }).from(jobs).where(eq(jobs.publicationStatus, "SCHEDULED")), connection.db.select({ value: count() }).from(jobs).where(eq(jobs.publicationStatus, "DRAFT")), connection.db.select({ value: count() }).from(jobs).where(eq(jobs.publicationStatus, "EXPIRED")), connection.db.select({ value: count() }).from(jobs).where(eq(jobs.publicationStatus, "PENDING_REVIEW")), connection.db.select({ value: count() }).from(companies), connection.db.select({ value: count() }).from(articles), connection.db.select({ value: count() }).from(importBatches), connection.db.select({ value: count() }).from(backgroundJobs).where(eq(backgroundJobs.status, "PENDING")), connection.db.select({ value: count() }).from(backgroundJobs).where(eq(backgroundJobs.status, "FAILED")), connection.db.select({ value: count() }).from(indexingEvents).where(eq(indexingEvents.status, "PENDING"))]); const values = results.map(([row]) => row?.value ?? 0); Object.assign(metrics, { published: values[0] ?? 0, scheduled: values[1] ?? 0, drafts: values[2] ?? 0, expired: values[3] ?? 0, review: values[4] ?? 0, companies: values[5] ?? 0, articles: values[6] ?? 0, imports: values[7] ?? 0, queuePending: values[8] ?? 0, failed: values[9] ?? 0, indexingPending: values[10] ?? 0 }); } finally { await connection.close(); } }
-const cards = [["Vagas publicadas", metrics.published], ["Vagas agendadas", metrics.scheduled], ["Rascunhos", metrics.drafts], ["Expiradas", metrics.expired], ["Aguardando revisão", metrics.review], ["Empresas", metrics.companies], ["Conteúdos", metrics.articles], ["Importações", metrics.imports], ["Filas pendentes", metrics.queuePending], ["Tarefas com erro", metrics.failed], ["Indexações pendentes", metrics.indexingPending]];
+import { getAdminDashboardMetrics } from "../../lib/admin-dashboard";
+import { countOpenSeoIssues } from "../../lib/seo-audit";
+
+const metrics = await getAdminDashboardMetrics();
+const seoIssues = await countOpenSeoIssues();
+metrics.seoIssues = seoIssues;
+
+const fmtCurrency = (v: number) => v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+
+const jobCards = [
+  ["Vagas publicadas", metrics.published],
+  ["Aguardando revisão", metrics.review],
+  ["Vagas agendadas", metrics.scheduled],
+  ["Vagas expiradas", metrics.expired]
+];
+
+const commercialCards = [
+  ["Pedidos pendentes", metrics.pendingOrders],
+  ["Pagamentos em revisão", metrics.manualReviewPayments],
+  ["Receita confirmada", fmtCurrency(metrics.paidRevenue)],
+  ["Planos ativos", metrics.activePlans],
+  ["Créditos emitidos", metrics.creditsIssued],
+  ["Créditos utilizados", metrics.creditsUsed],
+  ["Empresas com crédito", metrics.companiesWithCredit],
+  ["Contatos abertos", metrics.openContacts]
+];
+
+const opsCards = [
+  ["Falhas de webhook", metrics.webhookFailures],
+  ["Problemas SEO abertos", metrics.seoIssues]
+];
 ---
-<AdminLayout title="Visão geral"><div class="flex flex-wrap items-end justify-between gap-4"><div><h1 class="text-3xl font-black">Visão geral</h1><p class="mt-3 text-slate-700">Dados operacionais consultados diretamente no PostgreSQL.</p></div><a class="rounded-lg border bg-white px-4 py-2 font-bold" href="/api/ready" target="_blank">Ver saúde da infraestrutura</a></div><div class="mt-8 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">{cards.map(([label, value]) => <section class="rounded-2xl bg-white p-5"><p class="text-sm text-slate-600">{label}</p><strong class="mt-2 block text-3xl">{value}</strong></section>)}</div><div class="mt-8 flex flex-wrap gap-3"><a class="rounded-lg bg-emerald-700 px-4 py-2 font-bold text-white" href="/admin/vagas/nova">Cadastrar vaga</a><a class="rounded-lg border border-slate-300 bg-white px-4 py-2" href="/admin/importacao">Nova importação</a><a class="rounded-lg border border-slate-300 bg-white px-4 py-2" href="/admin/social">Abrir estúdio social</a><a class="rounded-lg border border-slate-300 bg-white px-4 py-2" href="/admin/seguranca">Segurança e sessões</a></div></AdminLayout>
+<AdminLayout title="Visão geral">
+  <div class="flex flex-wrap items-end justify-between gap-4">
+    <div>
+      <h1 class="font-display text-3xl font-black">Visão geral</h1>
+      <p class="mt-3 text-[var(--text-secondary)]">Métricas operacionais e comerciais consultadas no PostgreSQL.</p>
+    </div>
+    <a class="es-btn es-btn-secondary" href="/api/ready" target="_blank">Ver saúde da infraestrutura</a>
+  </div>
+
+  <h2 class="mt-8 text-sm font-bold uppercase tracking-wide text-[var(--text-secondary)]">Vagas</h2>
+  <div class="mt-3 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+    {jobCards.map(([label, value]) => (
+      <section class="rounded-2xl border border-[var(--brand-border)] bg-white p-5">
+        <p class="text-sm text-[var(--text-secondary)]">{label}</p>
+        <strong class="mt-2 block font-display text-3xl">{value}</strong>
+      </section>
+    ))}
+  </div>
+
+  <h2 class="mt-8 text-sm font-bold uppercase tracking-wide text-[var(--text-secondary)]">Comercial</h2>
+  <div class="mt-3 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+    {commercialCards.map(([label, value]) => (
+      <section class="rounded-2xl border border-[var(--brand-border)] bg-white p-5">
+        <p class="text-sm text-[var(--text-secondary)]">{label}</p>
+        <strong class="mt-2 block font-display text-3xl">{value}</strong>
+      </section>
+    ))}
+  </div>
+
+  <h2 class="mt-8 text-sm font-bold uppercase tracking-wide text-[var(--text-secondary)]">Operação</h2>
+  <div class="mt-3 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+    {opsCards.map(([label, value]) => (
+      <section class="rounded-2xl border border-[var(--brand-border)] bg-white p-5">
+        <p class="text-sm text-[var(--text-secondary)]">{label}</p>
+        <strong class="mt-2 block font-display text-3xl">{value}</strong>
+      </section>
+    ))}
+  </div>
+
+  <div class="mt-8 flex flex-wrap gap-3">
+    <a class="es-btn es-btn-primary" href="/admin/vagas/nova">Cadastrar vaga</a>
+    <a class="es-btn es-btn-secondary" href="/admin/comercial/planos">Planos comerciais</a>
+    <a class="es-btn es-btn-secondary" href="/admin/comercial/pedidos">Pedidos</a>
+    <a class="es-btn es-btn-secondary" href="/admin/comercial/pagamentos">Pagamentos</a>
+    <a class="es-btn es-btn-secondary" href="/admin/seo/auditoria">Auditoria SEO</a>
+  </div>
+</AdminLayout>

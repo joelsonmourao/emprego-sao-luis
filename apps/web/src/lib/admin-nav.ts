@@ -31,6 +31,8 @@ export const ADMIN_NAV_GROUPS: AdminNavGroup[] = [
       { label: "Pedidos", href: "/admin/comercial/pedidos", permission: "commercial.manage" },
       { label: "Pagamentos", href: "/admin/comercial/pagamentos", permission: "commercial.manage" },
       { label: "Créditos", href: "/admin/comercial/creditos", permission: "commercial.manage" },
+      { label: "Reembolsos", href: "/admin/comercial/reembolsos", permission: "commercial.manage" },
+      { label: "Config. pagamentos", href: "/admin/comercial/configuracao-pagamento", permission: "settings.manage" },
       { label: "Contatos", href: "/admin/contatos", permission: "commercial.manage" }
     ]
   },
@@ -61,7 +63,10 @@ export const ADMIN_NAV_GROUPS: AdminNavGroup[] = [
   },
   {
     title: "SEO e indexação",
-    items: [{ label: "Configurações SEO", href: "/admin/seo", permission: "seo.manage" }]
+    items: [
+      { label: "Configurações SEO", href: "/admin/seo", permission: "seo.manage" },
+      { label: "Auditoria SEO", href: "/admin/seo/auditoria", permission: "seo.manage" }
+    ]
   },
   {
     title: "Operação",

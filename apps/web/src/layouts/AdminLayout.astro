@@ -52,16 +52,68 @@ const logoSrc = identity.logoUrlDark || identity.logoUrl || BRAND_ASSETS.logoHor
         </nav>
       </aside>
       <div>
-        <header class="flex items-center justify-between border-b border-[var(--brand-border)] bg-[var(--brand-surface)] px-6 py-4">
+        <header class="flex flex-wrap items-center justify-between gap-4 border-b border-[var(--brand-border)] bg-[var(--brand-surface)] px-6 py-4">
           <div>
             <p class="text-xs font-bold uppercase tracking-wide text-[var(--text-secondary)]">Painel</p>
             <strong class="font-display text-lg">{title}</strong>
             <p class="text-sm text-[var(--text-secondary)]">{auth?.email}</p>
           </div>
-          <form method="post" action="/api/admin/logout"><button class="es-btn es-btn-secondary">Sair</button></form>
+          <div class="flex flex-1 flex-wrap items-center justify-end gap-4">
+            <div class="relative w-full max-w-xs">
+              <input
+                id="admin-search"
+                type="search"
+                placeholder="Busca global…"
+                autocomplete="off"
+                class="w-full rounded-xl border border-[var(--brand-border)] bg-white px-4 py-2 text-sm"
+                aria-label="Busca global no painel"
+              />
+              <div id="search-results" class="absolute right-0 top-full z-50 mt-1 hidden w-full min-w-[18rem] rounded-xl border border-[var(--brand-border)] bg-white py-2 shadow-lg"></div>
+            </div>
+            <form method="post" action="/api/admin/logout"><button class="es-btn es-btn-secondary">Sair</button></form>
+          </div>
         </header>
         <main class="p-6"><slot /></main>
       </div>
     </div>
+    <script is:inline>
+      (function () {
+        const searchInput = document.getElementById("admin-search");
+        const searchResults = document.getElementById("search-results");
+        if (!searchInput || !searchResults) return;
+        let searchTimer;
+
+        async function runSearch(q) {
+          if (!q.trim()) {
+            searchResults.classList.add("hidden");
+            searchResults.innerHTML = "";
+            return;
+          }
+          const res = await fetch("/api/admin/search?q=" + encodeURIComponent(q.trim()));
+          const data = await res.json();
+          const results = data.results || [];
+          if (!results.length) {
+            searchResults.innerHTML = '<p class="px-4 py-2 text-sm text-[var(--text-secondary)]">Nenhum resultado.</p>';
+          } else {
+            searchResults.innerHTML = results.map(function (r) {
+              return '<a class="block px-4 py-2 text-sm hover:bg-[var(--brand-background)]" href="' + r.href + '"><span class="text-xs font-bold uppercase text-[var(--text-secondary)]">' + r.type + '</span><br/>' + r.label + '</a>';
+            }).join("");
+          }
+          searchResults.classList.remove("hidden");
+        }
+
+        searchInput.addEventListener("input", function () {
+          clearTimeout(searchTimer);
+          searchTimer = setTimeout(function () { runSearch(searchInput.value); }, 250);
+        });
+        searchInput.addEventListener("keydown", function (e) {
+          if (e.key === "Enter") { clearTimeout(searchTimer); runSearch(searchInput.value); }
+          if (e.key === "Escape") { searchResults.classList.add("hidden"); searchInput.blur(); }
+        });
+        document.addEventListener("click", function (e) {
+          if (!searchResults.contains(e.target) && e.target !== searchInput) searchResults.classList.add("hidden");
+        });
+      })();
+    </script>
   </body>
 </html>
