@@ -1,7 +1,19 @@
 import { describe, expect, it } from "vitest";
-import { readFileSync } from "node:fs";
+import { existsSync } from "node:fs";
 import { resolve } from "node:path";
+import { readFileSync } from "node:fs";
 import { ADMIN_NAV_GROUPS } from "./admin-nav";
+
+const webRoot = resolve("apps/web/src/pages");
+
+function adminPageExists(href: string) {
+  const path = href.replace(/^\//, "");
+  const candidates = [
+    resolve(webRoot, `${path}.astro`),
+    resolve(webRoot, path, "index.astro")
+  ];
+  return candidates.some((file) => existsSync(file));
+}
 
 describe("admin navigation", () => {
   it("organiza menu em módulos, não lista única", () => {
@@ -14,8 +26,17 @@ describe("admin navigation", () => {
   it("inclui módulos comercial e instagram", () => {
     const labels = ADMIN_NAV_GROUPS.flatMap((g) => g.items.map((i) => i.href));
     expect(labels).toContain("/admin/comercial/planos");
+    expect(labels).toContain("/admin/comercial/reembolsos");
+    expect(labels).toContain("/admin/seo/auditoria");
     expect(labels).toContain("/admin/contatos");
     expect(labels).toContain("/admin/instagram");
+  });
+
+  it("cada item do menu aponta para página existente", () => {
+    const missing = ADMIN_NAV_GROUPS.flatMap((g) => g.items)
+      .filter((item) => !adminPageExists(item.href))
+      .map((item) => item.href);
+    expect(missing).toEqual([]);
   });
 
   it("AdminLayout usa grupos de menu", () => {
