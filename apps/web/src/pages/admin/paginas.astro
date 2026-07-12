@@ -1,0 +1,39 @@
+---
+import AdminLayout from "../../layouts/AdminLayout.astro";
+import { can } from "../../lib/auth";
+import { getInstitutionalPages, INSTITUTIONAL_SLUGS } from "../../lib/site-pages";
+
+const auth = Astro.locals.auth!;
+if (!can(auth, "settings.manage")) return new Response("Proibido", { status: 403 });
+
+const pages = await getInstitutionalPages();
+const slug = Astro.url.searchParams.get("slug") ?? "quem-somos";
+const current = pages[slug as keyof typeof pages] ?? pages["quem-somos"];
+const saved = Astro.url.searchParams.get("saved") === "1";
+---
+<AdminLayout title="Páginas institucionais">
+  <h1 class="text-3xl font-black">Páginas institucionais</h1>
+  <p class="mt-2 text-slate-600">Conteúdo editável com SEO, slug e auditoria.</p>
+  {saved && <p class="mt-4 rounded-xl border border-blue-200 bg-blue-50 p-4 text-blue-900">Página salva com auditoria.</p>}
+
+  <div class="mt-8 grid gap-6 lg:grid-cols-[220px_1fr]">
+    <nav class="grid gap-1 rounded-2xl bg-white p-4 text-sm">
+      {INSTITUTIONAL_SLUGS.map((item) => (
+        <a class={`rounded-lg px-3 py-2 ${item === slug ? "bg-slate-900 font-bold text-white" : "hover:bg-slate-100"}`} href={`?slug=${item}`}>{item}</a>
+      ))}
+    </nav>
+
+    <form class="rounded-2xl bg-white p-6" method="post" action="/api/admin/pages">
+      <input type="hidden" name="slug" value={current.slug} />
+      <div class="grid gap-4">
+        <label class="grid gap-1 text-sm font-semibold">Título<input class="rounded-lg border p-3" name="title" value={current.title} required /></label>
+        <label class="grid gap-1 text-sm font-semibold">SEO title<input class="rounded-lg border p-3" name="seoTitle" value={current.seoTitle} required /></label>
+        <label class="grid gap-1 text-sm font-semibold">Meta description<textarea class="rounded-lg border p-3" name="metaDescription" required>{current.metaDescription}</textarea></label>
+        <label class="grid gap-1 text-sm font-semibold">Canonical path<input class="rounded-lg border p-3" name="canonicalPath" value={current.canonicalPath} required /></label>
+        <label class="grid gap-1 text-sm font-semibold">Conteúdo HTML<textarea class="min-h-48 rounded-lg border p-3 font-mono text-sm" name="contentHtml" required>{current.contentHtml}</textarea></label>
+        <label class="flex items-center gap-2 text-sm"><input type="checkbox" name="published" value="1" checked={current.published} /><span>Publicada</span></label>
+      </div>
+      <button class="mt-5 rounded-lg bg-slate-900 px-5 py-3 font-bold text-white">Salvar página</button>
+    </form>
+  </div>
+</AdminLayout>

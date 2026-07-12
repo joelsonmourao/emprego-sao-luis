@@ -1,0 +1,35 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import { getInstitutionalPage } from "../lib/site-pages";
+
+interface Props {
+  slug: Parameters<typeof getInstitutionalPage>[0];
+  showContactForm?: boolean;
+}
+
+const { slug, showContactForm = slug === "contato" } = Astro.props;
+const page = await getInstitutionalPage(slug);
+const sent = Astro.url.searchParams.get("sent") === "1";
+const error = Astro.url.searchParams.get("error");
+---
+<BaseLayout title={page.seoTitle} description={page.metaDescription} canonical={page.canonicalPath} breadcrumbs={[{ name: page.title, url: page.canonicalPath }]}>
+  <article class="mx-auto max-w-3xl px-4 py-12">
+    <h1 class="text-4xl font-black">{page.title}</h1>
+    <div class="prose prose-slate mt-6 max-w-none" set:html={page.contentHtml} />
+    {showContactForm && (
+      <section class="mt-10 rounded-2xl border bg-white p-6">
+        <h2 class="text-2xl font-black">Envie sua mensagem</h2>
+        {sent && <p class="mt-3 rounded-lg border border-green-200 bg-green-50 p-3 text-green-900">Mensagem registrada. Responderemos quando possível.</p>}
+        {error && <p class="mt-3 rounded-lg border border-red-200 bg-red-50 p-3 text-red-900">{error}</p>}
+        <form class="mt-5 grid gap-4" method="post" action="/api/contato">
+          <label class="grid gap-1 text-sm font-semibold">Nome<input class="rounded-xl border p-3" name="name" required maxlength="120" /></label>
+          <label class="grid gap-1 text-sm font-semibold">E-mail<input class="rounded-xl border p-3" type="email" name="email" required maxlength="180" /></label>
+          <label class="grid gap-1 text-sm font-semibold">Assunto<input class="rounded-xl border p-3" name="subject" required maxlength="160" /></label>
+          <label class="grid gap-1 text-sm font-semibold">Mensagem<textarea class="min-h-32 rounded-xl border p-3" name="message" required maxlength="4000"></textarea></label>
+          <label class="flex items-start gap-2 text-sm"><input type="checkbox" name="consent" value="1" required /><span>Autorizo o tratamento dos dados para responder este contato, conforme a política de privacidade.</span></label>
+          <button class="rounded-xl bg-[var(--brand-primary)] p-3 font-bold text-white">Enviar</button>
+        </form>
+      </section>
+    )}
+  </article>
+</BaseLayout>
