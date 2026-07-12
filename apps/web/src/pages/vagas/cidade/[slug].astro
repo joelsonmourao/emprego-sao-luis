@@ -1,0 +1,5 @@
+---
+import BaseLayout from "../../../layouts/BaseLayout.astro";
+const slug = Astro.params.slug ?? "";
+---
+<BaseLayout title="Vagas por cidade — Empregos São Luís"><section class="mx-auto max-w-6xl px-4 py-12"><h1 class="text-4xl font-black">Vagas por cidade</h1><a href={`/vagas?cidade=${encodeURIComponent(slug)}`}>Consultar oportunidades</a></section></BaseLayout>

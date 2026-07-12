@@ -1,0 +1,17 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { findPublishedJob } from "../../lib/jobs";
+const slug = Astro.params.slug ?? "";
+const job = await findPublishedJob(slug);
+if (!job) return Astro.redirect(`/vagas/indisponivel/${encodeURIComponent(slug)}`, 302);
+const jsonLd = { "@context": "https://schema.org", "@type": "JobPosting", title: job.normalizedTitle, description: job.description, datePosted: job.publishedAt?.toISOString(), validThrough: job.expiresAt?.toISOString(), employmentType: job.employmentType, hiringOrganization: { "@type": "Organization", name: "Empresa contratante" }, jobLocationType: job.workplaceType === "remoto" ? "TELECOMMUTE" : undefined };
+---
+<BaseLayout title={`${job.normalizedTitle} — Empregos São Luís`} description={job.summary}>
+  <script is:inline type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+  <article class="mx-auto max-w-3xl px-4 py-12">
+    <p class="font-bold text-red-700">{job.publicCode}</p><h1 class="mt-2 text-4xl font-black">{job.normalizedTitle}</h1>
+    <p class="mt-4 text-lg text-slate-700">{job.summary}</p>
+    <section class="prose mt-8 max-w-none" set:html={job.description} />
+    <a class="mt-10 inline-flex rounded-xl bg-red-700 px-6 py-4 font-bold text-white" href={job.applicationUrl} rel="nofollow noopener noreferrer">Candidatar-se</a>
+  </article>
+</BaseLayout>
