@@ -1,0 +1,66 @@
+---
+import "../styles/global.css";
+import { cssVariablesFromIdentity } from "../lib/design-tokens";
+import { BRAND_ASSETS } from "../lib/brand-assets";
+import { getVisualIdentity } from "../lib/visual-identity";
+
+const company = Astro.locals.company!;
+interface Props { title: string }
+const { title } = Astro.props;
+const identity = await getVisualIdentity();
+const current = Astro.url.pathname;
+
+const nav = [
+  { label: "Visão geral", href: "/empresa/dashboard" },
+  { label: "Pedidos", href: "/empresa/pedidos" },
+  { label: "Pagamentos", href: "/empresa/pagamentos" },
+  { label: "Créditos", href: "/empresa/creditos" },
+  { label: "Vagas", href: "/empresa/vagas" },
+  { label: "Perfil", href: "/empresa/perfil" },
+  { label: "Suporte", href: "/empresa/suporte" }
+];
+---
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width" />
+    <meta name="robots" content="noindex,nofollow" />
+    <title>{title} — Área da empresa</title>
+    <link rel="icon" href={BRAND_ASSETS.faviconIco} />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;600;700&family=Fraunces:wght@700;800&display=swap" rel="stylesheet" />
+    <style is:inline set:html={cssVariablesFromIdentity(identity)} />
+  </head>
+  <body class="bg-[var(--brand-background)] text-[var(--text-primary)]">
+    <div class="min-h-screen lg:grid lg:grid-cols-[240px_1fr]">
+      <aside class="border-r border-[var(--brand-border)] bg-[var(--brand-surface)] p-5">
+        <a class="block" href="/empresa/dashboard" aria-label={BRAND_ASSETS.logoAlt}>
+          <img src={BRAND_ASSETS.logoHorizontalWebp} alt="" class="h-9 w-auto max-w-[9rem] object-contain" width="144" height="36" />
+        </a>
+        <p class="mt-2 text-xs text-[var(--text-secondary)]">Área da empresa</p>
+        <nav class="mt-6 grid gap-0.5 text-sm" aria-label="Área da empresa">
+          {nav.map((item) => (
+            <a
+              class={`rounded-xl px-3 py-2 transition-colors ${current === item.href || current.startsWith(`${item.href}/`) ? "bg-[var(--brand-background)] font-bold text-[var(--brand-primary)]" : "text-[var(--text-secondary)] hover:bg-[var(--brand-background)] hover:text-[var(--text-primary)]"}`}
+              href={item.href}
+            >
+              {item.label}
+            </a>
+          ))}
+        </nav>
+      </aside>
+      <div>
+        <header class="flex items-center justify-between border-b border-[var(--brand-border)] bg-[var(--brand-surface)] px-6 py-4">
+          <div>
+            <p class="text-xs font-bold uppercase tracking-wide text-[var(--text-secondary)]">Área da empresa</p>
+            <strong class="font-display text-lg">{title}</strong>
+            <p class="text-sm text-[var(--text-secondary)]">{company.name} · {company.email}</p>
+          </div>
+          <form method="post" action="/api/empresa/logout"><button class="es-btn es-btn-secondary" type="submit">Sair</button></form>
+        </header>
+        <main class="p-6"><slot /></main>
+      </div>
+    </div>
+  </body>
+</html>
