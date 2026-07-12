@@ -3,6 +3,7 @@ import { auditLogs, createDatabase, indexingEvents, jobs } from "@es/db";
 import { and, eq } from "drizzle-orm";
 import { z } from "zod";
 import { can } from "../../../../../lib/auth";
+import { buildPublishIndexingEvents, buildRemoveIndexingEvents } from "../../../../../lib/indexing";
 
 const schema = z.enum(["DRAFT", "PENDING_REVIEW", "APPROVED", "SCHEDULED", "PUBLISHED", "PAUSED", "EXPIRED", "CLOSED", "ARCHIVED"]);
 export const POST: APIRoute = async ({ params, request, locals, redirect, clientAddress }) => {
@@ -19,7 +20,8 @@ export const POST: APIRoute = async ({ params, request, locals, redirect, client
       const [after] = await tx.update(jobs).set({ publicationStatus: status.data, publishedAt: status.data === "PUBLISHED" ? before.publishedAt ?? now : before.publishedAt, closedAt: ["CLOSED", "ARCHIVED", "EXPIRED"].includes(status.data) ? now : null, updatedAt: now }).where(and(eq(jobs.id, before.id), eq(jobs.version, before.version))).returning();
       if (!after) throw new Error("A vaga foi alterada por outra sessão. Recarregue a página.");
       await tx.insert(auditLogs).values({ actorId: auth.id, action: `JOB_STATUS_${status.data}`, entityType: "JOB", entityId: before.id, before, after: { record: after, ip: clientAddress, userAgent: request.headers.get("user-agent") }, origin: "ADMIN" });
-      if (status.data === "PUBLISHED") { const url = new URL(`/vagas/${after.slug}`, process.env.SITE_URL ?? "https://empregossaoluis.com.br").toString(); await tx.insert(indexingEvents).values([{ dedupeKey: `status:${after.id}:${after.version}:${now.getTime()}:google`, jobId: after.id, provider: "GOOGLE", url, notificationType: "URL_UPDATED" }, { dedupeKey: `status:${after.id}:${after.version}:${now.getTime()}:indexnow`, jobId: after.id, provider: "INDEXNOW", url, notificationType: "URL_UPDATED" }]); }
+      if (status.data === "PUBLISHED") await tx.insert(indexingEvents).values(buildPublishIndexingEvents({ id: after.id, slug: after.slug, version: after.version, prefix: "status" })).onConflictDoNothing();
+      if (["CLOSED", "ARCHIVED", "EXPIRED"].includes(status.data)) await tx.insert(indexingEvents).values(buildRemoveIndexingEvents({ id: after.id, slug: after.slug, prefix: `status-${status.data.toLowerCase()}` })).onConflictDoNothing();
     });
     return redirect("/admin/vagas?updated=1", 303);
   } finally { await connection.close(); }
