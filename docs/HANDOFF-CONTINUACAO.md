@@ -20,7 +20,7 @@ Astro 7 SSR, Tailwind, React islands, Drizzle, PostgreSQL, BullMQ/Valkey, R2/S3,
 
 ## Trabalho em andamento
 
-Fase 5 recebeu dry run, reexecução do lote, CSV de rejeições e undo por snapshot no commit `3ea7fe6`. O trabalho atual adiciona expiração agendada, Google Indexing e IndexNow ao worker; validar e commitar antes de seguir.
+Fase 5 recebeu dry run, reexecução do lote, CSV de rejeições e undo por snapshot no commit `3ea7fe6`. Expiração e indexação estão no commit `4f1187c`. O estúdio social com PNG/R2/Meta está no commit `2b0faa5`.
 
 ## Pendências principais
 
@@ -28,7 +28,7 @@ Fase 5 recebeu dry run, reexecução do lote, CSV de rejeições e undo por snap
 2. Mapeamento manual de cabeçalhos e arquivo oficial de modelo.
 3. CRUDs completos dos módulos administrativos, versionamento e preview.
 4. Google Indexing API, IndexNow e expiração agendada no novo worker.
-5. Estúdio social conectado ao render PNG, aprovação, fila Meta, métricas e retry.
+5. Coleta de métricas sociais e painel de histórico/retry manual.
 6. Contas de candidatos, vagas salvas, Web Push, exportação e exclusão LGPD.
 7. Gestão comercial completa e relatórios de anúncios.
 8. Executar Docker/staging, migração real, comparação de dados/URLs, backup e rollback testados.
