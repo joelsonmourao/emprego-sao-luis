@@ -4,7 +4,7 @@
 
 Branch `codex/reconstrucao-astro`. Arquitetura Astro 7, Drizzle, PostgreSQL, Valkey/BullMQ e Docker preservada. A `main` não é alterada automaticamente.
 
-## Fases concluídas
+## Fases concluídas (1–15)
 
 - Fase 1 — segurança e autenticação administrativa.
 - Fase 2 — gestão ampliada de vagas.
@@ -18,119 +18,99 @@ Branch `codex/reconstrucao-astro`. Arquitetura Astro 7, Drizzle, PostgreSQL, Val
 - Fase 10 — publicidade e monetização (`@es/ads`, migration `0016`, painel `/admin/publicidade`).
 - Fase 11 — filas e monitoramento operacional (`/admin/operacao`, saúde de integrações).
 - Fase 12 — usuários e administradores (RBAC, LGPD, auditoria administrativa).
+- Fase 13 — portal público final (identidade visual, header/footer, home completa).
+- Fase 14 — páginas institucionais administráveis (`/admin/paginas`, formulário de contato).
+- Fase 15 — auditoria final, CI e preparação para deploy.
 
-## Fase atual
+## Commits desta sessão
 
-- Fase 13 — portal público final.
+- `22e98fd` — Fase 10: publicidade e monetização.
+- `1b95803` — Fase 11: painel operacional de filas.
+- `0e8033c` — Fase 12: usuários, administradores e auditoria.
+- `1e31ea5` — Fase 13: identidade visual e home do portal.
+- `8edb806` — Fase 14: páginas institucionais e contato.
+
+## Migrations
+
+- `0012`–`0015` e `0016_phase10_ads.sql` aguardam aplicação pelo job de migration no Coolify.
+- Fases 8, 13 e 14 usam `es_system_settings` (`seo_settings`, `visual_identity`, `institutional_pages`, `ad_settings`).
+- Migrations são aditivas, versionadas e nunca executadas automaticamente no start do web.
+
+## Validações (Fase 15)
+
+- `npm run lint` — aprovado.
+- `npm run typecheck` — aprovado.
+- `npm run test` — aprovado: 43 testes unitários.
+- `npm run migration:check` — aprovado.
+- `npm run build` — aprovado (web + worker).
+- `npm run test:e2e` — aprovado: 9 testes Playwright.
+
+## Fase 10 — entregas
+
+- Pacote `@es/ads`, migration `0016`, painel `/admin/publicidade`.
+- Slots, campanhas, impressões/cliques, AdSense configurável e regra de exclusão na candidatura.
+- Testes `candidature.test.ts` e `ads-candidature.test.ts`.
+
+## Fase 11 — entregas
+
+- Painel `/admin/operacao` com filas BullMQ, indexação e saúde de integrações.
+- Libs `operations.ts` e `operational-health.ts` com sanitização de payload.
 
 ## Fase 12 — entregas
 
 - Painéis `/admin/usuarios`, `/admin/administradores`, `/admin/permissoes`, `/admin/auditoria`.
-- Lib `users-admin.ts` com proteção contra escalada de privilégio e sanitização de auditoria.
-- APIs de bloqueio, anonimização LGPD, gestão de papéis, exportação CSV e encerramento de sessões.
-- Testes RBAC em `users-admin.test.ts` (6 casos).
+- Proteção contra escalada de privilégio, anonimização LGPD e exportação CSV.
 
-## Próximos itens internos (Fase 13)
+## Fase 13 — entregas
 
-- Identidade visual profissional, home completa e páginas públicas finalizadas.
+- `SiteHeader`, `SiteFooter`, identidade via `visual_identity`.
+- Home com busca, filtros rápidos, vagas recentes/destaque, empresas, categorias, cidades, notícias, alertas e publicidade segura.
 
-## Commits principais
+## Fase 14 — entregas
 
-- `ba658be` — segurança, recuperação de senha e sessões.
-- `c16b268` — identificação do deployment Astro, healthchecks e 404.
-- `c9c684a` — edição, duplicação e histórico de vagas.
-- `ee9aba3` — ações em lote de vagas.
-- `65619eb` — importação administrável de planilhas.
-- `d22dc6d` — programação em blocos.
-- `535dd46` — empresas, categorias, cidades e bairros.
-- `80c8084` — CMS editorial completo.
-- `ce3f675` — biblioteca de mídia e aparência.
-- `0ffb3ea` — ponto seguro após a Fase 7.
-- Commits da Fase 8 — ver `git log --oneline` após os commits desta sessão.
+- CMS institucional em `institutional_pages` (14 páginas).
+- Painel `/admin/paginas`, componente `InstitutionalPage`, API `/api/contato` com rate limit e consentimento.
 
-## Migrations
+## Bloqueios externos (não impedem dev local)
 
-- `0012_public_hex.sql`, `0013_elite_lorna_dane.sql`, `0014_typical_terror.sql` e `0015_abnormal_victor_mancha.sql` aguardam aplicação pelo job de migration no Coolify.
-- A Fase 8 não criou novas migrations; usa `es_system_settings` com chave `seo_settings`.
-- Migrations são aditivas, versionadas e nunca executadas automaticamente no start do web.
+- Migrations `0012`–`0016` pendentes no Coolify.
+- Credenciais: Google Indexing, IndexNow, Meta, Resend, R2/S3, Sentry, AdSense, Web Push (VAPID).
+- Domínio oficial pode estar no deployment legado.
+- Turnstile no contato: fallback seguro sem chave configurada.
 
-## Testes atuais
+## Variáveis externas pendentes
 
-- `npm run lint` aprovado.
-- `npm run typecheck` aprovado.
-- `npm run test` aprovado: 42 testes unitários.
-- `npm run migration:check` aprovado.
-- `npm run build` aprovado para web e worker.
+| Integração | Variáveis |
+|------------|-----------|
+| E-mail | `RESEND_API_KEY`, `EMAIL_FROM` |
+| Indexação Google | `GOOGLE_INDEXING_CLIENT_EMAIL`, `GOOGLE_INDEXING_PRIVATE_KEY`, `GOOGLE_INDEXING_ENABLED` |
+| IndexNow | `INDEXNOW_KEY`, `SITE_URL` |
+| Meta/Instagram | `META_INSTAGRAM_ACCOUNT_ID`, `META_PAGE_ACCESS_TOKEN` |
+| Storage | `S3_ENDPOINT`, `S3_BUCKET`, `S3_ACCESS_KEY_ID`, `S3_SECRET_ACCESS_KEY`, `S3_PUBLIC_URL` |
+| Sentry | `SENTRY_DSN` |
+| AdSense | `PUBLIC_ADSENSE_CLIENT_ID`, `PUBLIC_ADSENSE_ENABLED` |
+| Turnstile (opcional) | `TURNSTILE_SITE_KEY`, `TURNSTILE_SECRET_KEY` |
+| Web Push (opcional) | `VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY` |
 
-## Fase 8 — entregas
-
-### SEO geral
-
-- Configurações globais em `es_system_settings` (`seo_settings`): título, description, robots, Open Graph, Twitter, Organization, tipos de conteúdo e links do Instagram.
-- Painel `/admin/seo` com formulário real, preview, auditoria e permissão `seo.manage`.
-- `BaseLayout` aplica meta tags, canonical, JSON-LD Organization/WebSite/BreadcrumbList.
-
-### JobPosting
-
-- `buildJobPosting` com `identifier` (código ES), `canonicalUrl`, `directApply` condicional e salário somente quando visível.
-- `validateJobPosting` indica campos ausentes.
-
-### Sitemaps
-
-- `/sitemap.xml` como índice dinâmico.
-- `/sitemaps/{categoria}.xml` para static, jobs, companies, cities, categories, blog (com paginação quando necessário).
-- `/sitemap-news.xml` mantido.
-- `robots.txt` referencia sitemap principal e news.
-
-### Indexação
-
-- Painel com histórico, contadores, reprocessamento e status de integrações.
-- APIs: `/api/admin/indexing`, `/api/admin/indexing/[id]/retry`, `/api/admin/indexing/status`.
-- Triggers corrigidos em bulk publish e close/archive.
-- Worker respeita `GOOGLE_INDEXING_ENABLED=false`.
-
-### Social studio
-
-- Histórico de publicações, status, erros Meta e preview de PNG.
-- Feedback após criação (`?created=1`).
-
-### Página `/instagram`
-
-- Links administráveis via SEO settings.
-- Vagas em destaque e recentes.
-- Rastreamento de cliques em `/i/:code` via `es_short_links`.
-
-## Bloqueios externos
-
-- Domínio oficial pode ainda estar vinculado ao deployment legado.
-- Credenciais Meta, Google Indexing, IndexNow, Resend, R2/S3, Sentry e AdSense apenas no Coolify.
-- Migrations 0012–0015 pendentes no Coolify (não bloqueiam dev local).
-
-## Configurações pendentes
-
-- `GOOGLE_INDEXING_CLIENT_EMAIL`, `GOOGLE_INDEXING_PRIVATE_KEY` para Google Indexing API.
-- `INDEXNOW_KEY`, `SITE_URL` para IndexNow.
-- `META_INSTAGRAM_ACCOUNT_ID`, `META_PAGE_ACCESS_TOKEN` para publicação automática.
-- `S3_*` para preview de PNG no painel social.
-
-## Fase 9 — entregas
-
-- Formulário `/alertas` ampliado: cargo, cidade, categoria, empresa, modalidade, frequência e preferência Web Push.
-- API `/api/subscriptions` com filtros completos, consentimento LGPD e confirmação por e-mail.
-- Painel `/admin/audiencia` com inscrições, entregas, cancelamento administrativo e status Resend.
-- Worker `dispatchJobAlerts()` agendado a cada hora na fila `maintenance`.
-- Fallback seguro de e-mail quando `RESEND_API_KEY` não está configurado.
-
-## Próximos itens internos (Fase 10) — concluídos
-
-- Painel `/admin/publicidade` com anúncios diretos, AdSense e relatórios.
-- Slots, campanhas, impressões/cliques e regra de exclusão junto ao botão de candidatura.
-
-## Instruções de deploy
+## Deploy no Coolify
 
 1. Backup do PostgreSQL.
-2. Aplicar migrations 0012–0015 pelo job `Dockerfile.migrate`.
-3. Redeploy web e worker.
-4. Validar `/api/health`, `/api/ready`, `X-ES-App: astro`.
-5. Validar `/sitemap.xml`, `/admin/seo`, `/admin/social`, `/instagram`.
-6. Configurar credenciais externas no Coolify conforme ativação de cada integração.
+2. Executar job `Dockerfile.migrate` (migrations `0012`–`0016`).
+3. Configurar variáveis obrigatórias: `APP_ENV`, `SITE_URL`, `DATABASE_URL`, `REDIS_URL`, `AUTH_SECRET`.
+4. Deploy web (`Dockerfile.web`) — validar `/api/health`, `/api/ready`, header `X-ES-App: astro`.
+5. Deploy worker (`Dockerfile.worker`) — validar `worker.started`.
+6. Criar primeiro admin: `npm run db:seed-rbac --workspace=@es/db` com `ADMIN_INITIAL_EMAIL` e `ADMIN_INITIAL_PASSWORD` (remover após uso).
+7. Smoke tests: `/`, `/vagas`, `/admin/login`, `/sitemap.xml`, `/admin/operacao`, `/admin/publicidade`.
+8. Ativar integrações externas conforme credenciais disponíveis.
+
+## Riscos conhecidos
+
+- Integrações sem credencial real permanecem em estado `not_configured` no painel operacional.
+- Domínio legado pode servir tráfego até troca de DNS/proxy.
+- AdSense e Web Push exigem domínio e chaves reais para funcionamento completo.
+
+## Rollback
+
+1. Parar worker novo.
+2. Restaurar imagens anteriores de web/worker.
+3. Migrations são aditivas — não reverter schema automaticamente; restaurar backup se necessário.

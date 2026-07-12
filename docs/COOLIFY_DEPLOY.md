@@ -26,7 +26,7 @@ Crie um terceiro recurso usando `Dockerfile.worker`, sem domínio e sem porta p�
 
 ## 6. Variáveis
 
-Obrigatórias: `APP_ENV=production`, `SITE_URL=https://empregossaoluis.com.br`, `DATABASE_URL`, `REDIS_URL` e `AUTH_SECRET`. Para upload/social: `S3_ENDPOINT`, `S3_REGION`, `S3_BUCKET`, `S3_ACCESS_KEY_ID`, `S3_SECRET_ACCESS_KEY`, `S3_PUBLIC_URL`, `S3_FORCE_PATH_STYLE`. Integrações opcionais: `RESEND_API_KEY`, `EMAIL_FROM`, `SENTRY_DSN`, `INDEXNOW_KEY`, credenciais Google e Meta. Nunca grave valores no Git.
+Obrigatórias: `APP_ENV=production`, `SITE_URL=https://empregossaoluis.com.br`, `DATABASE_URL`, `REDIS_URL` e `AUTH_SECRET`. Para upload/social: `S3_ENDPOINT`, `S3_REGION`, `S3_BUCKET`, `S3_ACCESS_KEY_ID`, `S3_SECRET_ACCESS_KEY`, `S3_PUBLIC_URL`, `S3_FORCE_PATH_STYLE`. Integrações opcionais: `RESEND_API_KEY`, `EMAIL_FROM`, `SENTRY_DSN`, `INDEXNOW_KEY`, credenciais Google e Meta, `PUBLIC_ADSENSE_CLIENT_ID`, `PUBLIC_ADSENSE_ENABLED`, `TURNSTILE_SITE_KEY`, `TURNSTILE_SECRET_KEY`, `VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`. Nunca grave valores no Git.
 
 ## 7. Domínio e HTTPS
 
@@ -39,9 +39,9 @@ Valide primeiro em subdomínio de staging com `noindex`. Depois associe o domín
 ## 9. Primeiro deploy
 
 1. Faça backup do PostgreSQL.
-2. Execute o job de migration uma vez e confira as 11 migrations.
+2. Execute o job de migration uma vez e confira as migrations `0012`–`0016` (inclui publicidade Fase 10).
 3. Consulte `/api/ready` e exija todos os checks `ok`.
-4. Implante web e teste `/`, `/vagas`, `/admin/login`, sitemap e uma consulta real.
+4. Implante web e teste `/`, `/vagas`, `/admin/login`, `/contato`, `/sitemap.xml`, `/admin/operacao` e uma consulta real.
 5. Implante worker e confira `worker.started`, zero reinícios e ausência de `relation does not exist`.
 6. Crie o primeiro administrador pelo processo separado e remova a senha do ambiente.
 
