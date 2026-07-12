@@ -22,6 +22,13 @@
       "when": 1783824381011,
       "tag": "0002_job_public_code_sequence",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1783824946072,
+      "tag": "0003_nice_timeslip",
+      "breakpoints": true
     }
   ]
 }
