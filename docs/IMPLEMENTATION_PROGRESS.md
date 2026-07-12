@@ -14,10 +14,11 @@ Branch `codex/reconstrucao-astro`. Arquitetura Astro 7, Drizzle, PostgreSQL, Val
 - Fase 6 — CMS editorial, autoria, revisões, agendamento e notícias públicas.
 - Fase 7 — biblioteca de mídia R2/S3 e configuração visual auditável.
 - Fase 8 — SEO técnico, indexação, social studio e página `/instagram`.
+- Fase 9 — alertas multicanal (inscrição ampliada, painel administrativo, dispatch BullMQ, fallback de e-mail).
 
 ## Fase atual
 
-- Fase 9 — alertas multicanal (cadastro, preferências, e-mail, Web Push, painel administrativo).
+- Fase 10 — publicidade e monetização.
 
 ## Commits principais
 
@@ -98,12 +99,18 @@ Branch `codex/reconstrucao-astro`. Arquitetura Astro 7, Drizzle, PostgreSQL, Val
 - `META_INSTAGRAM_ACCOUNT_ID`, `META_PAGE_ACCESS_TOKEN` para publicação automática.
 - `S3_*` para preview de PNG no painel social.
 
-## Próximos itens internos (Fase 9)
+## Fase 9 — entregas
 
-- Painel `/admin/audiencia` com backend real.
-- Cadastro opcional, alertas por filtros, frequência, e-mail e Web Push.
-- Fila BullMQ `notifications` com templates e fallback sem Resend.
-- Histórico, cancelamento e descadastro LGPD.
+- Formulário `/alertas` ampliado: cargo, cidade, categoria, empresa, modalidade, frequência e preferência Web Push.
+- API `/api/subscriptions` com filtros completos, consentimento LGPD e confirmação por e-mail.
+- Painel `/admin/audiencia` com inscrições, entregas, cancelamento administrativo e status Resend.
+- Worker `dispatchJobAlerts()` agendado a cada hora na fila `maintenance`.
+- Fallback seguro de e-mail quando `RESEND_API_KEY` não está configurado.
+
+## Próximos itens internos (Fase 10)
+
+- Painel `/admin/publicidade` com anúncios diretos, AdSense e relatórios.
+- Slots, campanhas, impressões/cliques e regra de exclusão junto ao botão de candidatura.
 
 ## Instruções de deploy
 

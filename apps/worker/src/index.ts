@@ -4,6 +4,7 @@ import { Queue, Worker, type ConnectionOptions } from "bullmq";
 import { processImport } from "./import-processor.js";
 import { processNotification } from "./notification-processor.js";
 import { expireJobs, processIndexingEvents } from "./maintenance.js";
+import { dispatchJobAlerts } from "./alert-dispatch.js";
 import { processSocialPost } from "./social-processor.js";
 import { publishScheduledJobs } from "./scheduled-publication.js";
 import { startupFailureFields, workerLoggerOptions } from "./startup-error.js";
@@ -54,7 +55,8 @@ async function main() {
   await maintenanceQueue.upsertJobScheduler("expire-jobs", { every: 15 * 60 * 1000 }, { name: "expire-jobs", data: {} });
   await maintenanceQueue.upsertJobScheduler("process-indexing", { every: 60 * 1000 }, { name: "process-indexing", data: {} });
   await maintenanceQueue.upsertJobScheduler("publish-scheduled", { every: 60 * 1000 }, { name: "publish-scheduled", data: {} });
-  const maintenanceWorker = new Worker("maintenance", async (job) => job.name === "expire-jobs" ? expireJobs() : job.name === "publish-scheduled" ? publishScheduledJobs() : processIndexingEvents(), { connection: redisConnection, concurrency: 1 });
+  await maintenanceQueue.upsertJobScheduler("dispatch-alerts", { every: 60 * 60 * 1000 }, { name: "dispatch-alerts", data: {} });
+  const maintenanceWorker = new Worker("maintenance", async (job) => job.name === "expire-jobs" ? expireJobs() : job.name === "publish-scheduled" ? publishScheduledJobs() : job.name === "dispatch-alerts" ? dispatchJobAlerts() : processIndexingEvents(), { connection: redisConnection, concurrency: 1 });
   const socialWorker = new Worker("social", async (job) => processSocialPost(job.data), { connection: redisConnection, concurrency: Number(process.env.WORKER_SOCIAL_CONCURRENCY ?? 2) });
 
   worker.on("failed", (job, error) => { Sentry.captureException(error, { tags: { queue: "job-imports" }, extra: { jobId: job?.id } }); logger.error({ event: "import.failed", jobId: job?.id, error: error.message }, "Importação falhou"); });

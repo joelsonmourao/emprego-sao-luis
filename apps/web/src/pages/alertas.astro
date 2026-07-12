@@ -1,5 +1,28 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
+
 const whatsapp = import.meta.env.PUBLIC_WHATSAPP_CHANNEL_URL as string | undefined;
+const status = Astro.url.searchParams.get("status");
 ---
-<BaseLayout title="Alertas de vagas — Empregos São Luís"><section class="mx-auto max-w-2xl px-4 py-12"><h1 class="text-4xl font-black">Receba alertas de vagas</h1><p class="mt-4 text-slate-700">A inscrição é opcional e não limita o acesso às vagas. Confirme seu e-mail para ativar os alertas.</p><form class="mt-8 grid gap-5 rounded-2xl border bg-white p-6" method="post" action="/api/subscriptions"><label>E-mail<input class="mt-1 w-full rounded-xl border p-3" type="email" name="email" required/></label><label>Cidade<input class="mt-1 w-full rounded-xl border p-3" name="city" maxlength="120"/></label><label>Área profissional<input class="mt-1 w-full rounded-xl border p-3" name="category" maxlength="120"/></label><label class="flex gap-3"><input type="checkbox" name="consent" value="yes" required/><span>Concordo em receber alertas e li a política de privacidade.</span></label><button class="rounded-xl bg-red-700 p-4 font-bold text-white">Criar alerta</button></form>{whatsapp && <a class="mt-6 block rounded-xl border bg-white p-4 text-center font-bold" href={whatsapp} rel="noopener noreferrer">Entrar no canal oficial do WhatsApp</a>}</section></BaseLayout>
+<BaseLayout title="Alertas de vagas — Empregos São Luís">
+  <section class="mx-auto max-w-2xl px-4 py-12">
+    <h1 class="text-4xl font-black">Receba alertas de vagas</h1>
+    <p class="mt-4 text-slate-700">A inscrição é opcional e não limita o acesso às vagas. Confirme seu e-mail para ativar os alertas.</p>
+    {status === "verifique-email" && <p class="mt-4 rounded-xl border border-blue-200 bg-blue-50 p-4 text-blue-900">Enviamos um link de confirmação. Verifique sua caixa de entrada.</p>}
+    {status === "confirmado" && <p class="mt-4 rounded-xl border border-green-200 bg-green-50 p-4 text-green-900">Alerta confirmado com sucesso.</p>}
+    {status === "descadastrado" && <p class="mt-4 rounded-xl border border-slate-200 bg-slate-50 p-4">Você foi descadastrado dos alertas por e-mail.</p>}
+    <form class="mt-8 grid gap-5 rounded-2xl border bg-white p-6" method="post" action="/api/subscriptions">
+      <label>E-mail<input class="mt-1 w-full rounded-xl border p-3" type="email" name="email" required /></label>
+      <label>Cargo ou palavra-chave<input class="mt-1 w-full rounded-xl border p-3" name="title" maxlength="120" placeholder="Ex.: auxiliar administrativo" /></label>
+      <label>Cidade<input class="mt-1 w-full rounded-xl border p-3" name="city" maxlength="120" /></label>
+      <label>Área profissional<input class="mt-1 w-full rounded-xl border p-3" name="category" maxlength="120" /></label>
+      <label>Empresa<input class="mt-1 w-full rounded-xl border p-3" name="company" maxlength="120" /></label>
+      <label>Modalidade<select class="mt-1 w-full rounded-xl border p-3" name="workplaceType"><option value="">Qualquer</option><option value="presencial">Presencial</option><option value="hibrido">Híbrido</option><option value="remoto">Remoto</option></select></label>
+      <label>Frequência<select class="mt-1 w-full rounded-xl border p-3" name="frequency"><option value="DAILY">Diária</option><option value="WEEKLY">Semanal</option><option value="INSTANT">Imediata (quando houver novidade)</option></select></label>
+      <label class="flex gap-3"><input type="checkbox" name="webPush" value="yes" /><span>Quero receber Web Push quando disponível (opcional).</span></label>
+      <label class="flex gap-3"><input type="checkbox" name="consent" value="yes" required /><span>Concordo em receber alertas e li a <a class="underline" href="/privacidade">política de privacidade</a>.</span></label>
+      <button class="rounded-xl bg-red-700 p-4 font-bold text-white">Criar alerta</button>
+    </form>
+    {whatsapp && <a class="mt-6 block rounded-xl border bg-white p-4 text-center font-bold" href={whatsapp} rel="noopener noreferrer">Entrar no canal oficial do WhatsApp</a>}
+  </section>
+</BaseLayout>
