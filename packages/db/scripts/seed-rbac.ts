@@ -5,7 +5,7 @@ import { createDatabase, permissions, rolePermissions, roles, userRoles, users }
 const databaseUrl = process.env.DATABASE_URL;
 if (!databaseUrl) throw new Error("DATABASE_URL não configurada.");
 const roleKeys = ["SUPER_ADMIN", "ADMIN", "EDITOR", "OPERADOR", "ANALISTA", "SOMENTE_LEITURA", "REVIEWER", "SOCIAL_MEDIA", "COMMERCIAL", "SUPPORT", "COMPANY_USER"];
-const permissionKeys = ["jobs.read", "jobs.create", "jobs.review", "jobs.publish", "imports.manage", "companies.manage", "content.manage", "media.manage", "social.manage", "audience.manage", "commercial.manage", "seo.manage", "users.manage", "settings.manage", "audit.read", "queues.manage"];
+const permissionKeys = ["jobs.read", "jobs.create", "jobs.review", "jobs.publish", "imports.manage", "companies.manage", "content.manage", "media.manage", "social.manage", "audience.manage", "commercial.manage", "payments.manage", "payments.approve", "seo.manage", "users.manage", "settings.manage", "audit.read", "queues.manage", "ads.manage"];
 const connection = createDatabase(databaseUrl);
 try {
   for (const key of roleKeys) await connection.db.insert(roles).values({ key, name: key.replaceAll("_", " ") }).onConflictDoNothing();

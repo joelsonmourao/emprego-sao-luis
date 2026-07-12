@@ -79,8 +79,10 @@ export const indexingEvents = pgTable("es_indexing_events", { id: uuid("id").pri
 export const settings = pgTable("es_system_settings", { key: text("key").primaryKey(), value: jsonb("value").notNull(), public: boolean("public").notNull().default(false), updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow() });
 
 export const contactStatus = pgEnum("es_contact_status", ["OPEN", "IN_PROGRESS", "RESOLVED", "ARCHIVED"]);
-export const paymentStatus = pgEnum("es_payment_status", ["PENDING", "APPROVED", "REFUSED", "CANCELLED", "REFUNDED", "EXPIRED", "MANUAL_APPROVED"]);
-export const orderStatus = pgEnum("es_order_status", ["DRAFT", "PENDING_PAYMENT", "PAID", "CANCELLED", "EXPIRED"]);
+export const orderStatus = pgEnum("es_order_status", ["DRAFT", "PENDING_PAYMENT", "PAID", "CANCELLED", "EXPIRED", "MANUAL_REVIEW"]);
+export const companyUserRole = pgEnum("es_company_user_role", ["OWNER", "MANAGER", "RECRUITER", "BILLING", "VIEWER"]);
+export const refundStatus = pgEnum("es_refund_status", ["REQUESTED", "APPROVED", "PROCESSING", "COMPLETED", "REJECTED", "FAILED"]);
+export const ticketStatus = pgEnum("es_ticket_status", ["OPEN", "IN_PROGRESS", "RESOLVED", "CLOSED"]);
 
 export const contactSubmissions = pgTable("es_contact_submissions", {
   id: uuid("id").primaryKey().defaultRandom(),
@@ -103,19 +105,28 @@ export const commercialPlans = pgTable("es_commercial_plans", {
   id: uuid("id").primaryKey().defaultRandom(),
   name: text("name").notNull(),
   slug: text("slug").notNull().unique(),
+  shortDescription: text("short_description").notNull().default(""),
   description: text("description").notNull(),
-  price: numeric("price").notNull(),
+  fullDescriptionHtml: text("full_description_html"),
+  price: numeric("price").notNull().default("0"),
   promoPrice: numeric("promo_price"),
+  currency: varchar("currency", { length: 3 }).notNull().default("BRL"),
   jobCredits: integer("job_credits").notNull().default(1),
   durationDays: integer("duration_days").notNull().default(30),
   highlightDays: integer("highlight_days").notNull().default(0),
   publishStories: boolean("publish_stories").notNull().default(false),
   publishFeed: boolean("publish_feed").notNull().default(false),
   publishSite: boolean("publish_site").notNull().default(true),
+  postsCount: integer("posts_count").notNull().default(0),
   renewable: boolean("renewable").notNull().default(true),
+  billingType: text("billing_type").notNull().default("one_time"),
   creditValidityDays: integer("credit_validity_days").notNull().default(365),
+  promoStartsAt: timestamp("promo_starts_at", { withTimezone: true }),
+  promoEndsAt: timestamp("promo_ends_at", { withTimezone: true }),
   priority: integer("priority").notNull().default(0),
-  active: boolean("active").notNull().default(true),
+  active: boolean("active").notNull().default(false),
+  setupRequired: boolean("setup_required").notNull().default(true),
+  archived: boolean("archived").notNull().default(false),
   recommended: boolean("recommended").notNull().default(false),
   sortOrder: integer("sort_order").notNull().default(0),
   benefits: jsonb("benefits").notNull().default([]),
@@ -138,10 +149,14 @@ export const commercialOrders = pgTable("es_commercial_orders", {
   amount: numeric("amount").notNull(),
   status: orderStatus("status").notNull().default("PENDING_PAYMENT"),
   companyId: uuid("company_id").references(() => companies.id),
+  internalNotes: text("internal_notes"),
+  timeline: jsonb("timeline").notNull().default([]),
+  cancelReason: text("cancel_reason"),
+  cancelledAt: timestamp("cancelled_at", { withTimezone: true }),
   expiresAt: timestamp("expires_at", { withTimezone: true }),
   paidAt: timestamp("paid_at", { withTimezone: true }),
   ...timestamps
-}, (t) => [index("es_commercial_orders_status_idx").on(t.status, t.createdAt)]);
+}, (t) => [index("es_commercial_orders_status_idx").on(t.status, t.createdAt), index("es_commercial_orders_email_idx").on(t.email)]);
 
 export const commercialPayments = pgTable("es_commercial_payments", {
   id: uuid("id").primaryKey().defaultRandom(),
@@ -151,14 +166,45 @@ export const commercialPayments = pgTable("es_commercial_payments", {
   amount: numeric("amount").notNull(),
   method: text("method").notNull(),
   provider: text("provider").notNull(),
-  status: paymentStatus("status").notNull().default("PENDING"),
+  status: varchar("status", { length: 32 }).notNull().default("CREATED"),
+  attemptCount: integer("attempt_count").notNull().default(0),
+  lastError: text("last_error"),
   metadata: jsonb("metadata").notNull().default({}),
   webhookPayload: jsonb("webhook_payload"),
+  manualReason: text("manual_reason"),
+  manualProofUrl: text("manual_proof_url"),
+  approvedBy: uuid("approved_by").references(() => users.id),
   approvedAt: timestamp("approved_at", { withTimezone: true }),
   refusedAt: timestamp("refused_at", { withTimezone: true }),
   expiresAt: timestamp("expires_at", { withTimezone: true }),
   ...timestamps
-}, (t) => [index("es_commercial_payments_order_idx").on(t.orderId, t.status)]);
+}, (t) => [index("es_commercial_payments_order_idx").on(t.orderId, t.status), index("es_commercial_payments_status_idx").on(t.status, t.createdAt)]);
+
+export const commercialPaymentEvents = pgTable("es_commercial_payment_events", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  paymentId: uuid("payment_id").references(() => commercialPayments.id),
+  orderId: uuid("order_id").references(() => commercialOrders.id),
+  eventType: text("event_type").notNull(),
+  idempotencyKey: text("idempotency_key").notNull().unique(),
+  payload: jsonb("payload").notNull().default({}),
+  processed: boolean("processed").notNull().default(false),
+  error: text("error"),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow()
+}, (t) => [index("es_commercial_payment_events_payment_idx").on(t.paymentId, t.createdAt)]);
+
+export const commercialRefunds = pgTable("es_commercial_refunds", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  paymentId: uuid("payment_id").notNull().references(() => commercialPayments.id),
+  orderId: uuid("order_id").notNull().references(() => commercialOrders.id),
+  amount: numeric("amount").notNull(),
+  status: refundStatus("status").notNull().default("REQUESTED"),
+  reason: text("reason").notNull(),
+  partial: boolean("partial").notNull().default(false),
+  approvedBy: uuid("approved_by").references(() => users.id),
+  processedAt: timestamp("processed_at", { withTimezone: true }),
+  metadata: jsonb("metadata").notNull().default({}),
+  ...timestamps
+}, (t) => [index("es_commercial_refunds_order_idx").on(t.orderId, t.status)]);
 
 export const companyCredits = pgTable("es_company_credits", {
   id: uuid("id").primaryKey().defaultRandom(),
@@ -169,8 +215,78 @@ export const companyCredits = pgTable("es_company_credits", {
   totalCredits: integer("total_credits").notNull(),
   usedCredits: integer("used_credits").notNull().default(0),
   expiresAt: timestamp("expires_at", { withTimezone: true }),
+  grantedBy: uuid("granted_by").references(() => users.id),
   ...timestamps
-}, (t) => [index("es_company_credits_email_idx").on(t.email)]);
+}, (t) => [index("es_company_credits_email_idx").on(t.email), index("es_company_credits_company_idx").on(t.companyId)]);
+
+export const companyAccounts = pgTable("es_company_accounts", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  companyId: uuid("company_id").references(() => companies.id),
+  email: text("email").notNull().unique(),
+  name: text("name").notNull(),
+  passwordHash: text("password_hash"),
+  role: companyUserRole("role").notNull().default("OWNER"),
+  active: boolean("active").notNull().default(true),
+  emailVerifiedAt: timestamp("email_verified_at", { withTimezone: true }),
+  inviteTokenHash: text("invite_token_hash"),
+  inviteExpiresAt: timestamp("invite_expires_at", { withTimezone: true }),
+  ...timestamps
+}, (t) => [index("es_company_accounts_company_idx").on(t.companyId)]);
+
+export const companySessions = pgTable("es_company_sessions", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  accountId: uuid("account_id").notNull().references(() => companyAccounts.id, { onDelete: "cascade" }),
+  tokenHash: text("token_hash").notNull().unique(),
+  ipHash: text("ip_hash"),
+  expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
+  revokedAt: timestamp("revoked_at", { withTimezone: true }),
+  ...timestamps
+});
+
+export const companyJobDrafts = pgTable("es_company_job_drafts", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  accountId: uuid("account_id").references(() => companyAccounts.id),
+  orderId: uuid("order_id").references(() => commercialOrders.id),
+  creditId: uuid("credit_id").references(() => companyCredits.id),
+  companyId: uuid("company_id").references(() => companies.id),
+  jobTitle: text("job_title").notNull(),
+  description: text("description").notNull(),
+  applyUrl: text("apply_url").notNull(),
+  status: text("status").notNull().default("DRAFT"),
+  adminFeedback: text("admin_feedback"),
+  jobId: uuid("job_id").references(() => jobs.id),
+  ...timestamps
+}, (t) => [index("es_company_job_drafts_status_idx").on(t.status, t.createdAt)]);
+
+export const companyTickets = pgTable("es_company_tickets", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  accountId: uuid("account_id").references(() => companyAccounts.id),
+  companyId: uuid("company_id").references(() => companies.id),
+  orderId: uuid("order_id").references(() => commercialOrders.id),
+  paymentId: uuid("payment_id").references(() => commercialPayments.id),
+  subject: text("subject").notNull(),
+  message: text("message").notNull(),
+  status: ticketStatus("status").notNull().default("OPEN"),
+  protocol: varchar("protocol", { length: 20 }).notNull().unique(),
+  ...timestamps
+}, (t) => [index("es_company_tickets_status_idx").on(t.status, t.createdAt)]);
+
+export const seoAuditIssues = pgTable("es_seo_audit_issues", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  entityType: text("entity_type").notNull(),
+  entityId: text("entity_id"),
+  url: text("url").notNull(),
+  checkKey: text("check_key").notNull(),
+  severity: text("severity").notNull(),
+  scoreImpact: integer("score_impact").notNull().default(0),
+  message: text("message").notNull(),
+  recommendation: text("recommendation"),
+  resolved: boolean("resolved").notNull().default(false),
+  ignored: boolean("ignored").notNull().default(false),
+  ignoreReason: text("ignore_reason"),
+  checkedAt: timestamp("checked_at", { withTimezone: true }).notNull().defaultNow(),
+  ...timestamps
+}, (t) => [index("es_seo_audit_issues_url_idx").on(t.url, t.checkKey), index("es_seo_audit_issues_open_idx").on(t.resolved, t.ignored, t.severity)]);
 
 export const jobRelations = relations(jobs, ({ one, many }) => ({ company: one(companies, { fields: [jobs.companyId], references: [companies.id] }), city: one(cities, { fields: [jobs.cityId], references: [cities.id] }), revisions: many(jobRevisions), sources: many(jobSources) }));
 export const activePublishedJobs = sql`${jobs.publicationStatus} = 'PUBLISHED' and ${jobs.expiresAt} > now()`;
