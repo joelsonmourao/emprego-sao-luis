@@ -5,6 +5,7 @@ import EmptyState from "../components/ui/EmptyState.astro";
 import JobCard from "../components/ui/JobCard.astro";
 import PageHero from "../components/ui/PageHero.astro";
 import SectionHeading from "../components/ui/SectionHeading.astro";
+import InstagramFollow from "../components/InstagramFollow.astro";
 import { categories, cities, companies, createDatabase, jobs, states } from "@es/db";
 import { and, count, desc, eq, gt } from "drizzle-orm";
 import { listPublishedArticles } from "../lib/articles";
@@ -224,6 +225,8 @@ const steps = [
     </section>
   )}
 
+  <InstagramFollow />
+
   <section class="hero-pattern es-section text-white">
     <div class="es-container flex flex-col items-start justify-between gap-6 md:flex-row md:items-center">
       <div>
@@ -231,7 +234,7 @@ const steps = [
         <h2 class="font-display mt-2 text-3xl font-black sm:text-4xl">Receba vagas compatíveis com você</h2>
         <p class="mt-3 max-w-xl text-white/80">Escolha cidade, área e frequência. Gratuito e cancelável a qualquer momento.</p>
       </div>
-      <a class="es-btn bg-white text-[var(--brand-primary)] hover:bg-[var(--es-cream)]" href="/alertas">Criar alerta gratuito</a>
+      <a class="es-btn bg-white text-[var(--brand-primary)] hover:bg-[var(--brand-background)]" href="/alertas">Criar alerta gratuito</a>
     </div>
   </section>
 
@@ -240,8 +243,8 @@ const steps = [
       <article class="es-card p-6 sm:p-8">
         <p class="es-kicker">Empresas</p>
         <h2 class="font-display mt-2 text-2xl font-black">Divulgue vagas com transparência</h2>
-        <p class="mt-3 text-[var(--es-muted)]">Alcance candidatos locais com fonte identificada e página dedicada da empresa.</p>
-        <a class="es-btn es-btn-secondary mt-5" href="/area-empresas">Área para empresas</a>
+        <p class="mt-3 text-[var(--text-secondary)]">Alcance candidatos locais com fonte identificada e página dedicada da empresa.</p>
+        <a class="es-btn es-btn-primary mt-5" href="/publicar-vaga">Publicar vaga</a>
       </article>
       <article class="es-card p-6 sm:p-8">
         <p class="es-kicker">Segurança</p>

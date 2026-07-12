@@ -40,7 +40,7 @@ export const seoSettingsSchema = z.object({
     bioLinks: z.array(z.object({ label: z.string(), href: z.string() })).default([
       { label: "Todas as vagas", href: "/vagas" },
       { label: "Notícias e guias", href: "/blog" },
-      { label: "Anunciar vaga", href: "/anunciar-vaga" }
+      { label: "Publicar vaga", href: "/publicar-vaga" }
     ])
   })
 });
@@ -67,7 +67,7 @@ export const defaultSeoSettings: SeoSettings = {
     bioLinks: [
       { label: "Todas as vagas", href: "/vagas" },
       { label: "Notícias e guias", href: "/blog" },
-      { label: "Anunciar vaga", href: "/anunciar-vaga" }
+      { label: "Publicar vaga", href: "/publicar-vaga" }
     ]
   }
 };

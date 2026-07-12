@@ -1,5 +1,7 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
+import InstagramFollow from "../components/InstagramFollow.astro";
+import { BRAND_ASSETS } from "../lib/brand-assets";
 import { listPublishedJobs } from "../lib/jobs";
 import { listPublishedArticles } from "../lib/articles";
 import { getSeoSettings } from "../lib/seo-settings";
@@ -22,48 +24,73 @@ const [latestJobs, featuredJobs, articles] = await Promise.all([
   listPublishedArticles(4)
 ]);
 ---
-<BaseLayout title="Instagram — Empregos São Luís" description="Links oficiais, vagas em destaque e notícias do Empregos São Luís." canonical={new URL("/instagram", Astro.site).toString()}>
-  <section class="mx-auto max-w-2xl px-4 py-12 text-center">
-    <a class="font-bold text-red-700" href={seo.instagram.profileUrl} rel="noopener noreferrer">@empregosaoluis</a>
-    <h1 class="mt-2 text-4xl font-black">Empregos São Luís</h1>
-    <p class="mt-4">Encontre a vaga pelo código exibido no Instagram.</p>
-    <form class="mt-6 flex gap-2" action="/i" method="get">
-      <label class="sr-only" for="code">Código da vaga</label>
-      <input id="code" name="code" class="min-w-0 flex-1 rounded-xl border p-3 uppercase" placeholder="ES-000001" pattern="ES-[0-9]{6}" required />
-      <button class="rounded-xl bg-red-700 px-5 font-bold text-white">Buscar</button>
-    </form>
-    <nav class="mt-8 grid gap-3">
-      {seo.instagram.bioLinks.map((link) => <a class="rounded-xl border bg-white p-4 font-bold" href={link.href}>{link.label}</a>)}
-    </nav>
-    {featuredJobs.length > 0 && (
-      <section class="mt-12 text-left">
-        <h2 class="text-2xl font-black">Vagas em destaque</h2>
-        <ul class="mt-4 grid gap-3">
-          {featuredJobs.map((job) => (
-            <li><a class="block rounded-xl border bg-white p-4 font-bold" href={`/i/${job.publicCode}?utm_source=instagram&utm_medium=bio_featured`}>{job.normalizedTitle} · {job.publicCode}</a></li>
-          ))}
-        </ul>
-      </section>
-    )}
-    {latestJobs.length > 0 && (
-      <section class="mt-12 text-left">
-        <h2 class="text-2xl font-black">Últimas vagas</h2>
-        <ul class="mt-4 grid gap-3">
-          {latestJobs.map((job) => (
-            <li><a class="block rounded-xl border bg-white p-4 font-bold" href={`/i/${job.publicCode}?utm_source=instagram&utm_medium=bio`}>{job.normalizedTitle} · {job.publicCode}</a></li>
-          ))}
-        </ul>
-      </section>
-    )}
-    {articles.length > 0 && (
-      <section class="mt-12 text-left">
-        <h2 class="text-2xl font-black">Conteúdo recente</h2>
-        <ul class="mt-4 grid gap-3">
-          {articles.map(({ article }) => (
-            <li><a class="block rounded-xl border bg-white p-4 font-bold" href={`/blog/${article.slug}?utm_source=instagram&utm_medium=bio`}>{article.title}</a></li>
-          ))}
-        </ul>
-      </section>
-    )}
+<BaseLayout title="Instagram — Empregos São Luís" description="Siga @empregosaoluis para vagas em stories e no feed. O portal complementa com busca e alertas." canonical={new URL("/instagram", Astro.site).toString()}>
+  <section class="hero-pattern es-section text-white">
+    <div class="es-container text-center">
+      <img src={BRAND_ASSETS.iconWebp} alt="" class="mx-auto h-20 w-20 object-contain" width="80" height="80" />
+      <h1 class="font-display mt-4 text-4xl font-black sm:text-5xl">Empregos São Luís no Instagram</h1>
+      <p class="mx-auto mt-4 max-w-xl text-white/85">Vagas divulgadas em stories e no feed, com link direto para o portal. Busque pelo código ES ou siga para não perder oportunidades.</p>
+      <a
+        class="es-btn es-btn-primary mt-6"
+        href={seo.instagram.profileUrl}
+        target="_blank"
+        rel="noopener noreferrer"
+        data-track="instagram_follow_click"
+      >
+        Seguir {BRAND_ASSETS.instagramHandle}
+      </a>
+    </div>
   </section>
+
+  <section class="es-section">
+    <div class="es-container max-w-2xl">
+      <form class="flex flex-col gap-3 sm:flex-row" action="/i" method="get">
+        <label class="sr-only" for="code">Código da vaga</label>
+        <input id="code" name="code" class="min-w-0 flex-1 rounded-xl border border-[var(--brand-border)] px-4 py-3 uppercase" placeholder="ES-000001" pattern="ES-[0-9]{6}" required />
+        <button class="es-btn es-btn-primary" type="submit">Buscar vaga</button>
+      </form>
+      <nav class="mt-8 grid gap-3 sm:grid-cols-2">
+        {seo.instagram.bioLinks.map((link) => <a class="es-card rounded-2xl p-4 font-bold hover:text-[var(--brand-primary)]" href={link.href}>{link.label}</a>)}
+      </nav>
+      {featuredJobs.length > 0 && (
+        <section class="mt-12">
+          <h2 class="font-display text-2xl font-black">Vagas em destaque</h2>
+          <ul class="mt-4 grid gap-3">
+            {featuredJobs.map((job) => (
+              <li><a class="es-card block rounded-2xl p-4 font-bold" href={`/i/${job.publicCode}?utm_source=instagram&utm_medium=bio_featured`}>{job.normalizedTitle} · {job.publicCode}</a></li>
+            ))}
+          </ul>
+        </section>
+      )}
+      {latestJobs.length > 0 && (
+        <section class="mt-12">
+          <h2 class="font-display text-2xl font-black">Últimas vagas</h2>
+          <ul class="mt-4 grid gap-3">
+            {latestJobs.map((job) => (
+              <li><a class="es-card block rounded-2xl p-4 font-bold" href={`/i/${job.publicCode}?utm_source=instagram&utm_medium=bio`}>{job.normalizedTitle} · {job.publicCode}</a></li>
+            ))}
+          </ul>
+        </section>
+      )}
+      {articles.length > 0 && (
+        <section class="mt-12">
+          <h2 class="font-display text-2xl font-black">Conteúdo recente</h2>
+          <ul class="mt-4 grid gap-3">
+            {articles.map(({ article }) => (
+              <li><a class="es-card block rounded-2xl p-4 font-bold" href={`/noticias/${article.slug}?utm_source=instagram&utm_medium=bio`}>{article.title}</a></li>
+            ))}
+          </ul>
+        </section>
+      )}
+    </div>
+  </section>
+
+  <InstagramFollow variant="compact" trackEvent="instagram_follow_click" />
 </BaseLayout>
+<script is:inline>
+  document.querySelectorAll("[data-track]").forEach((el) => {
+    el.addEventListener("click", () => {
+      navigator.sendBeacon?.("/api/events/instagram", JSON.stringify({ event: el.getAttribute("data-track"), path: location.pathname }));
+    });
+  });
+</script>

@@ -2,7 +2,7 @@ import { and, desc, eq, gt, inArray } from "drizzle-orm";
 import { articles, categories, cities, companies, createDatabase, jobs, states } from "@es/db";
 import { dedupeEntries, normalizeLastmod, type SitemapEntry } from "@es/seo";
 
-const INSTITUTIONAL_PATHS = ["/", "/vagas", "/empresas", "/categorias", "/blog", "/noticias", "/quem-somos", "/contato", "/privacidade", "/termos", "/cookies", "/anunciar-vaga", "/instagram"];
+const INSTITUTIONAL_PATHS = ["/", "/vagas", "/empresas", "/categorias", "/blog", "/noticias", "/quem-somos", "/contato", "/privacidade", "/termos", "/cookies", "/publicar-vaga", "/area-empresas", "/instagram"];
 
 export async function listSitemapEntries(category: "static" | "jobs" | "companies" | "cities" | "categories" | "blog") {
   if (!process.env.DATABASE_URL) return [] as SitemapEntry[];
