@@ -13,6 +13,7 @@
     "@aws-sdk/client-s3": "^3.850.0",
     "@es/db": "*",
     "@es/shared": "*",
+    "@sentry/node": "^10.65.0",
     "bullmq": "^5.80.2",
     "pino": "^9.7.0",
     "resend": "^6.0.1",

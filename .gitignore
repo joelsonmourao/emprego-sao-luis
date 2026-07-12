@@ -2,6 +2,7 @@ node_modules
 .next
 .env
 .env.local
+.env.staging
 .vercel
 .env*.local
 
@@ -13,3 +14,4 @@ dist
 playwright-report
 test-results
 coverage
+.lighthouseci

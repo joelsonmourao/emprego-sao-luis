@@ -22,7 +22,7 @@ export async function processImport(payload: ImportPayload) {
       const [state] = await connection.db.select().from(states).where(eq(states.code, value.state)).limit(1);
       const [city] = state ? await connection.db.select().from(cities).where(and(eq(cities.stateId, state.id), sql`lower(${cities.name}) = lower(${value.city})`)).limit(1) : [];
       const [category] = value.category ? await connection.db.select().from(categories).where(sql`lower(${categories.name}) = lower(${value.category})`).limit(1) : [];
-      const relationErrors = [!company && "Empresa não cadastrada.", !state && "UF não cadastrada.", !city && "Cidade não cadastrada."].filter(Boolean) as string[];
+      const relationErrors = [!company ? "Empresa não cadastrada." : null, !state ? "UF não cadastrada." : null, !city ? "Cidade não cadastrada." : null].filter((item): item is string => item !== null);
       if (relationErrors.length) { rejectedRows++; await connection.db.insert(importRows).values({ batchId: payload.batchId, rowNumber: position + 2, raw, normalized: value, errors: relationErrors }); continue; }
       const duplicateHash = createHash("sha256").update(`${value.title}|${company!.id}|${city!.id}`).digest("hex");
       const [duplicate] = await connection.db.select({ id: jobs.id }).from(jobs).where(eq(jobs.duplicateHash, duplicateHash)).limit(1);

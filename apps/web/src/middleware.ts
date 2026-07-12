@@ -1,4 +1,5 @@
 import { defineMiddleware } from "astro:middleware";
+import "./instrumentation";
 import { ADMIN_COOKIE, verifySession } from "./lib/auth";
 
 export const onRequest = defineMiddleware(async (context, next) => {
