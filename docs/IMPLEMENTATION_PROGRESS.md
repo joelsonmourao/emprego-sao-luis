@@ -14,9 +14,9 @@ Branch `codex/reconstrucao-astro`. Arquitetura Astro 7, Drizzle, PostgreSQL, Val
 - Fase 6 — CMS editorial, autoria, revisões, agendamento e notícias públicas.
 - Fase 7 — biblioteca de mídia R2/S3 e configuração visual auditável.
 
-## Fase em andamento
+## Fase atual
 
-- Fase 8 — SEO técnico, social e estúdio de publicação.
+- Fase 8 — SEO técnico, social e estúdio de publicação. Ainda não iniciada; o repositório foi encerrado em ponto seguro após a Fase 7.
 
 ## Commits principais
 
@@ -26,6 +26,11 @@ Branch `codex/reconstrucao-astro`. Arquitetura Astro 7, Drizzle, PostgreSQL, Val
 - `ee9aba3` — ações em lote de vagas.
 - `65619eb` — importação administrável de planilhas.
 - `d22dc6d` — programação em blocos.
+- `535dd46` — empresas, categorias, cidades e bairros.
+- `80c8084` — CMS editorial completo.
+- `ce3f675` — biblioteca de mídia e aparência; último commit funcional antes do encerramento documental.
+
+O commit mais recente é o commit de encerramento que contém este relatório; seu hash deve ser obtido com `git log -1 --oneline` após o checkout da branch.
 
 ## Migrations
 
@@ -34,9 +39,17 @@ Branch `codex/reconstrucao-astro`. Arquitetura Astro 7, Drizzle, PostgreSQL, Val
 
 ## Testes atuais
 
-- lint, typecheck, migration check e build aprovados.
-- 23 testes unitários aprovados.
-- 9 testes E2E aprovados.
+- `npm run lint` aprovado.
+- `npm run typecheck` aprovado.
+- `npm run test` aprovado: 23 testes unitários.
+- `npm run migration:check` aprovado.
+- `npm run build` aprovado para web e worker.
+
+## Pendências internas
+
+- Implementar a Fase 8 sem alterar os módulos concluídos das Fases 1 a 7.
+- Depois da Fase 8: alertas multicanal, publicidade, operação de filas, usuários/admin, acabamento do portal, páginas institucionais e auditoria final.
+- Manter lint, typecheck, testes, migration check e build verdes a cada commit de fase.
 
 ## Bloqueios externos
 
@@ -46,6 +59,13 @@ O domínio oficial ainda pode estar vinculado ao deployment legado. Deve ficar e
 
 Credenciais reais de Meta, Google, Resend, R2/S3, Sentry e AdSense devem permanecer apenas no Coolify. Os módulos usam variáveis e fallbacks sem inventar segredos.
 
-## Próximos itens internos
+## Pendências externas do Coolify
 
-Fase 8 em execução; depois alertas, publicidade, filas, usuários/admin, portal final, institucionais e auditoria final.
+- Executar, pelo serviço/job de migrations, `0012_public_hex.sql`, `0013_elite_lorna_dane.sql`, `0014_typical_terror.sql` e `0015_abnormal_victor_mancha.sql` antes de usar os novos módulos.
+- Configurar `S3_ENDPOINT`, `S3_REGION`, `S3_BUCKET`, `S3_ACCESS_KEY_ID`, `S3_SECRET_ACCESS_KEY`, `S3_PUBLIC_URL` e `S3_FORCE_PATH_STYLE` para habilitar uploads.
+- Confirmar que o domínio oficial aponta exclusivamente para o serviço criado com `Dockerfile.web`, limpar cache do proxy/Cloudflare e validar o cabeçalho `X-ES-App: astro`.
+- Fornecer somente no Coolify as credenciais externas de Meta, Google, Resend, Sentry e AdSense quando suas integrações forem ativadas.
+
+## Primeiro item da próxima execução
+
+Auditar o módulo existente de SEO e social (`apps/web/src/pages/admin/social.astro`, endpoints de sitemap/feed/indexação, `packages/seo`, `packages/social` e workers relacionados) e produzir uma lista objetiva do que já funciona e do que falta antes de alterar o schema ou criar migrations da Fase 8.
