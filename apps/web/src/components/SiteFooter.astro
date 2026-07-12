@@ -1,17 +1,19 @@
 ---
 import type { VisualIdentity } from "../lib/visual-identity";
+import { BRAND_ASSETS } from "../lib/brand-assets";
 
 interface Props { identity: VisualIdentity }
 const { identity } = Astro.props;
 const year = new Date().getFullYear();
+const logoSrc = identity.logoUrlDark || identity.logoUrl || BRAND_ASSETS.logoHorizontalWebp;
 const groups = [
   {
     title: "Portal",
-    links: [["Vagas", "/vagas"], ["Empresas", "/empresas"], ["Categorias", "/categorias"], ["Notícias", "/noticias"], ["Alertas", "/alertas"]]
+    links: [["Vagas", "/vagas"], ["Empresas", "/empresas"], ["Categorias", "/categorias"], ["Notícias", "/noticias"], ["Alertas", "/alertas"], ["Instagram", "/instagram"]]
   },
   {
     title: "Institucional",
-    links: [["Quem somos", "/quem-somos"], ["Contato", "/contato"], ["Anunciar vaga", "/anunciar-vaga"], ["Área para empresas", "/area-empresas"]]
+    links: [["Quem somos", "/quem-somos"], ["Contato", "/contato"], ["Publicar vaga", "/publicar-vaga"], ["Área para empresas", "/area-empresas"]]
   },
   {
     title: "Legal",
@@ -19,18 +21,37 @@ const groups = [
   }
 ] as const;
 ---
-<footer class="border-t border-[var(--es-border)] bg-[var(--es-green)] text-white/90">
+<footer class="border-t border-[var(--brand-border)] bg-[var(--brand-secondary)] text-white/90">
   <div class="es-container grid gap-10 py-12 md:grid-cols-[1.3fr_repeat(3,1fr)]">
     <div>
-      <p class="font-display text-xl font-black text-white">{identity.siteName}</p>
+      <a href="/" aria-label={BRAND_ASSETS.logoAlt}>
+        <img src={logoSrc} alt="" class="h-12 w-auto max-w-[12rem] object-contain" width="192" height="48" loading="lazy" />
+      </a>
       <p class="mt-3 max-w-sm text-sm leading-6 text-white/75">{identity.tagline}</p>
-      <a class="es-btn es-btn-primary mt-5 text-sm" href="/alertas">Criar alerta gratuito</a>
+      <a
+        class="es-btn es-btn-primary mt-5 text-sm"
+        href={BRAND_ASSETS.instagramUrl}
+        target="_blank"
+        rel="noopener noreferrer"
+        data-track="instagram_footer_click"
+      >
+        Seguir {BRAND_ASSETS.instagramHandle}
+      </a>
+      <a class="mt-3 block text-sm text-white/75 hover:text-white" href="/alertas">Criar alerta gratuito</a>
     </div>
     {groups.map((group) => (
       <div>
         <p class="text-sm font-bold uppercase tracking-wide text-white/60">{group.title}</p>
         <nav class="mt-3 grid gap-2" aria-label={group.title}>
-          {group.links.map(([label, href]) => <a class="text-sm hover:text-white" href={href}>{label}</a>)}
+          {group.links.map(([label, href]) => (
+            <a
+              class="text-sm hover:text-white"
+              href={href}
+              {...(href === "/instagram" ? { "data-track": "instagram_footer_click" } : {})}
+            >
+              {label}
+            </a>
+          ))}
         </nav>
       </div>
     ))}
@@ -42,3 +63,12 @@ const groups = [
     </div>
   </div>
 </footer>
+<script is:inline>
+  document.querySelectorAll("footer [data-track]").forEach((el) => {
+    el.addEventListener("click", () => {
+      const event = el.getAttribute("data-track");
+      if (!event) return;
+      navigator.sendBeacon?.("/api/events/instagram", JSON.stringify({ event, path: location.pathname }));
+    });
+  });
+</script>

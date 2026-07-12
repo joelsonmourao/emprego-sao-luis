@@ -1,5 +1,6 @@
 ---
 import type { VisualIdentity } from "../lib/visual-identity";
+import { BRAND_ASSETS } from "../lib/brand-assets";
 import { MobileNav } from "./MobileNav";
 
 interface Props {
@@ -19,23 +20,25 @@ const nav = [
 
 const isCurrent = (href: string) => currentPath === href || (href !== "/" && currentPath.startsWith(href));
 const mobileItems = nav.map(([label, href]) => ({ label, href, current: isCurrent(href) }));
+const logoSrc = identity.logoUrl || BRAND_ASSETS.logoHorizontalWebp;
+const logoFallback = BRAND_ASSETS.logoHorizontalPng;
 ---
-<header class="sticky top-0 z-40 border-b border-[var(--es-border)] bg-white/95 backdrop-blur">
+<header class="sticky top-0 z-40 border-b border-[var(--brand-border)] bg-[var(--brand-surface)]/95 backdrop-blur">
   <div class="es-container relative flex items-center justify-between gap-4 py-3">
-    <a class="flex min-w-0 items-center gap-3" href="/" aria-label={identity.siteName}>
-      {identity.logoUrl ? (
-        <img src={identity.logoUrl} alt="" class="h-10 w-auto max-w-[9rem] object-contain" width="144" height="40" loading="eager" />
-      ) : (
-        <span class="font-display text-lg font-black text-[var(--brand-primary)]">{identity.siteName}</span>
-      )}
+    <a class="flex min-w-0 items-center gap-3" href="/" aria-label={BRAND_ASSETS.logoAlt}>
+      <picture>
+        <source srcset={logoSrc} type="image/webp" />
+        <img src={logoFallback} alt={BRAND_ASSETS.logoAlt} class="h-10 w-auto max-w-[11rem] object-contain" width="176" height="40" loading="eager" />
+      </picture>
     </a>
 
     <nav class="hidden items-center gap-1 md:flex" aria-label="Principal">
       {nav.map(([label, href]) => (
         <a
-          class={`rounded-xl px-3 py-2 text-sm font-semibold transition-colors ${isCurrent(href) ? "bg-[color-mix(in_srgb,var(--brand-primary)_10%,white)] text-[var(--brand-primary)]" : "text-[var(--es-muted)] hover:text-[var(--brand-primary)]"}`}
+          class={`rounded-xl px-3 py-2 text-sm font-semibold transition-colors ${isCurrent(href) ? "bg-[color-mix(in_srgb,var(--brand-primary)_10%,white)] text-[var(--brand-primary)]" : "text-[var(--text-secondary)] hover:text-[var(--brand-primary)]"}`}
           href={href}
           aria-current={isCurrent(href) ? "page" : undefined}
+          {...(href === "/instagram" ? { "data-track": "instagram_header_click" } : {})}
         >
           {label}
         </a>
@@ -43,8 +46,8 @@ const mobileItems = nav.map(([label, href]) => ({ label, href, current: isCurren
     </nav>
 
     <div class="flex items-center gap-2">
-      <a class="es-btn es-btn-primary hidden text-sm sm:inline-flex" href="/anunciar-vaga">Publicar vaga</a>
-      <MobileNav client:idle items={mobileItems} ctaHref="/anunciar-vaga" ctaLabel="Publicar vaga" />
+      <a class="es-btn es-btn-primary hidden text-sm sm:inline-flex" href="/publicar-vaga">Publicar vaga</a>
+      <MobileNav client:idle items={mobileItems} ctaHref="/publicar-vaga" ctaLabel="Publicar vaga" />
     </div>
   </div>
 </header>

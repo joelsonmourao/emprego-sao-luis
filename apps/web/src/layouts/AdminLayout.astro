@@ -1,14 +1,18 @@
 ---
 import "../styles/global.css";
 import { cssVariablesFromIdentity } from "../lib/design-tokens";
+import { BRAND_ASSETS } from "../lib/brand-assets";
+import { filterAdminNav } from "../lib/admin-nav";
 import { getVisualIdentity } from "../lib/visual-identity";
 
 const auth = Astro.locals.auth;
 interface Props { title: string }
 const { title } = Astro.props;
 const identity = await getVisualIdentity();
-const links = [["Visão geral", "/admin"], ["Vagas", "/admin/vagas"], ["Programação", "/admin/programacao"], ["Importação", "/admin/importacao"], ["Empresas", "/admin/empresas"], ["Categorias", "/admin/categorias"], ["Cidades e bairros", "/admin/localidades"], ["Conteúdo", "/admin/conteudo"], ["Páginas", "/admin/paginas"], ["Mídia", "/admin/midia"], ["Aparência", "/admin/aparencia"], ["Social", "/admin/social"], ["Audiência", "/admin/audiencia"], ["Publicidade", "/admin/publicidade"], ["SEO", "/admin/seo"], ["Usuários", "/admin/usuarios"], ["Administradores", "/admin/administradores"], ["Permissões", "/admin/permissoes"], ["Auditoria", "/admin/auditoria"], ["Operação", "/admin/operacao"], ["Saúde", "/admin/saude"], ["Segurança", "/admin/seguranca"]];
+const permissions = auth?.permissions ?? [];
+const navGroups = filterAdminNav(permissions);
 const current = Astro.url.pathname;
+const logoSrc = identity.logoUrlDark || identity.logoUrl || BRAND_ASSETS.logoHorizontalWebp;
 ---
 <!doctype html>
 <html lang="pt-BR">
@@ -17,27 +21,42 @@ const current = Astro.url.pathname;
     <meta name="viewport" content="width=device-width" />
     <meta name="robots" content="noindex,nofollow" />
     <title>{title} — Painel</title>
+    <link rel="icon" href={BRAND_ASSETS.faviconIco} />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;600;700&family=Fraunces:wght@700;800&display=swap" rel="stylesheet" />
     <style is:inline set:html={cssVariablesFromIdentity(identity)} />
   </head>
-  <body class="bg-[var(--es-cream)] text-[var(--es-ink)]">
-    <div class="min-h-screen lg:grid lg:grid-cols-[270px_1fr]">
-      <aside class="border-r border-[var(--es-border)] bg-[var(--es-green)] p-5 text-white">
-        <a class="font-display text-lg font-black" href="/admin">{identity.siteName}</a>
-        <p class="mt-1 text-xs text-white/60">Painel administrativo</p>
-        <nav class="mt-8 grid max-h-[calc(100vh-8rem)] gap-1 overflow-auto pr-1 text-sm" aria-label="Painel">
-          {links.map(([label, href]) => (
-            <a class={`rounded-xl px-3 py-2 transition-colors ${current === href || current.startsWith(`${href}/`) ? "bg-white/15 font-bold" : "hover:bg-white/10"}`} href={href}>{label}</a>
+  <body class="bg-[var(--brand-background)] text-[var(--text-primary)]">
+    <div class="min-h-screen lg:grid lg:grid-cols-[280px_1fr]">
+      <aside class="border-r border-[var(--brand-border)] bg-[var(--brand-secondary)] p-5 text-white">
+        <a class="block" href="/admin" aria-label={BRAND_ASSETS.logoAlt}>
+          <img src={logoSrc} alt="" class="h-10 w-auto max-w-[10rem] object-contain" width="160" height="40" />
+        </a>
+        <p class="mt-2 text-xs text-white/60">Painel administrativo</p>
+        <nav class="mt-6 grid max-h-[calc(100vh-9rem)] gap-4 overflow-auto pr-1 text-sm" aria-label="Painel">
+          {navGroups.map((group) => (
+            <div>
+              <p class="px-2 text-[0.65rem] font-bold uppercase tracking-wider text-white/45">{group.title}</p>
+              <div class="mt-1 grid gap-0.5">
+                {group.items.map((item) => (
+                  <a
+                    class={`rounded-xl px-3 py-2 transition-colors ${current === item.href || current.startsWith(`${item.href}/`) ? "bg-white/15 font-bold" : "hover:bg-white/10"}`}
+                    href={item.href}
+                  >
+                    {item.label}
+                  </a>
+                ))}
+              </div>
+            </div>
           ))}
         </nav>
       </aside>
       <div>
-        <header class="flex items-center justify-between border-b border-[var(--es-border)] bg-white px-6 py-4">
+        <header class="flex items-center justify-between border-b border-[var(--brand-border)] bg-[var(--brand-surface)] px-6 py-4">
           <div>
-            <p class="text-xs font-bold uppercase tracking-wide text-[var(--es-muted)]">Painel</p>
+            <p class="text-xs font-bold uppercase tracking-wide text-[var(--text-secondary)]">Painel</p>
             <strong class="font-display text-lg">{title}</strong>
-            <p class="text-sm text-[var(--es-muted)]">{auth?.email}</p>
+            <p class="text-sm text-[var(--text-secondary)]">{auth?.email}</p>
           </div>
           <form method="post" action="/api/admin/logout"><button class="es-btn es-btn-secondary">Sair</button></form>
         </header>

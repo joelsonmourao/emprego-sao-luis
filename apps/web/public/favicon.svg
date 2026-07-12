@@ -1,1 +1,8 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" rx="14" fill="#b42318"/><path d="M16 18h32v8H25v7h20v8H25v7h23v8H16z" fill="#fff"/></svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Empregos São Luís">
+  <rect width="64" height="64" rx="12" fill="#1A1A1A"/>
+  <text x="32" y="44" text-anchor="middle" font-family="Arial Black, Arial, sans-serif" font-size="28" font-weight="900" fill="#1A1A1A" stroke="#fff" stroke-width="1.5">ES</text>
+  <rect x="14" y="16" width="6" height="6" fill="#E41E26"/>
+  <rect x="22" y="12" width="6" height="6" fill="#E41E26"/>
+  <rect x="30" y="8" width="6" height="6" fill="#E41E26"/>
+  <rect x="14" y="30" width="22" height="3" fill="#E41E26"/>
+</svg>

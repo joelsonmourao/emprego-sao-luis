@@ -5,6 +5,7 @@ import SiteFooter from "../components/SiteFooter.astro";
 import SiteHeader from "../components/SiteHeader.astro";
 import { buildBreadcrumbSchema, buildOpenGraphTags, buildOrganizationSchema, buildTwitterTags, buildWebSiteSchema } from "@es/seo";
 import { cssVariablesFromIdentity } from "../lib/design-tokens";
+import { BRAND_ASSETS } from "../lib/brand-assets";
 import { getSeoSettings } from "../lib/seo-settings";
 import { getVisualIdentity } from "../lib/visual-identity";
 
@@ -44,7 +45,13 @@ const currentPath = Astro.url.pathname;
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,600;0,9..40,700;1,9..40,400&family=Fraunces:opsz,wght@9..144,600;9..144,700;9..144,800&display=swap" rel="stylesheet" />
-    <link rel="icon" href={identity.iconUrl || "/favicon.svg"} type="image/svg+xml" />
+    <link rel="icon" href={identity.iconUrl || BRAND_ASSETS.faviconIco} sizes="any" />
+    <link rel="icon" href={BRAND_ASSETS.faviconSvg} type="image/svg+xml" />
+    <link rel="icon" href={BRAND_ASSETS.favicon32} type="image/png" sizes="32x32" />
+    <link rel="icon" href={BRAND_ASSETS.favicon16} type="image/png" sizes="16x16" />
+    <link rel="apple-touch-icon" href={BRAND_ASSETS.appleTouchIcon} />
+    <link rel="manifest" href={BRAND_ASSETS.manifest} />
+    <meta name="theme-color" content={BRAND_ASSETS.themeColor} />
     <link rel="canonical" href={canonicalUrl} />
     <title>{pageTitle}</title>
     <style is:inline set:html={cssVariablesFromIdentity(identity)} />

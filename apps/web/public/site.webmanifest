@@ -1,0 +1,14 @@
+{
+  "name": "Empregos São Luís",
+  "short_name": "Empregos SL",
+  "description": "Vagas de emprego em São Luís e Maranhão",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#F5F5F5",
+  "theme_color": "#9B2D30",
+  "lang": "pt-BR",
+  "icons": [
+    { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}
