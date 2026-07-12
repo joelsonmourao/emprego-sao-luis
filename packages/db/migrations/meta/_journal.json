@@ -71,6 +71,13 @@
       "when": 1783859202466,
       "tag": "0009_modern_multiple_man",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1783859801373,
+      "tag": "0010_great_ogun",
+      "breakpoints": true
     }
   ]
 }

@@ -18,6 +18,7 @@ if (!jsonLd) return Astro.redirect(`/vagas/indisponivel/${encodeURIComponent(slu
     <p class="mt-4 text-lg text-slate-700">{record.summary}</p>
     <section class="prose mt-8 max-w-none" set:html={record.description} />
     <a class="mt-10 inline-flex rounded-xl bg-red-700 px-6 py-4 font-bold text-white" href={record.applicationUrl} rel="nofollow noopener noreferrer">Candidatar-se</a>
+    <form class="mt-4" method="post" action="/api/account/saved-jobs"><input type="hidden" name="jobId" value={record.id}/><input type="hidden" name="action" value="save"/><button class="rounded-xl border px-5 py-3 font-bold">Salvar vaga</button></form>
     <AdSlot slot="job-after-application" />
   </article>
 </BaseLayout>
