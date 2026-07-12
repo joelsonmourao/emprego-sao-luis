@@ -1,0 +1,66 @@
+---
+import { formatRelativeDate, formatSalary, formatWorkplace } from "../../lib/job-presenter";
+
+interface Props {
+  title: string;
+  slug: string;
+  code: string;
+  company: string;
+  city: string;
+  state: string;
+  workplace: string;
+  contract?: string | null;
+  neighborhood?: string | null;
+  salaryVisible?: boolean;
+  salaryMin?: string | null;
+  salaryMax?: string | null;
+  salaryCurrency?: string;
+  salaryPeriod?: string | null;
+  publishedAt?: Date | null;
+  featured?: boolean;
+  sponsored?: boolean;
+  logoUrl?: string | null;
+  compact?: boolean;
+}
+
+const {
+  title, slug, code, company, city, state, workplace, contract, neighborhood,
+  salaryVisible = false, salaryMin, salaryMax, salaryCurrency = "BRL", salaryPeriod,
+  publishedAt, featured = false, sponsored = false, logoUrl, compact = false
+} = Astro.props;
+
+const salary = formatSalary({ salaryVisible, salaryMin: salaryMin ?? null, salaryMax: salaryMax ?? null, salaryCurrency, salaryPeriod: salaryPeriod ?? null });
+const location = [city, state, neighborhood].filter(Boolean).join(" · ");
+---
+<article class={`es-card group flex h-full flex-col p-5 ${compact ? "" : "sm:p-6"}`}>
+  <div class="flex items-start gap-3">
+    {logoUrl ? (
+      <img src={logoUrl} alt="" class="h-11 w-11 shrink-0 rounded-xl border border-[var(--es-border)] object-contain bg-white p-1" width="44" height="44" loading="lazy" />
+    ) : (
+      <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[var(--es-cream-dark)] text-sm font-black text-[var(--brand-primary)]" aria-hidden="true">{company.slice(0, 1)}</div>
+    )}
+    <div class="min-w-0 flex-1">
+      <div class="flex flex-wrap items-center gap-2">
+        <span class="text-xs font-bold text-[var(--brand-primary)]">{code}</span>
+        {featured && <span class="chip chip-active">Destaque</span>}
+        {sponsored && <span class="chip">Patrocinada</span>}
+      </div>
+      <h3 class="font-display mt-1 text-lg font-black leading-snug sm:text-xl">
+        <a class="hover:text-[var(--brand-primary)]" href={`/vagas/${slug}`}>{title}</a>
+      </h3>
+      <p class="mt-1 text-sm font-semibold text-[var(--es-ink)]">{company}</p>
+    </div>
+  </div>
+  <dl class="mt-4 grid gap-1 text-sm text-[var(--es-muted)]">
+    <div class="flex flex-wrap gap-x-3 gap-y-1">
+      <dt class="sr-only">Local</dt><dd>{location}</dd>
+      <dt class="sr-only">Modalidade</dt><dd>{formatWorkplace(workplace)}</dd>
+      {contract && <><dt class="sr-only">Contrato</dt><dd>{contract}</dd></>}
+    </div>
+    {salary && <div><dt class="sr-only">Salário</dt><dd class="font-bold text-[var(--es-green)]">{salary}</dd></div>}
+    {publishedAt && <div><dt class="sr-only">Publicada em</dt><dd>{formatRelativeDate(publishedAt)}</dd></div>}
+  </dl>
+  <div class="mt-auto pt-5">
+    <a class="es-btn es-btn-secondary w-full text-sm group-hover:border-[var(--brand-primary)] group-hover:text-[var(--brand-primary)]" href={`/vagas/${slug}`}>Ver vaga</a>
+  </div>
+</article>

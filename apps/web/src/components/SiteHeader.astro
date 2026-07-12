@@ -1,5 +1,6 @@
 ---
 import type { VisualIdentity } from "../lib/visual-identity";
+import { MobileNav } from "./MobileNav";
 
 interface Props {
   identity: VisualIdentity;
@@ -14,22 +15,36 @@ const nav = [
   ["Notícias", "/noticias"],
   ["Alertas", "/alertas"],
   ["Instagram", "/instagram"]
-];
-const linkClass = (href: string) => (currentPath === href || (href !== "/" && currentPath.startsWith(href)) ? "font-bold text-[var(--brand-primary)]" : "hover:text-[var(--brand-primary)]");
+] as const;
+
+const isCurrent = (href: string) => currentPath === href || (href !== "/" && currentPath.startsWith(href));
+const mobileItems = nav.map(([label, href]) => ({ label, href, current: isCurrent(href) }));
 ---
-<header class="sticky top-0 z-40 border-b border-slate-200 bg-white/95 backdrop-blur">
-  <div class="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-3">
-    <a class="flex items-center gap-3" href="/" aria-label={identity.siteName}>
-      {identity.logoUrl ? <img src={identity.logoUrl} alt="" class="h-9 w-auto" width="120" height="36" loading="eager" /> : <span class="text-lg font-black text-[var(--brand-primary)]">{identity.siteName}</span>}
+<header class="sticky top-0 z-40 border-b border-[var(--es-border)] bg-white/95 backdrop-blur">
+  <div class="es-container relative flex items-center justify-between gap-4 py-3">
+    <a class="flex min-w-0 items-center gap-3" href="/" aria-label={identity.siteName}>
+      {identity.logoUrl ? (
+        <img src={identity.logoUrl} alt="" class="h-10 w-auto max-w-[9rem] object-contain" width="144" height="40" loading="eager" />
+      ) : (
+        <span class="font-display text-lg font-black text-[var(--brand-primary)]">{identity.siteName}</span>
+      )}
     </a>
-    <nav class="hidden items-center gap-5 text-sm font-semibold md:flex" aria-label="Principal">
-      {nav.map(([label, href]) => <a class={linkClass(href!)} href={href}>{label}</a>)}
+
+    <nav class="hidden items-center gap-1 md:flex" aria-label="Principal">
+      {nav.map(([label, href]) => (
+        <a
+          class={`rounded-xl px-3 py-2 text-sm font-semibold transition-colors ${isCurrent(href) ? "bg-[color-mix(in_srgb,var(--brand-primary)_10%,white)] text-[var(--brand-primary)]" : "text-[var(--es-muted)] hover:text-[var(--brand-primary)]"}`}
+          href={href}
+          aria-current={isCurrent(href) ? "page" : undefined}
+        >
+          {label}
+        </a>
+      ))}
     </nav>
-    <details class="relative md:hidden">
-      <summary class="cursor-pointer list-none rounded-lg border px-3 py-2 font-bold">Menu</summary>
-      <nav class="absolute right-0 mt-2 grid min-w-48 gap-1 rounded-xl border bg-white p-3 shadow-lg" aria-label="Menu mobile">
-        {nav.map(([label, href]) => <a class="rounded-lg px-3 py-2 hover:bg-slate-100" href={href}>{label}</a>)}
-      </nav>
-    </details>
+
+    <div class="flex items-center gap-2">
+      <a class="es-btn es-btn-primary hidden text-sm sm:inline-flex" href="/anunciar-vaga">Publicar vaga</a>
+      <MobileNav client:idle items={mobileItems} ctaHref="/anunciar-vaga" ctaLabel="Publicar vaga" />
+    </div>
   </div>
 </header>
