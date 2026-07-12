@@ -1,17 +1,28 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
 import AdSlot from "../components/AdSlot.astro";
+import EmptyState from "../components/ui/EmptyState.astro";
+import JobCard from "../components/ui/JobCard.astro";
+import PageHero from "../components/ui/PageHero.astro";
+import SectionHeading from "../components/ui/SectionHeading.astro";
 import { categories, cities, companies, createDatabase, jobs, states } from "@es/db";
 import { and, count, desc, eq, gt } from "drizzle-orm";
 import { listPublishedArticles } from "../lib/articles";
 import { getVisualIdentity } from "../lib/visual-identity";
 
-type JobCard = { id: string; title: string; slug: string; code: string; company: string; city: string; state: string; workplace: string; publishedAt: Date | null };
-let recent: JobCard[] = [];
-let featured: JobCard[] = [];
+type JobRow = {
+  id: string; title: string; slug: string; code: string; company: string; city: string; state: string;
+  workplace: string; contract: string; publishedAt: Date | null; featured: boolean; sponsored: boolean;
+  logoUrl: string | null; salaryVisible: boolean; salaryMin: string | null; salaryMax: string | null;
+  salaryCurrency: string; salaryPeriod: string | null;
+};
+
+let recent: JobRow[] = [];
+let featured: JobRow[] = [];
 let categoryRows: Array<{ name: string; slug: string; total: number }> = [];
 let cityRows: Array<{ name: string; slug: string; state: string; total: number }> = [];
-let companyRows: Array<{ name: string; slug: string; total: number }> = [];
+let companyRows: Array<{ name: string; slug: string; total: number; logoUrl: string | null }> = [];
+let categoryOptions: Array<{ name: string; slug: string }> = [];
 
 const identity = await getVisualIdentity();
 
@@ -19,158 +30,225 @@ if (process.env.DATABASE_URL) {
   const connection = createDatabase(process.env.DATABASE_URL);
   try {
     const active = and(eq(jobs.publicationStatus, "PUBLISHED"), gt(jobs.expiresAt, new Date()));
-    const fields = { id: jobs.id, title: jobs.normalizedTitle, slug: jobs.slug, code: jobs.publicCode, company: companies.name, city: cities.name, state: states.code, workplace: jobs.workplaceType, publishedAt: jobs.publishedAt };
-    [recent, featured, categoryRows, cityRows, companyRows] = await Promise.all([
+    const fields = {
+      id: jobs.id, title: jobs.normalizedTitle, slug: jobs.slug, code: jobs.publicCode, company: companies.name,
+      city: cities.name, state: states.code, workplace: jobs.workplaceType, contract: jobs.employmentType,
+      publishedAt: jobs.publishedAt, featured: jobs.featured, sponsored: jobs.sponsored, logoUrl: companies.logoUrl,
+      salaryVisible: jobs.salaryVisible, salaryMin: jobs.salaryMin, salaryMax: jobs.salaryMax,
+      salaryCurrency: jobs.salaryCurrency, salaryPeriod: jobs.salaryPeriod
+    };
+    [recent, featured, categoryRows, cityRows, companyRows, categoryOptions] = await Promise.all([
       connection.db.select(fields).from(jobs).innerJoin(companies, eq(jobs.companyId, companies.id)).innerJoin(cities, eq(jobs.cityId, cities.id)).innerJoin(states, eq(jobs.stateId, states.id)).where(active).orderBy(desc(jobs.publishedAt)).limit(9),
-      connection.db.select(fields).from(jobs).innerJoin(companies, eq(jobs.companyId, companies.id)).innerJoin(cities, eq(jobs.cityId, cities.id)).innerJoin(states, eq(jobs.stateId, states.id)).where(and(active, eq(jobs.featured, true))).orderBy(desc(jobs.publishedAt)).limit(3),
+      connection.db.select(fields).from(jobs).innerJoin(companies, eq(jobs.companyId, companies.id)).innerJoin(cities, eq(jobs.cityId, cities.id)).innerJoin(states, eq(jobs.stateId, states.id)).where(and(active, eq(jobs.featured, true))).orderBy(desc(jobs.publishedAt)).limit(6),
       connection.db.select({ name: categories.name, slug: categories.slug, total: count(jobs.id) }).from(categories).innerJoin(jobs, eq(jobs.categoryId, categories.id)).where(active).groupBy(categories.id).orderBy(desc(count(jobs.id))).limit(8),
       connection.db.select({ name: cities.name, slug: cities.slug, state: states.code, total: count(jobs.id) }).from(cities).innerJoin(states, eq(cities.stateId, states.id)).innerJoin(jobs, eq(jobs.cityId, cities.id)).where(active).groupBy(cities.id, states.code).orderBy(desc(count(jobs.id))).limit(8),
-      connection.db.select({ name: companies.name, slug: companies.slug, total: count(jobs.id) }).from(companies).innerJoin(jobs, eq(jobs.companyId, companies.id)).where(active).groupBy(companies.id).orderBy(desc(count(jobs.id))).limit(6)
+      connection.db.select({ name: companies.name, slug: companies.slug, total: count(jobs.id), logoUrl: companies.logoUrl }).from(companies).innerJoin(jobs, eq(jobs.companyId, companies.id)).where(active).groupBy(companies.id).orderBy(desc(count(jobs.id))).limit(6),
+      connection.db.select({ name: categories.name, slug: categories.slug }).from(categories).where(eq(categories.active, true)).orderBy(categories.name).limit(30)
     ]);
   } finally {
     await connection.close();
   }
 }
 
-const articles = await listPublishedArticles(3);
-const displayJobs = featured.length ? featured : recent.slice(0, 3);
+const articles = await listPublishedArticles(4);
+const displayFeatured = featured.length ? featured : recent.slice(0, 3);
 const quickFilters = [
   ["Presencial", "/vagas?modalidade=presencial"],
   ["Remoto", "/vagas?modalidade=remoto"],
   ["São Luís", "/vagas?cidade=São Luís"],
-  ["Primeiro emprego", "/vagas?q=auxiliar"]
+  ["Auxiliar", "/vagas?q=auxiliar"],
+  ["Vendedor", "/vagas?q=vendedor"]
+];
+const steps = [
+  ["Busque", "Pesquise por cargo, cidade, categoria ou modalidade."],
+  ["Compare", "Veja empresa, local, contrato e fonte da vaga."],
+  ["Candidate-se", "Acesse o link oficial sem cadastro obrigatório."]
 ];
 ---
 <BaseLayout title="Empregos São Luís — Vagas em São Luís e Maranhão" description={identity.tagline}>
-  <section class="bg-slate-950 text-white">
-    <div class="mx-auto max-w-6xl px-4 py-16 sm:py-24">
-      <p class="font-bold uppercase tracking-[.2em] text-red-400">{identity.siteName}</p>
-      <h1 class="mt-4 max-w-4xl text-4xl font-black leading-tight sm:text-6xl">Seu próximo trabalho pode estar mais perto do que você imagina.</h1>
-      <p class="mt-5 max-w-2xl text-lg text-slate-300">{identity.tagline}</p>
-      <form class="mt-8 grid gap-3 rounded-2xl bg-white p-3 text-slate-950 shadow-2xl sm:grid-cols-[1fr_1fr_auto]" action="/vagas" method="get" role="search">
-        <label><span class="sr-only">Cargo ou palavra-chave</span><input class="w-full rounded-xl border p-4" name="q" placeholder="Cargo ou palavra-chave" /></label>
-        <label><span class="sr-only">Cidade</span><input class="w-full rounded-xl border p-4" name="cidade" placeholder="Cidade" /></label>
-        <button class="rounded-xl bg-[var(--brand-primary)] px-7 py-4 font-black text-white">Buscar vagas</button>
-      </form>
-      <div class="mt-5 flex flex-wrap gap-2 text-sm">
-        {quickFilters.map(([label, href]) => <a class="rounded-full border border-white/20 px-3 py-1 hover:bg-white/10" href={href}>{label}</a>)}
+  <PageHero kicker={identity.siteName} title="Seu próximo trabalho pode estar mais perto do que você imagina." description={identity.tagline}>
+    <form class="mt-8 rounded-3xl border border-white/15 bg-white/95 p-4 text-[var(--es-ink)] shadow-2xl backdrop-blur sm:p-5" action="/vagas" method="get" role="search">
+      <div class="grid gap-3 lg:grid-cols-4">
+        <label class="grid gap-1 text-sm font-semibold lg:col-span-2">
+          <span>Cargo ou palavra-chave</span>
+          <input class="rounded-xl border border-[var(--es-border)] px-4 py-3" name="q" placeholder="Ex.: auxiliar administrativo" />
+        </label>
+        <label class="grid gap-1 text-sm font-semibold">
+          <span>Cidade</span>
+          <input class="rounded-xl border border-[var(--es-border)] px-4 py-3" name="cidade" placeholder="Ex.: São Luís" />
+        </label>
+        <label class="grid gap-1 text-sm font-semibold">
+          <span>Modalidade</span>
+          <select class="rounded-xl border border-[var(--es-border)] px-4 py-3" name="modalidade">
+            <option value="">Qualquer</option>
+            <option value="presencial">Presencial</option>
+            <option value="hibrido">Híbrido</option>
+            <option value="remoto">Remoto</option>
+          </select>
+        </label>
+        <label class="grid gap-1 text-sm font-semibold lg:col-span-2">
+          <span>Categoria</span>
+          <select class="rounded-xl border border-[var(--es-border)] px-4 py-3" name="categoria">
+            <option value="">Todas</option>
+            {categoryOptions.map((item) => <option value={item.slug}>{item.name}</option>)}
+          </select>
+        </label>
+        <div class="flex items-end lg:col-span-2">
+          <button class="es-btn es-btn-primary w-full py-3.5 text-base" type="submit">Buscar vagas</button>
+        </div>
       </div>
+      <div class="mt-4 flex flex-wrap gap-2">
+        <span class="text-xs font-bold uppercase tracking-wide text-[var(--es-muted)]">Populares:</span>
+        {quickFilters.map(([label, href]) => <a class="chip hover:border-[var(--brand-primary)] hover:text-[var(--brand-primary)]" href={href}>{label}</a>)}
+      </div>
+    </form>
+  </PageHero>
+
+  <div class="es-container py-6"><AdSlot slot="home-top" pageType="home" /></div>
+
+  <section class="es-section">
+    <div class="es-container">
+      <SectionHeading kicker="Oportunidades" title={featured.length ? "Vagas em destaque" : "Vagas mais recentes"} actionHref="/vagas" actionLabel="Ver todas" />
+      {displayFeatured.length ? (
+        <div class="mt-8 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+          {displayFeatured.map((job) => <JobCard {...job} />)}
+        </div>
+      ) : (
+        <div class="mt-8">
+          <EmptyState title="Novas vagas em breve" description="Ainda não há vagas publicadas agora, mas você pode criar um alerta gratuito e explorar categorias e cidades abaixo." actionHref="/alertas" actionLabel="Criar alerta" secondaryHref="/vagas" secondaryLabel="Explorar busca" />
+        </div>
+      )}
     </div>
   </section>
 
-  <div class="mx-auto max-w-6xl px-4 py-6"><AdSlot slot="home-top" pageType="home" /></div>
-
-  <section class="mx-auto max-w-6xl px-4 py-14">
-    <div class="flex items-end justify-between gap-4">
-      <div>
-        <p class="font-bold text-[var(--brand-primary)]">OPORTUNIDADES</p>
-        <h2 class="mt-1 text-3xl font-black">{featured.length ? "Vagas em destaque" : "Vagas mais recentes"}</h2>
-      </div>
-      <a class="font-bold text-[var(--brand-primary)]" href="/vagas">Ver todas →</a>
-    </div>
-    {displayJobs.length ? (
-      <div class="mt-7 grid gap-5 md:grid-cols-3">
-        {displayJobs.map((job) => (
-          <article class="rounded-2xl border bg-white p-6 shadow-sm">
-            <p class="text-sm font-bold text-[var(--brand-primary)]">{job.code}</p>
-            <h3 class="mt-2 text-xl font-black"><a href={`/vagas/${job.slug}`}>{job.title}</a></h3>
-            <p class="mt-3 text-slate-700">{job.company}</p>
-            <p class="mt-1 text-sm text-slate-600">{job.city}/{job.state} · {job.workplace}</p>
-            <a class="mt-5 inline-flex font-bold text-[var(--brand-primary)]" href={`/vagas/${job.slug}`}>Ver detalhes →</a>
-          </article>
-        ))}
-      </div>
-    ) : (
-      <div class="mt-7 rounded-2xl border bg-white p-8">
-        <h3 class="text-xl font-bold">Novas vagas serão publicadas em breve.</h3>
-        <p class="mt-2 text-slate-600">Cadastre um alerta para ser avisado quando surgirem oportunidades.</p>
-        <a class="mt-4 inline-flex rounded-lg bg-[var(--brand-primary)] px-5 py-3 font-bold text-white" href="/alertas">Criar alerta</a>
-      </div>
-    )}
-  </section>
-
-  {recent.length > 3 && (
-    <section class="bg-white">
-      <div class="mx-auto max-w-6xl px-4 py-14">
-        <h2 class="text-2xl font-black">Publicadas recentemente</h2>
-        <ul class="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-          {recent.slice(0, 6).map((job) => (
-            <li class="rounded-xl border p-4"><a class="font-bold hover:text-[var(--brand-primary)]" href={`/vagas/${job.slug}`}>{job.title}</a><p class="mt-1 text-sm text-slate-600">{job.company} · {job.city}</p></li>
-          ))}
-        </ul>
+  {recent.length > displayFeatured.length && (
+    <section class="es-section bg-white">
+      <div class="es-container">
+        <SectionHeading title="Publicadas recentemente" />
+        <div class="mt-8 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+          {recent.filter((job) => !displayFeatured.some((item) => item.id === job.id)).slice(0, 6).map((job) => <JobCard {...job} compact />)}
+        </div>
       </div>
     </section>
   )}
 
-  <div class="mx-auto max-w-6xl px-4"><AdSlot slot="home-mid" pageType="home" /></div>
+  <div class="es-container"><AdSlot slot="home-mid" pageType="home" /></div>
 
-  {(categoryRows.length > 0 || cityRows.length > 0) && (
-    <section class="bg-slate-100">
-      <div class="mx-auto grid max-w-6xl gap-10 px-4 py-14 md:grid-cols-2">
-        {categoryRows.length > 0 && (
-          <div>
-            <h2 class="text-2xl font-black">Vagas por categoria</h2>
-            <div class="mt-5 grid grid-cols-2 gap-3">
-              {categoryRows.map((item) => <a class="rounded-xl bg-white p-4 font-bold" href={`/vagas/categoria/${item.slug}`}>{item.name}<span class="mt-1 block text-sm font-normal text-slate-600">{item.total} vaga(s)</span></a>)}
-            </div>
+  <section class="es-section bg-[var(--es-cream-dark)]">
+    <div class="es-container grid gap-10 lg:grid-cols-2">
+      {categoryRows.length > 0 && (
+        <div>
+          <SectionHeading kicker="Áreas" title="Categorias mais procuradas" />
+          <div class="mt-6 grid gap-3 sm:grid-cols-2">
+            {categoryRows.map((item) => (
+              <a class="es-card block p-4 hover:border-[var(--brand-primary)]" href={`/vagas/categoria/${item.slug}`}>
+                <span class="font-display font-black">{item.name}</span>
+                <span class="mt-1 block text-sm text-[var(--es-muted)]">{item.total} vaga(s)</span>
+              </a>
+            ))}
           </div>
-        )}
-        {cityRows.length > 0 && (
-          <div>
-            <h2 class="text-2xl font-black">Vagas por cidade</h2>
-            <div class="mt-5 grid grid-cols-2 gap-3">
-              {cityRows.map((item) => <a class="rounded-xl bg-white p-4 font-bold" href={`/vagas/cidade/${item.slug}`}>{item.name}/{item.state}<span class="mt-1 block text-sm font-normal text-slate-600">{item.total} vaga(s)</span></a>)}
-            </div>
+        </div>
+      )}
+      {cityRows.length > 0 && (
+        <div>
+          <SectionHeading kicker="Local" title="Vagas por cidade" />
+          <div class="mt-6 grid gap-3 sm:grid-cols-2">
+            {cityRows.map((item) => (
+              <a class="es-card block p-4 hover:border-[var(--brand-primary)]" href={`/vagas/cidade/${item.slug}`}>
+                <span class="font-display font-black">{item.name}/{item.state}</span>
+                <span class="mt-1 block text-sm text-[var(--es-muted)]">{item.total} vaga(s)</span>
+              </a>
+            ))}
           </div>
-        )}
-      </div>
-    </section>
-  )}
+        </div>
+      )}
+    </div>
+  </section>
 
   {companyRows.length > 0 && (
-    <section class="mx-auto max-w-6xl px-4 py-14">
-      <div class="flex items-end justify-between gap-4">
-        <h2 class="text-2xl font-black">Empresas com vagas abertas</h2>
-        <a class="font-bold text-[var(--brand-primary)]" href="/empresas">Ver todas →</a>
-      </div>
-      <div class="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-        {companyRows.map((company) => <a class="rounded-xl border bg-white p-4 font-bold" href={`/empresas/${company.slug}`}>{company.name}<span class="mt-1 block text-sm font-normal text-slate-600">{company.total} vaga(s)</span></a>)}
+    <section class="es-section">
+      <div class="es-container">
+        <SectionHeading kicker="Empresas" title="Empresas com vagas abertas" actionHref="/empresas" actionLabel="Ver todas" />
+        <div class="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {companyRows.map((company) => (
+            <a class="es-card flex items-center gap-4 p-5" href={`/empresas/${company.slug}`}>
+              {company.logoUrl ? <img src={company.logoUrl} alt="" class="h-12 w-12 rounded-xl border object-contain p-1" width="48" height="48" loading="lazy" /> : <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-[var(--es-cream-dark)] font-black text-[var(--brand-primary)]">{company.name.slice(0, 1)}</div>}
+              <div>
+                <p class="font-display font-black">{company.name}</p>
+                <p class="text-sm text-[var(--es-muted)]">{company.total} vaga(s)</p>
+              </div>
+            </a>
+          ))}
+        </div>
       </div>
     </section>
   )}
 
-  {articles.length > 0 && (
-    <section class="mx-auto max-w-6xl px-4 py-14">
-      <h2 class="text-3xl font-black">Notícias e orientação profissional</h2>
-      <div class="mt-7 grid gap-5 md:grid-cols-3">
-        {articles.map(({ article }) => (
-          <article class="rounded-2xl border bg-white p-6">
-            <p class="text-sm font-bold text-[var(--brand-primary)]">{article.type}</p>
-            <h3 class="mt-2 text-xl font-black"><a href={`/noticias/${article.slug}`}>{article.title}</a></h3>
-            <p class="mt-3 text-slate-600">{article.excerpt}</p>
+  <section class="es-section bg-white">
+    <div class="es-container">
+      <SectionHeading kicker="Como funciona" title="Simples para quem busca emprego" description="Sem cobrança do candidato e com fonte identificada em cada publicação." />
+      <div class="mt-8 grid gap-4 md:grid-cols-3">
+        {steps.map(([title, text], index) => (
+          <article class="es-card p-6">
+            <p class="text-sm font-black text-[var(--brand-primary)]">0{index + 1}</p>
+            <h3 class="font-display mt-2 text-xl font-black">{title}</h3>
+            <p class="mt-2 text-sm text-[var(--es-muted)]">{text}</p>
           </article>
         ))}
       </div>
-    </section>
-  )}
-
-  <section class="bg-[var(--brand-primary)] text-white">
-    <div class="mx-auto flex max-w-6xl flex-col items-start justify-between gap-6 px-4 py-12 md:flex-row md:items-center">
-      <div>
-        <h2 class="text-3xl font-black">Receba vagas compatíveis com você</h2>
-        <p class="mt-2 text-red-100">Escolha cidade e área. O cadastro é gratuito e pode ser cancelado.</p>
-      </div>
-      <a class="rounded-xl bg-white px-6 py-3 font-black text-[var(--brand-primary)]" href="/alertas">Criar alerta gratuito</a>
     </div>
   </section>
 
-  <section class="mx-auto max-w-6xl px-4 py-10">
-    <div class="rounded-2xl border bg-white p-6 md:flex md:items-center md:justify-between">
-      <div>
-        <h2 class="text-xl font-black">É empresa ou recrutador?</h2>
-        <p class="mt-2 text-slate-600">Divulgue vagas com fonte identificada e alcance candidatos locais.</p>
+  {articles.length > 0 && (
+    <section class="es-section">
+      <div class="es-container">
+        <SectionHeading kicker="Conteúdo" title="Notícias e dicas de carreira" actionHref="/noticias" actionLabel="Ver notícias" />
+        <div class="mt-8 grid gap-5 lg:grid-cols-4">
+          <article class="es-card overflow-hidden lg:col-span-2">
+            <div class="h-full p-6 sm:p-8">
+              <p class="es-kicker">{articles[0]!.article.type}</p>
+              <h3 class="font-display mt-3 text-2xl font-black sm:text-3xl"><a href={`/noticias/${articles[0]!.article.slug}`}>{articles[0]!.article.title}</a></h3>
+              <p class="mt-3 text-[var(--es-muted)]">{articles[0]!.article.excerpt}</p>
+            </div>
+          </article>
+          <div class="grid gap-4 lg:col-span-2">
+            {articles.slice(1).map(({ article }) => (
+              <article class="es-card p-5">
+                <p class="text-xs font-bold text-[var(--brand-primary)]">{article.type}</p>
+                <h3 class="font-display mt-1 text-lg font-black"><a href={`/noticias/${article.slug}`}>{article.title}</a></h3>
+              </article>
+            ))}
+          </div>
+        </div>
       </div>
-      <a class="mt-4 inline-flex rounded-xl border px-5 py-3 font-bold md:mt-0" href="/anunciar-vaga">Anunciar vaga</a>
+    </section>
+  )}
+
+  <section class="hero-pattern es-section text-white">
+    <div class="es-container flex flex-col items-start justify-between gap-6 md:flex-row md:items-center">
+      <div>
+        <p class="es-kicker text-white/70">Alertas</p>
+        <h2 class="font-display mt-2 text-3xl font-black sm:text-4xl">Receba vagas compatíveis com você</h2>
+        <p class="mt-3 max-w-xl text-white/80">Escolha cidade, área e frequência. Gratuito e cancelável a qualquer momento.</p>
+      </div>
+      <a class="es-btn bg-white text-[var(--brand-primary)] hover:bg-[var(--es-cream)]" href="/alertas">Criar alerta gratuito</a>
+    </div>
+  </section>
+
+  <section class="es-section">
+    <div class="es-container grid gap-5 lg:grid-cols-2">
+      <article class="es-card p-6 sm:p-8">
+        <p class="es-kicker">Empresas</p>
+        <h2 class="font-display mt-2 text-2xl font-black">Divulgue vagas com transparência</h2>
+        <p class="mt-3 text-[var(--es-muted)]">Alcance candidatos locais com fonte identificada e página dedicada da empresa.</p>
+        <a class="es-btn es-btn-secondary mt-5" href="/area-empresas">Área para empresas</a>
+      </article>
+      <article class="es-card p-6 sm:p-8">
+        <p class="es-kicker">Segurança</p>
+        <h2 class="font-display mt-2 text-2xl font-black">Candidatura segura</h2>
+        <p class="mt-3 text-[var(--es-muted)]">Desconfie de cobranças e links suspeitos. Veja orientações para se proteger.</p>
+        <a class="es-btn es-btn-secondary mt-5" href="/seguranca-candidatos">Ler orientações</a>
+      </article>
     </div>
   </section>
 </BaseLayout>
