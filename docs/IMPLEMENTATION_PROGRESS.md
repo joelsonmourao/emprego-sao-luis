@@ -11,10 +11,11 @@ Branch `codex/reconstrucao-astro`. Arquitetura Astro 7, Drizzle, PostgreSQL, Val
 - Fase 3 — importação XLSX/CSV com mapeamento e processamento BullMQ.
 - Fase 4 — programação em blocos e publicação automática.
 - Fase 5 — empresas, categorias, cidades, bairros e redirecionamentos seguros.
+- Fase 6 — CMS editorial, autoria, revisões, agendamento e notícias públicas.
 
 ## Fase em andamento
 
-- Fase 6 — CMS editorial.
+- Fase 7 — biblioteca de mídia e configuração visual.
 
 ## Commits principais
 
@@ -27,7 +28,7 @@ Branch `codex/reconstrucao-astro`. Arquitetura Astro 7, Drizzle, PostgreSQL, Val
 
 ## Migrations
 
-- `0012_public_hex.sql`, `0013_elite_lorna_dane.sql` e `0014_typical_terror.sql` aguardam aplicação pelo job de migration no Coolify.
+- `0012_public_hex.sql`, `0013_elite_lorna_dane.sql`, `0014_typical_terror.sql` e `0015_abnormal_victor_mancha.sql` aguardam aplicação pelo job de migration no Coolify.
 - Migrations são aditivas, versionadas e nunca executadas automaticamente no start do web.
 
 ## Testes atuais
@@ -46,4 +47,4 @@ Credenciais reais de Meta, Google, Resend, R2/S3, Sentry e AdSense devem permane
 
 ## Próximos itens internos
 
-Fase 6 em execução; depois mídia, configuração visual, SEO, social, alertas, publicidade, filas, usuários/admin, portal final, institucionais e auditoria final.
+Fase 7 em execução; depois SEO, social, alertas, publicidade, filas, usuários/admin, portal final, institucionais e auditoria final.
