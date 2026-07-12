@@ -12,7 +12,7 @@ test("readiness fails closed without infrastructure", async ({ request }) => {
   await expect(response.json()).resolves.toMatchObject({ ok: false, status: "not_ready" });
 });
 
-for (const [path, text] of [["/", "Oportunidades verificadas"], ["/vagas", "Vagas de emprego"], ["/instagram", "Empregos São Luís"], ["/alertas", "Receba alertas"]] as const) {
+for (const [path, text] of [["/", "Seu próximo trabalho pode estar mais perto do que você imagina."], ["/vagas", "Vagas de emprego"], ["/instagram", "Empregos São Luís"], ["/alertas", "Receba alertas"]] as const) {
   test(`${path} renders useful HTML`, async ({ request }) => { const response = await request.get(path); expect(response.ok()).toBe(true); expect(await response.text()).toContain(text); });
 }
 
