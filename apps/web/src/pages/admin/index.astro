@@ -1,0 +1,4 @@
+---
+import AdminLayout from "../../layouts/AdminLayout.astro";
+---
+<AdminLayout title="Visão geral"><h1 class="text-3xl font-black">Visão geral</h1><p class="mt-3 text-slate-700">Acompanhe publicação, importações, integrações e saúde operacional.</p><div class="mt-8 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">{["Vagas publicadas", "Aguardando revisão", "Importações", "Tarefas com erro"].map((label) => <section class="rounded-2xl bg-white p-5"><p class="text-sm text-slate-600">{label}</p><strong class="mt-2 block text-3xl">—</strong></section>)}</div></AdminLayout>

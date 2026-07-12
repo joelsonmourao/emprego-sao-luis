@@ -1,0 +1,6 @@
+---
+import "../../styles/global.css";
+if (Astro.locals.auth) return Astro.redirect("/admin");
+const next = Astro.url.searchParams.get("next") ?? "/admin";
+---
+<!doctype html><html lang="pt-BR"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width"/><meta name="robots" content="noindex,nofollow"/><title>Entrar no painel</title></head><body class="grid min-h-screen place-items-center bg-slate-950 p-4"><main class="w-full max-w-md rounded-2xl bg-white p-8"><h1 class="text-3xl font-black">Painel administrativo</h1><form class="mt-8 grid gap-5" method="post" action="/api/admin/login"><input type="hidden" name="next" value={next}/><label>E-mail<input class="mt-1 w-full rounded-xl border p-3" type="email" name="email" autocomplete="username" required/></label><label>Senha<input class="mt-1 w-full rounded-xl border p-3" type="password" name="password" autocomplete="current-password" minlength="10" required/></label><button class="rounded-xl bg-red-700 p-3 font-bold text-white">Entrar</button></form></main></body></html>
