@@ -1,7 +1,7 @@
 import { createHash } from "node:crypto";
 import type { APIRoute } from "astro";
 import { jobDraftSchema } from "@es/shared";
-import { auditLogs, createDatabase, jobs } from "@es/db";
+import { auditLogs, createDatabase, indexingEvents, jobs } from "@es/db";
 import { sql } from "drizzle-orm";
 import { can } from "../../../../lib/auth";
 
@@ -21,6 +21,7 @@ export const POST: APIRoute = async ({ request, locals, redirect }) => {
       const [job] = await tx.insert(jobs).values({ ...parsed.data, publicCode, categoryId: parsed.data.categoryId ?? null, salaryMin: parsed.data.salaryMin?.toString(), salaryMax: parsed.data.salaryMax?.toString(), salaryVisible: parsed.data.salaryMin !== undefined || parsed.data.salaryMax !== undefined, sourceUrl: parsed.data.sourceUrl ?? null, sourceEvidence: null, originType: "MANUAL", duplicateHash, publishedAt: parsed.data.publicationStatus === "PUBLISHED" ? new Date() : null }).returning();
       if (!job) throw new Error("Falha ao criar vaga.");
       await tx.insert(auditLogs).values({ actorId: auth.id, action: "CREATE", entityType: "JOB", entityId: job.id, after: job, origin: "ADMIN" });
+      if (job.publicationStatus === "PUBLISHED") { const url = new URL(`/vagas/${job.slug}`, process.env.SITE_URL ?? "https://empregossaoluis.com.br").toString(); await tx.insert(indexingEvents).values([{ dedupeKey: `manual-create:${job.id}:google`, jobId: job.id, provider: "GOOGLE", url, notificationType: "URL_UPDATED" }, { dedupeKey: `manual-create:${job.id}:indexnow`, jobId: job.id, provider: "INDEXNOW", url, notificationType: "URL_UPDATED" }]).onConflictDoNothing(); }
       return job;
     });
     return redirect(`/admin/vagas?created=${created.id}`, 303);

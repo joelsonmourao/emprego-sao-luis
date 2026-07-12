@@ -20,7 +20,7 @@ Astro 7 SSR, Tailwind, React islands, Drizzle, PostgreSQL, BullMQ/Valkey, R2/S3,
 
 ## Trabalho em andamento
 
-Fase 5 recebeu dry run, reexecução do lote, CSV de rejeições e undo por snapshot. Executar migrations, lint, typecheck, testes e build; corrigir qualquer falha antes do commit.
+Fase 5 recebeu dry run, reexecução do lote, CSV de rejeições e undo por snapshot no commit `3ea7fe6`. O trabalho atual adiciona expiração agendada, Google Indexing e IndexNow ao worker; validar e commitar antes de seguir.
 
 ## Pendências principais
 

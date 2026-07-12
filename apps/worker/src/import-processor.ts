@@ -1,6 +1,6 @@
 import { createHash } from "node:crypto";
 import { and, eq, sql } from "drizzle-orm";
-import { categories, cities, companies, createDatabase, importBatches, importRows, jobs, states } from "@es/db";
+import { categories, cities, companies, createDatabase, importBatches, importRows, indexingEvents, jobs, states } from "@es/db";
 import { importJobRowSchema, importModeSchema, normalizeImportRow } from "@es/shared";
 import * as XLSX from "xlsx";
 import { getPrivateObject } from "./storage.js";
@@ -38,6 +38,7 @@ export async function processImport(payload: ImportPayload) {
         const [saved] = await tx.insert(jobs).values(row).returning(); return saved;
       });
       validRows++; await connection.db.insert(importRows).values({ batchId: payload.batchId, rowNumber: position + 2, raw, normalized: value, errors: [], action: existing ? "UPDATED" : "CREATED", beforeSnapshot, jobId: job?.id });
+      if (mode === "PUBLISHED" && job) { const url = new URL(`/vagas/${job.slug}`, process.env.SITE_URL ?? "https://empregossaoluis.com.br").toString(); await connection.db.insert(indexingEvents).values([{ dedupeKey: `import:${payload.batchId}:${position + 2}:google`, jobId: job.id, provider: "GOOGLE", url, notificationType: "URL_UPDATED" }, { dedupeKey: `import:${payload.batchId}:${position + 2}:indexnow`, jobId: job.id, provider: "INDEXNOW", url, notificationType: "URL_UPDATED" }]).onConflictDoNothing(); }
     }
     await connection.db.update(importBatches).set({ status: "COMPLETED", totalRows: rawRows.length, validRows, rejectedRows, updatedAt: new Date() }).where(eq(importBatches.id, payload.batchId));
     return { totalRows: rawRows.length, validRows, rejectedRows };

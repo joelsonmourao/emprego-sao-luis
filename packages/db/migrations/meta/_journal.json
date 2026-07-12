@@ -57,6 +57,13 @@
       "when": 1783850103727,
       "tag": "0007_slow_romulus",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1783850583430,
+      "tag": "0008_mean_hammerhead",
+      "breakpoints": true
     }
   ]
 }
