@@ -1,7 +1,10 @@
 ---
 import "../styles/global.css";
+import SiteFooter from "../components/SiteFooter.astro";
+import SiteHeader from "../components/SiteHeader.astro";
 import { buildBreadcrumbSchema, buildOpenGraphTags, buildOrganizationSchema, buildTwitterTags, buildWebSiteSchema } from "@es/seo";
 import { getSeoSettings } from "../lib/seo-settings";
+import { getVisualIdentity } from "../lib/visual-identity";
 
 interface Props {
   title: string;
@@ -13,10 +16,11 @@ interface Props {
   noindex?: boolean;
 }
 
+const identity = await getVisualIdentity();
 const seo = await getSeoSettings();
 const { title, description = seo.defaultDescription, robots = seo.robotsDefault, canonical, ogImage = seo.og.image, breadcrumbs, noindex = false } = Astro.props;
 const pageTitle = title.includes(seo.defaultTitle) ? title : `${title} — ${seo.defaultTitle}`;
-const canonicalUrl = canonical ?? new URL(Astro.url.pathname, Astro.site).toString();
+const canonicalUrl = canonical ? new URL(canonical, Astro.site).toString() : new URL(Astro.url.pathname, Astro.site).toString();
 const consentChoice = Astro.cookies.get("es_consent_ads")?.value;
 const adsEnabled = import.meta.env.PUBLIC_ADSENSE_ENABLED === "true" && Boolean(import.meta.env.PUBLIC_ADSENSE_CLIENT_ID) && consentChoice === "yes";
 const siteUrl = Astro.site?.toString() ?? process.env.SITE_URL ?? "https://empregossaoluis.com.br";
@@ -25,6 +29,7 @@ const twitter = buildTwitterTags({ title: pageTitle, description, card: seo.twit
 const organizationSchema = buildOrganizationSchema(seo, siteUrl);
 const websiteSchema = buildWebSiteSchema(seo, siteUrl);
 const breadcrumbSchema = breadcrumbs?.length ? buildBreadcrumbSchema(breadcrumbs.map((item) => ({ ...item, url: new URL(item.url, siteUrl).toString() }))) : null;
+const currentPath = Astro.url.pathname;
 ---
 <!doctype html>
 <html lang="pt-BR">
@@ -34,9 +39,10 @@ const breadcrumbSchema = breadcrumbs?.length ? buildBreadcrumbSchema(breadcrumbs
     <meta name="description" content={description} />
     <meta name="robots" content={noindex ? "noindex,nofollow" : robots} />
     <meta name="generator" content={Astro.generator} />
-    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="icon" href={identity.iconUrl || "/favicon.svg"} type="image/svg+xml" />
     <link rel="canonical" href={canonicalUrl} />
     <title>{pageTitle}</title>
+    <style is:inline set:html={`:root { --brand-primary: ${identity.primaryColor}; }`} />
     {Object.entries(og).map(([key, value]) => <meta property={key} content={value} />)}
     {Object.entries(twitter).map(([key, value]) => <meta name={key} content={value} />)}
     <script is:inline type="application/ld+json" set:html={JSON.stringify(organizationSchema)} />
@@ -45,14 +51,18 @@ const breadcrumbSchema = breadcrumbs?.length ? buildBreadcrumbSchema(breadcrumbs
     {adsEnabled && <script is:inline async src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${import.meta.env.PUBLIC_ADSENSE_CLIENT_ID}`} crossorigin="anonymous"></script>}
   </head>
   <body>
-    <a class="sr-only focus:not-sr-only" href="#conteudo">Ir para o conteúdo</a>
-    <header class="border-b border-slate-200 bg-white">
-      <nav class="mx-auto flex max-w-6xl items-center justify-between px-4 py-4" aria-label="Principal">
-        <a class="font-black text-red-700" href="/">EMPREGOS SÃO LUÍS</a>
-        <a href="/vagas">Vagas</a>
-      </nav>
-    </header>
+    <a class="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:rounded-lg focus:bg-white focus:px-4 focus:py-2" href="#conteudo">Ir para o conteúdo</a>
+    <SiteHeader identity={identity} currentPath={currentPath} />
     <main id="conteudo"><slot /></main>
-    {!consentChoice && <form class="fixed bottom-3 left-3 right-3 z-50 flex items-center justify-between gap-4 rounded-xl border bg-white p-4 shadow-xl sm:left-auto sm:max-w-lg" method="post" action="/api/consent"><p class="text-sm">Usamos cookies opcionais para medição e publicidade. Você pode recusar.</p><div class="flex gap-2"><button class="rounded-lg border px-3 py-2" name="choice" value="no">Recusar</button><button class="rounded-lg bg-slate-950 px-3 py-2 text-white" name="choice" value="yes">Aceitar</button></div></form>}
+    <SiteFooter identity={identity} />
+    {!consentChoice && (
+      <form class="fixed bottom-3 left-3 right-3 z-50 flex flex-col gap-3 rounded-xl border bg-white p-4 shadow-xl sm:left-auto sm:max-w-lg" method="post" action="/api/consent" role="dialog" aria-label="Consentimento de cookies">
+        <p class="text-sm">Usamos cookies opcionais para medição e publicidade. Você pode recusar.</p>
+        <div class="flex gap-2">
+          <button class="rounded-lg border px-3 py-2" name="choice" value="no">Recusar</button>
+          <button class="rounded-lg bg-slate-950 px-3 py-2 text-white" name="choice" value="yes">Aceitar</button>
+        </div>
+      </form>
+    )}
   </body>
 </html>

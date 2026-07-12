@@ -3,10 +3,19 @@
 :root {
   color-scheme: light;
   --brand-red: #b42318;
+  --brand-primary: #b42318;
   --brand-black: #171717;
   --brand-white: #ffffff;
   font-family: Inter, ui-sans-serif, system-ui, sans-serif;
 }
 
 body { margin: 0; background: #f8fafc; color: var(--brand-black); }
-a:focus-visible, button:focus-visible { outline: 3px solid #2563eb; outline-offset: 3px; }
+a:focus-visible, button:focus-visible, summary:focus-visible { outline: 3px solid #2563eb; outline-offset: 3px; }
+
+.prose p + p { margin-top: 1rem; }
+.prose h2 { margin-top: 1.5rem; font-size: 1.25rem; font-weight: 800; }
+.prose ul { margin-top: 0.75rem; list-style: disc; padding-left: 1.25rem; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+}

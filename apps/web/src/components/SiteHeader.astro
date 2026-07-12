@@ -1,0 +1,35 @@
+---
+import type { VisualIdentity } from "../lib/visual-identity";
+
+interface Props {
+  identity: VisualIdentity;
+  currentPath?: string;
+}
+
+const { identity, currentPath = "" } = Astro.props;
+const nav = [
+  ["Vagas", "/vagas"],
+  ["Empresas", "/empresas"],
+  ["Categorias", "/categorias"],
+  ["Notícias", "/noticias"],
+  ["Alertas", "/alertas"],
+  ["Instagram", "/instagram"]
+];
+const linkClass = (href: string) => (currentPath === href || (href !== "/" && currentPath.startsWith(href)) ? "font-bold text-[var(--brand-primary)]" : "hover:text-[var(--brand-primary)]");
+---
+<header class="sticky top-0 z-40 border-b border-slate-200 bg-white/95 backdrop-blur">
+  <div class="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-3">
+    <a class="flex items-center gap-3" href="/" aria-label={identity.siteName}>
+      {identity.logoUrl ? <img src={identity.logoUrl} alt="" class="h-9 w-auto" width="120" height="36" loading="eager" /> : <span class="text-lg font-black text-[var(--brand-primary)]">{identity.siteName}</span>}
+    </a>
+    <nav class="hidden items-center gap-5 text-sm font-semibold md:flex" aria-label="Principal">
+      {nav.map(([label, href]) => <a class={linkClass(href!)} href={href}>{label}</a>)}
+    </nav>
+    <details class="relative md:hidden">
+      <summary class="cursor-pointer list-none rounded-lg border px-3 py-2 font-bold">Menu</summary>
+      <nav class="absolute right-0 mt-2 grid min-w-48 gap-1 rounded-xl border bg-white p-3 shadow-lg" aria-label="Menu mobile">
+        {nav.map(([label, href]) => <a class="rounded-lg px-3 py-2 hover:bg-slate-100" href={href}>{label}</a>)}
+      </nav>
+    </details>
+  </div>
+</header>

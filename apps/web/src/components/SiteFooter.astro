@@ -1,0 +1,29 @@
+---
+import type { VisualIdentity } from "../lib/visual-identity";
+
+interface Props { identity: VisualIdentity }
+const { identity } = Astro.props;
+const year = new Date().getFullYear();
+const links = [
+  ["Quem somos", "/quem-somos"],
+  ["Contato", "/contato"],
+  ["Privacidade", "/privacidade"],
+  ["Cookies", "/cookies"],
+  ["Termos", "/termos"],
+  ["LGPD", "/lgpd"],
+  ["Segurança", "/seguranca-candidatos"],
+  ["Anunciar vaga", "/anunciar-vaga"]
+];
+---
+<footer class="border-t border-slate-200 bg-slate-950 text-slate-300">
+  <div class="mx-auto grid max-w-6xl gap-10 px-4 py-12 md:grid-cols-[1.4fr_1fr]">
+    <div>
+      <p class="text-lg font-black text-white">{identity.siteName}</p>
+      <p class="mt-2 max-w-md text-sm leading-6">{identity.tagline}</p>
+      <p class="mt-4 text-xs text-slate-500">© {year} {identity.siteName}. Todos os direitos reservados.</p>
+    </div>
+    <nav class="grid grid-cols-2 gap-2 text-sm" aria-label="Institucional">
+      {links.map(([label, href]) => <a class="hover:text-white" href={href}>{label}</a>)}
+    </nav>
+  </div>
+</footer>

@@ -1,34 +1,176 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
+import AdSlot from "../components/AdSlot.astro";
 import { categories, cities, companies, createDatabase, jobs, states } from "@es/db";
 import { and, count, desc, eq, gt } from "drizzle-orm";
 import { listPublishedArticles } from "../lib/articles";
+import { getVisualIdentity } from "../lib/visual-identity";
 
 type JobCard = { id: string; title: string; slug: string; code: string; company: string; city: string; state: string; workplace: string; publishedAt: Date | null };
 let recent: JobCard[] = [];
 let featured: JobCard[] = [];
 let categoryRows: Array<{ name: string; slug: string; total: number }> = [];
 let cityRows: Array<{ name: string; slug: string; state: string; total: number }> = [];
+let companyRows: Array<{ name: string; slug: string; total: number }> = [];
+
+const identity = await getVisualIdentity();
+
 if (process.env.DATABASE_URL) {
   const connection = createDatabase(process.env.DATABASE_URL);
   try {
     const active = and(eq(jobs.publicationStatus, "PUBLISHED"), gt(jobs.expiresAt, new Date()));
     const fields = { id: jobs.id, title: jobs.normalizedTitle, slug: jobs.slug, code: jobs.publicCode, company: companies.name, city: cities.name, state: states.code, workplace: jobs.workplaceType, publishedAt: jobs.publishedAt };
-    [recent, featured, categoryRows, cityRows] = await Promise.all([
+    [recent, featured, categoryRows, cityRows, companyRows] = await Promise.all([
       connection.db.select(fields).from(jobs).innerJoin(companies, eq(jobs.companyId, companies.id)).innerJoin(cities, eq(jobs.cityId, cities.id)).innerJoin(states, eq(jobs.stateId, states.id)).where(active).orderBy(desc(jobs.publishedAt)).limit(9),
       connection.db.select(fields).from(jobs).innerJoin(companies, eq(jobs.companyId, companies.id)).innerJoin(cities, eq(jobs.cityId, cities.id)).innerJoin(states, eq(jobs.stateId, states.id)).where(and(active, eq(jobs.featured, true))).orderBy(desc(jobs.publishedAt)).limit(3),
       connection.db.select({ name: categories.name, slug: categories.slug, total: count(jobs.id) }).from(categories).innerJoin(jobs, eq(jobs.categoryId, categories.id)).where(active).groupBy(categories.id).orderBy(desc(count(jobs.id))).limit(8),
-      connection.db.select({ name: cities.name, slug: cities.slug, state: states.code, total: count(jobs.id) }).from(cities).innerJoin(states, eq(cities.stateId, states.id)).innerJoin(jobs, eq(jobs.cityId, cities.id)).where(active).groupBy(cities.id, states.code).orderBy(desc(count(jobs.id))).limit(8)
+      connection.db.select({ name: cities.name, slug: cities.slug, state: states.code, total: count(jobs.id) }).from(cities).innerJoin(states, eq(cities.stateId, states.id)).innerJoin(jobs, eq(jobs.cityId, cities.id)).where(active).groupBy(cities.id, states.code).orderBy(desc(count(jobs.id))).limit(8),
+      connection.db.select({ name: companies.name, slug: companies.slug, total: count(jobs.id) }).from(companies).innerJoin(jobs, eq(jobs.companyId, companies.id)).where(active).groupBy(companies.id).orderBy(desc(count(jobs.id))).limit(6)
     ]);
-  } finally { await connection.close(); }
+  } finally {
+    await connection.close();
+  }
 }
+
 const articles = await listPublishedArticles(3);
 const displayJobs = featured.length ? featured : recent.slice(0, 3);
+const quickFilters = [
+  ["Presencial", "/vagas?modalidade=presencial"],
+  ["Remoto", "/vagas?modalidade=remoto"],
+  ["São Luís", "/vagas?cidade=São Luís"],
+  ["Primeiro emprego", "/vagas?q=auxiliar"]
+];
 ---
-<BaseLayout title="Empregos São Luís — Vagas em São Luís e Maranhão" description="Encontre vagas verificadas em São Luís e em todo o Maranhão. Pesquise por cargo, empresa e cidade.">
-  <section class="bg-slate-950 text-white"><div class="mx-auto max-w-6xl px-4 py-16 sm:py-24"><p class="font-bold uppercase tracking-[.2em] text-red-400">Empregos São Luís</p><h1 class="mt-4 max-w-4xl text-4xl font-black leading-tight sm:text-6xl">Seu próximo trabalho pode estar mais perto do que você imagina.</h1><p class="mt-5 max-w-2xl text-lg text-slate-300">Vagas locais, fontes identificadas e candidatura direta, sem cobrar do candidato.</p><form class="mt-8 grid gap-3 rounded-2xl bg-white p-3 text-slate-950 shadow-2xl sm:grid-cols-[1fr_1fr_auto]" action="/vagas" method="get"><label><span class="sr-only">Cargo ou palavra-chave</span><input class="w-full rounded-xl border p-4" name="q" placeholder="Cargo ou palavra-chave"/></label><label><span class="sr-only">Cidade</span><input class="w-full rounded-xl border p-4" name="cidade" placeholder="Cidade"/></label><button class="rounded-xl bg-red-700 px-7 py-4 font-black text-white">Buscar vagas</button></form></div></section>
-  <section class="mx-auto max-w-6xl px-4 py-14"><div class="flex items-end justify-between gap-4"><div><p class="font-bold text-red-700">OPORTUNIDADES</p><h2 class="mt-1 text-3xl font-black">{featured.length ? "Vagas em destaque" : "Vagas mais recentes"}</h2></div><a class="font-bold text-red-700" href="/vagas">Ver todas →</a></div>{displayJobs.length ? <div class="mt-7 grid gap-5 md:grid-cols-3">{displayJobs.map((job) => <article class="rounded-2xl border bg-white p-6 shadow-sm"><p class="text-sm font-bold text-red-700">{job.code}</p><h3 class="mt-2 text-xl font-black"><a href={`/vagas/${job.slug}`}>{job.title}</a></h3><p class="mt-3 text-slate-700">{job.company}</p><p class="mt-1 text-sm text-slate-600">{job.city}/{job.state} · {job.workplace}</p><a class="mt-5 inline-flex font-bold text-red-700" href={`/vagas/${job.slug}`}>Ver detalhes →</a></article>)}</div> : <div class="mt-7 rounded-2xl border bg-white p-8"><h3 class="text-xl font-bold">Novas vagas serão publicadas em breve.</h3><p class="mt-2 text-slate-600">Cadastre um alerta para ser avisado quando surgirem oportunidades.</p><a class="mt-4 inline-flex rounded-lg bg-red-700 px-5 py-3 font-bold text-white" href="/alertas">Criar alerta</a></div>}</section>
-  {(categoryRows.length > 0 || cityRows.length > 0) && <section class="bg-slate-100"><div class="mx-auto grid max-w-6xl gap-10 px-4 py-14 md:grid-cols-2">{categoryRows.length > 0 && <div><h2 class="text-2xl font-black">Vagas por categoria</h2><div class="mt-5 grid grid-cols-2 gap-3">{categoryRows.map((item) => <a class="rounded-xl bg-white p-4 font-bold" href={`/vagas/categoria/${item.slug}`}>{item.name}<span class="mt-1 block text-sm font-normal text-slate-600">{item.total} vaga(s)</span></a>)}</div></div>}{cityRows.length > 0 && <div><h2 class="text-2xl font-black">Vagas por cidade</h2><div class="mt-5 grid grid-cols-2 gap-3">{cityRows.map((item) => <a class="rounded-xl bg-white p-4 font-bold" href={`/vagas/cidade/${item.slug}`}>{item.name}/{item.state}<span class="mt-1 block text-sm font-normal text-slate-600">{item.total} vaga(s)</span></a>)}</div></div>}</div></section>}
-  {articles.length > 0 && <section class="mx-auto max-w-6xl px-4 py-14"><h2 class="text-3xl font-black">Notícias e orientação profissional</h2><div class="mt-7 grid gap-5 md:grid-cols-3">{articles.map(({ article }) => <article class="rounded-2xl border bg-white p-6"><p class="text-sm font-bold text-red-700">{article.type}</p><h3 class="mt-2 text-xl font-black"><a href={`/blog/${article.slug}`}>{article.title}</a></h3><p class="mt-3 text-slate-600">{article.excerpt}</p></article>)}</div></section>}
-  <section class="bg-red-700 text-white"><div class="mx-auto flex max-w-6xl flex-col items-start justify-between gap-6 px-4 py-12 md:flex-row md:items-center"><div><h2 class="text-3xl font-black">Receba vagas compatíveis com você</h2><p class="mt-2 text-red-100">Escolha cidade e área. O cadastro é gratuito e pode ser cancelado.</p></div><a class="rounded-xl bg-white px-6 py-3 font-black text-red-700" href="/alertas">Criar alerta gratuito</a></div></section>
+<BaseLayout title="Empregos São Luís — Vagas em São Luís e Maranhão" description={identity.tagline}>
+  <section class="bg-slate-950 text-white">
+    <div class="mx-auto max-w-6xl px-4 py-16 sm:py-24">
+      <p class="font-bold uppercase tracking-[.2em] text-red-400">{identity.siteName}</p>
+      <h1 class="mt-4 max-w-4xl text-4xl font-black leading-tight sm:text-6xl">Seu próximo trabalho pode estar mais perto do que você imagina.</h1>
+      <p class="mt-5 max-w-2xl text-lg text-slate-300">{identity.tagline}</p>
+      <form class="mt-8 grid gap-3 rounded-2xl bg-white p-3 text-slate-950 shadow-2xl sm:grid-cols-[1fr_1fr_auto]" action="/vagas" method="get" role="search">
+        <label><span class="sr-only">Cargo ou palavra-chave</span><input class="w-full rounded-xl border p-4" name="q" placeholder="Cargo ou palavra-chave" /></label>
+        <label><span class="sr-only">Cidade</span><input class="w-full rounded-xl border p-4" name="cidade" placeholder="Cidade" /></label>
+        <button class="rounded-xl bg-[var(--brand-primary)] px-7 py-4 font-black text-white">Buscar vagas</button>
+      </form>
+      <div class="mt-5 flex flex-wrap gap-2 text-sm">
+        {quickFilters.map(([label, href]) => <a class="rounded-full border border-white/20 px-3 py-1 hover:bg-white/10" href={href}>{label}</a>)}
+      </div>
+    </div>
+  </section>
+
+  <div class="mx-auto max-w-6xl px-4 py-6"><AdSlot slot="home-top" pageType="home" /></div>
+
+  <section class="mx-auto max-w-6xl px-4 py-14">
+    <div class="flex items-end justify-between gap-4">
+      <div>
+        <p class="font-bold text-[var(--brand-primary)]">OPORTUNIDADES</p>
+        <h2 class="mt-1 text-3xl font-black">{featured.length ? "Vagas em destaque" : "Vagas mais recentes"}</h2>
+      </div>
+      <a class="font-bold text-[var(--brand-primary)]" href="/vagas">Ver todas →</a>
+    </div>
+    {displayJobs.length ? (
+      <div class="mt-7 grid gap-5 md:grid-cols-3">
+        {displayJobs.map((job) => (
+          <article class="rounded-2xl border bg-white p-6 shadow-sm">
+            <p class="text-sm font-bold text-[var(--brand-primary)]">{job.code}</p>
+            <h3 class="mt-2 text-xl font-black"><a href={`/vagas/${job.slug}`}>{job.title}</a></h3>
+            <p class="mt-3 text-slate-700">{job.company}</p>
+            <p class="mt-1 text-sm text-slate-600">{job.city}/{job.state} · {job.workplace}</p>
+            <a class="mt-5 inline-flex font-bold text-[var(--brand-primary)]" href={`/vagas/${job.slug}`}>Ver detalhes →</a>
+          </article>
+        ))}
+      </div>
+    ) : (
+      <div class="mt-7 rounded-2xl border bg-white p-8">
+        <h3 class="text-xl font-bold">Novas vagas serão publicadas em breve.</h3>
+        <p class="mt-2 text-slate-600">Cadastre um alerta para ser avisado quando surgirem oportunidades.</p>
+        <a class="mt-4 inline-flex rounded-lg bg-[var(--brand-primary)] px-5 py-3 font-bold text-white" href="/alertas">Criar alerta</a>
+      </div>
+    )}
+  </section>
+
+  {recent.length > 3 && (
+    <section class="bg-white">
+      <div class="mx-auto max-w-6xl px-4 py-14">
+        <h2 class="text-2xl font-black">Publicadas recentemente</h2>
+        <ul class="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          {recent.slice(0, 6).map((job) => (
+            <li class="rounded-xl border p-4"><a class="font-bold hover:text-[var(--brand-primary)]" href={`/vagas/${job.slug}`}>{job.title}</a><p class="mt-1 text-sm text-slate-600">{job.company} · {job.city}</p></li>
+          ))}
+        </ul>
+      </div>
+    </section>
+  )}
+
+  <div class="mx-auto max-w-6xl px-4"><AdSlot slot="home-mid" pageType="home" /></div>
+
+  {(categoryRows.length > 0 || cityRows.length > 0) && (
+    <section class="bg-slate-100">
+      <div class="mx-auto grid max-w-6xl gap-10 px-4 py-14 md:grid-cols-2">
+        {categoryRows.length > 0 && (
+          <div>
+            <h2 class="text-2xl font-black">Vagas por categoria</h2>
+            <div class="mt-5 grid grid-cols-2 gap-3">
+              {categoryRows.map((item) => <a class="rounded-xl bg-white p-4 font-bold" href={`/vagas/categoria/${item.slug}`}>{item.name}<span class="mt-1 block text-sm font-normal text-slate-600">{item.total} vaga(s)</span></a>)}
+            </div>
+          </div>
+        )}
+        {cityRows.length > 0 && (
+          <div>
+            <h2 class="text-2xl font-black">Vagas por cidade</h2>
+            <div class="mt-5 grid grid-cols-2 gap-3">
+              {cityRows.map((item) => <a class="rounded-xl bg-white p-4 font-bold" href={`/vagas/cidade/${item.slug}`}>{item.name}/{item.state}<span class="mt-1 block text-sm font-normal text-slate-600">{item.total} vaga(s)</span></a>)}
+            </div>
+          </div>
+        )}
+      </div>
+    </section>
+  )}
+
+  {companyRows.length > 0 && (
+    <section class="mx-auto max-w-6xl px-4 py-14">
+      <div class="flex items-end justify-between gap-4">
+        <h2 class="text-2xl font-black">Empresas com vagas abertas</h2>
+        <a class="font-bold text-[var(--brand-primary)]" href="/empresas">Ver todas →</a>
+      </div>
+      <div class="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        {companyRows.map((company) => <a class="rounded-xl border bg-white p-4 font-bold" href={`/empresas/${company.slug}`}>{company.name}<span class="mt-1 block text-sm font-normal text-slate-600">{company.total} vaga(s)</span></a>)}
+      </div>
+    </section>
+  )}
+
+  {articles.length > 0 && (
+    <section class="mx-auto max-w-6xl px-4 py-14">
+      <h2 class="text-3xl font-black">Notícias e orientação profissional</h2>
+      <div class="mt-7 grid gap-5 md:grid-cols-3">
+        {articles.map(({ article }) => (
+          <article class="rounded-2xl border bg-white p-6">
+            <p class="text-sm font-bold text-[var(--brand-primary)]">{article.type}</p>
+            <h3 class="mt-2 text-xl font-black"><a href={`/noticias/${article.slug}`}>{article.title}</a></h3>
+            <p class="mt-3 text-slate-600">{article.excerpt}</p>
+          </article>
+        ))}
+      </div>
+    </section>
+  )}
+
+  <section class="bg-[var(--brand-primary)] text-white">
+    <div class="mx-auto flex max-w-6xl flex-col items-start justify-between gap-6 px-4 py-12 md:flex-row md:items-center">
+      <div>
+        <h2 class="text-3xl font-black">Receba vagas compatíveis com você</h2>
+        <p class="mt-2 text-red-100">Escolha cidade e área. O cadastro é gratuito e pode ser cancelado.</p>
+      </div>
+      <a class="rounded-xl bg-white px-6 py-3 font-black text-[var(--brand-primary)]" href="/alertas">Criar alerta gratuito</a>
+    </div>
+  </section>
+
+  <section class="mx-auto max-w-6xl px-4 py-10">
+    <div class="rounded-2xl border bg-white p-6 md:flex md:items-center md:justify-between">
+      <div>
+        <h2 class="text-xl font-black">É empresa ou recrutador?</h2>
+        <p class="mt-2 text-slate-600">Divulgue vagas com fonte identificada e alcance candidatos locais.</p>
+      </div>
+      <a class="mt-4 inline-flex rounded-xl border px-5 py-3 font-bold md:mt-0" href="/anunciar-vaga">Anunciar vaga</a>
+    </div>
+  </section>
 </BaseLayout>
