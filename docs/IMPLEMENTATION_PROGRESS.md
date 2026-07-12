@@ -12,10 +12,11 @@ Branch `codex/reconstrucao-astro`. Arquitetura Astro 7, Drizzle, PostgreSQL, Val
 - Fase 4 — programação em blocos e publicação automática.
 - Fase 5 — empresas, categorias, cidades, bairros e redirecionamentos seguros.
 - Fase 6 — CMS editorial, autoria, revisões, agendamento e notícias públicas.
+- Fase 7 — biblioteca de mídia R2/S3 e configuração visual auditável.
 
 ## Fase em andamento
 
-- Fase 7 — biblioteca de mídia e configuração visual.
+- Fase 8 — SEO técnico, social e estúdio de publicação.
 
 ## Commits principais
 
@@ -47,4 +48,4 @@ Credenciais reais de Meta, Google, Resend, R2/S3, Sentry e AdSense devem permane
 
 ## Próximos itens internos
 
-Fase 7 em execução; depois SEO, social, alertas, publicidade, filas, usuários/admin, portal final, institucionais e auditoria final.
+Fase 8 em execução; depois alertas, publicidade, filas, usuários/admin, portal final, institucionais e auditoria final.
