@@ -1,0 +1,157 @@
+---
+import AdminLayout from "../../layouts/AdminLayout.astro";
+import { can } from "../../lib/auth";
+import { ADMIN_PANEL_ROLES, MANAGEABLE_ROLES } from "../../lib/users-admin";
+import { createDatabase, roles, sessions, userRoles, users } from "@es/db";
+import { and, count, desc, eq, gt, ilike, inArray, isNull } from "drizzle-orm";
+
+const auth = Astro.locals.auth!;
+if (!can(auth, "users.manage")) return new Response("Proibido", { status: 403 });
+
+const q = Astro.url.searchParams.get("q")?.trim() ?? "";
+const updated = Astro.url.searchParams.get("updated") === "1";
+
+type AdminRow = {
+  id: string;
+  email: string;
+  name: string;
+  active: boolean;
+  mfaEnabled: boolean;
+  createdAt: Date;
+  roles: string[];
+  lastSession: Date | null;
+};
+
+let rows: AdminRow[] = [];
+let superAdminCount = 0;
+
+if (process.env.DATABASE_URL) {
+  const connection = createDatabase(process.env.DATABASE_URL);
+  try {
+    const adminRoleRows = await connection.db
+      .select({ userId: userRoles.userId, roleKey: roles.key })
+      .from(userRoles)
+      .innerJoin(roles, eq(userRoles.roleId, roles.id))
+      .where(inArray(roles.key, [...ADMIN_PANEL_ROLES]));
+
+    const rolesByUser = new Map<string, string[]>();
+    for (const row of adminRoleRows) {
+      const list = rolesByUser.get(row.userId) ?? [];
+      list.push(row.roleKey);
+      rolesByUser.set(row.userId, list);
+    }
+
+    const adminIds = [...rolesByUser.keys()];
+    if (adminIds.length) {
+      const filterIds = q
+        ? (await connection.db.select({ id: users.id }).from(users).where(ilike(users.email, `%${q}%`))).map((u) => u.id).filter((id) => rolesByUser.has(id))
+        : adminIds;
+
+      if (filterIds.length) {
+        const adminUsers = await connection.db.select().from(users).where(inArray(users.id, filterIds)).orderBy(desc(users.createdAt)).limit(100);
+
+      for (const user of adminUsers) {
+        const [last] = await connection.db
+          .select({ createdAt: sessions.createdAt })
+          .from(sessions)
+          .where(and(eq(sessions.userId, user.id), isNull(sessions.revokedAt), gt(sessions.expiresAt, new Date())))
+          .orderBy(desc(sessions.createdAt))
+          .limit(1);
+        rows.push({
+          id: user.id,
+          email: user.email,
+          name: user.name,
+          active: user.active,
+          mfaEnabled: user.mfaEnabled,
+          createdAt: user.createdAt,
+          roles: rolesByUser.get(user.id) ?? [],
+          lastSession: last?.createdAt ?? null
+        });
+      }
+      }
+    }
+
+    const [countRow] = await connection.db
+      .select({ value: count() })
+      .from(userRoles)
+      .innerJoin(roles, eq(userRoles.roleId, roles.id))
+      .where(eq(roles.key, "SUPER_ADMIN"));
+    superAdminCount = countRow?.value ?? 0;
+  } finally {
+    await connection.close();
+  }
+}
+---
+<AdminLayout title="Administradores">
+  <nav class="text-sm text-slate-600">
+    <a href="/admin/usuarios">Usuários</a>
+    · <a class="font-bold text-slate-900" href="/admin/administradores">Administradores</a>
+    · <a href="/admin/permissoes">Permissões</a>
+    · <a href="/admin/auditoria">Auditoria</a>
+  </nav>
+  <h1 class="mt-4 text-3xl font-black">Administradores</h1>
+  <p class="mt-2 text-slate-600">Convites, papéis, 2FA e sessões do painel. SUPER_ADMIN ativos: {superAdminCount}.</p>
+  {updated && <p class="mt-4 rounded-xl border border-blue-200 bg-blue-50 p-4 text-blue-900">Alteração registrada com auditoria.</p>}
+
+  <section class="mt-8 rounded-2xl bg-white p-6">
+    <h2 class="text-xl font-black">Convidar administrador</h2>
+    <form class="mt-4 grid gap-3 md:grid-cols-2" method="post" action="/api/admin/admins">
+      <input class="rounded-lg border px-3 py-2" name="name" placeholder="Nome" required />
+      <input class="rounded-lg border px-3 py-2" name="email" type="email" placeholder="E-mail" required />
+      <input class="rounded-lg border px-3 py-2" name="password" type="password" placeholder="Senha (mín. 14 caracteres)" minlength="14" required />
+      <select class="rounded-lg border px-3 py-2" name="roleKey" required>
+        {MANAGEABLE_ROLES.filter((key) => key !== "SUPER_ADMIN" || auth.roles.includes("SUPER_ADMIN")).map((key) => (
+          <option value={key}>{key}</option>
+        ))}
+      </select>
+      <button class="rounded-lg bg-slate-900 px-4 py-2 font-bold text-white md:col-span-2">Criar administrador</button>
+    </form>
+  </section>
+
+  <form class="mt-6 flex gap-3" method="get">
+    <input class="rounded-lg border px-3 py-2" name="q" placeholder="Buscar por e-mail" value={q} />
+    <button class="rounded-lg border px-4 py-2">Buscar</button>
+  </form>
+
+  <section class="mt-8 rounded-2xl bg-white p-6">
+    <div class="mt-4 overflow-auto">
+      <table class="min-w-full text-sm">
+        <thead>
+          <tr class="text-left text-slate-500">
+            <th class="py-2">Nome</th><th>E-mail</th><th>Papéis</th><th>2FA</th><th>Status</th><th>Último acesso</th><th></th>
+          </tr>
+        </thead>
+        <tbody>
+          {rows.map((row) => (
+            <tr class="border-t">
+              <td class="py-2 pr-3">{row.name}</td>
+              <td class="pr-3">{row.email}</td>
+              <td class="pr-3">{row.roles.join(", ")}</td>
+              <td class="pr-3">{row.mfaEnabled ? "Ativo" : "Desativado"}</td>
+              <td class="pr-3">{row.active ? "Ativo" : "Bloqueado"}</td>
+              <td class="pr-3 whitespace-nowrap">{row.lastSession?.toLocaleString("pt-BR") ?? "—"}</td>
+              <td class="flex flex-wrap gap-2">
+                {row.id !== auth.id && (
+                  <>
+                    <form method="post" action={`/api/admin/admins/${row.id}/role`}>
+                      <select class="rounded border px-2 py-1" name="roleKey">
+                        {MANAGEABLE_ROLES.map((key) => <option value={key} selected={row.roles.includes(key)}>{key}</option>)}
+                      </select>
+                      <button class="ml-1 rounded border px-2 py-1">Alterar papel</button>
+                    </form>
+                    {row.active ? (
+                      <form method="post" action={`/api/admin/admins/${row.id}/block`}><input type="hidden" name="confirm" value="1" /><button class="rounded border px-2 py-1 text-red-700">Bloquear</button></form>
+                    ) : (
+                      <form method="post" action={`/api/admin/admins/${row.id}/unblock`}><button class="rounded border px-2 py-1">Desbloquear</button></form>
+                    )}
+                    <form method="post" action={`/api/admin/admins/${row.id}/sessions/revoke`}><button class="rounded border px-2 py-1">Encerrar sessões</button></form>
+                  </>
+                )}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  </section>
+</AdminLayout>

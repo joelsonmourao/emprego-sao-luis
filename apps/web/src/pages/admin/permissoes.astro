@@ -1,0 +1,77 @@
+---
+import AdminLayout from "../../layouts/AdminLayout.astro";
+import { can } from "../../lib/auth";
+import { createDatabase, permissions, rolePermissions, roles } from "@es/db";
+import { eq } from "drizzle-orm";
+
+const auth = Astro.locals.auth!;
+if (!can(auth, "users.manage")) return new Response("Proibido", { status: 403 });
+if (!auth.roles.includes("SUPER_ADMIN") && !auth.roles.includes("ADMIN")) return new Response("Proibido", { status: 403 });
+
+const updated = Astro.url.searchParams.get("updated") === "1";
+
+let roleRows: Array<{ id: string; key: string; name: string; permissions: string[] }> = [];
+let allPermissions: string[] = [];
+
+if (process.env.DATABASE_URL) {
+  const connection = createDatabase(process.env.DATABASE_URL);
+  try {
+    const dbRoles = await connection.db.select().from(roles).orderBy(roles.key);
+    const dbPermissions = await connection.db.select().from(permissions).orderBy(permissions.key);
+    allPermissions = dbPermissions.map((p) => p.key);
+    const links = await connection.db
+      .select({ roleId: rolePermissions.roleId, permissionKey: permissions.key })
+      .from(rolePermissions)
+      .innerJoin(permissions, eq(rolePermissions.permissionId, permissions.id));
+
+    const permsByRole = new Map<string, string[]>();
+    for (const link of links) {
+      const list = permsByRole.get(link.roleId) ?? [];
+      list.push(link.permissionKey);
+      permsByRole.set(link.roleId, list);
+    }
+
+    roleRows = dbRoles.map((role) => ({
+      id: role.id,
+      key: role.key,
+      name: role.name,
+      permissions: permsByRole.get(role.id) ?? []
+    }));
+  } finally {
+    await connection.close();
+  }
+}
+---
+<AdminLayout title="Permissões">
+  <nav class="text-sm text-slate-600">
+    <a href="/admin/usuarios">Usuários</a>
+    · <a href="/admin/administradores">Administradores</a>
+    · <a class="font-bold text-slate-900" href="/admin/permissoes">Permissões</a>
+    · <a href="/admin/auditoria">Auditoria</a>
+  </nav>
+  <h1 class="mt-4 text-3xl font-black">Permissões por papel</h1>
+  <p class="mt-2 text-slate-600">Somente SUPER_ADMIN e ADMIN podem alterar permissões. Papéis superiores não podem ser concedidos por administradores comuns.</p>
+  {updated && <p class="mt-4 rounded-xl border border-blue-200 bg-blue-50 p-4 text-blue-900">Permissões atualizadas com auditoria.</p>}
+
+  <section class="mt-8 grid gap-6">
+    {roleRows.map((role) => (
+      <article class="rounded-2xl bg-white p-6">
+        <h2 class="text-xl font-black">{role.key}</h2>
+        <p class="text-sm text-slate-500">{role.name}</p>
+        {role.key === "SUPER_ADMIN" ? (
+          <p class="mt-3 text-sm text-slate-600">SUPER_ADMIN possui todas as permissões implicitamente.</p>
+        ) : (
+          <form class="mt-4 grid gap-2 md:grid-cols-3" method="post" action={`/api/admin/permissions/${role.id}`}>
+            {allPermissions.map((permission) => (
+              <label class="flex items-center gap-2 text-sm">
+                <input type="checkbox" name="permission" value={permission} checked={role.permissions.includes(permission)} />
+                {permission}
+              </label>
+            ))}
+            <button class="mt-3 rounded-lg bg-slate-900 px-4 py-2 font-bold text-white md:col-span-3">Salvar {role.key}</button>
+          </form>
+        )}
+      </article>
+    ))}
+  </section>
+</AdminLayout>

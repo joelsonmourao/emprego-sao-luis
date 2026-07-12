@@ -1,0 +1,130 @@
+---
+import AdminLayout from "../../layouts/AdminLayout.astro";
+import { can } from "../../lib/auth";
+import { sanitizeAuditPayload } from "../../lib/users-admin";
+import { auditLogs, createDatabase, users } from "@es/db";
+import { and, count, desc, eq, gte, ilike, lte } from "drizzle-orm";
+
+const auth = Astro.locals.auth!;
+if (!can(auth, "audit.read")) return new Response("Proibido", { status: 403 });
+
+const action = Astro.url.searchParams.get("action")?.trim() ?? "";
+const entity = Astro.url.searchParams.get("entity")?.trim() ?? "";
+const from = Astro.url.searchParams.get("from");
+const to = Astro.url.searchParams.get("to");
+const page = Math.max(1, Number(Astro.url.searchParams.get("page") ?? "1"));
+const perPage = 40;
+const offset = (page - 1) * perPage;
+
+type AuditRow = {
+  id: string;
+  action: string;
+  entityType: string;
+  entityId: string | null;
+  origin: string;
+  createdAt: Date;
+  actorEmail: string | null;
+  before: unknown;
+  after: unknown;
+};
+
+let rows: AuditRow[] = [];
+let total = 0;
+
+if (process.env.DATABASE_URL) {
+  const connection = createDatabase(process.env.DATABASE_URL);
+  try {
+    const conditions = [];
+    if (action) conditions.push(ilike(auditLogs.action, `%${action}%`));
+    if (entity) conditions.push(ilike(auditLogs.entityType, `%${entity}%`));
+    if (from) conditions.push(gte(auditLogs.createdAt, new Date(from)));
+    if (to) conditions.push(lte(auditLogs.createdAt, new Date(`${to}T23:59:59`)));
+    const where = conditions.length ? and(...conditions) : undefined;
+
+    const raw = await connection.db
+      .select({
+        id: auditLogs.id,
+        action: auditLogs.action,
+        entityType: auditLogs.entityType,
+        entityId: auditLogs.entityId,
+        origin: auditLogs.origin,
+        createdAt: auditLogs.createdAt,
+        actorEmail: users.email,
+        before: auditLogs.before,
+        after: auditLogs.after
+      })
+      .from(auditLogs)
+      .leftJoin(users, eq(auditLogs.actorId, users.id))
+      .where(where)
+      .orderBy(desc(auditLogs.createdAt))
+      .limit(perPage)
+      .offset(offset);
+
+    rows = raw.map((row) => ({
+      ...row,
+      before: sanitizeAuditPayload(row.before),
+      after: sanitizeAuditPayload(row.after)
+    }));
+
+    const [countRow] = await connection.db.select({ value: count() }).from(auditLogs).where(where);
+    total = countRow?.value ?? 0;
+  } finally {
+    await connection.close();
+  }
+}
+
+const pages = Math.max(1, Math.ceil(total / perPage));
+const query = new URLSearchParams(Astro.url.searchParams);
+---
+<AdminLayout title="Auditoria">
+  <nav class="text-sm text-slate-600">
+    <a href="/admin/usuarios">Usuários</a>
+    · <a href="/admin/administradores">Administradores</a>
+    · <a href="/admin/permissoes">Permissões</a>
+    · <a class="font-bold text-slate-900" href="/admin/auditoria">Auditoria</a>
+  </nav>
+  <h1 class="mt-4 text-3xl font-black">Auditoria administrativa</h1>
+  <p class="mt-2 text-slate-600">Histórico de ações com dados sensíveis ocultos na visualização e exportação.</p>
+
+  <form class="mt-6 flex flex-wrap gap-3" method="get">
+    <input class="rounded-lg border px-3 py-2" name="action" placeholder="Ação" value={action} />
+    <input class="rounded-lg border px-3 py-2" name="entity" placeholder="Entidade" value={entity} />
+    <input class="rounded-lg border px-3 py-2" name="from" type="date" value={from ?? ""} />
+    <input class="rounded-lg border px-3 py-2" name="to" type="date" value={to ?? ""} />
+    <button class="rounded-lg bg-slate-900 px-4 py-2 font-bold text-white">Filtrar</button>
+    <a class="rounded-lg border px-4 py-2" href={`/api/admin/audit/export.csv?${query.toString()}`}>Exportar CSV</a>
+  </form>
+
+  <section class="mt-8 rounded-2xl bg-white p-6">
+    <p class="text-sm text-slate-500">{total} registro(s)</p>
+    <div class="mt-4 overflow-auto">
+      <table class="min-w-full text-sm">
+        <thead>
+          <tr class="text-left text-slate-500">
+            <th class="py-2">Data</th><th>Administrador</th><th>Ação</th><th>Entidade</th><th>Origem</th><th>Detalhes</th>
+          </tr>
+        </thead>
+        <tbody>
+          {rows.length === 0 && <tr><td class="py-6 text-slate-500" colspan="6">Nenhum registro encontrado.</td></tr>}
+          {rows.map((row) => (
+            <tr class="border-t align-top">
+              <td class="py-2 pr-3 whitespace-nowrap">{row.createdAt.toLocaleString("pt-BR")}</td>
+              <td class="pr-3">{row.actorEmail ?? "sistema"}</td>
+              <td class="pr-3">{row.action}</td>
+              <td class="pr-3">{row.entityType}{row.entityId ? ` · ${row.entityId.slice(0, 8)}…` : ""}</td>
+              <td class="pr-3">{row.origin}</td>
+              <td class="max-w-md pr-3 font-mono text-xs whitespace-pre-wrap">{JSON.stringify(row.after ?? row.before, null, 0)}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+    {pages > 1 && (
+      <div class="mt-4 flex gap-2">
+        {page > 1 && <a class="rounded border px-3 py-1" href={`?${query.toString()}&page=${page - 1}`}>Anterior</a>}
+        <span class="px-3 py-1">Página {page} de {pages}</span>
+        {page < pages && <a class="rounded border px-3 py-1" href={`?${query.toString()}&page=${page + 1}`}>Próxima</a>}
+      </div>
+    )}
+  </section>
+</AdminLayout>

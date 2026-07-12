@@ -17,22 +17,22 @@ Branch `codex/reconstrucao-astro`. Arquitetura Astro 7, Drizzle, PostgreSQL, Val
 - Fase 9 — alertas multicanal (inscrição ampliada, painel administrativo, dispatch BullMQ, fallback de e-mail).
 - Fase 10 — publicidade e monetização (`@es/ads`, migration `0016`, painel `/admin/publicidade`).
 - Fase 11 — filas e monitoramento operacional (`/admin/operacao`, saúde de integrações).
+- Fase 12 — usuários e administradores (RBAC, LGPD, auditoria administrativa).
 
 ## Fase atual
 
-- Fase 12 — usuários e administradores.
+- Fase 13 — portal público final.
 
-## Fase 11 — entregas
-
-- Painel `/admin/operacao` com filas BullMQ, indexação e saúde de integrações.
-- Lib `operations.ts` com sanitização de payload e ações retry/remove.
-- Lib `operational-health.ts` com estados: saudável, degradado, não configurado, indisponível.
-- APIs `/api/admin/operations/jobs/[queue]/[id]/retry` e `cancel` com auditoria.
-
-## Próximos itens internos (Fase 12)
+## Fase 12 — entregas
 
 - Painéis `/admin/usuarios`, `/admin/administradores`, `/admin/permissoes`, `/admin/auditoria`.
-- Proteções RBAC, LGPD e escalada de privilégio.
+- Lib `users-admin.ts` com proteção contra escalada de privilégio e sanitização de auditoria.
+- APIs de bloqueio, anonimização LGPD, gestão de papéis, exportação CSV e encerramento de sessões.
+- Testes RBAC em `users-admin.test.ts` (6 casos).
+
+## Próximos itens internos (Fase 13)
+
+- Identidade visual profissional, home completa e páginas públicas finalizadas.
 
 ## Commits principais
 
@@ -58,7 +58,7 @@ Branch `codex/reconstrucao-astro`. Arquitetura Astro 7, Drizzle, PostgreSQL, Val
 
 - `npm run lint` aprovado.
 - `npm run typecheck` aprovado.
-- `npm run test` aprovado: 36 testes unitários.
+- `npm run test` aprovado: 42 testes unitários.
 - `npm run migration:check` aprovado.
 - `npm run build` aprovado para web e worker.
 
