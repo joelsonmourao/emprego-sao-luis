@@ -1,23 +1,44 @@
 import type { APIRoute } from "astro";
 import { createHash } from "node:crypto";
 import { and, eq, gt } from "drizzle-orm";
-import { auditLogs, consentLogs, createDatabase } from "@es/db";
+import { consentLogs, contactSubmissions, createDatabase } from "@es/db";
 import { z } from "zod";
+
+const categories = [
+  "suporte_candidato",
+  "correcao_vaga",
+  "denuncia",
+  "empresa",
+  "publicidade",
+  "pagamento",
+  "privacidade_lgpd",
+  "parceria",
+  "outro"
+] as const;
 
 const schema = z.object({
   name: z.string().trim().min(2).max(120),
   email: z.string().trim().email().max(180),
+  phone: z.string().trim().max(40).optional(),
   subject: z.string().trim().min(3).max(160),
+  category: z.enum(categories),
   message: z.string().trim().min(10).max(4000),
   consent: z.literal("1")
 });
 
 const hash = (value: string) => createHash("sha256").update(value).digest("hex");
 
+function protocol() {
+  const n = Date.now().toString(36).toUpperCase();
+  return `CT-${n.slice(-8)}`;
+}
+
 export const POST: APIRoute = async ({ request, redirect, clientAddress }) => {
-  const parsed = schema.safeParse(Object.fromEntries(await request.formData()));
+  const form = Object.fromEntries(await request.formData());
+  const parsed = schema.safeParse({ ...form, phone: String(form.phone ?? "").trim() || undefined });
   if (!parsed.success) return redirect("/contato?error=Dados+inválidos", 303);
 
+  const proto = protocol();
   if (process.env.DATABASE_URL) {
     const connection = createDatabase(process.env.DATABASE_URL);
     try {
@@ -32,6 +53,16 @@ export const POST: APIRoute = async ({ request, redirect, clientAddress }) => {
       if (recent.length >= 3) return redirect("/contato?error=Muitas+tentativas.+Aguarde+15+minutos.", 303);
 
       await connection.db.transaction(async (tx) => {
+        await tx.insert(contactSubmissions).values({
+          protocol: proto,
+          name: parsed.data.name,
+          email: parsed.data.email,
+          phone: parsed.data.phone ?? null,
+          subject: parsed.data.subject,
+          category: parsed.data.category,
+          message: parsed.data.message,
+          ipHash
+        });
         await tx.insert(consentLogs).values({
           subjectHash: emailHash,
           purpose: "contact_form",
@@ -41,17 +72,11 @@ export const POST: APIRoute = async ({ request, redirect, clientAddress }) => {
           ipHash,
           userAgentHash: hash(request.headers.get("user-agent") ?? "unknown")
         });
-        await tx.insert(auditLogs).values({
-          action: "CONTACT_MESSAGE",
-          entityType: "CONTACT",
-          after: { subject: parsed.data.subject, emailHash, ipHash },
-          origin: "PUBLIC"
-        });
       });
     } finally {
       await connection.close();
     }
   }
 
-  return redirect("/contato?sent=1", 303);
+  return redirect(`/contato?sent=1&protocolo=${proto}`, 303);
 };

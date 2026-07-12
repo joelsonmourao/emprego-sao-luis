@@ -1,6 +1,7 @@
 import { createDatabase, settings } from "@es/db";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
+import { INSTITUTIONAL_DEFAULTS_HTML } from "./institutional-defaults";
 
 export const INSTITUTIONAL_SLUGS = [
   "quem-somos",
@@ -49,7 +50,7 @@ const defaults: Record<InstitutionalSlug, InstitutionalPage> = {
     metaDescription: "Conheça o Empregos São Luís, portal de vagas verificadas em São Luís e no Maranhão.",
     canonicalPath: "/quem-somos",
     published: true,
-    contentHtml: "<p>O Empregos São Luís conecta candidatos a oportunidades verificadas em São Luís, Região Metropolitana e Maranhão. Não cobramos do candidato e indicamos sempre a fonte da vaga.</p>"
+    contentHtml: INSTITUTIONAL_DEFAULTS_HTML["quem-somos"]
   },
   sobre: {
     slug: "sobre",
@@ -58,7 +59,7 @@ const defaults: Record<InstitutionalSlug, InstitutionalPage> = {
     metaDescription: "Missão e propósito do Empregos São Luís.",
     canonicalPath: "/sobre",
     published: true,
-    contentHtml: "<p>Portal independente de empregos com foco em transparência, verificação de fontes e experiência segura para candidatos.</p>"
+    contentHtml: INSTITUTIONAL_DEFAULTS_HTML.sobre
   },
   contato: {
     slug: "contato",
@@ -67,7 +68,7 @@ const defaults: Record<InstitutionalSlug, InstitutionalPage> = {
     metaDescription: "Fale com a equipe do Empregos São Luís.",
     canonicalPath: "/contato",
     published: true,
-    contentHtml: "<p>Use o formulário abaixo para dúvidas, correções, parcerias e solicitações LGPD.</p>"
+    contentHtml: INSTITUTIONAL_DEFAULTS_HTML.contato
   },
   privacidade: {
     slug: "privacidade",
@@ -76,7 +77,7 @@ const defaults: Record<InstitutionalSlug, InstitutionalPage> = {
     metaDescription: "Como tratamos dados pessoais no Empregos São Luís.",
     canonicalPath: "/privacidade",
     published: true,
-    contentHtml: "<p>Tratamos dados pessoais somente para prestar os serviços solicitados, proteger o portal e cumprir obrigações legais.</p>"
+    contentHtml: INSTITUTIONAL_DEFAULTS_HTML.privacidade
   },
   cookies: {
     slug: "cookies",
@@ -85,7 +86,7 @@ const defaults: Record<InstitutionalSlug, InstitutionalPage> = {
     metaDescription: "Uso de cookies e tecnologias semelhantes.",
     canonicalPath: "/cookies",
     published: true,
-    contentHtml: "<p>Utilizamos cookies essenciais e, com consentimento, cookies de medição e publicidade.</p>"
+    contentHtml: INSTITUTIONAL_DEFAULTS_HTML.cookies
   },
   termos: {
     slug: "termos",
@@ -94,7 +95,7 @@ const defaults: Record<InstitutionalSlug, InstitutionalPage> = {
     metaDescription: "Condições de uso do portal Empregos São Luís.",
     canonicalPath: "/termos",
     published: true,
-    contentHtml: "<p>O uso do portal implica aceitação destes termos e das políticas complementares.</p>"
+    contentHtml: INSTITUTIONAL_DEFAULTS_HTML.termos
   },
   lgpd: {
     slug: "lgpd",
@@ -103,7 +104,7 @@ const defaults: Record<InstitutionalSlug, InstitutionalPage> = {
     metaDescription: "Direitos do titular e canal de atendimento LGPD.",
     canonicalPath: "/lgpd",
     published: true,
-    contentHtml: "<p>Atendemos solicitações de acesso, correção, portabilidade, anonimização e exclusão conforme a legislação aplicável.</p>"
+    contentHtml: INSTITUTIONAL_DEFAULTS_HTML.lgpd
   },
   "politica-editorial": {
     slug: "politica-editorial",
@@ -112,7 +113,7 @@ const defaults: Record<InstitutionalSlug, InstitutionalPage> = {
     metaDescription: "Critérios editoriais para notícias e conteúdos.",
     canonicalPath: "/politica-editorial",
     published: true,
-    contentHtml: "<p>Publicamos conteúdos com fonte identificada, revisão interna e correções transparentes.</p>"
+    contentHtml: INSTITUTIONAL_DEFAULTS_HTML["politica-editorial"]
   },
   "politica-correcoes": {
     slug: "politica-correcoes",
@@ -121,7 +122,7 @@ const defaults: Record<InstitutionalSlug, InstitutionalPage> = {
     metaDescription: "Como reportar e corrigir informações no portal.",
     canonicalPath: "/politica-correcoes",
     published: true,
-    contentHtml: "<p>Erros podem ser reportados pelo contato. Correções relevantes são registradas com data e motivo.</p>"
+    contentHtml: INSTITUTIONAL_DEFAULTS_HTML["politica-correcoes"]
   },
   "politica-fontes": {
     slug: "politica-fontes",
@@ -130,7 +131,7 @@ const defaults: Record<InstitutionalSlug, InstitutionalPage> = {
     metaDescription: "Critérios de verificação de fontes de vagas.",
     canonicalPath: "/politica-fontes",
     published: true,
-    contentHtml: "<p>Priorizamos fontes oficiais, empresas identificadas e evidências verificáveis para cada publicação.</p>"
+    contentHtml: INSTITUTIONAL_DEFAULTS_HTML["politica-fontes"]
   },
   "seguranca-candidatos": {
     slug: "seguranca-candidatos",
@@ -139,7 +140,7 @@ const defaults: Record<InstitutionalSlug, InstitutionalPage> = {
     metaDescription: "Orientações para candidatura segura.",
     canonicalPath: "/seguranca-candidatos",
     published: true,
-    contentHtml: "<p>Desconfie de cobranças, pedidos de senha bancária e mensagens fora dos canais oficiais da empresa.</p>"
+    contentHtml: INSTITUTIONAL_DEFAULTS_HTML["seguranca-candidatos"]
   },
   "anunciar-vaga": {
     slug: "anunciar-vaga",
@@ -148,7 +149,7 @@ const defaults: Record<InstitutionalSlug, InstitutionalPage> = {
     metaDescription: "Como empresas podem divulgar vagas.",
     canonicalPath: "/anunciar-vaga",
     published: true,
-    contentHtml: "<p>Empresas podem solicitar publicação pelo contato informando cargo, local, requisitos e link oficial de candidatura.</p>"
+    contentHtml: INSTITUTIONAL_DEFAULTS_HTML["anunciar-vaga"]
   },
   "area-empresas": {
     slug: "area-empresas",
@@ -157,7 +158,7 @@ const defaults: Record<InstitutionalSlug, InstitutionalPage> = {
     metaDescription: "Soluções para empregadores no Empregos São Luís.",
     canonicalPath: "/area-empresas",
     published: true,
-    contentHtml: "<p>Divulgue vagas, fortaleça sua marca empregadora e acompanhe resultados com transparência.</p>"
+    contentHtml: INSTITUTIONAL_DEFAULTS_HTML["area-empresas"]
   },
   "trabalhe-conosco": {
     slug: "trabalhe-conosco",
@@ -166,7 +167,7 @@ const defaults: Record<InstitutionalSlug, InstitutionalPage> = {
     metaDescription: "Oportunidades na equipe do portal.",
     canonicalPath: "/trabalhe-conosco",
     published: true,
-    contentHtml: "<p>Envie seu perfil pelo formulário de contato quando houver vagas abertas na operação do portal.</p>"
+    contentHtml: INSTITUTIONAL_DEFAULTS_HTML["trabalhe-conosco"]
   }
 };
 
