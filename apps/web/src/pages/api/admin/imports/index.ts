@@ -1,11 +1,11 @@
 import { createHash } from "node:crypto";
 import type { APIRoute } from "astro";
-import { importModeSchema } from "@es/shared";
+import { importModeSchema, suggestImportMapping } from "@es/shared";
 import { createDatabase, importBatches } from "@es/db";
 import { eq } from "drizzle-orm";
 import { can } from "../../../../lib/auth";
-import { createImportQueue } from "../../../../lib/queue";
 import { putPrivateObject } from "../../../../lib/storage";
+import * as XLSX from "xlsx";
 
 const MAX_BYTES = 20 * 1024 * 1024;
 export const POST: APIRoute = async ({ request, locals, redirect }) => {
@@ -19,10 +19,13 @@ export const POST: APIRoute = async ({ request, locals, redirect }) => {
   try {
     const [existing] = await connection.db.select().from(importBatches).where(eq(importBatches.fileHash, fileHash)).limit(1);
     if (existing) return redirect(`/admin/importacao?batch=${existing.id}&reused=1`, 303);
+    const workbook = XLSX.read(bytes, { type: "array", cellDates: true });
+    const sheets = workbook.SheetNames.map((name) => { const sheet = workbook.Sheets[name]; const rows = sheet ? XLSX.utils.sheet_to_json<Record<string, unknown>>(sheet, { defval: "", raw: false }) : []; const headers = rows[0] ? Object.keys(rows[0]) : []; return { name, headers, preview: rows.slice(0, 5) }; });
+    if (!sheets.length || sheets.every((sheet) => sheet.headers.length === 0)) return Response.json({ ok: false, error: "A planilha não possui cabeçalhos ou linhas legíveis." }, { status: 400 });
     await putPrivateObject(storageKey, bytes, file.type || "application/octet-stream");
-    const [batch] = await connection.db.insert(importBatches).values({ fileHash, fileName: file.name, settings: { storageKey, mode: mode.data }, createdBy: auth.id }).returning();
+    const first = sheets[0]!;
+    const [batch] = await connection.db.insert(importBatches).values({ fileHash, fileName: file.name, settings: { stage: "CONFIGURE", storageKey, mode: mode.data, sheets, sheetName: first.name, mapping: suggestImportMapping(first.headers), duplicateStrategy: "IGNORE" }, createdBy: auth.id }).returning();
     if (!batch) throw new Error("Falha ao criar lote.");
-    const queue = createImportQueue(); try { await queue.add("process-job-file", { batchId: batch.id, storageKey, mode: mode.data }, { jobId: batch.id, attempts: 5, backoff: { type: "exponential", delay: 5000 }, removeOnComplete: 1000, removeOnFail: 5000 }); } finally { await queue.close(); }
-    return redirect(`/admin/importacao?batch=${batch.id}`, 303);
+    return redirect(`/admin/importacao?batch=${batch.id}&configure=1`, 303);
   } finally { await connection.close(); }
 };

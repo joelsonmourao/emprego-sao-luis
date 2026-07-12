@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { importJobRowSchema, importModeSchema, normalizeImportRow } from "./index.js";
+import { importJobRowSchema, importModeSchema, normalizeImportRow, suggestImportMapping } from "./index.js";
 
 describe("spreadsheet import", () => {
   it("maps Portuguese headers without losing source fields", () => {
@@ -9,4 +9,5 @@ describe("spreadsheet import", () => {
   });
   it("rejects rows without a useful description", () => expect(importJobRowSchema.safeParse(normalizeImportRow({ Título: "Assistente" })).success).toBe(false));
   it("supports a no-write dry run", () => expect(importModeSchema.parse("DRY_RUN")).toBe("DRY_RUN"));
+  it("suggests reusable mappings from normalized aliases", () => expect(suggestImportMapping(["Cargo", "Empresa", "UF", "Link de candidatura"])).toEqual({ title: "Cargo", company: "Empresa", state: "UF", applyUrl: "Link de candidatura" }));
 });
