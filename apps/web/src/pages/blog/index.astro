@@ -1,0 +1,5 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro"; import { listPublishedArticles } from "../../lib/articles";
+const items = await listPublishedArticles();
+---
+<BaseLayout title="Notícias e guias — Empregos São Luís"><section class="mx-auto max-w-6xl px-4 py-12"><h1 class="text-4xl font-black">Notícias e guias</h1>{items.length === 0 ? <p class="mt-8">Nenhum conteúdo publicado neste momento.</p> : <ul class="mt-8 grid gap-5 md:grid-cols-2">{items.map(({ article }) => <li class="rounded-2xl border bg-white p-6"><a class="text-2xl font-bold" href={`/blog/${article.slug}`}>{article.title}</a><p class="mt-3">{article.excerpt}</p></li>)}</ul>}</section></BaseLayout>
