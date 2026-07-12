@@ -43,6 +43,13 @@
       "when": 1783825196156,
       "tag": "0005_wakeful_misty_knight",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1783826218262,
+      "tag": "0006_ambitious_doctor_faustus",
+      "breakpoints": true
     }
   ]
 }

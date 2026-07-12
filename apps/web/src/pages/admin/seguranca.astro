@@ -1,0 +1,4 @@
+---
+import AdminLayout from "../../layouts/AdminLayout.astro"; import { MfaSetup } from "../../components/MfaSetup";
+---
+<AdminLayout title="Segurança"><h1 class="text-3xl font-black">Segurança da conta</h1><p class="mt-3 text-slate-600">Administradores devem ativar autenticação em duas etapas.</p><MfaSetup client:load/></AdminLayout>

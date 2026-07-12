@@ -25,7 +25,7 @@ export const categories = pgTable("es_categories", {
   id: uuid("id").primaryKey().defaultRandom(), name: text("name").notNull(), slug: text("slug").notNull().unique(), ...timestamps
 });
 export const users = pgTable("es_users", {
-  id: uuid("id").primaryKey().defaultRandom(), email: text("email").notNull().unique(), name: text("name").notNull(), passwordHash: text("password_hash"), emailVerifiedAt: timestamp("email_verified_at", { withTimezone: true }), active: boolean("active").notNull().default(true), ...timestamps
+  id: uuid("id").primaryKey().defaultRandom(), email: text("email").notNull().unique(), name: text("name").notNull(), passwordHash: text("password_hash"), emailVerifiedAt: timestamp("email_verified_at", { withTimezone: true }), mfaEnabled: boolean("mfa_enabled").notNull().default(false), mfaSecretEncrypted: text("mfa_secret_encrypted"), mfaPendingSecretEncrypted: text("mfa_pending_secret_encrypted"), recoveryCodeHashes: jsonb("recovery_code_hashes").notNull().default([]), active: boolean("active").notNull().default(true), ...timestamps
 });
 export const roles = pgTable("es_roles", { id: uuid("id").primaryKey().defaultRandom(), key: text("key").notNull().unique(), name: text("name").notNull(), ...timestamps });
 export const permissions = pgTable("es_permissions", { id: uuid("id").primaryKey().defaultRandom(), key: text("key").notNull().unique(), description: text("description"), ...timestamps });
