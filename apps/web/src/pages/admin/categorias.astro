@@ -1,0 +1,10 @@
+---
+import AdminLayout from "../../layouts/AdminLayout.astro";
+import { categories, createDatabase, jobs } from "@es/db";
+import { asc, count, eq } from "drizzle-orm";
+import { can } from "../../lib/auth";
+const auth = Astro.locals.auth!; if (!can(auth, "settings.manage")) return new Response("Proibido", { status: 403 });
+let rows: Array<{ id: string; name: string; slug: string; jobs: number }> = [];
+if (process.env.DATABASE_URL) { const connection = createDatabase(process.env.DATABASE_URL); try { rows = await connection.db.select({ id: categories.id, name: categories.name, slug: categories.slug, jobs: count(jobs.id) }).from(categories).leftJoin(jobs, eq(jobs.categoryId, categories.id)).groupBy(categories.id).orderBy(asc(categories.name)); } finally { await connection.close(); } }
+---
+<AdminLayout title="Categorias"><h1 class="text-3xl font-black">Categorias</h1><form class="mt-6 grid gap-4 rounded-2xl bg-white p-6 md:grid-cols-[1fr_1fr_auto]" method="post" action="/api/admin/categories"><label>Nome<input class="mt-1 w-full rounded-lg border p-3" name="name" required/></label><label>Slug<input class="mt-1 w-full rounded-lg border p-3" name="slug" required pattern="[a-z0-9]+(?:-[a-z0-9]+)*"/></label><button class="self-end rounded-lg bg-red-700 px-5 py-3 font-bold text-white">Cadastrar</button></form><div class="mt-6 rounded-2xl bg-white"><table class="w-full"><thead><tr class="border-b text-left"><th class="p-4">Categoria</th><th class="p-4">Slug</th><th class="p-4">Vagas</th></tr></thead><tbody>{rows.length ? rows.map((item) => <tr class="border-b"><td class="p-4 font-bold">{item.name}</td><td class="p-4 font-mono">{item.slug}</td><td class="p-4">{item.jobs}</td></tr>) : <tr><td colspan="3" class="p-8 text-center">Nenhuma categoria cadastrada.</td></tr>}</tbody></table></div></AdminLayout>
