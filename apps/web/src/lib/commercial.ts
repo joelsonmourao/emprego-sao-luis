@@ -1,20 +1,12 @@
+import { and, asc, eq, gt, sql } from "drizzle-orm";
 import { commercialOrders, commercialPayments, commercialPlans, companyCredits, createDatabase } from "@es/db";
-import { and, asc, desc, eq, gt, sql } from "drizzle-orm";
 import { getConfiguredGateway, isPaymentAvailable } from "./payments/gateway";
+import { getPaymentSettings } from "./commercial/payment-settings";
+import { listPublicPlans, getPlanById } from "./commercial/plans-service";
+import { createOrder, getOrderDetail } from "./commercial/orders-service";
+import { submitManualProof } from "./commercial/payments-service";
 
-export async function listActivePlans() {
-  if (!process.env.DATABASE_URL) return [];
-  const connection = createDatabase(process.env.DATABASE_URL);
-  try {
-    return connection.db
-      .select()
-      .from(commercialPlans)
-      .where(eq(commercialPlans.active, true))
-      .orderBy(asc(commercialPlans.sortOrder), asc(commercialPlans.name));
-  } finally {
-    await connection.close();
-  }
-}
+export { listPublicPlans as listActivePlans };
 
 export async function getPlanBySlug(slug: string) {
   if (!process.env.DATABASE_URL) return null;
@@ -25,10 +17,6 @@ export async function getPlanBySlug(slug: string) {
   } finally {
     await connection.close();
   }
-}
-
-function orderCode() {
-  return `PED-${Date.now().toString(36).toUpperCase()}-${Math.random().toString(36).slice(2, 6).toUpperCase()}`;
 }
 
 export async function createCommercialOrder(input: {
@@ -42,34 +30,18 @@ export async function createCommercialOrder(input: {
   termsAccepted: boolean;
 }) {
   if (!input.termsAccepted) throw new Error("Aceite os termos para continuar.");
-  if (!process.env.DATABASE_URL) throw new Error("Serviço indisponível.");
-  const connection = createDatabase(process.env.DATABASE_URL);
-  try {
-    const plan = await getPlanBySlug(input.planSlug);
-    if (!plan || !plan.active) throw new Error("Plano inválido ou inativo.");
-    const amount = plan.promoPrice ?? plan.price;
-    const code = orderCode();
-    const expiresAt = new Date(Date.now() + 48 * 60 * 60 * 1000);
-    const [order] = await connection.db
-      .insert(commercialOrders)
-      .values({
-        orderCode: code,
-        planId: plan.id,
-        companyName: input.companyName,
-        contactName: input.contactName,
-        email: input.email.toLowerCase(),
-        whatsapp: input.whatsapp ?? null,
-        cnpj: input.cnpj ?? null,
-        city: input.city,
-        amount,
-        status: "PENDING_PAYMENT",
-        expiresAt
-      })
-      .returning();
-    return { order, plan, paymentAvailable: isPaymentAvailable() };
-  } finally {
-    await connection.close();
-  }
+  const plan = await getPlanBySlug(input.planSlug);
+  if (!plan) throw new Error("Plano inválido.");
+  const { order, plan: p } = await createOrder({
+    planId: plan.id,
+    companyName: input.companyName,
+    contactName: input.contactName,
+    email: input.email,
+    city: input.city,
+    ...(input.whatsapp ? { whatsapp: input.whatsapp } : {}),
+    ...(input.cnpj ? { cnpj: input.cnpj } : {})
+  });
+  return { order, plan: p, paymentAvailable: await isPaymentAvailable() };
 }
 
 export async function initiateOrderPayment(orderCode: string, siteUrl: string) {
@@ -80,14 +52,13 @@ export async function initiateOrderPayment(orderCode: string, siteUrl: string) {
   try {
     const [order] = await connection.db.select().from(commercialOrders).where(eq(commercialOrders.orderCode, orderCode)).limit(1);
     if (!order || order.status !== "PENDING_PAYMENT") throw new Error("Pedido inválido.");
-    const [plan] = await connection.db.select().from(commercialPlans).where(eq(commercialPlans.id, order.planId)).limit(1);
-    const amount = Number(order.amount);
+    const plan = await getPlanById(order.planId);
     const idempotencyKey = `pay-${order.id}-${Date.now()}`;
     const result = await gateway.initiate({
       orderCode: order.orderCode,
-      amount,
+      amount: Number(order.amount),
       description: `Plano ${plan?.name ?? ""} — ${order.companyName}`,
-      returnUrl: `${siteUrl}/publicar-vaga/pedido/${order.orderCode}`,
+      returnUrl: `${siteUrl}/publicar-vaga/confirmacao/${order.orderCode}`,
       webhookUrl: `${siteUrl}/api/payments/webhook`
     });
     if (result.status === "redirect") {
@@ -108,41 +79,13 @@ export async function initiateOrderPayment(orderCode: string, siteUrl: string) {
   }
 }
 
-export async function approveOrderAndGrantCredits(orderCode: string, externalId?: string) {
-  if (!process.env.DATABASE_URL) return;
-  const connection = createDatabase(process.env.DATABASE_URL);
-  try {
-    await connection.db.transaction(async (tx) => {
-      const [order] = await tx.select().from(commercialOrders).where(eq(commercialOrders.orderCode, orderCode)).limit(1);
-      if (!order || order.status === "PAID") return;
-      const [plan] = await tx.select().from(commercialPlans).where(eq(commercialPlans.id, order.planId)).limit(1);
-      if (!plan) return;
-      await tx.update(commercialOrders).set({ status: "PAID", paidAt: new Date(), updatedAt: new Date() }).where(eq(commercialOrders.id, order.id));
-      if (externalId) {
-        await tx.update(commercialPayments).set({ status: "APPROVED", approvedAt: new Date(), externalId, updatedAt: new Date() }).where(eq(commercialPayments.orderId, order.id));
-      }
-      const expiresAt = new Date(Date.now() + plan.creditValidityDays * 24 * 60 * 60 * 1000);
-      await tx.insert(companyCredits).values({
-        orderId: order.id,
-        email: order.email,
-        planId: plan.id,
-        totalCredits: plan.jobCredits,
-        usedCredits: 0,
-        expiresAt
-      });
-    });
-  } finally {
-    await connection.close();
-  }
-}
-
 export async function getOrderByCode(orderCode: string) {
-  if (!process.env.DATABASE_URL) return null;
+  const detail = await getOrderDetail(orderCode);
+  if (!detail) return null;
+  const { order, plan } = detail;
+  if (!process.env.DATABASE_URL) return { order, plan, credits: [], remaining: 0 };
   const connection = createDatabase(process.env.DATABASE_URL);
   try {
-    const [order] = await connection.db.select().from(commercialOrders).where(eq(commercialOrders.orderCode, orderCode)).limit(1);
-    if (!order) return null;
-    const [plan] = await connection.db.select().from(commercialPlans).where(eq(commercialPlans.id, order.planId)).limit(1);
     const credits = await connection.db
       .select()
       .from(companyCredits)
@@ -161,8 +104,10 @@ export async function getCreditsForEmail(email: string) {
       .select()
       .from(companyCredits)
       .where(and(eq(companyCredits.email, email.toLowerCase()), gt(companyCredits.expiresAt, new Date()), sql`${companyCredits.usedCredits} < ${companyCredits.totalCredits}`))
-      .orderBy(desc(companyCredits.createdAt));
+      .orderBy(asc(companyCredits.createdAt));
   } finally {
     await connection.close();
   }
 }
+
+export { submitManualProof, isPaymentAvailable, getPaymentSettings };

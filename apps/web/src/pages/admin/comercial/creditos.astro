@@ -1,35 +1,68 @@
 ---
 import AdminLayout from "../../../layouts/AdminLayout.astro";
-import { companyCredits, createDatabase } from "@es/db";
-import { desc } from "drizzle-orm";
+import { can } from "../../../lib/auth";
 
-let credits: Array<typeof companyCredits.$inferSelect> = [];
-if (process.env.DATABASE_URL) {
-  const connection = createDatabase(process.env.DATABASE_URL);
-  try {
-    credits = await connection.db.select().from(companyCredits).orderBy(desc(companyCredits.createdAt)).limit(50);
-  } finally {
-    await connection.close();
-  }
-}
+const auth = Astro.locals.auth!;
+if (!can(auth, "commercial.manage")) return new Response("Proibido", { status: 403 });
 ---
 <AdminLayout title="Créditos de empresas">
   <h1 class="font-display text-3xl font-black">Créditos</h1>
-  <div class="mt-8 overflow-x-auto rounded-2xl border border-[var(--brand-border)] bg-white">
+  <p class="mt-2 text-[var(--text-secondary)]">Créditos de publicação de vagas liberados após pagamento confirmado.</p>
+
+  <div class="mt-6 flex flex-wrap gap-3">
+    <input id="filter-q" type="search" placeholder="Buscar por e-mail…" class="min-w-[14rem] flex-1 rounded-xl border border-[var(--brand-border)] bg-white px-4 py-2 text-sm" />
+    <button type="button" id="btn-reload" class="es-btn es-btn-secondary">Buscar</button>
+  </div>
+
+  <div class="mt-6 overflow-x-auto rounded-2xl border border-[var(--brand-border)] bg-white">
     <table class="min-w-full text-sm">
       <thead class="border-b bg-[var(--brand-background)] text-left">
-        <tr><th class="p-3">E-mail</th><th class="p-3">Total</th><th class="p-3">Usados</th><th class="p-3">Expira</th></tr>
+        <tr>
+          <th class="p-3">E-mail</th>
+          <th class="p-3">Total</th>
+          <th class="p-3">Usados</th>
+          <th class="p-3">Disponíveis</th>
+          <th class="p-3">Expira em</th>
+          <th class="p-3">Concedido em</th>
+        </tr>
       </thead>
-      <tbody>
-        {credits.length ? credits.map((c) => (
-          <tr class="border-b">
-            <td class="p-3">{c.email}</td>
-            <td class="p-3">{c.totalCredits}</td>
-            <td class="p-3">{c.usedCredits}</td>
-            <td class="p-3">{c.expiresAt ? new Date(c.expiresAt).toLocaleDateString("pt-BR") : "—"}</td>
-          </tr>
-        )) : <tr><td class="p-6 text-[var(--text-secondary)]" colspan="4">Nenhum crédito liberado.</td></tr>}
+      <tbody id="credits-body">
+        <tr><td class="p-6 text-[var(--text-secondary)]" colspan="6">Carregando…</td></tr>
       </tbody>
     </table>
   </div>
+
+  <script is:inline>
+    const body = document.getElementById("credits-body");
+
+    async function loadCredits() {
+      const q = document.getElementById("filter-q").value;
+      const params = new URLSearchParams({ page: "1" });
+      if (q) params.set("q", q);
+      const res = await fetch(`/api/admin/commercial/credits?${params}`);
+      const data = await res.json();
+      const items = data.items ?? [];
+      if (!items.length) {
+        body.innerHTML = '<tr><td class="p-6 text-[var(--text-secondary)]" colspan="6">Nenhum crédito liberado.</td></tr>';
+        return;
+      }
+      body.innerHTML = items.map((c) => {
+        const avail = c.totalCredits - c.usedCredits;
+        const expired = c.expiresAt && new Date(c.expiresAt) < new Date();
+        return `
+        <tr class="border-b hover:bg-[var(--brand-background)]">
+          <td class="p-3">${c.email}</td>
+          <td class="p-3">${c.totalCredits}</td>
+          <td class="p-3">${c.usedCredits}</td>
+          <td class="p-3 ${avail <= 0 ? "text-[var(--text-secondary)]" : "font-bold"}">${avail}${expired ? ' <span class="text-xs text-red-600">(expirado)</span>' : ""}</td>
+          <td class="p-3">${c.expiresAt ? new Date(c.expiresAt).toLocaleDateString("pt-BR") : "—"}</td>
+          <td class="p-3 text-xs">${new Date(c.createdAt).toLocaleString("pt-BR")}</td>
+        </tr>`;
+      }).join("");
+    }
+
+    document.getElementById("btn-reload").addEventListener("click", loadCredits);
+    document.getElementById("filter-q").addEventListener("keydown", (e) => { if (e.key === "Enter") loadCredits(); });
+    loadCredits();
+  </script>
 </AdminLayout>
