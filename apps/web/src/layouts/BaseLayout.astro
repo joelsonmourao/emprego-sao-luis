@@ -3,6 +3,8 @@ import "../styles/global.css";
 
 interface Props { title: string; description?: string }
 const { title, description = "Vagas verificadas em São Luís e no Maranhão." } = Astro.props;
+const consentChoice = Astro.cookies.get("es_consent_ads")?.value;
+const adsEnabled = import.meta.env.PUBLIC_ADSENSE_ENABLED === "true" && Boolean(import.meta.env.PUBLIC_ADSENSE_CLIENT_ID) && consentChoice === "yes";
 ---
 <!doctype html>
 <html lang="pt-BR">
@@ -13,6 +15,7 @@ const { title, description = "Vagas verificadas em São Luís e no Maranhão." }
     <meta name="generator" content={Astro.generator} />
     <link rel="canonical" href={new URL(Astro.url.pathname, Astro.site)} />
     <title>{title}</title>
+    {adsEnabled && <script is:inline async src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${import.meta.env.PUBLIC_ADSENSE_CLIENT_ID}`} crossorigin="anonymous"></script>}
   </head>
   <body>
     <a class="sr-only focus:not-sr-only" href="#conteudo">Ir para o conteúdo</a>
@@ -23,5 +26,6 @@ const { title, description = "Vagas verificadas em São Luís e no Maranhão." }
       </nav>
     </header>
     <main id="conteudo"><slot /></main>
+    {!consentChoice && <form class="fixed bottom-3 left-3 right-3 z-50 flex items-center justify-between gap-4 rounded-xl border bg-white p-4 shadow-xl sm:left-auto sm:max-w-lg" method="post" action="/api/consent"><p class="text-sm">Usamos cookies opcionais para medição e publicidade. Você pode recusar.</p><div class="flex gap-2"><button class="rounded-lg border px-3 py-2" name="choice" value="no">Recusar</button><button class="rounded-lg bg-slate-950 px-3 py-2 text-white" name="choice" value="yes">Aceitar</button></div></form>}
   </body>
 </html>

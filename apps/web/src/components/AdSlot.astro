@@ -1,0 +1,9 @@
+---
+interface Props { slot: string; label?: string }
+const { slot, label = "Publicidade" } = Astro.props;
+const enabled = import.meta.env.PUBLIC_ADSENSE_ENABLED === "true";
+const client = import.meta.env.PUBLIC_ADSENSE_CLIENT_ID as string | undefined;
+const consent = Astro.cookies.get("es_consent_ads")?.value === "yes";
+const show = enabled && Boolean(client) && consent;
+---
+{show && <aside class="mt-10 min-h-[280px] border-t pt-6" aria-label={label}><p class="mb-2 text-center text-xs uppercase tracking-wide text-slate-500">{label}</p><ins class="adsbygoogle block" data-ad-client={client} data-ad-slot={slot} data-ad-format="auto" data-full-width-responsive="true"></ins><script is:inline>{`(adsbygoogle = window.adsbygoogle || []).push({});`}</script></aside>}

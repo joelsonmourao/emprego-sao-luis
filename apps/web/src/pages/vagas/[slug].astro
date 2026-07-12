@@ -2,6 +2,7 @@
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import { findPublishedJob } from "../../lib/jobs";
 import { buildJobPosting } from "@es/seo";
+import AdSlot from "../../components/AdSlot.astro";
 const slug = Astro.params.slug ?? "";
 const job = await findPublishedJob(slug);
 if (!job) return Astro.redirect(`/vagas/indisponivel/${encodeURIComponent(slug)}`, 302);
@@ -17,5 +18,6 @@ if (!jsonLd) return Astro.redirect(`/vagas/indisponivel/${encodeURIComponent(slu
     <p class="mt-4 text-lg text-slate-700">{record.summary}</p>
     <section class="prose mt-8 max-w-none" set:html={record.description} />
     <a class="mt-10 inline-flex rounded-xl bg-red-700 px-6 py-4 font-bold text-white" href={record.applicationUrl} rel="nofollow noopener noreferrer">Candidatar-se</a>
+    <AdSlot slot="job-after-application" />
   </article>
 </BaseLayout>
