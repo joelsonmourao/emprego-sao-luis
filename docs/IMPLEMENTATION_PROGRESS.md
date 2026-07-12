@@ -36,14 +36,22 @@ Branch `codex/reconstrucao-astro`. Arquitetura Astro 7, Drizzle, PostgreSQL, Val
 - Fases 8, 13 e 14 usam `es_system_settings` (`seo_settings`, `visual_identity`, `institutional_pages`, `ad_settings`).
 - Migrations são aditivas, versionadas e nunca executadas automaticamente no start do web.
 
-## Validações (Fase 15)
+## Validações (Fase 15 + redesign)
 
 - `npm run lint` — aprovado.
 - `npm run typecheck` — aprovado.
-- `npm run test` — aprovado: 43 testes unitários.
+- `npm run test` — aprovado: 52 testes unitários.
 - `npm run migration:check` — aprovado.
 - `npm run build` — aprovado (web + worker).
 - `npm run test:e2e` — aprovado: 9 testes Playwright.
+
+## Redesign visual premium (fase extra)
+
+- Sistema visual com tokens vinho/creme/verde (`design-tokens.ts`, `global.css`).
+- Componentes: `JobCard`, `PageHero`, `EmptyState`, `Breadcrumbs`, `CookieConsent`, `MobileNav`.
+- Home, `/vagas`, página da vaga, empresas, categorias, notícias, alertas e institucionais redesenhados.
+- Consentimento de cookies corrigido via `fetch` same-origin (sem desativar CSRF).
+- Painel administrativo com acabamento visual consistente.
 
 ## Fase 10 — entregas
 
