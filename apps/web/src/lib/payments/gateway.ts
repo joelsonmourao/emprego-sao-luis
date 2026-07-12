@@ -1,4 +1,5 @@
 import type { PaymentGateway, PaymentInitResult, PaymentWebhookResult } from "./types";
+import { isManualPixEnabled } from "../commercial/payment-settings";
 
 export function getConfiguredGateway(): PaymentGateway | null {
   const provider = process.env.PAYMENT_PROVIDER?.trim();
@@ -62,6 +63,7 @@ function createMercadoPagoGateway(): PaymentGateway {
   };
 }
 
-export function isPaymentAvailable(): boolean {
-  return getConfiguredGateway() !== null;
+export async function isPaymentAvailable(): Promise<boolean> {
+  if (getConfiguredGateway() !== null) return true;
+  return isManualPixEnabled();
 }

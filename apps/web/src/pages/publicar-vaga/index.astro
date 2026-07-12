@@ -5,7 +5,7 @@ import { listActivePlans } from "../../lib/commercial";
 import { isPaymentAvailable } from "../../lib/payments/gateway";
 
 const plans = await listActivePlans();
-const paymentAvailable = isPaymentAvailable();
+const paymentAvailable = await isPaymentAvailable();
 const faqs = [
   ["Como funciona?", "Escolha um plano, informe os dados da empresa, conclua o pagamento e cadastre a vaga após liberação do crédito."],
   ["Quando a vaga é publicada?", "Por padrão, após revisão da equipe. Planos podem incluir destaque no site e no Instagram."],

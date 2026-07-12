@@ -29,7 +29,7 @@ export const POST: APIRoute = async ({ request, redirect }) => {
       ...(parsed.data.cnpj ? { cnpj: parsed.data.cnpj } : {})
     });
     if (!result.order) return redirect("/publicar-vaga?error=indisponivel", 303);
-    return redirect(`/publicar-vaga/pedido/${result.order.orderCode}`, 303);
+    return redirect(`/publicar-vaga/resumo/${result.order.orderCode}`, 303);
   } catch {
     return redirect("/publicar-vaga?error=indisponivel", 303);
   }
