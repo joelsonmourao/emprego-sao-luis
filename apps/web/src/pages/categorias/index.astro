@@ -1,4 +1,40 @@
 ---
-import BaseLayout from "../../layouts/BaseLayout.astro";import{categories,createDatabase,jobs}from"@es/db";import{and,asc,count,eq,gt}from"drizzle-orm";let rows:Array<{name:string;slug:string;description:string|null;total:number}>=[];if(process.env.DATABASE_URL){const connection=createDatabase(process.env.DATABASE_URL);try{rows=await connection.db.select({name:categories.name,slug:categories.slug,description:categories.description,total:count(jobs.id)}).from(categories).leftJoin(jobs,and(eq(jobs.categoryId,categories.id),eq(jobs.publicationStatus,"PUBLISHED"),gt(jobs.expiresAt,new Date()))).where(eq(categories.active,true)).groupBy(categories.id).orderBy(asc(categories.sortOrder),asc(categories.name));}finally{await connection.close();}}
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import Breadcrumbs from "../../components/ui/Breadcrumbs.astro";
+import PageHero from "../../components/ui/PageHero.astro";
+import { categories, createDatabase, jobs } from "@es/db";
+import { and, asc, count, eq, gt } from "drizzle-orm";
+
+let rows: Array<{ name: string; slug: string; description: string | null; total: number }> = [];
+if (process.env.DATABASE_URL) {
+  const connection = createDatabase(process.env.DATABASE_URL);
+  try {
+    rows = await connection.db
+      .select({ name: categories.name, slug: categories.slug, description: categories.description, total: count(jobs.id) })
+      .from(categories)
+      .leftJoin(jobs, and(eq(jobs.categoryId, categories.id), eq(jobs.publicationStatus, "PUBLISHED"), gt(jobs.expiresAt, new Date())))
+      .where(eq(categories.active, true))
+      .groupBy(categories.id)
+      .orderBy(asc(categories.sortOrder), asc(categories.name));
+  } finally {
+    await connection.close();
+  }
+}
 ---
-<BaseLayout title="Categorias profissionais — Empregos São Luís"><section class="mx-auto max-w-6xl px-4 py-12"><nav class="text-sm text-slate-600"><a href="/">Início</a> / Categorias</nav><h1 class="mt-4 text-4xl font-black">Categorias profissionais</h1><div class="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">{rows.map((item)=><a class="rounded-2xl border bg-white p-6" href={`/categorias/${item.slug}`}><strong class="text-xl">{item.name}</strong><span class="mt-2 block text-sm text-slate-600">{item.total} vaga(s)</span></a>)}</div></section></BaseLayout>
+<BaseLayout title="Categorias profissionais — Empregos São Luís" breadcrumbs={[{ name: "Categorias", url: "/categorias" }]}>
+  <PageHero kicker="Áreas" title="Categorias profissionais" description="Explore vagas por área de atuação." pattern={false} />
+  <section class="es-section pt-0">
+    <div class="es-container">
+      <Breadcrumbs items={[{ name: "Início", url: "/" }, { name: "Categorias" }]} />
+      <div class="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        {rows.map((item) => (
+          <a class="es-card block p-6 hover:border-[var(--brand-primary)]" href={`/categorias/${item.slug}`}>
+            <h2 class="font-display text-xl font-black">{item.name}</h2>
+            {item.description && <p class="mt-2 text-sm text-[var(--es-muted)]">{item.description}</p>}
+            <p class="mt-3 text-sm font-bold text-[var(--brand-primary)]">{item.total} vaga(s)</p>
+          </a>
+        ))}
+      </div>
+    </div>
+  </section>
+</BaseLayout>

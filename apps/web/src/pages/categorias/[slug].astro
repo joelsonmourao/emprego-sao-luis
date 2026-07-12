@@ -1,4 +1,59 @@
 ---
-import BaseLayout from "../../layouts/BaseLayout.astro";import{categories,cities,companies,createDatabase,jobs,states}from"@es/db";import{and,desc,eq,gt}from"drizzle-orm";const slug=Astro.params.slug??"";let category;let rows:Array<{title:string;slug:string;company:string;city:string;state:string}>=[];if(process.env.DATABASE_URL){const connection=createDatabase(process.env.DATABASE_URL);try{[category]=await connection.db.select().from(categories).where(and(eq(categories.slug,slug),eq(categories.active,true))).limit(1);if(category)rows=await connection.db.select({title:jobs.normalizedTitle,slug:jobs.slug,company:companies.name,city:cities.name,state:states.code}).from(jobs).innerJoin(companies,eq(jobs.companyId,companies.id)).innerJoin(cities,eq(jobs.cityId,cities.id)).innerJoin(states,eq(jobs.stateId,states.id)).where(and(eq(jobs.categoryId,category.id),eq(jobs.publicationStatus,"PUBLISHED"),gt(jobs.expiresAt,new Date()))).orderBy(desc(jobs.publishedAt)).limit(50);}finally{await connection.close();}}if(!category)return Astro.redirect("/categorias",302);
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import Breadcrumbs from "../../components/ui/Breadcrumbs.astro";
+import JobCard from "../../components/ui/JobCard.astro";
+import SectionHeading from "../../components/ui/SectionHeading.astro";
+import { categories, cities, companies, createDatabase, jobs, states } from "@es/db";
+import { and, desc, eq, gt } from "drizzle-orm";
+
+const slug = Astro.params.slug ?? "";
+let category;
+let rows: Array<{
+  id: string; title: string; slug: string; code: string; company: string; city: string; state: string;
+  workplace: string; contract: string; publishedAt: Date | null; logoUrl: string | null;
+}> = [];
+
+if (process.env.DATABASE_URL) {
+  const connection = createDatabase(process.env.DATABASE_URL);
+  try {
+    [category] = await connection.db.select().from(categories).where(and(eq(categories.slug, slug), eq(categories.active, true))).limit(1);
+    if (category) {
+      rows = await connection.db
+        .select({
+          id: jobs.id, title: jobs.normalizedTitle, slug: jobs.slug, code: jobs.publicCode, company: companies.name,
+          city: cities.name, state: states.code, workplace: jobs.workplaceType, contract: jobs.employmentType,
+          publishedAt: jobs.publishedAt, logoUrl: companies.logoUrl
+        })
+        .from(jobs)
+        .innerJoin(companies, eq(jobs.companyId, companies.id))
+        .innerJoin(cities, eq(jobs.cityId, cities.id))
+        .innerJoin(states, eq(jobs.stateId, states.id))
+        .where(and(eq(jobs.categoryId, category.id), eq(jobs.publicationStatus, "PUBLISHED"), gt(jobs.expiresAt, new Date())))
+        .orderBy(desc(jobs.publishedAt))
+        .limit(50);
+    }
+  } finally {
+    await connection.close();
+  }
+}
+if (!category) return Astro.redirect("/categorias", 302);
 ---
-<BaseLayout title={category.seoTitle??`${category.name} — vagas de emprego`} description={category.metaDescription??`Vagas na categoria ${category.name}.`}><section class="mx-auto max-w-5xl px-4 py-12"><nav class="text-sm text-slate-600"><a href="/">Início</a> / <a href="/categorias">Categorias</a> / {category.name}</nav><h1 class="mt-4 text-4xl font-black">Vagas em {category.name}</h1>{category.description&&<p class="mt-4 text-lg text-slate-700">{category.description}</p>}<div class="mt-8 grid gap-3">{rows.length?rows.map((job)=><a class="rounded-xl border bg-white p-5" href={`/vagas/${job.slug}`}><strong>{job.title}</strong><span class="mt-1 block text-sm text-slate-600">{job.company} · {job.city}/{job.state}</span></a>):<p class="rounded-xl border bg-white p-5">Nenhuma vaga ativa nesta categoria.</p>}</div></section></BaseLayout>
+<BaseLayout title={category.seoTitle ?? `${category.name} — vagas de emprego`} description={category.metaDescription ?? `Vagas na categoria ${category.name}.`} breadcrumbs={[{ name: "Categorias", url: "/categorias" }, { name: category.name, url: `/categorias/${category.slug}` }]}>
+  <section class="es-section bg-white">
+    <div class="es-container">
+      <Breadcrumbs items={[{ name: "Início", url: "/" }, { name: "Categorias", url: "/categorias" }, { name: category.name }]} />
+      <h1 class="font-display mt-4 text-4xl font-black">Vagas em {category.name}</h1>
+      {category.description && <p class="mt-4 max-w-3xl text-lg text-[var(--es-muted)]">{category.description}</p>}
+      <section class="mt-10">
+        <SectionHeading title="Oportunidades abertas" description={`${rows.length} vaga(s) nesta categoria.`} />
+        {rows.length ? (
+          <div class="mt-6 grid gap-4 sm:grid-cols-2">
+            {rows.map((job) => <JobCard {...job} compact />)}
+          </div>
+        ) : (
+          <p class="mt-5 es-card p-5 text-[var(--es-muted)]">Nenhuma vaga ativa nesta categoria.</p>
+        )}
+      </section>
+    </div>
+  </section>
+</BaseLayout>
