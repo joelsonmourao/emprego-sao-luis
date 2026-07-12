@@ -20,7 +20,7 @@ export const jobDraftSchema = z.object({
 
 export type JobDraftInput = z.infer<typeof jobDraftSchema>;
 
-export const importModeSchema = z.enum(["DRAFT", "PENDING_REVIEW", "PUBLISHED"]);
+export const importModeSchema = z.enum(["DRY_RUN", "DRAFT", "PENDING_REVIEW", "PUBLISHED"]);
 export const importJobRowSchema = z.object({
   externalId: z.string().trim().max(200).optional(), title: z.string().trim().min(3).max(160),
   company: z.string().trim().min(2).max(180), city: z.string().trim().min(2).max(120), state: z.string().trim().length(2).transform((v) => v.toUpperCase()),

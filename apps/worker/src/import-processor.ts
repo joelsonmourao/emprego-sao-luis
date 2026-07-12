@@ -16,17 +16,20 @@ export async function processImport(payload: ImportPayload) {
     await connection.db.delete(importRows).where(eq(importRows.batchId, payload.batchId)); let validRows = 0; let rejectedRows = 0;
     for (const [position, raw] of rawRows.entries()) {
       const normalized = normalizeImportRow(raw); const parsed = importJobRowSchema.safeParse(normalized);
-      if (!parsed.success) { rejectedRows++; await connection.db.insert(importRows).values({ batchId: payload.batchId, rowNumber: position + 2, raw, normalized, errors: parsed.error.issues }); continue; }
+      if (!parsed.success) { rejectedRows++; await connection.db.insert(importRows).values({ batchId: payload.batchId, rowNumber: position + 2, raw, normalized, errors: parsed.error.issues, action: "REJECTED" }); continue; }
       const value = parsed.data;
       const [company] = await connection.db.select().from(companies).where(sql`lower(${companies.name}) = lower(${value.company})`).limit(1);
       const [state] = await connection.db.select().from(states).where(eq(states.code, value.state)).limit(1);
       const [city] = state ? await connection.db.select().from(cities).where(and(eq(cities.stateId, state.id), sql`lower(${cities.name}) = lower(${value.city})`)).limit(1) : [];
       const [category] = value.category ? await connection.db.select().from(categories).where(sql`lower(${categories.name}) = lower(${value.category})`).limit(1) : [];
       const relationErrors = [!company ? "Empresa não cadastrada." : null, !state ? "UF não cadastrada." : null, !city ? "Cidade não cadastrada." : null].filter((item): item is string => item !== null);
-      if (relationErrors.length) { rejectedRows++; await connection.db.insert(importRows).values({ batchId: payload.batchId, rowNumber: position + 2, raw, normalized: value, errors: relationErrors }); continue; }
+      if (relationErrors.length) { rejectedRows++; await connection.db.insert(importRows).values({ batchId: payload.batchId, rowNumber: position + 2, raw, normalized: value, errors: relationErrors, action: "REJECTED" }); continue; }
       const duplicateHash = createHash("sha256").update(`${value.title}|${company!.id}|${city!.id}`).digest("hex");
       const [duplicate] = await connection.db.select({ id: jobs.id }).from(jobs).where(eq(jobs.duplicateHash, duplicateHash)).limit(1);
-      if (duplicate && !value.externalId) { rejectedRows++; await connection.db.insert(importRows).values({ batchId: payload.batchId, rowNumber: position + 2, raw, normalized: value, errors: ["Vaga duplicada."], jobId: duplicate.id }); continue; }
+      const [existing] = value.externalId ? await connection.db.select().from(jobs).where(and(eq(jobs.externalId, value.externalId), eq(jobs.sourceName, value.source))).limit(1) : [];
+      if (duplicate && !value.externalId) { rejectedRows++; await connection.db.insert(importRows).values({ batchId: payload.batchId, rowNumber: position + 2, raw, normalized: value, errors: ["Vaga duplicada."], action: "DUPLICATE", jobId: duplicate.id }); continue; }
+      if (mode === "DRY_RUN") { validRows++; await connection.db.insert(importRows).values({ batchId: payload.batchId, rowNumber: position + 2, raw, normalized: value, errors: [], action: existing ? "WOULD_UPDATE" : "WOULD_CREATE", jobId: existing?.id }); continue; }
+      const beforeSnapshot = existing ? { originalTitle: existing.originalTitle, normalizedTitle: existing.normalizedTitle, summary: existing.summary, description: existing.description, employmentType: existing.employmentType, workplaceType: existing.workplaceType, applicationUrl: existing.applicationUrl, sourceUrl: existing.sourceUrl, expiresAt: existing.expiresAt?.toISOString() ?? null, salaryMin: existing.salaryMin, salaryMax: existing.salaryMax, salaryVisible: existing.salaryVisible, publicationStatus: existing.publicationStatus, publishedAt: existing.publishedAt?.toISOString() ?? null, categoryId: existing.categoryId } : null;
       const job = await connection.db.transaction(async (tx) => {
         const [sequence] = await tx.execute(sql<{ value: string }>`select nextval('es_job_public_code_seq')::text as value`); const publicCode = `ES-${String(sequence?.value ?? "0").padStart(6, "0")}`;
         const slug = `${slugify(`${value.title}-${value.company}-${value.city}`)}-${duplicateHash.slice(0, 8)}`;
@@ -34,10 +37,10 @@ export async function processImport(payload: ImportPayload) {
         if (value.externalId) { const [saved] = await tx.insert(jobs).values(row).onConflictDoUpdate({ target: [jobs.externalId, jobs.sourceName], set: { ...row, publicCode: sql`${jobs.publicCode}`, slug: sql`${jobs.slug}`, updatedAt: new Date() } }).returning(); return saved; }
         const [saved] = await tx.insert(jobs).values(row).returning(); return saved;
       });
-      validRows++; await connection.db.insert(importRows).values({ batchId: payload.batchId, rowNumber: position + 2, raw, normalized: value, errors: [], jobId: job?.id });
+      validRows++; await connection.db.insert(importRows).values({ batchId: payload.batchId, rowNumber: position + 2, raw, normalized: value, errors: [], action: existing ? "UPDATED" : "CREATED", beforeSnapshot, jobId: job?.id });
     }
     await connection.db.update(importBatches).set({ status: "COMPLETED", totalRows: rawRows.length, validRows, rejectedRows, updatedAt: new Date() }).where(eq(importBatches.id, payload.batchId));
     return { totalRows: rawRows.length, validRows, rejectedRows };
-  } catch (error) { await connection.db.update(importBatches).set({ status: "FAILED", settings: { error: error instanceof Error ? error.message : "Erro desconhecido" }, updatedAt: new Date() }).where(eq(importBatches.id, payload.batchId)); throw error; }
+  } catch (error) { await connection.db.update(importBatches).set({ status: "FAILED", settings: { storageKey: payload.storageKey, mode, error: error instanceof Error ? error.message : "Erro desconhecido" }, updatedAt: new Date() }).where(eq(importBatches.id, payload.batchId)); throw error; }
   finally { await connection.close(); }
 }

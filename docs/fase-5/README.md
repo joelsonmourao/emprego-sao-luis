@@ -18,6 +18,9 @@
 - Todas as abas, aliases de cabeçalho, validação Zod e erros por linha.
 - Resolução de empresa/cidade/UF/categoria e detecção de duplicidade.
 - Atualização por `externalId` + fonte e criação transacional.
+- Dry run sem escrita de vagas e promoção posterior do mesmo arquivo.
+- CSV UTF-8 das linhas rejeitadas.
+- Desfazer auditável: novas vagas são arquivadas e atualizações restauram snapshot anterior.
 
 ## Ainda necessário para fechar a fase
 
