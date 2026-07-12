@@ -1,0 +1,40 @@
+---
+import AdminLayout from "../../../layouts/AdminLayout.astro";
+import { commercialOrders, commercialPlans, createDatabase } from "@es/db";
+import { desc, eq } from "drizzle-orm";
+
+let rows: Array<{ order: typeof commercialOrders.$inferSelect; planName: string | null }> = [];
+if (process.env.DATABASE_URL) {
+  const connection = createDatabase(process.env.DATABASE_URL);
+  try {
+    const orders = await connection.db.select().from(commercialOrders).orderBy(desc(commercialOrders.createdAt)).limit(50);
+    for (const order of orders) {
+      const [plan] = await connection.db.select({ name: commercialPlans.name }).from(commercialPlans).where(eq(commercialPlans.id, order.planId)).limit(1);
+      rows.push({ order, planName: plan?.name ?? null });
+    }
+  } finally {
+    await connection.close();
+  }
+}
+---
+<AdminLayout title="Pedidos comerciais">
+  <h1 class="font-display text-3xl font-black">Pedidos</h1>
+  <div class="mt-8 overflow-x-auto rounded-2xl border border-[var(--brand-border)] bg-white">
+    <table class="min-w-full text-sm">
+      <thead class="border-b bg-[var(--brand-background)] text-left">
+        <tr><th class="p-3">Código</th><th class="p-3">Empresa</th><th class="p-3">Plano</th><th class="p-3">Valor</th><th class="p-3">Status</th></tr>
+      </thead>
+      <tbody>
+        {rows.length ? rows.map(({ order, planName }) => (
+          <tr class="border-b">
+            <td class="p-3 font-mono text-xs">{order.orderCode}</td>
+            <td class="p-3">{order.companyName}</td>
+            <td class="p-3">{planName}</td>
+            <td class="p-3">R$ {Number(order.amount).toFixed(2)}</td>
+            <td class="p-3">{order.status}</td>
+          </tr>
+        )) : <tr><td class="p-6 text-[var(--text-secondary)]" colspan="5">Nenhum pedido ainda.</td></tr>}
+      </tbody>
+    </table>
+  </div>
+</AdminLayout>

@@ -1,0 +1,35 @@
+---
+import AdminLayout from "../../../layouts/AdminLayout.astro";
+import { companyCredits, createDatabase } from "@es/db";
+import { desc } from "drizzle-orm";
+
+let credits: Array<typeof companyCredits.$inferSelect> = [];
+if (process.env.DATABASE_URL) {
+  const connection = createDatabase(process.env.DATABASE_URL);
+  try {
+    credits = await connection.db.select().from(companyCredits).orderBy(desc(companyCredits.createdAt)).limit(50);
+  } finally {
+    await connection.close();
+  }
+}
+---
+<AdminLayout title="Créditos de empresas">
+  <h1 class="font-display text-3xl font-black">Créditos</h1>
+  <div class="mt-8 overflow-x-auto rounded-2xl border border-[var(--brand-border)] bg-white">
+    <table class="min-w-full text-sm">
+      <thead class="border-b bg-[var(--brand-background)] text-left">
+        <tr><th class="p-3">E-mail</th><th class="p-3">Total</th><th class="p-3">Usados</th><th class="p-3">Expira</th></tr>
+      </thead>
+      <tbody>
+        {credits.length ? credits.map((c) => (
+          <tr class="border-b">
+            <td class="p-3">{c.email}</td>
+            <td class="p-3">{c.totalCredits}</td>
+            <td class="p-3">{c.usedCredits}</td>
+            <td class="p-3">{c.expiresAt ? new Date(c.expiresAt).toLocaleDateString("pt-BR") : "—"}</td>
+          </tr>
+        )) : <tr><td class="p-6 text-[var(--text-secondary)]" colspan="4">Nenhum crédito liberado.</td></tr>}
+      </tbody>
+    </table>
+  </div>
+</AdminLayout>

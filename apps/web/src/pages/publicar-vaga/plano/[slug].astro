@@ -1,0 +1,34 @@
+---
+import BaseLayout from "../../../layouts/BaseLayout.astro";
+import Breadcrumbs from "../../../components/ui/Breadcrumbs.astro";
+import { getPlanBySlug } from "../../../lib/commercial";
+
+const { slug } = Astro.params;
+const plan = slug ? await getPlanBySlug(slug) : null;
+if (!plan || !plan.active) return Astro.redirect("/publicar-vaga", 302);
+const price = plan.promoPrice ?? plan.price;
+---
+<BaseLayout title={`${plan.name} — Publicar vaga`} description={plan.description} canonical={`/publicar-vaga/plano/${plan.slug}`}>
+  <section class="es-section">
+    <div class="es-container max-w-2xl">
+      <Breadcrumbs items={[{ name: "Início", url: "/" }, { name: "Publicar vaga", url: "/publicar-vaga" }, { name: plan.name }]} />
+      <p class="es-kicker mt-6">Etapa 2 de 4</p>
+      <h1 class="font-display mt-2 text-4xl font-black">{plan.name}</h1>
+      <p class="mt-3 text-[var(--text-secondary)]">{plan.description}</p>
+      <p class="mt-4 text-2xl font-black text-[var(--brand-primary)]">R$ {Number(price).toFixed(2).replace(".", ",")}</p>
+
+      <form class="es-card mt-8 grid gap-4 rounded-2xl p-6" method="post" action="/api/commercial/order">
+        <input type="hidden" name="planSlug" value={plan.slug} />
+        <label class="grid gap-1 text-sm font-semibold">Nome da empresa<input class="rounded-xl border border-[var(--brand-border)] px-3 py-2.5" name="companyName" required maxlength="180" /></label>
+        <label class="grid gap-1 text-sm font-semibold">Responsável<input class="rounded-xl border border-[var(--brand-border)] px-3 py-2.5" name="contactName" required maxlength="120" /></label>
+        <label class="grid gap-1 text-sm font-semibold">E-mail<input class="rounded-xl border border-[var(--brand-border)] px-3 py-2.5" type="email" name="email" required maxlength="180" /></label>
+        <label class="grid gap-1 text-sm font-semibold">WhatsApp<input class="rounded-xl border border-[var(--brand-border)] px-3 py-2.5" name="whatsapp" maxlength="40" /></label>
+        <label class="grid gap-1 text-sm font-semibold">CNPJ (opcional)<input class="rounded-xl border border-[var(--brand-border)] px-3 py-2.5" name="cnpj" maxlength="20" /></label>
+        <label class="grid gap-1 text-sm font-semibold">Cidade<input class="rounded-xl border border-[var(--brand-border)] px-3 py-2.5" name="city" required maxlength="120" placeholder="Ex.: São Luís" /></label>
+        <label class="flex items-start gap-2 text-sm"><input type="checkbox" name="termsAccepted" value="1" required /><span>Li e aceito os <a href="/termos" class="underline">termos de uso</a> e a <a href="/privacidade" class="underline">política de privacidade</a>.</span></label>
+        <button class="es-btn es-btn-primary" type="submit">Continuar para pagamento</button>
+        <a class="text-center text-sm text-[var(--text-secondary)] underline" href="/contato">Preciso de um plano personalizado</a>
+      </form>
+    </div>
+  </section>
+</BaseLayout>

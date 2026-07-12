@@ -1,0 +1,41 @@
+---
+import AdminLayout from "../../../layouts/AdminLayout.astro";
+import { commercialPayments, commercialOrders, createDatabase } from "@es/db";
+import { desc, eq } from "drizzle-orm";
+
+let rows: Array<{ payment: typeof commercialPayments.$inferSelect; orderCode: string | null }> = [];
+if (process.env.DATABASE_URL) {
+  const connection = createDatabase(process.env.DATABASE_URL);
+  try {
+    const payments = await connection.db.select().from(commercialPayments).orderBy(desc(commercialPayments.createdAt)).limit(50);
+    for (const payment of payments) {
+      const [order] = await connection.db.select({ orderCode: commercialOrders.orderCode }).from(commercialOrders).where(eq(commercialOrders.id, payment.orderId)).limit(1);
+      rows.push({ payment, orderCode: order?.orderCode ?? null });
+    }
+  } finally {
+    await connection.close();
+  }
+}
+---
+<AdminLayout title="Pagamentos">
+  <h1 class="font-display text-3xl font-black">Pagamentos</h1>
+  <p class="mt-2 text-[var(--text-secondary)]">Status real do gateway ou aprovação manual. Vagas só liberam crédito após APPROVED ou MANUAL_APPROVED.</p>
+  <div class="mt-8 overflow-x-auto rounded-2xl border border-[var(--brand-border)] bg-white">
+    <table class="min-w-full text-sm">
+      <thead class="border-b bg-[var(--brand-background)] text-left">
+        <tr><th class="p-3">Pedido</th><th class="p-3">Provedor</th><th class="p-3">Método</th><th class="p-3">Valor</th><th class="p-3">Status</th></tr>
+      </thead>
+      <tbody>
+        {rows.length ? rows.map(({ payment, orderCode }) => (
+          <tr class="border-b">
+            <td class="p-3 font-mono text-xs">{orderCode}</td>
+            <td class="p-3">{payment.provider}</td>
+            <td class="p-3">{payment.method}</td>
+            <td class="p-3">R$ {Number(payment.amount).toFixed(2)}</td>
+            <td class="p-3">{payment.status}</td>
+          </tr>
+        )) : <tr><td class="p-6 text-[var(--text-secondary)]" colspan="5">Nenhum pagamento registrado.</td></tr>}
+      </tbody>
+    </table>
+  </div>
+</AdminLayout>

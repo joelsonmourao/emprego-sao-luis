@@ -78,5 +78,99 @@ export const adEvents = pgTable("es_ad_events", {
 export const indexingEvents = pgTable("es_indexing_events", { id: uuid("id").primaryKey().defaultRandom(), dedupeKey: text("dedupe_key").notNull().unique(), jobId: uuid("job_id").references(() => jobs.id), provider: text("provider").notNull(), url: text("url").notNull(), notificationType: text("notification_type").notNull(), status: queueStatus("status").notNull().default("PENDING"), attempts: integer("attempts").notNull().default(0), response: jsonb("response"), error: text("error"), processedAt: timestamp("processed_at", { withTimezone: true }), ...timestamps }, (t) => [index("es_indexing_event_queue_idx").on(t.status, t.createdAt)]);
 export const settings = pgTable("es_system_settings", { key: text("key").primaryKey(), value: jsonb("value").notNull(), public: boolean("public").notNull().default(false), updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow() });
 
+export const contactStatus = pgEnum("es_contact_status", ["OPEN", "IN_PROGRESS", "RESOLVED", "ARCHIVED"]);
+export const paymentStatus = pgEnum("es_payment_status", ["PENDING", "APPROVED", "REFUSED", "CANCELLED", "REFUNDED", "EXPIRED", "MANUAL_APPROVED"]);
+export const orderStatus = pgEnum("es_order_status", ["DRAFT", "PENDING_PAYMENT", "PAID", "CANCELLED", "EXPIRED"]);
+
+export const contactSubmissions = pgTable("es_contact_submissions", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  protocol: varchar("protocol", { length: 20 }).notNull().unique(),
+  name: text("name").notNull(),
+  email: text("email").notNull(),
+  phone: text("phone"),
+  subject: text("subject").notNull(),
+  category: text("category").notNull(),
+  message: text("message").notNull(),
+  status: contactStatus("status").notNull().default("OPEN"),
+  assignedTo: uuid("assigned_to").references(() => users.id),
+  internalNotes: text("internal_notes"),
+  ipHash: text("ip_hash"),
+  resolvedAt: timestamp("resolved_at", { withTimezone: true }),
+  ...timestamps
+}, (t) => [index("es_contact_submissions_status_idx").on(t.status, t.createdAt)]);
+
+export const commercialPlans = pgTable("es_commercial_plans", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  name: text("name").notNull(),
+  slug: text("slug").notNull().unique(),
+  description: text("description").notNull(),
+  price: numeric("price").notNull(),
+  promoPrice: numeric("promo_price"),
+  jobCredits: integer("job_credits").notNull().default(1),
+  durationDays: integer("duration_days").notNull().default(30),
+  highlightDays: integer("highlight_days").notNull().default(0),
+  publishStories: boolean("publish_stories").notNull().default(false),
+  publishFeed: boolean("publish_feed").notNull().default(false),
+  publishSite: boolean("publish_site").notNull().default(true),
+  renewable: boolean("renewable").notNull().default(true),
+  creditValidityDays: integer("credit_validity_days").notNull().default(365),
+  priority: integer("priority").notNull().default(0),
+  active: boolean("active").notNull().default(true),
+  recommended: boolean("recommended").notNull().default(false),
+  sortOrder: integer("sort_order").notNull().default(0),
+  benefits: jsonb("benefits").notNull().default([]),
+  limitations: jsonb("limitations").notNull().default([]),
+  rules: text("rules"),
+  ...timestamps
+});
+
+export const commercialOrders = pgTable("es_commercial_orders", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  orderCode: varchar("order_code", { length: 24 }).notNull().unique(),
+  planId: uuid("plan_id").notNull().references(() => commercialPlans.id),
+  companyName: text("company_name").notNull(),
+  contactName: text("contact_name").notNull(),
+  email: text("email").notNull(),
+  whatsapp: text("whatsapp"),
+  cnpj: text("cnpj"),
+  city: text("city").notNull(),
+  billingData: jsonb("billing_data").notNull().default({}),
+  amount: numeric("amount").notNull(),
+  status: orderStatus("status").notNull().default("PENDING_PAYMENT"),
+  companyId: uuid("company_id").references(() => companies.id),
+  expiresAt: timestamp("expires_at", { withTimezone: true }),
+  paidAt: timestamp("paid_at", { withTimezone: true }),
+  ...timestamps
+}, (t) => [index("es_commercial_orders_status_idx").on(t.status, t.createdAt)]);
+
+export const commercialPayments = pgTable("es_commercial_payments", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  orderId: uuid("order_id").notNull().references(() => commercialOrders.id),
+  externalId: text("external_id"),
+  idempotencyKey: text("idempotency_key").notNull().unique(),
+  amount: numeric("amount").notNull(),
+  method: text("method").notNull(),
+  provider: text("provider").notNull(),
+  status: paymentStatus("status").notNull().default("PENDING"),
+  metadata: jsonb("metadata").notNull().default({}),
+  webhookPayload: jsonb("webhook_payload"),
+  approvedAt: timestamp("approved_at", { withTimezone: true }),
+  refusedAt: timestamp("refused_at", { withTimezone: true }),
+  expiresAt: timestamp("expires_at", { withTimezone: true }),
+  ...timestamps
+}, (t) => [index("es_commercial_payments_order_idx").on(t.orderId, t.status)]);
+
+export const companyCredits = pgTable("es_company_credits", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  companyId: uuid("company_id").references(() => companies.id),
+  orderId: uuid("order_id").references(() => commercialOrders.id),
+  email: text("email").notNull(),
+  planId: uuid("plan_id").references(() => commercialPlans.id),
+  totalCredits: integer("total_credits").notNull(),
+  usedCredits: integer("used_credits").notNull().default(0),
+  expiresAt: timestamp("expires_at", { withTimezone: true }),
+  ...timestamps
+}, (t) => [index("es_company_credits_email_idx").on(t.email)]);
+
 export const jobRelations = relations(jobs, ({ one, many }) => ({ company: one(companies, { fields: [jobs.companyId], references: [companies.id] }), city: one(cities, { fields: [jobs.cityId], references: [cities.id] }), revisions: many(jobRevisions), sources: many(jobSources) }));
 export const activePublishedJobs = sql`${jobs.publicationStatus} = 'PUBLISHED' and ${jobs.expiresAt} > now()`;

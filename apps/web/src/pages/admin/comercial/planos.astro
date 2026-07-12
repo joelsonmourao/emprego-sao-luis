@@ -1,0 +1,41 @@
+---
+import AdminLayout from "../../../layouts/AdminLayout.astro";
+import { commercialPlans, createDatabase } from "@es/db";
+import { asc } from "drizzle-orm";
+
+let plans: Array<typeof commercialPlans.$inferSelect> = [];
+if (process.env.DATABASE_URL) {
+  const connection = createDatabase(process.env.DATABASE_URL);
+  try {
+    plans = await connection.db.select().from(commercialPlans).orderBy(asc(commercialPlans.sortOrder));
+  } finally {
+    await connection.close();
+  }
+}
+---
+<AdminLayout title="Planos comerciais">
+  <h1 class="font-display text-3xl font-black">Planos</h1>
+  <p class="mt-2 text-[var(--text-secondary)]">Gerencie nomes, preços, créditos e benefícios. Valores reais definidos aqui — nada hardcoded no site.</p>
+  <div class="mt-8 overflow-x-auto rounded-2xl border border-[var(--brand-border)] bg-white">
+    <table class="min-w-full text-sm">
+      <thead class="border-b bg-[var(--brand-background)] text-left">
+        <tr>
+          <th class="p-3">Nome</th><th class="p-3">Preço</th><th class="p-3">Créditos</th><th class="p-3">Ativo</th><th class="p-3">Recomendado</th>
+        </tr>
+      </thead>
+      <tbody>
+        {plans.length ? plans.map((plan) => (
+          <tr class="border-b">
+            <td class="p-3 font-bold">{plan.name}</td>
+            <td class="p-3">R$ {Number(plan.promoPrice ?? plan.price).toFixed(2)}</td>
+            <td class="p-3">{plan.jobCredits}</td>
+            <td class="p-3">{plan.active ? "Sim" : "Não"}</td>
+            <td class="p-3">{plan.recommended ? "Sim" : "—"}</td>
+          </tr>
+        )) : (
+          <tr><td class="p-6 text-[var(--text-secondary)]" colspan="5">Nenhum plano cadastrado. Insira planos via API ou migration seed.</td></tr>
+        )}
+      </tbody>
+    </table>
+  </div>
+</AdminLayout>

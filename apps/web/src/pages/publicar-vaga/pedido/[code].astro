@@ -1,0 +1,43 @@
+---
+import BaseLayout from "../../../layouts/BaseLayout.astro";
+import { getOrderByCode } from "../../../lib/commercial";
+import { isPaymentAvailable } from "../../../lib/payments/gateway";
+
+const { code } = Astro.params;
+const data = code ? await getOrderByCode(code) : null;
+if (!data) return Astro.redirect("/publicar-vaga", 302);
+
+const { order, plan, remaining } = data;
+const paymentAvailable = isPaymentAvailable();
+
+if (order.status === "PAID" && remaining > 0) {
+  return Astro.redirect(`/publicar-vaga/cadastro?pedido=${order.orderCode}`, 302);
+}
+---
+<BaseLayout title={`Pedido ${order.orderCode}`} description="Acompanhe pagamento e liberação de crédito." canonical={`/publicar-vaga/pedido/${order.orderCode}`}>
+  <section class="es-section">
+    <div class="es-container max-w-2xl">
+      <p class="es-kicker">Etapa 3 de 4</p>
+      <h1 class="font-display mt-2 text-4xl font-black">Pagamento do pedido</h1>
+      <p class="mt-3 text-[var(--text-secondary)]">Pedido <strong>{order.orderCode}</strong> · {plan?.name}</p>
+      <p class="mt-2 text-2xl font-black text-[var(--brand-primary)]">R$ {Number(order.amount).toFixed(2).replace(".", ",")}</p>
+
+      <div class="es-card mt-8 rounded-2xl p-6">
+        <p class="text-sm text-[var(--text-secondary)]">Status: <strong>{order.status}</strong></p>
+        {order.status === "PENDING_PAYMENT" && paymentAvailable ? (
+          <form class="mt-4" method="post" action="/api/commercial/pay">
+            <input type="hidden" name="orderCode" value={order.orderCode} />
+            <button class="es-btn es-btn-primary" type="submit">Ir para pagamento</button>
+          </form>
+        ) : order.status === "PENDING_PAYMENT" ? (
+          <div class="mt-4 grid gap-3">
+            <p class="rounded-xl border border-yellow-200 bg-yellow-50 p-3 text-sm text-yellow-900">Pagamento temporariamente indisponível. Não liberamos vagas automaticamente sem confirmação.</p>
+            <a class="es-btn es-btn-secondary" href={`/contato?assunto=Pagamento+pedido+${order.orderCode}`}>Falar com o comercial</a>
+          </div>
+        ) : (
+          <p class="mt-4 text-sm">Aguarde a confirmação ou acesse o cadastro quando o crédito estiver liberado.</p>
+        )}
+      </div>
+    </div>
+  </section>
+</BaseLayout>
