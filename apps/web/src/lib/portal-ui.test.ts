@@ -24,17 +24,18 @@ describe("portal UI redesign", () => {
 
   it("cabeçalho destaca publicar vaga", () => {
     const source = readFileSync(resolve("apps/web/src/components/SiteHeader.astro"), "utf8");
-    expect(source).toContain("/anunciar-vaga");
+    expect(source).toContain("/publicar-vaga");
     expect(source).toContain("Publicar vaga");
     expect(source).toContain("aria-current");
+    expect(source).toContain("logoHorizontalWebp");
+    expect(source).toContain("<picture>");
   });
 
-  it("home mantém busca com múltiplos campos", () => {
+  it("home inclui seção Instagram e busca", () => {
     const source = readFileSync(resolve("apps/web/src/pages/index.astro"), "utf8");
+    expect(source).toContain("InstagramFollow");
     expect(source).toContain('name="q"');
     expect(source).toContain('name="cidade"');
-    expect(source).toContain('name="modalidade"');
-    expect(source).toContain('name="categoria"');
   });
 
   it("listagem de vagas possui filtros laterais e chips", () => {
