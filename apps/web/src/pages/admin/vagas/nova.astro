@@ -1,0 +1,19 @@
+---
+import AdminLayout from "../../../layouts/AdminLayout.astro";
+import { can } from "../../../lib/auth";
+import { getJobFormOptions } from "../../../lib/admin-data";
+const auth = Astro.locals.auth!;
+if (!can(auth, "jobs.create")) return new Response("Proibido", { status: 403 });
+const options = await getJobFormOptions();
+---
+<AdminLayout title="Nova vaga"><div class="flex items-center justify-between"><div><h1 class="text-3xl font-black">Nova vaga</h1><p class="mt-2 text-slate-600">Salve como rascunho ou envie para revisão.</p></div><a href="/admin/vagas">Voltar</a></div>
+<form class="mt-8 grid gap-6 rounded-2xl bg-white p-6" method="post" action="/api/admin/jobs">
+  <div class="grid gap-4 md:grid-cols-2"><label>Título original<input class="mt-1 w-full rounded-lg border p-3" name="originalTitle" required/></label><label>Título normalizado<input class="mt-1 w-full rounded-lg border p-3" name="normalizedTitle" required/></label></div>
+  <label>Slug<input class="mt-1 w-full rounded-lg border p-3" name="slug" pattern="[a-z0-9]+(?:-[a-z0-9]+)*" required/></label>
+  <div class="grid gap-4 md:grid-cols-2"><label>Empresa<select class="mt-1 w-full rounded-lg border p-3" name="companyId" required><option value="">Selecione</option>{options.companies.map((item) => <option value={item.id}>{item.name}</option>)}</select></label><label>Categoria<select class="mt-1 w-full rounded-lg border p-3" name="categoryId"><option value="">Sem categoria</option>{options.categories.map((item) => <option value={item.id}>{item.name}</option>)}</select></label><label>Cidade<select class="mt-1 w-full rounded-lg border p-3" name="cityId" required><option value="">Selecione</option>{options.cities.map((item) => <option value={item.id}>{item.name}</option>)}</select></label><label>Estado<select class="mt-1 w-full rounded-lg border p-3" name="stateId" required><option value="">Selecione</option>{options.states.map((item) => <option value={item.id}>{item.name} ({item.code})</option>)}</select></label></div>
+  <div class="grid gap-4 md:grid-cols-2"><label>Tipo de contratação<input class="mt-1 w-full rounded-lg border p-3" name="employmentType" required/></label><label>Modalidade<select class="mt-1 w-full rounded-lg border p-3" name="workplaceType"><option value="presencial">Presencial</option><option value="hibrido">Híbrido</option><option value="remoto">Remoto</option></select></label></div>
+  <label>Resumo<textarea class="mt-1 w-full rounded-lg border p-3" name="summary" minlength="40" maxlength="500" required></textarea></label><label>Descrição completa<textarea class="mt-1 min-h-64 w-full rounded-lg border p-3" name="description" minlength="80" required></textarea></label>
+  <div class="grid gap-4 md:grid-cols-2"><label>Link de candidatura<input class="mt-1 w-full rounded-lg border p-3" type="url" name="applicationUrl" required/></label><label>Fonte<input class="mt-1 w-full rounded-lg border p-3" name="sourceName" required/></label><label>URL da fonte<input class="mt-1 w-full rounded-lg border p-3" type="url" name="sourceUrl"/></label><label>Validade<input class="mt-1 w-full rounded-lg border p-3" type="datetime-local" name="expiresAt" required/></label></div>
+  <div class="grid gap-4 md:grid-cols-2"><label>Salário mínimo<input class="mt-1 w-full rounded-lg border p-3" type="number" min="0" step="0.01" name="salaryMin"/></label><label>Salário máximo<input class="mt-1 w-full rounded-lg border p-3" type="number" min="0" step="0.01" name="salaryMax"/></label></div>
+  <label>Status<select class="mt-1 w-full rounded-lg border p-3" name="publicationStatus"><option value="DRAFT">Rascunho</option><option value="PENDING_REVIEW">Enviar para revisão</option></select></label><button class="rounded-xl bg-red-700 p-4 font-bold text-white">Salvar vaga</button>
+</form></AdminLayout>
