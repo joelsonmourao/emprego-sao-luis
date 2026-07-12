@@ -7,10 +7,11 @@ const slug = Astro.params.slug ?? "";
 const job = await findPublishedJob(slug);
 if (!job) return Astro.redirect(`/vagas/indisponivel/${encodeURIComponent(slug)}`, 302);
 const record = job.job;
-const jsonLd = buildJobPosting({ title: record.normalizedTitle, description: record.description, publishedAt: record.publishedAt, expiresAt: record.expiresAt, employmentType: record.employmentType, workplaceType: record.workplaceType, companyName: job.companyName, companyWebsiteUrl: job.companyWebsiteUrl, cityName: job.cityName, stateCode: job.stateCode, applicationUrl: record.applicationUrl, salaryMin: record.salaryVisible ? record.salaryMin : null, salaryMax: record.salaryVisible ? record.salaryMax : null, salaryCurrency: record.salaryCurrency, salaryPeriod: record.salaryPeriod });
+const canonicalUrl = new URL(`/vagas/${record.slug}`, Astro.site).toString();
+const jsonLd = buildJobPosting({ title: record.normalizedTitle, description: record.description, publishedAt: record.publishedAt, expiresAt: record.expiresAt, employmentType: record.employmentType, workplaceType: record.workplaceType, companyName: job.companyName, companyWebsiteUrl: job.companyWebsiteUrl, cityName: job.cityName, stateCode: job.stateCode, applicationUrl: record.applicationUrl, applicationType: record.applicationType, salaryMin: record.salaryVisible ? record.salaryMin : null, salaryMax: record.salaryVisible ? record.salaryMax : null, salaryCurrency: record.salaryCurrency, salaryPeriod: record.salaryPeriod, salaryVisible: record.salaryVisible, publicCode: record.publicCode, canonicalUrl });
 if (!jsonLd) return Astro.redirect(`/vagas/indisponivel/${encodeURIComponent(slug)}`, 302);
 ---
-<BaseLayout title={`${record.normalizedTitle} — Empregos São Luís`} description={record.summary}>
+<BaseLayout title={`${record.normalizedTitle} — Empregos São Luís`} description={record.summary} canonical={canonicalUrl} breadcrumbs={[{ name: "Vagas", url: "/vagas" }, { name: record.normalizedTitle, url: `/vagas/${record.slug}` }]}>
   <script is:inline type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
   <article class="mx-auto max-w-3xl px-4 py-12">
     <p class="font-bold text-red-700">{record.publicCode}</p><h1 class="mt-2 text-4xl font-black">{record.normalizedTitle}</h1>

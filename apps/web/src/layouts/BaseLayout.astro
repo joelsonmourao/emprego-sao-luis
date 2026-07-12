@@ -1,10 +1,30 @@
 ---
 import "../styles/global.css";
+import { buildBreadcrumbSchema, buildOpenGraphTags, buildOrganizationSchema, buildTwitterTags, buildWebSiteSchema } from "@es/seo";
+import { getSeoSettings } from "../lib/seo-settings";
 
-interface Props { title: string; description?: string }
-const { title, description = "Vagas verificadas em São Luís e no Maranhão." } = Astro.props;
+interface Props {
+  title: string;
+  description?: string;
+  robots?: string;
+  canonical?: string;
+  ogImage?: string;
+  breadcrumbs?: Array<{ name: string; url: string }>;
+  noindex?: boolean;
+}
+
+const seo = await getSeoSettings();
+const { title, description = seo.defaultDescription, robots = seo.robotsDefault, canonical, ogImage = seo.og.image, breadcrumbs, noindex = false } = Astro.props;
+const pageTitle = title.includes(seo.defaultTitle) ? title : `${title} — ${seo.defaultTitle}`;
+const canonicalUrl = canonical ?? new URL(Astro.url.pathname, Astro.site).toString();
 const consentChoice = Astro.cookies.get("es_consent_ads")?.value;
 const adsEnabled = import.meta.env.PUBLIC_ADSENSE_ENABLED === "true" && Boolean(import.meta.env.PUBLIC_ADSENSE_CLIENT_ID) && consentChoice === "yes";
+const siteUrl = Astro.site?.toString() ?? process.env.SITE_URL ?? "https://empregossaoluis.com.br";
+const og = buildOpenGraphTags({ title: pageTitle, description, url: canonicalUrl, type: seo.og.type, siteName: seo.og.siteName, locale: seo.og.locale, ...(ogImage ? { image: ogImage } : {}) });
+const twitter = buildTwitterTags({ title: pageTitle, description, card: seo.twitter.card, ...(seo.twitter.site ? { site: seo.twitter.site } : {}), ...(seo.twitter.creator ? { creator: seo.twitter.creator } : {}), ...(ogImage ? { image: ogImage } : {}) });
+const organizationSchema = buildOrganizationSchema(seo, siteUrl);
+const websiteSchema = buildWebSiteSchema(seo, siteUrl);
+const breadcrumbSchema = breadcrumbs?.length ? buildBreadcrumbSchema(breadcrumbs.map((item) => ({ ...item, url: new URL(item.url, siteUrl).toString() }))) : null;
 ---
 <!doctype html>
 <html lang="pt-BR">
@@ -12,10 +32,16 @@ const adsEnabled = import.meta.env.PUBLIC_ADSENSE_ENABLED === "true" && Boolean(
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width" />
     <meta name="description" content={description} />
+    <meta name="robots" content={noindex ? "noindex,nofollow" : robots} />
     <meta name="generator" content={Astro.generator} />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
-    <link rel="canonical" href={new URL(Astro.url.pathname, Astro.site)} />
-    <title>{title}</title>
+    <link rel="canonical" href={canonicalUrl} />
+    <title>{pageTitle}</title>
+    {Object.entries(og).map(([key, value]) => <meta property={key} content={value} />)}
+    {Object.entries(twitter).map(([key, value]) => <meta name={key} content={value} />)}
+    <script is:inline type="application/ld+json" set:html={JSON.stringify(organizationSchema)} />
+    <script is:inline type="application/ld+json" set:html={JSON.stringify(websiteSchema)} />
+    {breadcrumbSchema && <script is:inline type="application/ld+json" set:html={JSON.stringify(breadcrumbSchema)} />}
     {adsEnabled && <script is:inline async src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${import.meta.env.PUBLIC_ADSENSE_CLIENT_ID}`} crossorigin="anonymous"></script>}
   </head>
   <body>

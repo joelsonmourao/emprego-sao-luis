@@ -1,0 +1,109 @@
+---
+import AdminLayout from "../../layouts/AdminLayout.astro";
+import { can } from "../../lib/auth";
+import { indexingIntegrationStatus } from "../../lib/indexing";
+import { getSeoSettings } from "../../lib/seo-settings";
+import { createDatabase, indexingEvents } from "@es/db";
+import { count, desc, eq } from "drizzle-orm";
+
+const auth = Astro.locals.auth!;
+if (!can(auth, "seo.manage")) return new Response("Proibido", { status: 403 });
+
+const seo = await getSeoSettings();
+const integrations = indexingIntegrationStatus();
+const saved = Astro.url.searchParams.get("saved") === "1";
+const retry = Astro.url.searchParams.get("retry") === "1";
+
+let events: Array<typeof indexingEvents.$inferSelect> = [];
+let pendingCount = 0;
+let failedCount = 0;
+if (process.env.DATABASE_URL) {
+  const connection = createDatabase(process.env.DATABASE_URL);
+  try {
+    const pendingResult = await connection.db.select({ value: count() }).from(indexingEvents).where(eq(indexingEvents.status, "PENDING"));
+    const failedResult = await connection.db.select({ value: count() }).from(indexingEvents).where(eq(indexingEvents.status, "FAILED"));
+    events = await connection.db.select().from(indexingEvents).orderBy(desc(indexingEvents.createdAt)).limit(30);
+    pendingCount = pendingResult[0]?.value ?? 0;
+    failedCount = failedResult[0]?.value ?? 0;
+  } finally {
+    await connection.close();
+  }
+}
+
+const preview = {
+  title: seo.defaultTitle,
+  description: seo.defaultDescription,
+  robots: seo.robotsDefault,
+  organization: seo.organization.name,
+  ogSiteName: seo.og.siteName
+};
+---
+<AdminLayout title="SEO e indexação">
+  <h1 class="text-3xl font-black">SEO e indexação</h1>
+  <p class="mt-2 text-slate-600">Configurações globais, integrações e histórico de envio.</p>
+  {saved && <p class="mt-4 rounded-xl border border-green-200 bg-green-50 p-4 text-green-800">Configurações SEO salvas com auditoria.</p>}
+  {retry && <p class="mt-4 rounded-xl border border-blue-200 bg-blue-50 p-4 text-blue-800">Evento reenfileirado para processamento.</p>}
+
+  <section class="mt-8 grid gap-4 md:grid-cols-3">
+    <article class="rounded-2xl bg-white p-5"><p class="text-sm text-slate-500">Indexações pendentes</p><p class="mt-2 text-3xl font-black">{pendingCount}</p></article>
+    <article class="rounded-2xl bg-white p-5"><p class="text-sm text-slate-500">Falhas recentes</p><p class="mt-2 text-3xl font-black">{failedCount}</p></article>
+    <article class="rounded-2xl bg-white p-5"><p class="text-sm text-slate-500">Integrações</p><ul class="mt-2 text-sm"><li>Google: {integrations.google.configured ? (integrations.google.enabled ? "configurada" : "desabilitada") : "pendente"}</li><li>IndexNow: {integrations.indexNow.configured ? "configurada" : "pendente"}</li><li>Meta: {integrations.meta.configured ? "configurada" : "pendente"}</li></ul></article>
+  </section>
+
+  <div class="mt-8 grid gap-8 xl:grid-cols-2">
+    <form class="grid gap-4 rounded-2xl bg-white p-6" method="post" action="/api/admin/seo">
+      <h2 class="text-xl font-black">SEO geral</h2>
+      <label>Título padrão<input class="mt-1 w-full rounded-lg border p-3" name="defaultTitle" value={seo.defaultTitle} required /></label>
+      <label>Meta description padrão<textarea class="mt-1 w-full rounded-lg border p-3" name="defaultDescription" rows="3" required>{seo.defaultDescription}</textarea></label>
+      <label>Robots padrão<input class="mt-1 w-full rounded-lg border p-3" name="robotsDefault" value={seo.robotsDefault} /></label>
+      <label>OG site name<input class="mt-1 w-full rounded-lg border p-3" name="ogSiteName" value={seo.og.siteName} /></label>
+      <label>OG image URL<input class="mt-1 w-full rounded-lg border p-3" type="url" name="ogImage" value={seo.og.image} /></label>
+      <label>Twitter card<input class="mt-1 w-full rounded-lg border p-3" name="twitterCard" value={seo.twitter.card} /></label>
+      <label>Twitter @site<input class="mt-1 w-full rounded-lg border p-3" name="twitterSite" value={seo.twitter.site} /></label>
+      <label>Organization name<input class="mt-1 w-full rounded-lg border p-3" name="organizationName" value={seo.organization.name} /></label>
+      <label>Organization URL<input class="mt-1 w-full rounded-lg border p-3" type="url" name="organizationUrl" value={seo.organization.url} /></label>
+      <label>Organization logo URL<input class="mt-1 w-full rounded-lg border p-3" type="url" name="organizationLogo" value={seo.organization.logo} /></label>
+      <label>Perfis (um por linha)<textarea class="mt-1 w-full rounded-lg border p-3" name="organizationSameAs" rows="3">{seo.organization.sameAs.join("\n")}</textarea></label>
+      <h3 class="pt-2 text-lg font-bold">Vagas</h3>
+      <label>Sufixo de título<input class="mt-1 w-full rounded-lg border p-3" name="jobsTitleSuffix" value={seo.contentTypes.jobs.titleSuffix} /></label>
+      <label>Template de description<textarea class="mt-1 w-full rounded-lg border p-3" name="jobsDescriptionTemplate" rows="2">{seo.contentTypes.jobs.descriptionTemplate}</textarea></label>
+      <label>Robots de vagas<input class="mt-1 w-full rounded-lg border p-3" name="jobsRobots" value={seo.contentTypes.jobs.robots} /></label>
+      <h3 class="pt-2 text-lg font-bold">Instagram bio links</h3>
+      <label>Perfil Instagram<input class="mt-1 w-full rounded-lg border p-3" type="url" name="instagramProfileUrl" value={seo.instagram.profileUrl} /></label>
+      <label>Links (rótulo|URL por linha)<textarea class="mt-1 w-full rounded-lg border p-3" name="instagramBioLinks" rows="4">{seo.instagram.bioLinks.map((link) => `${link.label}|${link.href}`).join("\n")}</textarea></label>
+      <button class="rounded-xl bg-red-700 p-4 font-bold text-white">Salvar SEO</button>
+    </form>
+
+    <div class="grid gap-6">
+      <section class="rounded-2xl bg-white p-6">
+        <h2 class="text-xl font-black">Preview</h2>
+        <p class="mt-4 text-sm text-slate-500">Resultado aproximado no Google</p>
+        <p class="mt-2 text-lg text-blue-700">{preview.title}</p>
+        <p class="text-sm text-green-700">{Astro.site}</p>
+        <p class="mt-1 text-sm text-slate-700">{preview.description}</p>
+        <pre class="mt-4 overflow-auto rounded-xl bg-slate-950 p-4 text-xs text-green-100">{JSON.stringify({ robots: preview.robots, organization: preview.organization, ogSiteName: preview.ogSiteName }, null, 2)}</pre>
+      </section>
+
+      <section class="rounded-2xl bg-white p-6">
+        <h2 class="text-xl font-black">Histórico de indexação</h2>
+        <p class="mt-2 text-sm text-slate-600">Estados reais do envio. Indexação confirmada só com evidência externa.</p>
+        <div class="mt-4 overflow-auto">
+          <table class="min-w-full text-sm">
+            <thead><tr class="text-left text-slate-500"><th class="py-2">Data</th><th>Provedor</th><th>Status</th><th>URL</th><th></th></tr></thead>
+            <tbody>
+              {events.map((event) => (
+                <tr class="border-t">
+                  <td class="py-2 pr-3 whitespace-nowrap">{event.createdAt?.toLocaleString("pt-BR")}</td>
+                  <td class="pr-3">{event.provider}</td>
+                  <td class="pr-3">{event.status}</td>
+                  <td class="max-w-xs truncate pr-3" title={event.url}>{event.url}</td>
+                  <td>{event.status === "FAILED" && <form method="post" action={`/api/admin/indexing/${event.id}/retry`}><button class="rounded border px-2 py-1">Reprocessar</button></form>}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </div>
+  </div>
+</AdminLayout>

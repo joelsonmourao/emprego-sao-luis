@@ -1,5 +1,69 @@
 ---
-import BaseLayout from "../layouts/BaseLayout.astro"; import { listPublishedJobs } from "../lib/jobs"; import { listPublishedArticles } from "../lib/articles";
-const [jobs, articles] = await Promise.all([listPublishedJobs(8), listPublishedArticles(4)]);
+import BaseLayout from "../layouts/BaseLayout.astro";
+import { listPublishedJobs } from "../lib/jobs";
+import { listPublishedArticles } from "../lib/articles";
+import { getSeoSettings } from "../lib/seo-settings";
+import { desc, eq, and, gt } from "drizzle-orm";
+import { createDatabase, jobs } from "@es/db";
+
+const seo = await getSeoSettings();
+const [latestJobs, featuredJobs, articles] = await Promise.all([
+  listPublishedJobs(8),
+  process.env.DATABASE_URL
+    ? (async () => {
+        const connection = createDatabase(process.env.DATABASE_URL!);
+        try {
+          return await connection.db.select().from(jobs).where(and(eq(jobs.publicationStatus, "PUBLISHED"), eq(jobs.featured, true), gt(jobs.expiresAt, new Date()))).orderBy(desc(jobs.publishedAt)).limit(6);
+        } finally {
+          await connection.close();
+        }
+      })()
+    : Promise.resolve([]),
+  listPublishedArticles(4)
+]);
 ---
-<BaseLayout title="Instagram — Empregos São Luís" description="Links oficiais, vagas e notícias do Empregos São Luís."><section class="mx-auto max-w-2xl px-4 py-12 text-center"><p class="font-bold text-red-700">@empregosaoluis</p><h1 class="mt-2 text-4xl font-black">Empregos São Luís</h1><p class="mt-4">Encontre a vaga pelo código exibido no Instagram.</p><form class="mt-6 flex gap-2" action="/i" method="get"><label class="sr-only" for="code">Código da vaga</label><input id="code" name="code" class="min-w-0 flex-1 rounded-xl border p-3 uppercase" placeholder="ES-000001" pattern="ES-[0-9]{6}" required/><button class="rounded-xl bg-red-700 px-5 font-bold text-white">Buscar</button></form><nav class="mt-8 grid gap-3"><a class="rounded-xl border bg-white p-4 font-bold" href="/vagas">Todas as vagas</a><a class="rounded-xl border bg-white p-4 font-bold" href="/blog">Notícias e guias</a><a class="rounded-xl border bg-white p-4 font-bold" href="/anunciar-vaga">Anunciar vaga</a></nav>{jobs.length > 0 && <section class="mt-12 text-left"><h2 class="text-2xl font-black">Últimas vagas</h2><ul class="mt-4 grid gap-3">{jobs.map((job) => <li><a class="block rounded-xl border bg-white p-4 font-bold" href={`/i/${job.publicCode}?utm_source=instagram&utm_medium=bio`}>{job.normalizedTitle} · {job.publicCode}</a></li>)}</ul></section>}{articles.length > 0 && <section class="mt-12 text-left"><h2 class="text-2xl font-black">Conteúdo recente</h2><ul class="mt-4 grid gap-3">{articles.map(({ article }) => <li><a class="block rounded-xl border bg-white p-4 font-bold" href={`/blog/${article.slug}?utm_source=instagram&utm_medium=bio`}>{article.title}</a></li>)}</ul></section>}</section></BaseLayout>
+<BaseLayout title="Instagram — Empregos São Luís" description="Links oficiais, vagas em destaque e notícias do Empregos São Luís." canonical={new URL("/instagram", Astro.site).toString()}>
+  <section class="mx-auto max-w-2xl px-4 py-12 text-center">
+    <a class="font-bold text-red-700" href={seo.instagram.profileUrl} rel="noopener noreferrer">@empregosaoluis</a>
+    <h1 class="mt-2 text-4xl font-black">Empregos São Luís</h1>
+    <p class="mt-4">Encontre a vaga pelo código exibido no Instagram.</p>
+    <form class="mt-6 flex gap-2" action="/i" method="get">
+      <label class="sr-only" for="code">Código da vaga</label>
+      <input id="code" name="code" class="min-w-0 flex-1 rounded-xl border p-3 uppercase" placeholder="ES-000001" pattern="ES-[0-9]{6}" required />
+      <button class="rounded-xl bg-red-700 px-5 font-bold text-white">Buscar</button>
+    </form>
+    <nav class="mt-8 grid gap-3">
+      {seo.instagram.bioLinks.map((link) => <a class="rounded-xl border bg-white p-4 font-bold" href={link.href}>{link.label}</a>)}
+    </nav>
+    {featuredJobs.length > 0 && (
+      <section class="mt-12 text-left">
+        <h2 class="text-2xl font-black">Vagas em destaque</h2>
+        <ul class="mt-4 grid gap-3">
+          {featuredJobs.map((job) => (
+            <li><a class="block rounded-xl border bg-white p-4 font-bold" href={`/i/${job.publicCode}?utm_source=instagram&utm_medium=bio_featured`}>{job.normalizedTitle} · {job.publicCode}</a></li>
+          ))}
+        </ul>
+      </section>
+    )}
+    {latestJobs.length > 0 && (
+      <section class="mt-12 text-left">
+        <h2 class="text-2xl font-black">Últimas vagas</h2>
+        <ul class="mt-4 grid gap-3">
+          {latestJobs.map((job) => (
+            <li><a class="block rounded-xl border bg-white p-4 font-bold" href={`/i/${job.publicCode}?utm_source=instagram&utm_medium=bio`}>{job.normalizedTitle} · {job.publicCode}</a></li>
+          ))}
+        </ul>
+      </section>
+    )}
+    {articles.length > 0 && (
+      <section class="mt-12 text-left">
+        <h2 class="text-2xl font-black">Conteúdo recente</h2>
+        <ul class="mt-4 grid gap-3">
+          {articles.map(({ article }) => (
+            <li><a class="block rounded-xl border bg-white p-4 font-bold" href={`/blog/${article.slug}?utm_source=instagram&utm_medium=bio`}>{article.title}</a></li>
+          ))}
+        </ul>
+      </section>
+    )}
+  </section>
+</BaseLayout>
