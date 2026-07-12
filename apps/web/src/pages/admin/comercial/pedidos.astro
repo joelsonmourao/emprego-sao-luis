@@ -1,40 +1,82 @@
 ---
 import AdminLayout from "../../../layouts/AdminLayout.astro";
-import { commercialOrders, commercialPlans, createDatabase } from "@es/db";
-import { desc, eq } from "drizzle-orm";
+import { can } from "../../../lib/auth";
 
-let rows: Array<{ order: typeof commercialOrders.$inferSelect; planName: string | null }> = [];
-if (process.env.DATABASE_URL) {
-  const connection = createDatabase(process.env.DATABASE_URL);
-  try {
-    const orders = await connection.db.select().from(commercialOrders).orderBy(desc(commercialOrders.createdAt)).limit(50);
-    for (const order of orders) {
-      const [plan] = await connection.db.select({ name: commercialPlans.name }).from(commercialPlans).where(eq(commercialPlans.id, order.planId)).limit(1);
-      rows.push({ order, planName: plan?.name ?? null });
-    }
-  } finally {
-    await connection.close();
-  }
-}
+const auth = Astro.locals.auth!;
+if (!can(auth, "commercial.manage")) return new Response("Proibido", { status: 403 });
+
+const STATUS_LABELS: Record<string, string> = {
+  PENDING_PAYMENT: "Aguardando pagamento",
+  MANUAL_REVIEW: "Revisão manual",
+  PAID: "Pago",
+  CANCELLED: "Cancelado",
+  EXPIRED: "Expirado"
+};
 ---
 <AdminLayout title="Pedidos comerciais">
   <h1 class="font-display text-3xl font-black">Pedidos</h1>
-  <div class="mt-8 overflow-x-auto rounded-2xl border border-[var(--brand-border)] bg-white">
+  <p class="mt-2 text-[var(--text-secondary)]">Pedidos de planos comerciais e status de pagamento.</p>
+
+  <div class="mt-6 flex flex-wrap gap-3">
+    <input id="filter-q" type="search" placeholder="Código, empresa ou e-mail…" class="min-w-[14rem] flex-1 rounded-xl border border-[var(--brand-border)] bg-white px-4 py-2 text-sm" />
+    <select id="filter-status" class="rounded-xl border border-[var(--brand-border)] bg-white px-4 py-2 text-sm">
+      <option value="">Todos os status</option>
+      {Object.entries(STATUS_LABELS).map(([value, label]) => (
+        <option value={value}>{label}</option>
+      ))}
+    </select>
+    <button type="button" id="btn-reload" class="es-btn es-btn-secondary">Buscar</button>
+  </div>
+
+  <div class="mt-6 overflow-x-auto rounded-2xl border border-[var(--brand-border)] bg-white">
     <table class="min-w-full text-sm">
       <thead class="border-b bg-[var(--brand-background)] text-left">
-        <tr><th class="p-3">Código</th><th class="p-3">Empresa</th><th class="p-3">Plano</th><th class="p-3">Valor</th><th class="p-3">Status</th></tr>
+        <tr>
+          <th class="p-3">Código</th>
+          <th class="p-3">Empresa</th>
+          <th class="p-3">Plano</th>
+          <th class="p-3">Valor</th>
+          <th class="p-3">Status</th>
+          <th class="p-3">Data</th>
+        </tr>
       </thead>
-      <tbody>
-        {rows.length ? rows.map(({ order, planName }) => (
-          <tr class="border-b">
-            <td class="p-3 font-mono text-xs">{order.orderCode}</td>
-            <td class="p-3">{order.companyName}</td>
-            <td class="p-3">{planName}</td>
-            <td class="p-3">R$ {Number(order.amount).toFixed(2)}</td>
-            <td class="p-3">{order.status}</td>
-          </tr>
-        )) : <tr><td class="p-6 text-[var(--text-secondary)]" colspan="5">Nenhum pedido ainda.</td></tr>}
+      <tbody id="orders-body">
+        <tr><td class="p-6 text-[var(--text-secondary)]" colspan="6">Carregando…</td></tr>
       </tbody>
     </table>
   </div>
+
+  <script define:vars={{ STATUS_LABELS }}>
+    const fmt = (v) => Number(v ?? 0).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+    const body = document.getElementById("orders-body");
+
+    async function loadOrders() {
+      const q = document.getElementById("filter-q").value;
+      const status = document.getElementById("filter-status").value;
+      const params = new URLSearchParams({ page: "1" });
+      if (q) params.set("q", q);
+      if (status) params.set("status", status);
+      const res = await fetch(`/api/admin/commercial/orders?${params}`);
+      const data = await res.json();
+      const items = data.items ?? [];
+      if (!items.length) {
+        body.innerHTML = '<tr><td class="p-6 text-[var(--text-secondary)]" colspan="6">Nenhum pedido encontrado.</td></tr>';
+        return;
+      }
+      body.innerHTML = items.map(({ order, plan }) => `
+        <tr class="border-b hover:bg-[var(--brand-background)]">
+          <td class="p-3"><a class="font-mono text-xs font-bold text-[var(--brand-primary)] hover:underline" href="/admin/comercial/pedidos/${order.orderCode}">${order.orderCode}</a></td>
+          <td class="p-3">${order.companyName}<br/><span class="text-xs text-[var(--text-secondary)]">${order.email}</span></td>
+          <td class="p-3">${plan?.name ?? "—"}</td>
+          <td class="p-3">${fmt(order.amount)}</td>
+          <td class="p-3">${STATUS_LABELS[order.status] ?? order.status}</td>
+          <td class="p-3 text-xs">${new Date(order.createdAt).toLocaleString("pt-BR")}</td>
+        </tr>`).join("");
+    }
+
+    document.getElementById("btn-reload").addEventListener("click", loadOrders);
+    document.getElementById("filter-q").addEventListener("keydown", (e) => { if (e.key === "Enter") loadOrders(); });
+    document.getElementById("filter-status").addEventListener("change", loadOrders);
+    loadOrders();
+  </script>
 </AdminLayout>

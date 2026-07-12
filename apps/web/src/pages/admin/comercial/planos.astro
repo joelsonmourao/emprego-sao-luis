@@ -1,41 +1,278 @@
 ---
 import AdminLayout from "../../../layouts/AdminLayout.astro";
-import { commercialPlans, createDatabase } from "@es/db";
-import { asc } from "drizzle-orm";
+import { can } from "../../../lib/auth";
 
-let plans: Array<typeof commercialPlans.$inferSelect> = [];
-if (process.env.DATABASE_URL) {
-  const connection = createDatabase(process.env.DATABASE_URL);
-  try {
-    plans = await connection.db.select().from(commercialPlans).orderBy(asc(commercialPlans.sortOrder));
-  } finally {
-    await connection.close();
-  }
-}
+const auth = Astro.locals.auth!;
+if (!can(auth, "commercial.manage")) return new Response("Proibido", { status: 403 });
 ---
 <AdminLayout title="Planos comerciais">
-  <h1 class="font-display text-3xl font-black">Planos</h1>
-  <p class="mt-2 text-[var(--text-secondary)]">Gerencie nomes, preços, créditos e benefícios. Valores reais definidos aqui — nada hardcoded no site.</p>
-  <div class="mt-8 overflow-x-auto rounded-2xl border border-[var(--brand-border)] bg-white">
-    <table class="min-w-full text-sm">
-      <thead class="border-b bg-[var(--brand-background)] text-left">
-        <tr>
-          <th class="p-3">Nome</th><th class="p-3">Preço</th><th class="p-3">Créditos</th><th class="p-3">Ativo</th><th class="p-3">Recomendado</th>
-        </tr>
-      </thead>
-      <tbody>
-        {plans.length ? plans.map((plan) => (
-          <tr class="border-b">
-            <td class="p-3 font-bold">{plan.name}</td>
-            <td class="p-3">R$ {Number(plan.promoPrice ?? plan.price).toFixed(2)}</td>
-            <td class="p-3">{plan.jobCredits}</td>
-            <td class="p-3">{plan.active ? "Sim" : "Não"}</td>
-            <td class="p-3">{plan.recommended ? "Sim" : "—"}</td>
-          </tr>
-        )) : (
-          <tr><td class="p-6 text-[var(--text-secondary)]" colspan="5">Nenhum plano cadastrado. Insira planos via API ou migration seed.</td></tr>
-        )}
-      </tbody>
-    </table>
+  <div class="flex flex-wrap items-end justify-between gap-4">
+    <div>
+      <h1 class="font-display text-3xl font-black">Planos</h1>
+      <p class="mt-2 text-[var(--text-secondary)]">Gerencie nomes, preços, créditos e benefícios. Valores reais definidos aqui — nada hardcoded no site.</p>
+    </div>
+    <button type="button" id="btn-new-plan" class="es-btn es-btn-primary">Novo plano</button>
   </div>
+
+  <div class="mt-6 flex flex-wrap gap-3">
+    <input id="filter-q" type="search" placeholder="Buscar por nome ou slug…" class="min-w-[14rem] flex-1 rounded-xl border border-[var(--brand-border)] bg-white px-4 py-2 text-sm" />
+    <select id="filter-active" class="rounded-xl border border-[var(--brand-border)] bg-white px-4 py-2 text-sm">
+      <option value="">Todos os status</option>
+      <option value="true">Ativos</option>
+      <option value="false">Inativos</option>
+    </select>
+    <select id="filter-archived" class="rounded-xl border border-[var(--brand-border)] bg-white px-4 py-2 text-sm">
+      <option value="false">Não arquivados</option>
+      <option value="true">Arquivados</option>
+      <option value="">Todos</option>
+    </select>
+    <button type="button" id="btn-reload" class="es-btn es-btn-secondary">Atualizar</button>
+  </div>
+
+  <div class="mt-6 grid gap-6 xl:grid-cols-[1fr_320px]">
+    <div class="overflow-x-auto rounded-2xl border border-[var(--brand-border)] bg-white">
+      <table class="min-w-full text-sm" id="plans-table">
+        <thead class="border-b bg-[var(--brand-background)] text-left">
+          <tr>
+            <th class="p-3 w-8"></th>
+            <th class="p-3">Nome</th>
+            <th class="p-3">Preço</th>
+            <th class="p-3">Créditos</th>
+            <th class="p-3">Status</th>
+            <th class="p-3">Ações</th>
+          </tr>
+        </thead>
+        <tbody id="plans-body">
+          <tr><td class="p-6 text-[var(--text-secondary)]" colspan="6">Carregando…</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <aside id="preview-panel" class="rounded-2xl border border-[var(--brand-border)] bg-white p-5 hidden xl:block">
+      <h2 class="font-display text-lg font-bold">Pré-visualização</h2>
+      <p class="mt-2 text-sm text-[var(--text-secondary)]">Selecione um plano para ver como aparece no site.</p>
+      <div id="preview-content" class="mt-4 text-sm text-[var(--text-secondary)]">Nenhum plano selecionado.</div>
+    </aside>
+  </div>
+
+  <dialog id="plan-modal" class="w-full max-w-2xl rounded-2xl border border-[var(--brand-border)] p-0 shadow-xl backdrop:bg-black/40">
+    <form id="plan-form" class="grid max-h-[85vh] gap-4 overflow-auto p-6">
+      <div class="flex items-center justify-between">
+        <h2 id="modal-title" class="font-display text-xl font-bold">Novo plano</h2>
+        <button type="button" id="modal-close" class="text-2xl leading-none text-[var(--text-secondary)]" aria-label="Fechar">×</button>
+      </div>
+      <input type="hidden" id="plan-id" />
+      <div class="grid gap-4 sm:grid-cols-2">
+        <label class="text-sm">Nome<input id="plan-name" class="mt-1 w-full rounded-lg border border-[var(--brand-border)] p-2" required /></label>
+        <label class="text-sm">Slug<input id="plan-slug" class="mt-1 w-full rounded-lg border border-[var(--brand-border)] p-2" placeholder="auto" /></label>
+        <label class="text-sm">Preço (R$)<input id="plan-price" type="number" step="0.01" min="0" class="mt-1 w-full rounded-lg border border-[var(--brand-border)] p-2" required /></label>
+        <label class="text-sm">Preço promocional<input id="plan-promo" type="number" step="0.01" min="0" class="mt-1 w-full rounded-lg border border-[var(--brand-border)] p-2" /></label>
+        <label class="text-sm">Créditos de vaga<input id="plan-credits" type="number" min="1" class="mt-1 w-full rounded-lg border border-[var(--brand-border)] p-2" value="1" /></label>
+        <label class="text-sm">Duração (dias)<input id="plan-duration" type="number" min="1" class="mt-1 w-full rounded-lg border border-[var(--brand-border)] p-2" value="30" /></label>
+        <label class="text-sm">Validade créditos (dias)<input id="plan-validity" type="number" min="1" class="mt-1 w-full rounded-lg border border-[var(--brand-border)] p-2" value="365" /></label>
+        <label class="text-sm">Ordem<input id="plan-sort" type="number" class="mt-1 w-full rounded-lg border border-[var(--brand-border)] p-2" value="0" /></label>
+      </div>
+      <label class="text-sm">Descrição curta<input id="plan-short" class="mt-1 w-full rounded-lg border border-[var(--brand-border)] p-2" /></label>
+      <label class="text-sm">Descrição<textarea id="plan-desc" class="mt-1 w-full rounded-lg border border-[var(--brand-border)] p-2" rows="3" required></textarea></label>
+      <label class="text-sm">Benefícios (um por linha)<textarea id="plan-benefits" class="mt-1 w-full rounded-lg border border-[var(--brand-border)] p-2" rows="3"></textarea></label>
+      <label class="text-sm">Limitações (um por linha)<textarea id="plan-limits" class="mt-1 w-full rounded-lg border border-[var(--brand-border)] p-2" rows="2"></textarea></label>
+      <div class="flex flex-wrap gap-4 text-sm">
+        <label class="flex items-center gap-2"><input type="checkbox" id="plan-active" /> Ativo</label>
+        <label class="flex items-center gap-2"><input type="checkbox" id="plan-recommended" /> Recomendado</label>
+        <label class="flex items-center gap-2"><input type="checkbox" id="plan-setup" checked /> Requer configuração</label>
+        <label class="flex items-center gap-2"><input type="checkbox" id="plan-site" checked /> Publicar no site</label>
+      </div>
+      <div class="flex gap-3 pt-2">
+        <button type="submit" class="es-btn es-btn-primary">Salvar</button>
+        <button type="button" id="modal-cancel" class="es-btn es-btn-secondary">Cancelar</button>
+      </div>
+    </form>
+  </dialog>
+
+  <script is:inline>
+    const fmt = (v) => Number(v ?? 0).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+    const lines = (t) => t.split("\n").map((s) => s.trim()).filter(Boolean);
+    const joinLines = (arr) => (Array.isArray(arr) ? arr.join("\n") : "");
+
+    let plans = [];
+    let selectedId = null;
+
+    const modal = document.getElementById("plan-modal");
+    const form = document.getElementById("plan-form");
+    const body = document.getElementById("plans-body");
+    const preview = document.getElementById("preview-content");
+
+    function statusBadge(p) {
+      if (p.archived) return '<span class="rounded-full bg-slate-200 px-2 py-0.5 text-xs">Arquivado</span>';
+      if (p.active) return '<span class="rounded-full bg-green-100 px-2 py-0.5 text-xs text-green-800">Ativo</span>';
+      return '<span class="rounded-full bg-amber-100 px-2 py-0.5 text-xs text-amber-800">Inativo</span>';
+    }
+
+    function renderPreview(p) {
+      if (!p) { preview.innerHTML = "Nenhum plano selecionado."; return; }
+      const price = p.promoPrice ?? p.price;
+      const benefits = (p.benefits ?? []).map((b) => `<li>${b}</li>`).join("");
+      preview.innerHTML = `
+        <article class="rounded-xl border border-[var(--brand-border)] p-4">
+          ${p.recommended ? '<span class="text-xs font-bold uppercase text-[var(--brand-primary)]">Recomendado</span>' : ""}
+          <h3 class="mt-1 font-display text-xl font-bold">${p.name}</h3>
+          <p class="text-2xl font-black text-[var(--brand-primary)]">${fmt(price)}</p>
+          ${p.promoPrice ? `<p class="text-xs text-[var(--text-secondary)] line-through">${fmt(p.price)}</p>` : ""}
+          <p class="mt-2 text-[var(--text-secondary)]">${p.shortDescription || p.description?.slice(0, 120) || ""}</p>
+          <p class="mt-2 text-sm"><strong>${p.jobCredits}</strong> crédito(s) · ${p.durationDays} dias</p>
+          ${benefits ? `<ul class="mt-3 list-disc pl-5 text-sm">${benefits}</ul>` : ""}
+        </article>`;
+    }
+
+    function renderTable() {
+      if (!plans.length) {
+        body.innerHTML = '<tr><td class="p-6 text-[var(--text-secondary)]" colspan="6">Nenhum plano encontrado.</td></tr>';
+        return;
+      }
+      body.innerHTML = plans.map((p, i) => `
+        <tr class="border-b hover:bg-[var(--brand-background)]" data-id="${p.id}">
+          <td class="p-3">
+            <button type="button" class="reorder-up text-xs" data-i="${i}" ${i === 0 ? "disabled" : ""}>↑</button>
+            <button type="button" class="reorder-down text-xs" data-i="${i}" ${i === plans.length - 1 ? "disabled" : ""}>↓</button>
+          </td>
+          <td class="p-3"><button type="button" class="select-plan font-bold text-left hover:text-[var(--brand-primary)]" data-id="${p.id}">${p.name}</button></td>
+          <td class="p-3">${fmt(p.promoPrice ?? p.price)}</td>
+          <td class="p-3">${p.jobCredits}</td>
+          <td class="p-3">${statusBadge(p)}</td>
+          <td class="p-3">
+            <div class="flex flex-wrap gap-1">
+              <button type="button" class="btn-edit rounded border px-2 py-1 text-xs" data-id="${p.id}">Editar</button>
+              <button type="button" class="btn-dup rounded border px-2 py-1 text-xs" data-id="${p.id}">Duplicar</button>
+              <button type="button" class="btn-toggle rounded border px-2 py-1 text-xs" data-id="${p.id}">${p.active ? "Desativar" : "Ativar"}</button>
+              ${!p.archived ? `<button type="button" class="btn-archive rounded border px-2 py-1 text-xs text-red-700" data-id="${p.id}">Arquivar</button>` : ""}
+            </div>
+          </td>
+        </tr>`).join("");
+    }
+
+    async function loadPlans() {
+      const q = document.getElementById("filter-q").value;
+      const active = document.getElementById("filter-active").value;
+      const archived = document.getElementById("filter-archived").value;
+      const params = new URLSearchParams({ page: "1", pageSize: "50" });
+      if (q) params.set("q", q);
+      if (active) params.set("active", active);
+      if (archived) params.set("archived", archived);
+      const res = await fetch(`/api/admin/commercial/plans?${params}`);
+      const data = await res.json();
+      plans = data.items ?? [];
+      renderTable();
+      if (selectedId) {
+        const p = plans.find((x) => x.id === selectedId);
+        renderPreview(p);
+      }
+    }
+
+    function openModal(plan) {
+      document.getElementById("modal-title").textContent = plan ? "Editar plano" : "Novo plano";
+      document.getElementById("plan-id").value = plan?.id ?? "";
+      document.getElementById("plan-name").value = plan?.name ?? "";
+      document.getElementById("plan-slug").value = plan?.slug ?? "";
+      document.getElementById("plan-price").value = plan?.price ?? "";
+      document.getElementById("plan-promo").value = plan?.promoPrice ?? "";
+      document.getElementById("plan-credits").value = plan?.jobCredits ?? 1;
+      document.getElementById("plan-duration").value = plan?.durationDays ?? 30;
+      document.getElementById("plan-validity").value = plan?.creditValidityDays ?? 365;
+      document.getElementById("plan-sort").value = plan?.sortOrder ?? 0;
+      document.getElementById("plan-short").value = plan?.shortDescription ?? "";
+      document.getElementById("plan-desc").value = plan?.description ?? "";
+      document.getElementById("plan-benefits").value = joinLines(plan?.benefits);
+      document.getElementById("plan-limits").value = joinLines(plan?.limitations);
+      document.getElementById("plan-active").checked = Boolean(plan?.active);
+      document.getElementById("plan-recommended").checked = Boolean(plan?.recommended);
+      document.getElementById("plan-setup").checked = plan ? Boolean(plan.setupRequired) : true;
+      document.getElementById("plan-site").checked = plan ? plan.publishSite !== false : true;
+      modal.showModal();
+    }
+
+    function planPayload() {
+      return {
+        name: document.getElementById("plan-name").value,
+        slug: document.getElementById("plan-slug").value || undefined,
+        price: document.getElementById("plan-price").value,
+        promoPrice: document.getElementById("plan-promo").value || null,
+        jobCredits: Number(document.getElementById("plan-credits").value),
+        durationDays: Number(document.getElementById("plan-duration").value),
+        creditValidityDays: Number(document.getElementById("plan-validity").value),
+        sortOrder: Number(document.getElementById("plan-sort").value),
+        shortDescription: document.getElementById("plan-short").value,
+        description: document.getElementById("plan-desc").value,
+        benefits: lines(document.getElementById("plan-benefits").value),
+        limitations: lines(document.getElementById("plan-limits").value),
+        active: document.getElementById("plan-active").checked,
+        recommended: document.getElementById("plan-recommended").checked,
+        setupRequired: document.getElementById("plan-setup").checked,
+        publishSite: document.getElementById("plan-site").checked
+      };
+    }
+
+    document.getElementById("btn-new-plan").addEventListener("click", () => openModal(null));
+    document.getElementById("modal-close").addEventListener("click", () => modal.close());
+    document.getElementById("modal-cancel").addEventListener("click", () => modal.close());
+    document.getElementById("btn-reload").addEventListener("click", loadPlans);
+    document.getElementById("filter-q").addEventListener("keydown", (e) => { if (e.key === "Enter") loadPlans(); });
+    document.getElementById("filter-active").addEventListener("change", loadPlans);
+    document.getElementById("filter-archived").addEventListener("change", loadPlans);
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const id = document.getElementById("plan-id").value;
+      const payload = planPayload();
+      const res = await fetch(id ? `/api/admin/commercial/plans/${id}` : "/api/admin/commercial/plans", {
+        method: id ? "PUT" : "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      });
+      if (!res.ok) { alert("Erro ao salvar plano."); return; }
+      modal.close();
+      await loadPlans();
+    });
+
+    body.addEventListener("click", async (e) => {
+      const t = e.target;
+      const id = t.dataset?.id;
+      if (t.classList.contains("select-plan")) {
+        selectedId = id;
+        renderPreview(plans.find((p) => p.id === id));
+        return;
+      }
+      if (t.classList.contains("btn-edit")) {
+        const p = plans.find((x) => x.id === id);
+        if (p) openModal(p);
+        return;
+      }
+      if (t.classList.contains("btn-dup")) {
+        await fetch("/api/admin/commercial/plans", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: "duplicate", id }) });
+        await loadPlans();
+        return;
+      }
+      if (t.classList.contains("btn-toggle")) {
+        const p = plans.find((x) => x.id === id);
+        await fetch(`/api/admin/commercial/plans/${id}`, { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ active: !p.active }) });
+        await loadPlans();
+        return;
+      }
+      if (t.classList.contains("btn-archive")) {
+        if (!confirm("Arquivar este plano?")) return;
+        await fetch(`/api/admin/commercial/plans/${id}`, { method: "DELETE" });
+        await loadPlans();
+        return;
+      }
+      if (t.classList.contains("reorder-up") || t.classList.contains("reorder-down")) {
+        const i = Number(t.dataset.i);
+        const j = t.classList.contains("reorder-up") ? i - 1 : i + 1;
+        if (j < 0 || j >= plans.length) return;
+        const ids = plans.map((p) => p.id);
+        [ids[i], ids[j]] = [ids[j], ids[i]];
+        await fetch("/api/admin/commercial/plans", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: "reorder", ids }) });
+        await loadPlans();
+      }
+    });
+
+    loadPlans();
+  </script>
 </AdminLayout>
