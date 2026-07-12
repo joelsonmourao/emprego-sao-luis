@@ -1,7 +1,12 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
-import { categories, cities, companies, createDatabase, jobs, states } from "@es/db";
+import Breadcrumbs from "../../components/ui/Breadcrumbs.astro";
+import EmptyState from "../../components/ui/EmptyState.astro";
+import JobCard from "../../components/ui/JobCard.astro";
+import PageHero from "../../components/ui/PageHero.astro";
+import { categories, cities, companies, createDatabase, jobs, neighborhoods, states } from "@es/db";
 import { and, asc, count, desc, eq, gt, ilike, or, type SQL } from "drizzle-orm";
+
 const q = Astro.url.searchParams.get("q")?.trim() ?? "";
 const city = Astro.url.searchParams.get("cidade")?.trim() ?? "";
 const company = Astro.url.searchParams.get("empresa")?.trim() ?? "";
@@ -11,6 +16,7 @@ const contract = Astro.url.searchParams.get("contrato")?.trim() ?? "";
 const order = Astro.url.searchParams.get("ordem") === "titulo" ? "titulo" : "recentes";
 const page = Math.max(1, Number(Astro.url.searchParams.get("pagina") ?? 1) || 1);
 const pageSize = 18;
+
 const conditions: SQL[] = [eq(jobs.publicationStatus, "PUBLISHED"), gt(jobs.expiresAt, new Date())];
 if (q) conditions.push(or(ilike(jobs.normalizedTitle, `%${q}%`), ilike(jobs.summary, `%${q}%`))!);
 if (city) conditions.push(ilike(cities.name, `%${city}%`));
@@ -18,11 +24,146 @@ if (company) conditions.push(ilike(companies.name, `%${company}%`));
 if (category) conditions.push(eq(categories.slug, category));
 if (["presencial", "hibrido", "remoto"].includes(workplace)) conditions.push(eq(jobs.workplaceType, workplace));
 if (contract) conditions.push(ilike(jobs.employmentType, `%${contract}%`));
-let rows: Array<{ id: string; title: string; slug: string; code: string; company: string; city: string; state: string; category: string | null; workplace: string; contract: string; publishedAt: Date | null }> = [];
+
+type Row = {
+  id: string; title: string; slug: string; code: string; company: string; city: string; state: string;
+  category: string | null; workplace: string; contract: string; neighborhood: string | null;
+  publishedAt: Date | null; featured: boolean; sponsored: boolean; logoUrl: string | null;
+  salaryVisible: boolean; salaryMin: string | null; salaryMax: string | null; salaryCurrency: string; salaryPeriod: string | null;
+};
+
+let rows: Row[] = [];
 let total = 0;
 let categoryOptions: Array<{ name: string; slug: string }> = [];
-if (process.env.DATABASE_URL) { const connection = createDatabase(process.env.DATABASE_URL); try { const where = and(...conditions); const base = connection.db.select({ id: jobs.id, title: jobs.normalizedTitle, slug: jobs.slug, code: jobs.publicCode, company: companies.name, city: cities.name, state: states.code, category: categories.name, workplace: jobs.workplaceType, contract: jobs.employmentType, publishedAt: jobs.publishedAt }).from(jobs).innerJoin(companies, eq(jobs.companyId, companies.id)).innerJoin(cities, eq(jobs.cityId, cities.id)).innerJoin(states, eq(jobs.stateId, states.id)).leftJoin(categories, eq(jobs.categoryId, categories.id)).where(where); const [[summary], result, options] = await Promise.all([connection.db.select({ value: count() }).from(jobs).innerJoin(companies, eq(jobs.companyId, companies.id)).innerJoin(cities, eq(jobs.cityId, cities.id)).leftJoin(categories, eq(jobs.categoryId, categories.id)).where(where), order === "titulo" ? base.orderBy(asc(jobs.normalizedTitle)).limit(pageSize).offset((page - 1) * pageSize) : base.orderBy(desc(jobs.publishedAt)).limit(pageSize).offset((page - 1) * pageSize), connection.db.select({ name: categories.name, slug: categories.slug }).from(categories).orderBy(asc(categories.name))]); total = summary?.value ?? 0; rows = result; categoryOptions = options; } finally { await connection.close(); } }
+
+if (process.env.DATABASE_URL) {
+  const connection = createDatabase(process.env.DATABASE_URL);
+  try {
+    const where = and(...conditions);
+    const base = connection.db
+      .select({
+        id: jobs.id, title: jobs.normalizedTitle, slug: jobs.slug, code: jobs.publicCode, company: companies.name,
+        city: cities.name, state: states.code, category: categories.name, workplace: jobs.workplaceType,
+        contract: jobs.employmentType, neighborhood: neighborhoods.name, publishedAt: jobs.publishedAt,
+        featured: jobs.featured, sponsored: jobs.sponsored, logoUrl: companies.logoUrl,
+        salaryVisible: jobs.salaryVisible, salaryMin: jobs.salaryMin, salaryMax: jobs.salaryMax,
+        salaryCurrency: jobs.salaryCurrency, salaryPeriod: jobs.salaryPeriod
+      })
+      .from(jobs)
+      .innerJoin(companies, eq(jobs.companyId, companies.id))
+      .innerJoin(cities, eq(jobs.cityId, cities.id))
+      .innerJoin(states, eq(jobs.stateId, states.id))
+      .leftJoin(categories, eq(jobs.categoryId, categories.id))
+      .leftJoin(neighborhoods, eq(jobs.neighborhoodId, neighborhoods.id))
+      .where(where);
+
+    const [[summary], result, options] = await Promise.all([
+      connection.db.select({ value: count() }).from(jobs).innerJoin(companies, eq(jobs.companyId, companies.id)).innerJoin(cities, eq(jobs.cityId, cities.id)).leftJoin(categories, eq(jobs.categoryId, categories.id)).where(where),
+      order === "titulo" ? base.orderBy(asc(jobs.normalizedTitle)).limit(pageSize).offset((page - 1) * pageSize) : base.orderBy(desc(jobs.publishedAt)).limit(pageSize).offset((page - 1) * pageSize),
+      connection.db.select({ name: categories.name, slug: categories.slug }).from(categories).orderBy(asc(categories.name))
+    ]);
+    total = summary?.value ?? 0;
+    rows = result;
+    categoryOptions = options;
+  } finally {
+    await connection.close();
+  }
+}
+
 const pages = Math.max(1, Math.ceil(total / pageSize));
 const pageUrl = (target: number) => { const params = new URLSearchParams(Astro.url.searchParams); params.set("pagina", String(target)); return `?${params}`; };
+const clearUrl = "/vagas";
+const activeFilters = [
+  q && ["Cargo", q],
+  city && ["Cidade", city],
+  company && ["Empresa", company],
+  category && ["Categoria", category],
+  workplace && ["Modalidade", workplace],
+  contract && ["Contrato", contract]
+].filter(Boolean) as Array<[string, string]>;
 ---
-<BaseLayout title="Vagas em São Luís e no Maranhão" description="Pesquise vagas abertas em São Luís e cidades do Maranhão por cargo, empresa, categoria e modalidade."><section class="bg-slate-950 text-white"><div class="mx-auto max-w-6xl px-4 py-12"><h1 class="text-4xl font-black">Vagas de emprego</h1><p class="mt-3 text-slate-300">{total} oportunidade(s) aberta(s) e verificadas.</p></div></section><section class="mx-auto max-w-6xl px-4 py-10"><form class="grid gap-3 rounded-2xl border bg-white p-5 md:grid-cols-3" method="get"><input class="rounded-lg border p-3" name="q" value={q} placeholder="Cargo ou palavra-chave"/><input class="rounded-lg border p-3" name="empresa" value={company} placeholder="Empresa"/><input class="rounded-lg border p-3" name="cidade" value={city} placeholder="Cidade"/><select class="rounded-lg border p-3" name="categoria"><option value="">Todas as categorias</option>{categoryOptions.map((item) => <option value={item.slug} selected={category === item.slug}>{item.name}</option>)}</select><select class="rounded-lg border p-3" name="modalidade"><option value="">Todas as modalidades</option><option value="presencial" selected={workplace === "presencial"}>Presencial</option><option value="hibrido" selected={workplace === "hibrido"}>Híbrido</option><option value="remoto" selected={workplace === "remoto"}>Remoto</option></select><input class="rounded-lg border p-3" name="contrato" value={contract} placeholder="Tipo de contrato"/><select class="rounded-lg border p-3" name="ordem"><option value="recentes">Mais recentes</option><option value="titulo" selected={order === "titulo"}>Título A–Z</option></select><button class="rounded-lg bg-red-700 p-3 font-bold text-white md:col-span-2">Aplicar filtros</button></form>{rows.length === 0 ? <div class="mt-8 rounded-2xl border bg-white p-8"><h2 class="text-xl font-bold">Nenhuma vaga encontrada.</h2><p class="mt-2 text-slate-600">Tente remover alguns filtros ou crie um alerta para novas oportunidades.</p><div class="mt-5 flex gap-3"><a class="font-bold text-red-700" href="/vagas">Limpar filtros</a><a class="font-bold text-red-700" href="/alertas">Criar alerta</a></div></div> : <ul class="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">{rows.map((job) => <li class="rounded-2xl border bg-white p-6"><p class="text-xs font-bold text-red-700">{job.code}</p><a class="mt-2 block text-xl font-black hover:text-red-700" href={`/vagas/${job.slug}`}>{job.title}</a><p class="mt-3 text-slate-700">{job.company}</p><p class="mt-1 text-sm text-slate-600">{job.city}/{job.state} · {job.workplace}</p><p class="mt-1 text-sm text-slate-600">{job.contract}{job.category ? ` · ${job.category}` : ""}</p></li>)}</ul>}<nav class="mt-8 flex items-center justify-between"><span>Página {page} de {pages}</span><div class="flex gap-2">{page > 1 && <a class="rounded-lg border px-4 py-2" href={pageUrl(page - 1)}>Anterior</a>}{page < pages && <a class="rounded-lg border px-4 py-2" href={pageUrl(page + 1)}>Próxima</a>}</div></nav></section></BaseLayout>
+<BaseLayout title="Vagas em São Luís e no Maranhão" description="Pesquise vagas abertas em São Luís e cidades do Maranhão por cargo, empresa, categoria e modalidade." breadcrumbs={[{ name: "Vagas", url: "/vagas" }]}>
+  <PageHero kicker="Busca" title="Vagas de emprego" description={`${total} oportunidade(s) aberta(s) e verificadas.`} pattern={false} />
+
+  <section class="es-section pt-0">
+    <div class="es-container">
+      <Breadcrumbs items={[{ name: "Início", url: "/" }, { name: "Vagas" }]} />
+
+      <div class="mt-8 grid gap-8 lg:grid-cols-[280px_1fr]">
+        <aside class="hidden lg:block">
+          <form class="es-card sticky top-24 space-y-4 p-5" method="get">
+            <p class="font-display text-lg font-black">Filtros</p>
+            <label class="grid gap-1 text-sm font-semibold"><span>Cargo</span><input class="rounded-xl border border-[var(--es-border)] px-3 py-2.5" name="q" value={q} /></label>
+            <label class="grid gap-1 text-sm font-semibold"><span>Empresa</span><input class="rounded-xl border border-[var(--es-border)] px-3 py-2.5" name="empresa" value={company} /></label>
+            <label class="grid gap-1 text-sm font-semibold"><span>Cidade</span><input class="rounded-xl border border-[var(--es-border)] px-3 py-2.5" name="cidade" value={city} /></label>
+            <label class="grid gap-1 text-sm font-semibold"><span>Categoria</span>
+              <select class="rounded-xl border border-[var(--es-border)] px-3 py-2.5" name="categoria">
+                <option value="">Todas</option>
+                {categoryOptions.map((item) => <option value={item.slug} selected={category === item.slug}>{item.name}</option>)}
+              </select>
+            </label>
+            <label class="grid gap-1 text-sm font-semibold"><span>Modalidade</span>
+              <select class="rounded-xl border border-[var(--es-border)] px-3 py-2.5" name="modalidade">
+                <option value="">Todas</option>
+                <option value="presencial" selected={workplace === "presencial"}>Presencial</option>
+                <option value="hibrido" selected={workplace === "hibrido"}>Híbrido</option>
+                <option value="remoto" selected={workplace === "remoto"}>Remoto</option>
+              </select>
+            </label>
+            <label class="grid gap-1 text-sm font-semibold"><span>Contrato</span><input class="rounded-xl border border-[var(--es-border)] px-3 py-2.5" name="contrato" value={contract} /></label>
+            <label class="grid gap-1 text-sm font-semibold"><span>Ordenar</span>
+              <select class="rounded-xl border border-[var(--es-border)] px-3 py-2.5" name="ordem">
+                <option value="recentes">Mais recentes</option>
+                <option value="titulo" selected={order === "titulo"}>Título A–Z</option>
+              </select>
+            </label>
+            <button class="es-btn es-btn-primary w-full" type="submit">Aplicar filtros</button>
+            <a class="es-btn es-btn-secondary w-full" href={clearUrl}>Limpar</a>
+          </form>
+        </aside>
+
+        <div>
+          <details class="es-card mb-5 p-4 lg:hidden">
+            <summary class="cursor-pointer font-display text-lg font-black">Filtros e ordenação</summary>
+            <form class="mt-4 grid gap-3" method="get">
+              <input class="rounded-xl border px-3 py-2.5" name="q" value={q} placeholder="Cargo" />
+              <input class="rounded-xl border px-3 py-2.5" name="empresa" value={company} placeholder="Empresa" />
+              <input class="rounded-xl border px-3 py-2.5" name="cidade" value={city} placeholder="Cidade" />
+              <select class="rounded-xl border px-3 py-2.5" name="categoria"><option value="">Categoria</option>{categoryOptions.map((item) => <option value={item.slug} selected={category === item.slug}>{item.name}</option>)}</select>
+              <select class="rounded-xl border px-3 py-2.5" name="modalidade"><option value="">Modalidade</option><option value="presencial" selected={workplace === "presencial"}>Presencial</option><option value="hibrido" selected={workplace === "hibrido"}>Híbrido</option><option value="remoto" selected={workplace === "remoto"}>Remoto</option></select>
+              <select class="rounded-xl border px-3 py-2.5" name="ordem"><option value="recentes">Recentes</option><option value="titulo" selected={order === "titulo"}>A–Z</option></select>
+              <button class="es-btn es-btn-primary" type="submit">Buscar</button>
+            </form>
+          </details>
+
+          {activeFilters.length > 0 && (
+            <div class="mb-5 flex flex-wrap items-center gap-2">
+              {activeFilters.map(([label, value]) => <span class="chip chip-active">{label}: {value}</span>)}
+              <a class="text-sm font-bold text-[var(--brand-primary)]" href={clearUrl}>Limpar filtros</a>
+            </div>
+          )}
+
+          <p class="text-sm text-[var(--es-muted)]">{total} resultado(s) · Página {page} de {pages}</p>
+
+          {rows.length === 0 ? (
+            <div class="mt-6">
+              <EmptyState title="Nenhuma vaga encontrada" description="Tente remover alguns filtros ou crie um alerta para ser avisado quando surgirem oportunidades compatíveis." actionHref="/alertas" actionLabel="Criar alerta" secondaryHref={clearUrl} secondaryLabel="Limpar filtros" />
+            </div>
+          ) : (
+            <div class="mt-6 grid gap-5 sm:grid-cols-2 xl:grid-cols-2">
+              {rows.map((job) => <JobCard {...job} />)}
+            </div>
+          )}
+
+          <nav class="mt-8 flex items-center justify-between" aria-label="Paginação">
+            <span class="text-sm text-[var(--es-muted)]">Página {page} de {pages}</span>
+            <div class="flex gap-2">
+              {page > 1 && <a class="es-btn es-btn-secondary" href={pageUrl(page - 1)}>Anterior</a>}
+              {page < pages && <a class="es-btn es-btn-secondary" href={pageUrl(page + 1)}>Próxima</a>}
+            </div>
+          </nav>
+        </div>
+      </div>
+    </div>
+  </section>
+</BaseLayout>

@@ -1,29 +1,165 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
-import { findPublishedJob } from "../../lib/jobs";
-import { buildJobPosting } from "@es/seo";
 import AdSlot from "../../components/AdSlot.astro";
+import Breadcrumbs from "../../components/ui/Breadcrumbs.astro";
+import JobCard from "../../components/ui/JobCard.astro";
+import SectionHeading from "../../components/ui/SectionHeading.astro";
+import { buildJobPosting } from "@es/seo";
+import { formatRelativeDate, formatSalary, formatWorkplace } from "../../lib/job-presenter";
+import { findPublishedJob, listRelatedJobs } from "../../lib/jobs";
+
 const slug = Astro.params.slug ?? "";
 const job = await findPublishedJob(slug);
 if (!job) return Astro.redirect(`/vagas/indisponivel/${encodeURIComponent(slug)}`, 302);
+
 const record = job.job;
 const canonicalUrl = new URL(`/vagas/${record.slug}`, Astro.site).toString();
-const jsonLd = buildJobPosting({ title: record.normalizedTitle, description: record.description, publishedAt: record.publishedAt, expiresAt: record.expiresAt, employmentType: record.employmentType, workplaceType: record.workplaceType, companyName: job.companyName, companyWebsiteUrl: job.companyWebsiteUrl, cityName: job.cityName, stateCode: job.stateCode, applicationUrl: record.applicationUrl, applicationType: record.applicationType, salaryMin: record.salaryVisible ? record.salaryMin : null, salaryMax: record.salaryVisible ? record.salaryMax : null, salaryCurrency: record.salaryCurrency, salaryPeriod: record.salaryPeriod, salaryVisible: record.salaryVisible, publicCode: record.publicCode, canonicalUrl });
+const jsonLd = buildJobPosting({
+  title: record.normalizedTitle,
+  description: record.description,
+  publishedAt: record.publishedAt,
+  expiresAt: record.expiresAt,
+  employmentType: record.employmentType,
+  workplaceType: record.workplaceType,
+  companyName: job.companyName,
+  companyWebsiteUrl: job.companyWebsiteUrl,
+  cityName: job.cityName,
+  stateCode: job.stateCode,
+  applicationUrl: record.applicationUrl,
+  applicationType: record.applicationType,
+  salaryMin: record.salaryVisible ? record.salaryMin : null,
+  salaryMax: record.salaryVisible ? record.salaryMax : null,
+  salaryCurrency: record.salaryCurrency,
+  salaryPeriod: record.salaryPeriod,
+  salaryVisible: record.salaryVisible,
+  publicCode: record.publicCode,
+  canonicalUrl
+});
 if (!jsonLd) return Astro.redirect(`/vagas/indisponivel/${encodeURIComponent(slug)}`, 302);
+
+const related = await listRelatedJobs({ jobId: record.id, companyId: record.companyId, categoryId: record.categoryId, cityId: record.cityId, limit: 4 });
+const salary = formatSalary(record);
+const activities = Array.isArray(record.activities) ? record.activities as string[] : [];
+const requirements = Array.isArray(record.requirements) ? record.requirements as string[] : [];
+const benefits = Array.isArray(record.benefits) ? record.benefits as string[] : [];
+const shareUrl = canonicalUrl;
 ---
-<BaseLayout title={`${record.normalizedTitle} — Empregos São Luís`} description={record.summary} canonical={canonicalUrl} breadcrumbs={[{ name: "Vagas", url: "/vagas" }, { name: record.normalizedTitle, url: `/vagas/${record.slug}` }]}>
+<BaseLayout
+  title={`${record.normalizedTitle} — Empregos São Luís`}
+  description={record.summary}
+  canonical={canonicalUrl}
+  breadcrumbs={[{ name: "Vagas", url: "/vagas" }, { name: record.normalizedTitle, url: `/vagas/${record.slug}` }]}
+>
   <script is:inline type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
-  <article class="mx-auto max-w-3xl px-4 py-12">
-    <p class="font-bold text-red-700">{record.publicCode}</p><h1 class="mt-2 text-4xl font-black">{record.normalizedTitle}</h1>
-    <p class="mt-2 text-slate-600">{job.companyName} · {job.cityName}/{job.stateCode}</p>
-    <p class="mt-4 text-lg text-slate-700">{record.summary}</p>
-    <section class="prose mt-8 max-w-none" set:html={record.description} />
-    <AdSlot slot="job-content-mid" pageType="job" citySlug={job.cityName} companySlug={job.companyName} />
-    <div class="mt-10 rounded-2xl border-2 border-red-100 bg-red-50 p-6" id="candidatura">
-      <h2 class="text-xl font-black text-red-900">Candidatura</h2>
-      <a class="mt-4 inline-flex rounded-xl bg-red-700 px-6 py-4 font-bold text-white" href={record.applicationUrl} rel="nofollow noopener noreferrer">Candidatar-se</a>
-      <form class="mt-4" method="post" action="/api/account/saved-jobs"><input type="hidden" name="jobId" value={record.id}/><input type="hidden" name="action" value="save"/><button class="rounded-xl border px-5 py-3 font-bold">Salvar vaga</button></form>
+
+  <section class="es-section bg-white pt-8">
+    <div class="es-container">
+      <Breadcrumbs items={[{ name: "Início", url: "/" }, { name: "Vagas", url: "/vagas" }, { name: record.normalizedTitle }]} />
+
+      <div class="mt-6 grid gap-8 lg:grid-cols-[1fr_320px]">
+        <article>
+          <div class="flex flex-wrap items-start gap-4">
+            {job.companyLogoUrl ? (
+              <img src={job.companyLogoUrl} alt="" class="h-16 w-16 rounded-2xl border object-contain p-2" width="64" height="64" />
+            ) : (
+              <div class="flex h-16 w-16 items-center justify-center rounded-2xl bg-[var(--es-cream-dark)] text-xl font-black text-[var(--brand-primary)]">{job.companyName.slice(0, 1)}</div>
+            )}
+            <div class="min-w-0 flex-1">
+              <div class="flex flex-wrap gap-2">
+                <span class="chip chip-active">{record.publicCode}</span>
+                {record.featured && <span class="chip">Destaque</span>}
+                {record.sponsored && <span class="chip">Patrocinada</span>}
+              </div>
+              <h1 class="font-display mt-2 text-3xl font-black sm:text-4xl">{record.normalizedTitle}</h1>
+              <p class="mt-2 text-lg font-semibold">
+                <a class="hover:text-[var(--brand-primary)]" href={`/empresas/${job.companySlug}`}>{job.companyName}</a>
+              </p>
+              <p class="mt-1 text-[var(--es-muted)]">
+                {job.cityName}/{job.stateCode}
+                {job.neighborhoodName ? ` · ${job.neighborhoodName}` : record.neighborhood ? ` · ${record.neighborhood}` : ""}
+                · {formatWorkplace(record.workplaceType)}
+                · {record.employmentType}
+              </p>
+            </div>
+          </div>
+
+          <dl class="mt-6 grid gap-3 rounded-2xl border border-[var(--es-border)] bg-[var(--es-cream)] p-5 sm:grid-cols-2">
+            {salary && <div><dt class="text-xs font-bold uppercase text-[var(--es-muted)]">Salário</dt><dd class="font-bold text-[var(--es-green)]">{salary}</dd></div>}
+            <div><dt class="text-xs font-bold uppercase text-[var(--es-muted)]">Publicada</dt><dd>{formatRelativeDate(record.publishedAt)}</dd></div>
+            {record.expiresAt && <div><dt class="text-xs font-bold uppercase text-[var(--es-muted)]">Expira</dt><dd>{formatRelativeDate(record.expiresAt)}</dd></div>}
+            {job.categoryName && <div><dt class="text-xs font-bold uppercase text-[var(--es-muted)]">Categoria</dt><dd><a class="underline" href={`/vagas/categoria/${job.categorySlug}`}>{job.categoryName}</a></dd></div>}
+            {record.schedule && <div><dt class="text-xs font-bold uppercase text-[var(--es-muted)]">Jornada</dt><dd>{record.schedule}</dd></div>}
+          </dl>
+
+          <p class="mt-6 text-lg text-[var(--es-ink)]">{record.summary}</p>
+
+          <AdSlot slot="job-content-mid" pageType="job" citySlug={job.citySlug} companySlug={job.companySlug} workplaceType={record.workplaceType} />
+
+          <div class="es-prose mt-8 max-w-none" set:html={record.description} />
+
+          {activities.length > 0 && (
+            <section class="mt-8">
+              <h2 class="font-display text-2xl font-black">Atividades</h2>
+              <ul class="mt-3 list-disc space-y-2 pl-5 text-[var(--es-muted)]">{activities.map((item) => <li>{item}</li>)}</ul>
+            </section>
+          )}
+          {requirements.length > 0 && (
+            <section class="mt-8">
+              <h2 class="font-display text-2xl font-black">Requisitos</h2>
+              <ul class="mt-3 list-disc space-y-2 pl-5 text-[var(--es-muted)]">{requirements.map((item) => <li>{item}</li>)}</ul>
+            </section>
+          )}
+          {benefits.length > 0 && (
+            <section class="mt-8">
+              <h2 class="font-display text-2xl font-black">Benefícios</h2>
+              <ul class="mt-3 list-disc space-y-2 pl-5 text-[var(--es-muted)]">{benefits.map((item) => <li>{item}</li>)}</ul>
+            </section>
+          )}
+
+          <section class="mt-8 rounded-2xl border border-amber-200 bg-amber-50 p-5">
+            <h2 class="font-display text-lg font-black text-amber-950">Aviso de segurança</h2>
+            <p class="mt-2 text-sm text-amber-900">Nunca pague para conseguir emprego. Confirme se o link de candidatura é oficial da empresa. <a class="underline" href="/seguranca-candidatos">Saiba mais</a>.</p>
+          </section>
+
+          {related.length > 0 && (
+            <section class="mt-10">
+              <SectionHeading title="Vagas relacionadas" />
+              <div class="mt-6 grid gap-4 sm:grid-cols-2">
+                {related.map((item) => <JobCard {...item} compact />)}
+              </div>
+            </section>
+          )}
+        </article>
+
+        <aside class="space-y-5">
+          <div class="es-card sticky top-24 space-y-4 p-6" id="candidatura">
+            <h2 class="font-display text-xl font-black">Candidatura</h2>
+            <p class="text-sm text-[var(--es-muted)]">Você será direcionado ao canal oficial da empresa. Não é necessário criar conta.</p>
+            <a class="es-btn es-btn-primary w-full py-3.5 text-base" href={record.applicationUrl} rel="nofollow noopener noreferrer">Candidatar-se agora</a>
+            <form method="post" action="/api/account/saved-jobs">
+              <input type="hidden" name="jobId" value={record.id} />
+              <input type="hidden" name="action" value="save" />
+              <button class="es-btn es-btn-secondary w-full" type="submit">Salvar vaga</button>
+            </form>
+            <div class="grid grid-cols-2 gap-2 text-sm">
+              <a class="es-btn es-btn-secondary" href={`https://wa.me/?text=${encodeURIComponent(`${record.normalizedTitle} - ${shareUrl}`)}`} rel="noopener noreferrer">WhatsApp</a>
+              <button class="es-btn es-btn-secondary" type="button" data-share-url={shareUrl} id="copy-share-link">Copiar link</button>
+            </div>
+          </div>
+          <AdSlot slot="job-sidebar" pageType="job" citySlug={job.citySlug} companySlug={job.companySlug} workplaceType={record.workplaceType} />
+          <article class="es-card p-5">
+            <h3 class="font-display font-black">Sobre a empresa</h3>
+            <p class="mt-2 font-semibold">{job.companyName}</p>
+            <a class="mt-3 inline-flex text-sm font-bold text-[var(--brand-primary)]" href={`/empresas/${job.companySlug}`}>Ver perfil da empresa →</a>
+          </article>
+        </aside>
+      </div>
     </div>
-    <AdSlot slot="job-sidebar" pageType="job" citySlug={job.cityName} companySlug={job.companyName} />
-  </article>
+  </section>
+  <script is:inline>
+    document.getElementById("copy-share-link")?.addEventListener("click", () => {
+      const url = document.getElementById("copy-share-link")?.getAttribute("data-share-url");
+      if (url) navigator.clipboard?.writeText(url);
+    });
+  </script>
 </BaseLayout>
