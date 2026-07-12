@@ -8,3 +8,8 @@ node_modules
 # Cache incremental do TypeScript (evita merge conflicts e commits gigantes)
 tsconfig.tsbuildinfo
 *.tsbuildinfo
+dist
+.astro
+playwright-report
+test-results
+coverage

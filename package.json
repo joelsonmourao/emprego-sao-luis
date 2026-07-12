@@ -3,16 +3,29 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
   "scripts": {
-    "dev": "next dev --turbopack",
-    "build": "prisma generate && next build",
+    "dev": "npm run dev --workspace=@es/web",
+    "dev:worker": "npm run dev --workspace=@es/worker",
+    "build": "npm run build --workspaces --if-present",
+    "lint": "eslint apps packages --max-warnings=0",
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "test": "vitest run",
+    "test:e2e": "playwright test",
+    "format": "prettier --write apps packages docs *.json *.md",
+    "format:check": "prettier --check apps packages docs *.json *.md",
+    "legacy:dev": "next dev --turbopack",
+    "legacy:build": "prisma generate && next build",
+    "legacy:typecheck": "tsc --noEmit",
     "deploy:migrate": "node scripts/prisma-migrate-deploy.mjs",
     "migrate:deploy": "node scripts/prisma-migrate-deploy.mjs",
     "db:migrate:deploy": "prisma migrate deploy",
     "build:retry": "prisma generate && scripts/build-with-retry.bat",
     "start": "next start -H 0.0.0.0 -p 3000",
     "start:with-migrate": "npm run db:migrate:deploy && npm run start",
-    "typecheck": "tsc --noEmit",
     "jobs:schedule:process": "tsx scripts/process-scheduled-jobs.ts",
     "cron:publish-scheduled-jobs": "node scripts/publish-scheduled-jobs.mjs",
     "jobs:import:xlsx": "tsx scripts/import-jobs-api.ts",
@@ -36,7 +49,7 @@
     "audit:site": "node scripts/audit-site.mjs",
     "blog:images": "tsx scripts/generate-blog-images.ts",
     "lighthouse:local": "node scripts/lighthouse-local.mjs",
-    "lint": "node -e \"console.log('lint: no eslint config in this package; skipped')\""
+    "legacy:lint": "node -e \"console.log('legacy lint: no eslint config; use the workspace lint for new code')\""
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
@@ -67,16 +80,26 @@
     "zod": "^3.25.76"
   },
   "devDependencies": {
+    "@eslint/js": "^9.31.0",
+    "@playwright/test": "^1.54.1",
     "@tailwindcss/postcss": "^4.3.0",
     "@types/node": "20.17.6",
     "@types/react": "19.2.17",
     "@types/react-dom": "^19.0.4",
     "autoprefixer": "^10.5.0",
     "dotenv": "^17.4.2",
+    "eslint": "^9.31.0",
+    "eslint-plugin-react": "^7.37.5",
+    "eslint-plugin-react-hooks": "^5.2.0",
+    "globals": "^16.3.0",
+    "lighthouse": "^12.8.2",
+    "prettier": "^3.6.2",
     "postcss": "^8.5.15",
     "prisma": "^6.19.3",
     "tailwindcss": "^4.3.0",
     "tsx": "^4.19.4",
-    "typescript": "5.8.2"
+    "typescript": "5.8.2",
+    "typescript-eslint": "^8.38.0",
+    "vitest": "^3.2.4"
   }
 }

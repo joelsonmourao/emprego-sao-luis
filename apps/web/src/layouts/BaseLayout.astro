@@ -1,0 +1,27 @@
+---
+import "../styles/global.css";
+
+interface Props { title: string; description?: string }
+const { title, description = "Vagas verificadas em São Luís e no Maranhão." } = Astro.props;
+---
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width" />
+    <meta name="description" content={description} />
+    <meta name="generator" content={Astro.generator} />
+    <link rel="canonical" href={new URL(Astro.url.pathname, Astro.site)} />
+    <title>{title}</title>
+  </head>
+  <body>
+    <a class="sr-only focus:not-sr-only" href="#conteudo">Ir para o conteúdo</a>
+    <header class="border-b border-slate-200 bg-white">
+      <nav class="mx-auto flex max-w-6xl items-center justify-between px-4 py-4" aria-label="Principal">
+        <a class="font-black text-red-700" href="/">EMPREGOS SÃO LUÍS</a>
+        <a href="/vagas">Vagas</a>
+      </nav>
+    </header>
+    <main id="conteudo"><slot /></main>
+  </body>
+</html>
