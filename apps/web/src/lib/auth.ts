@@ -3,7 +3,7 @@ import bcrypt from "bcryptjs";
 import { and, eq, gt, isNull, sql } from "drizzle-orm";
 import { jwtVerify, SignJWT } from "jose";
 import { verify } from "otplib";
-import { createDatabase, loginAttempts, permissions, rolePermissions, roles, sessions, userRoles, users } from "@es/db";
+import { auditLogs, createDatabase, loginAttempts, permissions, rolePermissions, roles, sessions, userRoles, users } from "@es/db";
 
 export const ADMIN_COOKIE = "es_admin_session";
 const SESSION_SECONDS = 60 * 60 * 8;
@@ -20,7 +20,7 @@ const secret = () => {
 export function encryptSecret(value: string) { const iv = randomBytes(12); const cipher = createCipheriv("aes-256-gcm", createHash("sha256").update(secret()).digest(), iv); const encrypted = Buffer.concat([cipher.update(value, "utf8"), cipher.final()]); return `${iv.toString("base64url")}.${cipher.getAuthTag().toString("base64url")}.${encrypted.toString("base64url")}`; }
 export function decryptSecret(value: string) { const [ivValue, tagValue, dataValue] = value.split("."); if (!ivValue || !tagValue || !dataValue) throw new Error("Segredo MFA inválido."); const decipher = createDecipheriv("aes-256-gcm", createHash("sha256").update(secret()).digest(), Buffer.from(ivValue, "base64url")); decipher.setAuthTag(Buffer.from(tagValue, "base64url")); return Buffer.concat([decipher.update(Buffer.from(dataValue, "base64url")), decipher.final()]).toString("utf8"); }
 
-export async function authenticate(email: string, password: string, ip: string, otp?: string) {
+export async function authenticate(email: string, password: string, ip: string, userAgent: string, otp?: string) {
   if (!process.env.DATABASE_URL) throw new Error("DATABASE_URL não configurada.");
   const connection = createDatabase(process.env.DATABASE_URL);
   const emailNormalized = email.trim().toLowerCase();
@@ -28,15 +28,15 @@ export async function authenticate(email: string, password: string, ip: string, 
   try {
     const since = new Date(Date.now() - 15 * 60 * 1000);
     const [rate] = await connection.db.select({ count: sql<number>`count(*)::int` }).from(loginAttempts).where(and(eq(loginAttempts.emailHash, emailHash), eq(loginAttempts.ipHash, ipHash), eq(loginAttempts.successful, false), gt(loginAttempts.createdAt, since)));
-    if ((rate?.count ?? 0) >= 5) return { ok: false as const, reason: "rate_limited" as const };
+    if ((rate?.count ?? 0) >= 5) { await connection.db.insert(auditLogs).values({ action: "LOGIN_RATE_LIMITED", entityType: "AUTH", after: { emailHash, ipHash, userAgentHash: hash(userAgent || "unknown") }, origin: "ADMIN_LOGIN" }); return { ok: false as const, reason: "rate_limited" as const }; }
     const [user] = await connection.db.select().from(users).where(and(eq(users.email, emailNormalized), eq(users.active, true))).limit(1);
     const valid = Boolean(user?.passwordHash) && await bcrypt.compare(password, user?.passwordHash ?? "$2b$12$invalidinvalidinvalidinvalidinvalidinvalidinvalidinvalid");
-    if (!user || !valid) { await connection.db.insert(loginAttempts).values({ emailHash, ipHash, successful: false }); return { ok: false as const, reason: "invalid" as const }; }
+    if (!user || !valid) { await connection.db.insert(loginAttempts).values({ emailHash, ipHash, successful: false }); await connection.db.insert(auditLogs).values({ action: "LOGIN_FAILED", entityType: "AUTH", after: { emailHash, ipHash, userAgentHash: hash(userAgent || "unknown") }, origin: "ADMIN_LOGIN" }); return { ok: false as const, reason: "invalid" as const }; }
     if (user.mfaEnabled) { if (!user.mfaSecretEncrypted || !otp) return { ok: false as const, reason: "mfa_required" as const }; const result = await verify({ secret: decryptSecret(user.mfaSecretEncrypted), token: otp }); if (!result.valid) { await connection.db.insert(loginAttempts).values({ emailHash, ipHash, successful: false }); return { ok: false as const, reason: "invalid_otp" as const }; } }
     await connection.db.insert(loginAttempts).values({ emailHash, ipHash, successful: true });
     const jti = randomUUID(); const expiresAt = new Date(Date.now() + SESSION_SECONDS * 1000);
     const token = await new SignJWT({ email: user.email, name: user.name }).setProtectedHeader({ alg: "HS256" }).setSubject(user.id).setJti(jti).setIssuedAt().setExpirationTime(Math.floor(expiresAt.getTime() / 1000)).sign(secret());
-    await connection.db.insert(sessions).values({ userId: user.id, tokenHash: hash(jti), expiresAt });
+    await connection.db.transaction(async (tx) => { await tx.insert(sessions).values({ userId: user.id, tokenHash: hash(jti), ipHash, userAgentHash: hash(userAgent || "unknown"), expiresAt }); await tx.insert(auditLogs).values({ actorId: user.id, action: "LOGIN_SUCCESS", entityType: "AUTH", entityId: user.id, after: { ipHash, userAgentHash: hash(userAgent || "unknown") }, origin: "ADMIN_LOGIN" }); });
     return { ok: true as const, token, expiresAt };
   } finally { await connection.close(); }
 }

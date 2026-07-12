@@ -1,4 +1,10 @@
 ---
-import AdminLayout from "../../layouts/AdminLayout.astro"; import { MfaSetup } from "../../components/MfaSetup";
+import AdminLayout from "../../layouts/AdminLayout.astro";
+import { MfaSetup } from "../../components/MfaSetup";
+import { createDatabase, sessions } from "@es/db";
+import { and, desc, eq, gt, isNull } from "drizzle-orm";
+const auth = Astro.locals.auth!;
+let activeSessions: Array<{ id: string; createdAt: Date; expiresAt: Date; ipHash: string | null; userAgentHash: string | null }> = [];
+if (process.env.DATABASE_URL) { const connection = createDatabase(process.env.DATABASE_URL); try { activeSessions = await connection.db.select({ id: sessions.id, createdAt: sessions.createdAt, expiresAt: sessions.expiresAt, ipHash: sessions.ipHash, userAgentHash: sessions.userAgentHash }).from(sessions).where(and(eq(sessions.userId, auth.id), isNull(sessions.revokedAt), gt(sessions.expiresAt, new Date()))).orderBy(desc(sessions.createdAt)); } finally { await connection.close(); } }
 ---
-<AdminLayout title="Segurança"><h1 class="text-3xl font-black">Segurança da conta</h1><p class="mt-3 text-slate-600">Administradores devem ativar autenticação em duas etapas.</p><MfaSetup client:load/></AdminLayout>
+<AdminLayout title="Segurança"><h1 class="text-3xl font-black">Segurança da conta</h1><p class="mt-3 text-slate-600">Ative autenticação em duas etapas e encerre acessos que não reconhecer.</p><section class="mt-8 rounded-2xl bg-white p-6"><h2 class="text-xl font-black">Autenticação em duas etapas</h2><MfaSetup client:load/></section><section class="mt-8 rounded-2xl bg-white p-6"><h2 class="text-xl font-black">Sessões ativas</h2><div class="mt-4 grid gap-3">{activeSessions.map((session) => <div class="flex flex-wrap items-center justify-between gap-3 rounded-xl border p-4"><div><strong>Iniciada em {session.createdAt.toLocaleString("pt-BR")}</strong><p class="mt-1 text-sm text-slate-600">Expira em {session.expiresAt.toLocaleString("pt-BR")} · IP {session.ipHash?.slice(0, 12) ?? "não registrado"}… · navegador {session.userAgentHash?.slice(0, 12) ?? "não registrado"}…</p></div><form method="post" action={`/api/admin/sessions/${session.id}/revoke`}><button class="rounded-lg border border-red-300 px-4 py-2 font-bold text-red-700">Encerrar</button></form></div>)}</div></section></AdminLayout>

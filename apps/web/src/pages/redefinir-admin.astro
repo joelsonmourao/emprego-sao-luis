@@ -1,0 +1,5 @@
+---
+import "../styles/global.css";
+const token = Astro.url.searchParams.get("token") ?? "";
+---
+<!doctype html><html lang="pt-BR"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width"/><meta name="robots" content="noindex,nofollow"/><title>Definir nova senha</title></head><body class="grid min-h-screen place-items-center bg-slate-950 p-4"><main class="w-full max-w-md rounded-2xl bg-white p-8"><h1 class="text-3xl font-black">Definir nova senha</h1>{token ? <form class="mt-6 grid gap-4" method="post" action="/api/auth/admin-password/reset"><input type="hidden" name="token" value={token}/><label>Nova senha<input class="mt-1 w-full rounded-lg border p-3" type="password" name="password" minlength="14" autocomplete="new-password" required/></label><label>Confirmar senha<input class="mt-1 w-full rounded-lg border p-3" type="password" name="confirmation" minlength="14" autocomplete="new-password" required/></label><button class="rounded-lg bg-red-700 p-3 font-bold text-white">Alterar senha e encerrar sessões</button></form> : <p class="mt-5">Link inválido.</p>}</main></body></html>
