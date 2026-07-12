@@ -2,37 +2,37 @@
 
 Última atualização: 12 de julho de 2026.
 
-## Estado
+## Estado protegido
 
 - Branch: `codex/reconstrucao-astro`.
-- Não alterar `main` nem produção.
+- `main` e produção não foram alteradas.
 - Next.js/Prisma legado permanece na raiz como rollback.
 - Nova plataforma: `apps/web`, `apps/worker` e `packages/*`.
-- Commits por fase existem desde `60dfae6`; consulte `git log --oneline`.
+- Commits separados registram a evolução desde a Fase 0.
 
-## Já implementado
+## Implementado
 
-Astro 7 SSR, Tailwind, React islands, Drizzle, PostgreSQL, BullMQ/Valkey, R2/S3, Resend, Sentry, RBAC, sessões revogáveis, 2FA TOTP, portal, cadastro manual, importação assíncrona, SEO estruturado, página Instagram, alertas, AdSense controlado, Dockerfiles, CI, Playwright, Lighthouse e documentação operacional.
+Astro 7 SSR, TypeScript strict, Tailwind, React 19 somente em islands, Drizzle/PostgreSQL, BullMQ/Valkey, R2/S3, Resend, Sentry, RBAC, sessões revogáveis, 2FA TOTP, portal público, painel protegido, cadastro manual, importação assíncrona com dry run e undo, SEO estruturado, Google Indexing, IndexNow, expiração, estúdio social PNG/R2/Meta, alertas, conta do candidato com magic link/vagas salvas/exportação/exclusão LGPD, AdSense controlado, Dockerfiles, CI, Playwright, Lighthouse e documentação operacional.
+
+O dashboard administrativo usa métricas reais do PostgreSQL. Há uma imagem exclusiva `Dockerfile.migrate`, e o worker carrega corretamente os pacotes TypeScript internos em runtime.
 
 ## Validações aprovadas
 
-`npm run lint`, `npm run typecheck`, `npm run test`, `npm run migration:check`, `npm run build`, `npm run test:e2e`, `npm run lighthouse` e `npm run legacy:build`. Docker não foi executado porque o daemon local não estava disponível.
+`npm run lint`, `npm run typecheck`, `npm run test` (18 testes), `npm run migration:check`, `npm run build`, `npm run test:e2e` (8 cenários), `npm run lighthouse` e `npm run legacy:build` foram aprovados durante a reconstrução. O carregamento do worker com `node --import tsx` foi verificado. Docker não pôde ser construído porque o Docker Desktop local está desligado.
 
-## Trabalho em andamento
+## Dependências externas ainda necessárias
 
-Fase 5 recebeu dry run, reexecução do lote, CSV de rejeições e undo por snapshot no commit `3ea7fe6`. Expiração e indexação estão no commit `4f1187c`. O estúdio social com PNG/R2/Meta está no commit `2b0faa5`.
+Staging real e integrações exigem URLs/credenciais de PostgreSQL, Valkey, R2/S3, Resend, Cloudflare, Google, Meta, Sentry e AdSense conforme a funcionalidade ativada. Nenhuma credencial foi inventada ou gravada no Git.
 
-## Pendências principais
+## Pendências que só podem ser validadas externamente
 
-1. Testes integrados de importação com PostgreSQL/Valkey/MinIO, incluindo 10 e 1.000 linhas.
-2. Mapeamento manual de cabeçalhos e arquivo oficial de modelo.
-3. CRUDs completos dos módulos administrativos, versionamento e preview.
-4. Google Indexing API, IndexNow e expiração agendada no novo worker.
-5. Coleta de métricas sociais e painel de histórico/retry manual.
-6. Contas de candidatos, vagas salvas, Web Push, exportação e exclusão LGPD.
-7. Gestão comercial completa e relatórios de anúncios.
-8. Executar Docker/staging, migração real, comparação de dados/URLs, backup e rollback testados.
+1. Ligar Docker Desktop e construir `Dockerfile.web`, `Dockerfile.worker` e `Dockerfile.migrate`.
+2. Subir staging no Coolify e executar migrations no PostgreSQL de staging.
+3. Comparar contagens, URLs, slugs e datas após uma cópia controlada dos dados legados.
+4. Testar restauração de backup e rollback no ambiente de staging.
+5. Validar envios reais de Resend, R2, Google Indexing, IndexNow e Meta com credenciais oficiais.
+6. Completar configurações e decisões comerciais para campanhas/anunciantes reais.
 
-## Regras
+## Regra de continuidade
 
-Não declarar conclusão sem evidência requisito por requisito. Não usar credenciais no Git. Não executar migration em produção. Usar somente API oficial da Meta. Manter migrations aditivas e rollback.
+Não executar migration ou troca de domínio em produção antes de backup restaurável, staging aprovado e autorização explícita. O procedimento completo está em `docs/GUIA-WINDOWS-COOLIFY.md`.

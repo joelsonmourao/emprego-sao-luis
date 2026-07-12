@@ -146,20 +146,23 @@ node -e "console.log(require('crypto').randomBytes(48).toString('base64url'))"
 
 Opcionais até obter credenciais: Resend, Sentry, Google, Meta e AdSense. Não copie valores de staging para produção.
 
+## P.1 Criar job de migration
+
+Crie um terceiro recurso no Coolify usando o mesmo repositório e branch, com `Dockerfile.migrate` e contexto na raiz. Configure somente `DATABASE_URL`. Esse recurso é um job manual: não associe domínio, não habilite reinício automático e não o escale para mais de uma réplica.
+
 ## Q. Configurar domínio
 
 Use primeiro um subdomínio de staging. Proteja-o por autenticação no proxy e mantenha `noindex`. Só depois dos testes associe `empregossaoluis.com.br` ao web de produção. HTTPS deve ser emitido e renovado pelo Coolify/Let's Encrypt.
 
 ## R. Executar migrations
 
-Faça backup e teste a restauração. Execute uma única vez, como job separado e nunca simultaneamente em todas as réplicas:
+Faça backup e teste a restauração. Execute uma única vez pelo recurso criado com `Dockerfile.migrate`, nunca simultaneamente em todas as réplicas. O comando padrão dessa imagem executa:
 
 ```powershell
 npm run db:migrate --workspace=@es/db
-npm run db:seed-rbac --workspace=@es/db
 ```
 
-Para criar o primeiro admin, defina temporariamente `ADMIN_INITIAL_EMAIL`, `ADMIN_INITIAL_NAME` e `ADMIN_INITIAL_PASSWORD`, execute o seed e remova a senha do Coolify.
+Depois que a migration terminar com código zero, altere temporariamente o comando do mesmo job para `npm run db:seed-rbac --workspace=@es/db`. Para criar o primeiro admin, defina temporariamente `ADMIN_INITIAL_EMAIL`, `ADMIN_INITIAL_NAME` e `ADMIN_INITIAL_PASSWORD`, execute o seed uma vez e remova imediatamente a senha e as três variáveis do Coolify.
 
 ## S. Fazer deploy
 
