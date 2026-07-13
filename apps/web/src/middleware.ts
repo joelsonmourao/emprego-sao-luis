@@ -8,6 +8,7 @@ import { and, eq } from "drizzle-orm";
 import { logServerError } from "./lib/server-error";
 
 const CANONICAL_HOST = "empregossaoluis.com.br";
+const PUBLIC_ADMIN_PATHS = new Set(["/admin/login", "/admin/esqueci-senha", "/admin/redefinir-senha"]);
 
 export const onRequest = defineMiddleware(async (context, next) => {
   const host = context.url.hostname.toLowerCase();
@@ -36,7 +37,7 @@ export const onRequest = defineMiddleware(async (context, next) => {
     }
   }
 
-  const protectedAdmin = path.startsWith("/admin") && path !== "/admin/login" || path.startsWith("/api/admin") && path !== "/api/admin/login";
+  const protectedAdmin = path.startsWith("/admin") && !PUBLIC_ADMIN_PATHS.has(path) || path.startsWith("/api/admin") && path !== "/api/admin/login";
   const protectedCompany = path.startsWith("/empresa") && path !== "/empresa/login" && !path.startsWith("/empresa/convite") || path.startsWith("/api/empresa") && path !== "/api/empresa/login" && path !== "/api/empresa/convite";
 
   context.locals.auth = null;

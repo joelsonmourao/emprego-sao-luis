@@ -1,0 +1,154 @@
+---
+import "../../styles/global.css";
+import BrandLogo from "../../components/BrandLogo.astro";
+import { BRAND_ASSET_KEYS } from "../../lib/brand/constants";
+import { ADMIN_PASSWORD_MIN_LENGTH, ADMIN_PASSWORD_MIN_MESSAGE } from "@es/shared";
+import { cssVariablesFromIdentity } from "../../lib/design-tokens";
+import { getBrandIdentity } from "../../lib/brand/identity-service";
+import { getVisualIdentity, type VisualIdentity } from "../../lib/visual-identity";
+
+const token = Astro.url.searchParams.get("token") ?? "";
+
+let identity: VisualIdentity | null = null;
+let brandPalette = undefined;
+try {
+  identity = await getVisualIdentity();
+  brandPalette = (await getBrandIdentity()).palette;
+} catch {
+  // Mantém fallback visual quando identidade opcional estiver indisponível.
+}
+const siteName = identity?.siteName ?? "Empregos São Luís";
+const faviconUrl = identity?.faviconUrl ?? "/favicon.ico";
+---
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width" />
+    <meta name="robots" content="noindex,nofollow" />
+    <title>Redefinir senha — Painel administrativo</title>
+    <link rel="icon" href={faviconUrl} />
+    {brandPalette && identity && <style is:inline set:html={cssVariablesFromIdentity(identity, brandPalette)} />}
+  </head>
+  <body class="grid min-h-screen place-items-center bg-slate-950 p-4">
+    <main class="es-light-form-panel w-full max-w-md rounded-2xl bg-white p-8">
+      <a href="/admin/login" aria-label={siteName}>
+        <BrandLogo assetKey={BRAND_ASSET_KEYS.LOGIN_LOGO} class="h-10 w-auto" width={160} height={40} />
+      </a>
+      <h1 class="mt-6 text-3xl font-black">Redefinir senha</h1>
+      {!token ? (
+        <p class="mt-4 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900" role="alert">
+          Link inválido ou ausente. Solicite uma nova recuperação de senha.
+        </p>
+      ) : (
+        <>
+          <p class="mt-2 text-sm text-[var(--text-secondary)]">Defina uma nova senha para o painel administrativo.</p>
+          <p
+            id="admin-reset-password-error"
+            class="mt-4 hidden rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-800"
+            role="alert"
+            aria-live="polite"
+          />
+          <form id="admin-reset-password-form" class="mt-8 grid gap-5" novalidate>
+            <input type="hidden" name="token" value={token} />
+            <label>
+              Nova senha
+              <input
+                class="mt-1 w-full rounded-xl border p-3"
+                type="password"
+                name="password"
+                minlength={ADMIN_PASSWORD_MIN_LENGTH}
+                autocomplete="new-password"
+                data-password-input
+                data-min-message={ADMIN_PASSWORD_MIN_MESSAGE}
+                required
+              />
+              <span class="es-form-hint block">{ADMIN_PASSWORD_MIN_MESSAGE}</span>
+            </label>
+            <label>
+              Confirmar senha
+              <input
+                class="mt-1 w-full rounded-xl border p-3"
+                type="password"
+                name="confirmation"
+                minlength={ADMIN_PASSWORD_MIN_LENGTH}
+                autocomplete="new-password"
+                required
+              />
+            </label>
+            <button class="rounded-xl bg-red-700 p-3 font-bold text-white" type="submit" data-submit-button>
+              Alterar senha
+            </button>
+          </form>
+        </>
+      )}
+      <a class="mt-5 inline-block font-bold text-red-700" href="/admin/login">Voltar ao login</a>
+    </main>
+    {token && (
+      <script>
+        const form = document.getElementById("admin-reset-password-form");
+        const errorEl = document.getElementById("admin-reset-password-error");
+        const submitButton = document.querySelector("[data-submit-button]");
+        const passwordInput = document.querySelector("[data-password-input]");
+
+        if (passwordInput instanceof HTMLInputElement) {
+          passwordInput.addEventListener("invalid", () =>
+            passwordInput.setCustomValidity(passwordInput.dataset.minMessage ?? "")
+          );
+          passwordInput.addEventListener("input", () => passwordInput.setCustomValidity(""));
+        }
+
+        const showError = (message: string) => {
+          if (!(errorEl instanceof HTMLElement)) return;
+          errorEl.textContent = message;
+          errorEl.classList.remove("hidden");
+        };
+
+        if (form instanceof HTMLFormElement) {
+          form.addEventListener("submit", async (event) => {
+            event.preventDefault();
+            if (!form.reportValidity()) return;
+
+            const tokenInput = form.querySelector('input[name="token"]');
+            const passwordField = form.querySelector('input[name="password"]');
+            const confirmationField = form.querySelector('input[name="confirmation"]');
+            const tokenValue = tokenInput instanceof HTMLInputElement ? tokenInput.value : "";
+            const password = passwordField instanceof HTMLInputElement ? passwordField.value : "";
+            const confirmation = confirmationField instanceof HTMLInputElement ? confirmationField.value : "";
+
+            if (submitButton instanceof HTMLButtonElement) {
+              submitButton.disabled = true;
+              submitButton.textContent = "Salvando...";
+            }
+
+            try {
+              const response = await fetch("/api/auth/admin-password/reset", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                credentials: "same-origin",
+                body: JSON.stringify({ token: tokenValue, password, confirmation })
+              });
+              const payload = await response.json().catch(() => null);
+              if (response.ok && payload && payload.ok === true && typeof payload.redirect === "string") {
+                window.location.assign(payload.redirect);
+                return;
+              }
+              const message =
+                payload && typeof payload.error === "string" && payload.error.trim()
+                  ? payload.error
+                  : "Não foi possível redefinir a senha.";
+              showError(message);
+            } catch {
+              showError("Falha de conexão. Tente novamente em instantes.");
+            } finally {
+              if (submitButton instanceof HTMLButtonElement) {
+                submitButton.disabled = false;
+                submitButton.textContent = "Alterar senha";
+              }
+            }
+          });
+        }
+      </script>
+    )}
+  </body>
+</html>

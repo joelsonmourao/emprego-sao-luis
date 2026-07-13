@@ -7,6 +7,7 @@ import { and, eq, gt, isNull } from "drizzle-orm";
 import { z } from "zod";
 
 const hash = (value: string) => createHash("sha256").update(value).digest("hex");
+
 const schema = z
   .object({
     token: z.string().min(32),
@@ -18,11 +19,29 @@ const schema = z
     path: ["confirmation"]
   });
 
-export const POST: APIRoute = async ({ request, redirect, clientAddress }) => {
-  const parsed = schema.safeParse(Object.fromEntries(await request.formData()));
+async function parseBody(request: Request) {
+  const contentType = request.headers.get("content-type") ?? "";
+  if (contentType.includes("application/json")) {
+    return schema.safeParse(await request.json());
+  }
+  return schema.safeParse(Object.fromEntries(await request.formData()));
+}
+
+export const GET: APIRoute = () =>
+  new Response(JSON.stringify({ ok: false, error: "Method Not Allowed" }), {
+    status: 405,
+    headers: { Allow: "POST", "Content-Type": "application/json" }
+  });
+
+export const POST: APIRoute = async ({ request, clientAddress }) => {
+  const parsed = await parseBody(request);
   if (!parsed.success || !process.env.DATABASE_URL) {
     const passwordIssue = parsed.success ? undefined : parsed.error.issues.find((issue) => issue.path[0] === "password");
-    return new Response(passwordIssue?.message ?? "Solicitação inválida", { status: 400 });
+    const confirmationIssue = parsed.success ? undefined : parsed.error.issues.find((issue) => issue.path[0] === "confirmation");
+    return Response.json(
+      { ok: false, error: passwordIssue?.message ?? confirmationIssue?.message ?? "Solicitação inválida." },
+      { status: 400 }
+    );
   }
 
   const connection = createDatabase(process.env.DATABASE_URL);
@@ -38,7 +57,9 @@ export const POST: APIRoute = async ({ request, redirect, clientAddress }) => {
         )
       )
       .limit(1);
-    if (!record) return new Response("Link inválido ou expirado", { status: 400 });
+    if (!record) {
+      return Response.json({ ok: false, error: "Link inválido ou expirado." }, { status: 400 });
+    }
 
     const passwordHash = await bcrypt.hash(parsed.data.password, 12);
     await connection.db.transaction(async (tx) => {
@@ -65,7 +86,8 @@ export const POST: APIRoute = async ({ request, redirect, clientAddress }) => {
         origin: "PASSWORD_RESET"
       });
     });
-    return redirect("/admin/login?status=senha-alterada", 303);
+
+    return Response.json({ ok: true, redirect: "/admin/login?status=senha-alterada" });
   } finally {
     await connection.close();
   }

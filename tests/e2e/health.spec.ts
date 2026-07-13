@@ -65,18 +65,56 @@ test("admin login API accepts POST and rejects invalid credentials", async ({ re
 const e2eAdminEmail = process.env.E2E_ADMIN_EMAIL ?? process.env.ADMIN_INITIAL_EMAIL;
 const e2eAdminPassword = process.env.E2E_ADMIN_PASSWORD ?? process.env.ADMIN_INITIAL_PASSWORD;
 
-test("POST /api/admin/login with valid credentials redirects to /admin", async ({ request }) => {
+test("admin forgot password page is public and does not target API directly", async ({ request }) => {
+  const response = await request.get("/admin/esqueci-senha");
+  expect(response.ok()).toBe(true);
+  const html = await response.text();
+  expect(html).toContain("Recuperar senha");
+  expect(html).not.toContain('action="/api/auth/admin-password/request"');
+  expect(html).toContain('fetch("/api/auth/admin-password/request"');
+});
+
+test("admin password reset API rejects GET with 405", async ({ request }) => {
+  const response = await request.get("/api/auth/admin-password/request", { failOnStatusCode: false });
+  expect(response.status()).toBe(405);
+  expect(response.headers()["allow"]).toBe("POST");
+});
+
+test("admin password reset API returns neutral POST response", async ({ request }) => {
+  const response = await request.post("/api/auth/admin-password/request", {
+    headers: {
+      Origin: e2eOrigin,
+      Referer: `${e2eOrigin}/admin/esqueci-senha`,
+      "Content-Type": "application/json"
+    },
+    data: { email: "inexistente@example.com" },
+    failOnStatusCode: false
+  });
+  expect(response.ok()).toBe(true);
+  await expect(response.json()).resolves.toMatchObject({
+    ok: true,
+    message: "Se o e-mail estiver cadastrado, você receberá as instruções para redefinir sua senha."
+  });
+});
+
+test("login page links forgot password to public route", async ({ request }) => {
+  const response = await request.get("/admin/login");
+  const html = await response.text();
+  expect(html).toContain('href="/admin/esqueci-senha"');
+  expect(html).not.toContain("/api/auth/admin-password/request");
+});
+
+test("POST /api/admin/login with valid credentials returns JSON redirect", async ({ request }) => {
   test.skip(!e2eAdminEmail || !e2eAdminPassword || !process.env.DATABASE_URL, "Credenciais E2E não configuradas");
 
   const response = await request.post("/api/admin/login", {
     form: { email: e2eAdminEmail!, password: e2eAdminPassword!, next: "/admin" },
     headers: { Origin: e2eOrigin, Referer: `${e2eOrigin}/admin/login` },
-    maxRedirects: 0,
     failOnStatusCode: false
   });
 
-  expect(response.status()).toBe(303);
-  expect(response.headers().location).toMatch(/\/admin/);
+  expect(response.ok()).toBe(true);
+  await expect(response.json()).resolves.toMatchObject({ ok: true, redirect: "/admin" });
 });
 
 test("publish job renders a safe setup state without commercial configuration", async ({ request }) => {

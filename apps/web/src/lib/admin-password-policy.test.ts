@@ -13,7 +13,7 @@ describe("política de senha administrativa", () => {
 
   it("aplica constante no login, criação e recuperação de senha", () => {
     expect(read("apps/web/src/pages/admin/login.astro")).toContain("ADMIN_PASSWORD_MIN_LENGTH");
-    expect(read("apps/web/src/pages/redefinir-admin.astro")).toContain("ADMIN_PASSWORD_MIN_LENGTH");
+    expect(read("apps/web/src/pages/admin/redefinir-senha.astro")).toContain("ADMIN_PASSWORD_MIN_LENGTH");
     expect(read("apps/web/src/pages/admin/administradores.astro")).toContain("ADMIN_PASSWORD_MIN_LENGTH");
     expect(read("apps/web/src/pages/api/admin/login.ts")).toContain("adminPasswordSchema");
     expect(read("apps/web/src/pages/api/admin/admins/index.ts")).toContain("adminPasswordSchema");
@@ -23,7 +23,7 @@ describe("política de senha administrativa", () => {
 
   it("não mantém mínimos antigos de 10 ou 14 nos fluxos administrativos", () => {
     expect(read("apps/web/src/pages/admin/login.astro")).not.toContain('minlength="10"');
-    expect(read("apps/web/src/pages/redefinir-admin.astro")).not.toContain('minlength="14"');
+    expect(read("apps/web/src/pages/admin/redefinir-senha.astro")).not.toContain('minlength="14"');
     expect(read("apps/web/src/pages/api/admin/login.ts")).not.toContain(".min(10)");
     expect(read("apps/web/src/pages/api/admin/admins/index.ts")).not.toContain(".min(14)");
     expect(read("apps/web/src/pages/api/auth/admin-password/reset.ts")).not.toContain(".min(14)");
