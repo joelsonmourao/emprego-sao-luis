@@ -3,14 +3,15 @@ import { z } from "zod";
 import { adminPasswordSchema, zEmail } from "@es/shared";
 import { ADMIN_COOKIE, authenticate } from "../../../lib/auth";
 import { logAdminAuthFailure } from "../../../lib/admin-auth-log";
+import { parseJsonBody } from "../../../lib/json-api";
 import { logServerError } from "../../../lib/server-error";
 
-const otpSchema = z.union([z.literal(""), z.string().regex(/^\d{6}$/)]);
+const mfaCodeSchema = z.union([z.literal(""), z.string().regex(/^\d{6}$/)]);
 
 const schema = z.object({
   email: zEmail(),
   password: adminPasswordSchema(),
-  otp: otpSchema.optional().default(""),
+  mfaCode: mfaCodeSchema.optional().default(""),
   next: z
     .string()
     .startsWith("/")
@@ -25,14 +26,12 @@ export const GET: APIRoute = () =>
   });
 
 export const POST: APIRoute = async ({ request, cookies, clientAddress }) => {
-  const form = Object.fromEntries(await request.formData());
-  const parsed = schema.safeParse(form);
-  if (!parsed.success) {
-    const passwordIssue = parsed.error.issues.find((issue) => issue.path[0] === "password");
-    return Response.json(
-      { ok: false, error: passwordIssue?.message ?? "Dados inválidos." },
-      { status: 400 }
-    );
+  const parsed = await parseJsonBody(request, schema);
+  if (!parsed.ok) {
+    if (parsed.status === 415) {
+      return Response.json({ ok: false, error: parsed.error }, { status: 415 });
+    }
+    return Response.json({ ok: false, error: parsed.error }, { status: parsed.status });
   }
 
   let result;
@@ -42,7 +41,7 @@ export const POST: APIRoute = async ({ request, cookies, clientAddress }) => {
       parsed.data.password,
       clientAddress,
       request.headers.get("user-agent") ?? "unknown",
-      parsed.data.otp || undefined
+      parsed.data.mfaCode || undefined
     );
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);

@@ -50,6 +50,10 @@ describe("rotas de autenticação separadas", () => {
     expect(loginPage).toContain('id="admin-login-form"');
     expect(loginPage).toContain('fetch("/api/admin/login"');
     expect(loginPage).toContain('credentials: "same-origin"');
+    expect(loginPage).toContain('mode: "same-origin"');
+    expect(loginPage).toContain('"Content-Type": "application/json"');
+    expect(loginPage).toContain("JSON.stringify");
+    expect(loginPage).not.toContain("FormData");
     expect(footer).not.toContain("/api/admin/login");
     expect(header).not.toContain("/api/admin/login");
     expect(read("apps/web/src/pages/api/admin/login.ts")).toContain("status: 405");

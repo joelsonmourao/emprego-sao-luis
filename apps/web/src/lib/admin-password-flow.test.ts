@@ -62,6 +62,9 @@ describe("login administrativo", () => {
     const page = read("apps/web/src/pages/admin/login.astro");
     expect(page).toContain("payload.ok === true");
     expect(page).toContain("payload.redirect");
+    expect(page).toContain("application/json");
+    expect(page).toContain("mfaCode");
+    expect(page).not.toContain("FormData");
   });
 
   it("authenticate diferencia falhas internamente", () => {

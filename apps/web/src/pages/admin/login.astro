@@ -33,7 +33,7 @@ const status = Astro.url.searchParams.get("status");
         role="alert"
         aria-live="polite"
       />
-      <form id="admin-login-form" class="mt-8 grid gap-5" method="post" novalidate>
+      <form id="admin-login-form" class="mt-8 grid gap-5" novalidate>
         <input type="hidden" name="next" value={next} />
         <label>
           E-mail
@@ -109,6 +109,14 @@ const status = Astro.url.searchParams.get("status");
 
           if (!form.reportValidity()) return;
 
+          const emailInput = form.querySelector('input[name="email"]');
+          const passwordField = form.querySelector('input[name="password"]');
+          const otpInput = form.querySelector('input[name="otp"]');
+          const email = emailInput instanceof HTMLInputElement ? emailInput.value.trim() : "";
+          const password = passwordField instanceof HTMLInputElement ? passwordField.value : "";
+          const mfaCode = otpInput instanceof HTMLInputElement ? otpInput.value.trim() : "";
+          if (!email || !password) return;
+
           if (submitButton instanceof HTMLButtonElement) {
             submitButton.disabled = true;
             submitButton.textContent = "Entrando...";
@@ -117,8 +125,17 @@ const status = Astro.url.searchParams.get("status");
           try {
             const response = await fetch("/api/admin/login", {
               method: "POST",
-              body: new FormData(form),
-              credentials: "same-origin"
+              credentials: "same-origin",
+              mode: "same-origin",
+              headers: {
+                "Content-Type": "application/json",
+                Accept: "application/json"
+              },
+              body: JSON.stringify({
+                email,
+                password,
+                mfaCode
+              })
             });
 
             const payload = await response.json().catch(() => null);

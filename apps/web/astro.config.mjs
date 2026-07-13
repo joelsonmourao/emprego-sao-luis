@@ -10,5 +10,17 @@ export default defineConfig({
   adapter: node({ mode: "standalone" }),
   integrations: [react()],
   vite: { plugins: [tailwindcss()] },
-  security: { checkOrigin: true }
+  security: {
+    checkOrigin: true,
+    allowedDomains: [
+      {
+        protocol: "https",
+        hostname: "empregossaoluis.com.br"
+      },
+      {
+        protocol: "https",
+        hostname: "www.empregossaoluis.com.br"
+      }
+    ]
+  }
 });

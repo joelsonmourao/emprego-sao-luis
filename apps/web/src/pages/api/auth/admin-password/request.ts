@@ -5,6 +5,7 @@ import { zEmail } from "@es/shared";
 import { and, eq, gt, sql } from "drizzle-orm";
 import { z } from "zod";
 import { ADMIN_PASSWORD_RESET_NEUTRAL_MESSAGE } from "../../../../lib/admin-password-reset";
+import { parseJsonBody } from "../../../../lib/json-api";
 import { createNotificationQueue } from "../../../../lib/notification-queue";
 import { ADMIN_PANEL_ROLES } from "../../../../lib/users-admin";
 import { logServerError } from "../../../../lib/server-error";
@@ -16,11 +17,7 @@ const schema = z.object({
 });
 
 async function parseBody(request: Request) {
-  const contentType = request.headers.get("content-type") ?? "";
-  if (contentType.includes("application/json")) {
-    return schema.safeParse(await request.json());
-  }
-  return schema.safeParse(Object.fromEntries(await request.formData()));
+  return parseJsonBody(request, schema);
 }
 
 export const GET: APIRoute = () =>
@@ -31,8 +28,8 @@ export const GET: APIRoute = () =>
 
 export const POST: APIRoute = async ({ request, url, clientAddress }) => {
   const parsed = await parseBody(request);
-  if (!parsed.success) {
-    return Response.json({ ok: false, error: "Dados inválidos." }, { status: 400 });
+  if (!parsed.ok) {
+    return Response.json({ ok: false, error: parsed.error }, { status: parsed.status });
   }
 
   if (!process.env.DATABASE_URL) {

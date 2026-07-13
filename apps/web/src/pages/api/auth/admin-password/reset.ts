@@ -5,6 +5,7 @@ import { auditLogs, createDatabase, passwordResetTokens, sessions, users } from 
 import { adminPasswordSchema } from "@es/shared";
 import { and, eq, gt, isNull } from "drizzle-orm";
 import { z } from "zod";
+import { parseJsonBody } from "../../../../lib/json-api";
 
 const hash = (value: string) => createHash("sha256").update(value).digest("hex");
 
@@ -20,11 +21,7 @@ const schema = z
   });
 
 async function parseBody(request: Request) {
-  const contentType = request.headers.get("content-type") ?? "";
-  if (contentType.includes("application/json")) {
-    return schema.safeParse(await request.json());
-  }
-  return schema.safeParse(Object.fromEntries(await request.formData()));
+  return parseJsonBody(request, schema);
 }
 
 export const GET: APIRoute = () =>
@@ -35,13 +32,11 @@ export const GET: APIRoute = () =>
 
 export const POST: APIRoute = async ({ request, clientAddress }) => {
   const parsed = await parseBody(request);
-  if (!parsed.success || !process.env.DATABASE_URL) {
-    const passwordIssue = parsed.success ? undefined : parsed.error.issues.find((issue) => issue.path[0] === "password");
-    const confirmationIssue = parsed.success ? undefined : parsed.error.issues.find((issue) => issue.path[0] === "confirmation");
-    return Response.json(
-      { ok: false, error: passwordIssue?.message ?? confirmationIssue?.message ?? "Solicitação inválida." },
-      { status: 400 }
-    );
+  if (!parsed.ok) {
+    return Response.json({ ok: false, error: parsed.error }, { status: parsed.status });
+  }
+  if (!process.env.DATABASE_URL) {
+    return Response.json({ ok: false, error: "Solicitação inválida." }, { status: 400 });
   }
 
   const connection = createDatabase(process.env.DATABASE_URL);

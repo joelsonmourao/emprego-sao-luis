@@ -52,12 +52,18 @@ test("admin login API rejects GET with 405", async ({ request }) => {
 
 const e2eOrigin = "http://127.0.0.1:4321";
 
-test("admin login API accepts POST and rejects invalid credentials", async ({ request }) => {
+test("admin login API accepts JSON POST and rejects invalid credentials", async ({ request }) => {
   const response = await request.post("/api/admin/login", {
-    form: { email: "inexistente@example.com", password: "senha-invalida9", next: "/admin" },
-    headers: { Origin: e2eOrigin, Referer: `${e2eOrigin}/admin/login` },
+    headers: {
+      Origin: e2eOrigin,
+      Referer: `${e2eOrigin}/admin/login`,
+      "Content-Type": "application/json",
+      Accept: "application/json"
+    },
+    data: { email: "inexistente@example.com", password: "senha-invalida9", mfaCode: "" },
     failOnStatusCode: false
   });
+  expect(response.status()).not.toBe(403);
   expect([400, 401, 429, 503]).toContain(response.status());
   await expect(response.json()).resolves.toMatchObject({ ok: false });
 });
@@ -108,8 +114,13 @@ test("POST /api/admin/login with valid credentials returns JSON redirect", async
   test.skip(!e2eAdminEmail || !e2eAdminPassword || !process.env.DATABASE_URL, "Credenciais E2E não configuradas");
 
   const response = await request.post("/api/admin/login", {
-    form: { email: e2eAdminEmail!, password: e2eAdminPassword!, next: "/admin" },
-    headers: { Origin: e2eOrigin, Referer: `${e2eOrigin}/admin/login` },
+    headers: {
+      Origin: e2eOrigin,
+      Referer: `${e2eOrigin}/admin/login`,
+      "Content-Type": "application/json",
+      Accept: "application/json"
+    },
+    data: { email: e2eAdminEmail!, password: e2eAdminPassword!, mfaCode: "" },
     failOnStatusCode: false
   });
 

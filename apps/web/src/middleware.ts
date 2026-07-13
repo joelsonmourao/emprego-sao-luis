@@ -6,6 +6,7 @@ import { COMPANY_COOKIE, verifyCompanySession } from "./lib/company-auth";
 import { createDatabase, redirects } from "@es/db";
 import { and, eq } from "drizzle-orm";
 import { logServerError } from "./lib/server-error";
+import { isJsonAuthApiPath, isTrustedApiOrigin } from "./lib/trusted-origin";
 
 const CANONICAL_HOST = "empregossaoluis.com.br";
 const PUBLIC_ADMIN_PATHS = new Set(["/admin/login", "/admin/esqueci-senha", "/admin/redefinir-senha"]);
@@ -20,6 +21,16 @@ export const onRequest = defineMiddleware(async (context, next) => {
   }
 
   const path = context.url.pathname;
+
+  if (isJsonAuthApiPath(path) && !["GET", "HEAD", "OPTIONS"].includes(context.request.method)) {
+    const origin = context.request.headers.get("origin");
+    if (!isTrustedApiOrigin(origin, context.url.origin)) {
+      const denied = Response.json({ ok: false, error: "Cross-site request forbidden." }, { status: 403 });
+      denied.headers.set("X-ES-App", "astro");
+      return denied;
+    }
+  }
+
   if (path === "/anunciar-vaga") return context.redirect("/publicar-vaga", 301);
 
   if (context.request.method === "GET" && process.env.DATABASE_URL && !path.startsWith("/api/") && !path.startsWith("/admin") && !path.startsWith("/empresa")) {
