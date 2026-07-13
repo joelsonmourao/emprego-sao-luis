@@ -1,5 +1,6 @@
 import bcrypt from "bcryptjs";
 import { eq } from "drizzle-orm";
+import { assertAdminPasswordLength } from "@es/shared";
 import { createDatabase, permissions, rolePermissions, roles, userRoles, users } from "../src/index.js";
 import { validateAdminBootstrapEnv } from "./migrate-flags.js";
 
@@ -92,7 +93,7 @@ export async function seedRbac(): Promise<SeedRbacResult> {
     let adminEmail: string | undefined;
 
     if (email && password) {
-      if (password.length < 14) throw new Error("ADMIN_INITIAL_PASSWORD deve ter ao menos 14 caracteres.");
+      assertAdminPasswordLength(password);
 
       const [existingUser] = await connection.db.select().from(users).where(eq(users.email, email)).limit(1);
       if (existingUser) {

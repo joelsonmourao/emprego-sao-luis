@@ -1,5 +1,6 @@
 ---
 import AdminLayout from "../../layouts/AdminLayout.astro";
+import { ADMIN_PASSWORD_MIN_LENGTH } from "@es/shared";
 import { can } from "../../lib/auth";
 import { ADMIN_PANEL_ROLES, MANAGEABLE_ROLES } from "../../lib/users-admin";
 import { createDatabase, roles, sessions, userRoles, users } from "@es/db";
@@ -98,7 +99,7 @@ if (process.env.DATABASE_URL) {
     <form class="mt-4 grid gap-3 md:grid-cols-2" method="post" action="/api/admin/admins">
       <input class="rounded-lg border px-3 py-2" name="name" placeholder="Nome" required />
       <input class="rounded-lg border px-3 py-2" name="email" type="email" placeholder="E-mail" required />
-      <input class="rounded-lg border px-3 py-2" name="password" type="password" placeholder="Senha (mín. 14 caracteres)" minlength="14" required />
+      <input class="rounded-lg border px-3 py-2" name="password" type="password" placeholder={`Senha (mín. ${ADMIN_PASSWORD_MIN_LENGTH} caracteres)`} minlength={ADMIN_PASSWORD_MIN_LENGTH} required />
       <select class="rounded-lg border px-3 py-2" name="roleKey" required>
         {MANAGEABLE_ROLES.filter((key) => key !== "SUPER_ADMIN" || auth.roles.includes("SUPER_ADMIN")).map((key) => (
           <option value={key}>{key}</option>

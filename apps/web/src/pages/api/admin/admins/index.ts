@@ -1,6 +1,7 @@
 import type { APIRoute } from "astro";
 import bcrypt from "bcryptjs";
 import { auditLogs, createDatabase, roles, userRoles, users } from "@es/db";
+import { adminPasswordSchema } from "@es/shared";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
 import { can } from "../../../../lib/auth";
@@ -9,7 +10,7 @@ import { canAssignRole, MANAGEABLE_ROLES } from "../../../../lib/users-admin";
 const schema = z.object({
   name: z.string().trim().min(2).max(120),
   email: z.string().email(),
-  password: z.string().min(14),
+  password: adminPasswordSchema(),
   roleKey: z.enum(MANAGEABLE_ROLES)
 });
 
@@ -19,7 +20,10 @@ export const POST: APIRoute = async ({ request, locals, redirect, clientAddress 
   if (!process.env.DATABASE_URL) return new Response("Banco indisponível", { status: 503 });
 
   const parsed = schema.safeParse(Object.fromEntries(await request.formData()));
-  if (!parsed.success) return new Response("Dados inválidos", { status: 400 });
+  if (!parsed.success) {
+    const passwordIssue = parsed.error.issues.find((issue) => issue.path[0] === "password");
+    return new Response(passwordIssue?.message ?? "Dados inválidos", { status: 400 });
+  }
   if (!canAssignRole(auth.roles, parsed.data.roleKey)) return new Response("Escalada de privilégio bloqueada", { status: 403 });
 
   const connection = createDatabase(process.env.DATABASE_URL);

@@ -36,7 +36,7 @@ describe("migrate flags", () => {
     expect(validateAdminBootstrapEnv({
       ADMIN_INITIAL_EMAIL: "admin@example.com",
       ADMIN_INITIAL_NAME: "Administrador",
-      ADMIN_INITIAL_PASSWORD: "senha-segura-14"
+      ADMIN_INITIAL_PASSWORD: "senha-ok-9"
     })).toBeNull();
   });
 });
@@ -81,7 +81,8 @@ describe("seed idempotency", () => {
     expect(seed).toContain("Administrador criado");
     expect(seed).not.toMatch(/stdout\.write\([^)]*password/i);
     expect(seed).not.toMatch(/console\.log\([^)]*password/i);
-    expect(seed).toContain("SEED_RBAC_REQUIRE_ADMIN");
+    expect(seed).toContain("assertAdminPasswordLength");
+    expect(seed).toContain("@es/shared");
     expect(seed).toContain("validateAdminBootstrapEnv");
   });
 
