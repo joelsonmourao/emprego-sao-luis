@@ -68,7 +68,7 @@ const steps = [
 ---
 <BaseLayout title="Empregos São Luís — Vagas em São Luís e Maranhão" description={identity.tagline}>
   <PageHero kicker={identity.siteName} title="Seu próximo trabalho pode estar mais perto do que você imagina." description={identity.tagline}>
-    <form class="mt-8 rounded-3xl border border-white/15 bg-white/95 p-4 text-[var(--es-ink)] shadow-2xl backdrop-blur sm:p-5" action="/vagas" method="get" role="search">
+    <form class="hero-search-panel mt-8 rounded-3xl border p-4 shadow-2xl sm:p-5" action="/vagas" method="get" role="search">
       <div class="grid gap-3 lg:grid-cols-4">
         <label class="grid gap-1 text-sm font-semibold lg:col-span-2">
           <span>Cargo ou palavra-chave</span>
@@ -99,7 +99,7 @@ const steps = [
         </div>
       </div>
       <div class="mt-4 flex flex-wrap gap-2">
-        <span class="text-xs font-bold uppercase tracking-wide text-[var(--es-muted)]">Populares:</span>
+        <span class="hero-search-meta text-xs font-bold uppercase tracking-wide">Populares:</span>
         {quickFilters.map(([label, href]) => <a class="chip hover:border-[var(--brand-primary)] hover:text-[var(--brand-primary)]" href={href}>{label}</a>)}
       </div>
     </form>

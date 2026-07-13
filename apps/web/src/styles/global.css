@@ -17,6 +17,12 @@
   --danger: #DC2626;
   --info: #2563EB;
   --es-shadow: 0 8px 30px rgba(26, 26, 26, 0.06);
+  --es-ink: var(--text-primary);
+  --es-muted: var(--text-secondary);
+  --es-border: #D1D5DB;
+  --es-cream: var(--brand-background);
+  --es-cream-dark: var(--brand-background);
+  --es-placeholder: #6B7280;
   font-family: "DM Sans", ui-sans-serif, system-ui, sans-serif;
 }
 
@@ -242,4 +248,79 @@ textarea:focus-visible {
 .es-dropzone.es-dropzone-active {
   border-color: var(--brand-primary);
   background: color-mix(in srgb, var(--brand-primary) 6%, var(--brand-surface));
+}
+
+/* Painel claro de busca/filtros — isola contraste do hero vermelho */
+.hero-search-panel,
+.es-light-form-panel {
+  color: #1a1a1a;
+  background: #ffffff;
+  color-scheme: light;
+}
+
+.hero-search-panel label,
+.hero-search-panel legend,
+.es-light-form-panel label,
+.es-light-form-panel legend {
+  color: #1a1a1a !important;
+}
+
+.hero-search-panel input,
+.hero-search-panel select,
+.hero-search-panel textarea,
+.es-light-form-panel input,
+.es-light-form-panel select,
+.es-light-form-panel textarea {
+  color: #1a1a1a !important;
+  background-color: #ffffff !important;
+  border-color: #d1d5db;
+  -webkit-text-fill-color: #1a1a1a;
+  opacity: 1;
+}
+
+.hero-search-panel input::placeholder,
+.hero-search-panel textarea::placeholder,
+.es-light-form-panel input::placeholder,
+.es-light-form-panel textarea::placeholder {
+  color: #6b7280 !important;
+  -webkit-text-fill-color: #6b7280;
+  opacity: 1;
+}
+
+.hero-search-panel select option,
+.es-light-form-panel select option {
+  color: #1a1a1a;
+  background: #ffffff;
+}
+
+.hero-search-panel input:-webkit-autofill,
+.hero-search-panel input:-webkit-autofill:hover,
+.hero-search-panel input:-webkit-autofill:focus,
+.es-light-form-panel input:-webkit-autofill,
+.es-light-form-panel input:-webkit-autofill:hover,
+.es-light-form-panel input:-webkit-autofill:focus {
+  -webkit-text-fill-color: #1a1a1a !important;
+  box-shadow: 0 0 0 1000px #ffffff inset !important;
+  caret-color: #1a1a1a;
+}
+
+.hero-search-panel button[type="submit"],
+.es-light-form-panel button[type="submit"] {
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff;
+}
+
+.hero-search-panel input:focus,
+.hero-search-panel select:focus,
+.hero-search-panel textarea:focus,
+.es-light-form-panel input:focus,
+.es-light-form-panel select:focus,
+.es-light-form-panel textarea:focus {
+  border-color: var(--brand-primary);
+  outline: 3px solid color-mix(in srgb, var(--brand-primary) 25%, transparent);
+  outline-offset: 1px;
+}
+
+.hero-search-panel .hero-search-meta {
+  color: #6b7280 !important;
 }

@@ -7,11 +7,13 @@ interface Props {
 }
 const { kicker, title, description, pattern = true } = Astro.props;
 ---
-<section class={`es-section ${pattern ? "hero-pattern text-white" : "bg-[var(--es-cream-dark)]"}`}>
+<section class={`es-section ${pattern ? "hero-pattern" : "bg-[var(--es-cream-dark)]"}`}>
   <div class="es-container">
-    {kicker && <p class="es-kicker text-white/80">{kicker}</p>}
-    <h1 class="font-display mt-3 max-w-4xl text-4xl font-black leading-tight sm:text-5xl lg:text-6xl">{title}</h1>
-    {description && <p class={`mt-4 max-w-2xl text-lg ${pattern ? "text-white/85" : "text-[var(--es-muted)]"}`}>{description}</p>}
+    <div class={pattern ? "text-white" : ""}>
+      {kicker && <p class={`es-kicker ${pattern ? "text-white/80" : ""}`}>{kicker}</p>}
+      <h1 class="font-display mt-3 max-w-4xl text-4xl font-black leading-tight sm:text-5xl lg:text-6xl">{title}</h1>
+      {description && <p class={`mt-4 max-w-2xl text-lg ${pattern ? "text-white/85" : "text-[var(--es-muted)]"}`}>{description}</p>}
+    </div>
     <slot />
   </div>
 </section>

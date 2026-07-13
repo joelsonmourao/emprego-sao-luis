@@ -35,7 +35,7 @@ const benefits = [
         {status === "descadastrado" && <p class="mb-4 rounded-xl border border-[var(--es-border)] bg-[var(--es-cream)] p-4 text-sm">Você foi descadastrado dos alertas por e-mail.</p>}
 
         <h2 class="font-display text-2xl font-black">Criar alerta</h2>
-        <form class="mt-6 grid gap-4" method="post" action="/api/subscriptions">
+        <form class="es-light-form-panel mt-6 grid gap-4" method="post" action="/api/subscriptions">
           <fieldset class="grid gap-4">
             <legend class="font-bold">Contato</legend>
             <label class="grid gap-1 text-sm font-semibold">E-mail<input class="rounded-xl border border-[var(--es-border)] px-3 py-2.5" type="email" name="email" required /></label>

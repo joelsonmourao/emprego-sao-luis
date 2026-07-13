@@ -91,7 +91,7 @@ const activeFilters = [
 
       <div class="mt-8 grid gap-8 lg:grid-cols-[280px_1fr]">
         <aside class="hidden lg:block">
-          <form class="es-card sticky top-24 space-y-4 p-5" method="get">
+          <form class="es-card es-light-form-panel sticky top-24 space-y-4 p-5" method="get">
             <p class="font-display text-lg font-black">Filtros</p>
             <label class="grid gap-1 text-sm font-semibold"><span>Cargo</span><input class="rounded-xl border border-[var(--es-border)] px-3 py-2.5" name="q" value={q} /></label>
             <label class="grid gap-1 text-sm font-semibold"><span>Empresa</span><input class="rounded-xl border border-[var(--es-border)] px-3 py-2.5" name="empresa" value={company} /></label>
@@ -125,7 +125,7 @@ const activeFilters = [
         <div>
           <details class="es-card mb-5 p-4 lg:hidden">
             <summary class="cursor-pointer font-display text-lg font-black">Filtros e ordenação</summary>
-            <form class="mt-4 grid gap-3" method="get">
+            <form class="es-light-form-panel mt-4 grid gap-3" method="get">
               <input class="rounded-xl border px-3 py-2.5" name="q" value={q} placeholder="Cargo" />
               <input class="rounded-xl border px-3 py-2.5" name="empresa" value={company} placeholder="Empresa" />
               <input class="rounded-xl border px-3 py-2.5" name="cidade" value={city} placeholder="Cidade" />

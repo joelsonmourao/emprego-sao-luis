@@ -32,7 +32,7 @@ const brand = await getBrandIdentity();
       {activated && (
         <p class="mt-4 rounded-xl border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-800">Conta ativada. Faça login com sua nova senha.</p>
       )}
-      <form class="mt-8 grid gap-5" method="post" action="/api/empresa/login">
+      <form class="es-light-form-panel mt-8 grid gap-5" method="post" action="/api/empresa/login">
         <input type="hidden" name="next" value={next} />
         <label class="es-field">
           <span class="es-label">E-mail</span>

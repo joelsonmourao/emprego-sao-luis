@@ -17,7 +17,7 @@ const price = plan.promoPrice ?? plan.price;
       <p class="mt-3 text-[var(--text-secondary)]">{plan.description}</p>
       <p class="mt-4 text-2xl font-black text-[var(--brand-primary)]">R$ {Number(price).toFixed(2).replace(".", ",")}</p>
 
-      <form class="es-card mt-8 grid gap-4 rounded-2xl p-6" method="post" action="/api/commercial/order">
+      <form class="es-card es-light-form-panel mt-8 grid gap-4 rounded-2xl p-6" method="post" action="/api/commercial/order">
         <input type="hidden" name="planSlug" value={plan.slug} />
         <label class="grid gap-1 text-sm font-semibold">Nome da empresa<input class="rounded-xl border border-[var(--brand-border)] px-3 py-2.5" name="companyName" required maxlength="180" /></label>
         <label class="grid gap-1 text-sm font-semibold">Responsável<input class="rounded-xl border border-[var(--brand-border)] px-3 py-2.5" name="contactName" required maxlength="120" /></label>
