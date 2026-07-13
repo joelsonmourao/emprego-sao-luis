@@ -14,7 +14,7 @@ export const ADMIN_NAV_GROUPS: AdminNavGroup[] = [
     items: [
       { label: "Todas as vagas", href: "/admin/vagas", permission: "jobs.read" },
       { label: "Nova vaga", href: "/admin/vagas/nova", permission: "jobs.create" },
-      { label: "Importar planilha", href: "/admin/importacao", permission: "imports.manage" },
+      { label: "Importar planilha", href: "/admin/vagas/importar", permission: "imports.manage" },
       { label: "Programação", href: "/admin/programacao", permission: "jobs.publish" }
     ]
   },

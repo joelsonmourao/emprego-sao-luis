@@ -30,6 +30,7 @@ describe("admin navigation", () => {
     expect(labels).toContain("/admin/seo/auditoria");
     expect(labels).toContain("/admin/configuracoes/identidade-visual");
     expect(labels).toContain("/admin/contatos");
+    expect(labels).toContain("/admin/vagas/importar");
     expect(labels).toContain("/admin/instagram");
   });
 

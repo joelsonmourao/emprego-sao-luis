@@ -4,28 +4,121 @@ import { importModeSchema, suggestImportMapping } from "@es/shared";
 import { createDatabase, importBatches } from "@es/db";
 import { eq } from "drizzle-orm";
 import { can } from "../../../../lib/auth";
-import { putPrivateObject } from "../../../../lib/storage";
+import { adminJsonError, adminJsonRedirect, adminMethodNotAllowed } from "../../../../lib/admin-api-response";
+import { logServerError } from "../../../../lib/server-error";
+import { isStorageConfigured, putPrivateObject } from "../../../../lib/storage";
 import * as XLSX from "xlsx";
 
 const MAX_BYTES = 20 * 1024 * 1024;
-export const POST: APIRoute = async ({ request, locals, redirect }) => {
-  const auth = locals.auth!; if (!can(auth, "imports.manage")) return Response.json({ ok: false, error: "Proibido." }, { status: 403 });
-  const form = await request.formData(); const file = form.get("file"); const mode = importModeSchema.safeParse(form.get("mode"));
-  if (!(file instanceof File) || !mode.success) return Response.json({ ok: false, error: "Arquivo ou modo inválido." }, { status: 400 });
-  if (file.size === 0 || file.size > MAX_BYTES || !/\.(xlsx|csv)$/i.test(file.name)) return Response.json({ ok: false, error: "Envie XLSX/CSV de até 20 MB." }, { status: 400 });
-  if (!process.env.DATABASE_URL) return Response.json({ ok: false, error: "Banco indisponível." }, { status: 503 });
-  const bytes = new Uint8Array(await file.arrayBuffer()); const fileHash = createHash("sha256").update(bytes).digest("hex"); const storageKey = `imports/${fileHash}/${file.name.replace(/[^a-zA-Z0-9._-]/g, "_")}`;
+
+export const GET: APIRoute = () => adminMethodNotAllowed("POST");
+
+export const POST: APIRoute = async ({ request, locals }) => {
+  const auth = locals.auth;
+  if (!auth || !can(auth, "imports.manage")) {
+    return adminJsonError("Sem permissão para importar.", 403);
+  }
+
+  let form: FormData;
+  try {
+    form = await request.formData();
+  } catch (error) {
+    logServerError("route:/api/admin/imports:form", error);
+    return adminJsonError("Requisição inválida.", 400);
+  }
+
+  const file = form.get("file");
+  const mode = importModeSchema.safeParse(form.get("mode"));
+  if (!(file instanceof File) || !mode.success) {
+    return adminJsonError("Arquivo ou modo inválido.", 400, { details: ["Envie um arquivo XLSX/CSV e selecione o destino."] });
+  }
+
+  if (file.size === 0) {
+    return adminJsonError("Arquivo vazio.", 400, { details: ["A planilha não contém dados."] });
+  }
+  if (file.size > MAX_BYTES) {
+    return adminJsonError("Arquivo muito grande.", 400, { details: ["O limite é 20 MB."] });
+  }
+  if (!/\.(xlsx|csv)$/i.test(file.name)) {
+    return adminJsonError("Extensão não suportada.", 400, { details: ["Use arquivos .xlsx ou .csv."] });
+  }
+
+  if (!process.env.DATABASE_URL) {
+    return adminJsonError("Banco de dados indisponível.", 503);
+  }
+  if (!isStorageConfigured()) {
+    return adminJsonError("Armazenamento ainda não está configurado.", 503, {
+      code: "STORAGE_UNAVAILABLE",
+      details: ["Configure S3/R2 no ambiente antes de importar planilhas."]
+    });
+  }
+
   const connection = createDatabase(process.env.DATABASE_URL);
   try {
+    const bytes = new Uint8Array(await file.arrayBuffer());
+    const fileHash = createHash("sha256").update(bytes).digest("hex");
+    const storageKey = `imports/${fileHash}/${file.name.replace(/[^a-zA-Z0-9._-]/g, "_")}`;
+
     const [existing] = await connection.db.select().from(importBatches).where(eq(importBatches.fileHash, fileHash)).limit(1);
-    if (existing) return redirect(`/admin/importacao?batch=${existing.id}&reused=1`, 303);
-    const workbook = XLSX.read(bytes, { type: "array", cellDates: true });
-    const sheets = workbook.SheetNames.map((name) => { const sheet = workbook.Sheets[name]; const rows = sheet ? XLSX.utils.sheet_to_json<Record<string, unknown>>(sheet, { defval: "", raw: false }) : []; const headers = rows[0] ? Object.keys(rows[0]) : []; return { name, headers, preview: rows.slice(0, 5) }; });
-    if (!sheets.length || sheets.every((sheet) => sheet.headers.length === 0)) return Response.json({ ok: false, error: "A planilha não possui cabeçalhos ou linhas legíveis." }, { status: 400 });
-    await putPrivateObject(storageKey, bytes, file.type || "application/octet-stream");
+    if (existing) {
+      return adminJsonRedirect(`/admin/vagas/importar?batch=${existing.id}&reused=1`);
+    }
+
+    let workbook: XLSX.WorkBook;
+    try {
+      workbook = XLSX.read(bytes, { type: "array", cellDates: true });
+    } catch (error) {
+      logServerError("route:/api/admin/imports:parse", error);
+      return adminJsonError("Arquivo corrompido ou ilegível.", 400, { details: ["Não foi possível ler a planilha."] });
+    }
+
+    const sheets = workbook.SheetNames.map((name) => {
+      const sheet = workbook.Sheets[name];
+      const rows = sheet ? XLSX.utils.sheet_to_json<Record<string, unknown>>(sheet, { defval: "", raw: false }) : [];
+      const headers = rows[0] ? Object.keys(rows[0]) : [];
+      return { name, headers, preview: rows.slice(0, 5) };
+    });
+
+    if (!sheets.length || sheets.every((sheet) => sheet.headers.length === 0)) {
+      return adminJsonError("Planilha sem cabeçalhos.", 400, { details: ["Inclua cabeçalhos e ao menos uma linha de dados."] });
+    }
+
+    try {
+      await putPrivateObject(storageKey, bytes, file.type || "application/octet-stream");
+    } catch (error) {
+      logServerError("route:/api/admin/imports:storage", error);
+      return adminJsonError("Armazenamento indisponível.", 503, { code: "STORAGE_UNAVAILABLE" });
+    }
+
     const first = sheets[0]!;
-    const [batch] = await connection.db.insert(importBatches).values({ fileHash, fileName: file.name, settings: { stage: "CONFIGURE", storageKey, mode: mode.data, sheets, sheetName: first.name, mapping: suggestImportMapping(first.headers), duplicateStrategy: "IGNORE" }, createdBy: auth.id }).returning();
-    if (!batch) throw new Error("Falha ao criar lote.");
-    return redirect(`/admin/importacao?batch=${batch.id}&configure=1`, 303);
-  } finally { await connection.close(); }
+    const [batch] = await connection.db
+      .insert(importBatches)
+      .values({
+        fileHash,
+        fileName: file.name,
+        settings: {
+          stage: "CONFIGURE",
+          storageKey,
+          mode: mode.data,
+          sheets,
+          sheetName: first.name,
+          mapping: suggestImportMapping(first.headers),
+          duplicateStrategy: "IGNORE"
+        },
+        createdBy: auth.id
+      })
+      .returning();
+
+    if (!batch) {
+      logServerError("route:/api/admin/imports:batch", new Error("Falha ao criar lote."));
+      return adminJsonError("Não foi possível criar o lote.", 500);
+    }
+
+    return adminJsonRedirect(`/admin/vagas/importar?batch=${batch.id}&step=mapear`);
+  } catch (error) {
+    logServerError("route:/api/admin/imports", error);
+    return adminJsonError("Não foi possível analisar o arquivo.", 500);
+  } finally {
+    await connection.close();
+  }
 };
