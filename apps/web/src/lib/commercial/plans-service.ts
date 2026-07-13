@@ -4,6 +4,8 @@ import {
   createDatabase
 } from "@es/db";
 import { and, asc, count, eq, ilike, or } from "drizzle-orm";
+import { describePostgresError } from "../postgres-error.js";
+import { logServerError } from "../server-error.js";
 import { slugify } from "./constants";
 
 export type PlanInput = {
@@ -259,11 +261,17 @@ export async function listPublicPlans() {
   if (!process.env.DATABASE_URL) return [];
   const connection = createDatabase(process.env.DATABASE_URL);
   try {
-    return connection.db
+    return await connection.db
       .select()
       .from(commercialPlans)
       .where(and(eq(commercialPlans.active, true), eq(commercialPlans.archived, false), eq(commercialPlans.setupRequired, false)))
       .orderBy(asc(commercialPlans.sortOrder), asc(commercialPlans.name));
+  } catch (error) {
+    logServerError("commercial:listPublicPlans", {
+      ...describePostgresError(error),
+      table: "es_commercial_plans"
+    });
+    return [];
   } finally {
     await connection.close();
   }
