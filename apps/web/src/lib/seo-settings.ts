@@ -1,6 +1,7 @@
 import { eq } from "drizzle-orm";
 import { createDatabase, settings } from "@es/db";
 import { defaultSeoSettings, mergeSeoSettings, type SeoSettings } from "@es/seo";
+import { logServerError } from "./server-error";
 
 const KEY = "seo_settings";
 
@@ -10,6 +11,9 @@ export async function getSeoSettings(): Promise<SeoSettings> {
   try {
     const [row] = await connection.db.select().from(settings).where(eq(settings.key, KEY));
     return mergeSeoSettings(row?.value);
+  } catch (error) {
+    logServerError("seo-settings:load", error);
+    return defaultSeoSettings;
   } finally {
     await connection.close();
   }

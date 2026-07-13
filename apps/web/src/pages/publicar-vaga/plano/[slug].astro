@@ -2,11 +2,20 @@
 import BaseLayout from "../../../layouts/BaseLayout.astro";
 import Breadcrumbs from "../../../components/ui/Breadcrumbs.astro";
 import { getPlanBySlug } from "../../../lib/commercial";
+import { isPurchasablePlan } from "../../../lib/commercial/publication-page-state";
+import { getCommercialContactUrl } from "../../../lib/commercial/payment-settings";
+import { logServerError } from "../../../lib/server-error";
 
 const { slug } = Astro.params;
-const plan = slug ? await getPlanBySlug(slug) : null;
-if (!plan || !plan.active) return Astro.redirect("/publicar-vaga", 302);
+let plan = null;
+try {
+  plan = slug ? await getPlanBySlug(slug) : null;
+} catch (error) {
+  logServerError("route:/publicar-vaga/plano/:slug", error);
+}
+if (!plan || !isPurchasablePlan(plan)) return Astro.redirect("/publicar-vaga", 302);
 const price = plan.promoPrice ?? plan.price;
+const commercialContactUrl = await getCommercialContactUrl();
 ---
 <BaseLayout title={`${plan.name} — Publicar vaga`} description={plan.description} canonical={`/publicar-vaga/plano/${plan.slug}`}>
   <section class="es-section">
@@ -27,7 +36,7 @@ const price = plan.promoPrice ?? plan.price;
         <label class="grid gap-1 text-sm font-semibold">Cidade<input class="rounded-xl border border-[var(--brand-border)] px-3 py-2.5" name="city" required maxlength="120" placeholder="Ex.: São Luís" /></label>
         <label class="flex items-start gap-2 text-sm"><input type="checkbox" name="termsAccepted" value="1" required /><span>Li e aceito os <a href="/termos" class="underline">termos de uso</a> e a <a href="/privacidade" class="underline">política de privacidade</a>.</span></label>
         <button class="es-btn es-btn-primary" type="submit">Continuar para pagamento</button>
-        <a class="text-center text-sm text-[var(--text-secondary)] underline" href="/contato">Preciso de um plano personalizado</a>
+        {commercialContactUrl && <a class="text-center text-sm text-[var(--text-secondary)] underline" href={commercialContactUrl}>Preciso de um plano personalizado</a>}
       </form>
     </div>
   </section>

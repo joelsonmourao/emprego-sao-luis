@@ -48,6 +48,12 @@ describe("commercial payment settings", () => {
     });
     expect(parsed.manualPixEnabled).toBe(true);
     expect(parsed.mercadoPagoEnabled).toBe(false);
+    expect(parsed.commercialContactUrl).toBe("");
+  });
+
+  it("rejeita configuração nula ou JSON incompatível sem lançar", () => {
+    expect(paymentSettingsSchema.safeParse(null).success).toBe(false);
+    expect(paymentSettingsSchema.safeParse("inválido").success).toBe(false);
   });
 });
 
@@ -76,6 +82,14 @@ describe("commercial payment status transitions", () => {
     expect(source).toContain('status: "MANUAL_REVIEW"');
     expect(source).toContain('method: "pix_manual"');
     expect(source).toContain("MANUAL_PROOF_SUBMITTED");
+  });
+});
+
+describe("commercial order validation", () => {
+  it("bloqueia criação de pedido com preço zero ou inválido", () => {
+    const source = readFileSync(resolve("apps/web/src/lib/commercial/orders-service.ts"), "utf8");
+    expect(source).toContain("Number.isFinite(Number(amount))");
+    expect(source).toContain("Number(amount) <= 0");
   });
 });
 

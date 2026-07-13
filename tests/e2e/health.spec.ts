@@ -32,6 +32,33 @@ test("admin is protected", async ({ request }) => {
   expect(await response.text()).toContain("Painel administrativo");
 });
 
+test("admin login accepts the centralized nine-character policy", async ({ request }) => {
+  const response = await request.get("/admin/login");
+  expect(response.ok()).toBe(true);
+  const html = await response.text();
+  expect(html).toContain('minlength="9"');
+  expect(html).toContain("A senha deve ter pelo menos 9 caracteres.");
+});
+
+test("publish job renders a safe setup state without commercial configuration", async ({ request }) => {
+  const response = await request.get("/publicar-vaga", { failOnStatusCode: false });
+  expect(response.status()).toBe(200);
+  const html = await response.text();
+  expect(html).toContain("Publicação de vagas em configuração");
+  expect(html).toContain("Os planos para publicação ainda estão sendo preparados.");
+  expect(html).not.toContain(">Falar com o comercial</a>");
+});
+
+test("admin login and publish job remain readable on mobile", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto("/admin/login");
+  await expect(page.locator('input[name="email"]')).toBeVisible();
+  await expect(page.locator('input[name="password"]')).toBeVisible();
+  await expect(page.getByText("A senha deve ter pelo menos 9 caracteres.")).toBeVisible();
+  await page.goto("/publicar-vaga");
+  await expect(page.getByRole("heading", { name: "Publicação de vagas em configuração" })).toBeVisible();
+});
+
 test("custom 404 belongs to the Astro portal", async ({ request }) => {
   const response = await request.get("/rota-inexistente-e2e", { failOnStatusCode: false });
   expect(response.status()).toBe(404);

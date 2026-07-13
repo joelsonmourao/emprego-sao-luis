@@ -61,6 +61,7 @@ export async function createOrder(input: {
     const [plan] = await connection.db.select().from(commercialPlans).where(eq(commercialPlans.id, input.planId)).limit(1);
     if (!plan || !plan.active || plan.archived || plan.setupRequired) throw new Error("Plano indisponível.");
     const amount = plan.promoPrice ?? plan.price;
+    if (!Number.isFinite(Number(amount)) || Number(amount) <= 0) throw new Error("Plano indisponível.");
     const code = orderCode();
     const expiresAt = new Date(Date.now() + 48 * 3600000);
     const timeline = appendTimeline([], { type: "ORDER_CREATED", planSlug: plan.slug });

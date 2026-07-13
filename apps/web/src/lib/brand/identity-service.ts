@@ -13,6 +13,7 @@ import {
 } from "./constants";
 import { detectMime, validateAndProcessImage, contrastRatio } from "./image-processor";
 import { brandStorageKey, buildBrandPublicUrl, getBrandFile, getStorageInfo, putBrandFile, siteBaseUrl } from "./storage";
+import { logServerError } from "../server-error";
 
 const SETTINGS_KEY = "brand_identity";
 const ALL_KEYS = Object.values(BRAND_ASSET_KEYS);
@@ -118,6 +119,8 @@ export async function getBrandIdentity(force = false): Promise<BrandIdentityConf
         const key = row.key as BrandAssetKey;
         if (ALL_KEYS.includes(key)) assets[key] = rowToResolved(row);
       }
+    } catch (error) {
+      logServerError("brand-identity:load", error);
     } finally {
       await connection.close();
     }

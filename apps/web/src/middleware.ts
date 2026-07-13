@@ -5,6 +5,7 @@ import { CANDIDATE_COOKIE, verifyCandidateSession } from "./lib/candidate-auth";
 import { COMPANY_COOKIE, verifyCompanySession } from "./lib/company-auth";
 import { createDatabase, redirects } from "@es/db";
 import { and, eq } from "drizzle-orm";
+import { logServerError } from "./lib/server-error";
 
 const CANONICAL_HOST = "empregossaoluis.com.br";
 
@@ -28,6 +29,8 @@ export const onRequest = defineMiddleware(async (context, next) => {
         const status = ([301, 302, 303, 307, 308] as const).find((value) => value === rule.statusCode) ?? 301;
         return context.redirect(rule.destinationPath, status);
       }
+    } catch (error) {
+      logServerError(`middleware:redirects:${path}`, error);
     } finally {
       await connection.close();
     }

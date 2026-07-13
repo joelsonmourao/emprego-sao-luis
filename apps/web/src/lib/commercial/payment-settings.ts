@@ -1,6 +1,7 @@
 import { createDatabase, settings } from "@es/db";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
+import { logServerError } from "../server-error";
 
 export const paymentSettingsSchema = z.object({
   manualPixEnabled: z.boolean().default(false),
@@ -8,7 +9,8 @@ export const paymentSettingsSchema = z.object({
   manualPixHolder: z.string().default(""),
   manualPixQrUrl: z.string().optional(),
   manualPixInstructions: z.string().default("Envie o comprovante após a transferência. A liberação ocorre após revisão manual."),
-  mercadoPagoEnabled: z.boolean().default(false)
+  mercadoPagoEnabled: z.boolean().default(false),
+  commercialContactUrl: z.string().default("")
 });
 
 export type PaymentSettings = z.infer<typeof paymentSettingsSchema>;
@@ -23,6 +25,9 @@ export async function getPaymentSettings(): Promise<PaymentSettings> {
     if (!row?.value) return defaults;
     const parsed = paymentSettingsSchema.safeParse(row.value);
     return parsed.success ? parsed.data : defaults;
+  } catch (error) {
+    logServerError("payment-settings:load", error);
+    return defaults;
   } finally {
     await connection.close();
   }
@@ -47,4 +52,23 @@ export async function savePaymentSettings(input: Partial<PaymentSettings>) {
 export async function isManualPixEnabled() {
   const s = await getPaymentSettings();
   return s.manualPixEnabled && Boolean(s.manualPixKey.trim());
+}
+
+function safeContactUrl(value: string | undefined): string | null {
+  const candidate = value?.trim();
+  if (!candidate) return null;
+  if (candidate.startsWith("/") && !candidate.startsWith("//")) return candidate;
+  try {
+    const url = new URL(candidate);
+    return url.protocol === "https:" || url.protocol === "http:" ? url.toString() : null;
+  } catch {
+    return null;
+  }
+}
+
+export async function getCommercialContactUrl(): Promise<string | null> {
+  const fromEnvironment = safeContactUrl(process.env.COMMERCIAL_CONTACT_URL);
+  if (fromEnvironment) return fromEnvironment;
+  const current = await getPaymentSettings();
+  return safeContactUrl(current.commercialContactUrl);
 }

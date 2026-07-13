@@ -22,6 +22,7 @@ export const PUT: APIRoute = async ({ request, locals }) => {
   if (body.manualPixHolder !== undefined) patch.manualPixHolder = String(body.manualPixHolder);
   if (body.manualPixQrUrl !== undefined) patch.manualPixQrUrl = String(body.manualPixQrUrl);
   if (body.manualPixInstructions !== undefined) patch.manualPixInstructions = String(body.manualPixInstructions);
+  if (body.commercialContactUrl !== undefined) patch.commercialContactUrl = String(body.commercialContactUrl);
   if (body.manualPixKey && !String(body.manualPixKey).startsWith("••")) patch.manualPixKey = String(body.manualPixKey);
   const settings = await savePaymentSettings(patch);
   return Response.json({ ok: true, settings: { ...settings, manualPixKey: settings.manualPixKey ? "••••••••" : "" } });

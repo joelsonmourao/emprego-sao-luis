@@ -1,11 +1,9 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import PageHero from "../../components/ui/PageHero.astro";
-import { listActivePlans } from "../../lib/commercial";
-import { isPaymentAvailable } from "../../lib/payments/gateway";
+import { loadPublicationPageState } from "../../lib/commercial/publication-page-state";
 
-const plans = await listActivePlans();
-const paymentAvailable = await isPaymentAvailable();
+const { plans, paymentAvailable, commercialContactUrl } = await loadPublicationPageState();
 const faqs = [
   ["Como funciona?", "Escolha um plano, informe os dados da empresa, conclua o pagamento e cadastre a vaga após liberação do crédito."],
   ["Quando a vaga é publicada?", "Por padrão, após revisão da equipe. Planos podem incluir destaque no site e no Instagram."],
@@ -51,7 +49,9 @@ const faqs = [
         <h2 class="font-display text-2xl font-black">Planos disponíveis</h2>
         {!paymentAvailable && (
           <p class="mt-3 rounded-xl border border-[var(--warning)] bg-yellow-50 p-3 text-sm text-yellow-900">
-            Pagamento online temporariamente indisponível. Escolha um plano e use “Falar com o comercial” no checkout.
+            {commercialContactUrl
+              ? "Pagamento online temporariamente indisponível. Fale com o atendimento comercial."
+              : "Pagamento temporariamente indisponível. Tente novamente mais tarde."}
           </p>
         )}
         <div class="mt-4 grid gap-4">
@@ -71,13 +71,18 @@ const faqs = [
                   {plan.publishStories && <li>Stories no Instagram</li>}
                   {plan.publishFeed && <li>Post no feed do Instagram</li>}
                 </ul>
-                <a class="es-btn es-btn-primary mt-4 w-full" href={`/publicar-vaga/plano/${plan.slug}`}>Escolher plano</a>
+                {paymentAvailable
+                  ? <a class="es-btn es-btn-primary mt-4 w-full" href={`/publicar-vaga/plano/${plan.slug}`}>Escolher plano</a>
+                  : commercialContactUrl
+                    ? <a class="es-btn es-btn-secondary mt-4 w-full" href={commercialContactUrl}>Falar com o comercial</a>
+                    : <span class="mt-4 block rounded-xl bg-slate-100 p-3 text-center text-sm font-bold text-slate-600">Compra temporariamente indisponível</span>}
               </article>
             );
           }) : (
-            <div class="es-card rounded-2xl p-5">
-              <p class="text-[var(--text-secondary)]">Planos em configuração pelo administrador. Enquanto isso, fale com o comercial.</p>
-              <a class="es-btn es-btn-secondary mt-4" href="/contato">Falar com o comercial</a>
+            <div class="es-card rounded-2xl p-5" role="status">
+              <h3 class="font-display text-xl font-black">Publicação de vagas em configuração</h3>
+              <p class="mt-2 text-[var(--text-secondary)]">Os planos para publicação ainda estão sendo preparados. Você poderá voltar em breve ou falar com o atendimento comercial.</p>
+              {commercialContactUrl && <a class="es-btn es-btn-secondary mt-4" href={commercialContactUrl}>Falar com o comercial</a>}
             </div>
           )}
         </div>

@@ -22,6 +22,10 @@ import AdminLayout from "../../../layouts/AdminLayout.astro";
     <label class="mt-4 block text-sm font-bold">Instruções ao pagador
       <textarea class="mt-1 w-full rounded-xl border border-[var(--brand-border)] p-3" name="manualPixInstructions" id="manualPixInstructions" rows="4"></textarea>
     </label>
+    <label class="mt-4 block text-sm font-bold">URL do contato comercial
+      <input class="mt-1 w-full rounded-xl border border-[var(--brand-border)] p-3" name="commercialContactUrl" id="commercialContactUrl" placeholder="/contato ou https://..." />
+      <span class="mt-1 block text-xs text-[var(--text-secondary)]">O botão comercial só aparece no site quando este campo estiver configurado.</span>
+    </label>
     <p class="mt-4 text-xs text-[var(--text-secondary)]">Mercado Pago: configure <code>PAYMENT_PROVIDER=mercadopago</code> e <code>MERCADOPAGO_ACCESS_TOKEN</code> no ambiente.</p>
     <button class="es-btn es-btn-primary mt-6" type="submit">Salvar configurações</button>
     <p id="save-msg" class="mt-3 text-sm"></p>
@@ -37,6 +41,7 @@ import AdminLayout from "../../../layouts/AdminLayout.astro";
       document.getElementById("manualPixKey").value = s.manualPixKey || "";
       document.getElementById("manualPixQrUrl").value = s.manualPixQrUrl || "";
       document.getElementById("manualPixInstructions").value = s.manualPixInstructions || "";
+      document.getElementById("commercialContactUrl").value = s.commercialContactUrl || "";
     }
     document.getElementById("payment-form")?.addEventListener("submit", async (e) => {
       e.preventDefault();
@@ -46,7 +51,8 @@ import AdminLayout from "../../../layouts/AdminLayout.astro";
         manualPixHolder: form.manualPixHolder.value,
         manualPixKey: form.manualPixKey.value,
         manualPixQrUrl: form.manualPixQrUrl.value,
-        manualPixInstructions: form.manualPixInstructions.value
+        manualPixInstructions: form.manualPixInstructions.value,
+        commercialContactUrl: form.commercialContactUrl.value
       };
       const res = await fetch("/api/admin/commercial/payment-settings", { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
       const data = await res.json();
