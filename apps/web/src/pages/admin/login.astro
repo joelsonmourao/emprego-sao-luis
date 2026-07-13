@@ -75,7 +75,7 @@ const status = Astro.url.searchParams.get("status");
           Entrar
         </button>
       </form>
-      <a class="mt-5 inline-block font-bold text-red-700" href="/recuperar-admin">Esqueci minha senha</a>
+      <a class="mt-5 inline-block font-bold text-red-700" href="/admin/esqueci-senha">Esqueci minha senha</a>
     </main>
     <script>
       const form = document.getElementById("admin-login-form");
@@ -118,25 +118,19 @@ const status = Astro.url.searchParams.get("status");
             const response = await fetch("/api/admin/login", {
               method: "POST",
               body: new FormData(form),
-              credentials: "same-origin",
-              redirect: "manual"
+              credentials: "same-origin"
             });
 
-            if (response.status === 303 || response.status === 302) {
-              const destination = response.headers.get("Location") || "/admin";
-              window.location.assign(destination);
+            const payload = await response.json().catch(() => null);
+            if (response.ok && payload && payload.ok === true && typeof payload.redirect === "string") {
+              window.location.assign(payload.redirect);
               return;
             }
 
-            let message = "Não foi possível entrar. Tente novamente.";
-            try {
-              const payload = await response.json();
-              if (payload && typeof payload.error === "string" && payload.error.trim()) {
-                message = payload.error;
-              }
-            } catch {
-              // Mantém mensagem genérica quando a API não retorna JSON.
-            }
+            const message =
+              payload && typeof payload.error === "string" && payload.error.trim()
+                ? payload.error
+                : "Não foi possível entrar. Tente novamente.";
             showError(message);
           } catch {
             showError("Falha de conexão. Verifique sua rede e tente novamente.");

@@ -117,9 +117,11 @@ export async function seedRbac(): Promise<SeedRbacResult> {
       }, { email, ...(name ? { name } : {}), password });
       adminAction = result.action;
       adminEmail = email;
-      process.stdout.write(`Administrador ${result.action === "created" ? "criado" : "atualizado"}: ${email}\n`);
+      process.stdout.write(`Administrador ${result.action === "created" ? "criado" : "atualizado"}.\n`);
+      process.stdout.write("Permissões aplicadas.\n");
     }
 
+    process.stdout.write("Seed concluído.\n");
     process.stdout.write(
       `RBAC concluído: ${roleKeys.length} papéis, ${permissionKeys.length} permissões, administrador ${adminAction}.\n`
     );

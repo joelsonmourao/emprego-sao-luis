@@ -2,12 +2,15 @@ import type { APIRoute } from "astro";
 import { z } from "zod";
 import { adminPasswordSchema, zEmail } from "@es/shared";
 import { ADMIN_COOKIE, authenticate } from "../../../lib/auth";
+import { logAdminAuthFailure } from "../../../lib/admin-auth-log";
 import { logServerError } from "../../../lib/server-error";
+
+const otpSchema = z.union([z.literal(""), z.string().regex(/^\d{6}$/)]);
 
 const schema = z.object({
   email: zEmail(),
   password: adminPasswordSchema(),
-  otp: z.string().regex(/^\d{6}$/).optional().or(z.literal("")),
+  otp: otpSchema.optional().default(""),
   next: z
     .string()
     .startsWith("/")
@@ -21,7 +24,7 @@ export const GET: APIRoute = () =>
     headers: { Allow: "POST", "Content-Type": "application/json" }
   });
 
-export const POST: APIRoute = async ({ request, cookies, clientAddress, redirect }) => {
+export const POST: APIRoute = async ({ request, cookies, clientAddress }) => {
   const form = Object.fromEntries(await request.formData());
   const parsed = schema.safeParse(form);
   if (!parsed.success) {
@@ -31,6 +34,7 @@ export const POST: APIRoute = async ({ request, cookies, clientAddress, redirect
       { status: 400 }
     );
   }
+
   let result;
   try {
     result = await authenticate(
@@ -41,9 +45,17 @@ export const POST: APIRoute = async ({ request, cookies, clientAddress, redirect
       parsed.data.otp || undefined
     );
   } catch (error) {
-    logServerError("route:/api/admin/login", error);
+    const message = error instanceof Error ? error.message : String(error);
+    if (message.includes("AUTH_SECRET")) {
+      logAdminAuthFailure("auth_secret_missing");
+    } else if (message.includes("DATABASE_URL")) {
+      logAdminAuthFailure("database_unavailable");
+    } else {
+      logServerError("route:/api/admin/login", error);
+    }
     return Response.json({ ok: false, error: "Serviço de autenticação temporariamente indisponível." }, { status: 503 });
   }
+
   if (!result.ok) {
     return Response.json(
       {
@@ -60,6 +72,7 @@ export const POST: APIRoute = async ({ request, cookies, clientAddress, redirect
       { status: result.reason === "rate_limited" ? 429 : 401 }
     );
   }
+
   cookies.set(ADMIN_COOKIE, result.token, {
     httpOnly: true,
     secure: import.meta.env.PROD,
@@ -67,5 +80,6 @@ export const POST: APIRoute = async ({ request, cookies, clientAddress, redirect
     path: "/",
     expires: result.expiresAt
   });
-  return redirect(parsed.data.next ?? "/admin", 303);
+
+  return Response.json({ ok: true, redirect: parsed.data.next ?? "/admin" });
 };

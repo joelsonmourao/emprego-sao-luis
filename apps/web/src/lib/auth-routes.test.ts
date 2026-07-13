@@ -9,7 +9,7 @@ describe("rotas de autenticação separadas", () => {
   it("admin redireciona para /admin e empresa para /empresa/dashboard", () => {
     expect(read("apps/web/src/pages/admin/login.astro")).toContain('return Astro.redirect("/admin")');
     expect(read("apps/web/src/pages/empresa/login.astro")).toContain('return Astro.redirect("/empresa/dashboard")');
-    expect(read("apps/web/src/pages/api/admin/login.ts")).toContain('parsed.data.next ?? "/admin"');
+    expect(read("apps/web/src/pages/api/admin/login.ts")).toContain('Response.json({ ok: true, redirect:');
     expect(read("apps/web/src/pages/api/empresa/login.ts")).toContain('"/empresa/dashboard"');
   });
 
