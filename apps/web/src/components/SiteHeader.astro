@@ -43,8 +43,9 @@ const mobileItems = nav.map(([label, href]) => ({ label, href, current: isCurren
     </nav>
 
     <div class="flex items-center gap-2">
+      <a class="hidden text-sm font-semibold text-[var(--text-secondary)] hover:text-[var(--brand-primary)] sm:inline-flex" href="/empresa/login">Área da empresa</a>
       <a class="es-btn es-btn-primary hidden text-sm sm:inline-flex" href="/publicar-vaga">Publicar vaga</a>
-      <MobileNav client:idle items={mobileItems} ctaHref="/publicar-vaga" ctaLabel="Publicar vaga" />
+      <MobileNav client:idle items={mobileItems} ctaHref="/publicar-vaga" ctaLabel="Publicar vaga" companyHref="/empresa/login" />
     </div>
   </div>
 </header>

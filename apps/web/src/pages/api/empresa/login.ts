@@ -1,9 +1,10 @@
+import { zEmail } from "@es/shared";
 import type { APIRoute } from "astro";
 import { z } from "zod";
 import { COMPANY_COOKIE, authenticateCompany } from "../../../lib/company-auth";
 
 const schema = z.object({
-  email: z.email(),
+  email: zEmail(),
   password: z.string().min(8),
   next: z.string().startsWith("/").optional()
 });

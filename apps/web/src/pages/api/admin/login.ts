@@ -1,14 +1,18 @@
 import type { APIRoute } from "astro";
 import { z } from "zod";
-import { adminPasswordSchema } from "@es/shared";
+import { adminPasswordSchema, zEmail } from "@es/shared";
 import { ADMIN_COOKIE, authenticate } from "../../../lib/auth";
 import { logServerError } from "../../../lib/server-error";
 
 const schema = z.object({
-  email: z.email(),
+  email: zEmail(),
   password: adminPasswordSchema(),
   otp: z.string().regex(/^\d{6}$/).optional().or(z.literal("")),
-  next: z.string().startsWith("/").optional()
+  next: z
+    .string()
+    .startsWith("/")
+    .optional()
+    .refine((value) => !value || value.startsWith("/admin"), { message: "Destino inválido." })
 });
 
 export const POST: APIRoute = async ({ request, cookies, clientAddress, redirect }) => {

@@ -10,9 +10,10 @@ interface Props {
   items: NavItem[];
   ctaHref: string;
   ctaLabel: string;
+  companyHref?: string;
 }
 
-export function MobileNav({ items, ctaHref, ctaLabel }: Props) {
+export function MobileNav({ items, ctaHref, ctaLabel, companyHref }: Props) {
   const [open, setOpen] = useState(false);
 
   return (
@@ -39,6 +40,11 @@ export function MobileNav({ items, ctaHref, ctaLabel }: Props) {
               {item.label}
             </a>
           ))}
+          {companyHref && (
+            <a href={companyHref} className="rounded-xl px-3 py-2 text-sm font-semibold text-[var(--text-secondary)] hover:bg-[var(--es-cream-dark)]" onClick={() => setOpen(false)}>
+              Área da empresa
+            </a>
+          )}
           <a href={ctaHref} className="es-btn es-btn-primary mt-1 text-sm" onClick={() => setOpen(false)}>
             {ctaLabel}
           </a>
