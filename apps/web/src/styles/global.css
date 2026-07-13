@@ -159,3 +159,87 @@ textarea:focus-visible {
 .instagram-gradient {
   background: linear-gradient(135deg, #833ab4 0%, #fd1d1d 50%, #fcb045 100%);
 }
+
+/* Formulários — contraste acessível em fundos claros */
+.es-label {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.es-input,
+.es-textarea,
+.es-select {
+  display: block;
+  width: 100%;
+  margin-top: 0.35rem;
+  border: 1px solid var(--brand-border);
+  border-radius: 0.75rem;
+  background: var(--brand-surface);
+  color: var(--text-primary);
+  padding: 0.65rem 0.85rem;
+  font-size: 0.9375rem;
+  line-height: 1.4;
+}
+
+.es-input::placeholder,
+.es-textarea::placeholder {
+  color: var(--text-secondary);
+  opacity: 0.85;
+}
+
+.es-input:focus,
+.es-textarea:focus,
+.es-select:focus {
+  border-color: var(--brand-primary);
+  outline: 3px solid color-mix(in srgb, var(--brand-primary) 25%, transparent);
+  outline-offset: 1px;
+}
+
+.es-select option {
+  color: var(--text-primary);
+  background: var(--brand-surface);
+}
+
+.es-input:-webkit-autofill,
+.es-textarea:-webkit-autofill,
+.es-select:-webkit-autofill {
+  -webkit-text-fill-color: var(--text-primary);
+  box-shadow: 0 0 0 1000px var(--brand-surface) inset;
+}
+
+.es-form-error {
+  margin-top: 0.35rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--danger);
+}
+
+.es-form-hint {
+  margin-top: 0.35rem;
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+}
+
+.es-field {
+  display: grid;
+  gap: 0.25rem;
+}
+
+.es-dropzone {
+  border: 2px dashed var(--brand-border);
+  border-radius: 1rem;
+  padding: 1.5rem;
+  text-align: center;
+  background: var(--brand-background);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s;
+}
+
+.es-dropzone:hover,
+.es-dropzone.es-dropzone-active {
+  border-color: var(--brand-primary);
+  background: color-mix(in srgb, var(--brand-primary) 6%, var(--brand-surface));
+}

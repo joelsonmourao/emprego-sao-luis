@@ -27,8 +27,8 @@ describe("portal UI redesign", () => {
     expect(source).toContain("/publicar-vaga");
     expect(source).toContain("Publicar vaga");
     expect(source).toContain("aria-current");
-    expect(source).toContain("logoHorizontalWebp");
-    expect(source).toContain("<picture>");
+    expect(source).toContain("BrandLogo");
+    expect(source).toContain("LOGO_MAIN");
   });
 
   it("home inclui seção Instagram e busca", () => {

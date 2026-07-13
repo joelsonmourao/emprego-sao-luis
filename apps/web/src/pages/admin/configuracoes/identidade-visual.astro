@@ -1,0 +1,575 @@
+---
+import AdminLayout from "../../../layouts/AdminLayout.astro";
+import { can } from "../../../lib/auth";
+import {
+  BRAND_ASSET_GROUPS,
+  BRAND_ASSET_LABELS,
+  type BrandAssetKey,
+  type BrandPalette
+} from "../../../lib/brand/constants";
+import { getBrandIdentity, listBrandHistory } from "../../../lib/brand/identity-service";
+
+const auth = Astro.locals.auth;
+if (!auth) return Astro.redirect("/admin/login");
+if (!can(auth, "settings.brand.view")) return new Response("Proibido", { status: 403 });
+
+const identity = await getBrandIdentity(true);
+const history = await listBrandHistory(undefined, 30);
+const canManage = can(auth, "settings.brand.manage");
+
+const storageLabels: Record<string, string> = {
+  s3: "S3 / R2",
+  volume: "Volume persistente",
+  unconfigured: "Não configurado"
+};
+
+const paletteFields: Array<{ key: keyof BrandPalette; label: string }> = [
+  { key: "brandPrimary", label: "Cor primária" },
+  { key: "brandPrimaryHover", label: "Primária (hover)" },
+  { key: "brandSecondary", label: "Cor secundária" },
+  { key: "brandAccent", label: "Destaque" },
+  { key: "brandAccentWarm", label: "Destaque quente" },
+  { key: "brandBackground", label: "Fundo do site" },
+  { key: "brandSurface", label: "Superfície (cards)" },
+  { key: "brandBorder", label: "Bordas" },
+  { key: "textPrimary", label: "Texto principal" },
+  { key: "textSecondary", label: "Texto secundário" },
+  { key: "themeColor", label: "Cor do tema (PWA)" }
+];
+
+function formatBytes(n: number | null): string {
+  if (n == null) return "—";
+  if (n < 1024) return `${n} B`;
+  if (n < 1024 * 1024) return `${(n / 1024).toFixed(1)} KB`;
+  return `${(n / (1024 * 1024)).toFixed(1)} MB`;
+}
+
+function formatDate(iso: string | null): string {
+  if (!iso) return "—";
+  return new Date(iso).toLocaleString("pt-BR");
+}
+
+function formatMime(mime: string | null): string {
+  if (!mime) return "—";
+  const map: Record<string, string> = {
+    "image/png": "PNG",
+    "image/webp": "WebP",
+    "image/jpeg": "JPEG",
+    "image/svg+xml": "SVG",
+    "image/x-icon": "ICO",
+    "image/vnd.microsoft.icon": "ICO"
+  };
+  return map[mime] ?? mime.split("/").pop()?.toUpperCase() ?? mime;
+}
+
+const actionLabels: Record<string, string> = {
+  upload: "Upload",
+  remove: "Remoção",
+  restore: "Restauração"
+};
+
+const bootJson = JSON.stringify({
+  identity,
+  history,
+  canManage,
+  groups: BRAND_ASSET_GROUPS,
+  labels: BRAND_ASSET_LABELS
+});
+---
+
+<AdminLayout title="Identidade visual">
+  <div class="flex flex-wrap items-start justify-between gap-4">
+    <div>
+      <h1 class="font-display text-3xl font-black">Identidade visual</h1>
+      <p class="mt-2 text-[var(--text-secondary)]">
+        Logos, ícones, paleta de cores e metadados da marca. Alterações refletem no site público e no painel.
+      </p>
+    </div>
+    <a class="es-btn es-btn-secondary" href="/admin/midia">Biblioteca de mídia</a>
+  </div>
+
+  <div
+    id="storage-status"
+    class={`es-card mt-6 rounded-2xl p-4 text-sm ${identity.storageReady ? "border-emerald-200 bg-emerald-50" : "border-amber-200 bg-amber-50"}`}
+  >
+    <p class="font-bold text-[var(--text-primary)]">
+      Armazenamento: {storageLabels[identity.storageProvider] ?? identity.storageProvider}
+      {identity.storageReady ? " — pronto para uploads" : " — configure S3/R2 ou volume persistente"}
+    </p>
+    <p class="mt-1 text-[var(--text-secondary)]">Versão da identidade: {identity.version}</p>
+  </div>
+
+  <div id="assets-root" class="mt-8 grid gap-10">
+    {BRAND_ASSET_GROUPS.map((group) => (
+      <section>
+        <h2 class="font-display text-xl font-bold">{group.title}</h2>
+        <div class="mt-4 grid gap-5 lg:grid-cols-2">
+          {group.keys.map((key) => {
+            const asset = identity.assets[key];
+            const label = BRAND_ASSET_LABELS[key];
+            const isDefault = asset?.isDefault ?? true;
+            return (
+              <article class="es-card rounded-2xl p-5" data-asset-card={key}>
+                <div class="flex flex-wrap items-start justify-between gap-2">
+                  <h3 class="font-bold text-[var(--text-primary)]">{label}</h3>
+                  {isDefault ? (
+                    <span class="rounded-full bg-[var(--brand-background)] px-2 py-0.5 text-xs font-bold text-[var(--text-secondary)]">Padrão</span>
+                  ) : (
+                    <span class="rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-bold text-emerald-800">Personalizado</span>
+                  )}
+                </div>
+
+                <div class="mt-4 grid grid-cols-3 gap-2">
+                  <div class="flex aspect-[4/3] items-center justify-center rounded-xl border border-[var(--brand-border)] bg-white p-2">
+                    <img src={asset?.url ?? ""} alt="" class="max-h-full max-w-full object-contain" loading="lazy" data-preview="white" />
+                  </div>
+                  <div class="flex aspect-[4/3] items-center justify-center rounded-xl border border-[var(--brand-border)] bg-[#1A1A1A] p-2">
+                    <img src={asset?.url ?? ""} alt="" class="max-h-full max-w-full object-contain" loading="lazy" data-preview="dark" />
+                  </div>
+                  <div
+                    class="flex aspect-[4/3] items-center justify-center rounded-xl border border-[var(--brand-border)] p-2"
+                    style={`background:${identity.palette.brandPrimary}`}
+                    data-preview-bg="brand"
+                  >
+                    <img src={asset?.url ?? ""} alt="" class="max-h-full max-w-full object-contain" loading="lazy" data-preview="brand" />
+                  </div>
+                </div>
+                <p class="mt-1 text-center text-xs text-[var(--text-secondary)]">Branco · Escuro · Marca</p>
+
+                <dl class="mt-4 grid grid-cols-2 gap-x-4 gap-y-1 text-sm">
+                  <div><dt class="text-[var(--text-secondary)]">Dimensões</dt><dd class="font-medium" data-meta="dims">{asset?.width && asset?.height ? `${asset.width}×${asset.height}` : "—"}</dd></div>
+                  <div><dt class="text-[var(--text-secondary)]">Tamanho</dt><dd class="font-medium" data-meta="size">{formatBytes(asset?.fileSize ?? null)}</dd></div>
+                  <div><dt class="text-[var(--text-secondary)]">Formato</dt><dd class="font-medium" data-meta="format">{formatMime(asset?.mimeType ?? null)}</dd></div>
+                  <div><dt class="text-[var(--text-secondary)]">Atualizado</dt><dd class="font-medium" data-meta="updated">{formatDate(asset?.updatedAt ?? null)}</dd></div>
+                </dl>
+
+                <div
+                  class="mt-4 rounded-xl border-2 border-dashed border-[var(--brand-border)] p-4 text-center transition-colors"
+                  data-dropzone={key}
+                >
+                  <p class="text-sm text-[var(--text-secondary)]">Arraste uma imagem ou use o botão abaixo</p>
+                  <label class="mt-3 flex cursor-pointer items-center justify-center gap-2">
+                    <span class="es-btn es-btn-primary text-sm">Trocar imagem</span>
+                    <input type="file" class="sr-only" accept="image/png,image/jpeg,image/webp,image/svg+xml,image/x-icon,.ico" data-file={key} />
+                  </label>
+                  <label class="mt-3 flex items-center justify-center gap-2 text-sm">
+                    <input type="checkbox" data-trim={key} checked />
+                    <span class="text-[var(--text-primary)]">Recortar espaços transparentes</span>
+                  </label>
+                  <div class="mt-3 hidden h-2 overflow-hidden rounded-full bg-[var(--brand-background)]" data-progress-wrap={key}>
+                    <div class="h-full bg-[var(--brand-primary)] transition-all" style="width:0%" data-progress={key}></div>
+                  </div>
+                  <p class="mt-2 hidden text-sm" data-upload-msg={key}></p>
+                </div>
+
+                {canManage && (
+                  <div class="mt-3 flex flex-wrap gap-2">
+                    <button type="button" class="es-btn es-btn-secondary text-sm" data-remove={key} disabled={isDefault}>Remover</button>
+                    <button type="button" class="es-btn es-btn-secondary text-sm" data-restore-default={key} disabled={isDefault}>Restaurar padrão</button>
+                  </div>
+                )}
+              </article>
+            );
+          })}
+        </div>
+      </section>
+    ))}
+  </div>
+
+  <form id="palette-form" class="es-card mt-10 rounded-2xl p-6">
+    <h2 class="font-display text-xl font-bold">Paleta e textos</h2>
+    <p class="mt-1 text-sm text-[var(--text-secondary)]">Cores aplicadas via tokens CSS em todo o portal.</p>
+
+    <div class="mt-6 grid gap-4 md:grid-cols-2">
+      <label class="es-label">Nome do site
+        <input class="es-input" type="text" name="siteName" id="siteName" value={identity.siteName} maxlength="120" />
+      </label>
+      <label class="es-label">Slogan
+        <input class="es-input" type="text" name="tagline" id="tagline" value={identity.tagline} maxlength="240" />
+      </label>
+      <label class="es-label md:col-span-2">Texto alternativo da logo
+        <input class="es-input" type="text" name="logoAlt" id="logoAlt" value={identity.logoAlt} maxlength="240" />
+      </label>
+      <label class="flex items-center gap-2 md:col-span-2">
+        <input type="checkbox" name="useSameLogoEverywhere" id="useSameLogoEverywhere" checked={identity.useSameLogoEverywhere} />
+        <span class="es-label mb-0">Usar a mesma logo em todos os contextos (admin, login, e-mail)</span>
+      </label>
+    </div>
+
+    <div class="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      {paletteFields.map(({ key, label }) => (
+        <label class="es-label">{label}
+          <div class="mt-1 flex items-center gap-2">
+            <input class="h-10 w-14 shrink-0 cursor-pointer rounded-lg border border-[var(--brand-border)] p-1" type="color" name={key} id={`palette-${key}`} value={identity.palette[key]} data-palette={key} />
+            <input class="es-input mt-0 font-mono text-sm" type="text" value={identity.palette[key]} data-palette-hex={key} maxlength="7" pattern="^#[0-9A-Fa-f]{6}$" />
+          </div>
+        </label>
+      ))}
+    </div>
+
+    <div id="contrast-warnings" class="mt-6 hidden rounded-xl border border-amber-300 bg-amber-50 p-4 text-sm text-amber-900"></div>
+
+    {canManage && (
+      <button class="es-btn es-btn-primary mt-6" type="submit">Salvar paleta</button>
+    )}
+    <p id="palette-msg" class="mt-3 text-sm text-[var(--text-secondary)]"></p>
+  </form>
+
+  <section class="es-card mt-10 rounded-2xl p-6">
+    <h2 class="font-display text-xl font-bold">Histórico de alterações</h2>
+    <p class="mt-1 text-sm text-[var(--text-secondary)]">Últimas 30 ações em ativos da marca.</p>
+    <div id="history-root" class="mt-4 overflow-x-auto">
+      {history.length === 0 ? (
+        <p class="text-sm text-[var(--text-secondary)]">Nenhuma alteração registrada.</p>
+      ) : (
+        <table class="w-full min-w-[36rem] text-left text-sm">
+          <thead>
+            <tr class="border-b border-[var(--brand-border)] text-[var(--text-secondary)]">
+              <th class="py-2 pr-4 font-bold">Data</th>
+              <th class="py-2 pr-4 font-bold">Ativo</th>
+              <th class="py-2 pr-4 font-bold">Ação</th>
+              <th class="py-2 font-bold">Opções</th>
+            </tr>
+          </thead>
+          <tbody>
+            {history.map((entry) => (
+              <tr class="border-b border-[var(--brand-border)]" data-history-row={entry.id}>
+                <td class="py-3 pr-4 whitespace-nowrap">{formatDate(entry.createdAt?.toISOString() ?? null)}</td>
+                <td class="py-3 pr-4">{BRAND_ASSET_LABELS[entry.assetKey as BrandAssetKey] ?? entry.assetKey}</td>
+                <td class="py-3 pr-4">{actionLabels[entry.action] ?? entry.action}</td>
+                <td class="py-3">
+                  {canManage && entry.previousUrl && entry.action !== "restore" ? (
+                    <button type="button" class="es-btn es-btn-secondary text-xs" data-history-restore={entry.id}>Restaurar versão</button>
+                  ) : (
+                    <span class="text-[var(--text-secondary)]">—</span>
+                  )}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
+    </div>
+  </section>
+
+  <script is:inline define:vars={{ bootJson, canManage }}>
+    const BOOT = JSON.parse(bootJson);
+    let state = BOOT.identity;
+    let history = BOOT.history || [];
+    const labels = BOOT.labels;
+    const groups = BOOT.groups;
+
+    function formatBytes(n) {
+      if (n == null) return "—";
+      if (n < 1024) return n + " B";
+      if (n < 1024 * 1024) return (n / 1024).toFixed(1) + " KB";
+      return (n / (1024 * 1024)).toFixed(1) + " MB";
+    }
+
+    function formatDate(iso) {
+      if (!iso) return "—";
+      return new Date(iso).toLocaleString("pt-BR");
+    }
+
+    function formatMime(mime) {
+      if (!mime) return "—";
+      const map = { "image/png": "PNG", "image/webp": "WebP", "image/jpeg": "JPEG", "image/svg+xml": "SVG", "image/x-icon": "ICO" };
+      return map[mime] || (mime.split("/").pop() || mime).toUpperCase();
+    }
+
+    function hexToRgb(hex) {
+      const h = hex.replace("#", "");
+      return [parseInt(h.slice(0, 2), 16), parseInt(h.slice(2, 4), 16), parseInt(h.slice(4, 6), 16)];
+    }
+
+    function luminance(hex) {
+      const rgb = hexToRgb(hex).map(function (c) {
+        c /= 255;
+        return c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
+      });
+      return 0.2126 * rgb[0] + 0.7152 * rgb[1] + 0.0722 * rgb[2];
+    }
+
+    function contrastRatio(fg, bg) {
+      const l1 = luminance(fg);
+      const l2 = luminance(bg);
+      const lighter = Math.max(l1, l2);
+      const darker = Math.min(l1, l2);
+      return (lighter + 0.05) / (darker + 0.05);
+    }
+
+    function getPaletteFromForm() {
+      const palette = {};
+      document.querySelectorAll("[data-palette]").forEach(function (el) {
+        palette[el.getAttribute("data-palette")] = el.value;
+      });
+      return palette;
+    }
+
+    function updateContrastWarnings(warnings) {
+      const box = document.getElementById("contrast-warnings");
+      if (!box) return;
+      const palette = getPaletteFromForm();
+      const computed = [];
+      const textContrast = contrastRatio(palette.textPrimary || "#1A1A1A", palette.brandSurface || "#FFFFFF");
+      if (textContrast < 4.5) computed.push("Contraste texto/superfície (" + textContrast.toFixed(2) + ") abaixo de 4.5:1.");
+      const btnContrast = contrastRatio("#ffffff", palette.brandPrimary || "#9B2D30");
+      if (btnContrast < 4.5) computed.push("Contraste botão primário (" + btnContrast.toFixed(2) + ") abaixo de 4.5:1.");
+      const all = (warnings || []).concat(computed);
+      const unique = all.filter(function (w, i) { return all.indexOf(w) === i; });
+      if (!unique.length) {
+        box.classList.add("hidden");
+        box.innerHTML = "";
+        return;
+      }
+      box.classList.remove("hidden");
+      box.innerHTML = "<strong>Avisos de contraste</strong><ul class=\"mt-2 list-disc pl-5\">" + unique.map(function (w) { return "<li>" + w + "</li>"; }).join("") + "</ul>";
+    }
+
+    function syncColorInputs(key, value) {
+      const picker = document.querySelector("[data-palette=\"" + key + "\"]");
+      const hex = document.querySelector("[data-palette-hex=\"" + key + "\"]");
+      if (picker) picker.value = value;
+      if (hex) hex.value = value;
+    }
+
+    function updateCard(key, asset) {
+      const card = document.querySelector("[data-asset-card=\"" + key + "\"]");
+      if (!card || !asset) return;
+      card.querySelectorAll("img[data-preview]").forEach(function (img) { img.src = asset.url; });
+      const dims = card.querySelector("[data-meta=\"dims\"]");
+      const size = card.querySelector("[data-meta=\"size\"]");
+      const format = card.querySelector("[data-meta=\"format\"]");
+      const updated = card.querySelector("[data-meta=\"updated\"]");
+      if (dims) dims.textContent = asset.width && asset.height ? asset.width + "×" + asset.height : "—";
+      if (size) size.textContent = formatBytes(asset.fileSize);
+      if (format) format.textContent = formatMime(asset.mimeType);
+      if (updated) updated.textContent = formatDate(asset.updatedAt);
+      const badge = card.querySelector("h3 + span, h3 + .rounded-full");
+      const removeBtn = card.querySelector("[data-remove=\"" + key + "\"]");
+      const restoreBtn = card.querySelector("[data-restore-default=\"" + key + "\"]");
+      const isDefault = asset.isDefault;
+      const badges = card.querySelectorAll("h3 ~ span.rounded-full");
+      badges.forEach(function (b) { b.remove(); });
+      const h3 = card.querySelector("h3");
+      if (h3) {
+        const span = document.createElement("span");
+        span.className = isDefault
+          ? "rounded-full bg-[var(--brand-background)] px-2 py-0.5 text-xs font-bold text-[var(--text-secondary)]"
+          : "rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-bold text-emerald-800";
+        span.textContent = isDefault ? "Padrão" : "Personalizado";
+        h3.parentElement?.appendChild(span);
+      }
+      if (removeBtn) removeBtn.disabled = isDefault;
+      if (restoreBtn) restoreBtn.disabled = isDefault;
+      const brandBg = card.querySelector("[data-preview-bg=\"brand\"]");
+      if (brandBg) brandBg.style.background = state.palette.brandPrimary;
+    }
+
+    function renderHistory(rows) {
+      const root = document.getElementById("history-root");
+      if (!root) return;
+      if (!rows.length) {
+        root.innerHTML = "<p class=\"text-sm text-[var(--text-secondary)]\">Nenhuma alteração registrada.</p>";
+        return;
+      }
+      const actionLabels = { upload: "Upload", remove: "Remoção", restore: "Restauração" };
+      root.innerHTML = "<table class=\"w-full min-w-[36rem] text-left text-sm\"><thead><tr class=\"border-b border-[var(--brand-border)] text-[var(--text-secondary)]\"><th class=\"py-2 pr-4 font-bold\">Data</th><th class=\"py-2 pr-4 font-bold\">Ativo</th><th class=\"py-2 pr-4 font-bold\">Ação</th><th class=\"py-2 font-bold\">Opções</th></tr></thead><tbody>"
+        + rows.map(function (entry) {
+          const canRestore = canManage && entry.previousUrl && entry.action !== "restore";
+          const date = formatDate(entry.createdAt);
+          const label = labels[entry.assetKey] || entry.assetKey;
+          const action = actionLabels[entry.action] || entry.action;
+          const btn = canRestore
+            ? "<button type=\"button\" class=\"es-btn es-btn-secondary text-xs\" data-history-restore=\"" + entry.id + "\">Restaurar versão</button>"
+            : "<span class=\"text-[var(--text-secondary)]\">—</span>";
+          return "<tr class=\"border-b border-[var(--brand-border)]\"><td class=\"py-3 pr-4 whitespace-nowrap\">" + date + "</td><td class=\"py-3 pr-4\">" + label + "</td><td class=\"py-3 pr-4\">" + action + "</td><td class=\"py-3\">" + btn + "</td></tr>";
+        }).join("")
+        + "</tbody></table>";
+      bindHistoryButtons();
+    }
+
+    async function refreshAll() {
+      const res = await fetch("/api/admin/brand-identity?history=1");
+      const data = await res.json();
+      if (!data.ok) return;
+      state = data.identity;
+      history = data.history || [];
+      groups.forEach(function (group) {
+        group.keys.forEach(function (key) {
+          updateCard(key, state.assets[key]);
+        });
+      });
+      renderHistory(history);
+      const storage = document.getElementById("storage-status");
+      if (storage) {
+        const labels = { s3: "S3 / R2", volume: "Volume persistente", unconfigured: "Não configurado" };
+        storage.querySelector("p.font-bold").textContent = "Armazenamento: " + (labels[state.storageProvider] || state.storageProvider)
+          + (state.storageReady ? " — pronto para uploads" : " — configure S3/R2 ou volume persistente");
+      }
+    }
+
+    function uploadFile(key, file) {
+      const trimEl = document.querySelector("[data-trim=\"" + key + "\"]");
+      const progressWrap = document.querySelector("[data-progress-wrap=\"" + key + "\"]");
+      const progressBar = document.querySelector("[data-progress=\"" + key + "\"]");
+      const msg = document.querySelector("[data-upload-msg=\"" + key + "\"]");
+      const form = new FormData();
+      form.append("key", key);
+      form.append("file", file);
+      form.append("trimTransparent", trimEl && trimEl.checked ? "true" : "false");
+      form.append("altText", document.getElementById("logoAlt")?.value || "");
+
+      if (progressWrap) progressWrap.classList.remove("hidden");
+      if (msg) { msg.classList.remove("hidden"); msg.textContent = "Enviando…"; msg.className = "mt-2 text-sm text-[var(--text-secondary)]"; }
+
+      const xhr = new XMLHttpRequest();
+      xhr.open("POST", "/api/admin/brand-identity/upload");
+      xhr.upload.onprogress = function (e) {
+        if (e.lengthComputable && progressBar) progressBar.style.width = Math.round((e.loaded / e.total) * 100) + "%";
+      };
+      xhr.onload = async function () {
+        if (progressWrap) progressWrap.classList.add("hidden");
+        if (progressBar) progressBar.style.width = "0%";
+        let data;
+        try { data = JSON.parse(xhr.responseText); } catch { data = { ok: false, error: "Resposta inválida." }; }
+        if (msg) {
+          msg.classList.remove("hidden");
+          if (data.ok) {
+            msg.textContent = "Imagem atualizada.";
+            msg.className = "mt-2 text-sm text-emerald-700";
+            updateCard(key, data.asset);
+            await refreshAll();
+          } else {
+            msg.textContent = data.error || "Erro no upload.";
+            msg.className = "mt-2 text-sm text-red-700";
+          }
+        }
+      };
+      xhr.onerror = function () {
+        if (progressWrap) progressWrap.classList.add("hidden");
+        if (msg) { msg.textContent = "Falha de rede."; msg.className = "mt-2 text-sm text-red-700"; }
+      };
+      xhr.send(form);
+    }
+
+    async function removeAsset(key) {
+      if (!confirm("Remover esta imagem personalizada?")) return;
+      const res = await fetch("/api/admin/brand-identity/upload", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ key: key })
+      });
+      const data = await res.json();
+      if (data.ok) await refreshAll();
+      else alert(data.error || "Erro ao remover.");
+    }
+
+    async function restoreDefault(key) {
+      if (!confirm("Restaurar o arquivo padrão do sistema para este ativo?")) return;
+      const res = await fetch("/api/admin/brand-identity/upload", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ key: key })
+      });
+      const data = await res.json();
+      if (data.ok) await refreshAll();
+      else alert(data.error || "Erro ao restaurar.");
+    }
+
+    async function restoreFromHistory(historyId) {
+      const res = await fetch("/api/admin/brand-identity/upload", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ historyId: historyId })
+      });
+      const data = await res.json();
+      if (data.ok) await refreshAll();
+      else alert(data.error || "Erro na restauração.");
+    }
+
+    function bindHistoryButtons() {
+      document.querySelectorAll("[data-history-restore]").forEach(function (btn) {
+        btn.onclick = function () { restoreFromHistory(btn.getAttribute("data-history-restore")); };
+      });
+    }
+
+    document.querySelectorAll("[data-file]").forEach(function (input) {
+      input.addEventListener("change", function () {
+        const key = input.getAttribute("data-file");
+        const file = input.files && input.files[0];
+        if (key && file) uploadFile(key, file);
+        input.value = "";
+      });
+    });
+
+    document.querySelectorAll("[data-dropzone]").forEach(function (zone) {
+      const key = zone.getAttribute("data-dropzone");
+      zone.addEventListener("dragover", function (e) { e.preventDefault(); zone.classList.add("border-[var(--brand-primary)]", "bg-[var(--brand-background)]"); });
+      zone.addEventListener("dragleave", function () { zone.classList.remove("border-[var(--brand-primary)]", "bg-[var(--brand-background)]"); });
+      zone.addEventListener("drop", function (e) {
+        e.preventDefault();
+        zone.classList.remove("border-[var(--brand-primary)]", "bg-[var(--brand-background)]");
+        const file = e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0];
+        if (key && file && file.type.startsWith("image/")) uploadFile(key, file);
+      });
+    });
+
+    document.querySelectorAll("[data-remove]").forEach(function (btn) {
+      btn.addEventListener("click", function () { removeAsset(btn.getAttribute("data-remove")); });
+    });
+
+    document.querySelectorAll("[data-restore-default]").forEach(function (btn) {
+      btn.addEventListener("click", function () { restoreDefault(btn.getAttribute("data-restore-default")); });
+    });
+
+    bindHistoryButtons();
+
+    document.querySelectorAll("[data-palette]").forEach(function (picker) {
+      picker.addEventListener("input", function () {
+        syncColorInputs(picker.getAttribute("data-palette"), picker.value);
+        updateContrastWarnings();
+      });
+    });
+
+    document.querySelectorAll("[data-palette-hex]").forEach(function (hex) {
+      hex.addEventListener("input", function () {
+        const key = hex.getAttribute("data-palette-hex");
+        if (/^#[0-9A-Fa-f]{6}$/.test(hex.value)) syncColorInputs(key, hex.value);
+        updateContrastWarnings();
+      });
+    });
+
+    updateContrastWarnings();
+
+    document.getElementById("palette-form")?.addEventListener("submit", async function (e) {
+      e.preventDefault();
+      if (!canManage) return;
+      const form = e.target;
+      const body = {
+        siteName: form.siteName.value,
+        tagline: form.tagline.value,
+        logoAlt: form.logoAlt.value,
+        useSameLogoEverywhere: form.useSameLogoEverywhere.checked,
+        palette: getPaletteFromForm()
+      };
+      const res = await fetch("/api/admin/brand-identity", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body)
+      });
+      const data = await res.json();
+      const msg = document.getElementById("palette-msg");
+      if (data.ok) {
+        state = data.identity;
+        if (msg) msg.textContent = "Paleta salva com sucesso.";
+        updateContrastWarnings(data.warnings);
+        document.querySelectorAll("[data-preview-bg=\"brand\"]").forEach(function (el) {
+          el.style.background = state.palette.brandPrimary;
+        });
+      } else if (msg) {
+        msg.textContent = data.error || "Erro ao salvar.";
+      }
+    });
+  </script>
+</AdminLayout>

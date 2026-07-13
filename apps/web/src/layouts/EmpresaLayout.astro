@@ -1,13 +1,16 @@
 ---
 import "../styles/global.css";
+import BrandLogo from "../components/BrandLogo.astro";
 import { cssVariablesFromIdentity } from "../lib/design-tokens";
-import { BRAND_ASSETS } from "../lib/brand-assets";
+import { BRAND_ASSET_KEYS } from "../lib/brand/constants";
+import { getBrandIdentity } from "../lib/brand/identity-service";
 import { getVisualIdentity } from "../lib/visual-identity";
 
 const company = Astro.locals.company!;
 interface Props { title: string }
 const { title } = Astro.props;
 const identity = await getVisualIdentity();
+const brand = await getBrandIdentity();
 const current = Astro.url.pathname;
 
 const nav = [
@@ -27,16 +30,16 @@ const nav = [
     <meta name="viewport" content="width=device-width" />
     <meta name="robots" content="noindex,nofollow" />
     <title>{title} — Área da empresa</title>
-    <link rel="icon" href={BRAND_ASSETS.faviconIco} />
+    <link rel="icon" href={identity.faviconUrl ?? "/favicon.ico"} />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;600;700&family=Fraunces:wght@700;800&display=swap" rel="stylesheet" />
-    <style is:inline set:html={cssVariablesFromIdentity(identity)} />
+    <style is:inline set:html={cssVariablesFromIdentity(identity, brand.palette)} />
   </head>
   <body class="bg-[var(--brand-background)] text-[var(--text-primary)]">
     <div class="min-h-screen lg:grid lg:grid-cols-[240px_1fr]">
       <aside class="border-r border-[var(--brand-border)] bg-[var(--brand-surface)] p-5">
-        <a class="block" href="/empresa/dashboard" aria-label={BRAND_ASSETS.logoAlt}>
-          <img src={BRAND_ASSETS.logoHorizontalWebp} alt="" class="h-9 w-auto max-w-[9rem] object-contain" width="144" height="36" />
+        <a class="block" href="/empresa/dashboard" aria-label={identity.siteName}>
+          <BrandLogo assetKey={BRAND_ASSET_KEYS.LOGO_MAIN} class="h-9 w-auto max-w-[9rem] object-contain" width={144} height={36} />
         </a>
         <p class="mt-2 text-xs text-[var(--text-secondary)]">Área da empresa</p>
         <nav class="mt-6 grid gap-0.5 text-sm" aria-label="Área da empresa">

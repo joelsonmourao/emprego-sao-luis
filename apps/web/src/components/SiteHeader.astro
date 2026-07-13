@@ -1,7 +1,9 @@
 ---
-import type { VisualIdentity } from "../lib/visual-identity";
-import { BRAND_ASSETS } from "../lib/brand-assets";
+import BrandLogo from "./BrandLogo.astro";
 import { MobileNav } from "./MobileNav";
+import { BRAND_ASSETS } from "../lib/brand-assets";
+import { BRAND_ASSET_KEYS } from "../lib/brand/constants";
+import type { VisualIdentity } from "../lib/visual-identity";
 
 interface Props {
   identity: VisualIdentity;
@@ -20,16 +22,11 @@ const nav = [
 
 const isCurrent = (href: string) => currentPath === href || (href !== "/" && currentPath.startsWith(href));
 const mobileItems = nav.map(([label, href]) => ({ label, href, current: isCurrent(href) }));
-const logoSrc = identity.logoUrl || BRAND_ASSETS.logoHorizontalWebp;
-const logoFallback = BRAND_ASSETS.logoHorizontalPng;
 ---
 <header class="sticky top-0 z-40 border-b border-[var(--brand-border)] bg-[var(--brand-surface)]/95 backdrop-blur">
   <div class="es-container relative flex items-center justify-between gap-4 py-3">
-    <a class="flex min-w-0 items-center gap-3" href="/" aria-label={BRAND_ASSETS.logoAlt}>
-      <picture>
-        <source srcset={logoSrc} type="image/webp" />
-        <img src={logoFallback} alt={BRAND_ASSETS.logoAlt} class="h-10 w-auto max-w-[11rem] object-contain" width="176" height="40" loading="eager" />
-      </picture>
+    <a class="flex min-w-0 items-center gap-3" href="/" aria-label={identity.siteName || BRAND_ASSETS.logoAlt}>
+      <BrandLogo assetKey={BRAND_ASSET_KEYS.LOGO_MAIN} picture class="h-10 w-auto max-w-[11rem]" width={176} height={40} loading="eager" />
     </a>
 
     <nav class="hidden items-center gap-1 md:flex" aria-label="Principal">

@@ -28,6 +28,7 @@ describe("admin navigation", () => {
     expect(labels).toContain("/admin/comercial/planos");
     expect(labels).toContain("/admin/comercial/reembolsos");
     expect(labels).toContain("/admin/seo/auditoria");
+    expect(labels).toContain("/admin/configuracoes/identidade-visual");
     expect(labels).toContain("/admin/contatos");
     expect(labels).toContain("/admin/instagram");
   });
@@ -43,6 +44,6 @@ describe("admin navigation", () => {
     const layout = readFileSync(resolve("apps/web/src/layouts/AdminLayout.astro"), "utf8");
     expect(layout).toContain("filterAdminNav");
     expect(layout).toContain("navGroups.map");
-    expect(layout).toContain("logoHorizontalWebp");
+    expect(layout).toContain("BrandLogo");
   });
 });

@@ -85,6 +85,7 @@ export const ADMIN_NAV_GROUPS: AdminNavGroup[] = [
   {
     title: "Configurações",
     items: [
+      { label: "Identidade visual", href: "/admin/configuracoes/identidade-visual", permission: "settings.brand.view" },
       { label: "Categorias", href: "/admin/categorias", permission: "content.manage" }
     ]
   }

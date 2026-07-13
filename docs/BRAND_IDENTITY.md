@@ -2,6 +2,19 @@
 
 Documento de auditoria e regras de uso da marca oficial do portal, derivado da pasta `Logo/` e do perfil complementar [@empregosaoluis](https://www.instagram.com/empregosaoluis/).
 
+## Gerenciamento pelo painel
+
+A identidade visual é administrável em **Configurações → Identidade visual** (`/admin/configuracoes/identidade-visual`).
+
+- Upload de PNG, WebP, JPG, SVG sanitizado e ICO (favicon)
+- Armazenamento persistente: R2/S3 quando configurado, ou volume `BRAND_UPLOADS_PATH` / `data/brand-uploads`
+- URLs versionadas (`?v=hash`) — alterações aparecem sem redeploy
+- Fallback local em `/brand/*` quando nenhuma imagem estiver configurada
+- Histórico e restauração por campo
+- Paleta de cores editável com aviso de contraste
+
+Permissões: `settings.brand.view`, `settings.brand.manage`, `media.upload`, `media.delete`, `media.restore`.
+
 ## Arquivos encontrados na pasta Logo
 
 | Arquivo | Formato | Dimensão aprox. | Uso |

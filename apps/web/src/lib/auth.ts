@@ -68,4 +68,11 @@ export async function revokeSession(token: string) {
   } catch { /* An invalid cookie is already effectively revoked. */ }
 }
 
-export const can = (identity: AdminIdentity, permission: string) => identity.roles.includes("SUPER_ADMIN") || identity.permissions.includes(permission);
+export const can = (identity: AdminIdentity, permission: string) => {
+  if (identity.roles.includes("SUPER_ADMIN")) return true;
+  if (identity.permissions.includes(permission)) return true;
+  if (permission.startsWith("settings.brand.") && identity.permissions.includes("settings.manage")) return true;
+  if (permission === "media.upload" && identity.permissions.includes("media.manage")) return true;
+  if ((permission === "media.delete" || permission === "media.restore") && identity.permissions.includes("media.manage")) return true;
+  return false;
+};
