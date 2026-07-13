@@ -48,9 +48,13 @@ export async function seedCommercialPlans() {
   const connection = createDatabase(process.env.DATABASE_URL);
   try {
     let created = 0;
+    let existing = 0;
     for (const plan of SEED_PLANS) {
-      const [existing] = await connection.db.select({ id: commercialPlans.id }).from(commercialPlans).where(eq(commercialPlans.slug, plan.slug)).limit(1);
-      if (existing) continue;
+      const [row] = await connection.db.select({ id: commercialPlans.id }).from(commercialPlans).where(eq(commercialPlans.slug, plan.slug)).limit(1);
+      if (row) {
+        existing++;
+        continue;
+      }
       await connection.db.insert(commercialPlans).values({
         slug: plan.slug,
         name: plan.name,
@@ -72,7 +76,7 @@ export async function seedCommercialPlans() {
       });
       created++;
     }
-    process.stdout.write(`Planos comerciais: ${created} criado(s), demais já existiam.\n`);
+    process.stdout.write(`Planos comerciais: ${created} criado(s), ${existing} já existente(s).\n`);
   } finally {
     await connection.close();
   }

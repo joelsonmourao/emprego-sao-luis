@@ -98,7 +98,8 @@ describe("commercial seed idempotency", () => {
   it("seed não recria planos com slug existente", () => {
     const seed = readFileSync(resolve("packages/db/scripts/seed-commercial-plans.ts"), "utf8");
     expect(seed).toContain("where(eq(commercialPlans.slug, plan.slug))");
-    expect(seed).toContain("if (existing) continue");
+    expect(seed).toContain("if (row)");
+    expect(seed).toContain("existing++");
     expect(seed).toContain('"vaga-individual"');
     expect(seed).toContain('"site-instagram"');
   });

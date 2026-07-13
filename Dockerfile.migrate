@@ -13,5 +13,7 @@ COPY packages/social/package.json packages/social/package.json
 COPY packages/ui/package.json packages/ui/package.json
 RUN npm ci --legacy-peer-deps --include=dev --no-audit --no-fund
 COPY packages/db packages/db
+COPY scripts/migrate-entrypoint.sh scripts/migrate-entrypoint.sh
+RUN chmod +x scripts/migrate-entrypoint.sh
 USER node
-CMD ["npm", "run", "db:migrate:verified", "--workspace=@es/db"]
+CMD ["sh", "scripts/migrate-entrypoint.sh"]
