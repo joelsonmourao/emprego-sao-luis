@@ -1,7 +1,153 @@
 ---
 import "../../styles/global.css";
 import { ADMIN_PASSWORD_MIN_LENGTH, ADMIN_PASSWORD_MIN_MESSAGE } from "@es/shared";
+
 if (Astro.locals.auth) return Astro.redirect("/admin");
+
 const next = Astro.url.searchParams.get("next") ?? "/admin";
+const status = Astro.url.searchParams.get("status");
 ---
-<!doctype html><html lang="pt-BR"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width"/><meta name="robots" content="noindex,nofollow"/><title>Painel administrativo</title></head><body class="grid min-h-screen place-items-center bg-slate-950 p-4"><main class="es-light-form-panel w-full max-w-md rounded-2xl bg-white p-8"><h1 class="text-3xl font-black">Painel administrativo</h1><p class="mt-2 text-sm text-[var(--text-secondary)]">Acesso da equipe do portal. Empresas anunciantes usam a <a class="font-semibold text-[var(--brand-primary)] underline" href="/empresa/login">área da empresa</a>.</p><form class="mt-8 grid gap-5" method="post" action="/api/admin/login"><input type="hidden" name="next" value={next}/><label>E-mail<input class="mt-1 w-full rounded-xl border p-3" type="email" name="email" autocomplete="username" required/></label><label>Senha<input class="mt-1 w-full rounded-xl border p-3" type="password" name="password" autocomplete="current-password" minlength={ADMIN_PASSWORD_MIN_LENGTH} aria-describedby="admin-password-help" data-password-input data-min-message={ADMIN_PASSWORD_MIN_MESSAGE} required/><span id="admin-password-help" class="es-form-hint block">{ADMIN_PASSWORD_MIN_MESSAGE}</span></label><label>Código de autenticação <span class="text-sm text-slate-500">(se ativado)</span><input class="mt-1 w-full rounded-xl border p-3" inputmode="numeric" pattern="[0-9]{6}" maxlength="6" name="otp" autocomplete="one-time-code"/></label><button class="rounded-xl bg-red-700 p-3 font-bold text-white">Entrar</button></form><a class="mt-5 inline-block font-bold text-red-700" href="/recuperar-admin">Esqueci minha senha</a></main><script>const input = document.querySelector('[data-password-input]'); if (input instanceof HTMLInputElement) { input.addEventListener('invalid', () => input.setCustomValidity(input.dataset.minMessage ?? '')); input.addEventListener('input', () => input.setCustomValidity('')); }</script></body></html>
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width" />
+    <meta name="robots" content="noindex,nofollow" />
+    <title>Painel administrativo</title>
+  </head>
+  <body class="grid min-h-screen place-items-center bg-slate-950 p-4">
+    <main class="es-light-form-panel w-full max-w-md rounded-2xl bg-white p-8">
+      <h1 class="text-3xl font-black">Painel administrativo</h1>
+      <p class="mt-2 text-sm text-[var(--text-secondary)]">
+        Acesso da equipe do portal. Empresas anunciantes usam a
+        <a class="font-semibold text-[var(--brand-primary)] underline" href="/empresa/login">área da empresa</a>.
+      </p>
+      {status === "senha-alterada" && (
+        <p class="mt-4 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800" role="status">
+          Senha alterada com sucesso. Faça login novamente.
+        </p>
+      )}
+      <p
+        id="admin-login-error"
+        class="mt-4 hidden rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-800"
+        role="alert"
+        aria-live="polite"
+      />
+      <form id="admin-login-form" class="mt-8 grid gap-5" method="post" novalidate>
+        <input type="hidden" name="next" value={next} />
+        <label>
+          E-mail
+          <input
+            class="mt-1 w-full rounded-xl border p-3"
+            type="email"
+            name="email"
+            autocomplete="username"
+            required
+          />
+        </label>
+        <label>
+          Senha
+          <input
+            class="mt-1 w-full rounded-xl border p-3"
+            type="password"
+            name="password"
+            autocomplete="current-password"
+            minlength={ADMIN_PASSWORD_MIN_LENGTH}
+            aria-describedby="admin-password-help"
+            data-password-input
+            data-min-message={ADMIN_PASSWORD_MIN_MESSAGE}
+            required
+          />
+          <span id="admin-password-help" class="es-form-hint block">{ADMIN_PASSWORD_MIN_MESSAGE}</span>
+        </label>
+        <label>
+          Código de autenticação <span class="text-sm text-slate-500">(se ativado)</span>
+          <input
+            class="mt-1 w-full rounded-xl border p-3"
+            inputmode="numeric"
+            pattern="[0-9]{6}"
+            maxlength="6"
+            name="otp"
+            autocomplete="one-time-code"
+          />
+        </label>
+        <button class="rounded-xl bg-red-700 p-3 font-bold text-white" type="submit" data-submit-button>
+          Entrar
+        </button>
+      </form>
+      <a class="mt-5 inline-block font-bold text-red-700" href="/recuperar-admin">Esqueci minha senha</a>
+    </main>
+    <script>
+      const form = document.getElementById("admin-login-form");
+      const errorEl = document.getElementById("admin-login-error");
+      const submitButton = document.querySelector("[data-submit-button]");
+      const passwordInput = document.querySelector("[data-password-input]");
+
+      if (passwordInput instanceof HTMLInputElement) {
+        passwordInput.addEventListener("invalid", () =>
+          passwordInput.setCustomValidity(passwordInput.dataset.minMessage ?? "")
+        );
+        passwordInput.addEventListener("input", () => passwordInput.setCustomValidity(""));
+      }
+
+      const showError = (message: string) => {
+        if (!(errorEl instanceof HTMLElement)) return;
+        errorEl.textContent = message;
+        errorEl.classList.remove("hidden");
+      };
+
+      const clearError = () => {
+        if (!(errorEl instanceof HTMLElement)) return;
+        errorEl.textContent = "";
+        errorEl.classList.add("hidden");
+      };
+
+      if (form instanceof HTMLFormElement) {
+        form.addEventListener("submit", async (event) => {
+          event.preventDefault();
+          clearError();
+
+          if (!form.reportValidity()) return;
+
+          if (submitButton instanceof HTMLButtonElement) {
+            submitButton.disabled = true;
+            submitButton.textContent = "Entrando...";
+          }
+
+          try {
+            const response = await fetch("/api/admin/login", {
+              method: "POST",
+              body: new FormData(form),
+              credentials: "same-origin",
+              redirect: "manual"
+            });
+
+            if (response.status === 303 || response.status === 302) {
+              const destination = response.headers.get("Location") || "/admin";
+              window.location.assign(destination);
+              return;
+            }
+
+            let message = "Não foi possível entrar. Tente novamente.";
+            try {
+              const payload = await response.json();
+              if (payload && typeof payload.error === "string" && payload.error.trim()) {
+                message = payload.error;
+              }
+            } catch {
+              // Mantém mensagem genérica quando a API não retorna JSON.
+            }
+            showError(message);
+          } catch {
+            showError("Falha de conexão. Verifique sua rede e tente novamente.");
+          } finally {
+            if (submitButton instanceof HTMLButtonElement) {
+              submitButton.disabled = false;
+              submitButton.textContent = "Entrar";
+            }
+          }
+        });
+      }
+    </script>
+  </body>
+</html>

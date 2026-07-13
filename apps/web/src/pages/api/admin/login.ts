@@ -15,6 +15,12 @@ const schema = z.object({
     .refine((value) => !value || value.startsWith("/admin"), { message: "Destino inválido." })
 });
 
+export const GET: APIRoute = () =>
+  new Response(JSON.stringify({ ok: false, error: "Method Not Allowed" }), {
+    status: 405,
+    headers: { Allow: "POST", "Content-Type": "application/json" }
+  });
+
 export const POST: APIRoute = async ({ request, cookies, clientAddress, redirect }) => {
   const form = Object.fromEntries(await request.formData());
   const parsed = schema.safeParse(form);

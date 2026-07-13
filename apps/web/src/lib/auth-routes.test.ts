@@ -39,6 +39,21 @@ describe("rotas de autenticação separadas", () => {
   it("API admin restringe destino pós-login à área /admin", () => {
     expect(read("apps/web/src/pages/api/admin/login.ts")).toContain('value.startsWith("/admin")');
   });
+
+  it("login administrativo não navega diretamente para /api/admin/login", () => {
+    const loginPage = read("apps/web/src/pages/admin/login.astro");
+    const footer = read("apps/web/src/components/SiteFooter.astro");
+    const header = read("apps/web/src/components/SiteHeader.astro");
+
+    expect(loginPage).not.toContain('href="/api/admin/login"');
+    expect(loginPage).not.toContain('action="/api/admin/login"');
+    expect(loginPage).toContain('id="admin-login-form"');
+    expect(loginPage).toContain('fetch("/api/admin/login"');
+    expect(loginPage).toContain('credentials: "same-origin"');
+    expect(footer).not.toContain("/api/admin/login");
+    expect(header).not.toContain("/api/admin/login");
+    expect(read("apps/web/src/pages/api/admin/login.ts")).toContain("status: 405");
+  });
 });
 
 describe("mascaramento de DATABASE_URL", () => {

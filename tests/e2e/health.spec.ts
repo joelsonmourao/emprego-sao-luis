@@ -38,6 +38,45 @@ test("admin login accepts the centralized nine-character policy", async ({ reque
   const html = await response.text();
   expect(html).toContain('minlength="9"');
   expect(html).toContain("A senha deve ter pelo menos 9 caracteres.");
+  expect(html).not.toContain('href="/api/admin/login"');
+  expect(html).not.toContain('action="/api/admin/login"');
+  expect(html).toContain('id="admin-login-form"');
+});
+
+test("admin login API rejects GET with 405", async ({ request }) => {
+  const response = await request.get("/api/admin/login", { failOnStatusCode: false });
+  expect(response.status()).toBe(405);
+  expect(response.headers()["allow"]).toBe("POST");
+  await expect(response.json()).resolves.toMatchObject({ ok: false, error: "Method Not Allowed" });
+});
+
+const e2eOrigin = "http://127.0.0.1:4321";
+
+test("admin login API accepts POST and rejects invalid credentials", async ({ request }) => {
+  const response = await request.post("/api/admin/login", {
+    form: { email: "inexistente@example.com", password: "senha-invalida9", next: "/admin" },
+    headers: { Origin: e2eOrigin, Referer: `${e2eOrigin}/admin/login` },
+    failOnStatusCode: false
+  });
+  expect([400, 401, 429, 503]).toContain(response.status());
+  await expect(response.json()).resolves.toMatchObject({ ok: false });
+});
+
+const e2eAdminEmail = process.env.E2E_ADMIN_EMAIL ?? process.env.ADMIN_INITIAL_EMAIL;
+const e2eAdminPassword = process.env.E2E_ADMIN_PASSWORD ?? process.env.ADMIN_INITIAL_PASSWORD;
+
+test("POST /api/admin/login with valid credentials redirects to /admin", async ({ request }) => {
+  test.skip(!e2eAdminEmail || !e2eAdminPassword || !process.env.DATABASE_URL, "Credenciais E2E não configuradas");
+
+  const response = await request.post("/api/admin/login", {
+    form: { email: e2eAdminEmail!, password: e2eAdminPassword!, next: "/admin" },
+    headers: { Origin: e2eOrigin, Referer: `${e2eOrigin}/admin/login` },
+    maxRedirects: 0,
+    failOnStatusCode: false
+  });
+
+  expect(response.status()).toBe(303);
+  expect(response.headers().location).toMatch(/\/admin/);
 });
 
 test("publish job renders a safe setup state without commercial configuration", async ({ request }) => {
