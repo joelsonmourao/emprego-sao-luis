@@ -5,6 +5,7 @@ import { cssVariablesFromIdentity } from "../lib/design-tokens";
 import { BRAND_ASSET_KEYS } from "../lib/brand/constants";
 import { getBrandIdentity } from "../lib/brand/identity-service";
 import { filterAdminNav } from "../lib/admin-nav";
+import { ADMIN_FORM_BRIDGE_SCRIPT } from "../lib/admin-form-bridge";
 import { getVisualIdentity } from "../lib/visual-identity";
 
 const auth = Astro.locals.auth;
@@ -118,5 +119,6 @@ const current = Astro.url.pathname;
         });
       })();
     </script>
+    <script is:inline set:html={ADMIN_FORM_BRIDGE_SCRIPT} />
   </body>
 </html>

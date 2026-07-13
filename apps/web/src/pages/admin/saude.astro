@@ -14,7 +14,7 @@ import AdminLayout from "../../layouts/AdminLayout.astro";
     <section class="es-card rounded-2xl p-6">
       <h2 class="text-lg font-bold">Atalhos</h2>
       <ul class="mt-4 grid gap-2 text-sm">
-        <li><a class="font-bold text-[var(--brand-primary)]" href="/api/health" target="_blank">Health check</a></li>
+        <li><button class="font-bold text-[var(--brand-primary)]" type="button" id="open-health">Health check</button></li>
         <li><a class="font-bold text-[var(--brand-primary)]" href="/admin/operacao">Filas e jobs</a></li>
         <li><a class="font-bold text-[var(--brand-primary)]" href="/admin/auditoria">Auditoria</a></li>
       </ul>
@@ -33,6 +33,17 @@ import AdminLayout from "../../layouts/AdminLayout.astro";
       }
     }
     document.getElementById("refresh-ready")?.addEventListener("click", loadReady);
+    document.getElementById("open-health")?.addEventListener("click", async () => {
+      const el = document.getElementById("ready-json");
+      if (!el) return;
+      try {
+        const res = await fetch("/api/health", { cache: "no-store" });
+        const data = await res.json();
+        el.textContent = JSON.stringify(data, null, 2);
+      } catch (e) {
+        el.textContent = String(e);
+      }
+    });
     loadReady();
   </script>
 </AdminLayout>
