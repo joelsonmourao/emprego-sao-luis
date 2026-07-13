@@ -1,6 +1,6 @@
 import type { APIRoute } from "astro";
-import { can } from "../../../../../lib/auth";
-import { getPaymentSettings, savePaymentSettings } from "../../../../../lib/commercial/payment-settings";
+import { can } from "../../../../lib/auth";
+import { getPaymentSettings, savePaymentSettings } from "../../../../lib/commercial/payment-settings";
 
 export const GET: APIRoute = async ({ locals }) => {
   if (!locals.auth || !can(locals.auth, "commercial.manage")) return Response.json({ ok: false }, { status: 403 });
