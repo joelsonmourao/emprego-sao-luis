@@ -49,6 +49,24 @@ test("publish job renders a safe setup state without commercial configuration", 
   expect(html).not.toContain(">Falar com o comercial</a>");
 });
 
+test("empresa login returns 200 and is distinct from admin", async ({ request }) => {
+  const response = await request.get("/empresa/login");
+  expect(response.ok()).toBe(true);
+  const html = await response.text();
+  expect(html).toContain("Área da empresa");
+  expect(html).toContain("Não é o painel administrativo");
+  expect(html).not.toContain("Painel administrativo");
+});
+
+test("public navigation links auth areas correctly", async ({ request }) => {
+  const home = await request.get("/");
+  const html = await home.text();
+  expect(html).toContain('href="/empresa/login"');
+  expect(html).toContain("Área da empresa");
+  expect(html).toContain('href="/admin/login"');
+  expect(html).toContain("Administração");
+});
+
 test("admin login and publish job remain readable on mobile", async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto("/admin/login");
