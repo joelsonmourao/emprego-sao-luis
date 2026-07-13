@@ -1,8 +1,7 @@
-import bcrypt from "bcryptjs";
 import { eq } from "drizzle-orm";
-import { assertAdminPasswordLength } from "@es/shared";
 import { createDatabase, permissions, rolePermissions, roles, userRoles, users } from "../src/index.js";
 import { validateAdminBootstrapEnv } from "./migrate-flags.js";
+import { upsertInitialAdmin } from "./seed-rbac-admin.js";
 
 const roleKeys = [
   "SUPER_ADMIN",
@@ -47,7 +46,7 @@ const permissionKeys = [
 export type SeedRbacResult = {
   rolesEnsured: number;
   permissionsEnsured: number;
-  adminAction: "created" | "exists" | "skipped";
+  adminAction: "created" | "updated" | "skipped";
   adminEmail?: string;
 };
 
@@ -93,33 +92,32 @@ export async function seedRbac(): Promise<SeedRbacResult> {
     let adminEmail: string | undefined;
 
     if (email && password) {
-      assertAdminPasswordLength(password);
-
-      const [existingUser] = await connection.db.select().from(users).where(eq(users.email, email)).limit(1);
-      if (existingUser) {
-        adminAction = "exists";
-        adminEmail = email;
-        process.stdout.write(`Administrador já existente: ${email}\n`);
-      } else {
-        const passwordHash = await bcrypt.hash(password, 12);
-        await connection.db.insert(users).values({
-          email,
-          name: name ?? "Administrador",
-          passwordHash,
-          emailVerifiedAt: new Date()
-        });
-        adminAction = "created";
-        adminEmail = email;
-        process.stdout.write(`Administrador criado: ${email}\n`);
-      }
-
-      const [user] = await connection.db.select().from(users).where(eq(users.email, email)).limit(1);
-      if (user) {
-        await connection.db
-          .insert(userRoles)
-          .values({ userId: user.id, roleId: superRole.id })
-          .onConflictDoNothing();
-      }
+      const result = await upsertInitialAdmin({
+        async findByEmail(value) {
+          const [user] = await connection.db.select().from(users).where(eq(users.email, value)).limit(1);
+          return user;
+        },
+        async create(input) {
+          const [user] = await connection.db.insert(users).values({
+            ...input,
+            emailVerifiedAt: new Date()
+          }).returning();
+          return user!;
+        },
+        async update(id, input) {
+          const [user] = await connection.db.update(users).set({
+            ...input,
+            updatedAt: new Date()
+          }).where(eq(users.id, id)).returning();
+          return user!;
+        },
+        async ensureSuperAdminRole(userId) {
+          await connection.db.insert(userRoles).values({ userId, roleId: superRole.id }).onConflictDoNothing();
+        }
+      }, { email, ...(name ? { name } : {}), password });
+      adminAction = result.action;
+      adminEmail = email;
+      process.stdout.write(`Administrador ${result.action === "created" ? "criado" : "atualizado"}: ${email}\n`);
     }
 
     process.stdout.write(
@@ -139,7 +137,7 @@ export async function seedRbac(): Promise<SeedRbacResult> {
 
 if (import.meta.url === `file://${process.argv[1]?.replace(/\\/g, "/")}` || process.argv[1]?.includes("seed-rbac")) {
   seedRbac().catch((error) => {
-    console.error(error);
+    console.error(error instanceof Error ? error.message : "Falha ao executar seed RBAC.");
     process.exit(1);
   });
 }

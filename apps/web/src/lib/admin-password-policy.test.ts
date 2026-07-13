@@ -18,7 +18,7 @@ describe("política de senha administrativa", () => {
     expect(read("apps/web/src/pages/api/admin/login.ts")).toContain("adminPasswordSchema");
     expect(read("apps/web/src/pages/api/admin/admins/index.ts")).toContain("adminPasswordSchema");
     expect(read("apps/web/src/pages/api/auth/admin-password/reset.ts")).toContain("adminPasswordSchema");
-    expect(read("packages/db/scripts/seed-rbac.ts")).toContain("assertAdminPasswordLength");
+    expect(read("packages/db/scripts/seed-rbac-admin.ts")).toContain("assertAdminPasswordLength");
   });
 
   it("não mantém mínimos antigos de 10 ou 14 nos fluxos administrativos", () => {
@@ -27,6 +27,6 @@ describe("política de senha administrativa", () => {
     expect(read("apps/web/src/pages/api/admin/login.ts")).not.toContain(".min(10)");
     expect(read("apps/web/src/pages/api/admin/admins/index.ts")).not.toContain(".min(14)");
     expect(read("apps/web/src/pages/api/auth/admin-password/reset.ts")).not.toContain(".min(14)");
-    expect(read("packages/db/scripts/seed-rbac.ts")).not.toContain("14 caracteres");
+    expect(read("packages/db/scripts/seed-rbac-admin.ts")).not.toContain("14 caracteres");
   });
 });

@@ -69,6 +69,7 @@ describe("migrate entrypoint", () => {
   it("Dockerfile.migrate usa o entrypoint", () => {
     const dockerfile = read("Dockerfile.migrate");
     expect(dockerfile).toContain("scripts/migrate-entrypoint.sh");
+    expect(dockerfile).toContain("COPY packages/shared packages/shared");
     expect(dockerfile).toContain('CMD ["sh", "scripts/migrate-entrypoint.sh"]');
   });
 });
@@ -77,12 +78,14 @@ describe("seed idempotency", () => {
   it("RBAC não duplica papéis, permissões nem administrador", () => {
     const seed = read("packages/db/scripts/seed-rbac.ts");
     expect(seed).toContain("onConflictDoNothing");
-    expect(seed).toContain("Administrador já existente");
-    expect(seed).toContain("Administrador criado");
+    expect(seed).toContain("upsertInitialAdmin");
     expect(seed).not.toMatch(/stdout\.write\([^)]*password/i);
     expect(seed).not.toMatch(/console\.log\([^)]*password/i);
-    expect(seed).toContain("assertAdminPasswordLength");
-    expect(seed).toContain("@es/shared");
+    const adminSeed = read("packages/db/scripts/seed-rbac-admin.ts");
+    expect(adminSeed).toContain("assertAdminPasswordLength");
+    expect(adminSeed).toContain("@es/shared");
+    expect(adminSeed).toContain("passwordHash");
+    expect(adminSeed).toContain("active: true");
     expect(seed).toContain("validateAdminBootstrapEnv");
   });
 
