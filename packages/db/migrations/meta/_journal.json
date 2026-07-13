@@ -134,6 +134,13 @@
       "when": 1783894000000,
       "tag": "0018_commercial_company_seo",
       "breakpoints": true
+    },
+    {
+      "idx": 19,
+      "version": "7",
+      "when": 1783894800000,
+      "tag": "0019_brand_identity_assets",
+      "breakpoints": true
     }
   ]
 }

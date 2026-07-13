@@ -48,6 +48,34 @@ export const authors = pgTable("es_authors", { id: uuid("id").primaryKey().defau
 export const articles = pgTable("es_articles", { id: uuid("id").primaryKey().defaultRandom(), type: contentType("type").notNull(), authorId: uuid("author_id").notNull().references(() => authors.id), title: text("title").notNull(), subtitle: text("subtitle"), slug: text("slug").notNull().unique(), excerpt: text("excerpt").notNull(), contentHtml: text("content_html").notNull(), coverImageUrl: text("cover_image_url"), coverImageAlt: text("cover_image_alt"), coverImageCaption: text("cover_image_caption"), section: text("section"), tags: jsonb("tags").notNull().default([]), sourceName: text("source_name"), sourceUrl: text("source_url"), originalPublishedAt: timestamp("original_published_at", { withTimezone: true }), seoTitle: text("seo_title"), metaDescription: text("meta_description"), canonicalUrl: text("canonical_url"), internalNotes: text("internal_notes"), status: publicationStatus("status").notNull().default("DRAFT"), publishedAt: timestamp("published_at", { withTimezone: true }), scheduledAt: timestamp("scheduled_at", { withTimezone: true }), expiresAt: timestamp("expires_at", { withTimezone: true }), version: integer("version").notNull().default(1), featured: boolean("featured").notNull().default(false), ...timestamps }, (t) => [index("es_articles_publication_idx").on(t.status, t.publishedAt)]);
 export const articleRevisions = pgTable("es_article_revisions", { id: uuid("id").primaryKey().defaultRandom(), articleId: uuid("article_id").notNull().references(() => articles.id, { onDelete: "cascade" }), version: integer("version").notNull(), snapshot: jsonb("snapshot").notNull(), actorId: uuid("actor_id").references(() => users.id), createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow() }, (t) => [uniqueIndex("es_article_revisions_uq").on(t.articleId, t.version)]);
 export const mediaAssets = pgTable("es_media_assets", { id: uuid("id").primaryKey().defaultRandom(), storageKey: text("storage_key").notNull().unique(), originalName: text("original_name").notNull(), mimeType: text("mime_type").notNull(), size: integer("size").notNull(), url: text("url").notNull(), altText: text("alt_text"), metadata: jsonb("metadata").notNull().default({}), ...timestamps });
+export const brandAssets = pgTable("es_brand_assets", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  key: varchar("key", { length: 64 }).notNull().unique(),
+  mediaId: uuid("media_id").references(() => mediaAssets.id),
+  url: text("url").notNull(),
+  originalUrl: text("original_url"),
+  storageKey: text("storage_key"),
+  width: integer("width"),
+  height: integer("height"),
+  mimeType: varchar("mime_type", { length: 128 }),
+  fileSize: integer("file_size"),
+  altText: text("alt_text"),
+  variants: jsonb("variants").notNull().default({}),
+  versionHash: varchar("version_hash", { length: 64 }),
+  updatedBy: uuid("updated_by").references(() => users.id),
+  ...timestamps
+});
+export const brandAssetHistory = pgTable("es_brand_asset_history", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  assetKey: varchar("asset_key", { length: 64 }).notNull(),
+  mediaId: uuid("media_id"),
+  previousUrl: text("previous_url"),
+  newUrl: text("new_url"),
+  action: varchar("action", { length: 32 }).notNull(),
+  actorId: uuid("actor_id").references(() => users.id),
+  metadata: jsonb("metadata").notNull().default({}),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow()
+}, (t) => [index("es_brand_asset_history_key_idx").on(t.assetKey, t.createdAt)]);
 export const redirects = pgTable("es_redirects", { id: uuid("id").primaryKey().defaultRandom(), sourcePath: text("source_path").notNull().unique(), destinationPath: text("destination_path").notNull(), statusCode: integer("status_code").notNull().default(301), active: boolean("active").notNull().default(true), ...timestamps });
 export const importBatches = pgTable("es_import_batches", { id: uuid("id").primaryKey().defaultRandom(), fileHash: text("file_hash").notNull().unique(), fileName: text("file_name").notNull(), status: queueStatus("status").notNull().default("PENDING"), totalRows: integer("total_rows").notNull().default(0), validRows: integer("valid_rows").notNull().default(0), rejectedRows: integer("rejected_rows").notNull().default(0), settings: jsonb("settings").notNull().default({}), createdBy: uuid("created_by").references(() => users.id), undoneAt: timestamp("undone_at", { withTimezone: true }), undoneBy: uuid("undone_by").references(() => users.id), ...timestamps });
 export const importMappingTemplates = pgTable("es_import_mapping_templates", { id: uuid("id").primaryKey().defaultRandom(), name: text("name").notNull().unique(), mapping: jsonb("mapping").notNull(), sheetName: text("sheet_name"), createdBy: uuid("created_by").references(() => users.id), ...timestamps });
