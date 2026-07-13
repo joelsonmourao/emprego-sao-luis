@@ -35,6 +35,7 @@ describe("contraste de formulários em painéis claros", () => {
     expect(read("apps/web/src/components/InstitutionalPage.astro")).toContain("es-light-form-panel");
     expect(read("apps/web/src/pages/publicar-vaga/plano/[slug].astro")).toContain("es-light-form-panel");
     expect(read("apps/web/src/pages/empresa/login.astro")).toContain("es-light-form-panel");
+    expect(read("apps/web/src/pages/admin/login.astro")).toContain("es-light-form-panel");
   });
 
   it("isola text-white do hero para não afetar o slot de busca", () => {

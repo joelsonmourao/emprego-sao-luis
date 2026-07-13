@@ -2,6 +2,7 @@ import type { APIRoute } from "astro";
 import { z } from "zod";
 import { adminPasswordSchema } from "@es/shared";
 import { ADMIN_COOKIE, authenticate } from "../../../lib/auth";
+import { logServerError } from "../../../lib/server-error";
 
 const schema = z.object({
   email: z.email(),
@@ -20,13 +21,19 @@ export const POST: APIRoute = async ({ request, cookies, clientAddress, redirect
       { status: 400 }
     );
   }
-  const result = await authenticate(
-    parsed.data.email,
-    parsed.data.password,
-    clientAddress,
-    request.headers.get("user-agent") ?? "unknown",
-    parsed.data.otp || undefined
-  );
+  let result;
+  try {
+    result = await authenticate(
+      parsed.data.email,
+      parsed.data.password,
+      clientAddress,
+      request.headers.get("user-agent") ?? "unknown",
+      parsed.data.otp || undefined
+    );
+  } catch (error) {
+    logServerError("route:/api/admin/login", error);
+    return Response.json({ ok: false, error: "Serviço de autenticação temporariamente indisponível." }, { status: 503 });
+  }
   if (!result.ok) {
     return Response.json(
       {

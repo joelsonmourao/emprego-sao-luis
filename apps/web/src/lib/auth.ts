@@ -10,6 +10,14 @@ const SESSION_SECONDS = 60 * 60 * 8;
 
 export interface AdminIdentity { id: string; email: string; name: string; roles: string[]; permissions: string[] }
 
+type PasswordUser = { passwordHash: string | null } | null | undefined;
+const DUMMY_PASSWORD_HASH = "$2b$12$C6UzMDM.H6dfI/f/IKcEe.6Q7pQwS7Qv7hG7gV8Qx5JxR6JmP6a3K";
+
+export async function verifyAdminCredentials(user: PasswordUser, password: string): Promise<boolean> {
+  const matches = await bcrypt.compare(password, user?.passwordHash ?? DUMMY_PASSWORD_HASH);
+  return Boolean(user?.passwordHash) && matches;
+}
+
 const hash = (value: string) => createHash("sha256").update(value).digest("hex");
 const secret = () => {
   const value = process.env.AUTH_SECRET;
@@ -30,7 +38,7 @@ export async function authenticate(email: string, password: string, ip: string, 
     const [rate] = await connection.db.select({ count: sql<number>`count(*)::int` }).from(loginAttempts).where(and(eq(loginAttempts.emailHash, emailHash), eq(loginAttempts.ipHash, ipHash), eq(loginAttempts.successful, false), gt(loginAttempts.createdAt, since)));
     if ((rate?.count ?? 0) >= 5) { await connection.db.insert(auditLogs).values({ action: "LOGIN_RATE_LIMITED", entityType: "AUTH", after: { emailHash, ipHash, userAgentHash: hash(userAgent || "unknown") }, origin: "ADMIN_LOGIN" }); return { ok: false as const, reason: "rate_limited" as const }; }
     const [user] = await connection.db.select().from(users).where(and(eq(users.email, emailNormalized), eq(users.active, true))).limit(1);
-    const valid = Boolean(user?.passwordHash) && await bcrypt.compare(password, user?.passwordHash ?? "$2b$12$invalidinvalidinvalidinvalidinvalidinvalidinvalidinvalid");
+    const valid = await verifyAdminCredentials(user, password);
     if (!user || !valid) { await connection.db.insert(loginAttempts).values({ emailHash, ipHash, successful: false }); await connection.db.insert(auditLogs).values({ action: "LOGIN_FAILED", entityType: "AUTH", after: { emailHash, ipHash, userAgentHash: hash(userAgent || "unknown") }, origin: "ADMIN_LOGIN" }); return { ok: false as const, reason: "invalid" as const }; }
     if (user.mfaEnabled) { if (!user.mfaSecretEncrypted || !otp) return { ok: false as const, reason: "mfa_required" as const }; const result = await verify({ secret: decryptSecret(user.mfaSecretEncrypted), token: otp }); if (!result.valid) { await connection.db.insert(loginAttempts).values({ emailHash, ipHash, successful: false }); return { ok: false as const, reason: "invalid_otp" as const }; } }
     await connection.db.insert(loginAttempts).values({ emailHash, ipHash, successful: true });
