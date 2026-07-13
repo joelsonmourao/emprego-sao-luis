@@ -10,7 +10,7 @@ export const POST: APIRoute = async ({ request, locals, redirect, clientAddress 
   const auth = locals.auth!;
   if (!can(auth, "jobs.publish")) return new Response("Proibido", { status: 403 });
   const form = await request.formData();
-  const ids = z.array(z.uuid()).min(1).max(200).safeParse(form.getAll("jobId"));
+  const ids = z.array(z.string().uuid()).min(1).max(200).safeParse(form.getAll("jobId"));
   const status = statusSchema.safeParse(form.get("status"));
   if (!ids.success || !status.success || !process.env.DATABASE_URL) return new Response("Selecione vagas e uma ação válida.", { status: 400 });
   const connection = createDatabase(process.env.DATABASE_URL);

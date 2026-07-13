@@ -1,12 +1,13 @@
 import { randomBytes } from "node:crypto";
 import type { APIRoute } from "astro";
+import { zEmail } from "@es/shared";
 import { z } from "zod";
 import { createDatabase, magicLinkTokens, notificationDeliveries, userRoles, users } from "@es/db";
 import { eq } from "drizzle-orm";
 import { candidateTokenHash } from "../../../lib/candidate-auth";
 import { createNotificationQueue } from "../../../lib/notification-queue";
 
-const schema = z.object({ email: z.email(), name: z.string().trim().min(2).max(120).optional().or(z.literal("")) });
+const schema = z.object({ email: zEmail(), name: z.string().trim().min(2).max(120).optional().or(z.literal("")) });
 
 export const POST: APIRoute = async ({ request, url, redirect }) => {
   const parsed = schema.safeParse(Object.fromEntries(await request.formData()));

@@ -1,12 +1,13 @@
 import { createHash, randomBytes } from "node:crypto";
 import type { APIRoute } from "astro";
+import { zEmail } from "@es/shared";
 import { z } from "zod";
 import { alerts, consentLogs, createDatabase, notificationDeliveries, subscriptions } from "@es/db";
 import { eq } from "drizzle-orm";
 import { createNotificationQueue } from "../../../lib/notification-queue";
 
 const schema = z.object({
-  email: z.email(),
+  email: zEmail(),
   title: z.string().trim().max(120).optional(),
   city: z.string().trim().max(120).optional(),
   category: z.string().trim().max(120).optional(),

@@ -1,10 +1,11 @@
+import { zUrl, zUuid } from "@es/shared";
 import type { APIRoute } from "astro";
 import { adCreatives, auditLogs, campaigns, createDatabase } from "@es/db";
 import { z } from "zod";
 import { can } from "../../../../lib/auth";
 
 const campaignSchema = z.object({
-  advertiserId: z.uuid(),
+  advertiserId: zUuid(),
   name: z.string().min(2),
   sponsorName: z.string().optional(),
   status: z.enum(["DRAFT", "ACTIVE", "PAUSED", "ARCHIVED"]).default("DRAFT"),
@@ -18,10 +19,10 @@ const campaignSchema = z.object({
   impressionLimit: z.coerce.number().int().optional(),
   clickLimit: z.coerce.number().int().optional(),
   internalNotes: z.string().optional(),
-  slotId: z.uuid(),
+  slotId: zUuid(),
   creativeName: z.string().min(2),
-  imageUrl: z.url(),
-  destinationUrl: z.url(),
+  imageUrl: zUrl(),
+  destinationUrl: zUrl(),
   altText: z.string().min(2)
 });
 

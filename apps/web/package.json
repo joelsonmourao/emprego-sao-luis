@@ -31,7 +31,7 @@
     "sharp": "^0.34.5",
     "tailwindcss": "^4.1.11",
     "xlsx": "^0.18.5",
-    "zod": "^4.0.10"
+    "zod": "3.25.76"
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.4",

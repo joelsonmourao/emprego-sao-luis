@@ -1,9 +1,10 @@
+import { zEmail } from "@es/shared";
 import type { APIRoute } from "astro";
-import { advertisers, auditLogs, createDatabase } from "@es/db";
 import { z } from "zod";
+import { advertisers, auditLogs, createDatabase } from "@es/db";
 import { can } from "../../../../lib/auth";
 
-const schema = z.object({ name: z.string().min(2), contactEmail: z.email(), document: z.string().optional() });
+const schema = z.object({ name: z.string().min(2), contactEmail: zEmail(), document: z.string().optional() });
 
 export const POST: APIRoute = async ({ request, locals, redirect, clientAddress }) => {
   const auth = locals.auth!;
