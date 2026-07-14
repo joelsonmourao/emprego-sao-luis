@@ -8,7 +8,18 @@ function sanitize(value: string): string {
     .slice(0, 8_000);
 }
 
-export function logServerError(context: string, error: unknown): void {
+export type ServerErrorContext = {
+  requestId?: string;
+  route?: string;
+  operation?: string;
+  userId?: string;
+  entity?: string;
+  code?: string;
+  cause?: string;
+  integration?: string;
+};
+
+export function logServerError(context: string, error: unknown, metadata: ServerErrorContext = {}): void {
   const source = error instanceof Error ? error : new Error(String(error));
   const entry: Record<string, string> = {
     context,
@@ -18,6 +29,16 @@ export function logServerError(context: string, error: unknown): void {
 
   if (process.env.NODE_ENV !== "production" && source.stack) {
     entry.stack = sanitize(source.stack);
+  }
+
+  for (const [key, value] of Object.entries(metadata)) {
+    if (value) entry[key] = sanitize(value);
+  }
+
+  const sourceWithCode = source as Error & { code?: string; cause?: unknown };
+  if (sourceWithCode.code && !entry.code) entry.code = sanitize(sourceWithCode.code);
+  if (sourceWithCode.cause && !entry.cause) {
+    entry.cause = sanitize(sourceWithCode.cause instanceof Error ? sourceWithCode.cause.message : String(sourceWithCode.cause));
   }
 
   console.error("[server-error]", entry);

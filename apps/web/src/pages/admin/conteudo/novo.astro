@@ -1,5 +1,60 @@
 ---
-import { authors, createDatabase } from "@es/db"; import AdminLayout from "../../../layouts/AdminLayout.astro";
-let authorRows: typeof authors.$inferSelect[] = []; if (process.env.DATABASE_URL) { const connection = createDatabase(process.env.DATABASE_URL); try { authorRows = await connection.db.select().from(authors).orderBy(authors.name); } finally { await connection.close(); } }
+import { authors, createDatabase } from "@es/db";
+import AdminLayout from "../../../layouts/AdminLayout.astro";
+
+let authorRows: typeof authors.$inferSelect[] = [];
+if (process.env.DATABASE_URL) {
+  const connection = createDatabase(process.env.DATABASE_URL);
+  try { authorRows = await connection.db.select().from(authors).orderBy(authors.name); }
+  finally { await connection.close(); }
+}
 ---
-<AdminLayout title="Novo conteúdo"><h1 class="text-3xl font-black">Novo conteúdo</h1>{authorRows.length === 0 ? <p class="mt-6 rounded-xl border border-amber-300 bg-amber-50 p-5">Cadastre um autor em <a class="font-bold underline" href="/admin/conteudo">Conteúdo</a> primeiro.</p> : <form class="mt-6 grid gap-4 rounded-2xl bg-white p-6" method="post" action="/api/admin/articles"><div class="grid gap-4 md:grid-cols-3"><label>Tipo<select class="mt-1 w-full rounded-lg border p-3" name="type"><option value="NEWS">Notícia</option><option value="GUIDE">Guia</option><option value="DATA_REPORT">Relatório</option></select></label><label>Autor<select class="mt-1 w-full rounded-lg border p-3" name="authorId" required>{authorRows.map((author)=><option value={author.id}>{author.name}</option>)}</select></label><label>Status<select class="mt-1 w-full rounded-lg border p-3" name="status"><option value="DRAFT">Rascunho</option><option value="SCHEDULED">Agendado</option><option value="PUBLISHED">Publicado</option></select></label></div><label>Título<input class="mt-1 w-full rounded-lg border p-3" name="title" minlength="5" required/></label><label>Subtítulo<input class="mt-1 w-full rounded-lg border p-3" name="subtitle"/></label><label>Slug<input class="mt-1 w-full rounded-lg border p-3" name="slug" placeholder="gerado pelo título"/></label><label>Resumo<textarea class="mt-1 w-full rounded-lg border p-3" name="excerpt" minlength="10" required></textarea></label><label>Conteúdo HTML<textarea class="mt-1 min-h-72 w-full rounded-lg border p-3 font-mono" name="contentHtml" minlength="20" required></textarea></label><div class="grid gap-4 md:grid-cols-2"><label>Imagem de capa<input class="mt-1 w-full rounded-lg border p-3" name="coverImageUrl" type="url"/></label><label>Texto alternativo<input class="mt-1 w-full rounded-lg border p-3" name="coverImageAlt"/></label><label>Seção<input class="mt-1 w-full rounded-lg border p-3" name="section"/></label><label>Tags separadas por vírgula<input class="mt-1 w-full rounded-lg border p-3" name="tags"/></label><label>Fonte<input class="mt-1 w-full rounded-lg border p-3" name="sourceName"/></label><label>URL da fonte<input class="mt-1 w-full rounded-lg border p-3" name="sourceUrl" type="url"/></label><label>Agendar para<input class="mt-1 w-full rounded-lg border p-3" name="scheduledAt" type="datetime-local"/></label><label>Expira em<input class="mt-1 w-full rounded-lg border p-3" name="expiresAt" type="datetime-local"/></label><label>Título SEO<input class="mt-1 w-full rounded-lg border p-3" name="seoTitle"/></label><label>Descrição SEO<input class="mt-1 w-full rounded-lg border p-3" name="metaDescription"/></label></div><label><input class="mr-2" name="featured" type="checkbox"/>Destaque</label><label>Notas internas<textarea class="mt-1 w-full rounded-lg border p-3" name="internalNotes"></textarea></label><button class="rounded-xl bg-red-700 p-4 font-bold text-white">Salvar conteúdo</button></form>}</AdminLayout>
+
+<AdminLayout title="Novo conteúdo">
+  <h1 class="text-3xl font-black">Novo conteúdo</h1>
+  <section class="mt-6 rounded-xl border border-sky-200 bg-sky-50 p-5">
+    <h2 class="font-bold">Cadastro rápido de autor</h2>
+    <form id="quick-author-form" class="mt-3 grid gap-3 md:grid-cols-4" method="post" action="/api/admin/authors">
+      <input type="hidden" name="returnTo" value="json" />
+      <input class="rounded-lg border p-3" name="name" placeholder="Nome" minlength="2" required />
+      <input class="rounded-lg border p-3" name="slug" placeholder="slug opcional" />
+      <input class="rounded-lg border p-3" name="bio" placeholder="Biografia curta" />
+      <button class="rounded-lg border bg-white font-bold">Cadastrar e selecionar</button>
+    </form>
+  </section>
+  <form class="mt-6 grid gap-4 rounded-2xl bg-white p-6" method="post" action="/api/admin/articles">
+    <div class="grid gap-4 md:grid-cols-3">
+      <label>Tipo<select class="mt-1 w-full rounded-lg border p-3" name="type"><option value="NEWS">Notícia</option><option value="GUIDE">Guia</option><option value="DATA_REPORT">Relatório</option></select></label>
+      <label>Autor<select id="article-author" class="mt-1 w-full rounded-lg border p-3" name="authorId" required>{authorRows.map((author)=><option value={author.id}>{author.name}</option>)}</select></label>
+      <label>Status<select class="mt-1 w-full rounded-lg border p-3" name="status"><option value="DRAFT">Rascunho</option><option value="PENDING_REVIEW">Em revisão</option><option value="SCHEDULED">Agendado</option><option value="PUBLISHED">Publicado</option></select></label>
+    </div>
+    {authorRows.length === 0 && <p id="author-required-message" class="rounded-lg bg-amber-50 p-3 text-sm text-amber-900">Cadastre um autor acima; ele será selecionado automaticamente.</p>}
+    <label>Título<input class="mt-1 w-full rounded-lg border p-3" name="title" minlength="5" required /></label>
+    <label>Subtítulo<input class="mt-1 w-full rounded-lg border p-3" name="subtitle" /></label>
+    <label>Slug<input class="mt-1 w-full rounded-lg border p-3" name="slug" placeholder="gerado pelo título" /></label>
+    <label>Resumo<textarea class="mt-1 w-full rounded-lg border p-3" name="excerpt" minlength="10" required></textarea></label>
+    <label>Conteúdo HTML<textarea class="mt-1 min-h-72 w-full rounded-lg border p-3 font-mono" name="contentHtml" minlength="20" required></textarea></label>
+    <div class="grid gap-4 md:grid-cols-2">
+      <label>Imagem de capa<input class="mt-1 w-full rounded-lg border p-3" name="coverImageUrl" type="url" /></label><label>Texto alternativo<input class="mt-1 w-full rounded-lg border p-3" name="coverImageAlt" /></label>
+      <label>Seção/categoria<input class="mt-1 w-full rounded-lg border p-3" name="section" /></label><label>Tags separadas por vírgula<input class="mt-1 w-full rounded-lg border p-3" name="tags" /></label>
+      <label>Fonte<input class="mt-1 w-full rounded-lg border p-3" name="sourceName" /></label><label>URL da fonte<input class="mt-1 w-full rounded-lg border p-3" name="sourceUrl" type="url" /></label>
+      <label>Agendar para<input class="mt-1 w-full rounded-lg border p-3" name="scheduledAt" type="datetime-local" /></label><label>Expira em<input class="mt-1 w-full rounded-lg border p-3" name="expiresAt" type="datetime-local" /></label>
+      <label>Título SEO<input class="mt-1 w-full rounded-lg border p-3" name="seoTitle" /></label><label>Descrição SEO<input class="mt-1 w-full rounded-lg border p-3" name="metaDescription" /></label>
+    </div>
+    <label><input class="mr-2" name="featured" type="checkbox" />Destaque</label>
+    <label>Notas internas<textarea class="mt-1 w-full rounded-lg border p-3" name="internalNotes"></textarea></label>
+    <button class="rounded-xl bg-red-700 p-4 font-bold text-white">Salvar conteúdo</button>
+  </form>
+  <script>
+    document.addEventListener("admin:operation-success", ((event: CustomEvent) => {
+      const author = event.detail?.data?.author;
+      if (!author?.id || !author?.name) return;
+      const select = document.getElementById("article-author") as HTMLSelectElement | null;
+      if (!select) return;
+      select.add(new Option(author.name, author.id, true, true));
+      select.value = author.id;
+      document.getElementById("author-required-message")?.remove();
+      (document.getElementById("quick-author-form") as HTMLFormElement | null)?.reset();
+    }) as EventListener);
+  </script>
+</AdminLayout>

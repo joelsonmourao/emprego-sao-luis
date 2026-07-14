@@ -100,7 +100,7 @@ export async function getCreditsForEmail(email: string) {
   if (!process.env.DATABASE_URL) return [];
   const connection = createDatabase(process.env.DATABASE_URL);
   try {
-    return connection.db
+    return await connection.db
       .select()
       .from(companyCredits)
       .where(and(eq(companyCredits.email, email.toLowerCase()), gt(companyCredits.expiresAt, new Date()), sql`${companyCredits.usedCredits} < ${companyCredits.totalCredits}`))

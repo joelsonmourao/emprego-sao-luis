@@ -1,14 +1,59 @@
 ---
-import AdminLayout from "../../../../layouts/AdminLayout.astro";
 import { createDatabase, jobs } from "@es/db";
 import { eq } from "drizzle-orm";
+import AdminLayout from "../../../../layouts/AdminLayout.astro";
+import { getJobFormOptions, EMPLOYMENT_TYPES, WORKPLACE_TYPES } from "../../../../lib/admin-data";
 import { can } from "../../../../lib/auth";
-import { getJobFormOptions } from "../../../../lib/admin-data";
-const auth = Astro.locals.auth!; if (!can(auth, "jobs.create")) return new Response("Proibido", { status: 403 });
+
+const auth = Astro.locals.auth!;
+if (!can(auth, "jobs.create")) return new Response("Proibido", { status: 403 });
 if (!Astro.params.id || !process.env.DATABASE_URL) return new Response("Não encontrada", { status: 404 });
-const connection = createDatabase(process.env.DATABASE_URL); let job; try { [job] = await connection.db.select().from(jobs).where(eq(jobs.id, Astro.params.id)).limit(1); } finally { await connection.close(); }
+const connection = createDatabase(process.env.DATABASE_URL);
+let job;
+try { [job] = await connection.db.select().from(jobs).where(eq(jobs.id, Astro.params.id)).limit(1); }
+finally { await connection.close(); }
 if (!job) return new Response("Não encontrada", { status: 404 });
 const options = await getJobFormOptions();
-const localDate = (value: Date | null) => value ? new Date(value.getTime() - value.getTimezoneOffset() * 60000).toISOString().slice(0, 16) : "";
+const localDate = (value: Date | null) => value ? new Date(value.getTime() - value.getTimezoneOffset() * 60_000).toISOString().slice(0, 16) : "";
+const listText = (value: unknown) => Array.isArray(value) ? (value as string[]).join("\n") : "";
 ---
-<AdminLayout title={`Editar ${job.publicCode}`}><div class="flex flex-wrap items-center justify-between gap-3"><div><p class="font-mono text-red-700">{job.publicCode}</p><h1 class="text-3xl font-black">Editar vaga</h1></div><div class="flex gap-3"><a href={`/vagas/${job.slug}`} target="_blank">Preview público</a><a href={`/admin/vagas/${job.id}/historico`}>Histórico</a></div></div><form class="mt-8 grid gap-5 rounded-2xl bg-white p-6" method="post" action={`/api/admin/jobs/${job.id}/update`}><input type="hidden" name="version" value={job.version}/><div class="grid gap-4 md:grid-cols-2"><label>Título original<input class="mt-1 w-full rounded-lg border p-3" name="originalTitle" value={job.originalTitle} required/></label><label>Título público<input class="mt-1 w-full rounded-lg border p-3" name="normalizedTitle" value={job.normalizedTitle} required/></label></div><label>Slug<input class="mt-1 w-full rounded-lg border p-3" name="slug" value={job.slug} required/></label><div class="grid gap-4 md:grid-cols-2"><label>Empresa<select class="mt-1 w-full rounded-lg border p-3" name="companyId" required>{options.companies.map((item) => <option value={item.id} selected={item.id === job.companyId}>{item.name}</option>)}</select></label><label>Categoria<select class="mt-1 w-full rounded-lg border p-3" name="categoryId"><option value="">Sem categoria</option>{options.categories.map((item) => <option value={item.id} selected={item.id === job.categoryId}>{item.name}</option>)}</select></label><label>Cidade<select class="mt-1 w-full rounded-lg border p-3" name="cityId" required>{options.cities.map((item) => <option value={item.id} selected={item.id === job.cityId}>{item.name}</option>)}</select></label><label>UF<select class="mt-1 w-full rounded-lg border p-3" name="stateId" required>{options.states.map((item) => <option value={item.id} selected={item.id === job.stateId}>{item.code}</option>)}</select></label></div><div class="grid gap-4 md:grid-cols-2"><label>Contrato<input class="mt-1 w-full rounded-lg border p-3" name="employmentType" value={job.employmentType} required/></label><label>Modalidade<select class="mt-1 w-full rounded-lg border p-3" name="workplaceType"><option value="presencial" selected={job.workplaceType === "presencial"}>Presencial</option><option value="hibrido" selected={job.workplaceType === "hibrido"}>Híbrido</option><option value="remoto" selected={job.workplaceType === "remoto"}>Remoto</option></select></label></div><label>Resumo<textarea class="mt-1 w-full rounded-lg border p-3" name="summary" required>{job.summary}</textarea></label><label>Descrição<textarea class="mt-1 min-h-64 w-full rounded-lg border p-3" name="description" required>{job.description}</textarea></label><div class="grid gap-4 md:grid-cols-2"><label>Candidatura<input class="mt-1 w-full rounded-lg border p-3" type="url" name="applicationUrl" value={job.applicationUrl} required/></label><label>Fonte<input class="mt-1 w-full rounded-lg border p-3" name="sourceName" value={job.sourceName} required/></label><label>URL da fonte<input class="mt-1 w-full rounded-lg border p-3" type="url" name="sourceUrl" value={job.sourceUrl ?? ""}/></label><label>Validade<input class="mt-1 w-full rounded-lg border p-3" type="datetime-local" name="expiresAt" value={localDate(job.expiresAt)} required/></label><label>Salário mínimo<input class="mt-1 w-full rounded-lg border p-3" type="number" name="salaryMin" value={job.salaryMin ?? ""}/></label><label>Salário máximo<input class="mt-1 w-full rounded-lg border p-3" type="number" name="salaryMax" value={job.salaryMax ?? ""}/></label></div><label>Status<select class="mt-1 w-full rounded-lg border p-3" name="publicationStatus">{["DRAFT","PENDING_REVIEW","APPROVED","SCHEDULED","PUBLISHED"].map((status) => <option value={status} selected={job.publicationStatus === status}>{status}</option>)}</select></label><button class="rounded-xl bg-red-700 p-4 font-bold text-white">Salvar alterações</button></form></AdminLayout>
+
+<AdminLayout title={`Editar ${job.publicCode}`}>
+  <div class="flex flex-wrap items-center justify-between gap-3">
+    <div><p class="font-mono text-red-700">{job.publicCode}</p><h1 class="text-3xl font-black">Editar vaga</h1></div>
+    <div class="flex flex-wrap gap-3"><a href={`/vagas/${job.slug}`} target="_blank">Preview público</a><a href={`/admin/vagas/${job.id}/historico`}>Histórico</a></div>
+  </div>
+  <div class="mt-4 flex flex-wrap gap-2">
+    <form method="post" action={`/api/admin/jobs/${job.id}/duplicate`}><button class="rounded-lg border px-3 py-2 text-sm font-bold">Duplicar</button></form>
+    {job.publicationStatus === "PUBLISHED" && <form method="post" action={`/api/admin/jobs/${job.id}/status`}><input type="hidden" name="status" value="PAUSED"/><button class="rounded-lg border px-3 py-2 text-sm font-bold">Pausar</button></form>}
+    <form method="post" action={`/api/admin/jobs/${job.id}/status`}><input type="hidden" name="status" value="ARCHIVED"/><button class="rounded-lg border border-red-200 px-3 py-2 text-sm font-bold text-red-700">Arquivar</button></form>
+  </div>
+  <form class="mt-8 grid gap-5 rounded-2xl bg-white p-6" method="post" action={`/api/admin/jobs/${job.id}/update`}>
+    <input type="hidden" name="version" value={job.version}/>
+    <div class="grid gap-4 md:grid-cols-2"><label>Título original<input class="mt-1 w-full rounded-lg border p-3" name="originalTitle" value={job.originalTitle} required/></label><label>Título público<input class="mt-1 w-full rounded-lg border p-3" name="normalizedTitle" value={job.normalizedTitle} required/></label></div>
+    <label>Slug<input class="mt-1 w-full rounded-lg border p-3" name="slug" value={job.slug} required/></label>
+    <div class="grid gap-4 md:grid-cols-2">
+      <label>Empresa<select class="mt-1 w-full rounded-lg border p-3" name="companyId" required>{options.companies.map((item)=><option value={item.id} selected={item.id===job.companyId}>{item.name}</option>)}</select></label>
+      <label>Categoria<select class="mt-1 w-full rounded-lg border p-3" name="categoryId"><option value="">Sem categoria</option>{options.categories.map((item)=><option value={item.id} selected={item.id===job.categoryId}>{item.name}</option>)}</select></label>
+      <label>Cidade<select class="mt-1 w-full rounded-lg border p-3" name="cityId" required>{options.cities.map((item)=><option value={item.id} selected={item.id===job.cityId}>{item.name}</option>)}</select></label>
+      <label>UF<select class="mt-1 w-full rounded-lg border p-3" name="stateId" required>{options.states.map((item)=><option value={item.id} selected={item.id===job.stateId}>{item.name} ({item.code})</option>)}</select></label>
+      <label>Bairro<input class="mt-1 w-full rounded-lg border p-3" name="neighborhood" value={job.neighborhood ?? ""}/></label>
+      <label>Jornada<input class="mt-1 w-full rounded-lg border p-3" name="schedule" value={job.schedule ?? ""}/></label>
+    </div>
+    <div class="grid gap-4 md:grid-cols-2"><label>Contrato<select class="mt-1 w-full rounded-lg border p-3" name="employmentType">{EMPLOYMENT_TYPES.map((value)=><option value={value} selected={value===job.employmentType}>{value}</option>)}</select></label><label>Modalidade<select class="mt-1 w-full rounded-lg border p-3" name="workplaceType">{WORKPLACE_TYPES.map((value)=><option value={value.value} selected={value.value===job.workplaceType}>{value.label}</option>)}</select></label></div>
+    <label>Resumo<textarea class="mt-1 w-full rounded-lg border p-3" name="summary" required>{job.summary}</textarea></label>
+    <label>Descrição<textarea class="mt-1 min-h-64 w-full rounded-lg border p-3" name="description" required>{job.description}</textarea></label>
+    <div class="grid gap-4 md:grid-cols-3"><label>Atividades<textarea class="mt-1 min-h-32 w-full rounded-lg border p-3" name="activities">{listText(job.activities)}</textarea></label><label>Requisitos<textarea class="mt-1 min-h-32 w-full rounded-lg border p-3" name="requirements">{listText(job.requirements)}</textarea></label><label>Benefícios<textarea class="mt-1 min-h-32 w-full rounded-lg border p-3" name="benefits">{listText(job.benefits)}</textarea></label></div>
+    <label>Informações adicionais<textarea class="mt-1 w-full rounded-lg border p-3" name="additionalInfo">{job.additionalInfo ?? ""}</textarea></label>
+    <div class="grid gap-4 md:grid-cols-2">
+      <label>Candidatura<input class="mt-1 w-full rounded-lg border p-3" type="url" name="applicationUrl" value={job.applicationUrl} required/></label><label>Fonte<input class="mt-1 w-full rounded-lg border p-3" name="sourceName" value={job.sourceName} required/></label>
+      <label>URL da fonte<input class="mt-1 w-full rounded-lg border p-3" type="url" name="sourceUrl" value={job.sourceUrl ?? ""}/></label><label>Evidência da fonte<input class="mt-1 w-full rounded-lg border p-3" name="sourceEvidence" value={job.sourceEvidence ?? ""}/></label>
+      <label>Validade<input class="mt-1 w-full rounded-lg border p-3" type="datetime-local" name="expiresAt" value={localDate(job.expiresAt)} required/></label><label>Publicar em<input class="mt-1 w-full rounded-lg border p-3" type="datetime-local" name="scheduledAt" value={localDate(job.scheduledAt)}/></label>
+      <label>Salário mínimo<input class="mt-1 w-full rounded-lg border p-3" type="number" name="salaryMin" value={job.salaryMin ?? ""}/></label><label>Salário máximo<input class="mt-1 w-full rounded-lg border p-3" type="number" name="salaryMax" value={job.salaryMax ?? ""}/></label>
+    </div>
+    <div class="grid gap-4 md:grid-cols-3"><label>Título SEO<input class="mt-1 w-full rounded-lg border p-3" name="seoTitle" value={job.seoTitle ?? ""}/></label><label>Descrição SEO<input class="mt-1 w-full rounded-lg border p-3" name="metaDescription" value={job.metaDescription ?? ""}/></label><label>Canônica<input class="mt-1 w-full rounded-lg border p-3" type="url" name="canonicalUrl" value={job.canonicalUrl ?? ""}/></label></div>
+    <label>Status<select class="mt-1 w-full rounded-lg border p-3" name="publicationStatus">{["DRAFT","PENDING_REVIEW","APPROVED","SCHEDULED","PUBLISHED"].map((status)=><option value={status} selected={job.publicationStatus===status}>{status}</option>)}</select></label>
+    <div class="flex flex-wrap gap-5"><label><input class="mr-2" type="checkbox" name="featured" checked={job.featured}/>Destaque</label><label><input class="mr-2" type="checkbox" name="confidentialCompany" checked={job.confidentialCompany}/>Empresa confidencial</label><label><input class="mr-2" type="checkbox" name="salaryVisible" checked={job.salaryVisible}/>Exibir salário</label></div>
+    <button class="rounded-xl bg-red-700 p-4 font-bold text-white">Salvar alterações</button>
+  </form>
+</AdminLayout>

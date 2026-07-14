@@ -92,7 +92,7 @@ const query = new URLSearchParams(Astro.url.searchParams);
     <input class="rounded-lg border px-3 py-2" name="from" type="date" value={from ?? ""} />
     <input class="rounded-lg border px-3 py-2" name="to" type="date" value={to ?? ""} />
     <button class="rounded-lg bg-slate-900 px-4 py-2 font-bold text-white">Filtrar</button>
-    <a class="rounded-lg border px-4 py-2" href={`/api/admin/audit/export.csv?${query.toString()}`}>Exportar CSV</a>
+    <a class="rounded-lg border px-4 py-2" href={`/api/admin/audit/export.csv?${query.toString()}`} data-admin-download data-filename="auditoria.csv">Exportar CSV</a>
   </form>
 
   <section class="mt-8 rounded-2xl bg-white p-6">

@@ -90,6 +90,10 @@ const formData = {
           ))}
         </select>
       </label>
+      <label class="flex items-center gap-2">
+        <input type="checkbox" name="confidentialCompany" />
+        Exibir como empresa confidencial no portal público
+      </label>
     </section>
 
     <section class="grid gap-4 md:grid-cols-2">
@@ -170,6 +174,13 @@ const formData = {
         Descrição completa
         <textarea class="mt-1 min-h-48 w-full rounded-lg border p-3" name="description" minlength="80" required placeholder="Atividades, requisitos, benefícios e instruções de candidatura."></textarea>
       </label>
+      <div class="grid gap-4 md:grid-cols-3">
+        <label>Atividades<textarea class="mt-1 min-h-32 w-full rounded-lg border p-3" name="activities" placeholder="Uma por linha"></textarea></label>
+        <label>Requisitos<textarea class="mt-1 min-h-32 w-full rounded-lg border p-3" name="requirements" placeholder="Um por linha"></textarea></label>
+        <label>Benefícios<textarea class="mt-1 min-h-32 w-full rounded-lg border p-3" name="benefits" placeholder="Um por linha"></textarea></label>
+      </div>
+      <label>Informações adicionais<textarea class="mt-1 w-full rounded-lg border p-3" name="additionalInfo"></textarea></label>
+      <label>Jornada/horário<input class="mt-1 w-full rounded-lg border p-3" name="schedule" /></label>
     </section>
 
     <section class="grid gap-4">
@@ -206,9 +217,18 @@ const formData = {
           <input class="mt-1 w-full rounded-lg border p-3" type="url" name="sourceUrl" placeholder="https://" />
         </label>
         <label>
+          Evidência/origem interna (opcional)
+          <input class="mt-1 w-full rounded-lg border p-3" name="sourceEvidence" />
+        </label>
+        <label>
           Validade
           <input class="mt-1 w-full rounded-lg border p-3" type="datetime-local" name="expiresAt" required value={defaultExpiresLocal} />
         </label>
+      </div>
+      <div class="grid gap-4 md:grid-cols-3">
+        <label>Título SEO<input class="mt-1 w-full rounded-lg border p-3" name="seoTitle" maxlength="70" /></label>
+        <label>Descrição SEO<input class="mt-1 w-full rounded-lg border p-3" name="metaDescription" maxlength="170" /></label>
+        <label>URL canônica (opcional)<input class="mt-1 w-full rounded-lg border p-3" type="url" name="canonicalUrl" /></label>
       </div>
     </section>
 
@@ -219,9 +239,15 @@ const formData = {
         <select class="mt-1 w-full max-w-md rounded-lg border p-3" name="publicationStatus">
           <option value="DRAFT">Salvar rascunho</option>
           <option value="PENDING_REVIEW">Enviar para revisão</option>
+          <option value="SCHEDULED">Agendar publicação</option>
           <option value="PUBLISHED">Publicar agora</option>
         </select>
       </label>
+      <label>
+        Publicar em (obrigatório para agendamento)
+        <input class="mt-1 w-full max-w-md rounded-lg border p-3" type="datetime-local" name="scheduledAt" />
+      </label>
+      <label class="flex items-center gap-2"><input type="checkbox" name="featured" /> Destacar vaga</label>
       <button class="rounded-xl bg-red-700 p-4 font-bold text-white" type="submit">Salvar vaga</button>
     </section>
   </form>
@@ -232,6 +258,7 @@ const formData = {
       <label>Nome interno<input id="quick-company-name" class="mt-1 w-full rounded-lg border p-3" required /></label>
       <label>Nome público<input id="quick-company-public" class="mt-1 w-full rounded-lg border p-3" /></label>
       <label>Site (opcional)<input id="quick-company-site" class="mt-1 w-full rounded-lg border p-3" type="url" /></label>
+      <label>Logo (opcional)<input id="quick-company-logo" class="mt-1 w-full rounded-lg border p-3" type="url" /></label>
       <label class="flex items-center gap-2"><input id="quick-company-verified" type="checkbox" /> Empresa verificada</label>
       <div class="flex justify-end gap-2">
         <button type="button" id="close-company-modal" class="rounded-lg border px-4 py-2">Cancelar</button>
@@ -329,8 +356,9 @@ const formData = {
 
     try {
       const response = await fetch(`/api/admin/jobs/slug?${params.toString()}`, { credentials: "same-origin" });
-      const payload = await response.json();
-      if (payload?.ok && payload.suggested) {
+      const envelope = await response.json();
+      const payload = envelope?.data ?? envelope;
+      if (envelope?.ok && payload.suggested) {
         slugInput.value = payload.suggested;
         if (slugStatus) slugStatus.textContent = "Slug sugerido automaticamente.";
         updateSlugPreview();
@@ -405,6 +433,9 @@ const formData = {
       websiteUrl: document.getElementById("quick-company-site") instanceof HTMLInputElement
         ? document.getElementById("quick-company-site").value.trim() || undefined
         : undefined,
+      logoUrl: document.getElementById("quick-company-logo") instanceof HTMLInputElement
+        ? document.getElementById("quick-company-logo").value.trim() || undefined
+        : undefined,
       cityId: citySelect instanceof HTMLSelectElement ? citySelect.value || undefined : undefined,
       stateId: stateSelect instanceof HTMLSelectElement ? stateSelect.value || undefined : undefined,
       verified: document.getElementById("quick-company-verified") instanceof HTMLInputElement
@@ -417,9 +448,10 @@ const formData = {
       credentials: "same-origin",
       body: JSON.stringify(payload)
     });
-    const result = await response.json();
-    if (!result?.ok) {
-      alert(result?.error ?? "Não foi possível criar a empresa.");
+    const envelope = await response.json();
+    const result = envelope?.data;
+    if (!envelope?.ok || !result?.id) {
+      alert(envelope?.error ?? "Não foi possível criar a empresa.");
       return;
     }
     companies.push({ id: result.id, name: result.name });
@@ -437,9 +469,10 @@ const formData = {
       credentials: "same-origin",
       body: JSON.stringify({ name: name.value.trim(), stateId: stateSelect.value })
     });
-    const result = await response.json();
-    if (!result?.ok) {
-      alert(result?.error ?? "Não foi possível criar a cidade.");
+    const envelope = await response.json();
+    const result = envelope?.data;
+    if (!envelope?.ok || !result?.id) {
+      alert(envelope?.error ?? "Não foi possível criar a cidade.");
       return;
     }
     if (!cities.some((city) => city.id === result.id)) {
@@ -460,9 +493,10 @@ const formData = {
       credentials: "same-origin",
       body: JSON.stringify({ name: name.value.trim() })
     });
-    const result = await response.json();
-    if (!result?.ok) {
-      alert(result?.error ?? "Não foi possível criar a categoria.");
+    const envelope = await response.json();
+    const result = envelope?.data;
+    if (!envelope?.ok || !result?.id) {
+      alert(envelope?.error ?? "Não foi possível criar a categoria.");
       return;
     }
     categories.push({ id: result.id, name: result.name });

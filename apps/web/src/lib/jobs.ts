@@ -1,4 +1,4 @@
-import { and, desc, eq, gt, ne } from "drizzle-orm";
+import { and, desc, eq, gt, ne, sql } from "drizzle-orm";
 import { categories, cities, companies, createDatabase, jobs, neighborhoods, states } from "@es/db";
 
 export async function listPublishedJobs(limit = 24) {
@@ -16,10 +16,10 @@ export async function findPublishedJob(slug: string) {
     const [job] = await connection.db
       .select({
         job: jobs,
-        companyName: companies.name,
-        companySlug: companies.slug,
-        companyWebsiteUrl: companies.websiteUrl,
-        companyLogoUrl: companies.logoUrl,
+        companyName: sql<string>`case when ${jobs.confidentialCompany} then 'Empresa confidencial' else coalesce(${companies.publicName}, ${companies.name}) end`,
+        companySlug: sql<string>`case when ${jobs.confidentialCompany} then '' else ${companies.slug} end`,
+        companyWebsiteUrl: sql<string | null>`case when ${jobs.confidentialCompany} then null else ${companies.websiteUrl} end`,
+        companyLogoUrl: sql<string | null>`case when ${jobs.confidentialCompany} then null else ${companies.logoUrl} end`,
         cityName: cities.name,
         citySlug: cities.slug,
         stateCode: states.code,
@@ -49,7 +49,7 @@ export async function listRelatedJobs(input: { jobId: string; companyId: string;
       title: jobs.normalizedTitle,
       slug: jobs.slug,
       code: jobs.publicCode,
-      company: companies.name,
+      company: sql<string>`case when ${jobs.confidentialCompany} then 'Empresa confidencial' else coalesce(${companies.publicName}, ${companies.name}) end`,
       city: cities.name,
       state: states.code,
       workplace: jobs.workplaceType,

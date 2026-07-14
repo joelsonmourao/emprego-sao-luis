@@ -1,12 +1,12 @@
 import { createHash } from "node:crypto";
 import type { APIRoute } from "astro";
 import { jobDraftSchema } from "@es/shared";
-import { auditLogs, cities, createDatabase, indexingEvents, jobs, states } from "@es/db";
+import { auditLogs, categories, cities, companies, createDatabase, indexingEvents, jobs, states } from "@es/db";
 import { eq, sql } from "drizzle-orm";
 import { can } from "../../../../lib/auth";
 import { adminJsonError, adminJsonRedirect, adminMethodNotAllowed } from "../../../../lib/admin-api-response";
 import { logServerError } from "../../../../lib/server-error";
-import { resolveUniqueJobSlug } from "../../../../lib/job-slug";
+import { resolveRequestedJobSlug } from "../../../../lib/job-slug";
 
 const optional = (value: FormDataEntryValue | null) =>
   typeof value === "string" && value.trim() ? value.trim() : undefined;
@@ -35,26 +35,23 @@ export const POST: APIRoute = async ({ request, locals }) => {
 
   const connection = createDatabase(process.env.DATABASE_URL);
   try {
-    const [city] = await connection.db
-      .select({ name: cities.name })
-      .from(cities)
-      .where(eq(cities.id, parsed.data.cityId))
-      .limit(1);
-    const [state] = await connection.db
-      .select({ code: states.code })
-      .from(states)
-      .where(eq(states.id, parsed.data.stateId))
-      .limit(1);
+    const [[city], [state], [company], categoryRows] = await Promise.all([
+      connection.db.select({ name: cities.name, stateId: cities.stateId }).from(cities).where(eq(cities.id, parsed.data.cityId)).limit(1),
+      connection.db.select({ code: states.code }).from(states).where(eq(states.id, parsed.data.stateId)).limit(1),
+      connection.db.select({ id: companies.id }).from(companies).where(eq(companies.id, parsed.data.companyId)).limit(1),
+      parsed.data.categoryId ? connection.db.select({ id: categories.id }).from(categories).where(eq(categories.id, parsed.data.categoryId)).limit(1) : Promise.resolve([])
+    ]);
+    if (!city || !state || city.stateId !== parsed.data.stateId) return adminJsonError("Cidade e estado não correspondem.", 422, { code: "LOCATION_MISMATCH" });
+    if (!company) return adminJsonError("Empresa não encontrada.", 422, { code: "COMPANY_NOT_FOUND" });
+    if (parsed.data.categoryId && !categoryRows[0]) return adminJsonError("Categoria não encontrada.", 422, { code: "CATEGORY_NOT_FOUND" });
 
-    const slug =
-      parsed.data.slug && parsed.data.slug !== "1"
-        ? parsed.data.slug
-        : await resolveUniqueJobSlug(
-            connection.db,
-            parsed.data.normalizedTitle || parsed.data.originalTitle,
-            city?.name,
-            state?.code
-          );
+    const slug = await resolveRequestedJobSlug(
+      connection.db,
+      parsed.data.slug === "1" ? "" : parsed.data.slug,
+      parsed.data.normalizedTitle || parsed.data.originalTitle,
+      city.name,
+      state.code
+    );
 
     const created = await connection.db.transaction(async (tx) => {
       const [sequence] = await tx.execute(sql<{ value: string }>`select nextval('es_job_public_code_seq')::text as value`);
@@ -77,10 +74,11 @@ export const POST: APIRoute = async ({ request, locals }) => {
             parsed.data.salaryMin !== undefined ||
             parsed.data.salaryMax !== undefined,
           sourceUrl: parsed.data.sourceUrl ?? null,
-          sourceEvidence: null,
+          sourceEvidence: parsed.data.sourceEvidence ?? null,
           originType: "MANUAL",
           duplicateHash,
-          publishedAt: parsed.data.publicationStatus === "PUBLISHED" ? new Date() : null
+          publishedAt: parsed.data.publicationStatus === "PUBLISHED" ? new Date() : null,
+          scheduledAt: parsed.data.publicationStatus === "SCHEDULED" ? parsed.data.scheduledAt : null
         })
         .returning();
 

@@ -5,7 +5,7 @@ import EmptyState from "../../components/ui/EmptyState.astro";
 import JobCard from "../../components/ui/JobCard.astro";
 import PageHero from "../../components/ui/PageHero.astro";
 import { categories, cities, companies, createDatabase, jobs, neighborhoods, states } from "@es/db";
-import { and, asc, count, desc, eq, gt, ilike, or, type SQL } from "drizzle-orm";
+import { and, asc, count, desc, eq, gt, ilike, or, sql, type SQL } from "drizzle-orm";
 
 const q = Astro.url.searchParams.get("q")?.trim() ?? "";
 const city = Astro.url.searchParams.get("cidade")?.trim() ?? "";
@@ -20,7 +20,7 @@ const pageSize = 18;
 const conditions: SQL[] = [eq(jobs.publicationStatus, "PUBLISHED"), gt(jobs.expiresAt, new Date())];
 if (q) conditions.push(or(ilike(jobs.normalizedTitle, `%${q}%`), ilike(jobs.summary, `%${q}%`))!);
 if (city) conditions.push(ilike(cities.name, `%${city}%`));
-if (company) conditions.push(ilike(companies.name, `%${company}%`));
+if (company) conditions.push(and(eq(jobs.confidentialCompany, false), or(ilike(companies.name, `%${company}%`), ilike(companies.publicName, `%${company}%`))!)!);
 if (category) conditions.push(eq(categories.slug, category));
 if (["presencial", "hibrido", "remoto"].includes(workplace)) conditions.push(eq(jobs.workplaceType, workplace));
 if (contract) conditions.push(ilike(jobs.employmentType, `%${contract}%`));
@@ -42,10 +42,12 @@ if (process.env.DATABASE_URL) {
     const where = and(...conditions);
     const base = connection.db
       .select({
-        id: jobs.id, title: jobs.normalizedTitle, slug: jobs.slug, code: jobs.publicCode, company: companies.name,
+        id: jobs.id, title: jobs.normalizedTitle, slug: jobs.slug, code: jobs.publicCode,
+        company: sql<string>`case when ${jobs.confidentialCompany} then 'Empresa confidencial' else coalesce(${companies.publicName}, ${companies.name}) end`,
         city: cities.name, state: states.code, category: categories.name, workplace: jobs.workplaceType,
         contract: jobs.employmentType, neighborhood: neighborhoods.name, publishedAt: jobs.publishedAt,
-        featured: jobs.featured, sponsored: jobs.sponsored, logoUrl: companies.logoUrl,
+        featured: jobs.featured, sponsored: jobs.sponsored,
+        logoUrl: sql<string | null>`case when ${jobs.confidentialCompany} then null else ${companies.logoUrl} end`,
         salaryVisible: jobs.salaryVisible, salaryMin: jobs.salaryMin, salaryMax: jobs.salaryMax,
         salaryCurrency: jobs.salaryCurrency, salaryPeriod: jobs.salaryPeriod
       })

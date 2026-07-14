@@ -5,6 +5,7 @@ import { ADMIN_COOKIE, authenticate } from "../../../lib/auth";
 import { logAdminAuthFailure } from "../../../lib/admin-auth-log";
 import { parseJsonBody } from "../../../lib/json-api";
 import { logServerError } from "../../../lib/server-error";
+import { shouldUseSecureCookies } from "../../../lib/cookie-policy";
 
 const mfaCodeSchema = z.union([z.literal(""), z.string().regex(/^\d{6}$/)]);
 
@@ -74,7 +75,7 @@ export const POST: APIRoute = async ({ request, cookies, clientAddress }) => {
 
   cookies.set(ADMIN_COOKIE, result.token, {
     httpOnly: true,
-    secure: import.meta.env.PROD,
+    secure: shouldUseSecureCookies(import.meta.env.PROD),
     sameSite: "strict",
     path: "/",
     expires: result.expiresAt

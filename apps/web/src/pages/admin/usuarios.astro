@@ -92,7 +92,7 @@ const pages = Math.max(1, Math.ceil(total / perPage));
   <form class="mt-6 flex flex-wrap gap-3" method="get">
     <input class="rounded-lg border px-3 py-2" name="q" placeholder="Buscar por e-mail" value={q} />
     <button class="rounded-lg bg-slate-900 px-4 py-2 font-bold text-white">Buscar</button>
-    <a class="rounded-lg border px-4 py-2" href="/api/admin/users/export.csv">Exportar CSV</a>
+    <a class="rounded-lg border px-4 py-2" href="/api/admin/users/export.csv" data-admin-download data-filename="usuarios.csv">Exportar CSV</a>
   </form>
 
   <section class="mt-8 rounded-2xl bg-white p-6">

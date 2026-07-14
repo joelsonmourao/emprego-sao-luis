@@ -1,4 +1,4 @@
-/** Script injetado no AdminLayout para evitar navegação direta a /api em formulários. */
+/** Script injetado no AdminLayout para executar ações administrativas sem navegar para APIs. */
 export const ADMIN_FORM_BRIDGE_SCRIPT = `
 (function () {
   const showBanner = (message, tone) => {
@@ -17,7 +17,7 @@ export const ADMIN_FORM_BRIDGE_SCRIPT = `
         ? "border-rose-200 bg-rose-50 text-rose-900"
         : "border-emerald-200 bg-emerald-50 text-emerald-900");
     banner.classList.remove("hidden");
-    window.setTimeout(() => banner.classList.add("hidden"), 8000);
+    window.setTimeout(() => banner.classList.add("hidden"), 10000);
   };
 
   const followRedirect = (response) => {
@@ -34,19 +34,20 @@ export const ADMIN_FORM_BRIDGE_SCRIPT = `
     async (event) => {
       const form = event.target;
       if (!(form instanceof HTMLFormElement)) return;
-      const action = form.getAttribute("action") ?? "";
+      const submitter = event.submitter;
+      const isSubmitControl = submitter instanceof HTMLButtonElement || submitter instanceof HTMLInputElement;
+      const action = (isSubmitControl ? submitter.getAttribute("formaction") : null) ?? form.getAttribute("action") ?? "";
       if (!action.startsWith("/api/")) return;
       event.preventDefault();
 
-      const submitter = form.querySelector('[type="submit"]');
-      if (submitter instanceof HTMLButtonElement) {
-        submitter.disabled = true;
-      }
+      if (isSubmitControl) submitter.disabled = true;
 
       try {
+        const method = ((isSubmitControl ? submitter.getAttribute("formmethod") : null) ?? form.method) || "POST";
+        const body = isSubmitControl ? new FormData(form, submitter) : new FormData(form);
         const response = await fetch(action, {
-          method: form.method || "POST",
-          body: new FormData(form),
+          method,
+          body,
           credentials: "same-origin",
           redirect: "manual"
         });
@@ -60,17 +61,33 @@ export const ADMIN_FORM_BRIDGE_SCRIPT = `
             window.location.assign(payload.redirect);
             return;
           }
+          if (payload && payload.ok === true) {
+            const message =
+              typeof payload.message === "string"
+                ? payload.message
+                : payload.data && typeof payload.data.message === "string"
+                  ? payload.data.message
+                  : "Operação concluída.";
+            showBanner(message, "success");
+            document.dispatchEvent(new CustomEvent("admin:operation-success", { detail: payload }));
+            return;
+          }
           const message =
             payload && typeof payload.error === "string" && payload.error.trim()
               ? payload.error
               : "Não foi possível concluir a operação.";
-          showBanner(message, "error");
+          const reference = payload && typeof payload.requestId === "string" ? " Referência: " + payload.requestId : "";
+          showBanner(message + reference, "error");
           return;
         }
 
         if (!response.ok) {
           const text = (await response.text()).trim();
-          showBanner(text || "Não foi possível concluir a operação.", "error");
+          const requestId = response.headers.get("x-request-id");
+          showBanner(
+            (text || "Não foi possível concluir a operação.") + (requestId ? " Referência: " + requestId : ""),
+            "error"
+          );
           return;
         }
 
@@ -78,9 +95,7 @@ export const ADMIN_FORM_BRIDGE_SCRIPT = `
       } catch {
         showBanner("Falha de conexão. Tente novamente.", "error");
       } finally {
-        if (submitter instanceof HTMLButtonElement) {
-          submitter.disabled = false;
-        }
+        if (isSubmitControl) submitter.disabled = false;
       }
     },
     true
@@ -97,7 +112,10 @@ export const ADMIN_FORM_BRIDGE_SCRIPT = `
     try {
       const response = await fetch(href, { credentials: "same-origin" });
       if (!response.ok) {
-        showBanner("Não foi possível baixar o arquivo.", "error");
+        const payload = await response.json().catch(() => null);
+        const message = payload && typeof payload.error === "string" ? payload.error : "Não foi possível baixar o arquivo.";
+        const reference = payload && typeof payload.requestId === "string" ? " Referência: " + payload.requestId : "";
+        showBanner(message + reference, "error");
         return;
       }
       const blob = await response.blob();

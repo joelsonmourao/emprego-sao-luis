@@ -13,7 +13,7 @@ const job = await findPublishedJob(slug);
 if (!job) return Astro.redirect(`/vagas/indisponivel/${encodeURIComponent(slug)}`, 302);
 
 const record = job.job;
-const canonicalUrl = new URL(`/vagas/${record.slug}`, Astro.site).toString();
+const canonicalUrl = record.canonicalUrl || new URL(`/vagas/${record.slug}`, Astro.site).toString();
 const jsonLd = buildJobPosting({
   title: record.normalizedTitle,
   description: record.description,
@@ -45,8 +45,8 @@ const benefits = Array.isArray(record.benefits) ? record.benefits as string[] : 
 const shareUrl = canonicalUrl;
 ---
 <BaseLayout
-  title={`${record.normalizedTitle} — Empregos São Luís`}
-  description={record.summary}
+  title={record.seoTitle || `${record.normalizedTitle} — Empregos São Luís`}
+  description={record.metaDescription || record.summary}
   canonical={canonicalUrl}
   breadcrumbs={[{ name: "Vagas", url: "/vagas" }, { name: record.normalizedTitle, url: `/vagas/${record.slug}` }]}
 >
@@ -72,7 +72,7 @@ const shareUrl = canonicalUrl;
               </div>
               <h1 class="font-display mt-2 text-3xl font-black sm:text-4xl">{record.normalizedTitle}</h1>
               <p class="mt-2 text-lg font-semibold">
-                <a class="hover:text-[var(--brand-primary)]" href={`/empresas/${job.companySlug}`}>{job.companyName}</a>
+                {record.confidentialCompany ? job.companyName : <a class="hover:text-[var(--brand-primary)]" href={`/empresas/${job.companySlug}`}>{job.companyName}</a>}
               </p>
               <p class="mt-1 text-[var(--es-muted)]">
                 {job.cityName}/{job.stateCode}
@@ -96,6 +96,7 @@ const shareUrl = canonicalUrl;
           <AdSlot slot="job-content-mid" pageType="job" citySlug={job.citySlug} companySlug={job.companySlug} workplaceType={record.workplaceType} />
 
           <div class="es-prose mt-8 max-w-none" set:html={record.description} />
+          {record.additionalInfo && <section class="mt-8"><h2 class="font-display text-2xl font-black">Informações adicionais</h2><p class="mt-3 whitespace-pre-line text-[var(--es-muted)]">{record.additionalInfo}</p></section>}
 
           {activities.length > 0 && (
             <section class="mt-8">
@@ -147,11 +148,11 @@ const shareUrl = canonicalUrl;
             </div>
           </div>
           <AdSlot slot="job-sidebar" pageType="job" citySlug={job.citySlug} companySlug={job.companySlug} workplaceType={record.workplaceType} />
-          <article class="es-card p-5">
+          {!record.confidentialCompany && <article class="es-card p-5">
             <h3 class="font-display font-black">Sobre a empresa</h3>
             <p class="mt-2 font-semibold">{job.companyName}</p>
             <a class="mt-3 inline-flex text-sm font-bold text-[var(--brand-primary)]" href={`/empresas/${job.companySlug}`}>Ver perfil da empresa →</a>
-          </article>
+          </article>}
         </aside>
       </div>
     </div>

@@ -73,7 +73,7 @@ const envAdsense = import.meta.env.PUBLIC_ADSENSE_CLIENT_ID ?? "";
   </div>
 
   <section class="mt-8 rounded-2xl bg-white p-6">
-    <div class="flex items-center justify-between gap-4"><h2 class="text-xl font-black">Espaços publicitários</h2><a class="rounded-lg border px-3 py-2 text-sm font-bold" href="/api/admin/ads/reports.csv">Exportar CSV</a></div>
+    <div class="flex items-center justify-between gap-4"><h2 class="text-xl font-black">Espaços publicitários</h2><a class="rounded-lg border px-3 py-2 text-sm font-bold" href="/api/admin/ads/reports.csv" data-admin-download data-filename="publicidade.csv">Exportar CSV</a></div>
     <div class="mt-4 overflow-auto">
       <table class="min-w-full text-sm">
         <thead><tr class="text-left text-slate-500"><th class="py-2">Nome</th><th>Código</th><th>Página</th><th>Status</th><th>AdSense</th></tr></thead>

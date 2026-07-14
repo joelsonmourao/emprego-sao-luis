@@ -86,7 +86,7 @@ export async function listSeoIssues(options: { severity?: string; resolved?: boo
     const filters = [eq(seoAuditIssues.ignored, false)];
     if (options.severity) filters.push(eq(seoAuditIssues.severity, options.severity));
     if (options.resolved !== undefined) filters.push(eq(seoAuditIssues.resolved, options.resolved));
-    return connection.db.select().from(seoAuditIssues).where(and(...filters)).orderBy(desc(seoAuditIssues.checkedAt)).limit(200);
+    return await connection.db.select().from(seoAuditIssues).where(and(...filters)).orderBy(desc(seoAuditIssues.checkedAt)).limit(200);
   } finally {
     await connection.close();
   }

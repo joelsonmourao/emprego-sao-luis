@@ -1,8 +1,64 @@
 ---
-import { desc } from "drizzle-orm";
 import { articles, authors, createDatabase } from "@es/db";
+import { desc } from "drizzle-orm";
 import AdminLayout from "../../layouts/AdminLayout.astro";
-let items: typeof articles.$inferSelect[] = []; let authorRows: typeof authors.$inferSelect[] = [];
-if (process.env.DATABASE_URL) { const connection = createDatabase(process.env.DATABASE_URL); try { [items, authorRows] = await Promise.all([connection.db.select().from(articles).orderBy(desc(articles.updatedAt)).limit(100), connection.db.select().from(authors).orderBy(authors.name)]); } finally { await connection.close(); } }
+
+let items: typeof articles.$inferSelect[] = [];
+let authorRows: typeof authors.$inferSelect[] = [];
+if (process.env.DATABASE_URL) {
+  const connection = createDatabase(process.env.DATABASE_URL);
+  try {
+    [items, authorRows] = await Promise.all([
+      connection.db.select().from(articles).orderBy(desc(articles.updatedAt)).limit(100),
+      connection.db.select().from(authors).orderBy(authors.name)
+    ]);
+  } finally {
+    await connection.close();
+  }
+}
 ---
-<AdminLayout title="Conteúdo"><div class="flex flex-wrap items-center justify-between gap-3"><div><h1 class="text-3xl font-black">Conteúdo editorial</h1><p class="mt-2 text-slate-600">Notícias, guias, relatórios, autoria e histórico.</p></div><a class="rounded-xl bg-red-700 px-5 py-3 font-bold text-white" href="/admin/conteudo/novo">Novo conteúdo</a></div><section class="mt-8 rounded-2xl bg-white p-6"><h2 class="text-xl font-black">Autores</h2><form class="mt-4 grid gap-3 md:grid-cols-4" method="post" action="/api/admin/authors"><input class="rounded-lg border p-3" name="name" placeholder="Nome" required/><input class="rounded-lg border p-3" name="slug" placeholder="slug opcional"/><input class="rounded-lg border p-3" name="bio" placeholder="Biografia curta"/><button class="rounded-lg border font-bold">Cadastrar autor</button></form><p class="mt-3 text-sm text-slate-600">{authorRows.map((author) => author.name).join(" · ") || "Cadastre o primeiro autor antes de criar conteúdo."}</p></section><div class="mt-8 overflow-auto rounded-2xl bg-white"><table class="w-full text-left"><thead><tr class="border-b"><th class="p-4">Título</th><th>Tipo</th><th>Status</th><th>Atualizado</th><th></th></tr></thead><tbody>{items.map((article) => <tr class="border-b"><td class="p-4 font-bold">{article.title}<div class="font-normal text-xs text-slate-500">/{article.slug} · v{article.version}</div></td><td>{article.type}</td><td>{article.status}</td><td>{article.updatedAt.toLocaleString("pt-BR")}</td><td class="p-4"><a class="text-red-700" href={`/admin/conteudo/${article.id}/editar`}>Editar</a></td></tr>)}</tbody></table>{items.length === 0 && <p class="p-6">Nenhum conteúdo cadastrado.</p>}</div></AdminLayout>
+
+<AdminLayout title="Conteúdo">
+  <div class="flex flex-wrap items-center justify-between gap-3">
+    <div><h1 class="text-3xl font-black">Conteúdo editorial</h1><p class="mt-2 text-slate-600">Notícias, guias, relatórios, autoria, SEO e histórico.</p></div>
+    <a class="rounded-xl bg-red-700 px-5 py-3 font-bold text-white" href="/admin/conteudo/novo">Novo conteúdo</a>
+  </div>
+  <section class="mt-8 rounded-2xl bg-white p-6">
+    <h2 class="text-xl font-black">Autores</h2>
+    <form class="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-5" method="post" action="/api/admin/authors">
+      <input type="hidden" name="returnTo" value="content" />
+      <input class="rounded-lg border p-3" name="name" placeholder="Nome" minlength="2" required />
+      <input class="rounded-lg border p-3" name="slug" placeholder="slug opcional" />
+      <input class="rounded-lg border p-3" name="bio" placeholder="Biografia curta" />
+      <input class="rounded-lg border p-3" name="avatarUrl" type="url" placeholder="URL do avatar (opcional)" />
+      <button class="rounded-lg border font-bold">Cadastrar autor</button>
+    </form>
+    <div class="mt-6 grid gap-4 lg:grid-cols-2">
+      {authorRows.map((author) => (
+        <article class="rounded-xl border p-4">
+          <form class="grid gap-3" method="post" action={`/api/admin/authors/${author.id}`}>
+            <input type="hidden" name="action" value="UPDATE" />
+            <div class="grid gap-3 sm:grid-cols-2">
+              <label class="text-xs font-bold">Nome<input class="mt-1 w-full rounded-lg border p-2 text-sm" name="name" value={author.name} required /></label>
+              <label class="text-xs font-bold">Slug<input class="mt-1 w-full rounded-lg border p-2 text-sm" name="slug" value={author.slug} required /></label>
+            </div>
+            <label class="text-xs font-bold">Biografia<input class="mt-1 w-full rounded-lg border p-2 text-sm" name="bio" value={author.bio ?? ""} /></label>
+            <label class="text-xs font-bold">Avatar<input class="mt-1 w-full rounded-lg border p-2 text-sm" name="avatarUrl" type="url" value={author.avatarUrl ?? ""} /></label>
+            <button class="rounded-lg border px-3 py-2 text-sm font-bold">Salvar autor</button>
+          </form>
+          <form class="mt-2" method="post" action={`/api/admin/authors/${author.id}`}>
+            <input type="hidden" name="action" value="DELETE" />
+            <button class="text-sm font-bold text-red-700">Excluir se não estiver em uso</button>
+          </form>
+        </article>
+      ))}
+    </div>
+    {authorRows.length === 0 && <p class="mt-4 text-sm text-slate-600">Cadastre o primeiro autor antes de criar conteúdo.</p>}
+  </section>
+  <div class="mt-8 overflow-auto rounded-2xl bg-white">
+    <table class="w-full text-left"><thead><tr class="border-b"><th class="p-4">Título</th><th>Tipo</th><th>Status</th><th>Atualizado</th><th></th></tr></thead>
+      <tbody>{items.map((article) => <tr class="border-b"><td class="p-4 font-bold">{article.title}<div class="text-xs font-normal text-slate-500">/{article.slug} · v{article.version}</div></td><td>{article.type}</td><td>{article.status}</td><td>{article.updatedAt.toLocaleString("pt-BR")}</td><td class="p-4"><a class="text-red-700" href={`/admin/conteudo/${article.id}/editar`}>Editar</a></td></tr>)}</tbody>
+    </table>
+    {items.length === 0 && <p class="p-6">Nenhum conteúdo cadastrado.</p>}
+  </div>
+</AdminLayout>

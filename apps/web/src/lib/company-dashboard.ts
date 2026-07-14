@@ -131,7 +131,7 @@ export async function listCompanyJobDrafts(accountId: string) {
   if (!process.env.DATABASE_URL) return [];
   const connection = createDatabase(process.env.DATABASE_URL);
   try {
-    return connection.db
+    return await connection.db
       .select()
       .from(companyJobDrafts)
       .where(eq(companyJobDrafts.accountId, accountId))
@@ -146,7 +146,7 @@ export async function listCompanyTickets(accountId: string) {
   if (!process.env.DATABASE_URL) return [];
   const connection = createDatabase(process.env.DATABASE_URL);
   try {
-    return connection.db
+    return await connection.db
       .select()
       .from(companyTickets)
       .where(eq(companyTickets.accountId, accountId))

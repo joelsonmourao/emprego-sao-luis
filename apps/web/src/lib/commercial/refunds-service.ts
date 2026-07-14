@@ -46,7 +46,7 @@ export async function listRefundsAdmin() {
   if (!process.env.DATABASE_URL) return [];
   const connection = createDatabase(process.env.DATABASE_URL);
   try {
-    return connection.db.select().from(commercialRefunds).orderBy(desc(commercialRefunds.createdAt)).limit(100);
+    return await connection.db.select().from(commercialRefunds).orderBy(desc(commercialRefunds.createdAt)).limit(100);
   } finally {
     await connection.close();
   }
