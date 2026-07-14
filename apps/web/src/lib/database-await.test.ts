@@ -21,4 +21,3 @@ describe("database connection lifetime", () => {
     expect(offenders).toEqual([]);
   });
 });
-
