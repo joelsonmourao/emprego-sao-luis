@@ -35,11 +35,13 @@ if (process.env.DATABASE_URL) {
     <label>Resumo<textarea class="mt-1 w-full rounded-lg border p-3" name="excerpt" minlength="10" required></textarea></label>
     <label>Conteúdo HTML<textarea class="mt-1 min-h-72 w-full rounded-lg border p-3 font-mono" name="contentHtml" minlength="20" required></textarea></label>
     <div class="grid gap-4 md:grid-cols-2">
-      <label>Imagem de capa<input class="mt-1 w-full rounded-lg border p-3" name="coverImageUrl" type="url" /></label><label>Texto alternativo<input class="mt-1 w-full rounded-lg border p-3" name="coverImageAlt" /></label>
+      <label>Imagem principal da biblioteca<input class="mt-1 w-full rounded-lg border p-3" name="coverImageUrl" type="url" /><span class="mt-1 block text-xs text-slate-500">Para publicar, use mídia processada com original de pelo menos 1200 px.</span></label><label>Texto alternativo (ALT)<input class="mt-1 w-full rounded-lg border p-3" name="coverImageAlt" /></label>
+      <label>Legenda da imagem<input class="mt-1 w-full rounded-lg border p-3" name="coverImageCaption" /></label><label>Crédito/origem da imagem<input class="mt-1 w-full rounded-lg border p-3" name="coverImageCredit" /></label>
       <label>Seção/categoria<input class="mt-1 w-full rounded-lg border p-3" name="section" /></label><label>Tags separadas por vírgula<input class="mt-1 w-full rounded-lg border p-3" name="tags" /></label>
       <label>Fonte<input class="mt-1 w-full rounded-lg border p-3" name="sourceName" /></label><label>URL da fonte<input class="mt-1 w-full rounded-lg border p-3" name="sourceUrl" type="url" /></label>
       <label>Agendar para<input class="mt-1 w-full rounded-lg border p-3" name="scheduledAt" type="datetime-local" /></label><label>Expira em<input class="mt-1 w-full rounded-lg border p-3" name="expiresAt" type="datetime-local" /></label>
       <label>Título SEO<input class="mt-1 w-full rounded-lg border p-3" name="seoTitle" /></label><label>Descrição SEO<input class="mt-1 w-full rounded-lg border p-3" name="metaDescription" /></label>
+      <label>Canônica opcional<input class="mt-1 w-full rounded-lg border p-3" name="canonicalUrl" type="url" placeholder="gerada automaticamente quando vazia" /></label>
     </div>
     <label><input class="mr-2" name="featured" type="checkbox" />Destaque</label>
     <label>Notas internas<textarea class="mt-1 w-full rounded-lg border p-3" name="internalNotes"></textarea></label>

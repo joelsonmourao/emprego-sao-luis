@@ -1,14 +1,16 @@
 import type { APIRoute } from "astro";
-import { articleRevisions, articles, auditLogs, createDatabase } from "@es/db";
+import { articleRevisions, articles, auditLogs, createDatabase, mediaAssets } from "@es/db";
 import { and, eq, ne } from "drizzle-orm";
 import { adminJsonError, adminJsonRedirect } from "../../../../lib/admin-api-response";
 import { parseArticleForm } from "../../../../lib/admin-article-input";
 import { can } from "../../../../lib/auth";
 import { logServerError } from "../../../../lib/server-error";
+import { validateNewsImageAsset } from "../../../../lib/news-image";
 
 export const POST: APIRoute = async ({ params, request, locals }) => {
   const auth = locals.auth;
-  if (!auth || !can(auth, "content.manage")) return adminJsonError("Sem permissão para alterar conteúdo.", 403);
+  if (!auth || !can(auth, "content.manage"))
+    return adminJsonError("Sem permissão para alterar conteúdo.", 403);
   if (!params.id || !process.env.DATABASE_URL) return adminJsonError("Conteúdo ou banco inválido.", 400);
 
   const form = await request.formData();
@@ -19,45 +21,104 @@ export const POST: APIRoute = async ({ params, request, locals }) => {
 
     if (form.get("action") === "DUPLICATE") {
       const suffix = Date.now().toString(36);
-      const [copy] = await connection.db.insert(articles).values({
-        ...before,
-        id: undefined,
-        slug: `${before.slug}-copia-${suffix}`,
-        title: `${before.title} (cópia)`,
-        status: "DRAFT",
-        publishedAt: null,
-        scheduledAt: null,
-        version: 1,
-        createdAt: undefined,
-        updatedAt: undefined
-      }).returning();
+      const [copy] = await connection.db
+        .insert(articles)
+        .values({
+          ...before,
+          id: undefined,
+          slug: `${before.slug}-copia-${suffix}`,
+          title: `${before.title} (cópia)`,
+          status: "DRAFT",
+          publishedAt: null,
+          scheduledAt: null,
+          version: 1,
+          createdAt: undefined,
+          updatedAt: undefined
+        })
+        .returning();
       if (!copy) throw new Error("Falha ao duplicar conteúdo.");
-      await connection.db.insert(auditLogs).values({ actorId: auth.id, action: "DUPLICATE", entityType: "ARTICLE", entityId: copy.id, before: { sourceId: before.id }, after: copy, origin: "ADMIN" });
+      await connection.db
+        .insert(auditLogs)
+        .values({
+          actorId: auth.id,
+          action: "DUPLICATE",
+          entityType: "ARTICLE",
+          entityId: copy.id,
+          before: { sourceId: before.id },
+          after: copy,
+          origin: "ADMIN"
+        });
       return adminJsonRedirect(`/admin/conteudo/${copy.id}/editar?duplicated=1`, { article: copy });
     }
 
     const parsed = parseArticleForm(form);
     if (!parsed.ok) return adminJsonError(parsed.error, 422, { details: parsed.details });
-    const [duplicate] = await connection.db.select({ id: articles.id }).from(articles).where(and(eq(articles.slug, parsed.data.slug), ne(articles.id, before.id))).limit(1);
-    if (duplicate) return adminJsonError("Já existe outro conteúdo com este slug.", 409, { code: "ARTICLE_SLUG_EXISTS" });
+    const [media] = parsed.data.coverImageUrl
+      ? await connection.db
+          .select({ metadata: mediaAssets.metadata })
+          .from(mediaAssets)
+          .where(eq(mediaAssets.url, parsed.data.coverImageUrl))
+          .limit(1)
+      : [];
+    const image = media ? validateNewsImageAsset(media.metadata) : null;
+    if (parsed.data.status === "PUBLISHED" && (!image || !image.ok)) {
+      return adminJsonError(
+        image && !image.ok ? image.error : "Selecione uma imagem processada na biblioteca de mídia.",
+        422,
+        {
+          code: "NEWS_IMAGE_STANDARD_REQUIRED"
+        }
+      );
+    }
+    const [duplicate] = await connection.db
+      .select({ id: articles.id })
+      .from(articles)
+      .where(and(eq(articles.slug, parsed.data.slug), ne(articles.id, before.id)))
+      .limit(1);
+    if (duplicate)
+      return adminJsonError("Já existe outro conteúdo com este slug.", 409, { code: "ARTICLE_SLUG_EXISTS" });
 
     const nextVersion = before.version + 1;
     const values = {
       ...parsed.data,
-      publishedAt: parsed.data.status === "PUBLISHED" ? before.publishedAt ?? new Date() : before.publishedAt,
+      coverImageWidth: image?.ok ? image.width : null,
+      coverImageHeight: image?.ok ? image.height : null,
+      coverImageVariants: image?.ok ? image.variants : {},
+      ogImageUrl: image?.ok ? image.ogImageUrl : null,
+      publishedAt:
+        parsed.data.status === "PUBLISHED" ? (before.publishedAt ?? new Date()) : before.publishedAt,
       version: nextVersion,
       updatedAt: new Date()
     };
     let after: typeof before | undefined;
     await connection.db.transaction(async (tx) => {
-      await tx.insert(articleRevisions).values({ articleId: before.id, version: before.version, snapshot: before, actorId: auth.id }).onConflictDoNothing();
+      await tx
+        .insert(articleRevisions)
+        .values({ articleId: before.id, version: before.version, snapshot: before, actorId: auth.id })
+        .onConflictDoNothing();
       [after] = await tx.update(articles).set(values).where(eq(articles.id, before.id)).returning();
       if (!after) throw new Error("Falha ao atualizar conteúdo.");
-      await tx.insert(auditLogs).values({ actorId: auth.id, action: parsed.data.status === "ARCHIVED" ? "ARCHIVE" : "UPDATE", entityType: "ARTICLE", entityId: before.id, before, after, origin: "ADMIN" });
+      await tx
+        .insert(auditLogs)
+        .values({
+          actorId: auth.id,
+          action: parsed.data.status === "ARCHIVED" ? "ARCHIVE" : "UPDATE",
+          entityType: "ARTICLE",
+          entityId: before.id,
+          before,
+          after,
+          origin: "ADMIN"
+        });
     });
     return adminJsonRedirect(`/admin/conteudo/${before.id}/editar?saved=1`, { article: after });
   } catch (error) {
-    logServerError("route:/api/admin/articles/:id", error, { userId: auth.id, entity: "ARTICLE", route: `/api/admin/articles/${params.id}` });
+    logServerError("route:/api/admin/articles/:id", error, {
+      userId: auth.id,
+      entity: "ARTICLE",
+      route: `/api/admin/articles/${params.id}`
+    });
     return adminJsonError("Não foi possível alterar o conteúdo.", 500);
-  } finally { await connection.close(); }
+  } finally {
+    await connection.close();
+  }
 };

@@ -36,7 +36,12 @@ if (process.env.DATABASE_URL) {
     await connection.close();
   }
 }
-if (!company) return Astro.redirect("/empresas", 302);
+if (!company) {
+  return new Response("Empresa não encontrada", {
+    status: 404,
+    headers: { "Content-Type": "text/plain; charset=utf-8", "X-Robots-Tag": "noindex, follow" }
+  });
+}
 ---
 <BaseLayout title={company.seoTitle ?? `${company.name} — vagas e informações`} description={company.metaDescription ?? `Consulte vagas abertas na ${company.name}.`} breadcrumbs={[{ name: "Empresas", url: "/empresas" }, { name: company.name, url: `/empresas/${company.slug}` }]}>
   <section class="es-section bg-white">

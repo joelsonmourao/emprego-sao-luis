@@ -2,11 +2,7 @@ import { and, eq } from "drizzle-orm";
 import { createDatabase, redirects } from "@es/db";
 import { defineMiddleware } from "astro:middleware";
 import { storageStartup } from "./instrumentation";
-import {
-  adminJsonError,
-  createRequestId,
-  normalizeAdminApiResponse
-} from "./lib/admin-api-response";
+import { adminJsonError, createRequestId, normalizeAdminApiResponse } from "./lib/admin-api-response";
 import { ADMIN_COOKIE, verifySession } from "./lib/auth";
 import { CANDIDATE_COOKIE, verifyCandidateSession } from "./lib/candidate-auth";
 import { COMPANY_COOKIE, verifyCompanySession } from "./lib/company-auth";
@@ -15,6 +11,7 @@ import { isJsonAuthApiPath, isTrustedApiOrigin } from "./lib/trusted-origin";
 
 const CANONICAL_HOST = "empregossaoluis.com.br";
 const PUBLIC_ADMIN_PATHS = new Set(["/admin/login", "/admin/esqueci-senha", "/admin/redefinir-senha"]);
+const isRouteWithin = (path: string, prefix: string) => path === prefix || path.startsWith(`${prefix}/`);
 
 export const onRequest = defineMiddleware(async (context, next) => {
   const host = context.url.hostname.toLowerCase();
@@ -28,8 +25,13 @@ export const onRequest = defineMiddleware(async (context, next) => {
   const path = context.url.pathname;
   const isAdminApi = path.startsWith("/api/admin");
   const requestId = isAdminApi ? createRequestId(context.request) : null;
+  context.locals.requestId = requestId;
 
-  if (path.startsWith("/api/admin/imports") || path.startsWith("/api/admin/media") || path === "/admin/saude") {
+  if (
+    path.startsWith("/api/admin/imports") ||
+    path.startsWith("/api/admin/media") ||
+    path === "/admin/saude"
+  ) {
     await storageStartup;
   }
 
@@ -54,7 +56,7 @@ export const onRequest = defineMiddleware(async (context, next) => {
     process.env.DATABASE_URL &&
     !path.startsWith("/api/") &&
     !path.startsWith("/admin") &&
-    !path.startsWith("/empresa")
+    !isRouteWithin(path, "/empresa")
   ) {
     const connection = createDatabase(process.env.DATABASE_URL);
     try {
@@ -78,8 +80,8 @@ export const onRequest = defineMiddleware(async (context, next) => {
     (path.startsWith("/admin") && !PUBLIC_ADMIN_PATHS.has(path)) ||
     (path.startsWith("/api/admin") && path !== "/api/admin/login");
   const protectedCompany =
-    (path.startsWith("/empresa") && path !== "/empresa/login" && !path.startsWith("/empresa/convite")) ||
-    (path.startsWith("/api/empresa") && path !== "/api/empresa/login" && path !== "/api/empresa/convite");
+    (isRouteWithin(path, "/empresa") && path !== "/empresa/login" && !isRouteWithin(path, "/empresa/convite")) ||
+    (isRouteWithin(path, "/api/empresa") && path !== "/api/empresa/login" && path !== "/api/empresa/convite");
 
   context.locals.auth = null;
   context.locals.candidate = null;
@@ -104,7 +106,8 @@ export const onRequest = defineMiddleware(async (context, next) => {
   }
 
   if (protectedCompany && !context.locals.company) {
-    if (path.startsWith("/api/")) return Response.json({ ok: false, error: "Não autenticado." }, { status: 401 });
+    if (path.startsWith("/api/"))
+      return Response.json({ ok: false, error: "Não autenticado." }, { status: 401 });
     return context.redirect(`/empresa/login?next=${encodeURIComponent(path)}`, 302);
   }
 
@@ -129,8 +132,32 @@ export const onRequest = defineMiddleware(async (context, next) => {
   if (path.startsWith("/admin") || path.startsWith("/api/admin")) {
     response.headers.set("X-Robots-Tag", "noindex, nofollow");
   }
-  if (path.startsWith("/empresa") || path.startsWith("/api/empresa")) {
+  if (isRouteWithin(path, "/empresa") || isRouteWithin(path, "/api/empresa")) {
     response.headers.set("X-Robots-Tag", "noindex, nofollow");
+  }
+  const privateResponse =
+    path.startsWith("/admin") ||
+    path.startsWith("/api/admin") ||
+    isRouteWithin(path, "/empresa") ||
+    isRouteWithin(path, "/api/empresa") ||
+    path.startsWith("/minha-conta") ||
+    path.startsWith("/entrar") ||
+    path.startsWith("/acesso");
+  if (privateResponse) {
+    response.headers.set("Cache-Control", "private, no-store");
+  } else if (
+    path.startsWith("/api/uploads/media/") ||
+    path.startsWith("/api/uploads/brand/") ||
+    path.startsWith("/api/brand-assets/")
+  ) {
+    response.headers.set("Cache-Control", "public, max-age=31536000, immutable");
+  } else if (
+    context.request.method === "GET" &&
+    !path.startsWith("/api/") &&
+    !context.request.headers.get("cookie") &&
+    !response.headers.has("Cache-Control")
+  ) {
+    response.headers.set("Cache-Control", "public, s-maxage=60, stale-while-revalidate=300");
   }
   return response;
 });

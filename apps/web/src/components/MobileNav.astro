@@ -1,0 +1,81 @@
+---
+interface NavItem {
+  label: string;
+  href: string;
+  current?: boolean;
+}
+
+interface Props {
+  items: NavItem[];
+  ctaHref: string;
+  ctaLabel: string;
+  companyHref?: string;
+}
+
+const { items, ctaHref, ctaLabel, companyHref } = Astro.props;
+---
+<div class="md:hidden" data-mobile-nav>
+  <button
+    type="button"
+    class="es-btn es-btn-secondary px-3 py-2 text-sm"
+    aria-expanded="false"
+    aria-controls="mobile-nav-panel"
+    data-mobile-nav-toggle
+  >
+    Menu
+  </button>
+  <nav
+    id="mobile-nav-panel"
+    class="absolute right-4 top-full z-50 mt-2 hidden min-w-52 gap-1 rounded-2xl border border-[var(--es-border)] bg-white p-3 shadow-[var(--es-shadow)]"
+    aria-label="Menu mobile"
+    data-mobile-nav-panel
+  >
+    {items.map((item) => (
+      <a
+        href={item.href}
+        class={`rounded-xl px-3 py-2 text-sm font-semibold ${item.current ? "bg-[color-mix(in_srgb,var(--brand-primary)_10%,white)] text-[var(--brand-primary)]" : "hover:bg-[var(--es-cream-dark)]"}`}
+        aria-current={item.current ? "page" : undefined}
+      >
+        {item.label}
+      </a>
+    ))}
+    {companyHref && (
+      <a href={companyHref} class="rounded-xl px-3 py-2 text-sm font-semibold text-[var(--text-secondary)] hover:bg-[var(--es-cream-dark)]">
+        Área da empresa
+      </a>
+    )}
+    <a href={ctaHref} class="es-btn es-btn-primary mt-1 text-sm">{ctaLabel}</a>
+  </nav>
+</div>
+
+<script>
+  const closeMenu = (root: HTMLElement) => {
+    const toggle = root.querySelector<HTMLButtonElement>("[data-mobile-nav-toggle]");
+    const panel = root.querySelector<HTMLElement>("[data-mobile-nav-panel]");
+    if (!toggle || !panel) return;
+    toggle.setAttribute("aria-expanded", "false");
+    panel.classList.add("hidden");
+    panel.classList.remove("grid");
+  };
+
+  for (const root of document.querySelectorAll<HTMLElement>("[data-mobile-nav]")) {
+    const toggle = root.querySelector<HTMLButtonElement>("[data-mobile-nav-toggle]");
+    const panel = root.querySelector<HTMLElement>("[data-mobile-nav-panel]");
+    if (!toggle || !panel) continue;
+    toggle.addEventListener("click", () => {
+      const open = toggle.getAttribute("aria-expanded") === "true";
+      toggle.setAttribute("aria-expanded", String(!open));
+      panel.classList.toggle("hidden", open);
+      panel.classList.toggle("grid", !open);
+    });
+    panel.addEventListener("click", (event) => {
+      if ((event.target as Element).closest("a")) closeMenu(root);
+    });
+    document.addEventListener("click", (event) => {
+      if (!root.contains(event.target as Node)) closeMenu(root);
+    });
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape") closeMenu(root);
+    });
+  }
+</script>

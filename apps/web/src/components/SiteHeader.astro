@@ -1,6 +1,6 @@
 ---
 import BrandLogo from "./BrandLogo.astro";
-import { MobileNav } from "./MobileNav";
+import MobileNav from "./MobileNav.astro";
 import { BRAND_ASSETS } from "../lib/brand-assets";
 import { BRAND_ASSET_KEYS } from "../lib/brand/constants";
 import type { VisualIdentity } from "../lib/visual-identity";
@@ -45,7 +45,7 @@ const mobileItems = nav.map(([label, href]) => ({ label, href, current: isCurren
     <div class="flex items-center gap-2">
       <a class="hidden text-sm font-semibold text-[var(--text-secondary)] hover:text-[var(--brand-primary)] sm:inline-flex" href="/empresa/login">Área da empresa</a>
       <a class="es-btn es-btn-primary hidden text-sm sm:inline-flex" href="/publicar-vaga">Publicar vaga</a>
-      <MobileNav client:idle items={mobileItems} ctaHref="/publicar-vaga" ctaLabel="Publicar vaga" companyHref="/empresa/login" />
+      <MobileNav items={mobileItems} ctaHref="/publicar-vaga" ctaLabel="Publicar vaga" companyHref="/empresa/login" />
     </div>
   </div>
 </header>

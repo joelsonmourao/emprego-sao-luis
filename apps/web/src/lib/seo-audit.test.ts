@@ -10,7 +10,10 @@ function mockJob(overrides: Record<string, unknown> = {}) {
     normalizedTitle: "",
     summary: "",
     publicationStatus: "PUBLISHED",
-    description: "",
+    descriptionHtml: "",
+    expiresAt: new Date(Date.now() + 86_400_000),
+    confidentialCompany: false,
+    unidentifiedCompany: false,
     ...overrides
   } as unknown as Parameters<typeof auditJob>[0];
 }
@@ -65,7 +68,7 @@ describe("seo auditJob checks", () => {
       normalizedTitle: "T",
       summary: "D",
       slug: "analista-financeiro-sao-luis",
-      description: "Curta."
+      descriptionHtml: "Curta."
     }));
     const thin = issues.find((i) => i.checkKey === "thin_content");
     expect(thin?.severity).toBe("warning");
@@ -77,7 +80,7 @@ describe("seo auditJob checks", () => {
       normalizedTitle: "T",
       summary: "D",
       slug: "analista-financeiro-sao-luis",
-      description: "Descrição longa o suficiente para JobPosting com detalhes da vaga, requisitos e benefícios oferecidos pela empresa."
+      descriptionHtml: "Descrição longa o suficiente para JobPosting com detalhes da vaga, requisitos e benefícios oferecidos pela empresa."
     }));
     expect(issues.find((i) => i.checkKey === "thin_content")).toBeUndefined();
   });
@@ -103,7 +106,7 @@ describe("seo score", () => {
       normalizedTitle: "Analista Financeiro",
       summary: "Vaga para analista em São Luís com benefícios.",
       slug: "analista-financeiro-sao-luis",
-      description: "Descrição completa da vaga com responsabilidades, requisitos mínimos, diferenciais e informações sobre a empresa contratante no Maranhão."
+      descriptionHtml: "Descrição completa da vaga com responsabilidades, requisitos mínimos, diferenciais e informações sobre a empresa contratante no Maranhão."
     }));
     expect(seoScoreFromIssues(issues)).toBe(100);
   });

@@ -83,8 +83,20 @@ const activeFilters = [
   workplace && ["Modalidade", workplace],
   contract && ["Contrato", contract]
 ].filter(Boolean) as Array<[string, string]>;
+const noindex = activeFilters.length > 0 || order !== "recentes";
+const canonical = new URL(page > 1 ? `/vagas?pagina=${page}` : "/vagas", Astro.site).toString();
+const itemListSchema = {
+  "@type": "ItemList",
+  numberOfItems: rows.length,
+  itemListElement: rows.map((row, index) => ({
+    "@type": "ListItem",
+    position: (page - 1) * pageSize + index + 1,
+    url: new URL(`/vagas/${row.slug}`, Astro.site).toString(),
+    name: row.title
+  }))
+};
 ---
-<BaseLayout title="Vagas em São Luís e no Maranhão" description="Pesquise vagas abertas em São Luís e cidades do Maranhão por cargo, empresa, categoria e modalidade." breadcrumbs={[{ name: "Vagas", url: "/vagas" }]}>
+<BaseLayout title="Vagas em São Luís e no Maranhão" description="Pesquise vagas abertas em São Luís e cidades do Maranhão por cargo, empresa, categoria e modalidade." canonical={canonical} noindex={noindex} breadcrumbs={[{ name: "Vagas", url: "/vagas" }]} pageSchemaType="CollectionPage" schemas={[itemListSchema]}>
   <PageHero kicker="Busca" title="Vagas de emprego" description={`${total} oportunidade(s) aberta(s) e verificadas.`} pattern={false} />
 
   <section class="es-section pt-0">

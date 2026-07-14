@@ -24,12 +24,26 @@ describe("JobPosting", () => {
     expect(result.hiringOrganization.name).toBe("Empresa Real");
     expect(result).not.toHaveProperty("baseSalary");
     expect(result.identifier).toEqual({ "@type": "PropertyValue", name: "Código ES", value: "ES-000123" });
-    expect(result.directApply).toBe(true);
+    expect(result).not.toHaveProperty("directApply");
   });
 
-  it("does not generate schema for expired jobs", () => expect(buildJobPosting({ ...input, expiresAt: new Date(0) })).toBeNull());
+  it("does not generate schema for expired jobs", () =>
+    expect(buildJobPosting({ ...input, expiresAt: new Date(0) })).toBeNull());
 
-  it("marks remote jobs correctly", () => expect(buildJobPosting({ ...input, workplaceType: "remoto" })).toHaveProperty("jobLocationType", "TELECOMMUTE"));
+  it("does not invent an organization for confidential or unidentified jobs", () => {
+    expect(buildJobPosting({ ...input, confidentialCompany: true })).toBeNull();
+    expect(buildJobPosting({ ...input, unidentifiedCompany: true })).toBeNull();
+  });
+
+  it("only marks directApply when explicitly confirmed", () => {
+    expect(buildJobPosting({ ...input, directApply: true })).toHaveProperty("directApply", true);
+  });
+
+  it("marks remote jobs correctly", () =>
+    expect(buildJobPosting({ ...input, workplaceType: "remoto" })).toHaveProperty(
+      "jobLocationType",
+      "TELECOMMUTE"
+    ));
 
   it("reports missing fields in validation", () => {
     const result = validateJobPosting({ ...input, publicCode: "", canonicalUrl: "" });

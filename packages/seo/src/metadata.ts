@@ -6,7 +6,28 @@ export function buildOrganizationSchema(settings: SeoSettings, siteUrl: string) 
     "@type": "Organization",
     name: settings.organization.name,
     url: settings.organization.url || siteUrl,
-    ...(settings.organization.logo ? { logo: settings.organization.logo } : {}),
+    ...(settings.organization.logo
+      ? {
+          logo: {
+            "@type": "ImageObject",
+            url: settings.organization.logo,
+            caption: settings.organization.logoAlt
+          }
+        }
+      : {}),
+    ...(settings.publicContacts.email || settings.publicContacts.phone
+      ? {
+          contactPoint: [
+            {
+              "@type": "ContactPoint",
+              ...(settings.publicContacts.email ? { email: settings.publicContacts.email } : {}),
+              ...(settings.publicContacts.phone ? { telephone: settings.publicContacts.phone } : {}),
+              contactType: "customer support",
+              availableLanguage: ["pt-BR"]
+            }
+          ]
+        }
+      : {}),
     ...(settings.organization.sameAs.length ? { sameAs: settings.organization.sameAs } : {})
   };
 }
@@ -34,7 +55,15 @@ export function buildBreadcrumbSchema(items: Array<{ name: string; url: string }
   };
 }
 
-export function buildOpenGraphTags(input: { title: string; description: string; url: string; image?: string; type?: string; siteName?: string; locale?: string }) {
+export function buildOpenGraphTags(input: {
+  title: string;
+  description: string;
+  url: string;
+  image?: string;
+  type?: string;
+  siteName?: string;
+  locale?: string;
+}) {
   return {
     "og:title": input.title,
     "og:description": input.description,
@@ -46,7 +75,14 @@ export function buildOpenGraphTags(input: { title: string; description: string; 
   };
 }
 
-export function buildTwitterTags(input: { title: string; description: string; card?: string; site?: string; creator?: string; image?: string }) {
+export function buildTwitterTags(input: {
+  title: string;
+  description: string;
+  card?: string;
+  site?: string;
+  creator?: string;
+  image?: string;
+}) {
   return {
     "twitter:card": input.card ?? "summary_large_image",
     "twitter:title": input.title,

@@ -1,6 +1,6 @@
 ---
 import "../styles/global.css";
-import { CookieConsent } from "../components/CookieConsent";
+import CookieConsent from "../components/CookieConsent.astro";
 import SiteFooter from "../components/SiteFooter.astro";
 import SiteHeader from "../components/SiteHeader.astro";
 import { buildBreadcrumbSchema, buildOpenGraphTags, buildOrganizationSchema, buildTwitterTags, buildWebSiteSchema } from "@es/seo";
@@ -15,16 +15,19 @@ interface Props {
   description?: string;
   robots?: string;
   canonical?: string;
-  ogImage?: string;
+  ogImage?: string | undefined;
   breadcrumbs?: Array<{ name: string; url: string }>;
   noindex?: boolean;
+  pageSchemaType?: "WebPage" | "CollectionPage" | "SearchResultsPage" | "AboutPage" | "ContactPage";
+  schemas?: Array<Record<string, unknown>>;
+  disableSeoGraph?: boolean;
 }
 
 const identity = await getVisualIdentity();
 const brand = await getBrandIdentity();
 const seo = await getSeoSettings();
-const { title, description = seo.defaultDescription, robots = seo.robotsDefault, canonical, ogImage = identity.ogImageUrl ?? seo.og.image, breadcrumbs, noindex = false } = Astro.props;
-const pageTitle = title.includes(seo.defaultTitle) ? title : `${title} — ${seo.defaultTitle}`;
+const { title, description = seo.defaultDescription, robots = seo.robotsDefault, canonical, ogImage = identity.ogImageUrl ?? seo.og.image, breadcrumbs, noindex = false, pageSchemaType = "WebPage", schemas = [], disableSeoGraph = false } = Astro.props;
+const pageTitle = title.includes(seo.titleSuffix) ? title : `${title} — ${seo.titleSuffix}`;
 const canonicalUrl = canonical ? new URL(canonical, Astro.site).toString() : new URL(Astro.url.pathname, Astro.site).toString();
 const consentChoice = Astro.cookies.get("es_consent_ads")?.value;
 const adsEnabled = import.meta.env.PUBLIC_ADSENSE_ENABLED === "true" && Boolean(import.meta.env.PUBLIC_ADSENSE_CLIENT_ID) && consentChoice === "yes";
@@ -34,32 +37,54 @@ const twitter = buildTwitterTags({ title: pageTitle, description, card: seo.twit
 const organizationSchema = buildOrganizationSchema(seo, siteUrl);
 const websiteSchema = buildWebSiteSchema(seo, siteUrl);
 const breadcrumbSchema = breadcrumbs?.length ? buildBreadcrumbSchema(breadcrumbs.map((item) => ({ ...item, url: new URL(item.url, siteUrl).toString() }))) : null;
+const withoutContext = (schema: Record<string, unknown>) => Object.fromEntries(Object.entries(schema).filter(([key]) => key !== "@context"));
+const organizationNode = { ...withoutContext(organizationSchema), "@id": `${siteUrl.replace(/\/$/, "")}#organization` };
+const websiteNode = {
+  ...withoutContext(websiteSchema),
+  "@id": `${siteUrl.replace(/\/$/, "")}#website`,
+  publisher: { "@id": `${siteUrl.replace(/\/$/, "")}#organization` },
+  potentialAction: {
+    "@type": "SearchAction",
+    target: `${siteUrl.replace(/\/$/, "")}/busca?q={search_term_string}`,
+    "query-input": "required name=search_term_string"
+  }
+};
+const pageNode = {
+  "@type": pageSchemaType,
+  "@id": `${canonicalUrl}#webpage`,
+  url: canonicalUrl,
+  name: pageTitle,
+  description,
+  isPartOf: { "@id": `${siteUrl.replace(/\/$/, "")}#website` }
+};
+const seoGraph = disableSeoGraph ? null : {
+  "@context": "https://schema.org",
+  "@graph": [organizationNode, websiteNode, pageNode, ...(breadcrumbSchema ? [withoutContext(breadcrumbSchema)] : []), ...schemas.map(withoutContext)]
+};
 const currentPath = Astro.url.pathname;
 ---
 <!doctype html>
-<html lang="pt-BR">
+<html lang={seo.language}>
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width" />
     <meta name="description" content={description} />
-    <meta name="robots" content={noindex ? "noindex,nofollow" : robots} />
+    <meta name="robots" content={noindex ? "noindex,follow" : robots} />
     <meta name="generator" content={Astro.generator} />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,600;0,9..40,700;1,9..40,400&family=Fraunces:opsz,wght@9..144,600;9..144,700;9..144,800&display=swap" rel="stylesheet" />
+    {seo.verifications.google && <meta name="google-site-verification" content={seo.verifications.google} />}
+    {seo.verifications.bing && <meta name="msvalidate.01" content={seo.verifications.bing} />}
     <link rel="icon" href={identity.faviconUrl ?? BRAND_ASSETS.faviconIco} sizes="any" />
     <link rel="icon" href={BRAND_ASSETS.faviconSvg} type="image/svg+xml" />
     <link rel="apple-touch-icon" href={identity.appleTouchIconUrl ?? BRAND_ASSETS.appleTouchIcon} />
     <link rel="manifest" href="/api/brand-manifest.webmanifest" />
-    <meta name="theme-color" content={identity.themeColor ?? BRAND_ASSETS.themeColor} />
-    <link rel="canonical" href={canonicalUrl} />
+    <meta name="theme-color" content={identity.themeColor ?? seo.themeColor ?? BRAND_ASSETS.themeColor} />
+    {!disableSeoGraph && <link rel="canonical" href={canonicalUrl} />}
     <title>{pageTitle}</title>
     <style is:inline set:html={cssVariablesFromIdentity(identity, brand.palette)} />
     {Object.entries(og).map(([key, value]) => <meta property={key} content={value} />)}
+    {ogImage && <meta property="og:image:alt" content={seo.defaultOgImageAlt} />}
     {Object.entries(twitter).map(([key, value]) => <meta name={key} content={value} />)}
-    <script is:inline type="application/ld+json" set:html={JSON.stringify(organizationSchema)} />
-    <script is:inline type="application/ld+json" set:html={JSON.stringify(websiteSchema)} />
-    {breadcrumbSchema && <script is:inline type="application/ld+json" set:html={JSON.stringify(breadcrumbSchema)} />}
+    {seoGraph && <script is:inline type="application/ld+json" set:html={JSON.stringify(seoGraph)} />}
     {adsEnabled && <script is:inline async src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${import.meta.env.PUBLIC_ADSENSE_CLIENT_ID}`} crossorigin="anonymous"></script>}
   </head>
   <body>
@@ -67,6 +92,6 @@ const currentPath = Astro.url.pathname;
     <SiteHeader identity={identity} currentPath={currentPath} />
     <main id="conteudo"><slot /></main>
     <SiteFooter identity={identity} />
-    {!consentChoice && <CookieConsent client:idle />}
+    {!consentChoice && <CookieConsent />}
   </body>
 </html>

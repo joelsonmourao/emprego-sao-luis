@@ -1,6 +1,54 @@
 ---
-import { eq } from "drizzle-orm"; import { articles, authors, createDatabase } from "@es/db"; import AdminLayout from "../../../../layouts/AdminLayout.astro";
-if (!process.env.DATABASE_URL) return Astro.redirect("/admin/conteudo"); const connection = createDatabase(process.env.DATABASE_URL); const [articleRows, authorRows] = await Promise.all([connection.db.select().from(articles).where(eq(articles.id, Astro.params.id!)).limit(1), connection.db.select().from(authors).orderBy(authors.name)]); await connection.close(); const article = articleRows[0]; if (!article) { Astro.response.status = 404; }
-const localDate = (value: Date | null) => value ? new Date(value.getTime() - value.getTimezoneOffset()*60000).toISOString().slice(0,16) : "";
+import { eq } from "drizzle-orm";
+import { articles, authors, createDatabase } from "@es/db";
+import AdminLayout from "../../../../layouts/AdminLayout.astro";
+
+if (!process.env.DATABASE_URL) return Astro.redirect("/admin/conteudo");
+const connection = createDatabase(process.env.DATABASE_URL);
+const [articleRows, authorRows] = await Promise.all([
+  connection.db.select().from(articles).where(eq(articles.id, Astro.params.id!)).limit(1),
+  connection.db.select().from(authors).orderBy(authors.name)
+]);
+await connection.close();
+const article = articleRows[0];
+if (!article) Astro.response.status = 404;
+const localDate = (value: Date | null) => value ? new Date(value.getTime() - value.getTimezoneOffset() * 60000).toISOString().slice(0, 16) : "";
 ---
-<AdminLayout title="Editar conteúdo">{article ? <><div class="flex flex-wrap justify-between gap-3"><h1 class="text-3xl font-black">Editar conteúdo</h1><form method="post" action={`/api/admin/articles/${article.id}`}><input type="hidden" name="action" value="DUPLICATE"/><button class="rounded-lg border px-4 py-2">Duplicar como rascunho</button></form></div><form class="mt-6 grid gap-4 rounded-2xl bg-white p-6" method="post" action={`/api/admin/articles/${article.id}`}><div class="grid gap-4 md:grid-cols-3"><label>Tipo<select class="mt-1 w-full rounded-lg border p-3" name="type">{["NEWS","GUIDE","DATA_REPORT"].map((value)=><option value={value} selected={article.type===value}>{value}</option>)}</select></label><label>Autor<select class="mt-1 w-full rounded-lg border p-3" name="authorId">{authorRows.map((author)=><option value={author.id} selected={article.authorId===author.id}>{author.name}</option>)}</select></label><label>Status<select class="mt-1 w-full rounded-lg border p-3" name="status">{["DRAFT","PENDING_REVIEW","SCHEDULED","PUBLISHED","ARCHIVED"].map((value)=><option value={value} selected={article.status===value}>{value}</option>)}</select></label></div><label>Título<input class="mt-1 w-full rounded-lg border p-3" name="title" value={article.title} required/></label><label>Subtítulo<input class="mt-1 w-full rounded-lg border p-3" name="subtitle" value={article.subtitle ?? ""}/></label><label>Slug<input class="mt-1 w-full rounded-lg border p-3" name="slug" value={article.slug} required/></label><label>Resumo<textarea class="mt-1 w-full rounded-lg border p-3" name="excerpt" required>{article.excerpt}</textarea></label><label>Conteúdo HTML<textarea class="mt-1 min-h-72 w-full rounded-lg border p-3 font-mono" name="contentHtml" required>{article.contentHtml}</textarea></label><div class="grid gap-4 md:grid-cols-2"><label>Imagem de capa<input class="mt-1 w-full rounded-lg border p-3" name="coverImageUrl" value={article.coverImageUrl ?? ""}/></label><label>Texto alternativo<input class="mt-1 w-full rounded-lg border p-3" name="coverImageAlt" value={article.coverImageAlt ?? ""}/></label><label>Seção<input class="mt-1 w-full rounded-lg border p-3" name="section" value={article.section ?? ""}/></label><label>Tags<input class="mt-1 w-full rounded-lg border p-3" name="tags" value={(article.tags as string[]).join(", ")}/></label><label>Fonte<input class="mt-1 w-full rounded-lg border p-3" name="sourceName" value={article.sourceName ?? ""}/></label><label>URL da fonte<input class="mt-1 w-full rounded-lg border p-3" name="sourceUrl" value={article.sourceUrl ?? ""}/></label><label>Agendar<input class="mt-1 w-full rounded-lg border p-3" name="scheduledAt" type="datetime-local" value={localDate(article.scheduledAt)}/></label><label>Expira<input class="mt-1 w-full rounded-lg border p-3" name="expiresAt" type="datetime-local" value={localDate(article.expiresAt)}/></label><label>Título SEO<input class="mt-1 w-full rounded-lg border p-3" name="seoTitle" value={article.seoTitle ?? ""}/></label><label>Descrição SEO<input class="mt-1 w-full rounded-lg border p-3" name="metaDescription" value={article.metaDescription ?? ""}/></label></div><label><input class="mr-2" name="featured" type="checkbox" checked={article.featured}/>Destaque</label><label>Notas internas<textarea class="mt-1 w-full rounded-lg border p-3" name="internalNotes">{article.internalNotes}</textarea></label><button class="rounded-xl bg-red-700 p-4 font-bold text-white">Salvar versão {article.version + 1}</button></form></> : <h1>Conteúdo não encontrado</h1>}</AdminLayout>
+<AdminLayout title="Editar conteúdo">
+  {article ? <>
+    <div class="flex flex-wrap justify-between gap-3">
+      <h1 class="text-3xl font-black">Editar conteúdo</h1>
+      <form method="post" action={`/api/admin/articles/${article.id}`}><input type="hidden" name="action" value="DUPLICATE"/><button class="rounded-lg border px-4 py-2">Duplicar como rascunho</button></form>
+    </div>
+    <form class="mt-6 grid gap-4 rounded-2xl bg-white p-6" method="post" action={`/api/admin/articles/${article.id}`}>
+      <div class="grid gap-4 md:grid-cols-3">
+        <label>Tipo<select class="mt-1 w-full rounded-lg border p-3" name="type">{["NEWS","GUIDE","DATA_REPORT"].map((value)=><option value={value} selected={article.type===value}>{value}</option>)}</select></label>
+        <label>Autor<select class="mt-1 w-full rounded-lg border p-3" name="authorId">{authorRows.map((author)=><option value={author.id} selected={article.authorId===author.id}>{author.name}</option>)}</select></label>
+        <label>Status<select class="mt-1 w-full rounded-lg border p-3" name="status">{["DRAFT","PENDING_REVIEW","SCHEDULED","PUBLISHED","ARCHIVED"].map((value)=><option value={value} selected={article.status===value}>{value}</option>)}</select></label>
+      </div>
+      <label>Título<input class="mt-1 w-full rounded-lg border p-3" name="title" value={article.title} required/></label>
+      <label>Subtítulo<input class="mt-1 w-full rounded-lg border p-3" name="subtitle" value={article.subtitle ?? ""}/></label>
+      <label>Slug<input class="mt-1 w-full rounded-lg border p-3" name="slug" value={article.slug} required/></label>
+      <label>Resumo<textarea class="mt-1 w-full rounded-lg border p-3" name="excerpt" required>{article.excerpt}</textarea></label>
+      <label>Conteúdo HTML<textarea class="mt-1 min-h-72 w-full rounded-lg border p-3 font-mono" name="contentHtml" required>{article.contentHtml}</textarea></label>
+      <div class="grid gap-4 md:grid-cols-2">
+        <label>Imagem principal da biblioteca<input class="mt-1 w-full rounded-lg border p-3" name="coverImageUrl" value={article.coverImageUrl ?? ""}/></label>
+        <label>Texto alternativo (ALT)<input class="mt-1 w-full rounded-lg border p-3" name="coverImageAlt" value={article.coverImageAlt ?? ""}/></label>
+        <label>Legenda<input class="mt-1 w-full rounded-lg border p-3" name="coverImageCaption" value={article.coverImageCaption ?? ""}/></label>
+        <label>Crédito/origem<input class="mt-1 w-full rounded-lg border p-3" name="coverImageCredit" value={article.coverImageCredit ?? ""}/></label>
+        <label>Seção<input class="mt-1 w-full rounded-lg border p-3" name="section" value={article.section ?? ""}/></label>
+        <label>Tags<input class="mt-1 w-full rounded-lg border p-3" name="tags" value={(article.tags as string[]).join(", ")}/></label>
+        <label>Fonte<input class="mt-1 w-full rounded-lg border p-3" name="sourceName" value={article.sourceName ?? ""}/></label>
+        <label>URL da fonte<input class="mt-1 w-full rounded-lg border p-3" name="sourceUrl" value={article.sourceUrl ?? ""}/></label>
+        <label>Agendar<input class="mt-1 w-full rounded-lg border p-3" name="scheduledAt" type="datetime-local" value={localDate(article.scheduledAt)}/></label>
+        <label>Expira<input class="mt-1 w-full rounded-lg border p-3" name="expiresAt" type="datetime-local" value={localDate(article.expiresAt)}/></label>
+        <label>Título SEO<input class="mt-1 w-full rounded-lg border p-3" name="seoTitle" value={article.seoTitle ?? ""}/></label>
+        <label>Descrição SEO<input class="mt-1 w-full rounded-lg border p-3" name="metaDescription" value={article.metaDescription ?? ""}/></label>
+        <label>Canônica opcional<input class="mt-1 w-full rounded-lg border p-3" name="canonicalUrl" value={article.canonicalUrl ?? ""}/></label>
+      </div>
+      <label><input class="mr-2" name="featured" type="checkbox" checked={article.featured}/>Destaque</label>
+      <label>Notas internas<textarea class="mt-1 w-full rounded-lg border p-3" name="internalNotes">{article.internalNotes}</textarea></label>
+      <button class="rounded-xl bg-red-700 p-4 font-bold text-white">Salvar versão {article.version + 1}</button>
+    </form>
+  </> : <h1>Conteúdo não encontrado</h1>}
+</AdminLayout>

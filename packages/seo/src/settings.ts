@@ -9,7 +9,18 @@ const contentTypeSeoSchema = z.object({
 export const seoSettingsSchema = z.object({
   defaultTitle: z.string().min(1).default("Empregos São Luís"),
   defaultDescription: z.string().min(1).default("Vagas verificadas em São Luís e no Maranhão."),
+  canonicalDomain: z.string().default("https://empregossaoluis.com.br"),
+  language: z.string().default("pt-BR"),
+  titleSuffix: z.string().default("Empregos São Luís"),
+  themeColor: z.string().default("#b42318"),
+  defaultOgImageAlt: z.string().default("Empregos São Luís"),
   robotsDefault: z.string().default("index,follow"),
+  verifications: z.object({ google: z.string().default(""), bing: z.string().default("") }),
+  publicContacts: z.object({
+    email: z.string().default(""),
+    phone: z.string().default(""),
+    whatsapp: z.string().default("")
+  }),
   og: z.object({
     siteName: z.string().default("Empregos São Luís"),
     type: z.string().default("website"),
@@ -25,6 +36,7 @@ export const seoSettingsSchema = z.object({
     name: z.string().default("Empregos São Luís"),
     url: z.string().default(""),
     logo: z.string().default(""),
+    logoAlt: z.string().default("Logo do Empregos São Luís"),
     sameAs: z.array(z.string()).default([])
   }),
   contentTypes: z.object({
@@ -50,10 +62,23 @@ export type SeoSettings = z.infer<typeof seoSettingsSchema>;
 export const defaultSeoSettings: SeoSettings = {
   defaultTitle: "Empregos São Luís",
   defaultDescription: "Vagas verificadas em São Luís e no Maranhão.",
+  canonicalDomain: "https://empregossaoluis.com.br",
+  language: "pt-BR",
+  titleSuffix: "Empregos São Luís",
+  themeColor: "#b42318",
+  defaultOgImageAlt: "Empregos São Luís",
   robotsDefault: "index,follow",
+  verifications: { google: "", bing: "" },
+  publicContacts: { email: "", phone: "", whatsapp: "" },
   og: { siteName: "Empregos São Luís", type: "website", image: "", locale: "pt_BR" },
   twitter: { card: "summary_large_image", site: "", creator: "" },
-  organization: { name: "Empregos São Luís", url: "", logo: "", sameAs: [] },
+  organization: {
+    name: "Empregos São Luís",
+    url: "",
+    logo: "",
+    logoAlt: "Logo do Empregos São Luís",
+    sameAs: []
+  },
   contentTypes: {
     jobs: { titleSuffix: "", descriptionTemplate: "", robots: "index,follow" },
     news: { titleSuffix: "", descriptionTemplate: "", robots: "index,follow" },
@@ -75,5 +100,15 @@ export const defaultSeoSettings: SeoSettings = {
 export function mergeSeoSettings(input: unknown): SeoSettings {
   const base = defaultSeoSettings;
   if (!input || typeof input !== "object") return base;
-  return seoSettingsSchema.parse({ ...base, ...input, og: { ...base.og, ...(input as SeoSettings).og }, twitter: { ...base.twitter, ...(input as SeoSettings).twitter }, organization: { ...base.organization, ...(input as SeoSettings).organization }, contentTypes: { ...base.contentTypes, ...(input as SeoSettings).contentTypes }, instagram: { ...base.instagram, ...(input as SeoSettings).instagram } });
+  return seoSettingsSchema.parse({
+    ...base,
+    ...input,
+    verifications: { ...base.verifications, ...(input as SeoSettings).verifications },
+    publicContacts: { ...base.publicContacts, ...(input as SeoSettings).publicContacts },
+    og: { ...base.og, ...(input as SeoSettings).og },
+    twitter: { ...base.twitter, ...(input as SeoSettings).twitter },
+    organization: { ...base.organization, ...(input as SeoSettings).organization },
+    contentTypes: { ...base.contentTypes, ...(input as SeoSettings).contentTypes },
+    instagram: { ...base.instagram, ...(input as SeoSettings).instagram }
+  });
 }

@@ -13,6 +13,7 @@ const page = await getInstitutionalPage(slug);
 const sent = Astro.url.searchParams.get("sent") === "1";
 const protocol = Astro.url.searchParams.get("protocolo");
 const error = Astro.url.searchParams.get("error");
+const pageSchemaType = slug === "contato" ? "ContactPage" : ["sobre", "quem-somos"].includes(slug) ? "AboutPage" : "WebPage";
 const categories = [
   ["suporte_candidato", "Suporte ao candidato"],
   ["correcao_vaga", "Correção de vaga"],
@@ -25,7 +26,7 @@ const categories = [
   ["outro", "Outro"]
 ] as const;
 ---
-<BaseLayout title={page.seoTitle} description={page.metaDescription} canonical={page.canonicalPath} breadcrumbs={[{ name: page.title, url: page.canonicalPath }]}>
+<BaseLayout title={page.seoTitle} description={page.metaDescription} canonical={page.canonicalPath} breadcrumbs={[{ name: page.title, url: page.canonicalPath }]} pageSchemaType={pageSchemaType}>
   <section class="es-section">
     <div class="es-container max-w-4xl">
       <Breadcrumbs items={[{ name: "Início", url: "/" }, { name: page.title }]} />
@@ -35,21 +36,13 @@ const categories = [
       {showContactForm && (
         <section class="es-card mt-8 p-6 sm:p-8">
           <h2 class="font-display text-2xl font-black">Envie sua mensagem</h2>
-          {sent && (
-            <p class="mt-3 rounded-xl border border-green-200 bg-green-50 p-3 text-green-900">
-              Mensagem registrada{protocol ? ` · Protocolo ${protocol}` : ""}. Responderemos quando possível.
-            </p>
-          )}
+          {sent && <p class="mt-3 rounded-xl border border-green-200 bg-green-50 p-3 text-green-900">Mensagem registrada{protocol ? ` · Protocolo ${protocol}` : ""}. Responderemos quando possível.</p>}
           {error && <p class="mt-3 rounded-xl border border-red-200 bg-red-50 p-3 text-red-900">{error}</p>}
           <form class="es-light-form-panel mt-5 grid gap-4" method="post" action="/api/contato">
             <label class="grid gap-1 text-sm font-semibold">Nome<input class="rounded-xl border border-[var(--brand-border)] px-3 py-2.5" name="name" required maxlength="120" /></label>
             <label class="grid gap-1 text-sm font-semibold">E-mail<input class="rounded-xl border border-[var(--brand-border)] px-3 py-2.5" type="email" name="email" required maxlength="180" /></label>
             <label class="grid gap-1 text-sm font-semibold">Telefone (opcional)<input class="rounded-xl border border-[var(--brand-border)] px-3 py-2.5" name="phone" maxlength="40" /></label>
-            <label class="grid gap-1 text-sm font-semibold">Categoria
-              <select class="rounded-xl border border-[var(--brand-border)] px-3 py-2.5" name="category" required>
-                {categories.map(([value, label]) => <option value={value}>{label}</option>)}
-              </select>
-            </label>
+            <label class="grid gap-1 text-sm font-semibold">Categoria<select class="rounded-xl border border-[var(--brand-border)] px-3 py-2.5" name="category" required>{categories.map(([value, label]) => <option value={value}>{label}</option>)}</select></label>
             <label class="grid gap-1 text-sm font-semibold">Assunto<input class="rounded-xl border border-[var(--brand-border)] px-3 py-2.5" name="subject" required maxlength="160" /></label>
             <label class="grid gap-1 text-sm font-semibold">Mensagem<textarea class="min-h-32 rounded-xl border border-[var(--brand-border)] px-3 py-2.5" name="message" required maxlength="4000"></textarea></label>
             <label class="flex items-start gap-2 text-sm"><input type="checkbox" name="consent" value="1" required /><span>Autorizo o tratamento dos dados para responder este contato, conforme a política de privacidade.</span></label>

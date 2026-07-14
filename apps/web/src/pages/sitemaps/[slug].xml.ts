@@ -2,11 +2,11 @@ import type { APIRoute } from "astro";
 import { buildUrlSet, chunkEntries, SITEMAP_CHUNK_SIZE } from "@es/seo";
 import { listSitemapEntries } from "../../lib/sitemaps";
 
-const categories = ["static", "jobs", "companies", "cities", "categories", "blog"] as const;
+const categories = ["static", "jobs", "companies", "cities", "categories", "blog", "news"] as const;
 
 export const GET: APIRoute = async ({ params }) => {
   const slug = params.slug ?? "";
-  const match = /^(static|jobs|companies|cities|categories|blog)(?:-(\d+))?\.xml$/.exec(slug);
+  const match = /^(static|jobs|companies|cities|categories|blog|news)(?:-(\d+))?\.xml$/.exec(slug);
   if (!match) return new Response("Sitemap não encontrado", { status: 404 });
   const category = match[1] as (typeof categories)[number];
   const page = match[2] ? Number(match[2]) : 1;

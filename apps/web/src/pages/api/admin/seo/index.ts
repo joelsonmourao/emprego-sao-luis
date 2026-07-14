@@ -19,22 +19,90 @@ export const POST: APIRoute = async ({ request, locals, redirect, clientAddress 
     ...before,
     defaultTitle: String(form.get("defaultTitle") ?? before.defaultTitle).trim(),
     defaultDescription: String(form.get("defaultDescription") ?? before.defaultDescription).trim(),
+    canonicalDomain: String(form.get("canonicalDomain") ?? before.canonicalDomain).trim(),
+    language: String(form.get("language") ?? before.language).trim(),
+    titleSuffix: String(form.get("titleSuffix") ?? before.titleSuffix).trim(),
+    themeColor: String(form.get("themeColor") ?? before.themeColor).trim(),
+    defaultOgImageAlt: String(form.get("defaultOgImageAlt") ?? before.defaultOgImageAlt).trim(),
     robotsDefault: String(form.get("robotsDefault") ?? before.robotsDefault).trim(),
-    og: { ...before.og, siteName: String(form.get("ogSiteName") ?? before.og.siteName).trim(), type: String(form.get("ogType") ?? before.og.type).trim(), image: String(form.get("ogImage") ?? before.og.image).trim(), locale: String(form.get("ogLocale") ?? before.og.locale).trim() },
-    twitter: { ...before.twitter, card: String(form.get("twitterCard") ?? before.twitter.card).trim(), site: String(form.get("twitterSite") ?? before.twitter.site).trim(), creator: String(form.get("twitterCreator") ?? before.twitter.creator).trim() },
-    organization: { ...before.organization, name: String(form.get("organizationName") ?? before.organization.name).trim(), url: String(form.get("organizationUrl") ?? before.organization.url).trim(), logo: String(form.get("organizationLogo") ?? before.organization.logo).trim(), sameAs: String(form.get("organizationSameAs") ?? before.organization.sameAs.join("\n")).split("\n").map((line) => line.trim()).filter(Boolean) },
+    verifications: {
+      google: String(form.get("googleVerification") ?? before.verifications.google).trim(),
+      bing: String(form.get("bingVerification") ?? before.verifications.bing).trim()
+    },
+    publicContacts: {
+      email: String(form.get("publicEmail") ?? before.publicContacts.email).trim(),
+      phone: String(form.get("publicPhone") ?? before.publicContacts.phone).trim(),
+      whatsapp: String(form.get("publicWhatsapp") ?? before.publicContacts.whatsapp).trim()
+    },
+    og: {
+      ...before.og,
+      siteName: String(form.get("ogSiteName") ?? before.og.siteName).trim(),
+      type: String(form.get("ogType") ?? before.og.type).trim(),
+      image: String(form.get("ogImage") ?? before.og.image).trim(),
+      locale: String(form.get("ogLocale") ?? before.og.locale).trim()
+    },
+    twitter: {
+      ...before.twitter,
+      card: String(form.get("twitterCard") ?? before.twitter.card).trim(),
+      site: String(form.get("twitterSite") ?? before.twitter.site).trim(),
+      creator: String(form.get("twitterCreator") ?? before.twitter.creator).trim()
+    },
+    organization: {
+      ...before.organization,
+      name: String(form.get("organizationName") ?? before.organization.name).trim(),
+      url: String(form.get("organizationUrl") ?? before.organization.url).trim(),
+      logo: String(form.get("organizationLogo") ?? before.organization.logo).trim(),
+      logoAlt: String(form.get("organizationLogoAlt") ?? before.organization.logoAlt).trim(),
+      sameAs: String(form.get("organizationSameAs") ?? before.organization.sameAs.join("\n"))
+        .split("\n")
+        .map((line) => line.trim())
+        .filter(Boolean)
+    },
     contentTypes: {
       ...before.contentTypes,
-      jobs: { ...before.contentTypes.jobs, titleSuffix: String(form.get("jobsTitleSuffix") ?? before.contentTypes.jobs.titleSuffix).trim(), descriptionTemplate: String(form.get("jobsDescriptionTemplate") ?? before.contentTypes.jobs.descriptionTemplate).trim(), robots: String(form.get("jobsRobots") ?? before.contentTypes.jobs.robots).trim() }
+      jobs: {
+        ...before.contentTypes.jobs,
+        titleSuffix: String(form.get("jobsTitleSuffix") ?? before.contentTypes.jobs.titleSuffix).trim(),
+        descriptionTemplate: String(
+          form.get("jobsDescriptionTemplate") ?? before.contentTypes.jobs.descriptionTemplate
+        ).trim(),
+        robots: String(form.get("jobsRobots") ?? before.contentTypes.jobs.robots).trim()
+      }
     },
-    instagram: { profileUrl: String(form.get("instagramProfileUrl") ?? before.instagram.profileUrl).trim(), bioLinks: String(form.get("instagramBioLinks") ?? before.instagram.bioLinks.map((link: { label: string; href: string }) => `${link.label}|${link.href}`).join("\n")).split("\n").map((line) => line.trim()).filter(Boolean).map((line) => { const [label, href] = line.split("|").map((part) => part.trim()); return label && href ? { label, href } : null; }).filter((item): item is { label: string; href: string } => Boolean(item)) }
+    instagram: {
+      profileUrl: String(form.get("instagramProfileUrl") ?? before.instagram.profileUrl).trim(),
+      bioLinks: String(
+        form.get("instagramBioLinks") ??
+          before.instagram.bioLinks
+            .map((link: { label: string; href: string }) => `${link.label}|${link.href}`)
+            .join("\n")
+      )
+        .split("\n")
+        .map((line) => line.trim())
+        .filter(Boolean)
+        .map((line) => {
+          const [label, href] = line.split("|").map((part) => part.trim());
+          return label && href ? { label, href } : null;
+        })
+        .filter((item): item is { label: string; href: string } => Boolean(item))
+    }
   });
   if (!parsed.success) return new Response("Configuração SEO inválida", { status: 400 });
   const value = mergeSeoSettings(parsed.data);
   await saveSeoSettings(value);
   const connection = createDatabase(process.env.DATABASE_URL);
   try {
-    await connection.db.insert(auditLogs).values({ actorId: auth.id, action: "SEO_SETTINGS_UPDATE", entityType: "SETTINGS", entityId: "seo_settings", before, after: { record: value, ip: clientAddress, userAgent: request.headers.get("user-agent") }, origin: "ADMIN" });
+    await connection.db
+      .insert(auditLogs)
+      .values({
+        actorId: auth.id,
+        action: "SEO_SETTINGS_UPDATE",
+        entityType: "SETTINGS",
+        entityId: "seo_settings",
+        before,
+        after: { record: value, ip: clientAddress, userAgent: request.headers.get("user-agent") },
+        origin: "ADMIN"
+      });
   } finally {
     await connection.close();
   }

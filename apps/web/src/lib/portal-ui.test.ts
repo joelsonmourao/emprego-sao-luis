@@ -4,10 +4,10 @@ import { resolve } from "node:path";
 
 describe("portal UI redesign", () => {
   it("usa fetch same-origin no banner de cookies", () => {
-    const source = readFileSync(resolve("apps/web/src/components/CookieConsent.tsx"), "utf8");
+    const source = readFileSync(resolve("apps/web/src/components/CookieConsent.astro"), "utf8");
     expect(source).toContain('fetch("/api/consent"');
     expect(source).toContain("application/json");
-    expect(source).toContain("credentials: \"same-origin\"");
+    expect(source).toContain('credentials: "same-origin"');
   });
 
   it("API de consentimento aceita JSON", () => {
@@ -17,7 +17,7 @@ describe("portal UI redesign", () => {
   });
 
   it("menu mobile expõe aria-expanded", () => {
-    const source = readFileSync(resolve("apps/web/src/components/MobileNav.tsx"), "utf8");
+    const source = readFileSync(resolve("apps/web/src/components/MobileNav.astro"), "utf8");
     expect(source).toContain("aria-expanded");
     expect(source).toContain("aria-controls");
   });

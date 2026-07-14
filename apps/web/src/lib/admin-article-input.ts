@@ -13,6 +13,7 @@ const schema = z.object({
   coverImageUrl: optionalUrl,
   coverImageAlt: z.string().trim().max(240).optional(),
   coverImageCaption: z.string().trim().max(300).optional(),
+  coverImageCredit: z.string().trim().max(300).optional(),
   section: z.string().trim().max(100).optional(),
   tags: z.string().max(1_000).optional(),
   sourceName: z.string().trim().max(180).optional(),
@@ -38,7 +39,11 @@ const nullable = (value: string | undefined) => value?.trim() || null;
 export function parseArticleForm(form: FormData, now = new Date()) {
   const parsed = schema.safeParse(Object.fromEntries(form));
   if (!parsed.success) {
-    return { ok: false as const, error: "Campos editoriais inválidos.", details: parsed.error.issues.map((issue) => issue.message) };
+    return {
+      ok: false as const,
+      error: "Campos editoriais inválidos.",
+      details: parsed.error.issues.map((issue) => issue.message)
+    };
   }
   const scheduledAt = dateOrNull(parsed.data.scheduledAt);
   const expiresAt = dateOrNull(parsed.data.expiresAt);
@@ -53,6 +58,22 @@ export function parseArticleForm(form: FormData, now = new Date()) {
   }
   if (parsed.data.coverImageUrl && !parsed.data.coverImageAlt?.trim()) {
     return { ok: false as const, error: "Informe o texto alternativo da imagem de capa.", details: [] };
+  }
+  if (parsed.data.coverImageUrl && !parsed.data.coverImageCredit?.trim()) {
+    return { ok: false as const, error: "Informe o crédito/origem da imagem de capa.", details: [] };
+  }
+  if (
+    parsed.data.status === "PUBLISHED" &&
+    (!parsed.data.coverImageUrl ||
+      !parsed.data.coverImageAlt?.trim() ||
+      !parsed.data.coverImageCaption?.trim() ||
+      !parsed.data.coverImageCredit?.trim())
+  ) {
+    return {
+      ok: false as const,
+      error: "Publicação exige imagem principal, ALT, legenda e crédito.",
+      details: []
+    };
   }
   const slug = slugify(parsed.data.slug || parsed.data.title);
   if (!slug) return { ok: false as const, error: "Não foi possível gerar o slug do conteúdo.", details: [] };
@@ -70,8 +91,12 @@ export function parseArticleForm(form: FormData, now = new Date()) {
       coverImageUrl: nullable(parsed.data.coverImageUrl),
       coverImageAlt: nullable(parsed.data.coverImageAlt),
       coverImageCaption: nullable(parsed.data.coverImageCaption),
+      coverImageCredit: nullable(parsed.data.coverImageCredit),
       section: nullable(parsed.data.section),
-      tags: (parsed.data.tags ?? "").split(",").map((tag) => tag.trim()).filter(Boolean),
+      tags: (parsed.data.tags ?? "")
+        .split(",")
+        .map((tag) => tag.trim())
+        .filter(Boolean),
       sourceName: nullable(parsed.data.sourceName),
       sourceUrl: nullable(parsed.data.sourceUrl),
       seoTitle: nullable(parsed.data.seoTitle),

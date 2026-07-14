@@ -4,9 +4,27 @@ import Breadcrumbs from "../../components/ui/Breadcrumbs.astro";
 import { findPublishedArticle } from "../../lib/articles";
 
 const result = await findPublishedArticle(Astro.params.slug!, "NEWS");
-if (!result) return Astro.redirect("/404", 302);
+if (!result) {
+  return new Response("Notícia não encontrada", {
+    status: 404,
+    headers: { "Content-Type": "text/plain; charset=utf-8", "X-Robots-Tag": "noindex, follow" }
+  });
+}
 const { article, authorName } = result;
 const canonical = article.canonicalUrl ?? new URL(`/noticias/${article.slug}`, Astro.site).toString();
+const variants = article.coverImageVariants && typeof article.coverImageVariants === "object"
+  ? article.coverImageVariants as Record<string, { url?: string; width?: number; height?: number }>
+  : {};
+const structuredImages = [variants.hero, variants.landscape43, variants.square]
+  .filter((image): image is { url: string; width?: number; height?: number } => Boolean(image?.url))
+  .map((image) => ({
+    "@type": "ImageObject",
+    url: image.url,
+    ...(image.width ? { width: image.width } : {}),
+    ...(image.height ? { height: image.height } : {}),
+    ...(article.coverImageCaption ? { caption: article.coverImageCaption } : {}),
+    ...(article.coverImageCredit ? { creditText: article.coverImageCredit } : {})
+  }));
 const jsonLd = {
   "@context": "https://schema.org",
   "@type": "NewsArticle",
@@ -17,11 +35,10 @@ const jsonLd = {
   mainEntityOfPage: canonical,
   author: { "@type": "Person", name: authorName },
   publisher: { "@type": "Organization", name: "Empregos São Luís" },
-  ...(article.coverImageUrl ? { image: [article.coverImageUrl] } : {})
+  ...(structuredImages.length ? { image: structuredImages } : {})
 };
 ---
-<BaseLayout title={`${article.seoTitle ?? article.title} — Empregos São Luís`} description={article.metaDescription ?? article.excerpt} canonical={canonical} breadcrumbs={[{ name: "Notícias", url: "/noticias" }, { name: article.title, url: `/noticias/${article.slug}` }]}>
-  <script is:inline type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+<BaseLayout title={`${article.seoTitle ?? article.title} — Empregos São Luís`} description={article.metaDescription ?? article.excerpt} canonical={canonical} ogImage={article.ogImageUrl ?? article.coverImageUrl ?? undefined} breadcrumbs={[{ name: "Notícias", url: "/noticias" }, { name: article.title, url: `/noticias/${article.slug}` }]} schemas={[jsonLd]}>
   <article class="es-section">
     <div class="es-container max-w-4xl">
       <Breadcrumbs items={[{ name: "Início", url: "/" }, { name: "Notícias", url: "/noticias" }, { name: article.title }]} />
@@ -31,8 +48,8 @@ const jsonLd = {
       <p class="mt-4 text-sm text-[var(--es-muted)]">Por {authorName} · {article.publishedAt?.toLocaleDateString("pt-BR")}</p>
       {article.coverImageUrl && (
         <figure class="mt-8 overflow-hidden rounded-3xl">
-          <img class="w-full" src={article.coverImageUrl} alt={article.coverImageAlt ?? article.title} loading="lazy" />
-          {article.coverImageCaption && <figcaption class="mt-2 text-sm text-[var(--es-muted)]">{article.coverImageCaption}</figcaption>}
+          <img class="w-full" src={variants.hero?.url ?? article.coverImageUrl} srcset={variants.card?.url && variants.hero?.url ? `${variants.card.url} 640w, ${variants.hero.url} 1600w` : undefined} sizes="(max-width: 768px) 100vw, 896px" alt={article.coverImageAlt ?? article.title} width={article.coverImageWidth ?? 1600} height={article.coverImageHeight ?? 900} loading="eager" fetchpriority="high" />
+          {(article.coverImageCaption || article.coverImageCredit) && <figcaption class="mt-2 text-sm text-[var(--es-muted)]">{article.coverImageCaption}{article.coverImageCaption && article.coverImageCredit ? " · " : ""}{article.coverImageCredit ? `Crédito: ${article.coverImageCredit}` : ""}</figcaption>}
         </figure>
       )}
       <div class="es-prose mt-8 max-w-none text-[1.05rem] leading-8" set:html={article.contentHtml} />

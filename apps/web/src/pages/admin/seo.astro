@@ -55,15 +55,22 @@ const preview = {
       <h2 class="text-xl font-black">SEO geral</h2>
       <label>Título padrão<input class="mt-1 w-full rounded-lg border p-3" name="defaultTitle" value={seo.defaultTitle} required /></label>
       <label>Meta description padrão<textarea class="mt-1 w-full rounded-lg border p-3" name="defaultDescription" rows="3" required>{seo.defaultDescription}</textarea></label>
+      <label>Domínio canônico<input class="mt-1 w-full rounded-lg border p-3" type="url" name="canonicalDomain" value={seo.canonicalDomain} /></label>
+      <div class="grid gap-4 md:grid-cols-2"><label>Idioma<input class="mt-1 w-full rounded-lg border p-3" name="language" value={seo.language} /></label><label>Sufixo global de título<input class="mt-1 w-full rounded-lg border p-3" name="titleSuffix" value={seo.titleSuffix} /></label></div>
       <label>Robots padrão<input class="mt-1 w-full rounded-lg border p-3" name="robotsDefault" value={seo.robotsDefault} /></label>
       <label>OG site name<input class="mt-1 w-full rounded-lg border p-3" name="ogSiteName" value={seo.og.siteName} /></label>
       <label>OG image URL<input class="mt-1 w-full rounded-lg border p-3" type="url" name="ogImage" value={seo.og.image} /></label>
+      <label>ALT padrão da imagem social<input class="mt-1 w-full rounded-lg border p-3" name="defaultOgImageAlt" value={seo.defaultOgImageAlt} /></label>
+      <label>Cor do tema<input class="mt-1 w-full rounded-lg border p-3" type="color" name="themeColor" value={seo.themeColor} /></label>
       <label>Twitter card<input class="mt-1 w-full rounded-lg border p-3" name="twitterCard" value={seo.twitter.card} /></label>
       <label>Twitter @site<input class="mt-1 w-full rounded-lg border p-3" name="twitterSite" value={seo.twitter.site} /></label>
       <label>Organization name<input class="mt-1 w-full rounded-lg border p-3" name="organizationName" value={seo.organization.name} /></label>
       <label>Organization URL<input class="mt-1 w-full rounded-lg border p-3" type="url" name="organizationUrl" value={seo.organization.url} /></label>
       <label>Organization logo URL<input class="mt-1 w-full rounded-lg border p-3" type="url" name="organizationLogo" value={seo.organization.logo} /></label>
+      <label>ALT da logo no schema<input class="mt-1 w-full rounded-lg border p-3" name="organizationLogoAlt" value={seo.organization.logoAlt} /></label>
       <label>Perfis (um por linha)<textarea class="mt-1 w-full rounded-lg border p-3" name="organizationSameAs" rows="3">{seo.organization.sameAs.join("\n")}</textarea></label>
+      <h3 class="pt-2 text-lg font-bold">Contatos públicos e verificações</h3>
+      <div class="grid gap-4 md:grid-cols-2"><label>E-mail público<input class="mt-1 w-full rounded-lg border p-3" name="publicEmail" value={seo.publicContacts.email} /></label><label>Telefone público<input class="mt-1 w-full rounded-lg border p-3" name="publicPhone" value={seo.publicContacts.phone} /></label><label>WhatsApp público<input class="mt-1 w-full rounded-lg border p-3" name="publicWhatsapp" value={seo.publicContacts.whatsapp} /></label><label>Google verification<input class="mt-1 w-full rounded-lg border p-3" name="googleVerification" value={seo.verifications.google} /></label><label>Bing verification<input class="mt-1 w-full rounded-lg border p-3" name="bingVerification" value={seo.verifications.bing} /></label></div>
       <h3 class="pt-2 text-lg font-bold">Vagas</h3>
       <label>Sufixo de título<input class="mt-1 w-full rounded-lg border p-3" name="jobsTitleSuffix" value={seo.contentTypes.jobs.titleSuffix} /></label>
       <label>Template de description<textarea class="mt-1 w-full rounded-lg border p-3" name="jobsDescriptionTemplate" rows="2">{seo.contentTypes.jobs.descriptionTemplate}</textarea></label>

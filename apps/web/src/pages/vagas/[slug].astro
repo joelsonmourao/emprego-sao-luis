@@ -16,7 +16,7 @@ const record = job.job;
 const canonicalUrl = record.canonicalUrl || new URL(`/vagas/${record.slug}`, Astro.site).toString();
 const jsonLd = buildJobPosting({
   title: record.normalizedTitle,
-  description: record.description,
+  description: record.descriptionHtml,
   publishedAt: record.publishedAt,
   expiresAt: record.expiresAt,
   employmentType: record.employmentType,
@@ -33,24 +33,27 @@ const jsonLd = buildJobPosting({
   salaryPeriod: record.salaryPeriod,
   salaryVisible: record.salaryVisible,
   publicCode: record.publicCode,
-  canonicalUrl
+  canonicalUrl,
+  publicationStatus: record.publicationStatus,
+  confidentialCompany: record.confidentialCompany,
+  unidentifiedCompany: record.unidentifiedCompany,
+  organizationPubliclyIdentifiable: !record.confidentialCompany && !record.unidentifiedCompany
 });
-if (!jsonLd) return Astro.redirect(`/vagas/indisponivel/${encodeURIComponent(slug)}`, 302);
 
 const related = await listRelatedJobs({ jobId: record.id, companyId: record.companyId, categoryId: record.categoryId, cityId: record.cityId, limit: 4 });
 const salary = formatSalary(record);
-const activities = Array.isArray(record.activities) ? record.activities as string[] : [];
-const requirements = Array.isArray(record.requirements) ? record.requirements as string[] : [];
-const benefits = Array.isArray(record.benefits) ? record.benefits as string[] : [];
 const shareUrl = canonicalUrl;
+const acceptingApplications = record.publicationStatus === "PUBLISHED" && Boolean(record.expiresAt && record.expiresAt > new Date());
+const noindex = record.publicationStatus !== "PUBLISHED";
 ---
 <BaseLayout
   title={record.seoTitle || `${record.normalizedTitle} — Empregos São Luís`}
   description={record.metaDescription || record.summary}
   canonical={canonicalUrl}
   breadcrumbs={[{ name: "Vagas", url: "/vagas" }, { name: record.normalizedTitle, url: `/vagas/${record.slug}` }]}
+  noindex={noindex}
+  schemas={jsonLd ? [jsonLd] : []}
 >
-  <script is:inline type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
 
   <section class="es-section bg-white pt-8">
     <div class="es-container">
@@ -91,31 +94,11 @@ const shareUrl = canonicalUrl;
             {record.schedule && <div><dt class="text-xs font-bold uppercase text-[var(--es-muted)]">Jornada</dt><dd>{record.schedule}</dd></div>}
           </dl>
 
-          <p class="mt-6 text-lg text-[var(--es-ink)]">{record.summary}</p>
+          {!acceptingApplications && <p class="mt-6 rounded-xl border border-amber-200 bg-amber-50 p-4 font-semibold text-amber-950" role="status">Esta vaga está encerrada ou temporariamente pausada. A candidatura não está disponível.</p>}
 
           <AdSlot slot="job-content-mid" pageType="job" citySlug={job.citySlug} companySlug={job.companySlug} workplaceType={record.workplaceType} />
 
-          <div class="es-prose mt-8 max-w-none" set:html={record.description} />
-          {record.additionalInfo && <section class="mt-8"><h2 class="font-display text-2xl font-black">Informações adicionais</h2><p class="mt-3 whitespace-pre-line text-[var(--es-muted)]">{record.additionalInfo}</p></section>}
-
-          {activities.length > 0 && (
-            <section class="mt-8">
-              <h2 class="font-display text-2xl font-black">Atividades</h2>
-              <ul class="mt-3 list-disc space-y-2 pl-5 text-[var(--es-muted)]">{activities.map((item) => <li>{item}</li>)}</ul>
-            </section>
-          )}
-          {requirements.length > 0 && (
-            <section class="mt-8">
-              <h2 class="font-display text-2xl font-black">Requisitos</h2>
-              <ul class="mt-3 list-disc space-y-2 pl-5 text-[var(--es-muted)]">{requirements.map((item) => <li>{item}</li>)}</ul>
-            </section>
-          )}
-          {benefits.length > 0 && (
-            <section class="mt-8">
-              <h2 class="font-display text-2xl font-black">Benefícios</h2>
-              <ul class="mt-3 list-disc space-y-2 pl-5 text-[var(--es-muted)]">{benefits.map((item) => <li>{item}</li>)}</ul>
-            </section>
-          )}
+          <section class="mt-8"><h2 class="font-display text-2xl font-black">Descrição da vaga</h2><div class="es-prose mt-4 max-w-none" set:html={record.descriptionHtml} /></section>
 
           <section class="mt-8 rounded-2xl border border-amber-200 bg-amber-50 p-5">
             <h2 class="font-display text-lg font-black text-amber-950">Aviso de segurança</h2>
@@ -133,7 +116,7 @@ const shareUrl = canonicalUrl;
         </article>
 
         <aside class="space-y-5">
-          <div class="es-card sticky top-24 space-y-4 p-6" id="candidatura">
+          {acceptingApplications && <div class="es-card sticky top-24 space-y-4 p-6" id="candidatura">
             <h2 class="font-display text-xl font-black">Candidatura</h2>
             <p class="text-sm text-[var(--es-muted)]">Você será direcionado ao canal oficial da empresa. Não é necessário criar conta.</p>
             <a class="es-btn es-btn-primary w-full py-3.5 text-base" href={record.applicationUrl} rel="nofollow noopener noreferrer">Candidatar-se agora</a>
@@ -146,7 +129,7 @@ const shareUrl = canonicalUrl;
               <a class="es-btn es-btn-secondary" href={`https://wa.me/?text=${encodeURIComponent(`${record.normalizedTitle} - ${shareUrl}`)}`} rel="noopener noreferrer">WhatsApp</a>
               <button class="es-btn es-btn-secondary" type="button" data-share-url={shareUrl} id="copy-share-link">Copiar link</button>
             </div>
-          </div>
+          </div>}
           <AdSlot slot="job-sidebar" pageType="job" citySlug={job.citySlug} companySlug={job.companySlug} workplaceType={record.workplaceType} />
           {!record.confidentialCompany && <article class="es-card p-5">
             <h3 class="font-display font-black">Sobre a empresa</h3>

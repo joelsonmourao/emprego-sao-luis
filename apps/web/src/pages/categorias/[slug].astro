@@ -38,7 +38,12 @@ if (process.env.DATABASE_URL) {
     await connection.close();
   }
 }
-if (!category) return Astro.redirect("/categorias", 302);
+if (!category) {
+  return new Response("Categoria não encontrada", {
+    status: 404,
+    headers: { "Content-Type": "text/plain; charset=utf-8", "X-Robots-Tag": "noindex, follow" }
+  });
+}
 ---
 <BaseLayout title={category.seoTitle ?? `${category.name} — vagas de emprego`} description={category.metaDescription ?? `Vagas na categoria ${category.name}.`} breadcrumbs={[{ name: "Categorias", url: "/categorias" }, { name: category.name, url: `/categorias/${category.slug}` }]}>
   <section class="es-section bg-white">

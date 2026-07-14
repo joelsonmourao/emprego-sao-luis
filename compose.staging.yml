@@ -38,6 +38,9 @@ services:
       dockerfile: Dockerfile.web
     env_file:
       - .env.staging
+    environment:
+      COOKIE_SECURE: "false"
+      S3_SERVER_SIDE_ENCRYPTION: none
     ports:
       - "4321:4321"
     volumes:
@@ -54,6 +57,8 @@ services:
       dockerfile: Dockerfile.worker
     env_file:
       - .env.staging
+    environment:
+      S3_SERVER_SIDE_ENCRYPTION: none
     volumes:
       - uploads_staging:/app/data
     depends_on:

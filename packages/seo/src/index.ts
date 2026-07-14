@@ -1,7 +1,21 @@
 export const SITE_NAME = "Empregos São Luís";
 
-export { buildBreadcrumbSchema, buildOpenGraphTags, buildOrganizationSchema, buildTwitterTags, buildWebSiteSchema } from "./metadata.js";
-export { buildSitemapIndex, buildUrlSet, chunkEntries, dedupeEntries, normalizeLastmod, SITEMAP_CHUNK_SIZE, type SitemapEntry } from "./sitemaps.js";
+export {
+  buildBreadcrumbSchema,
+  buildOpenGraphTags,
+  buildOrganizationSchema,
+  buildTwitterTags,
+  buildWebSiteSchema
+} from "./metadata.js";
+export {
+  buildSitemapIndex,
+  buildUrlSet,
+  chunkEntries,
+  dedupeEntries,
+  normalizeLastmod,
+  SITEMAP_CHUNK_SIZE,
+  type SitemapEntry
+} from "./sitemaps.js";
 export { defaultSeoSettings, mergeSeoSettings, seoSettingsSchema, type SeoSettings } from "./settings.js";
 
 export interface JobPostingInput {
@@ -24,13 +38,38 @@ export interface JobPostingInput {
   salaryVisible?: boolean;
   publicCode?: string;
   canonicalUrl?: string;
+  publicationStatus?: string;
+  confidentialCompany?: boolean;
+  unidentifiedCompany?: boolean;
+  organizationPubliclyIdentifiable?: boolean;
+  directApply?: boolean;
 }
 
 export function buildJobPosting(input: JobPostingInput) {
-  if (!input.publishedAt || !input.expiresAt || input.expiresAt <= new Date()) return null;
+  if (
+    (input.publicationStatus && input.publicationStatus !== "PUBLISHED") ||
+    !input.publishedAt ||
+    !input.expiresAt ||
+    input.expiresAt <= new Date() ||
+    input.confidentialCompany ||
+    input.unidentifiedCompany ||
+    input.organizationPubliclyIdentifiable === false ||
+    !input.companyName.trim()
+  )
+    return null;
   const showSalary = input.salaryVisible && (input.salaryMin || input.salaryMax);
-  const baseSalary = showSalary ? { "@type": "MonetaryAmount", currency: input.salaryCurrency, value: { "@type": "QuantitativeValue", ...(input.salaryMin ? { minValue: Number(input.salaryMin) } : {}), ...(input.salaryMax ? { maxValue: Number(input.salaryMax) } : {}), ...(input.salaryPeriod ? { unitText: input.salaryPeriod } : {}) } } : undefined;
-  const directApply = input.applicationType === "URL" || input.applicationType === "EMAIL" || input.applicationType === "WHATSAPP";
+  const baseSalary = showSalary
+    ? {
+        "@type": "MonetaryAmount",
+        currency: input.salaryCurrency,
+        value: {
+          "@type": "QuantitativeValue",
+          ...(input.salaryMin ? { minValue: Number(input.salaryMin) } : {}),
+          ...(input.salaryMax ? { maxValue: Number(input.salaryMax) } : {}),
+          ...(input.salaryPeriod ? { unitText: input.salaryPeriod } : {})
+        }
+      }
+    : undefined;
   return {
     "@context": "https://schema.org",
     "@type": "JobPosting",
@@ -39,12 +78,30 @@ export function buildJobPosting(input: JobPostingInput) {
     datePosted: input.publishedAt.toISOString(),
     validThrough: input.expiresAt.toISOString(),
     employmentType: input.employmentType,
-    hiringOrganization: { "@type": "Organization", name: input.companyName, ...(input.companyWebsiteUrl ? { sameAs: input.companyWebsiteUrl } : {}) },
-    ...(input.publicCode ? { identifier: { "@type": "PropertyValue", name: "Código ES", value: input.publicCode } } : {}),
+    hiringOrganization: {
+      "@type": "Organization",
+      name: input.companyName,
+      ...(input.companyWebsiteUrl ? { sameAs: input.companyWebsiteUrl } : {})
+    },
+    ...(input.publicCode
+      ? { identifier: { "@type": "PropertyValue", name: "Código ES", value: input.publicCode } }
+      : {}),
     ...(input.canonicalUrl ? { url: input.canonicalUrl } : {}),
-    ...(input.workplaceType === "remoto" ? { jobLocationType: "TELECOMMUTE", applicantLocationRequirements: { "@type": "Country", name: "BR" } } : { jobLocation: { "@type": "Place", address: { "@type": "PostalAddress", addressLocality: input.cityName, addressRegion: input.stateCode, addressCountry: "BR" } } }),
+    ...(input.workplaceType === "remoto"
+      ? { jobLocationType: "TELECOMMUTE", applicantLocationRequirements: { "@type": "Country", name: "BR" } }
+      : {
+          jobLocation: {
+            "@type": "Place",
+            address: {
+              "@type": "PostalAddress",
+              addressLocality: input.cityName,
+              addressRegion: input.stateCode,
+              addressCountry: "BR"
+            }
+          }
+        }),
     ...(baseSalary ? { baseSalary } : {}),
-    directApply
+    ...(input.directApply === true ? { directApply: true } : {})
   };
 }
 
@@ -56,8 +113,16 @@ export function validateJobPosting(input: JobPostingInput) {
   if (!input.expiresAt) missing.push("validThrough");
   if (!input.employmentType.trim()) missing.push("employmentType");
   if (!input.companyName.trim()) missing.push("hiringOrganization");
+  if (
+    input.confidentialCompany ||
+    input.unidentifiedCompany ||
+    input.organizationPubliclyIdentifiable === false
+  )
+    missing.push("publicHiringOrganization");
+  if (input.publicationStatus && input.publicationStatus !== "PUBLISHED") missing.push("publicationStatus");
   if (!input.applicationUrl.trim()) missing.push("applicationUrl");
-  if (input.workplaceType !== "remoto" && (!input.cityName.trim() || !input.stateCode.trim())) missing.push("jobLocation");
+  if (input.workplaceType !== "remoto" && (!input.cityName.trim() || !input.stateCode.trim()))
+    missing.push("jobLocation");
   if (!input.publicCode?.trim()) missing.push("identifier");
   if (!input.canonicalUrl?.trim()) missing.push("canonicalUrl");
   if (input.salaryVisible && !input.salaryMin && !input.salaryMax) missing.push("baseSalary");
@@ -65,4 +130,11 @@ export function validateJobPosting(input: JobPostingInput) {
   return { valid: missing.length === 0 && schema !== null, missing, schema };
 }
 
-export function escapeXml(value: string) { return value.replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll('"', "&quot;").replaceAll("'", "&apos;"); }
+export function escapeXml(value: string) {
+  return value
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&apos;");
+}

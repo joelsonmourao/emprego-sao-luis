@@ -1,12 +1,7 @@
 import { randomUUID } from "node:crypto";
 import { mkdir, readFile, rm, stat, writeFile } from "node:fs/promises";
 import { dirname, isAbsolute, join, relative, resolve, sep } from "node:path";
-import {
-  DeleteObjectCommand,
-  GetObjectCommand,
-  PutObjectCommand,
-  S3Client
-} from "@aws-sdk/client-s3";
+import { DeleteObjectCommand, GetObjectCommand, PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
 
 export const STORAGE_AREAS = ["imports", "media", "brand", "reports", "temp", "receipts"] as const;
 export type StorageArea = (typeof STORAGE_AREAS)[number];
@@ -26,11 +21,7 @@ export type StorageDiagnostic = {
 export class StorageError extends Error {
   readonly code: "STORAGE_NOT_WRITABLE" | "STORAGE_NOT_FOUND" | "STORAGE_INVALID_KEY";
 
-  constructor(
-    code: StorageError["code"],
-    message: string,
-    options?: { cause?: unknown }
-  ) {
+  constructor(code: StorageError["code"], message: string, options?: { cause?: unknown }) {
     super(message, options);
     this.name = "StorageError";
     this.code = code;
@@ -44,17 +35,15 @@ const DIAGNOSTIC_TTL_MS = 60_000;
 export function isS3Configured(): boolean {
   return Boolean(
     process.env.S3_BUCKET?.trim() &&
-      process.env.S3_ENDPOINT?.trim() &&
-      process.env.S3_ACCESS_KEY_ID?.trim() &&
-      process.env.S3_SECRET_ACCESS_KEY?.trim()
+    process.env.S3_ENDPOINT?.trim() &&
+    process.env.S3_ACCESS_KEY_ID?.trim() &&
+    process.env.S3_SECRET_ACCESS_KEY?.trim()
   );
 }
 
 export function getUploadsDir(): string {
   return resolve(
-    process.env.UPLOADS_DIR?.trim() ||
-      process.env.UPLOADS_VOLUME_PATH?.trim() ||
-      join(process.cwd(), "data")
+    process.env.UPLOADS_DIR?.trim() || process.env.UPLOADS_VOLUME_PATH?.trim() || join(process.cwd(), "data")
   );
 }
 
@@ -69,11 +58,7 @@ export function getStorageInfo(): { provider: StorageProvider; ready: boolean; p
 export function normalizeStorageKey(input: string): string {
   const key = input.replaceAll("\\", "/").replace(/^\/+/, "");
   const parts = key.split("/");
-  if (
-    !key ||
-    isAbsolute(input) ||
-    parts.some((part) => !part || part === "." || part === "..")
-  ) {
+  if (!key || isAbsolute(input) || parts.some((part) => !part || part === "." || part === "..")) {
     throw new StorageError("STORAGE_INVALID_KEY", "Caminho de armazenamento inválido.");
   }
   return parts.join("/");
@@ -107,6 +92,12 @@ function s3() {
   return { bucket, client };
 }
 
+function s3Encryption(): { ServerSideEncryption: "AES256" | "aws:kms" } | Record<string, never> {
+  const configured = process.env.S3_SERVER_SIDE_ENCRYPTION?.trim().toLowerCase();
+  if (configured === "none") return {};
+  return { ServerSideEncryption: configured === "aws:kms" ? "aws:kms" : "AES256" };
+}
+
 function storageFailure(error: unknown, message: string): StorageError {
   if (error instanceof StorageError) return error;
   const source = error as { code?: string } | null;
@@ -131,7 +122,7 @@ export async function putStorageObject(
           Key: key,
           Body: body,
           ContentType: contentType,
-          ServerSideEncryption: "AES256"
+          ...s3Encryption()
         })
       );
       return { provider: "s3", key };

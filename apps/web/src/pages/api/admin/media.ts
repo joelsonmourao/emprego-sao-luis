@@ -1,12 +1,7 @@
 import { createHash, randomUUID } from "node:crypto";
 import type { APIRoute } from "astro";
 import { auditLogs, createDatabase, mediaAssets } from "@es/db";
-import {
-  buildStoragePublicUrl,
-  deleteStorageObject,
-  putStorageObject,
-  StorageError
-} from "@es/storage";
+import { buildStoragePublicUrl, deleteStorageObject, putStorageObject, StorageError } from "@es/storage";
 import sharp from "sharp";
 import { adminJsonError, adminJsonRedirect, adminMethodNotAllowed } from "../../../lib/admin-api-response";
 import { can } from "../../../lib/auth";
@@ -25,6 +20,13 @@ const formats: Record<string, string> = {
   webp: "image/webp",
   gif: "image/gif"
 };
+const variantSpecs = [
+  { key: "hero", width: 1600, height: 900 },
+  { key: "card", width: 640, height: 360 },
+  { key: "og", width: 1200, height: 630 },
+  { key: "square", width: 1200, height: 1200 },
+  { key: "landscape43", width: 1200, height: 900 }
+] as const;
 
 export const GET: APIRoute = () => adminMethodNotAllowed("POST");
 
@@ -70,10 +72,35 @@ export const POST: APIRoute = async ({ request, locals }) => {
   const digest = createHash("sha256").update(bytes).digest("hex");
   const canonicalExtension = image.mimeType === "image/jpeg" ? "jpg" : extensions[image.mimeType]![0]!;
   const key = `media/${new Date().toISOString().slice(0, 7)}/${digest.slice(0, 16)}-${randomUUID()}.${canonicalExtension}`;
+  const keyWithoutExtension = key.replace(/\.[^.]+$/, "");
+  const storedKeys: string[] = [];
+  const variants: Record<
+    string,
+    { url: string; width: number; height: number; mimeType: "image/webp"; storageKey: string }
+  > = {};
 
   try {
     await putStorageObject(key, bytes, image.mimeType);
+    storedKeys.push(key);
+    for (const spec of variantSpecs) {
+      const variantKey = `${keyWithoutExtension}-${spec.key}.webp`;
+      const body = await sharp(bytes)
+        .rotate()
+        .resize(spec.width, spec.height, { fit: "cover", position: "centre" })
+        .webp({ quality: 82, effort: 5 })
+        .toBuffer();
+      await putStorageObject(variantKey, body, "image/webp");
+      storedKeys.push(variantKey);
+      variants[spec.key] = {
+        url: buildStoragePublicUrl(variantKey),
+        width: spec.width,
+        height: spec.height,
+        mimeType: "image/webp",
+        storageKey: variantKey
+      };
+    }
   } catch (error) {
+    await Promise.all(storedKeys.map((storedKey) => deleteStorageObject(storedKey).catch(() => undefined)));
     logServerError("route:/api/admin/media:storage", error);
     const code = error instanceof StorageError ? error.code : "STORAGE_NOT_WRITABLE";
     return adminJsonError("O armazenamento local não está disponível.", 503, { code });
@@ -92,7 +119,20 @@ export const POST: APIRoute = async ({ request, locals }) => {
           size: file.size,
           url,
           altText,
-          metadata: { sha256: digest, width: image.width, height: image.height }
+          metadata: {
+            sha256: digest,
+            width: image.width,
+            height: image.height,
+            original: {
+              url,
+              width: image.width,
+              height: image.height,
+              mimeType: image.mimeType,
+              storageKey: key
+            },
+            variants,
+            focalPoint: { x: 0.5, y: 0.5 }
+          }
         })
         .returning();
       if (!created) throw new Error("Falha ao registrar a mídia.");
@@ -101,14 +141,17 @@ export const POST: APIRoute = async ({ request, locals }) => {
         action: "UPLOAD",
         entityType: "MEDIA",
         entityId: created.id,
-        after: { ...created, metadata: { sha256: digest, width: image.width, height: image.height } },
+        after: {
+          ...created,
+          metadata: { sha256: digest, width: image.width, height: image.height, variants }
+        },
         origin: "ADMIN"
       });
       return created;
     });
     return adminJsonRedirect("/admin/midia?uploaded=1", { asset });
   } catch (error) {
-    await deleteStorageObject(key).catch(() => undefined);
+    await Promise.all(storedKeys.map((storedKey) => deleteStorageObject(storedKey).catch(() => undefined)));
     logServerError("route:/api/admin/media:database", error);
     return adminJsonError("Não foi possível registrar a imagem.", 500);
   } finally {
