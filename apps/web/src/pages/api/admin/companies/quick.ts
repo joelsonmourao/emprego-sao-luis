@@ -11,6 +11,7 @@ const schema = z.object({
   name: z.string().trim().min(2).max(160),
   publicName: z.string().trim().min(2).max(160).optional(),
   websiteUrl: zOptionalUrl(),
+  logoUrl: zOptionalUrl(),
   cityId: z.string().uuid().optional(),
   stateId: z.string().uuid().optional(),
   verified: z
@@ -64,10 +65,12 @@ export const POST: APIRoute = async ({ request, locals, clientAddress }) => {
         .insert(companies)
         .values({
           name: parsed.data.name.trim(),
+          publicName: displayName,
           normalizedName: slugify(parsed.data.name),
           slug,
           cityId,
           websiteUrl: parsed.data.websiteUrl ?? null,
+          logoUrl: parsed.data.logoUrl ?? null,
           verifiedAt: parsed.data.verified ? new Date() : null
         })
         .returning();
@@ -84,7 +87,7 @@ export const POST: APIRoute = async ({ request, locals, clientAddress }) => {
 
     if (!company) return adminJsonError("Não foi possível criar a empresa.", 500);
 
-    return adminJsonOk({ id: company.id, name: company.name, slug: company.slug });
+    return adminJsonOk({ id: company.id, name: company.publicName || company.name, slug: company.slug });
   } finally {
     await connection.close();
   }

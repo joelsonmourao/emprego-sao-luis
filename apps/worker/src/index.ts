@@ -8,6 +8,7 @@ import { dispatchJobAlerts } from "./alert-dispatch.js";
 import { processSocialPost } from "./social-processor.js";
 import { publishScheduledJobs } from "./scheduled-publication.js";
 import { startupFailureFields, workerLoggerOptions } from "./startup-error.js";
+import { initializeStorage } from "@es/storage";
 
 const logger = pino(workerLoggerOptions);
 let startupStage = "initial_validation";
@@ -17,6 +18,11 @@ async function main() {
   if (process.env.WORKER_SMOKE_TEST === "true") {
     logger.info({ event: "worker.smoke_test" }, "Artefato ESM do worker carregado");
     return;
+  }
+
+  const storage = await initializeStorage();
+  if (!storage.write || !storage.read || !storage.delete) {
+    logger.warn({ event: "worker.storage.degraded", provider: storage.provider, path: storage.path, error: storage.error }, "Armazenamento indisponível para operações de arquivo");
   }
 
   startupStage = "redis_url_validation";

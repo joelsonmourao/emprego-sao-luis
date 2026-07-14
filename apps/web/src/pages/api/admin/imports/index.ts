@@ -8,8 +8,8 @@ import { adminJsonError, adminJsonRedirect, adminMethodNotAllowed } from "../../
 import { logServerError } from "../../../../lib/server-error";
 import { getImportStorageInfo, putImportFile } from "../../../../lib/import-storage";
 import * as XLSX from "xlsx";
-
-const MAX_BYTES = 20 * 1024 * 1024;
+import { StorageError } from "@es/storage";
+import { validateImportFile } from "../../../../lib/import-file-validation";
 
 export const GET: APIRoute = () => adminMethodNotAllowed("POST");
 
@@ -33,16 +33,10 @@ export const POST: APIRoute = async ({ request, locals }) => {
     return adminJsonError("Arquivo ou modo inválido.", 400, { details: ["Envie um arquivo XLSX/CSV e selecione o destino."] });
   }
 
-  if (file.size === 0) {
-    return adminJsonError("Arquivo vazio.", 400, { details: ["A planilha não contém dados."] });
+  const initialValidation = validateImportFile(file.name, file.size);
+  if (!initialValidation.ok) {
+    return adminJsonError(initialValidation.error, initialValidation.status, { code: initialValidation.code });
   }
-  if (file.size > MAX_BYTES) {
-    return adminJsonError("Arquivo muito grande.", 400, { details: ["O limite é 20 MB."] });
-  }
-  if (!/\.(xlsx|csv)$/i.test(file.name)) {
-    return adminJsonError("Extensão não suportada.", 400, { details: ["Use arquivos .xlsx ou .csv."] });
-  }
-
   if (!process.env.DATABASE_URL) {
     return adminJsonError("Banco de dados indisponível.", 503);
   }
@@ -55,6 +49,10 @@ export const POST: APIRoute = async ({ request, locals }) => {
   const connection = createDatabase(process.env.DATABASE_URL);
   try {
     const bytes = new Uint8Array(await file.arrayBuffer());
+    const contentValidation = validateImportFile(file.name, file.size, bytes);
+    if (!contentValidation.ok) {
+      return adminJsonError(contentValidation.error, contentValidation.status, { code: contentValidation.code });
+    }
     const fileHash = createHash("sha256").update(bytes).digest("hex");
     const storageKey = `imports/${fileHash}/${file.name.replace(/[^a-zA-Z0-9._-]/g, "_")}`;
 
@@ -68,7 +66,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
       workbook = XLSX.read(bytes, { type: "array", cellDates: true });
     } catch (error) {
       logServerError("route:/api/admin/imports:parse", error);
-      return adminJsonError("Arquivo corrompido ou ilegível.", 400, { details: ["Não foi possível ler a planilha."] });
+      return adminJsonError("Arquivo corrompido ou ilegível.", 422, { code: "FILE_CORRUPTED", details: ["Não foi possível ler a planilha."] });
     }
 
     const sheets = workbook.SheetNames.map((name) => {
@@ -79,14 +77,16 @@ export const POST: APIRoute = async ({ request, locals }) => {
     });
 
     if (!sheets.length || sheets.every((sheet) => sheet.headers.length === 0)) {
-      return adminJsonError("Planilha sem cabeçalhos.", 400, { details: ["Inclua cabeçalhos e ao menos uma linha de dados."] });
+      return adminJsonError("Planilha sem cabeçalhos.", 422, { code: "HEADERS_MISSING", details: ["Inclua cabeçalhos e ao menos uma linha de dados."] });
     }
 
     try {
       await putImportFile(storageKey, bytes, file.type || "application/octet-stream");
     } catch (error) {
       logServerError("route:/api/admin/imports:storage", error);
-      return adminJsonError("Não foi possível armazenar o arquivo.", 503, { code: "STORAGE_UNAVAILABLE" });
+      return adminJsonError("O armazenamento local não está disponível.", 503, {
+        code: error instanceof StorageError ? error.code : "STORAGE_NOT_WRITABLE"
+      });
     }
 
     const first = sheets[0]!;

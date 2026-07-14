@@ -13,6 +13,7 @@
     "@aws-sdk/client-s3": "^3.850.0",
     "@es/db": "*",
     "@es/shared": "*",
+    "@es/storage": "*",
     "@sentry/node": "^10.65.0",
     "bullmq": "^5.80.2",
     "google-auth-library": "^10.2.1",

@@ -33,6 +33,10 @@ const slugify = (value: string) =>
     .replace(/^-|-$/g, "")
     .slice(0, 150);
 
+const listItems = (value?: string) => value
+  ? value.split(/\r?\n|;/).map((item) => item.trim().replace(/^[-•]\s*/, "")).filter(Boolean)
+  : [];
+
 export async function processImport(payload: ImportPayload) {
   const mode = importModeSchema.parse(payload.mode);
   const databaseUrl = process.env.DATABASE_URL;
@@ -206,16 +210,20 @@ export async function processImport(payload: ImportPayload) {
           publicCode,
           externalId: value.externalId ?? null,
           slug,
-          originalTitle: value.title,
+          originalTitle: value.originalTitle ?? value.title,
           normalizedTitle: value.title,
           companyId: company!.id,
           cityId: city!.id,
           stateId: state!.id,
           categoryId: category?.id ?? null,
+          neighborhood: value.neighborhood ?? null,
           employmentType: value.employmentType,
           workplaceType: value.workplaceType,
-          summary: value.description.slice(0, 500),
+          summary: value.summary ?? value.description.slice(0, 500),
           description: value.description,
+          activities: listItems(value.activities),
+          requirements: listItems(value.requirements),
+          benefits: listItems(value.benefits),
           applicationUrl: value.applyUrl,
           sourceName: value.source,
           sourceUrl: value.sourceUrl ?? null,
@@ -223,11 +231,12 @@ export async function processImport(payload: ImportPayload) {
           duplicateHash,
           verificationStatus: "NEEDS_REVIEW" as const,
           publicationStatus: mode,
-          publishedAt: mode === "PUBLISHED" ? new Date() : null,
+          publishedAt: mode === "PUBLISHED" ? value.publishedAt ?? new Date() : null,
           expiresAt: value.expiresAt,
           salaryMin: value.salaryMin?.toString() ?? null,
           salaryMax: value.salaryMax?.toString() ?? null,
-          salaryVisible: value.salaryMin !== undefined || value.salaryMax !== undefined
+          salaryVisible: value.salaryMin !== undefined || value.salaryMax !== undefined,
+          featured: value.featured ?? false
         };
 
         if (existing && !value.externalId) {

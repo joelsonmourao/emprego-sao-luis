@@ -1,42 +1,25 @@
-import { GetObjectCommand, PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
+import {
+  buildStoragePublicUrl,
+  deleteStorageObject,
+  getStorageObject,
+  isS3Configured,
+  putStorageObject
+} from "@es/storage";
 
-function config() {
-  const bucket = process.env.S3_BUCKET;
-  const endpoint = process.env.S3_ENDPOINT;
-  const accessKeyId = process.env.S3_ACCESS_KEY_ID;
-  const secretAccessKey = process.env.S3_SECRET_ACCESS_KEY;
-  if (!bucket || !endpoint || !accessKeyId || !secretAccessKey) {
-    throw new Error("Armazenamento S3/R2 não configurado.");
-  }
-  return {
-    bucket,
-    client: new S3Client({
-      region: process.env.S3_REGION ?? "auto",
-      endpoint,
-      forcePathStyle: process.env.S3_FORCE_PATH_STYLE === "true",
-      credentials: { accessKeyId, secretAccessKey }
-    })
-  };
-}
-
-export function isStorageConfigured() {
-  return Boolean(
-    process.env.S3_BUCKET &&
-      process.env.S3_ENDPOINT &&
-      process.env.S3_ACCESS_KEY_ID &&
-      process.env.S3_SECRET_ACCESS_KEY
-  );
-}
+export const isStorageConfigured = isS3Configured;
 
 export async function putPrivateObject(key: string, body: Uint8Array, contentType: string) {
-  const { bucket, client } = config();
-  await client.send(
-    new PutObjectCommand({ Bucket: bucket, Key: key, Body: body, ContentType: contentType, ServerSideEncryption: "AES256" })
-  );
+  return putStorageObject(key, body, contentType);
 }
+
 export async function getPrivateObject(key: string) {
-  const { bucket, client } = config();
-  const result = await client.send(new GetObjectCommand({ Bucket: bucket, Key: key }));
-  if (!result.Body) throw new Error("Objeto sem conteúdo.");
-  return result.Body.transformToByteArray();
+  return getStorageObject(key);
+}
+
+export async function deletePrivateObject(key: string) {
+  return deleteStorageObject(key);
+}
+
+export function publicStorageUrl(key: string) {
+  return buildStoragePublicUrl(key);
 }

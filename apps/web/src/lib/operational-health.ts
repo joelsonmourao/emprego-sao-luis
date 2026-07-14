@@ -1,6 +1,7 @@
 import { createDatabase, indexingEvents } from "@es/db";
 import { count, eq, sql } from "drizzle-orm";
 import { indexingIntegrationStatus } from "./indexing";
+import { diagnoseStorage } from "@es/storage";
 
 export type IntegrationState = "healthy" | "degraded" | "not_configured" | "unavailable" | "unknown";
 
@@ -47,7 +48,8 @@ export async function getOperationalHealth() {
   checks.indexNow = stateFrom({ configured: indexing.indexNow.configured, enabled: true });
   checks.meta = stateFrom({ configured: indexing.meta.configured, enabled: true });
   checks.resend = stateFrom({ configured: Boolean(process.env.RESEND_API_KEY && process.env.EMAIL_FROM), enabled: true });
-  checks.storage = stateFrom({ configured: Boolean(process.env.S3_BUCKET && process.env.S3_ACCESS_KEY_ID), enabled: true });
+  const storage = await diagnoseStorage();
+  checks.storage = storage.exists && storage.read && storage.write && storage.delete ? "healthy" : "unavailable";
   checks.sentry = stateFrom({ configured: Boolean(process.env.SENTRY_DSN), enabled: true });
   checks.adsense = stateFrom({ configured: Boolean(process.env.PUBLIC_ADSENSE_CLIENT_ID), enabled: process.env.PUBLIC_ADSENSE_ENABLED === "true" });
 

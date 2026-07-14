@@ -30,3 +30,11 @@ export function shouldRunCommercialPlansSeed(env: Record<string, string | undefi
 export function shouldRunLocationsSeed(env: Record<string, string | undefined>): boolean {
   return isTruthyFlag(env.RUN_SEED_LOCATIONS);
 }
+
+export function shouldRunCategoriesSeed(env: Record<string, string | undefined>): boolean {
+  return isTruthyFlag(env.RUN_SEED_CATEGORIES);
+}
+
+export function shouldRunSystemDefaultsSeed(env: Record<string, string | undefined>): boolean {
+  return isTruthyFlag(env.RUN_SEED_SYSTEM_DEFAULTS);
+}

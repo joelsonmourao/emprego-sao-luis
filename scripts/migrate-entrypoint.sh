@@ -22,9 +22,21 @@ if [ "${RUN_SEED_COMMERCIAL_PLANS:-}" = "true" ]; then
 fi
 
 if [ "${RUN_SEED_LOCATIONS:-}" = "true" ]; then
-  echo "[migrate] Executando seed de localidades e categorias..."
+  echo "[migrate] Executando seed de localidades..."
   npm run db:seed-locations --workspace=@es/db
   echo "[migrate] Seed de localidades concluído."
+fi
+
+if [ "${RUN_SEED_CATEGORIES:-}" = "true" ]; then
+  echo "[migrate] Executando seed de categorias..."
+  npm run db:seed-categories --workspace=@es/db
+  echo "[migrate] Seed de categorias concluído."
+fi
+
+if [ "${RUN_SEED_SYSTEM_DEFAULTS:-}" = "true" ]; then
+  echo "[migrate] Executando seed de padrões estruturais..."
+  npm run db:seed-system-defaults --workspace=@es/db
+  echo "[migrate] Seed de padrões estruturais concluído."
 fi
 
 echo "[migrate] Execução finalizada. Encerrando container."

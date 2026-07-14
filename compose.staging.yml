@@ -40,6 +40,8 @@ services:
       - .env.staging
     ports:
       - "4321:4321"
+    volumes:
+      - uploads_staging:/app/data
     depends_on:
       postgres:
         condition: service_healthy
@@ -52,6 +54,8 @@ services:
       dockerfile: Dockerfile.worker
     env_file:
       - .env.staging
+    volumes:
+      - uploads_staging:/app/data
     depends_on:
       postgres:
         condition: service_healthy
@@ -74,3 +78,4 @@ volumes:
   postgres_staging: {}
   valkey_staging: {}
   minio_staging: {}
+  uploads_staging: {}

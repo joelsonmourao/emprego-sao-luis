@@ -17,6 +17,7 @@
     "test:e2e": "playwright test",
     "lighthouse": "lhci autorun",
     "migration:check": "npm run db:check --workspace=@es/db",
+    "db:audit-schema": "npm run db:audit-schema --workspace=@es/db",
     "format": "prettier --write apps packages docs *.json *.md",
     "format:check": "prettier --check apps packages docs *.json *.md",
     "legacy:dev": "next dev --turbopack",

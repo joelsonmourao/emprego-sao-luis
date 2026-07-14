@@ -63,21 +63,12 @@ const config = batch?.settings as
   | undefined;
 
 const fields: Array<[string, string]> = [
-  ["title", "Título"],
-  ["company", "Empresa"],
-  ["city", "Cidade"],
-  ["state", "UF"],
-  ["description", "Descrição"],
-  ["applyUrl", "URL de candidatura"],
-  ["source", "Fonte"],
-  ["expiresAt", "Validade"],
-  ["externalId", "Código externo"],
-  ["category", "Categoria"],
-  ["sourceUrl", "URL da fonte"],
-  ["employmentType", "Contrato"],
-  ["workplaceType", "Modalidade"],
-  ["salaryMin", "Salário mínimo"],
-  ["salaryMax", "Salário máximo"]
+  ["originalTitle", "Título original"], ["title", "Título público"], ["company", "Empresa"], ["category", "Categoria"],
+  ["city", "Cidade"], ["state", "UF"], ["neighborhood", "Bairro"], ["workplaceType", "Modalidade"],
+  ["employmentType", "Tipo de contratação"], ["description", "Descrição"], ["summary", "Resumo"], ["activities", "Atividades"],
+  ["requirements", "Requisitos"], ["benefits", "Benefícios"], ["salaryMin", "Salário"], ["salaryMax", "Salário máximo"],
+  ["applyUrl", "URL de candidatura"], ["source", "Fonte"], ["sourceUrl", "URL da fonte"], ["publishedAt", "Data de publicação"],
+  ["expiresAt", "Validade"], ["sourceStatus", "Status de origem"], ["featured", "Destaque"], ["externalId", "Código externo"]
 ];
 const requiredFields = ["title", "company", "city", "state", "description", "applyUrl", "source", "expiresAt"];
 const headers = [...new Set(config?.sheets?.flatMap((sheet) => sheet.headers) ?? [])];

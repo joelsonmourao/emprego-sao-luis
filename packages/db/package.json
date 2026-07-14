@@ -13,10 +13,13 @@
     "db:migrate": "drizzle-kit migrate",
     "db:migrate:verified": "drizzle-kit migrate && tsx scripts/report-migrations.ts",
     "db:check": "drizzle-kit check",
+    "db:audit-schema": "tsx scripts/audit-schema.ts",
     "db:seed-rbac": "tsx scripts/seed-rbac.ts",
     "db:seed-commercial-plans": "tsx scripts/seed-commercial-plans.ts",
     "migrate:legacy": "tsx scripts/migrate-legacy.ts",
-    "db:seed-locations": "tsx scripts/seed-locations.ts"
+    "db:seed-locations": "tsx scripts/seed-locations.ts",
+    "db:seed-categories": "tsx scripts/seed-categories.ts",
+    "db:seed-system-defaults": "tsx scripts/seed-system-defaults.ts"
   },
   "dependencies": {
     "bcryptjs": "^3.0.3",
