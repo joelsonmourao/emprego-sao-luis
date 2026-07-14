@@ -41,9 +41,11 @@ describe("auditoria do painel administrativo", () => {
     expect(page).toContain("Importar vagas");
     expect(page).toContain('action="/api/admin/imports"');
     expect(page).toContain("data-admin-download");
+    expect(page).not.toContain("Esta integração ainda não está configurada");
     expect(api).toContain("adminJsonRedirect");
     expect(api).toContain('adminMethodNotAllowed("POST")');
-    expect(api).toContain("isStorageConfigured");
+    expect(api).toContain("getImportStorageInfo");
+    expect(api).toContain("putImportFile");
   });
 
   it("rota legada /admin/importacao redireciona", () => {
