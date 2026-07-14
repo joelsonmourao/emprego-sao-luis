@@ -1,7 +1,7 @@
 ---
 import AdminLayout from "../../../layouts/AdminLayout.astro";
 import { can } from "../../../lib/auth";
-import { isStorageConfigured } from "../../../lib/storage";
+import { getImportStorageInfo } from "../../../lib/import-storage";
 import { createDatabase, importBatches, importMappingTemplates } from "@es/db";
 import { desc, eq } from "drizzle-orm";
 
@@ -81,7 +81,7 @@ const fields: Array<[string, string]> = [
 ];
 const requiredFields = ["title", "company", "city", "state", "description", "applyUrl", "source", "expiresAt"];
 const headers = [...new Set(config?.sheets?.flatMap((sheet) => sheet.headers) ?? [])];
-const storageReady = isStorageConfigured();
+const storage = getImportStorageInfo();
 const steps = [
   { id: "arquivo", label: "1. Arquivo" },
   { id: "mapear", label: "2. Mapear" },
@@ -104,6 +104,7 @@ const steps = [
   <h1 class="mt-3 text-3xl font-black">Importar vagas</h1>
   <p class="mt-2 max-w-3xl text-[var(--text-secondary)]">
     Envie a planilha, revise o mapeamento, valide os dados e só então confirme a importação.
+    Armazenamento: <strong>{storage.mode === "s3" ? "R2/S3" : "volume local"}</strong>.
   </p>
 
   {loadError && (
@@ -112,9 +113,9 @@ const steps = [
     </p>
   )}
 
-  {!storageReady && (
-    <p class="mt-4 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900" role="status">
-      Esta integração ainda não está configurada. Configure o armazenamento S3/R2 antes de importar planilhas.
+  {storage.mode === "volume" && (
+    <p class="mt-4 rounded-xl border border-sky-200 bg-sky-50 px-4 py-3 text-sm text-sky-900" role="status">
+      Arquivos serão guardados no volume persistente{storage.path ? ` (${storage.path})` : ""}. Configure R2/S3 para produção em escala.
     </p>
   )}
 
@@ -247,7 +248,7 @@ const steps = [
             <option value="PUBLISHED">Publicar após validação</option>
           </select>
         </label>
-        <button class="rounded-xl bg-red-700 p-4 font-bold text-white disabled:opacity-50" type="submit" disabled={!storageReady}>
+        <button class="rounded-xl bg-red-700 p-4 font-bold text-white" type="submit">
           Analisar arquivo
         </button>
       </form>

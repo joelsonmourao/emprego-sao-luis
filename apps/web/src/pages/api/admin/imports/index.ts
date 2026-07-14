@@ -6,7 +6,7 @@ import { eq } from "drizzle-orm";
 import { can } from "../../../../lib/auth";
 import { adminJsonError, adminJsonRedirect, adminMethodNotAllowed } from "../../../../lib/admin-api-response";
 import { logServerError } from "../../../../lib/server-error";
-import { isStorageConfigured, putPrivateObject } from "../../../../lib/storage";
+import { getImportStorageInfo, putImportFile } from "../../../../lib/import-storage";
 import * as XLSX from "xlsx";
 
 const MAX_BYTES = 20 * 1024 * 1024;
@@ -46,11 +46,10 @@ export const POST: APIRoute = async ({ request, locals }) => {
   if (!process.env.DATABASE_URL) {
     return adminJsonError("Banco de dados indisponível.", 503);
   }
-  if (!isStorageConfigured()) {
-    return adminJsonError("Armazenamento ainda não está configurado.", 503, {
-      code: "STORAGE_UNAVAILABLE",
-      details: ["Configure S3/R2 no ambiente antes de importar planilhas."]
-    });
+
+  const storage = getImportStorageInfo();
+  if (!storage.ready) {
+    return adminJsonError("Armazenamento indisponível.", 503);
   }
 
   const connection = createDatabase(process.env.DATABASE_URL);
@@ -84,10 +83,10 @@ export const POST: APIRoute = async ({ request, locals }) => {
     }
 
     try {
-      await putPrivateObject(storageKey, bytes, file.type || "application/octet-stream");
+      await putImportFile(storageKey, bytes, file.type || "application/octet-stream");
     } catch (error) {
       logServerError("route:/api/admin/imports:storage", error);
-      return adminJsonError("Armazenamento indisponível.", 503, { code: "STORAGE_UNAVAILABLE" });
+      return adminJsonError("Não foi possível armazenar o arquivo.", 503, { code: "STORAGE_UNAVAILABLE" });
     }
 
     const first = sheets[0]!;

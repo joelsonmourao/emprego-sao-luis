@@ -7,6 +7,7 @@ import { can } from "../../../../../lib/auth";
 import { adminJsonError, adminJsonRedirect, adminMethodNotAllowed } from "../../../../../lib/admin-api-response";
 import { logServerError } from "../../../../../lib/server-error";
 import { createImportQueue } from "../../../../../lib/queue";
+import { processImport } from "../../../../../lib/import-processor";
 
 const fields = [
   "externalId",
@@ -116,6 +117,8 @@ export const POST: APIRoute = async ({ params, request, locals, clientAddress })
     });
 
     let queueWarning: string | undefined;
+    let processedInline = false;
+
     if (process.env.REDIS_URL) {
       try {
         const queue = createImportQueue();
@@ -137,13 +140,31 @@ export const POST: APIRoute = async ({ params, request, locals, clientAddress })
         }
       } catch (error) {
         logServerError("route:/api/admin/imports/configure:queue", error);
-        queueWarning = "Fila indisponível. O lote foi salvo, mas o processamento automático não iniciou.";
+        queueWarning = "Fila indisponível. Processando o lote nesta requisição.";
       }
-    } else {
-      queueWarning = "Fila não configurada. O lote foi salvo para processamento manual.";
     }
 
-    return adminJsonRedirect(`/admin/vagas/importar?batch=${batch.id}&step=acompanhar`, queueWarning ? { warning: queueWarning } : {});
+    if (!process.env.REDIS_URL || queueWarning) {
+      try {
+        await processImport({
+          batchId: batch.id,
+          storageKey: current.data.storageKey,
+          mode: mode.data,
+          sheetName: sheetName.data,
+          mapping: mapping.data,
+          duplicateStrategy: duplicateStrategy.data
+        });
+        processedInline = true;
+        queueWarning = undefined;
+      } catch (error) {
+        logServerError("route:/api/admin/imports/configure:sync", error);
+        if (!queueWarning) {
+          queueWarning = "Não foi possível processar o lote automaticamente. Tente novamente em Operação.";
+        }
+      }
+    }
+
+    return adminJsonRedirect(`/admin/vagas/importar?batch=${batch.id}&step=${processedInline ? "resultado" : "acompanhar"}`, queueWarning ? { warning: queueWarning } : {});
   } catch (error) {
     logServerError("route:/api/admin/imports/configure", error);
     return adminJsonError("Não foi possível validar o lote.", 500);

@@ -3,7 +3,7 @@ import { and, eq, sql } from "drizzle-orm";
 import { categories, cities, companies, createDatabase, importBatches, importRows, indexingEvents, jobs, states } from "@es/db";
 import { importJobRowSchema, importModeSchema, normalizeImportRow } from "@es/shared";
 import * as XLSX from "xlsx";
-import { getPrivateObject } from "./storage.js";
+import { getImportFile } from "./import-storage.js";
 
 interface ImportPayload { batchId: string; storageKey: string; mode: string; sheetName?: string; mapping?: Record<string, string>; duplicateStrategy?: "IGNORE" | "UPDATE" | "CREATE_NEW" }
 const slugify = (value: string) => value.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 150);
@@ -11,7 +11,7 @@ export async function processImport(payload: ImportPayload) {
   const mode = importModeSchema.parse(payload.mode); const databaseUrl = process.env.DATABASE_URL; if (!databaseUrl) throw new Error("DATABASE_URL não configurada.");
   const connection = createDatabase(databaseUrl); await connection.db.update(importBatches).set({ status: "PROCESSING", updatedAt: new Date() }).where(eq(importBatches.id, payload.batchId));
   try {
-    const bytes = await getPrivateObject(payload.storageKey); const workbook = XLSX.read(bytes, { type: "array", cellDates: true });
+    const bytes = await getImportFile(payload.storageKey); const workbook = XLSX.read(bytes, { type: "array", cellDates: true });
     const selectedSheets = payload.sheetName ? workbook.SheetNames.filter((name) => name === payload.sheetName) : workbook.SheetNames;
     if (!selectedSheets.length) throw new Error(`Aba não encontrada: ${payload.sheetName}`);
     const rawRows: Array<Record<string, unknown>> = selectedSheets.flatMap((sheetName) => { const sheet = workbook.Sheets[sheetName]; return sheet ? XLSX.utils.sheet_to_json<Record<string, unknown>>(sheet, { defval: "" }).map((row) => ({ ...row, __sheet: sheetName } as Record<string, unknown>)) : []; });
