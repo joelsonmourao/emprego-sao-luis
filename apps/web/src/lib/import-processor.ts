@@ -11,7 +11,7 @@ import {
   jobs,
   states
 } from "@es/db";
-import { importJobRowSchema, importModeSchema, normalizeImportRow } from "@es/shared";
+import { consolidateJobContent, importJobRowSchema, importModeSchema, normalizeImportRow } from "@es/shared";
 import * as XLSX from "xlsx";
 import { getImportFile } from "./import-storage";
 
@@ -22,6 +22,7 @@ export interface ImportPayload {
   sheetName?: string;
   mapping?: Record<string, string>;
   duplicateStrategy?: "IGNORE" | "UPDATE" | "CREATE_NEW";
+  requestId?: string;
 }
 
 const slugify = (value: string) =>
@@ -33,16 +34,21 @@ const slugify = (value: string) =>
     .replace(/^-|-$/g, "")
     .slice(0, 150);
 
-const listItems = (value?: string) => value
-  ? value.split(/\r?\n|;/).map((item) => item.trim().replace(/^[-•]\s*/, "")).filter(Boolean)
-  : [];
-
 export async function processImport(payload: ImportPayload) {
   const mode = importModeSchema.parse(payload.mode);
   const databaseUrl = process.env.DATABASE_URL;
   if (!databaseUrl) throw new Error("DATABASE_URL não configurada.");
 
   const connection = createDatabase(databaseUrl);
+  const [currentBatch] = await connection.db
+    .select()
+    .from(importBatches)
+    .where(eq(importBatches.id, payload.batchId))
+    .limit(1);
+  if (!currentBatch) {
+    await connection.close();
+    throw new Error("Lote de importação não encontrado.");
+  }
   await connection.db
     .update(importBatches)
     .set({ status: "PROCESSING", updatedAt: new Date() })
@@ -59,15 +65,18 @@ export async function processImport(payload: ImportPayload) {
     const rawRows: Array<Record<string, unknown>> = selectedSheets.flatMap((sheetName) => {
       const sheet = workbook.Sheets[sheetName];
       return sheet
-        ? XLSX.utils.sheet_to_json<Record<string, unknown>>(sheet, { defval: "" }).map(
-            (row) => ({ ...row, __sheet: sheetName }) as Record<string, unknown>
-          )
+        ? XLSX.utils
+            .sheet_to_json<Record<string, unknown>>(sheet, { defval: "" })
+            .map((row) => ({ ...row, __sheet: sheetName }) as Record<string, unknown>)
         : [];
     });
+    if (rawRows.length === 0) throw new Error("A planilha não contém linhas de dados.");
 
     await connection.db.delete(importRows).where(eq(importRows.batchId, payload.batchId));
     let validRows = 0;
     let rejectedRows = 0;
+    const consolidatedSections = new Set<string>();
+    let duplicateContentItemsRemoved = 0;
 
     for (const [position, raw] of rawRows.entries()) {
       const normalized = payload.mapping
@@ -88,6 +97,15 @@ export async function processImport(payload: ImportPayload) {
       }
 
       const value = parsed.data;
+      const content = consolidateJobContent({
+        description: value.description,
+        summary: value.summary,
+        activities: value.activities,
+        requirements: value.requirements,
+        benefits: value.benefits
+      });
+      content.report.sectionsMerged.forEach((section) => consolidatedSections.add(section));
+      duplicateContentItemsRemoved += content.report.duplicateItemsRemoved;
       const [company] = await connection.db
         .select()
         .from(companies)
@@ -121,7 +139,7 @@ export async function processImport(payload: ImportPayload) {
           batchId: payload.batchId,
           rowNumber: position + 2,
           raw,
-          normalized: value,
+          normalized: { ...value, _consolidation: content.report },
           errors: relationErrors,
           action: "REJECTED"
         });
@@ -188,6 +206,7 @@ export async function processImport(payload: ImportPayload) {
             normalizedTitle: existing.normalizedTitle,
             summary: existing.summary,
             description: existing.description,
+            descriptionHtml: existing.descriptionHtml,
             employmentType: existing.employmentType,
             workplaceType: existing.workplaceType,
             applicationUrl: existing.applicationUrl,
@@ -203,7 +222,9 @@ export async function processImport(payload: ImportPayload) {
         : null;
 
       const job = await connection.db.transaction(async (tx) => {
-        const [sequence] = await tx.execute(sql<{ value: string }>`select nextval('es_job_public_code_seq')::text as value`);
+        const [sequence] = await tx.execute(
+          sql<{ value: string }>`select nextval('es_job_public_code_seq')::text as value`
+        );
         const publicCode = `ES-${String(sequence?.value ?? "0").padStart(6, "0")}`;
         const slug = `${slugify(`${value.title}-${value.company}-${value.city}`)}-${duplicateHash.slice(0, 8)}`;
         const row = {
@@ -219,11 +240,12 @@ export async function processImport(payload: ImportPayload) {
           neighborhood: value.neighborhood ?? null,
           employmentType: value.employmentType,
           workplaceType: value.workplaceType,
-          summary: value.summary ?? value.description.slice(0, 500),
-          description: value.description,
-          activities: listItems(value.activities),
-          requirements: listItems(value.requirements),
-          benefits: listItems(value.benefits),
+          summary: content.summary,
+          description: content.plainText,
+          descriptionHtml: content.descriptionHtml,
+          activities: [],
+          requirements: [],
+          benefits: [],
           applicationUrl: value.applyUrl,
           sourceName: value.source,
           sourceUrl: value.sourceUrl ?? null,
@@ -231,7 +253,7 @@ export async function processImport(payload: ImportPayload) {
           duplicateHash,
           verificationStatus: "NEEDS_REVIEW" as const,
           publicationStatus: mode,
-          publishedAt: mode === "PUBLISHED" ? value.publishedAt ?? new Date() : null,
+          publishedAt: mode === "PUBLISHED" ? (value.publishedAt ?? new Date()) : null,
           expiresAt: value.expiresAt,
           salaryMin: value.salaryMin?.toString() ?? null,
           salaryMax: value.salaryMax?.toString() ?? null,
@@ -260,7 +282,12 @@ export async function processImport(payload: ImportPayload) {
             .values(row)
             .onConflictDoUpdate({
               target: [jobs.externalId, jobs.sourceName],
-              set: { ...row, publicCode: sql`${jobs.publicCode}`, slug: sql`${jobs.slug}`, updatedAt: new Date() }
+              set: {
+                ...row,
+                publicCode: sql`${jobs.publicCode}`,
+                slug: sql`${jobs.slug}`,
+                updatedAt: new Date()
+              }
             })
             .returning();
           return saved;
@@ -275,7 +302,7 @@ export async function processImport(payload: ImportPayload) {
         batchId: payload.batchId,
         rowNumber: position + 2,
         raw,
-        normalized: value,
+        normalized: { ...value, _consolidation: content.report },
         errors: [],
         action: existing ? "UPDATED" : "CREATED",
         beforeSnapshot,
@@ -283,7 +310,10 @@ export async function processImport(payload: ImportPayload) {
       });
 
       if (mode === "PUBLISHED" && job) {
-        const url = new URL(`/vagas/${job.slug}`, process.env.SITE_URL ?? "https://empregossaoluis.com.br").toString();
+        const url = new URL(
+          `/vagas/${job.slug}`,
+          process.env.SITE_URL ?? "https://empregossaoluis.com.br"
+        ).toString();
         await connection.db
           .insert(indexingEvents)
           .values([
@@ -313,6 +343,23 @@ export async function processImport(payload: ImportPayload) {
         totalRows: rawRows.length,
         validRows,
         rejectedRows,
+        settings: {
+          ...(typeof currentBatch.settings === "object" && currentBatch.settings
+            ? currentBatch.settings
+            : {}),
+          stage: mode === "DRY_RUN" ? "VALIDATED" : "IMPORTED",
+          mode,
+          analysisValid: mode === "DRY_RUN" ? validRows > 0 : true,
+          analysis: {
+            totalRows: rawRows.length,
+            validRows,
+            rejectedRows,
+            consolidation: {
+              sectionsMerged: [...consolidatedSections],
+              duplicateItemsRemoved: duplicateContentItemsRemoved
+            }
+          }
+        },
         updatedAt: new Date()
       })
       .where(eq(importBatches.id, payload.batchId));
@@ -324,13 +371,18 @@ export async function processImport(payload: ImportPayload) {
       .set({
         status: "FAILED",
         settings: {
+          ...(typeof currentBatch.settings === "object" && currentBatch.settings
+            ? currentBatch.settings
+            : {}),
           stage: "FAILED",
           storageKey: payload.storageKey,
           mode,
           sheetName: payload.sheetName,
           mapping: payload.mapping,
           duplicateStrategy: payload.duplicateStrategy,
-          error: error instanceof Error ? error.message : "Erro desconhecido"
+          error: error instanceof Error ? error.message : "Erro desconhecido",
+          failureRequestId: payload.requestId ?? null,
+          failedAt: new Date().toISOString()
         },
         updatedAt: new Date()
       })

@@ -4,7 +4,11 @@ import { importModeSchema } from "@es/shared";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
 import { can } from "../../../../../lib/auth";
-import { adminJsonError, adminJsonRedirect, adminMethodNotAllowed } from "../../../../../lib/admin-api-response";
+import {
+  adminJsonError,
+  adminJsonRedirect,
+  adminMethodNotAllowed
+} from "../../../../../lib/admin-api-response";
 import { logServerError } from "../../../../../lib/server-error";
 import { createImportQueue } from "../../../../../lib/queue";
 import { processImport } from "../../../../../lib/import-processor";
@@ -35,7 +39,22 @@ const fields = [
   "salaryMin",
   "salaryMax"
 ] as const;
-const mappingSchema = z.record(z.enum(fields), z.string().min(1));
+const requiredFields = [
+  "title",
+  "company",
+  "city",
+  "state",
+  "description",
+  "applyUrl",
+  "source",
+  "expiresAt"
+] as const;
+const mappingSchema = z.record(z.enum(fields), z.string().min(1)).superRefine((mapping, context) => {
+  for (const field of requiredFields) {
+    if (!mapping[field])
+      context.addIssue({ code: "custom", path: [field], message: `Mapeie o campo obrigatório ${field}.` });
+  }
+});
 const settingsSchema = z.object({
   storageKey: z.string(),
   sheets: z.array(
@@ -57,7 +76,9 @@ export const POST: APIRoute = async ({ params, request, locals, clientAddress })
   const form = await request.formData();
   const mode = importModeSchema.exclude(["DRY_RUN"]).or(z.literal("DRY_RUN")).safeParse(form.get("mode"));
   const sheetName = z.string().min(1).safeParse(form.get("sheetName"));
-  const duplicateStrategy = z.enum(["IGNORE", "UPDATE", "CREATE_NEW"]).safeParse(form.get("duplicateStrategy"));
+  const duplicateStrategy = z
+    .enum(["IGNORE", "UPDATE", "CREATE_NEW"])
+    .safeParse(form.get("duplicateStrategy"));
   const mapping = mappingSchema.safeParse(
     Object.fromEntries(
       fields.flatMap((field) => {
@@ -75,16 +96,27 @@ export const POST: APIRoute = async ({ params, request, locals, clientAddress })
 
   const connection = createDatabase(process.env.DATABASE_URL);
   try {
-    const [batch] = await connection.db.select().from(importBatches).where(eq(importBatches.id, params.id)).limit(1);
+    const [batch] = await connection.db
+      .select()
+      .from(importBatches)
+      .where(eq(importBatches.id, params.id))
+      .limit(1);
     const current = settingsSchema.safeParse(batch?.settings);
-    if (!batch || !current.success || !current.data.sheets.some((sheet) => sheet.name === sheetName.data)) {
+    if (
+      !batch ||
+      !current.success ||
+      ["FAILED", "CANCELLED", "PROCESSING"].includes(batch.status) ||
+      !current.data.sheets.some((sheet) => sheet.name === sheetName.data)
+    ) {
       return adminJsonError("Lote indisponível.", 409);
     }
 
     const settings = {
       ...(typeof batch.settings === "object" && batch.settings ? batch.settings : {}),
-      stage: "QUEUED",
-      mode: mode.data,
+      stage: "QUEUED_VALIDATION",
+      mode: "DRY_RUN",
+      targetMode: mode.data === "DRY_RUN" ? "DRAFT" : mode.data,
+      analysisValid: false,
       sheetName: sheetName.data,
       mapping: mapping.data,
       duplicateStrategy: duplicateStrategy.data
@@ -137,10 +169,11 @@ export const POST: APIRoute = async ({ params, request, locals, clientAddress })
             {
               batchId: batch.id,
               storageKey: current.data.storageKey,
-              mode: mode.data,
+              mode: "DRY_RUN",
               sheetName: sheetName.data,
               mapping: mapping.data,
-              duplicateStrategy: duplicateStrategy.data
+              duplicateStrategy: duplicateStrategy.data,
+              requestId: locals.requestId ?? undefined
             },
             { jobId: `${batch.id}-${Date.now()}`, attempts: 5, backoff: { type: "exponential", delay: 5000 } }
           );
@@ -158,10 +191,11 @@ export const POST: APIRoute = async ({ params, request, locals, clientAddress })
         await processImport({
           batchId: batch.id,
           storageKey: current.data.storageKey,
-          mode: mode.data,
+          mode: "DRY_RUN",
           sheetName: sheetName.data,
           mapping: mapping.data,
-          duplicateStrategy: duplicateStrategy.data
+          duplicateStrategy: duplicateStrategy.data,
+          ...(locals.requestId ? { requestId: locals.requestId } : {})
         });
         processedInline = true;
         queueWarning = undefined;
@@ -173,7 +207,12 @@ export const POST: APIRoute = async ({ params, request, locals, clientAddress })
       }
     }
 
-    return adminJsonRedirect(`/admin/vagas/importar?batch=${batch.id}&step=${processedInline ? "resultado" : "acompanhar"}`, queueWarning ? { warning: queueWarning } : {});
+    return adminJsonRedirect(
+      `/admin/vagas/importar?batch=${batch.id}&step=${processedInline ? "resultado" : "acompanhar"}`,
+      queueWarning
+        ? { warning: queueWarning }
+        : { message: "Validação concluída. Confirme antes de importar." }
+    );
   } catch (error) {
     logServerError("route:/api/admin/imports/configure", error);
     return adminJsonError("Não foi possível validar o lote.", 500);

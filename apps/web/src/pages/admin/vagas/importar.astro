@@ -16,7 +16,7 @@ const reused = Astro.url.searchParams.get("reused") === "1";
 
 let batch: (typeof importBatches.$inferSelect) | null = null;
 let templates: Array<{ id: string; name: string }> = [];
-let history: Array<{ id: string; fileName: string; status: string; createdAt: Date | null; totalRows: number; validRows: number; rejectedRows: number }> = [];
+let history: Array<{ id: string; fileName: string; status: string; createdAt: Date | null; totalRows: number; validRows: number; rejectedRows: number; settings: unknown }> = [];
 let loadError: string | null = null;
 
 if (process.env.DATABASE_URL) {
@@ -37,7 +37,8 @@ if (process.env.DATABASE_URL) {
         createdAt: importBatches.createdAt,
         totalRows: importBatches.totalRows,
         validRows: importBatches.validRows,
-        rejectedRows: importBatches.rejectedRows
+        rejectedRows: importBatches.rejectedRows,
+        settings: importBatches.settings
       })
       .from(importBatches)
       .orderBy(desc(importBatches.createdAt))
@@ -59,6 +60,10 @@ const config = batch?.settings as
       sheets?: Array<{ name: string; headers: string[]; preview: Array<Record<string, unknown>> }>;
       sheetName?: string;
       mapping?: Record<string, string>;
+      error?: string;
+      failureRequestId?: string | null;
+      analysisValid?: boolean;
+      analysis?: { consolidation?: { sectionsMerged?: string[]; duplicateItemsRemoved?: number } };
     }
   | undefined;
 
@@ -191,33 +196,47 @@ const steps = [
     <section class="mt-8 rounded-2xl border border-[var(--brand-border)] bg-white p-6">
       <h2 class="text-xl font-black">Lote {batch.fileName}</h2>
       <p class="mt-2 text-sm">Status: <strong>{batch.status}</strong></p>
+      {config?.stage === "FAILED" && (
+        <div class="mt-4 rounded-xl border border-rose-200 bg-rose-50 p-4 text-sm text-rose-950" role="alert">
+          <p><strong>Falha:</strong> {config.error || "A causa não foi registrada."}</p>
+          {config.failureRequestId && <p class="mt-1 font-mono text-xs">Referência: {config.failureRequestId}</p>}
+          <form class="mt-3" method="post" action={`/api/admin/imports/${batch.id}/retry`}>
+            <button class="rounded-lg bg-rose-800 px-4 py-2 font-bold text-white" type="submit">Criar nova tentativa</button>
+          </form>
+        </div>
+      )}
       <dl class="mt-4 grid grid-cols-3 gap-4">
         <div><dt class="text-sm text-[var(--text-secondary)]">Total</dt><dd class="text-2xl font-bold">{batch.totalRows}</dd></div>
         <div><dt class="text-sm text-[var(--text-secondary)]">Válidas</dt><dd class="text-2xl font-bold text-green-700">{batch.validRows}</dd></div>
         <div><dt class="text-sm text-[var(--text-secondary)]">Rejeitadas</dt><dd class="text-2xl font-bold text-red-700">{batch.rejectedRows}</dd></div>
       </dl>
       <div class="mt-5 flex flex-wrap gap-3">
-        <a
+        {batch.status === "COMPLETED" && batch.rejectedRows > 0 && <a
           class="rounded-lg border px-4 py-2 font-bold"
           href={`/api/admin/imports/${batch.id}/rejected.csv`}
           data-admin-download
           data-filename={`rejeitadas-${batch.id}.csv`}
         >
           Baixar rejeitadas
-        </a>
-        <form method="post" action={`/api/admin/imports/${batch.id}/execute`}>
+        </a>}
+        {batch.status === "COMPLETED" && config?.stage === "VALIDATED" && config.analysisValid && batch.validRows > 0 && <form method="post" action={`/api/admin/imports/${batch.id}/execute`}>
           <select class="rounded-l-lg border p-2" name="mode">
             <option value="DRAFT">Importar rascunhos</option>
             <option value="PENDING_REVIEW">Enviar para revisão</option>
           </select>
           <button class="rounded-r-lg bg-slate-950 p-2 text-white" type="submit">Executar lote validado</button>
-        </form>
-        {batch.status === "COMPLETED" && !batch.undoneAt && (
+        </form>}
+        {batch.status === "COMPLETED" && config?.stage === "IMPORTED" && !batch.undoneAt && (
           <form method="post" action={`/api/admin/imports/${batch.id}/undo`}>
             <button class="rounded-lg border border-red-300 px-4 py-2 text-red-700" type="submit">Desfazer lote</button>
           </form>
         )}
       </div>
+      {config?.analysis?.consolidation && (
+        <p class="mt-4 rounded-lg bg-slate-50 p-3 text-xs text-slate-700">
+          Conteúdo consolidado: {(config.analysis.consolidation.sectionsMerged ?? []).join(", ") || "descrição"}; duplicações removidas: {config.analysis.consolidation.duplicateItemsRemoved ?? 0}.
+        </p>
+      )}
     </section>
   )}
 
@@ -268,7 +287,7 @@ const steps = [
             {history.map((item) => (
               <tr class="border-t border-[var(--brand-border)]">
                 <td class="px-4 py-3 font-semibold">{item.fileName}</td>
-                <td class="px-4 py-3">{item.status}</td>
+                <td class="px-4 py-3">{item.status}{typeof item.settings === "object" && item.settings && "stage" in item.settings ? ` · ${String(item.settings.stage)}` : ""}</td>
                 <td class="px-4 py-3">{item.validRows}/{item.totalRows} válidas · {item.rejectedRows} rejeitadas</td>
                 <td class="px-4 py-3">{item.createdAt ? item.createdAt.toLocaleString("pt-BR") : "—"}</td>
                 <td class="px-4 py-3"><a class="font-bold text-red-700" href={`/admin/vagas/importar?batch=${item.id}&step=acompanhar`}>Abrir</a></td>

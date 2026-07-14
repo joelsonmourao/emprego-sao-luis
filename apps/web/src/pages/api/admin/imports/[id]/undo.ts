@@ -3,7 +3,11 @@ import { z } from "zod";
 import { auditLogs, createDatabase, importBatches, importRows, jobs } from "@es/db";
 import { and, eq, sql } from "drizzle-orm";
 import { can } from "../../../../../lib/auth";
-import { adminJsonError, adminJsonRedirect, adminMethodNotAllowed } from "../../../../../lib/admin-api-response";
+import {
+  adminJsonError,
+  adminJsonRedirect,
+  adminMethodNotAllowed
+} from "../../../../../lib/admin-api-response";
 import { logServerError } from "../../../../../lib/server-error";
 
 const snapshotSchema = z.object({
@@ -11,6 +15,7 @@ const snapshotSchema = z.object({
   normalizedTitle: z.string(),
   summary: z.string(),
   description: z.string(),
+  descriptionHtml: z.string(),
   employmentType: z.string(),
   workplaceType: z.string(),
   applicationUrl: z.string(),
@@ -45,7 +50,11 @@ export const POST: APIRoute = async ({ params, locals }) => {
 
   const connection = createDatabase(process.env.DATABASE_URL);
   try {
-    const [batch] = await connection.db.select().from(importBatches).where(eq(importBatches.id, params.id)).limit(1);
+    const [batch] = await connection.db
+      .select()
+      .from(importBatches)
+      .where(eq(importBatches.id, params.id))
+      .limit(1);
     if (!batch || batch.undoneAt || batch.status !== "COMPLETED") {
       return adminJsonError("Lote não pode ser desfeito.", 409);
     }

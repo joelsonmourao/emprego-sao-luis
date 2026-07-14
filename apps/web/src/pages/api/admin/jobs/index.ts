@@ -1,7 +1,16 @@
 import { createHash } from "node:crypto";
 import type { APIRoute } from "astro";
-import { jobDraftSchema } from "@es/shared";
-import { auditLogs, categories, cities, companies, createDatabase, indexingEvents, jobs, states } from "@es/db";
+import { consolidateJobContent, jobDraftSchema, UNIDENTIFIED_COMPANY_ID } from "@es/shared";
+import {
+  auditLogs,
+  categories,
+  cities,
+  companies,
+  createDatabase,
+  indexingEvents,
+  jobs,
+  states
+} from "@es/db";
 import { eq, sql } from "drizzle-orm";
 import { can } from "../../../../lib/auth";
 import { adminJsonError, adminJsonRedirect, adminMethodNotAllowed } from "../../../../lib/admin-api-response";
@@ -35,15 +44,37 @@ export const POST: APIRoute = async ({ request, locals }) => {
 
   const connection = createDatabase(process.env.DATABASE_URL);
   try {
+    const content = consolidateJobContent({ descriptionHtml: parsed.data.descriptionHtml });
+    const unidentifiedCompany = parsed.data.companyId === UNIDENTIFIED_COMPANY_ID;
     const [[city], [state], [company], categoryRows] = await Promise.all([
-      connection.db.select({ name: cities.name, stateId: cities.stateId }).from(cities).where(eq(cities.id, parsed.data.cityId)).limit(1),
-      connection.db.select({ code: states.code }).from(states).where(eq(states.id, parsed.data.stateId)).limit(1),
-      connection.db.select({ id: companies.id }).from(companies).where(eq(companies.id, parsed.data.companyId)).limit(1),
-      parsed.data.categoryId ? connection.db.select({ id: categories.id }).from(categories).where(eq(categories.id, parsed.data.categoryId)).limit(1) : Promise.resolve([])
+      connection.db
+        .select({ name: cities.name, stateId: cities.stateId })
+        .from(cities)
+        .where(eq(cities.id, parsed.data.cityId))
+        .limit(1),
+      connection.db
+        .select({ code: states.code })
+        .from(states)
+        .where(eq(states.id, parsed.data.stateId))
+        .limit(1),
+      connection.db
+        .select({ id: companies.id })
+        .from(companies)
+        .where(eq(companies.id, parsed.data.companyId))
+        .limit(1),
+      parsed.data.categoryId
+        ? connection.db
+            .select({ id: categories.id })
+            .from(categories)
+            .where(eq(categories.id, parsed.data.categoryId))
+            .limit(1)
+        : Promise.resolve([])
     ]);
-    if (!city || !state || city.stateId !== parsed.data.stateId) return adminJsonError("Cidade e estado não correspondem.", 422, { code: "LOCATION_MISMATCH" });
+    if (!city || !state || city.stateId !== parsed.data.stateId)
+      return adminJsonError("Cidade e estado não correspondem.", 422, { code: "LOCATION_MISMATCH" });
     if (!company) return adminJsonError("Empresa não encontrada.", 422, { code: "COMPANY_NOT_FOUND" });
-    if (parsed.data.categoryId && !categoryRows[0]) return adminJsonError("Categoria não encontrada.", 422, { code: "CATEGORY_NOT_FOUND" });
+    if (parsed.data.categoryId && !categoryRows[0])
+      return adminJsonError("Categoria não encontrada.", 422, { code: "CATEGORY_NOT_FOUND" });
 
     const slug = await resolveRequestedJobSlug(
       connection.db,
@@ -54,7 +85,9 @@ export const POST: APIRoute = async ({ request, locals }) => {
     );
 
     const created = await connection.db.transaction(async (tx) => {
-      const [sequence] = await tx.execute(sql<{ value: string }>`select nextval('es_job_public_code_seq')::text as value`);
+      const [sequence] = await tx.execute(
+        sql<{ value: string }>`select nextval('es_job_public_code_seq')::text as value`
+      );
       const publicCode = `ES-${String(sequence?.value ?? "0").padStart(6, "0")}`;
       const duplicateHash = createHash("sha256")
         .update(`${parsed.data.normalizedTitle}|${parsed.data.companyId}|${parsed.data.cityId}`)
@@ -64,6 +97,15 @@ export const POST: APIRoute = async ({ request, locals }) => {
         .insert(jobs)
         .values({
           ...parsed.data,
+          descriptionHtml: content.descriptionHtml,
+          description: content.plainText,
+          summary: content.summary,
+          activities: [],
+          requirements: [],
+          benefits: [],
+          additionalInfo: null,
+          confidentialCompany: unidentifiedCompany || parsed.data.confidentialCompany,
+          unidentifiedCompany,
           slug,
           publicCode,
           categoryId: parsed.data.categoryId ?? null,
@@ -94,7 +136,10 @@ export const POST: APIRoute = async ({ request, locals }) => {
       });
 
       if (job.publicationStatus === "PUBLISHED") {
-        const url = new URL(`/vagas/${job.slug}`, process.env.SITE_URL ?? "https://empregossaoluis.com.br").toString();
+        const url = new URL(
+          `/vagas/${job.slug}`,
+          process.env.SITE_URL ?? "https://empregossaoluis.com.br"
+        ).toString();
         await tx
           .insert(indexingEvents)
           .values([

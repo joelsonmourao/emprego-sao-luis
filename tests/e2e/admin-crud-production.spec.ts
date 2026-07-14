@@ -91,20 +91,32 @@ test.describe.serial("CRUD administrativo no build de produção", () => {
     const authorPayload = await envelope<{ author: { id: string; name: string; slug: string } }>(
       await page.request.post("/api/admin/authors", {
         headers: { origin },
-        form: { name: `Autor E2E ${suffix}`, slug: `autor-e2e-${suffix}`, bio: "Autor criado pelo teste protegido.", returnTo: "json" }
+        form: {
+          name: `Autor E2E ${suffix}`,
+          slug: `autor-e2e-${suffix}`,
+          bio: "Autor criado pelo teste protegido.",
+          returnTo: "json"
+        }
       })
     );
     const author = authorPayload.data!.author;
     await envelope(
       await page.request.post(`/api/admin/authors/${author.id}`, {
         headers: { origin },
-        form: { action: "UPDATE", name: `${author.name} Editado`, slug: author.slug, bio: "Biografia atualizada pelo fluxo E2E." }
+        form: {
+          action: "UPDATE",
+          name: `${author.name} Editado`,
+          slug: author.slug,
+          bio: "Biografia atualizada pelo fluxo E2E."
+        }
       })
     );
 
     const image = await sharp({
-      create: { width: 24, height: 24, channels: 4, background: { r: 185, g: 28, b: 28, alpha: 1 } }
-    }).png().toBuffer();
+      create: { width: 1600, height: 900, channels: 4, background: { r: 185, g: 28, b: 28, alpha: 1 } }
+    })
+      .png()
+      .toBuffer();
     const mediaPayload = await envelope<{ asset: { id: string; url: string } }>(
       await page.request.post("/api/admin/media", {
         headers: { origin },
@@ -137,12 +149,8 @@ test.describe.serial("CRUD administrativo no build de produção", () => {
           neighborhood: "Centro",
           employmentType: "CLT",
           workplaceType: "hibrido",
-          summary: "Resumo completo da vaga criada pelo teste E2E do painel administrativo.",
-          description: "Descrição completa da oportunidade criada pelo teste E2E, com atividades, requisitos, benefícios e instruções de candidatura.",
-          activities: "Atender usuários\nDocumentar chamados",
-          requirements: "Boa comunicação\nOrganização",
-          benefits: "Vale-transporte\nPlano de saúde",
-          additionalInfo: "Cadastro temporário e protegido.",
+          descriptionHtml:
+            "<p>Descrição completa da oportunidade criada pelo teste E2E, com atividades, requisitos, benefícios e instruções de candidatura.</p><h2>Atividades</h2><ul><li>Atender usuários</li><li>Documentar chamados</li></ul><h2>Requisitos e benefícios</h2><p>Boa comunicação, organização, vale-transporte e plano de saúde.</p>",
           schedule: "Segunda a sexta",
           applicationUrl: "https://example.com/candidatura",
           sourceName: "Teste E2E",
@@ -162,7 +170,9 @@ test.describe.serial("CRUD administrativo no build de produção", () => {
       await page.goto(`/admin/vagas/${jobId}/editar`);
       await page.locator('select[name="publicationStatus"]').selectOption(status);
       if (status === "SCHEDULED") {
-        await page.locator('input[name="scheduledAt"]').fill(new Date(Date.now() + 86_400_000).toISOString().slice(0, 16));
+        await page
+          .locator('input[name="scheduledAt"]')
+          .fill(new Date(Date.now() + 86_400_000).toISOString().slice(0, 16));
       }
       await page.locator('form[action$="/update"] button').click();
       await page.waitForURL(new RegExp(`/admin/vagas/${jobId}/editar\\?saved=1`));
@@ -171,6 +181,17 @@ test.describe.serial("CRUD administrativo no build de produção", () => {
     const publicJob = await page.goto(`/vagas/analista-e2e-${suffix}`, { waitUntil: "domcontentloaded" });
     expect(publicJob?.status()).toBe(200);
     await expect(page.getByRole("heading", { name: title })).toBeVisible();
+
+    await page.goto(`/admin/vagas/${jobId}/editar`);
+    await page.locator('input[name="confidentialCompany"]').check();
+    await page.locator('form[action$="/update"] button').click();
+    await page.waitForURL(new RegExp(`/admin/vagas/${jobId}/editar\\?saved=1`));
+    await page.goto(`/vagas/analista-e2e-${suffix}`, { waitUntil: "domcontentloaded" });
+    await expect(page.getByText("Empresa confidencial", { exact: true })).toBeVisible();
+    await expect(page.locator("body")).not.toContainText(`Empresa Interna E2E ${suffix}`);
+    await expect(page.locator("body")).not.toContainText(`Empresa E2E ${suffix}`);
+    const structuredData = await page.locator('script[type="application/ld+json"]').allTextContents();
+    expect(structuredData.join("\n")).not.toContain('"JobPosting"');
 
     const articlePayload = await envelope<{ article: { id: string; slug: string } }>(
       await page.request.post("/api/admin/articles", {
@@ -184,6 +205,8 @@ test.describe.serial("CRUD administrativo no build de produção", () => {
           contentHtml: "<p>Conteúdo editorial completo criado para validar o fluxo administrativo.</p>",
           coverImageUrl: media.url,
           coverImageAlt: "Imagem E2E com ALT atualizado",
+          coverImageCaption: "Imagem editorial criada pelo teste automatizado.",
+          coverImageCredit: "Auditoria E2E",
           section: "Testes",
           tags: "e2e, auditoria",
           seoTitle: articleTitle,
@@ -196,7 +219,9 @@ test.describe.serial("CRUD administrativo no build de produção", () => {
 
     await page.goto(`/admin/conteudo/${article.id}/editar`);
     await page.locator('select[name="status"]').selectOption("SCHEDULED");
-    await page.locator('input[name="scheduledAt"]').fill(new Date(Date.now() + 86_400_000).toISOString().slice(0, 16));
+    await page
+      .locator('input[name="scheduledAt"]')
+      .fill(new Date(Date.now() + 86_400_000).toISOString().slice(0, 16));
     await page.locator('form[action*="/api/admin/articles/"] button').last().click();
     await page.waitForURL(new RegExp(`/admin/conteudo/${article.id}/editar\\?saved=1`));
     await page.goto(`/admin/conteudo/${article.id}/editar`);
@@ -207,27 +232,38 @@ test.describe.serial("CRUD administrativo no build de produção", () => {
     expect(publicArticle?.status()).toBe(200);
 
     const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, XLSX.utils.json_to_sheet([{
-      "Título original": `AUXILIAR IMPORTADO ${suffix}`,
-      "Título público": `Auxiliar Importado ${suffix}`,
-      Empresa: `Empresa Interna E2E ${suffix}`,
-      Categoria: category.name,
-      Cidade: city.name,
-      UF: "MA",
-      Descrição: "Descrição completa e válida da oportunidade importada pelo teste E2E do painel administrativo.",
-      Resumo: "Resumo completo da vaga importada pelo teste E2E.",
-      "Link de candidatura": "https://example.com/importada",
-      Fonte: "Teste E2E",
-      Validade: expiresAt,
-      "Código externo": `IMPORT-${suffix}`
-    }]), "Vagas");
+    XLSX.utils.book_append_sheet(
+      workbook,
+      XLSX.utils.json_to_sheet([
+        {
+          "Título original": `AUXILIAR IMPORTADO ${suffix}`,
+          "Título público": `Auxiliar Importado ${suffix}`,
+          Empresa: `Empresa Interna E2E ${suffix}`,
+          Categoria: category.name,
+          Cidade: city.name,
+          UF: "MA",
+          Descrição:
+            "Descrição completa e válida da oportunidade importada pelo teste E2E do painel administrativo.",
+          Resumo: "Resumo completo da vaga importada pelo teste E2E.",
+          "Link de candidatura": "https://example.com/importada",
+          Fonte: "Teste E2E",
+          Validade: expiresAt,
+          "Código externo": `IMPORT-${suffix}`
+        }
+      ]),
+      "Vagas"
+    );
     const xlsx = XLSX.write(workbook, { type: "buffer", bookType: "xlsx" }) as Buffer;
     const importPayload = await envelope(
       await page.request.post("/api/admin/imports", {
         headers: { origin },
         multipart: {
           mode: "DRAFT",
-          file: { name: `vagas-${suffix}.xlsx`, mimeType: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", buffer: xlsx }
+          file: {
+            name: `vagas-${suffix}.xlsx`,
+            mimeType: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            buffer: xlsx
+          }
         }
       })
     );
@@ -255,15 +291,45 @@ test.describe.serial("CRUD administrativo no build de produção", () => {
         }
       })
     );
-    await expect.poll(async () => {
-      const response = await page.request.get(`/admin/vagas/importar?batch=${batchId}&step=resultado`);
-      return (await response.text()).includes("COMPLETED");
-    }, { timeout: 60_000 }).toBe(true);
-    await envelope(await page.request.post(`/api/admin/imports/${batchId}/undo`, { headers: { origin }, form: {} }));
+    await expect
+      .poll(
+        async () => {
+          const response = await page.request.get(`/admin/vagas/importar?batch=${batchId}&step=resultado`);
+          const body = await response.text();
+          return body.includes("COMPLETED") && body.includes("VALIDATED");
+        },
+        { timeout: 60_000 }
+      )
+      .toBe(true);
+    await envelope(
+      await page.request.post(`/api/admin/imports/${batchId}/execute`, {
+        headers: { origin },
+        form: { mode: "DRAFT" }
+      })
+    );
+    await expect
+      .poll(
+        async () => {
+          const response = await page.request.get(`/admin/vagas/importar?batch=${batchId}&step=resultado`);
+          const body = await response.text();
+          return body.includes("COMPLETED") && body.includes("IMPORTED");
+        },
+        { timeout: 60_000 }
+      )
+      .toBe(true);
+    await envelope(
+      await page.request.post(`/api/admin/imports/${batchId}/undo`, { headers: { origin }, form: {} })
+    );
 
     for (const [name, mimeType, buffer, status, code] of [
       ["vazio.csv", "text/csv", Buffer.alloc(0), 400, "EMPTY_FILE"],
-      ["falso.xlsx", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", Buffer.from("não é xlsx"), 415, "FILE_SIGNATURE_MISMATCH"],
+      [
+        "falso.xlsx",
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        Buffer.from("não é xlsx"),
+        415,
+        "FILE_SIGNATURE_MISMATCH"
+      ],
       ["binario.csv", "text/csv", Buffer.from([65, 0, 66]), 415, "FILE_SIGNATURE_MISMATCH"]
     ] as const) {
       const response = await page.request.post("/api/admin/imports", {
@@ -276,14 +342,24 @@ test.describe.serial("CRUD administrativo no build de produção", () => {
       expect(payload).toMatchObject({ ok: false, code });
     }
 
-    await envelope(await page.request.post(`/api/admin/jobs/${jobId}/status`, { headers: { origin }, form: { status: "ARCHIVED" } }));
+    await envelope(
+      await page.request.post(`/api/admin/jobs/${jobId}/status`, {
+        headers: { origin },
+        form: { status: "ARCHIVED" }
+      })
+    );
     await page.goto(`/admin/conteudo/${article.id}/editar`);
     await page.locator('select[name="status"]').selectOption("ARCHIVED");
     await page.locator('input[name="coverImageUrl"]').fill("");
     await page.locator('input[name="coverImageAlt"]').fill("");
     await page.locator('form[action*="/api/admin/articles/"] button').last().click();
     await page.waitForURL(new RegExp(`/admin/conteudo/${article.id}/editar\\?saved=1`));
-    await envelope(await page.request.post(`/api/admin/media/${media.id}`, { headers: { origin }, form: { action: "DELETE" } }));
+    await envelope(
+      await page.request.post(`/api/admin/media/${media.id}`, {
+        headers: { origin },
+        form: { action: "DELETE" }
+      })
+    );
 
     expect(unexpected).toEqual([]);
   });
