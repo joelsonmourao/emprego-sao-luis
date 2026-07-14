@@ -135,3 +135,11 @@ O E2E mutável cobre login, cadastros rápidos, autor, mídia e ALT, vaga do ras
 ## Rollback
 
 Migrations são aditivas; não execute downgrade destrutivo. Em incidente, pare o worker novo, restaure as imagens anteriores e, se necessário, restaure banco e volume do mesmo backup. Preserve a migration aplicada para uma correção forward-only.
+
+## Atualização final — 14/07/2026
+
+O job de deploy aplica migrations até `0023`. A `0022` corrige integridade de importação e conteúdo de vagas; a `0023` adiciona metadata/variantes editoriais. No banco isolado, o schema final ficou em 59 tabelas, 695 colunas, 121 índices e 158 constraints, sem divergência.
+
+Antes do rollout, execute também `audit:seo`, `audit:schemas`, `audit:performance` e `audit:admin`. O resultado local final foi 216 testes unitários, build web/worker, 105 E2E aprovados com 1 skip condicional e Lighthouse 99–100 em performance, com 100 em acessibilidade, SEO e boas práticas nas oito rotas principais.
+
+No Coolify HTTPS mantenha `COOKIE_SECURE=true`. Para R2/S3 mantenha `S3_SERVER_SIDE_ENCRYPTION=AES256` (padrão) ou `aws:kms`; use `none` somente quando o provider, como MinIO de staging sem KMS, não aceitar SSE. Depois do deploy valide `/api/ready`, upload, importação em duas fases e persistência após redeploy.

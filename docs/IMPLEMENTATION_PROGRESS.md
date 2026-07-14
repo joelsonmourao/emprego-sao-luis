@@ -52,3 +52,16 @@ Publicar o SHA final da branch no Coolify seguindo:
 - [ADMIN_OPERATIONS_AUDIT.md](./ADMIN_OPERATIONS_AUDIT.md)
 
 O deploy deve montar o mesmo volume em `/app/data` no web e worker, executar o job de migration/seeds antes do rollout e validar `/api/ready` depois da publicação.
+
+## Checkpoint final — 14/07/2026
+
+- Migrations: `0000`–`0023`, verificadas em PostgreSQL 17 isolado.
+- Schema: 59 tabelas, 695 colunas, 121 índices, 158 constraints, zero divergência.
+- Qualidade: lint, typecheck, build, migration check e 216 testes unitários aprovados.
+- Auditorias: site, SEO, schemas, performance e admin aprovadas.
+- E2E: 105 aprovados, 1 skip condicional e nenhuma falha contra web/worker Docker.
+- Lighthouse: performance 99–100 e acessibilidade, SEO e boas práticas em 100 nas oito rotas públicas principais; LCP de 1.207–1.604 ms, CLS 0 e TBT 0 ms no ciclo final local.
+- Storage: S3/MinIO e volume compartilhado validados para leitura, escrita e exclusão.
+- Proteção: banco de produção e `main` não foram tocados; mudanças do usuário em `Logo/` ficaram fora do escopo e dos commits.
+
+O próximo passo é operacional: publicar o SHA desta branch, aplicar o job de migration antes de web/worker e validar integrações externas no Coolify. Não há validação local capaz de certificar Search Console, Rich Results, Google/Meta, Resend, gateway de pagamento, anúncios ou Core Web Vitals de campo.

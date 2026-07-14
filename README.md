@@ -78,6 +78,10 @@ npm run migration:check
 npm run build
 npm run test:e2e
 npm run audit:site
+npm run audit:seo
+npm run audit:schemas
+npm run audit:performance
+npm run audit:admin
 ```
 
 O E2E mutável exige ambiente isolado e recebe credenciais somente por ambiente:
@@ -109,3 +113,8 @@ Procedimento completo: [docs/PRODUCTION_STABILIZATION.md](docs/PRODUCTION_STABIL
 - [Inventário do sistema](docs/SYSTEM_INVENTORY.md)
 - [Identidade visual](docs/BRAND_IDENTITY.md)
 - [Operação comercial](docs/COMMERCIAL.md)
+- [Modelo de conteúdo de vagas](docs/JOB_CONTENT_MODEL.md)
+- [Arquitetura de SEO](docs/SEO_ARCHITECTURE.md)
+- [Dados estruturados](docs/STRUCTURED_DATA.md)
+- [Padrão de imagens de notícias](docs/NEWS_IMAGE_STANDARD.md)
+- [Orçamento de performance](docs/PERFORMANCE_BUDGET.md)

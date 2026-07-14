@@ -442,6 +442,7 @@ Pendências globais: padronizar JSON+405 em todas APIs admin (~89 rotas), págin
 | S3_SECRET_ACCESS_KEY | Variável de ambiente | Deploy/dev | — | — | — | S3/R2 | Documentada | — | — | — |
 | S3_PUBLIC_URL | Variável de ambiente | Deploy/dev | — | — | — | S3/R2 | Documentada | — | — | — |
 | S3_FORCE_PATH_STYLE | Variável de ambiente | Deploy/dev | — | — | — | S3/R2 | Documentada | — | — | — |
+| S3_SERVER_SIDE_ENCRYPTION | Variável de ambiente | Deploy/dev | — | — | — | S3/R2/MinIO | Documentada | — | `AES256`, `aws:kms` ou `none` |
 | RESEND_API_KEY | Variável de ambiente | Deploy/dev | — | — | — | Resend | Documentada | — | — | — |
 | EMAIL_FROM | Variável de ambiente | Deploy/dev | — | — | — | — | Documentada | — | — | — |
 | PUBLIC_WHATSAPP_CHANNEL_URL | Variável de ambiente | Deploy/dev | — | — | — | — | Documentada | — | — | — |
@@ -462,3 +463,8 @@ Pendências globais: padronizar JSON+405 em todas APIs admin (~89 rotas), págin
 | ADMIN_INITIAL_NAME | Variável de ambiente | Deploy/dev | — | — | — | — | Documentada | — | — | — |
 | ADMIN_INITIAL_PASSWORD | Variável de ambiente | Deploy/dev | — | — | — | — | Documentada | — | — | — |
 
+## Snapshot final de estabilização — 14/07/2026
+
+Este snapshot substitui contagens anteriores: 97 páginas Astro, 43 páginas administrativas, 75 APIs administrativas e 92 formulários. O runtime Drizzle contém 59 tabelas, 695 colunas, 121 índices, 158 constraints e 10 enums após as migrations `0022` e `0023`.
+
+As superfícies novas/alteradas são: retry de importação falha, descrição única de vagas, contratante não identificada, padrão editorial de imagens, configurações SEO completas, grafo JSON-LD central e os scripts `audit:seo`, `audit:schemas`, `audit:performance` e `audit:admin`.

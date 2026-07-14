@@ -145,3 +145,14 @@ Todos os endpoints `/api/admin/**` passam pelo middleware de autenticação, CSR
 - Formulários administrativos usam o bridge comum, preservam o submitter, exibem mensagem clara e `requestId`, e tratam downloads separadamente.
 - Respostas JSON antigas mantêm campos de compatibilidade no topo, além do envelope canônico `data`, para evitar quebra de consumidores já publicados.
 - O E2E produtivo percorreu as 33 rotas do menu e os fluxos mutáveis críticos. O teste estático de inventário falha se uma nova rota/API escapar das regras centrais.
+
+## Complemento de integridade — 14/07/2026
+
+- Upload identifica conteúdo por SHA-256. Apenas lote utilizável pode ser retomado; `FAILED` é arquivado e recebe sucessor com novo ID, erro original e `requestId` preservados.
+- Configuração sempre dispara `DRY_RUN`; execução exige `VALIDATED`, análise válida e linha positiva. Lote zero, falho, cancelado ou desfeito é recusado.
+- CSV de rejeitados só existe quando há linhas reais; a ausência responde JSON controlado.
+- Web e worker usam o mesmo storage/provider; o compose isolado confirma leitura, escrita e exclusão.
+- Editor de vagas usa somente `descriptionHtml`; importação consolida campos legados com ordem e relatório.
+- Empresa confidencial mantém vínculo interno e some do HTML/schema. Fonte sem contratante usa registro técnico, sem inventar empresa.
+- Notícia publicada exige original ≥1200 px, cinco variantes, ALT, legenda e crédito.
+- O E2E mutável cobre o encadeamento; o inventário final registra 75 APIs administrativas, 43 páginas administrativas e 92 formulários.

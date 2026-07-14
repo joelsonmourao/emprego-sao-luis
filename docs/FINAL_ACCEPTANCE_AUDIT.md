@@ -111,3 +111,25 @@ Nenhuma migration nova nesta sessão. Schema existente validado com `npm run mig
 - Inventário completo: [`SYSTEM_INVENTORY.md`](./SYSTEM_INVENTORY.md)
 - Auditoria painel: [`ADMIN_AUDIT.md`](./ADMIN_AUDIT.md)
 - Regenerar inventário: `node scripts/generate-system-inventory.mjs`
+
+## Aceite final complementar — 14/07/2026
+
+Esta seção substitui os números e pendências da tabela anterior. A validação final foi executada somente no stack Docker isolado `es-final-audit`, sem acesso ou alteração do banco de produção.
+
+| Gate | Resultado final |
+| --- | --- |
+| `npm run lint` | aprovado |
+| `npm run typecheck` | aprovado em todos os workspaces; Astro 0 erros |
+| `npm run test` | 216/216 aprovados em 44 arquivos |
+| `npm run migration:check` | aprovado |
+| `npm run build` | aprovado para web e worker |
+| `npm run audit:site` | aprovado, sem falhas |
+| `npm run audit:seo` | aprovado, sem falhas/avisos |
+| `npm run audit:schemas` | aprovado, sem falhas |
+| `npm run audit:performance` | aprovado |
+| `npm run audit:admin` | aprovado; 97/43/75/92 |
+| `npm run db:audit-schema` | 59 tabelas e zero divergência |
+| `npm run test:e2e` | 105 aprovados, 1 skip condicional, 0 falhas |
+| Lighthouse local | performance 99–100; acessibilidade, SEO e boas práticas 100 nas 8 rotas; LCP máximo 1.604 ms, CLS 0 e TBT 0 ms |
+
+Importação falha, sigilo empresarial, descrição única, ciclo de vida/schema, imagens de notícias, sitemaps, 404/410, cache, storage e navegação administrativa estão fechados no código e nos testes locais. Permanecem externas: deploy Coolify, Search Console/Rich Results, credenciais Google/Meta/Resend/pagamento, anúncios reais e métricas de campo.

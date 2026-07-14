@@ -48,6 +48,7 @@ S3_ACCESS_KEY_ID=
 S3_SECRET_ACCESS_KEY=
 S3_PUBLIC_URL=
 S3_FORCE_PATH_STYLE=false
+S3_SERVER_SIDE_ENCRYPTION=AES256
 ```
 
 Se qualquer variável essencial estiver ausente, o sistema usa o volume local. Não misture um bucket parcialmente configurado com o volume.
@@ -80,3 +81,7 @@ Inclua o volume `/app/data` no plano de backup junto com o PostgreSQL. Para rest
 3. preserve caminhos relativos internos;
 4. suba `web` e `worker`;
 5. valide `/api/ready`, uma mídia existente e um histórico de importação.
+
+## Criptografia compatível com o provider
+
+`S3_SERVER_SIDE_ENCRYPTION` aceita `AES256` (padrão), `aws:kms` ou `none`. Cloudflare R2/S3 deve manter criptografia suportada pelo provider. MinIO local sem KMS precisa de `none`; isso não desativa TLS de transporte e deve ficar restrito ao staging isolado. O diagnóstico de startup grava apenas provider, bucket lógico e capacidades, nunca credenciais.
