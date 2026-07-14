@@ -55,9 +55,9 @@ Resultado no banco isolado migrado:
 | Item                    | Quantidade |
 | ----------------------- | ---------: |
 | Tabelas esperadas/reais |    59 / 59 |
-| Colunas                 |        688 |
+| Colunas                 |        695 |
 | Índices                 |        121 |
-| Constraints             |        159 |
+| Constraints             |        158 |
 | Enums                   |         10 |
 | Divergências            |          0 |
 
@@ -67,7 +67,7 @@ O job `Dockerfile.migrate` aceita:
 
 ```dotenv
 RUN_SEED_RBAC=true
-RUN_SEED_COMMERCIAL=true
+RUN_SEED_COMMERCIAL_PLANS=true
 RUN_SEED_LOCATIONS=true
 RUN_SEED_CATEGORIES=true
 RUN_SEED_SYSTEM_DEFAULTS=true
@@ -97,7 +97,7 @@ RUN_SEED_CATEGORIES=true
 RUN_SEED_SYSTEM_DEFAULTS=true
 ```
 
-`ADMIN_INITIAL_EMAIL`, `ADMIN_INITIAL_PASSWORD`, `RUN_SEED_RBAC` e `RUN_SEED_COMMERCIAL` só devem ser ativadas quando a operação correspondente for intencional. Remova senhas e desative flags após o job.
+`ADMIN_INITIAL_EMAIL`, `ADMIN_INITIAL_PASSWORD`, `RUN_SEED_RBAC` e `RUN_SEED_COMMERCIAL_PLANS` só devem ser ativadas quando a operação correspondente for intencional. Remova senhas e desative flags após o job.
 
 S3/R2, e-mail, indexação, Meta, Sentry, AdSense, Turnstile e Web Push são integrações opcionais. A ausência delas não bloqueia os CRUDs básicos.
 
@@ -107,14 +107,14 @@ S3/R2, e-mail, indexação, Meta, Sentry, AdSense, Turnstile e Web Push são int
 | ---------------------------- | ----------------------------------------------------------- |
 | `npm run lint`               | aprovado, zero erro                                         |
 | `npm run typecheck`          | aprovado em todos os workspaces; Astro 0 erros e 0 warnings |
-| `npm test`                   | 209/209 aprovados em 42 arquivos                            |
+| `npm test`                   | 216/216 aprovados em 44 arquivos                            |
 | `npm run migration:check`    | aprovado                                                    |
 | `npm run build`              | aprovado para web e worker                                  |
-| `npm run audit:site`         | aprovado; 4 avisos legados não bloqueantes                  |
+| `npm run audit:site`         | aprovado; sem falhas                                        |
 | `npm run db:audit-schema`    | aprovado; zero divergência                                  |
 | Docker web/worker            | build e startup aprovados                                   |
 | `/api/health` e `/api/ready` | healthy/ready; banco, schema, Redis e storage `ok`          |
-| `npm run test:e2e`           | 100/100 aprovados contra build de produção                  |
+| `npm run test:e2e`           | 105 aprovados, 1 skip condicional e 0 falhas                |
 
 O E2E mutável cobre login, cadastros rápidos, autor, mídia e ALT, vaga do rascunho à publicação pública, notícia do rascunho à publicação pública, importação XLSX, arquivos inválidos, histórico, desfazer, arquivar e limpeza. Credenciais são recebidas exclusivamente por `E2E_ADMIN_EMAIL` e `E2E_ADMIN_PASSWORD`.
 
@@ -125,7 +125,7 @@ O E2E mutável cobre login, cadastros rápidos, autor, mídia e ALT, vaga do ras
 3. Configure `web` com `Dockerfile.web`, `worker` com `Dockerfile.worker` e o job com `Dockerfile.migrate`.
 4. Monte o mesmo volume persistente em `/app/data` no `web` e no `worker`, conforme [COOLIFY_STORAGE.md](./COOLIFY_STORAGE.md).
 5. Configure as variáveis obrigatórias acima, com `COOKIE_SECURE=true` no domínio HTTPS.
-6. Ative as três flags estruturais de seed e execute uma vez o job de migration. Ele aplica migrations até `0021` antes dos seeds.
+6. Ative as três flags estruturais de seed e execute uma vez o job de migration. Ele aplica migrations até `0023` antes dos seeds.
 7. Confirme no log as contagens de locations, categories e system defaults; depois desative as flags.
 8. Faça deploy do `web` e do `worker` a partir do mesmo SHA.
 9. Valide `https://empregossaoluis.com.br/api/health` e `/api/ready`.

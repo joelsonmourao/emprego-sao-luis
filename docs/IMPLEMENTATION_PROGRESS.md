@@ -22,8 +22,8 @@ Arquitetura ativa preservada: Astro 7, Drizzle, PostgreSQL, Valkey/BullMQ, Docke
 
 ## Migration e seeds
 
-- Nova migration `0021_admin_stabilization.sql`.
-- Schema auditado: 59 tabelas, 688 colunas, 121 índices, 159 constraints, 10 enums e zero divergência.
+- Migrations vigentes de `0000` a `0023`, incluindo estabilização administrativa (`0021`), integridade de conteúdo/importação (`0022`) e imagens editoriais (`0023`).
+- Schema auditado: 59 tabelas, 695 colunas, 121 índices, 158 constraints, 10 enums e zero divergência.
 - Seeds confirmados no ambiente isolado: 27 estados, 8 cidades do Maranhão, 10 categorias e defaults de sistema.
 
 ## Aceitação de produção
@@ -34,12 +34,12 @@ Ambiente isolado composto por PostgreSQL 17, Valkey, `web`, `worker`, job de mig
 | ------------------------- | --------------------------------------------- |
 | `npm run lint`            | aprovado                                      |
 | `npm run typecheck`       | aprovado em todos os workspaces               |
-| `npm test`                | 209/209 aprovados                             |
+| `npm test`                | 216/216 aprovados em 44 arquivos              |
 | `npm run migration:check` | aprovado                                      |
 | `npm run build`           | aprovado, web + worker                        |
-| `npm run audit:site`      | aprovado com 4 avisos legados não bloqueantes |
+| `npm run audit:site`      | aprovado, sem falhas                           |
 | `npm run db:audit-schema` | aprovado, 0 divergência                       |
-| `npm run test:e2e`        | 100/100 aprovados no build de produção        |
+| `npm run test:e2e`        | 105 aprovados, 1 skip condicional, 0 falhas   |
 
 O E2E produtivo cobre login, rotas de todo o menu, cadastros auxiliares, autor, mídia, vaga, notícia, estados de publicação, visualização pública, importação, arquivos inválidos, histórico, desfazer, arquivamento e limpeza.
 
