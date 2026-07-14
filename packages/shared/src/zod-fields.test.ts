@@ -24,6 +24,8 @@ describe("zod fields runtime", () => {
     expect(zUrl().safeParse("https://empregossaoluis.com.br").success).toBe(true);
     expect(zUrl().safeParse("not-url").success).toBe(false);
     expect(zOptionalUrl().safeParse("").success).toBe(true);
+    expect(zOptionalUrl().safeParse(undefined)).toEqual({ success: true, data: null });
+    expect(zOptionalUrl().safeParse("not-url").success).toBe(false);
   });
 });
 

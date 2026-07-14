@@ -22,6 +22,17 @@ function collectAdminPages(dir: string, base = ""): string[] {
   return pages;
 }
 
+function collectFiles(dir: string, extensions: string[]): string[] {
+  return readdirSync(dir).flatMap((entry) => {
+    const full = join(dir, entry);
+    return statSync(full).isDirectory()
+      ? collectFiles(full, extensions)
+      : extensions.some((extension) => entry.endsWith(extension))
+        ? [full]
+        : [];
+  });
+}
+
 describe("auditoria do painel administrativo", () => {
   it("menu não aponta para /api", () => {
     const hrefs = ADMIN_NAV_GROUPS.flatMap((group) => group.items.map((item) => item.href));
@@ -57,7 +68,7 @@ describe("auditoria do painel administrativo", () => {
     const health = read("apps/web/src/pages/admin/saude.astro");
     expect(dashboard).not.toContain('href="/api/');
     expect(health).not.toContain('href="/api/');
-    expect(health).toContain('fetch("/api/ready"');
+    expect(health).toContain('loadEndpoint("/api/ready")');
   });
 
   it("APIs de importação expõem GET 405", () => {
@@ -87,5 +98,37 @@ describe("auditoria do painel administrativo", () => {
   it("inventaria páginas administrativas auditáveis", () => {
     const pages = collectAdminPages(resolve("apps/web/src/pages/admin"));
     expect(pages.length).toBeGreaterThanOrEqual(35);
+  });
+
+  it("nenhum link administrativo navega diretamente para API", () => {
+    const pages = collectFiles(resolve("apps/web/src/pages/admin"), [".astro"]);
+    const offenders = pages.flatMap((file) => {
+      const source = readFileSync(file, "utf8");
+      return [...source.matchAll(/<a\b[^>]*href=(?:"[^"`]*|\{`[^`]*|\{"[^"}]*)(\/api\/admin\/)[^>]*>/g)]
+        .filter((match) => !match[0].includes("data-admin-download"))
+        .map(() => file);
+    });
+    expect(offenders).toEqual([]);
+  });
+
+  it("não usa atalhos incompatíveis com Zod 3", () => {
+    const files = collectFiles(resolve("apps/web/src"), [".ts", ".tsx", ".astro"]);
+    const offenders = files.filter((file) => /\bz\.(?:email|uuid)\s*\(/.test(readFileSync(file, "utf8")));
+    expect(offenders).toEqual([]);
+  });
+
+  it("middleware padroniza toda resposta de API administrativa", () => {
+    const middleware = read("apps/web/src/middleware.ts");
+    expect(middleware).toContain('path.startsWith("/api/admin")');
+    expect(middleware).toContain("normalizeAdminApiResponse(response, requestId!)");
+    expect(middleware).toContain('code: "UNHANDLED_ADMIN_API_ERROR"');
+  });
+
+  it("inventaria todos os endpoints administrativos sob autenticação central", () => {
+    const apiFiles = collectFiles(resolve("apps/web/src/pages/api/admin"), [".ts"]);
+    expect(apiFiles.length).toBeGreaterThanOrEqual(70);
+    const middleware = read("apps/web/src/middleware.ts");
+    expect(middleware).toContain('(path.startsWith("/api/admin") && path !== "/api/admin/login")');
+    expect(middleware).toContain('adminJsonError("Não autenticado.", 401)');
   });
 });

@@ -8,12 +8,21 @@ test("health endpoint reports healthy", async ({ request }) => {
   await expect(response.json()).resolves.toMatchObject({ ok: true, service: "web" });
 });
 
-test("readiness fails closed without infrastructure", async ({ request }) => {
+test("readiness reflects the infrastructure state", async ({ request }) => {
   const response = await request.get("/api/ready", { failOnStatusCode: false });
-  expect(response.status()).toBe(503);
   expect(response.headers()["content-type"]).toContain("application/json");
   expect(response.headers()["x-es-app"]).toBe("astro");
-  await expect(response.json()).resolves.toMatchObject({ ok: false, status: "not_ready" });
+  if (process.env.E2E_EXPECT_READY === "true") {
+    expect(response.status()).toBe(200);
+    await expect(response.json()).resolves.toMatchObject({
+      ok: true,
+      status: "ready",
+      checks: { database: "ok", schema: "ok", redis: "ok", storage: "ok" }
+    });
+  } else {
+    expect(response.status()).toBe(503);
+    await expect(response.json()).resolves.toMatchObject({ ok: false, status: "not_ready" });
+  }
 });
 
 for (const [path, text] of [["/", "Seu próximo trabalho pode estar mais perto do que você imagina."], ["/vagas", "Vagas de emprego"], ["/instagram", "Empregos São Luís"], ["/alertas", "Receba vagas compatíveis com você"]] as const) {

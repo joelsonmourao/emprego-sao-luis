@@ -85,7 +85,11 @@ describe.skipIf(!existsSync(DIST_ENTRY))("checkOrigin em build de produção", (
     });
 
     expect(response.status).toBe(403);
-    await expect(response.json()).resolves.toMatchObject({ ok: false, error: "Cross-site request forbidden." });
+    await expect(response.json()).resolves.toMatchObject({
+      ok: false,
+      error: "Origem da requisição não autorizada.",
+      code: "ORIGIN_FORBIDDEN"
+    });
   });
 
   it("POST sem JSON retorna 415 após passar pelo checkOrigin", async () => {

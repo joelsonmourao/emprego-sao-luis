@@ -55,16 +55,15 @@ test.describe("auditoria completa do painel", () => {
 
       const response = await page.goto(route, { waitUntil: "domcontentloaded" });
       expect(response?.status(), `HTTP em ${route}`).toBe(200);
-      await expect(page.locator("main, body")).toBeVisible();
+      await expect(page.locator("main")).toBeVisible();
       expect(page.url(), `redirecionou para API em ${route}`).not.toMatch(/\/api\//);
-      expect(consoleErrors.join("\n")).not.toMatch(/hydration|uncaught/i);
+      expect(consoleErrors, `erros de console em ${route}`).toEqual([]);
+      expect(failedRequests, `requisições de mutação falharam em ${route}`).toEqual([]);
 
-      const apiNavLinks = page.locator('a[href^="/api/"], form[action^="/api/"] button[type="submit"]');
-      const apiCount = await apiNavLinks.count();
-      for (let index = 0; index < apiCount; index += 1) {
-        const href = await apiNavLinks.nth(index).getAttribute("href");
-        const action = await apiNavLinks.nth(index).getAttribute("action");
-        expect(href ?? action, `link direto para API em ${route}`).not.toMatch(/^\/api\//);
+      await expect(page.locator('a[href^="/api/"]:not([data-admin-download])')).toHaveCount(0);
+      const forms = page.locator('form[action^="/api/"]');
+      for (let index = 0; index < await forms.count(); index += 1) {
+        await expect(forms.nth(index).locator('button, input[type="submit"]')).not.toHaveCount(0);
       }
     });
   }

@@ -3,9 +3,11 @@ import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import {
   isTruthyFlag,
+  shouldRunCategoriesSeed,
   shouldRunCommercialPlansSeed,
   shouldRunLocationsSeed,
   shouldRunRbacSeed,
+  shouldRunSystemDefaultsSeed,
   validateAdminBootstrapEnv
 } from "./migrate-flags";
 
@@ -27,6 +29,10 @@ describe("migrate flags", () => {
     expect(shouldRunCommercialPlansSeed({})).toBe(false);
     expect(shouldRunLocationsSeed({ RUN_SEED_LOCATIONS: "true" })).toBe(true);
     expect(shouldRunLocationsSeed({})).toBe(false);
+    expect(shouldRunCategoriesSeed({ RUN_SEED_CATEGORIES: "true" })).toBe(true);
+    expect(shouldRunCategoriesSeed({})).toBe(false);
+    expect(shouldRunSystemDefaultsSeed({ RUN_SEED_SYSTEM_DEFAULTS: "true" })).toBe(true);
+    expect(shouldRunSystemDefaultsSeed({})).toBe(false);
   });
 
   it("falha quando RUN_SEED_RBAC exige dados do administrador", () => {
@@ -52,9 +58,13 @@ describe("migrate entrypoint", () => {
     expect(entrypoint).toContain('[ "${RUN_SEED_RBAC:-}" = "true" ]');
     expect(entrypoint).toContain('[ "${RUN_SEED_COMMERCIAL_PLANS:-}" = "true" ]');
     expect(entrypoint).toContain('[ "${RUN_SEED_LOCATIONS:-}" = "true" ]');
+    expect(entrypoint).toContain('[ "${RUN_SEED_CATEGORIES:-}" = "true" ]');
+    expect(entrypoint).toContain('[ "${RUN_SEED_SYSTEM_DEFAULTS:-}" = "true" ]');
     expect(entrypoint).toContain("npm run db:seed-rbac --workspace=@es/db");
     expect(entrypoint).toContain("npm run db:seed-commercial-plans --workspace=@es/db");
     expect(entrypoint).toContain("npm run db:seed-locations --workspace=@es/db");
+    expect(entrypoint).toContain("npm run db:seed-categories --workspace=@es/db");
+    expect(entrypoint).toContain("npm run db:seed-system-defaults --workspace=@es/db");
   });
 
   it("valida administrador antes do seed RBAC e não imprime valor da senha", () => {
@@ -103,7 +113,10 @@ describe("seed idempotency", () => {
 
   it("localidades e categorias são idempotentes", () => {
     const seed = read("packages/db/scripts/seed-locations.ts");
-    expect(seed).toContain("onConflictDoNothing");
+    expect(seed).toContain("onConflictDoUpdate");
+    expect(seed).toContain("brazilianStates");
+    expect(read("packages/db/scripts/seed-categories.ts")).toContain("onConflictDoUpdate");
+    expect(read("packages/db/scripts/seed-system-defaults.ts")).toContain("onConflictDoUpdate");
     expect(seed).toContain("Maranhão");
     expect(seed).toContain("São Luís");
   });
