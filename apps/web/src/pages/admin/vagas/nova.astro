@@ -1,19 +1,475 @@
 ---
 import AdminLayout from "../../../layouts/AdminLayout.astro";
 import { can } from "../../../lib/auth";
-import { getJobFormOptions } from "../../../lib/admin-data";
+import { EMPLOYMENT_TYPES, getJobFormOptions, WORKPLACE_TYPES } from "../../../lib/admin-data";
+
 const auth = Astro.locals.auth!;
-if (!can(auth, "jobs.create")) return new Response("Proibido", { status: 403 });
+if (!can(auth, "jobs.create")) return Astro.redirect("/admin?error=sem-permissao");
+
 const options = await getJobFormOptions();
+const defaultExpires = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
+const defaultExpiresLocal = new Date(defaultExpires.getTime() - defaultExpires.getTimezoneOffset() * 60000)
+  .toISOString()
+  .slice(0, 16);
+
+const formData = {
+  companies: JSON.stringify(options.companies),
+  cities: JSON.stringify(options.cities),
+  states: JSON.stringify(options.states),
+  categories: JSON.stringify(options.categories)
+};
 ---
-<AdminLayout title="Nova vaga"><div class="flex items-center justify-between"><div><h1 class="text-3xl font-black">Nova vaga</h1><p class="mt-2 text-slate-600">Salve como rascunho ou envie para revisão.</p></div><a href="/admin/vagas">Voltar</a></div>
-<form class="mt-8 grid gap-6 rounded-2xl bg-white p-6" method="post" action="/api/admin/jobs">
-  <div class="grid gap-4 md:grid-cols-2"><label>Título original<input class="mt-1 w-full rounded-lg border p-3" name="originalTitle" required/></label><label>Título normalizado<input class="mt-1 w-full rounded-lg border p-3" name="normalizedTitle" required/></label></div>
-  <label>Slug<input class="mt-1 w-full rounded-lg border p-3" name="slug" pattern="[a-z0-9]+(?:-[a-z0-9]+)*" required/></label>
-  <div class="grid gap-4 md:grid-cols-2"><label>Empresa<select class="mt-1 w-full rounded-lg border p-3" name="companyId" required><option value="">Selecione</option>{options.companies.map((item) => <option value={item.id}>{item.name}</option>)}</select></label><label>Categoria<select class="mt-1 w-full rounded-lg border p-3" name="categoryId"><option value="">Sem categoria</option>{options.categories.map((item) => <option value={item.id}>{item.name}</option>)}</select></label><label>Cidade<select class="mt-1 w-full rounded-lg border p-3" name="cityId" required><option value="">Selecione</option>{options.cities.map((item) => <option value={item.id}>{item.name}</option>)}</select></label><label>Estado<select class="mt-1 w-full rounded-lg border p-3" name="stateId" required><option value="">Selecione</option>{options.states.map((item) => <option value={item.id}>{item.name} ({item.code})</option>)}</select></label></div>
-  <div class="grid gap-4 md:grid-cols-2"><label>Tipo de contratação<input class="mt-1 w-full rounded-lg border p-3" name="employmentType" required/></label><label>Modalidade<select class="mt-1 w-full rounded-lg border p-3" name="workplaceType"><option value="presencial">Presencial</option><option value="hibrido">Híbrido</option><option value="remoto">Remoto</option></select></label></div>
-  <label>Resumo<textarea class="mt-1 w-full rounded-lg border p-3" name="summary" minlength="40" maxlength="500" required></textarea></label><label>Descrição completa<textarea class="mt-1 min-h-64 w-full rounded-lg border p-3" name="description" minlength="80" required></textarea></label>
-  <div class="grid gap-4 md:grid-cols-2"><label>Link de candidatura<input class="mt-1 w-full rounded-lg border p-3" type="url" name="applicationUrl" required/></label><label>Fonte<input class="mt-1 w-full rounded-lg border p-3" name="sourceName" required/></label><label>URL da fonte<input class="mt-1 w-full rounded-lg border p-3" type="url" name="sourceUrl"/></label><label>Validade<input class="mt-1 w-full rounded-lg border p-3" type="datetime-local" name="expiresAt" required/></label></div>
-  <div class="grid gap-4 md:grid-cols-2"><label>Salário mínimo<input class="mt-1 w-full rounded-lg border p-3" type="number" min="0" step="0.01" name="salaryMin"/></label><label>Salário máximo<input class="mt-1 w-full rounded-lg border p-3" type="number" min="0" step="0.01" name="salaryMax"/></label></div>
-  <label>Status<select class="mt-1 w-full rounded-lg border p-3" name="publicationStatus"><option value="DRAFT">Rascunho</option><option value="PENDING_REVIEW">Enviar para revisão</option></select></label><button class="rounded-xl bg-red-700 p-4 font-bold text-white">Salvar vaga</button>
-</form></AdminLayout>
+
+<AdminLayout title="Nova vaga">
+  <nav class="text-sm text-[var(--text-secondary)]" aria-label="Breadcrumb">
+    <a class="font-semibold text-[var(--brand-primary)]" href="/admin">Painel</a>
+    <span aria-hidden="true"> / </span>
+    <a class="font-semibold text-[var(--brand-primary)]" href="/admin/vagas">Vagas</a>
+    <span aria-hidden="true"> / </span>
+    <span>Nova</span>
+  </nav>
+
+  <div class="mt-3 flex flex-wrap items-center justify-between gap-3">
+    <div>
+      <h1 class="text-3xl font-black">Nova vaga</h1>
+      <p class="mt-2 text-[var(--text-secondary)]">Cadastre manualmente com empresa, localização e publicação controladas.</p>
+    </div>
+    <a class="font-bold text-red-700" href="/admin/vagas">Voltar</a>
+  </div>
+
+  {options.emptyReason && (
+    <p class="mt-4 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900" role="status">
+      {options.emptyReason} Execute o seed de localidades ou cadastre dados pelo formulário.
+    </p>
+  )}
+
+  {options.states.length === 0 && !options.emptyReason && (
+    <p class="mt-4 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900" role="status">
+      Nenhum estado cadastrado. Defina <code>RUN_SEED_LOCATIONS=true</code> no deploy ou cadastre em Localização.
+    </p>
+  )}
+
+  <form id="job-create-form" class="mt-8 grid gap-6 rounded-2xl border border-[var(--brand-border)] bg-white p-6" method="post" action="/api/admin/jobs">
+    <section class="grid gap-4">
+      <h2 class="text-lg font-black">Título</h2>
+      <div class="grid gap-4 md:grid-cols-2">
+        <label>
+          Título original
+          <input id="originalTitle" class="mt-1 w-full rounded-lg border p-3" name="originalTitle" required minlength="3" maxlength="160" />
+        </label>
+        <label>
+          Título normalizado (público)
+          <input id="normalizedTitle" class="mt-1 w-full rounded-lg border p-3" name="normalizedTitle" required minlength="3" maxlength="160" />
+          <span class="mt-1 block text-xs text-[var(--text-secondary)]">Sugerido a partir do original; você pode editar.</span>
+        </label>
+      </div>
+      <div class="grid gap-4 md:grid-cols-2">
+        <label>
+          Slug
+          <input id="slug" class="mt-1 w-full rounded-lg border p-3 font-mono text-sm" name="slug" pattern="[a-z0-9]+(?:-[a-z0-9]+)*" required maxlength="180" />
+        </label>
+        <div class="rounded-lg border border-dashed border-[var(--brand-border)] bg-[var(--brand-background)] p-3 text-sm">
+          <p class="font-semibold">Preview da URL</p>
+          <p id="slug-preview" class="mt-1 break-all font-mono text-red-700">/vagas/…</p>
+          <p id="slug-status" class="mt-1 text-xs text-[var(--text-secondary)]">Slug gerado automaticamente.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="grid gap-4">
+      <div class="flex flex-wrap items-center justify-between gap-2">
+        <h2 class="text-lg font-black">Empresa</h2>
+        <button type="button" id="open-company-modal" class="rounded-lg border px-3 py-2 text-sm font-bold">Cadastrar nova empresa</button>
+      </div>
+      <label>
+        Empresa contratante
+        <select id="companyId" class="mt-1 w-full rounded-lg border p-3" name="companyId" required>
+          <option value="">Selecione ou cadastre uma empresa</option>
+          {options.companies.map((item) => (
+            <option value={item.id}>{item.name}</option>
+          ))}
+        </select>
+      </label>
+    </section>
+
+    <section class="grid gap-4 md:grid-cols-2">
+      <div>
+        <div class="flex flex-wrap items-center justify-between gap-2">
+          <h2 class="text-lg font-black">Categoria</h2>
+          <button type="button" id="open-category-modal" class="rounded-lg border px-3 py-1 text-xs font-bold">Nova categoria</button>
+        </div>
+        <label class="mt-2 block">
+          Categoria
+          <select id="categoryId" class="mt-1 w-full rounded-lg border p-3" name="categoryId">
+            <option value="">Sem categoria</option>
+            {options.categories.map((item) => (
+              <option value={item.id}>{item.name}</option>
+            ))}
+          </select>
+        </label>
+      </div>
+      <div class="grid gap-4">
+        <label>
+          Tipo de contratação
+          <select class="mt-1 w-full rounded-lg border p-3" name="employmentType" required>
+            <option value="">Selecione</option>
+            {EMPLOYMENT_TYPES.map((type) => (
+              <option value={type}>{type}</option>
+            ))}
+          </select>
+        </label>
+        <label>
+          Modalidade
+          <select class="mt-1 w-full rounded-lg border p-3" name="workplaceType" required>
+            {WORKPLACE_TYPES.map((type) => (
+              <option value={type.value}>{type.label}</option>
+            ))}
+          </select>
+        </label>
+      </div>
+    </section>
+
+    <section class="grid gap-4">
+      <div class="flex flex-wrap items-center justify-between gap-2">
+        <h2 class="text-lg font-black">Localização</h2>
+        <button type="button" id="open-city-modal" class="rounded-lg border px-3 py-2 text-sm font-bold">Cadastrar cidade</button>
+      </div>
+      <div class="grid gap-4 md:grid-cols-3">
+        <label>
+          Estado
+          <select id="stateId" class="mt-1 w-full rounded-lg border p-3" name="stateId" required>
+            <option value="">Selecione o estado</option>
+            {options.states.map((item) => (
+              <option value={item.id} data-code={item.code}>{item.name} ({item.code})</option>
+            ))}
+          </select>
+        </label>
+        <label>
+          Cidade
+          <select id="cityId" class="mt-1 w-full rounded-lg border p-3" name="cityId" required>
+            <option value="">Selecione o estado primeiro</option>
+            {options.cities.map((item) => (
+              <option value={item.id} data-state-id={item.stateId}>{item.name}</option>
+            ))}
+          </select>
+        </label>
+        <label>
+          Bairro (opcional)
+          <input class="mt-1 w-full rounded-lg border p-3" name="neighborhood" maxlength="120" placeholder="Ex.: Centro" />
+        </label>
+      </div>
+    </section>
+
+    <section class="grid gap-4">
+      <h2 class="text-lg font-black">Descrição</h2>
+      <label>
+        Resumo
+        <textarea class="mt-1 w-full rounded-lg border p-3" name="summary" minlength="40" maxlength="500" required placeholder="Resumo objetivo para listagens e SEO."></textarea>
+      </label>
+      <label>
+        Descrição completa
+        <textarea class="mt-1 min-h-48 w-full rounded-lg border p-3" name="description" minlength="80" required placeholder="Atividades, requisitos, benefícios e instruções de candidatura."></textarea>
+      </label>
+    </section>
+
+    <section class="grid gap-4">
+      <h2 class="text-lg font-black">Salário</h2>
+      <div class="grid gap-4 md:grid-cols-4">
+        <label>
+          Mínimo (R$)
+          <input class="mt-1 w-full rounded-lg border p-3" type="number" min="0" step="0.01" name="salaryMin" />
+        </label>
+        <label>
+          Máximo (R$)
+          <input class="mt-1 w-full rounded-lg border p-3" type="number" min="0" step="0.01" name="salaryMax" />
+        </label>
+        <label class="flex items-end gap-2 pb-3">
+          <input type="checkbox" name="salaryVisible" />
+          Exibir salário no portal
+        </label>
+      </div>
+    </section>
+
+    <section class="grid gap-4">
+      <h2 class="text-lg font-black">Candidatura e fonte</h2>
+      <div class="grid gap-4 md:grid-cols-2">
+        <label>
+          URL de candidatura
+          <input class="mt-1 w-full rounded-lg border p-3" type="url" name="applicationUrl" required placeholder="https://" />
+        </label>
+        <label>
+          Fonte
+          <input class="mt-1 w-full rounded-lg border p-3" name="sourceName" required value="Empregos São Luís" />
+        </label>
+        <label>
+          URL da fonte (opcional)
+          <input class="mt-1 w-full rounded-lg border p-3" type="url" name="sourceUrl" placeholder="https://" />
+        </label>
+        <label>
+          Validade
+          <input class="mt-1 w-full rounded-lg border p-3" type="datetime-local" name="expiresAt" required value={defaultExpiresLocal} />
+        </label>
+      </div>
+    </section>
+
+    <section class="grid gap-4">
+      <h2 class="text-lg font-black">Publicação</h2>
+      <label>
+        Status inicial
+        <select class="mt-1 w-full max-w-md rounded-lg border p-3" name="publicationStatus">
+          <option value="DRAFT">Salvar rascunho</option>
+          <option value="PENDING_REVIEW">Enviar para revisão</option>
+          <option value="PUBLISHED">Publicar agora</option>
+        </select>
+      </label>
+      <button class="rounded-xl bg-red-700 p-4 font-bold text-white" type="submit">Salvar vaga</button>
+    </section>
+  </form>
+
+  <dialog id="company-modal" class="w-full max-w-lg rounded-2xl border p-6 backdrop:bg-black/40">
+    <form method="dialog" class="grid gap-4">
+      <h3 class="text-xl font-black">Cadastrar empresa</h3>
+      <label>Nome interno<input id="quick-company-name" class="mt-1 w-full rounded-lg border p-3" required /></label>
+      <label>Nome público<input id="quick-company-public" class="mt-1 w-full rounded-lg border p-3" /></label>
+      <label>Site (opcional)<input id="quick-company-site" class="mt-1 w-full rounded-lg border p-3" type="url" /></label>
+      <label class="flex items-center gap-2"><input id="quick-company-verified" type="checkbox" /> Empresa verificada</label>
+      <div class="flex justify-end gap-2">
+        <button type="button" id="close-company-modal" class="rounded-lg border px-4 py-2">Cancelar</button>
+        <button type="button" id="save-company-modal" class="rounded-lg bg-red-700 px-4 py-2 font-bold text-white">Salvar e selecionar</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="city-modal" class="w-full max-w-lg rounded-2xl border p-6 backdrop:bg-black/40">
+    <form method="dialog" class="grid gap-4">
+      <h3 class="text-xl font-black">Cadastrar cidade</h3>
+      <p class="text-sm text-[var(--text-secondary)]">Use o estado já selecionado no formulário principal.</p>
+      <label>Nome da cidade<input id="quick-city-name" class="mt-1 w-full rounded-lg border p-3" required /></label>
+      <div class="flex justify-end gap-2">
+        <button type="button" id="close-city-modal" class="rounded-lg border px-4 py-2">Cancelar</button>
+        <button type="button" id="save-city-modal" class="rounded-lg bg-red-700 px-4 py-2 font-bold text-white">Salvar e selecionar</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="category-modal" class="w-full max-w-lg rounded-2xl border p-6 backdrop:bg-black/40">
+    <form method="dialog" class="grid gap-4">
+      <h3 class="text-xl font-black">Nova categoria</h3>
+      <label>Nome<input id="quick-category-name" class="mt-1 w-full rounded-lg border p-3" required /></label>
+      <div class="flex justify-end gap-2">
+        <button type="button" id="close-category-modal" class="rounded-lg border px-4 py-2">Cancelar</button>
+        <button type="button" id="save-category-modal" class="rounded-lg bg-red-700 px-4 py-2 font-bold text-white">Salvar e selecionar</button>
+      </div>
+    </form>
+  </dialog>
+</AdminLayout>
+
+<script define:vars={formData}>
+  const companies = JSON.parse(formData.companies);
+  const cities = JSON.parse(formData.cities);
+  const states = JSON.parse(formData.states);
+  const categories = JSON.parse(formData.categories);
+
+  const originalTitle = document.getElementById("originalTitle");
+  const normalizedTitle = document.getElementById("normalizedTitle");
+  const slugInput = document.getElementById("slug");
+  const slugPreview = document.getElementById("slug-preview");
+  const slugStatus = document.getElementById("slug-status");
+  const stateSelect = document.getElementById("stateId");
+  const citySelect = document.getElementById("cityId");
+  const companySelect = document.getElementById("companyId");
+  const categorySelect = document.getElementById("categoryId");
+
+  let slugTouched = false;
+  let titleTouched = false;
+
+  const slugify = (value) =>
+    value
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/(^-|-$)/g, "")
+      .slice(0, 150);
+
+  const updateSlugPreview = () => {
+    const slug = slugInput?.value?.trim();
+    if (slugPreview) slugPreview.textContent = slug ? `/vagas/${slug}` : "/vagas/…";
+  };
+
+  const refreshCities = () => {
+    if (!(stateSelect instanceof HTMLSelectElement) || !(citySelect instanceof HTMLSelectElement)) return;
+    const stateId = stateSelect.value;
+    const current = citySelect.value;
+    citySelect.innerHTML = '<option value="">Selecione a cidade</option>';
+    cities
+      .filter((city) => city.stateId === stateId)
+      .forEach((city) => {
+        const option = document.createElement("option");
+        option.value = city.id;
+        option.textContent = city.name;
+        option.dataset.stateId = city.stateId;
+        citySelect.appendChild(option);
+      });
+    if (current && [...citySelect.options].some((option) => option.value === current)) {
+      citySelect.value = current;
+    }
+    suggestSlug();
+  };
+
+  const suggestSlug = async () => {
+    if (slugTouched || !(slugInput instanceof HTMLInputElement)) return;
+    const title = (normalizedTitle instanceof HTMLInputElement ? normalizedTitle.value : "") ||
+      (originalTitle instanceof HTMLInputElement ? originalTitle.value : "");
+    if (title.trim().length < 3) return;
+
+    const params = new URLSearchParams({ title: title.trim() });
+    if (stateSelect instanceof HTMLSelectElement && stateSelect.value) params.set("stateId", stateSelect.value);
+    if (citySelect instanceof HTMLSelectElement && citySelect.value) params.set("cityId", citySelect.value);
+
+    try {
+      const response = await fetch(`/api/admin/jobs/slug?${params.toString()}`, { credentials: "same-origin" });
+      const payload = await response.json();
+      if (payload?.ok && payload.suggested) {
+        slugInput.value = payload.suggested;
+        if (slugStatus) slugStatus.textContent = "Slug sugerido automaticamente.";
+        updateSlugPreview();
+      }
+    } catch {
+      const cityName = citySelect instanceof HTMLSelectElement
+        ? citySelect.selectedOptions[0]?.textContent ?? ""
+        : "";
+      const stateCode = stateSelect instanceof HTMLSelectElement
+        ? stateSelect.selectedOptions[0]?.dataset.code ?? ""
+        : "";
+      slugInput.value = slugify([title, cityName, stateCode].filter(Boolean).join(" "));
+      updateSlugPreview();
+    }
+  };
+
+  originalTitle?.addEventListener("input", () => {
+    if (!(normalizedTitle instanceof HTMLInputElement) || titleTouched) return;
+    normalizedTitle.value = originalTitle.value;
+    suggestSlug();
+  });
+
+  normalizedTitle?.addEventListener("input", () => {
+    titleTouched = true;
+    suggestSlug();
+  });
+
+  slugInput?.addEventListener("input", () => {
+    slugTouched = true;
+    updateSlugPreview();
+  });
+
+  stateSelect?.addEventListener("change", refreshCities);
+  citySelect?.addEventListener("change", suggestSlug);
+
+  const companyModal = document.getElementById("company-modal");
+  const cityModal = document.getElementById("city-modal");
+  const categoryModal = document.getElementById("category-modal");
+
+  document.getElementById("open-company-modal")?.addEventListener("click", () => companyModal?.showModal());
+  document.getElementById("open-city-modal")?.addEventListener("click", () => {
+    if (!(stateSelect instanceof HTMLSelectElement) || !stateSelect.value) {
+      alert("Selecione o estado antes de cadastrar a cidade.");
+      return;
+    }
+    cityModal?.showModal();
+  });
+  document.getElementById("open-category-modal")?.addEventListener("click", () => categoryModal?.showModal());
+
+  document.getElementById("close-company-modal")?.addEventListener("click", () => companyModal?.close());
+  document.getElementById("close-city-modal")?.addEventListener("click", () => cityModal?.close());
+  document.getElementById("close-category-modal")?.addEventListener("click", () => categoryModal?.close());
+
+  const appendOption = (select, item) => {
+    if (!(select instanceof HTMLSelectElement)) return;
+    const option = document.createElement("option");
+    option.value = item.id;
+    option.textContent = item.name;
+    if (item.stateId) option.dataset.stateId = item.stateId;
+    select.appendChild(option);
+    select.value = item.id;
+  };
+
+  document.getElementById("save-company-modal")?.addEventListener("click", async () => {
+    const name = document.getElementById("quick-company-name");
+    if (!(name instanceof HTMLInputElement) || !name.value.trim()) return;
+    const payload = {
+      name: name.value.trim(),
+      publicName: document.getElementById("quick-company-public") instanceof HTMLInputElement
+        ? document.getElementById("quick-company-public").value.trim() || name.value.trim()
+        : name.value.trim(),
+      websiteUrl: document.getElementById("quick-company-site") instanceof HTMLInputElement
+        ? document.getElementById("quick-company-site").value.trim() || undefined
+        : undefined,
+      cityId: citySelect instanceof HTMLSelectElement ? citySelect.value || undefined : undefined,
+      stateId: stateSelect instanceof HTMLSelectElement ? stateSelect.value || undefined : undefined,
+      verified: document.getElementById("quick-company-verified") instanceof HTMLInputElement
+        ? document.getElementById("quick-company-verified").checked
+        : false
+    };
+    const response = await fetch("/api/admin/companies/quick", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      credentials: "same-origin",
+      body: JSON.stringify(payload)
+    });
+    const result = await response.json();
+    if (!result?.ok) {
+      alert(result?.error ?? "Não foi possível criar a empresa.");
+      return;
+    }
+    companies.push({ id: result.id, name: result.name });
+    appendOption(companySelect, result);
+    companyModal?.close();
+  });
+
+  document.getElementById("save-city-modal")?.addEventListener("click", async () => {
+    const name = document.getElementById("quick-city-name");
+    if (!(name instanceof HTMLInputElement) || !name.value.trim()) return;
+    if (!(stateSelect instanceof HTMLSelectElement) || !stateSelect.value) return;
+    const response = await fetch("/api/admin/locations/cities/quick", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      credentials: "same-origin",
+      body: JSON.stringify({ name: name.value.trim(), stateId: stateSelect.value })
+    });
+    const result = await response.json();
+    if (!result?.ok) {
+      alert(result?.error ?? "Não foi possível criar a cidade.");
+      return;
+    }
+    if (!cities.some((city) => city.id === result.id)) {
+      cities.push({ id: result.id, name: result.name, stateId: result.stateId });
+    }
+    refreshCities();
+    if (citySelect instanceof HTMLSelectElement) citySelect.value = result.id;
+    cityModal?.close();
+    suggestSlug();
+  });
+
+  document.getElementById("save-category-modal")?.addEventListener("click", async () => {
+    const name = document.getElementById("quick-category-name");
+    if (!(name instanceof HTMLInputElement) || !name.value.trim()) return;
+    const response = await fetch("/api/admin/categories/quick", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      credentials: "same-origin",
+      body: JSON.stringify({ name: name.value.trim() })
+    });
+    const result = await response.json();
+    if (!result?.ok) {
+      alert(result?.error ?? "Não foi possível criar a categoria.");
+      return;
+    }
+    categories.push({ id: result.id, name: result.name });
+    appendOption(categorySelect, result);
+    categoryModal?.close();
+  });
+
+  refreshCities();
+  updateSlugPreview();
+</script>
