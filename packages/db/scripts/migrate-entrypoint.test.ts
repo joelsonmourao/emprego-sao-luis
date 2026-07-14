@@ -4,6 +4,7 @@ import { resolve } from "node:path";
 import {
   isTruthyFlag,
   shouldRunCommercialPlansSeed,
+  shouldRunLocationsSeed,
   shouldRunRbacSeed,
   validateAdminBootstrapEnv
 } from "./migrate-flags";
@@ -24,6 +25,8 @@ describe("migrate flags", () => {
     expect(shouldRunRbacSeed({ RUN_SEED_RBAC: "false" })).toBe(false);
     expect(shouldRunCommercialPlansSeed({ RUN_SEED_COMMERCIAL_PLANS: "true" })).toBe(true);
     expect(shouldRunCommercialPlansSeed({})).toBe(false);
+    expect(shouldRunLocationsSeed({ RUN_SEED_LOCATIONS: "true" })).toBe(true);
+    expect(shouldRunLocationsSeed({})).toBe(false);
   });
 
   it("falha quando RUN_SEED_RBAC exige dados do administrador", () => {
@@ -48,8 +51,10 @@ describe("migrate entrypoint", () => {
     expect(entrypoint).toContain("npm run db:migrate --workspace=@es/db");
     expect(entrypoint).toContain('[ "${RUN_SEED_RBAC:-}" = "true" ]');
     expect(entrypoint).toContain('[ "${RUN_SEED_COMMERCIAL_PLANS:-}" = "true" ]');
+    expect(entrypoint).toContain('[ "${RUN_SEED_LOCATIONS:-}" = "true" ]');
     expect(entrypoint).toContain("npm run db:seed-rbac --workspace=@es/db");
     expect(entrypoint).toContain("npm run db:seed-commercial-plans --workspace=@es/db");
+    expect(entrypoint).toContain("npm run db:seed-locations --workspace=@es/db");
   });
 
   it("valida administrador antes do seed RBAC e não imprime valor da senha", () => {
@@ -94,5 +99,12 @@ describe("seed idempotency", () => {
     expect(seed).toContain("where(eq(commercialPlans.slug, plan.slug))");
     expect(seed).toContain("já existente(s)");
     expect(seed).toContain("export async function seedCommercialPlans");
+  });
+
+  it("localidades e categorias são idempotentes", () => {
+    const seed = read("packages/db/scripts/seed-locations.ts");
+    expect(seed).toContain("onConflictDoNothing");
+    expect(seed).toContain("Maranhão");
+    expect(seed).toContain("São Luís");
   });
 });

@@ -21,4 +21,10 @@ if [ "${RUN_SEED_COMMERCIAL_PLANS:-}" = "true" ]; then
   echo "[migrate] Seed de planos comerciais concluído."
 fi
 
+if [ "${RUN_SEED_LOCATIONS:-}" = "true" ]; then
+  echo "[migrate] Executando seed de localidades e categorias..."
+  npm run db:seed-locations --workspace=@es/db
+  echo "[migrate] Seed de localidades concluído."
+fi
+
 echo "[migrate] Execução finalizada. Encerrando container."

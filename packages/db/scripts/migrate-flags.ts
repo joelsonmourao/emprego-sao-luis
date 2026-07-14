@@ -26,3 +26,7 @@ export function shouldRunRbacSeed(env: Record<string, string | undefined>): bool
 export function shouldRunCommercialPlansSeed(env: Record<string, string | undefined>): boolean {
   return isTruthyFlag(env.RUN_SEED_COMMERCIAL_PLANS);
 }
+
+export function shouldRunLocationsSeed(env: Record<string, string | undefined>): boolean {
+  return isTruthyFlag(env.RUN_SEED_LOCATIONS);
+}
