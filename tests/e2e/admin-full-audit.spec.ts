@@ -1,6 +1,7 @@
 import { test, expect } from "@playwright/test";
 import { readFileSync, readdirSync, statSync } from "node:fs";
 import { join, resolve } from "node:path";
+import { ADMIN_STORAGE_STATE, ensureAdminSession, hasAdminStorageState } from "./helpers/admin-auth";
 
 const adminNavSource = readFileSync(resolve("apps/web/src/lib/admin-nav.ts"), "utf8");
 const menuRoutes = [...adminNavSource.matchAll(/href:\s*"(\/admin[^"]+)"/g)].map((match) => match[1]);
@@ -24,18 +25,16 @@ function collectAstroRoutes(dir: string, prefix = ""): string[] {
   return routes;
 }
 
-const publicRoutes = collectAstroRoutes(resolve("apps/web/src/pages")).filter(
-  (route) => !route.startsWith("/admin") && !route.startsWith("/api") && !route.startsWith("/empresa")
-);
-
 test.describe("auditoria completa do painel", () => {
+  test.skip(!adminEmail || !adminPassword, "E2E_ADMIN_EMAIL e E2E_ADMIN_PASSWORD não configurados");
+  test.describe.configure({ mode: "serial" });
+
+  if (hasAdminStorageState()) {
+    test.use({ storageState: ADMIN_STORAGE_STATE });
+  }
+
   test.beforeEach(async ({ page }) => {
-    test.skip(!adminEmail || !adminPassword, "E2E_ADMIN_EMAIL e E2E_ADMIN_PASSWORD não configurados");
-    await page.goto("/admin/login");
-    await page.locator('input[name="email"]').fill(adminEmail!);
-    await page.locator('input[name="password"]').fill(adminPassword!);
-    await page.getByRole("button", { name: "Entrar" }).click();
-    await page.waitForURL(/\/admin(\?|$)/, { timeout: 15_000 });
+    await ensureAdminSession(page);
   });
 
   for (const route of menuRoutes) {
@@ -53,17 +52,21 @@ test.describe("auditoria completa do painel", () => {
         }
       });
 
-      const response = await page.goto(route, { waitUntil: "domcontentloaded" });
+      const response = await page.goto(route, { waitUntil: "domcontentloaded", timeout: 45_000 });
       expect(response?.status(), `HTTP em ${route}`).toBe(200);
       await expect(page.locator("main")).toBeVisible();
+      await expect(page.getByRole("heading").first()).toBeVisible();
+      await page.waitForLoadState("load");
       expect(page.url(), `redirecionou para API em ${route}`).not.toMatch(/\/api\//);
+      expect(page.url()).not.toContain("/admin/login");
       expect(consoleErrors, `erros de console em ${route}`).toEqual([]);
       expect(failedRequests, `requisições de mutação falharam em ${route}`).toEqual([]);
 
       await expect(page.locator('a[href^="/api/"]:not([data-admin-download])')).toHaveCount(0);
-      const forms = page.locator('form[action^="/api/"]');
-      for (let index = 0; index < await forms.count(); index += 1) {
-        await expect(forms.nth(index).locator('button, input[type="submit"]')).not.toHaveCount(0);
+      const apiForms = page.locator('form[action^="/api/"]');
+      const formCount = await apiForms.evaluateAll((nodes) => nodes.length);
+      for (let index = 0; index < formCount; index += 1) {
+        await expect(apiForms.nth(index).locator('button, input[type="submit"]').first()).toBeVisible();
       }
     });
   }

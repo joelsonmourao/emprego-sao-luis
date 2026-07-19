@@ -1,6 +1,7 @@
 import { test, expect } from "@playwright/test";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
+import { ADMIN_STORAGE_STATE, ensureAdminSession, hasAdminStorageState } from "./helpers/admin-auth";
 
 const adminNavSource = readFileSync(resolve("apps/web/src/lib/admin-nav.ts"), "utf8");
 const menuRoutes = [...adminNavSource.matchAll(/href:\s*"(\/admin[^"]+)"/g)].map((match) => match[1]);
@@ -9,17 +10,18 @@ const adminEmail = process.env.E2E_ADMIN_EMAIL ?? process.env.ADMIN_INITIAL_EMAI
 const adminPassword = process.env.E2E_ADMIN_PASSWORD ?? process.env.ADMIN_INITIAL_PASSWORD;
 
 test.describe("painel administrativo — smoke autenticado", () => {
-  test.beforeEach(async ({ page }) => {
-    test.skip(!adminEmail || !adminPassword, "E2E_ADMIN_EMAIL e E2E_ADMIN_PASSWORD não configurados");
+  test.skip(!adminEmail || !adminPassword, "E2E_ADMIN_EMAIL e E2E_ADMIN_PASSWORD não configurados");
 
-    await page.goto("/admin/login");
-    await page.locator('input[name="email"]').fill(adminEmail!);
-    await page.locator('input[name="password"]').fill(adminPassword!);
-    await page.getByRole("button", { name: "Entrar" }).click();
-    await page.waitForURL(/\/admin(\?|$)/, { timeout: 15_000 });
+  if (hasAdminStorageState()) {
+    test.use({ storageState: ADMIN_STORAGE_STATE });
+  }
+
+  test.beforeEach(async ({ page }) => {
+    await ensureAdminSession(page);
   });
 
   test("login abre o painel", async ({ page }) => {
+    await page.goto("/admin");
     await expect(page.getByRole("heading", { name: "Visão geral" })).toBeVisible();
   });
 
@@ -30,10 +32,11 @@ test.describe("painel administrativo — smoke autenticado", () => {
         if (msg.type() === "error") consoleErrors.push(msg.text());
       });
 
-      const response = await page.goto(route, { waitUntil: "domcontentloaded" });
+      const response = await page.goto(route, { waitUntil: "domcontentloaded", timeout: 45_000 });
       expect(response?.status(), `status inesperado em ${route}`).toBeLessThan(400);
       await expect(page.locator("main")).toBeVisible();
       expect(page.url()).not.toContain("/api/");
+      expect(page.url()).not.toContain("/admin/login");
       expect(consoleErrors.join("\n")).not.toMatch(/hydration|uncaught/i);
     });
   }

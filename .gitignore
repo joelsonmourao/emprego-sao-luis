@@ -16,5 +16,6 @@ test-results
 coverage
 .lighthouseci
 
+tmp/
 tmp-lighthouse/
 backups/

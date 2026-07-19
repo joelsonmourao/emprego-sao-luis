@@ -1,6 +1,6 @@
 import { CANDIDATURE_BLOCKED_SLOT_KEYS } from "@es/ads";
 import { articles, categories, cities, companies, createDatabase, jobs, states, webStories } from "@es/db";
-import { evaluateJobPublication } from "@es/shared";
+import { evaluateJobPublication, isStagingLikeEnvironment } from "@es/shared";
 import { eq } from "drizzle-orm";
 import { getInstitutionalPages } from "./site-pages";
 
@@ -22,9 +22,13 @@ export type ReadinessCheck = {
 const placeholderPattern = /\[configur[aá]vel no painel administrativo\]|data-admin-field=/i;
 const plainLength = (html: string) => html.replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim().length;
 
+type CacheEntry = { at: number; value: Awaited<ReturnType<typeof buildAdsenseReadiness>> };
+const readinessCache = new Map<string, CacheEntry>();
+const READINESS_CACHE_MS = 15_000;
+
 async function fetchText(url: URL) {
   try {
-    const response = await fetch(url, { redirect: "follow", signal: AbortSignal.timeout(8_000) });
+    const response = await fetch(url, { redirect: "follow", signal: AbortSignal.timeout(4_000) });
     return { status: response.status, contentType: response.headers.get("content-type") ?? "", body: await response.text() };
   } catch (error) {
     return { status: 0, contentType: "", body: error instanceof Error ? error.message : "Falha de rede" };
@@ -36,7 +40,17 @@ function pass(partial: Omit<ReadinessCheck, "status" | "autoFixAvailable"> & { s
 }
 
 export async function getAdsenseReadiness(baseUrl: URL) {
+  const cacheKey = baseUrl.origin;
+  const cached = readinessCache.get(cacheKey);
+  if (cached && Date.now() - cached.at < READINESS_CACHE_MS) return cached.value;
+  const value = await buildAdsenseReadiness(baseUrl);
+  readinessCache.set(cacheKey, { at: Date.now(), value });
+  return value;
+}
+
+async function buildAdsenseReadiness(baseUrl: URL) {
   const checks: ReadinessCheck[] = [];
+  const stagingLike = isStagingLikeEnvironment();
   const institutional = await getInstitutionalPages();
   const institutionalRequired = [
     "quem-somos",
@@ -79,8 +93,8 @@ export async function getAdsenseReadiness(baseUrl: URL) {
   if (process.env.DATABASE_URL) {
     const connection = createDatabase(process.env.DATABASE_URL);
     try {
-      articleRows = await connection.db.select().from(articles);
-      storyRows = await connection.db.select().from(webStories);
+      articleRows = await connection.db.select().from(articles).limit(400);
+      storyRows = await connection.db.select().from(webStories).limit(100);
       jobRows = await connection.db
         .select({
           job: jobs,
@@ -94,7 +108,8 @@ export async function getAdsenseReadiness(baseUrl: URL) {
         .innerJoin(cities, eq(jobs.cityId, cities.id))
         .innerJoin(states, eq(jobs.stateId, states.id))
         .leftJoin(categories, eq(jobs.categoryId, categories.id))
-        .where(eq(jobs.publicationStatus, "PUBLISHED"));
+        .where(eq(jobs.publicationStatus, "PUBLISHED"))
+        .limit(400);
     } finally {
       await connection.close();
     }
@@ -215,6 +230,8 @@ export async function getAdsenseReadiness(baseUrl: URL) {
   );
 
   const robots = await fetchText(new URL("/robots.txt", baseUrl));
+  const robotsHasSitemap = robots.body.includes("Sitemap:");
+  const robotsBlocksAll = /Disallow:\s*\/\s*$/m.test(robots.body);
   checks.push(
     pass({
       id: "robots",
@@ -222,24 +239,32 @@ export async function getAdsenseReadiness(baseUrl: URL) {
       label: "robots.txt",
       kind: "OFFICIAL",
       severity: "P0",
-      status: robots.status === 200 && robots.body.includes("Sitemap:") ? "APROVADO_INTERNAMENTE" : "BLOQUEADOR",
-      evidence: `HTTP ${robots.status || "indisponível"}; ${robots.body.includes("Sitemap:") ? "sitemap declarado" : "sitemap ausente"}.`
+      status: stagingLike
+        ? robots.status === 200 && robotsBlocksAll && !robotsHasSitemap
+          ? "APROVADO_INTERNAMENTE"
+          : "BLOQUEADOR"
+        : robots.status === 200 && robotsHasSitemap
+          ? "APROVADO_INTERNAMENTE"
+          : "BLOQUEADOR",
+      evidence: stagingLike
+        ? `Ambiente de homologação: HTTP ${robots.status || "indisponível"}; ${robotsBlocksAll ? "Disallow: /" : "bloqueio ausente"}; sitemap ${robotsHasSitemap ? "indevidamente declarado" : "omitido (correto)"}.`
+        : `HTTP ${robots.status || "indisponível"}; ${robotsHasSitemap ? "sitemap declarado" : "sitemap ausente"}.`
     })
   );
   const sitemap = await fetchText(new URL("/sitemap.xml", baseUrl));
   const childUrls = [...sitemap.body.matchAll(/<loc>([^<]+)<\/loc>/g)].map((match) => match[1]!).filter(Boolean);
-  const childResults = [];
-  for (const child of childUrls) {
-    const url = new URL(child, baseUrl);
-    if (url.origin !== baseUrl.origin) {
-      childResults.push(`${url.pathname}: origem externa`);
-      continue;
-    }
-    const result = await fetchText(url);
-    if (result.status !== 200 || !/<(?:urlset|sitemapindex)[\s>]/.test(result.body)) {
-      childResults.push(`${url.pathname}: HTTP ${result.status}`);
-    }
-  }
+  const childResults = await Promise.all(
+    childUrls.map(async (child) => {
+      const url = new URL(child, baseUrl);
+      if (url.origin !== baseUrl.origin) return `${url.pathname}: origem externa`;
+      const result = await fetchText(url);
+      if (result.status !== 200 || !/<(?:urlset|sitemapindex)[\s>]/.test(result.body)) {
+        return `${url.pathname}: HTTP ${result.status}`;
+      }
+      return null;
+    })
+  );
+  const childFailures = childResults.filter(Boolean) as string[];
   checks.push(
     pass({
       id: "sitemaps",
@@ -247,17 +272,19 @@ export async function getAdsenseReadiness(baseUrl: URL) {
       label: "Sitemaps e filhos",
       kind: "OFFICIAL",
       severity: "P0",
-      status: sitemap.status === 200 && childUrls.length > 0 && childResults.length === 0 ? "APROVADO_INTERNAMENTE" : "BLOQUEADOR",
-      evidence: childResults.length ? childResults.join(" | ") : `${childUrls.length} sitemap(s) filho(s) validados.`
+      status: sitemap.status === 200 && childUrls.length > 0 && childFailures.length === 0 ? "APROVADO_INTERNAMENTE" : "BLOQUEADOR",
+      evidence: childFailures.length ? childFailures.join(" | ") : `${childUrls.length} sitemap(s) filho(s) validados.`
     })
   );
 
+  const hubPaths = ["/blog", "/noticias", "/empresas"] as const;
+  const hubPages = await Promise.all(hubPaths.map((path) => fetchText(new URL(path, baseUrl))));
   const emptyHubs: string[] = [];
-  for (const path of ["/blog", "/noticias", "/empresas"]) {
-    const page = await fetchText(new URL(path, baseUrl));
+  hubPaths.forEach((path, index) => {
+    const page = hubPages[index]!;
     const noindex = /noindex/i.test(page.body) || /noindex/i.test(page.contentType);
     if (page.status === 200 && /Nenhum|Nenhuma|vazia|fora do índice/i.test(page.body) && !noindex) emptyHubs.push(path);
-  }
+  });
   checks.push(
     pass({
       id: "empty-hubs",

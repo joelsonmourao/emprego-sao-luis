@@ -18,6 +18,7 @@ if (process.env.DATABASE_URL) {
   }
   finally { await connection.close(); }
 }
+const preferredTemplate = Astro.url.searchParams.get("template") === "POST_MAGNETICO" ? "POST_MAGNETICO" : "STANDARD";
 ---
 
 <AdminLayout title="Novo conteúdo">
@@ -45,7 +46,7 @@ if (process.env.DATABASE_URL) {
     </div>
     <div class="grid gap-4 md:grid-cols-3">
       <label>Etapa editorial<select class="mt-1 w-full rounded-lg border p-3" name="editorialStage"><option value="PITCH">Pauta</option><option value="SOURCES">Fontes</option><option value="BRIEF">Briefing</option><option value="DRAFT">Rascunho</option><option value="FACT_REVIEW">Revisão factual</option><option value="EDITORIAL_REVIEW">Revisão editorial</option><option value="INTERNAL_LINKS">Links internos</option><option value="SEO">SEO</option><option value="APPROVED">Aprovado</option></select></label>
-      <label>Template editorial<select class="mt-1 w-full rounded-lg border p-3" name="editorialTemplate"><option value="STANDARD">Padrão</option><option value="POST_MAGNETICO">Post Magnético</option></select></label>
+      <label>Template editorial<select class="mt-1 w-full rounded-lg border p-3" name="editorialTemplate"><option value="STANDARD" selected={preferredTemplate==="STANDARD"}>Padrão</option><option value="POST_MAGNETICO" selected={preferredTemplate==="POST_MAGNETICO"}>Post Magnético</option></select></label>
       <label>Intenção de busca<select class="mt-1 w-full rounded-lg border p-3" name="searchIntent"><option value="INFORMATIONAL">Informacional</option><option value="LOCAL">Local</option><option value="TRANSACTIONAL">Transacional</option><option value="NAVIGATIONAL">Navegacional</option></select></label>
     </div>
     <div class="grid gap-4 md:grid-cols-2">

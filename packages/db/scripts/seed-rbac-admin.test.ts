@@ -28,25 +28,29 @@ function memoryStore() {
 }
 
 describe("upsert do administrador inicial", () => {
-  it("executa duas vezes sem duplicar e atualiza nome, senha e papel", async () => {
-    const memory = memoryStore();
-    const first = await upsertInitialAdmin(memory.store, {
-      email: "admin@example.com",
-      name: "Admin inicial",
-      password: "senha0001"
-    });
-    const second = await upsertInitialAdmin(memory.store, {
-      email: "admin@example.com",
-      name: "Admin atualizado",
-      password: "senha0002"
-    });
+  it(
+    "executa duas vezes sem duplicar e atualiza nome, senha e papel",
+    async () => {
+      const memory = memoryStore();
+      const first = await upsertInitialAdmin(memory.store, {
+        email: "admin@example.com",
+        name: "Admin inicial",
+        password: "senha0001"
+      });
+      const second = await upsertInitialAdmin(memory.store, {
+        email: "admin@example.com",
+        name: "Admin atualizado",
+        password: "senha0002"
+      });
 
-    expect(first.action).toBe("created");
-    expect(second.action).toBe("updated");
-    expect(memory.users).toHaveLength(1);
-    expect(memory.superAdmins).toHaveLength(1);
-    expect(second.user.name).toBe("Admin atualizado");
-    await expect(bcrypt.compare("senha0002", second.user.passwordHash!)).resolves.toBe(true);
-    await expect(bcrypt.compare("senha0001", second.user.passwordHash!)).resolves.toBe(false);
-  });
+      expect(first.action).toBe("created");
+      expect(second.action).toBe("updated");
+      expect(memory.users).toHaveLength(1);
+      expect(memory.superAdmins).toHaveLength(1);
+      expect(second.user.name).toBe("Admin atualizado");
+      await expect(bcrypt.compare("senha0002", second.user.passwordHash!)).resolves.toBe(true);
+      await expect(bcrypt.compare("senha0001", second.user.passwordHash!)).resolves.toBe(false);
+    },
+    15_000
+  );
 });

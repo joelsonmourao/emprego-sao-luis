@@ -53,6 +53,7 @@ export function maxBytesForKey(key: BrandAssetKey): number {
 }
 export const FALLBACK_PATHS: Record<BrandAssetKey, string> = {
   [BRAND_ASSET_KEYS.LOGO_MAIN]: "/brand/logo-horizontal.webp",
+  // Mantém fundo claro do ativo horizontal — letras escuras legíveis no rodapé escuro.
   [BRAND_ASSET_KEYS.LOGO_DARK]: "/brand/logo-horizontal.webp",
   [BRAND_ASSET_KEYS.ICON]: "/brand/icon.webp",
   [BRAND_ASSET_KEYS.FAVICON]: "/favicon.ico",
@@ -63,7 +64,7 @@ export const FALLBACK_PATHS: Record<BrandAssetKey, string> = {
   [BRAND_ASSET_KEYS.EMAIL_LOGO]: "/brand/logo-horizontal.png",
   [BRAND_ASSET_KEYS.ADMIN_LOGO]: "/brand/logo-horizontal.webp",
   [BRAND_ASSET_KEYS.LOGIN_LOGO]: "/brand/logo-horizontal.webp",
-  [BRAND_ASSET_KEYS.INSTAGRAM_IMAGE]: "/brand/icon.webp"
+  [BRAND_ASSET_KEYS.INSTAGRAM_IMAGE]: "/brand/icon-instagram.webp"
 };
 
 export interface BrandPalette {

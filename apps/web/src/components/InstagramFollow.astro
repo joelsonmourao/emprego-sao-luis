@@ -1,7 +1,5 @@
 ---
-import BrandLogo from "./BrandLogo.astro";
 import { BRAND_ASSETS } from "../lib/brand-assets";
-import { BRAND_ASSET_KEYS } from "../lib/brand/constants";
 import { getInstagramCtaSettings } from "../lib/instagram-cta";
 
 interface Props {
@@ -44,10 +42,18 @@ const showQr = settings.showQrCode && settings.qrCodeUrl;
         </div>
         <div class="flex items-center justify-center bg-[var(--brand-secondary)] p-6 sm:p-10">
           <div class="text-center">
-            <BrandLogo assetKey={BRAND_ASSET_KEYS.INSTAGRAM_IMAGE} variant="large" class="mx-auto h-24 w-24 object-contain" width={96} height={96} />
+            <img
+              src="/brand/icon-instagram.webp"
+              alt={BRAND_ASSETS.logoAlt}
+              class="mx-auto h-36 w-36 rounded-2xl bg-white object-contain p-2 shadow-sm sm:h-44 sm:w-44 sm:p-2.5 lg:h-48 lg:w-48"
+              width="192"
+              height="192"
+              loading="lazy"
+              decoding="async"
+            />
             <p class="mt-4 font-display text-xl font-black text-white">{BRAND_ASSETS.instagramHandle}</p>
             <p class="mt-2 text-sm text-white/70">Vagas · Stories · Dicas</p>
-            {showQr && <img src={settings.qrCodeUrl!} alt="QR Code do Instagram" class="mx-auto mt-6 h-28 w-28 rounded-xl bg-white p-2" width="112" height="112" loading="lazy" />}
+            {showQr && <img src={settings.qrCodeUrl!} alt="QR Code do Instagram" class="mx-auto mt-6 h-28 w-28 rounded-xl bg-white p-2" width="112" height="112" loading="lazy" decoding="async" />}
           </div>
         </div>
       </div>

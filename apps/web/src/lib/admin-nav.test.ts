@@ -34,6 +34,30 @@ describe("admin navigation", () => {
     expect(labels).toContain("/admin/instagram");
   });
 
+  it("inclui áreas de continuidade do negócio no menu", () => {
+    const hrefs = ADMIN_NAV_GROUPS.flatMap((g) => g.items.map((i) => i.href));
+    for (const href of [
+      "/admin/vagas/importar-contatos",
+      "/admin/vagas/revisao",
+      "/admin/vagas/monitor-candidaturas",
+      "/admin/conteudo/pilares",
+      "/admin/conteudo/post-magnetico",
+      "/admin/adsense-readiness",
+      "/admin/web-stories",
+      "/admin/calendario-editorial",
+      "/admin/autores",
+      "/admin/fontes",
+      "/admin/seo/links-internos",
+      "/admin/seo/canibalizacao",
+      "/admin/vagas-patrocinadas",
+      "/admin/perfis-empresariais",
+      "/admin/conteudo-patrocinado",
+      "/admin/automacoes-editoriais"
+    ]) {
+      expect(hrefs).toContain(href);
+    }
+  });
+
   it("cada item do menu aponta para página existente", () => {
     const missing = ADMIN_NAV_GROUPS.flatMap((g) => g.items)
       .filter((item) => !adminPageExists(item.href))

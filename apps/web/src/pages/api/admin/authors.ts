@@ -12,7 +12,7 @@ const schema = z.object({
   slug: z.string().trim().max(140).optional(),
   bio: z.string().trim().max(2_000).optional(),
   avatarUrl: z.union([z.string().trim().url(), z.literal("")]).optional(),
-  returnTo: z.enum(["content", "json"]).default("content")
+  returnTo: z.enum(["content", "json", "authors"]).default("content")
 });
 
 export const POST: APIRoute = async ({ request, locals }) => {
@@ -53,6 +53,9 @@ export const POST: APIRoute = async ({ request, locals }) => {
 
     if (parsed.data.returnTo === "json") {
       return adminJsonOk({ author, message: "Autor cadastrado e selecionado." });
+    }
+    if (parsed.data.returnTo === "authors") {
+      return adminJsonRedirect(`/admin/autores?author=${author.id}`, { author });
     }
     return adminJsonRedirect(`/admin/conteudo?author=${author.id}`, { author });
   } catch (error) {

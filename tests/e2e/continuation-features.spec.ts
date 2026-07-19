@@ -1,6 +1,7 @@
 import { expect, test } from "@playwright/test";
 import { createHash, randomUUID } from "node:crypto";
 import postgres from "postgres";
+import { ADMIN_STORAGE_STATE, ensureAdminSession, hasAdminStorageState, loginAdmin } from "./helpers/admin-auth";
 
 const adminEmail = process.env.E2E_ADMIN_EMAIL ?? process.env.ADMIN_INITIAL_EMAIL;
 const adminPassword = process.env.E2E_ADMIN_PASSWORD ?? process.env.ADMIN_INITIAL_PASSWORD;
@@ -8,14 +9,12 @@ const allowMutations = process.env.E2E_ALLOW_MUTATIONS === "true";
 const databaseUrl = process.env.E2E_DATABASE_URL ?? process.env.DATABASE_URL;
 
 async function login(page: import("@playwright/test").Page) {
-  await page.goto("/admin/login");
-  await page.locator("#admin-login-form input[name='email']").fill(adminEmail!);
-  await page.locator("#admin-login-form input[name='password']").fill(adminPassword!);
-  await page.locator("#admin-login-form button[type='submit']").click();
-  // Não usar /\/admin(?:\/|$)/ — isso também casa com /admin/login.
-  await page.waitForURL((url) => url.pathname.startsWith("/admin") && !url.pathname.startsWith("/admin/login"), {
-    timeout: 20_000
-  });
+  if (hasAdminStorageState()) {
+    // storageState aplicado no describe; só garante sessão
+    await ensureAdminSession(page);
+    return;
+  }
+  await loginAdmin(page);
 }
 
 test.describe("continuação — rotas públicas críticas", () => {
@@ -45,7 +44,16 @@ test.describe("continuação — rotas públicas críticas", () => {
   test("sitemaps index e filhos respondem XML válido", async ({ request }) => {
     const robots = await request.get("/robots.txt");
     expect(robots.ok()).toBe(true);
-    expect(await robots.text()).toContain("Sitemap:");
+    const robotsBody = await robots.text();
+    const stagingLike = /Disallow:\s*\/\s*$/m.test(robotsBody);
+
+    if (stagingLike) {
+      // Homologação/E2E: bloqueio total sem declarar Sitemap ao Search Console.
+      expect(robotsBody).toMatch(/Disallow:\s*\//i);
+      expect(robotsBody).not.toMatch(/Sitemap:/i);
+    } else {
+      expect(robotsBody).toContain("Sitemap:");
+    }
 
     const index = await request.get("/sitemap.xml");
     expect(index.ok()).toBe(true);
@@ -80,6 +88,9 @@ test.describe("continuação — rotas públicas críticas", () => {
 
 test.describe("continuação — painel e candidatura multicanal", () => {
   test.skip(!allowMutations || !adminEmail || !adminPassword || !databaseUrl, "Requer E2E_ALLOW_MUTATIONS e banco isolado");
+  if (hasAdminStorageState()) {
+    test.use({ storageState: ADMIN_STORAGE_STATE });
+  }
 
   test("Rota da Aprovação mostra disclaimer e etapas", async ({ page }) => {
     await login(page);

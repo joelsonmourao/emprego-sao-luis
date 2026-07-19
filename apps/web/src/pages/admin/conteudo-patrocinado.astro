@@ -1,0 +1,53 @@
+---
+import AdminLayout from "../../layouts/AdminLayout.astro";
+import { can } from "../../lib/auth";
+import { articles, createDatabase } from "@es/db";
+import { desc, eq } from "drizzle-orm";
+
+const auth = Astro.locals.auth!;
+if (!can(auth, "content.manage")) return Astro.redirect("/admin?error=sem-permissao");
+
+let rows: Array<{ id: string; title: string; status: string; sponsorshipDisclosure: string | null; updatedAt: Date }> = [];
+if (process.env.DATABASE_URL) {
+  const connection = createDatabase(process.env.DATABASE_URL);
+  try {
+    rows = await connection.db
+      .select({
+        id: articles.id,
+        title: articles.title,
+        status: articles.status,
+        sponsorshipDisclosure: articles.sponsorshipDisclosure,
+        updatedAt: articles.updatedAt
+      })
+      .from(articles)
+      .where(eq(articles.sponsoredContent, true))
+      .orderBy(desc(articles.updatedAt))
+      .limit(100);
+  } finally {
+    await connection.close();
+  }
+}
+---
+<AdminLayout title="Conteúdo patrocinado">
+  <div>
+    <p class="text-sm font-bold uppercase tracking-wide text-red-700">Monetização B2B</p>
+    <h1 class="mt-2 text-3xl font-black">Conteúdo patrocinado</h1>
+    <p class="mt-2 text-sm text-[var(--text-secondary)]">Deve ser identificado. Não confundir com verificação editorial. Candidato nunca paga.</p>
+  </div>
+  <div class="mt-8 overflow-auto rounded-2xl bg-white">
+    <table class="w-full text-left text-sm">
+      <thead><tr class="border-b"><th class="p-4">Título</th><th>Status</th><th>Identificação</th><th></th></tr></thead>
+      <tbody>
+        {rows.map((row) => (
+          <tr class="border-b">
+            <td class="p-4 font-bold">{row.title}</td>
+            <td>{row.status}</td>
+            <td>{row.sponsorshipDisclosure ?? "⚠️ sem disclosure"}</td>
+            <td class="p-4"><a class="text-red-700" href={`/admin/conteudo/${row.id}/editar`}>Editar</a></td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+    {rows.length === 0 && <p class="p-6 text-sm text-slate-600">Nenhum conteúdo patrocinado.</p>}
+  </div>
+</AdminLayout>

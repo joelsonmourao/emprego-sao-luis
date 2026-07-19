@@ -1,0 +1,86 @@
+---
+import AdminLayout from "../../../layouts/AdminLayout.astro";
+import { can } from "../../../lib/auth";
+import { articles, createDatabase } from "@es/db";
+import { desc, eq } from "drizzle-orm";
+import { scorePostMagnetico } from "@es/shared";
+
+const auth = Astro.locals.auth!;
+if (!can(auth, "content.manage")) return Astro.redirect("/admin?error=sem-permissao");
+
+let rows: Array<typeof articles.$inferSelect & { score: ReturnType<typeof scorePostMagnetico> }> = [];
+if (process.env.DATABASE_URL) {
+  const connection = createDatabase(process.env.DATABASE_URL);
+  try {
+    const data = await connection.db
+      .select()
+      .from(articles)
+      .where(eq(articles.editorialTemplate, "POST_MAGNETICO"))
+      .orderBy(desc(articles.updatedAt))
+      .limit(100);
+    rows = data.map((article) => ({
+      ...article,
+      score: scorePostMagnetico({
+        title: article.title,
+        excerpt: article.excerpt,
+        contentHtml: article.contentHtml,
+        directAnswer: article.directAnswer,
+        localHook: article.localHook,
+        candidateCta: article.candidateCta,
+        companyCta: article.companyCta,
+        pillarId: article.pillarId,
+        clusterId: article.clusterId,
+        authorId: article.authorId,
+        reviewerId: article.reviewerId,
+        coverImageUrl: article.coverImageUrl,
+        coverImageAlt: article.coverImageAlt,
+        sources: article.sources as Array<{ name?: string | null; url?: string | null }>,
+        sourceUrl: article.sourceUrl
+      })
+    }));
+  } finally {
+    await connection.close();
+  }
+}
+---
+<AdminLayout title="Post Magnético">
+  <div class="flex flex-wrap items-start justify-between gap-4">
+    <div>
+      <p class="text-sm font-bold uppercase tracking-wide text-red-700">Conteúdo</p>
+      <h1 class="mt-2 text-3xl font-black">Post Magnético</h1>
+      <p class="mt-2 text-sm text-[var(--text-secondary)]">
+        Template editorial com score interno. IA pode auxiliar; publicação exige revisão humana.
+        CTAs de candidato são sempre gratuitos.
+      </p>
+    </div>
+    <a class="rounded-lg bg-red-700 px-4 py-2 font-bold text-white" href="/admin/conteudo/novo?template=POST_MAGNETICO">Novo Post Magnético</a>
+  </div>
+  <section class="mt-8 overflow-x-auto rounded-2xl bg-white p-6">
+    {rows.length === 0 ? (
+      <p class="text-sm text-slate-600">Nenhum conteúdo com template Post Magnético. Crie pelo botão acima e preencha resposta, gancho local e CTAs.</p>
+    ) : (
+      <table class="min-w-full text-sm">
+        <thead>
+          <tr class="border-b text-left">
+            <th class="p-3">Título</th>
+            <th class="p-3">Status</th>
+            <th class="p-3">Score</th>
+            <th class="p-3">Bloqueadores</th>
+            <th class="p-3">Ação</th>
+          </tr>
+        </thead>
+        <tbody>
+          {rows.map((row) => (
+            <tr class="border-b align-top">
+              <td class="p-3 font-bold">{row.title}</td>
+              <td class="p-3">{row.status}</td>
+              <td class="p-3 font-black">{row.score.total}</td>
+              <td class="p-3 text-xs">{row.score.blockers.length ? row.score.blockers.join(" · ") : "nenhum"}</td>
+              <td class="p-3"><a class="font-bold text-red-700 underline" href={`/admin/conteudo/${row.id}/editar`}>Editar</a></td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    )}
+  </section>
+</AdminLayout>
