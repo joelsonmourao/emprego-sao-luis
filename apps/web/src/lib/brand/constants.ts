@@ -53,15 +53,15 @@ export function maxBytesForKey(key: BrandAssetKey): number {
 }
 export const FALLBACK_PATHS: Record<BrandAssetKey, string> = {
   [BRAND_ASSET_KEYS.LOGO_MAIN]: "/brand/logo-horizontal.webp",
-  // Mantém fundo claro do ativo horizontal — letras escuras legíveis no rodapé escuro.
-  [BRAND_ASSET_KEYS.LOGO_DARK]: "/brand/logo-horizontal.webp",
+  // Letras escuras da marca: placa branca gerada (contraste no rodapé).
+  [BRAND_ASSET_KEYS.LOGO_DARK]: "/brand/logo-horizontal-on-dark.webp",
   [BRAND_ASSET_KEYS.ICON]: "/brand/icon.webp",
-  [BRAND_ASSET_KEYS.FAVICON]: "/favicon.ico",
+  [BRAND_ASSET_KEYS.FAVICON]: "/favicon.svg",
   [BRAND_ASSET_KEYS.APPLE_TOUCH]: "/apple-touch-icon.png",
   [BRAND_ASSET_KEYS.PWA_192]: "/icon-192.png",
   [BRAND_ASSET_KEYS.PWA_512]: "/icon-512.png",
-  [BRAND_ASSET_KEYS.OG_DEFAULT]: "/brand/logo-horizontal.png",
-  [BRAND_ASSET_KEYS.EMAIL_LOGO]: "/brand/logo-horizontal.png",
+  [BRAND_ASSET_KEYS.OG_DEFAULT]: "/brand/og-default.png",
+  [BRAND_ASSET_KEYS.EMAIL_LOGO]: "/brand/og-default.png",
   [BRAND_ASSET_KEYS.ADMIN_LOGO]: "/brand/logo-horizontal.webp",
   [BRAND_ASSET_KEYS.LOGIN_LOGO]: "/brand/logo-horizontal.webp",
   [BRAND_ASSET_KEYS.INSTAGRAM_IMAGE]: "/brand/icon-instagram.webp"

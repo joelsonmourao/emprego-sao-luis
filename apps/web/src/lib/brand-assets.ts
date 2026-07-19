@@ -1,5 +1,6 @@
 export const BRAND_ASSETS = {
   logoHorizontalWebp: "/brand/logo-horizontal.webp",
+  logoHorizontalOnDarkWebp: "/brand/logo-horizontal-on-dark.webp",
   logoHorizontalPng: "/brand/logo-horizontal.png",
   iconWebp: "/brand/icon.webp",
   faviconSvg: "/favicon.svg",

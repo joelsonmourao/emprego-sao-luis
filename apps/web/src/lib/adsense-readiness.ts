@@ -131,7 +131,12 @@ async function buildAdsenseReadiness(baseUrl: URL) {
     })
   );
 
+  /** Meta interna (não é número oficial do Google). Usada para “Pronto para solicitar análise”. */
+  const MIN_PUBLISHED_ARTICLES = 15;
+  const MIN_USEFUL_CHARS = 800;
   const publishedArticles = articleRows.filter((article) => article.status === "PUBLISHED");
+  const scheduledArticles = articleRows.filter((article) => article.status === "SCHEDULED");
+  const substantialPublished = publishedArticles.filter((article) => plainLength(article.contentHtml) >= MIN_USEFUL_CHARS);
   checks.push(
     pass({
       id: "content-volume",
@@ -140,11 +145,28 @@ async function buildAdsenseReadiness(baseUrl: URL) {
       kind: "OFFICIAL",
       severity: "P0",
       status: publishedArticles.length ? "APROVADO_INTERNAMENTE" : "BLOQUEADOR",
-      evidence: `${publishedArticles.length} conteúdo(s) editorial(is) publicado(s). O Google não define quantidade mínima oficial.`,
+      evidence: `${publishedArticles.length} publicado(s); ${scheduledArticles.length} agendado(s). O Google não publica quantidade mínima oficial.`,
       action: "/admin/conteudo/estrategia"
     })
   );
-  const thin = publishedArticles.filter((article) => plainLength(article.contentHtml) < 800);
+  checks.push(
+    pass({
+      id: "content-volume-internal",
+      stage: "ETAPA_2",
+      label: `Meta interna: ${MIN_PUBLISHED_ARTICLES} posts substanciais`,
+      kind: "INTERNAL",
+      severity: "P0",
+      status:
+        substantialPublished.length >= MIN_PUBLISHED_ARTICLES
+          ? "APROVADO_INTERNAMENTE"
+          : publishedArticles.length === 0
+            ? "BLOQUEADOR"
+            : "PENDENTE",
+      evidence: `${substantialPublished.length}/${MIN_PUBLISHED_ARTICLES} publicados com ≥${MIN_USEFUL_CHARS} caracteres úteis. Agendados: ${scheduledArticles.length}. Use o seed editorial ou o calendário.`,
+      action: "/admin/calendario-editorial"
+    })
+  );
+  const thin = publishedArticles.filter((article) => plainLength(article.contentHtml) < MIN_USEFUL_CHARS);
   checks.push(
     pass({
       id: "thin-content",
@@ -153,7 +175,7 @@ async function buildAdsenseReadiness(baseUrl: URL) {
       kind: "INTERNAL",
       severity: "P1",
       status: thin.length ? "BLOQUEADOR" : "APROVADO_INTERNAMENTE",
-      evidence: `${thin.length} conteúdo(s) publicado(s) abaixo da meta interna de 800 caracteres úteis.`,
+      evidence: `${thin.length} conteúdo(s) publicado(s) abaixo da meta interna de ${MIN_USEFUL_CHARS} caracteres úteis.`,
       action: thin.length ? "/admin/conteudo/estrategia" : undefined
     })
   );
@@ -376,10 +398,17 @@ async function buildAdsenseReadiness(baseUrl: URL) {
     blockers.length === 0 &&
     !pendingInstitutional.length &&
     invalidJobs.length === 0 &&
-    publishedArticles.length > 0 &&
+    substantialPublished.length >= MIN_PUBLISHED_ARTICLES &&
     thin.length === 0 &&
-    noAuthorSource.length === 0;
-  const classification = ready ? "PRONTO PARA SOLICITAR ANÁLISE" : blockers.some((item) => item.severity === "P0") ? "BLOQUEADO" : pending.length ? "QUASE PRONTO" : "NÃO PRONTO";
+    noAuthorSource.length === 0 &&
+    missingPillar.length === 0;
+  const classification = ready
+    ? "PRONTO PARA SOLICITAR ANÁLISE"
+    : blockers.some((item) => item.severity === "P0")
+      ? "BLOQUEADO"
+      : pending.length || substantialPublished.length < MIN_PUBLISHED_ARTICLES
+        ? "QUASE PRONTO"
+        : "NÃO PRONTO";
 
   const stages: Array<{ id: ReadinessStage; title: string; checks: ReadinessCheck[] }> = [
     { id: "ETAPA_0", title: "Etapa 0 — Contenção", checks: checks.filter((item) => item.stage === "ETAPA_0") },
@@ -394,6 +423,14 @@ async function buildAdsenseReadiness(baseUrl: URL) {
     classification,
     readyForRequest: ready,
     disclaimer: "Esta verificação é interna e não garante aprovação pelo Google AdSense.",
+    editorialMeta: {
+      minPublished: MIN_PUBLISHED_ARTICLES,
+      minUsefulChars: MIN_USEFUL_CHARS,
+      published: publishedArticles.length,
+      substantialPublished: substantialPublished.length,
+      scheduled: scheduledArticles.length,
+      publishedStories: storyRows.filter((story) => story.status === "PUBLISHED").length
+    },
     checks,
     stages,
     blockers,

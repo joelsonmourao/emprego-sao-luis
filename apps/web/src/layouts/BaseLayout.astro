@@ -86,10 +86,11 @@ const robotsValue = stagingLike
     <meta name="generator" content={Astro.generator} />
     {!stagingLike && seo.verifications.google && <meta name="google-site-verification" content={seo.verifications.google} />}
     {!stagingLike && seo.verifications.bing && <meta name="msvalidate.01" content={seo.verifications.bing} />}
+    <link rel="icon" type="image/svg+xml" href={BRAND_ASSETS.faviconSvg} />
     <link rel="icon" type="image/png" sizes="32x32" href={BRAND_ASSETS.favicon32} />
     <link rel="icon" type="image/png" sizes="16x16" href={BRAND_ASSETS.favicon16} />
     <link rel="icon" type="image/png" sizes="48x48" href="/favicon-48x48.png" />
-    <link rel="icon" href={identity.faviconUrl ?? BRAND_ASSETS.faviconIco} sizes="any" />
+    <link rel="shortcut icon" href={identity.faviconUrl ?? BRAND_ASSETS.faviconIco} />
     <link rel="apple-touch-icon" href={identity.appleTouchIconUrl ?? BRAND_ASSETS.appleTouchIcon} />
     <link rel="manifest" href="/api/brand-manifest.webmanifest" />
     <meta name="theme-color" content={identity.themeColor ?? seo.themeColor ?? BRAND_ASSETS.themeColor} />

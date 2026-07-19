@@ -1,5 +1,5 @@
 import { and, eq, gt, inArray, isNotNull, lte, or } from "drizzle-orm";
-import { articles, createDatabase, indexingEvents, jobs } from "@es/db";
+import { articles, createDatabase, indexingEvents, jobs, webStories } from "@es/db";
 
 export async function publishScheduledJobs() {
   if (!process.env.DATABASE_URL) throw new Error("DATABASE_URL não configurada.");
@@ -24,7 +24,25 @@ export async function publishScheduledJobs() {
         const url = new URL(path, process.env.SITE_URL ?? "https://empregossaoluis.com.br").toString();
         await tx.insert(indexingEvents).values({ dedupeKey: `scheduled-article:${article.id}:indexnow`, provider: "INDEXNOW", url, notificationType: "URL_UPDATED" }).onConflictDoNothing();
       }
-      return { published: published.length, publishedArticles: publishedArticles.length };
+      const publishedStories = await tx
+        .update(webStories)
+        .set({ status: "PUBLISHED", publishedAt: now, updatedAt: now })
+        .where(and(eq(webStories.status, "SCHEDULED"), lte(webStories.scheduledAt, now)))
+        .returning({ id: webStories.id, slug: webStories.slug });
+      for (const story of publishedStories) {
+        const url = new URL(`/web-stories/${story.slug}`, process.env.SITE_URL ?? "https://empregossaoluis.com.br").toString();
+        await tx.insert(indexingEvents).values({
+          dedupeKey: `scheduled-story:${story.id}:indexnow`,
+          provider: "INDEXNOW",
+          url,
+          notificationType: "URL_UPDATED"
+        }).onConflictDoNothing();
+      }
+      return {
+        published: published.length,
+        publishedArticles: publishedArticles.length,
+        publishedStories: publishedStories.length
+      };
     });
   } finally { await connection.close(); }
 }

@@ -24,7 +24,9 @@ API de apoio: `/api/admin/adsense-readiness`
 
 ## Botão “Pronto para solicitar análise”
 
-Só aparece quando não há bloqueadores P0 relevantes, institucionais estão completos, candidatura funciona e há conteúdo editorial com autoria. Mesmo assim o disclaimer permanece visível.
+Só aparece quando não há bloqueadores P0 relevantes, institucionais estão completos, candidatura funciona e há **meta interna de 15 posts substanciais** (≥800 caracteres) com autoria, fontes e pilar/cluster. Mesmo assim o disclaimer permanece visível — **não garante** aprovação do Google.
+
+Agenda automática: [ADSENSE_EDITORIAL_SCHEDULE.md](./ADSENSE_EDITORIAL_SCHEDULE.md).
 
 ## Evidências
 

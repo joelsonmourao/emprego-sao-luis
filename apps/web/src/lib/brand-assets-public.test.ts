@@ -10,7 +10,9 @@ describe("ativos de marca públicos", () => {
     "brand/icon.webp",
     "brand/icon-instagram.webp",
     "brand/logo-horizontal.webp",
+    "brand/logo-horizontal-on-dark.webp",
     "brand/logo-horizontal.png",
+    "favicon.svg",
     "favicon-16x16.png",
     "favicon-32x32.png",
     "favicon-48x48.png",
@@ -49,6 +51,9 @@ describe("ativos de marca públicos", () => {
     const instagram = read("apps/web/src/components/InstagramFollow.astro");
     const footer = read("apps/web/src/components/SiteFooter.astro");
     const header = read("apps/web/src/components/SiteHeader.astro");
+    const constants = read("apps/web/src/lib/brand/constants.ts");
+    const faviconSvg = read("apps/web/public/favicon.svg");
+    expect(layout).toContain("BRAND_ASSETS.faviconSvg");
     expect(layout).toContain("BRAND_ASSETS.favicon32");
     expect(layout).toContain("BRAND_ASSETS.favicon16");
     expect(layout).toContain('sizes="48x48"');
@@ -56,8 +61,21 @@ describe("ativos de marca públicos", () => {
     expect(instagram).toContain('width="192"');
     expect(instagram).toMatch(/rounded-2xl|object-contain/);
     expect(footer).toContain("LOGO_DARK");
+    expect(footer).toMatch(/bg-white/);
     expect(header).toContain("LOGO_MAIN");
+    expect(constants).toContain("logo-horizontal-on-dark.webp");
+    expect(faviconSvg).toContain("#9B2D30");
+    expect(faviconSvg).toContain("#F5F5F5");
     expect(instagram).not.toMatch(/h-24 w-24/);
+  });
+
+  it("logos públicos têm alpha real (fundo não é caixa opaca)", async () => {
+    const sharp = (await import("sharp")).default;
+    const logo = await sharp(resolve(publicRoot, "brand/logo-horizontal.webp")).ensureAlpha().raw().toBuffer({ resolveWithObject: true });
+    let transparent = 0;
+    for (let i = 3; i < logo.data.length; i += 4) if (logo.data[i] < 10) transparent += 1;
+    const pct = transparent / (logo.info.width * logo.info.height);
+    expect(pct).toBeGreaterThan(0.4);
   });
 
   it("não referencia caminhos antigos removidos em componentes públicos", () => {

@@ -43,3 +43,13 @@ node scripts/archive-junk-jobs.mjs --write
 ```
 
 Só arquiva títulos claramente de teste (ex.: `sqsqs`) — nunca dados reais sem revisão.
+
+## Agenda AdSense (interno)
+
+Ver [ADSENSE_EDITORIAL_SCHEDULE.md](./ADSENSE_EDITORIAL_SCHEDULE.md) e comandos PowerShell em [DEPLOY_POWERSHELL.md](./DEPLOY_POWERSHELL.md).
+
+- [ ] Worker redeployado (publica `SCHEDULED`)
+- [ ] Seed editorial dry-run + `--write` no staging
+- [ ] `/admin/adsense-readiness` mostra meta editorial (ex.: 6/15)
+- [ ] Institucionais sem placeholder
+- [ ] `PUBLIC_ADSENSE_ENABLED=false` até “Pronto para solicitar análise” + Publisher ID real

@@ -1,109 +1,64 @@
-# Auditoria e correção de ativos de imagem
+# Auditoria de ativos de imagem (marca)
 
-Data: 2026-07-19
-Escopo: apenas imagens, referências, dimensões e comportamento responsivo.
-Fora de escopo: paleta de cores, redesign, alteração de `Logo/`, nova marca.
+Data: 2026-07-19 (reavaliação contraste / transparência / favicon)  
+Escopo: logos, favicon, Instagram, OG — sem redesenhar paleta do site.  
+`Logo/` permanece **somente leitura** (fontes oficiais não alteradas).
 
-## Confirmações explícitas
+## Diagnóstico (causa raiz)
 
-- Nenhuma cor de fundo, texto, botão, link, borda ou paleta foi alterada.
-- O rodapé não foi redesenhado (apenas tamanho/proporção do logo via classes de dimensão).
-- A identidade visual foi preservada.
-- A pasta `Logo/` **não foi alterada** (somente leitura pelo gerador).
-- Não foi criada marca nova com IA.
-- Somente imagens públicas, referências, dimensões e CSS de encaixe (`width`/`height`/`max-width`/`object-fit`/responsivo) foram corrigidos.
+| Achado | Evidência |
+|--------|-----------|
+| Fontes em `Logo/*.png` **não têm canal alpha** | `hasAlpha: false`, `channels: 3` — fundo branco/cinza **opaco** |
+| “Falta transparência” no site | Derivados antigos copiavam esse fundo → caixa clara no header/footer |
+| Contraste ruim no rodapé | Logo com tipografia **escura** (vinho/cinza) sobre `--brand-secondary` (#1A1A1A); `LOGO_DARK` apontava para o mesmo arquivo do header |
+| Favicon ilegível | PNG era o logo completo (mascote+ES) em 16–32px; `favicon.svg` antigo tinha **texto `#1A1A1A` no fundo `#1A1A1A`** (invisível) |
+| OG/social | Alpha em PNG faz muitas redes preencharem com **preto** → letras escuras somem |
 
-## Origem oficial (somente leitura)
+## Correções aplicadas
 
-| Ativo fonte | Caminho | Uso |
-|---|---|---|
-| Ícone quadrado oficial | `Logo/icon.png` (~1254×1254) | Favicons, ícone Instagram, `brand/icon.*` |
-| Logo horizontal oficial | `Logo/logo-horizontal.png` (~2172×724) | Header, footer, OG fallback |
+1. **Gerador** `scripts/generate-brand-public-assets.mjs`  
+   - Flood-fill a partir das bordas remove fundo claro → **alpha real** (~70% transparente nos logos).  
+   - `logo-horizontal-on-dark.webp` = logo sobre **placa branca** (contraste no footer).  
+   - Favicons 16–512 rasterizados a partir do **SVG de marca ES** (não do logo inteiro).  
+   - `brand/og-default.png` 1200×630 com fundo branco opaco.
 
-Gerador: `node scripts/generate-brand-public-assets.mjs`
-Destino: `apps/web/public/brand/` e favicons em `apps/web/public/`.
+2. **Wiring**  
+   - `FALLBACK_PATHS.LOGO_DARK` → `/brand/logo-horizontal-on-dark.webp`  
+   - `FALLBACK_PATHS.FAVICON` → `/favicon.svg`  
+   - `BaseLayout`: `rel=icon` SVG primeiro  
+   - Footer: `bg-white` + cantos arredondados no logo escuro  
+   - `BrandLogo` usa `FALLBACK_PATHS[assetKey]` (não um único path fixo)
 
-## Problemas encontrados e correções
+3. **Favicon SVG**  
+   - Fundo `#9B2D30`, letras `#F5F5F5`, acentos laranja/vermelho da marca.
 
-### Bloco Instagram (home)
+## Matriz de uso
 
-| Campo | Antes | Depois |
-|---|---|---|
-| Arquivo | `/brand/icon.webp` (~96×96, ~3 KB) | `/brand/icon-instagram.webp` (320×320, fundo branco opaco) |
-| CSS | `h-24 w-24` (96px) | `h-36…lg:h-48` + `width/height=192` + `rounded-2xl` (apenas encaixe) |
-| Problema | pequena, baixa presença, pouco nítida; letras escuras ilegíveis se transparente no painel escuro | resolução alta + fundo branco do ativo para contraste no painel escuro |
-| Componentes | `InstagramFollow.astro`, `FALLBACK_PATHS.INSTAGRAM_IMAGE` | mesmos; sem mudança de cores da seção |
+| Superfície | Ativo | Fundo do site | Estratégia |
+|------------|-------|---------------|------------|
+| Header | `logo-horizontal.webp` | claro | alpha real |
+| Footer | `logo-horizontal-on-dark.webp` | escuro | placa branca + `bg-white` |
+| Instagram CTA | `icon-instagram.webp` | painel | flatten branco |
+| Aba do browser | `favicon.svg` (+ PNG/ICO) | qualquer | marca ES sólida |
+| OG / e-mail | `og-default.png` | n/a | branco opaco 1200×630 |
+| PWA / Apple | `icon-192` / `512` / apple-touch | n/a | do SVG |
 
-### Favicon
+## Regenerar
 
-| Campo | Antes | Depois |
-|---|---|---|
-| Problema | legibilidade fraca / possível ativo inadequado | derivados quadrados do `Logo/icon.png` |
-| Tamanhos | inconsistentes | 16, 32, 48, 180, 192, 512 + `favicon.ico` |
-| Layout | preferência fraca | PNG 16/32/48 + ico em `BaseLayout.astro` |
-| Manifest | — | `site.webmanifest` aponta para ícones existentes |
+```powershell
+cd C:\Users\Joelson\Documents\ES
+node scripts/generate-brand-public-assets.mjs
+npx vitest run apps/web/src/lib/brand-assets-public.test.ts
+```
 
-### Rodapé / cabeçalho
+## O que ainda pode precisar (manual / produção)
 
-| Campo | Antes | Depois |
-|---|---|---|
-| Logo | possível baixa presença | `h-11`→`sm:h-12`, `max-w` 13–15rem, `width/height` reservados |
-| Ativo | `BrandLogo` via `LOGO_DARK` / `LOGO_MAIN` | fallback `/brand/logo-horizontal.webp` (800×267) |
-| Cores | fundo escuro do footer intacto | sem alteração de `background-color` / `color` |
+- Se o **painel de identidade** (`/admin` marca) tiver uploads antigos no banco, eles **sobrescrevem** os fallbacks — reenviar ativos novos ou limpar overrides.
+- Fontes em `Logo/` continuam RGB sem alpha; o gerador corrige só o que vai para `public/`. Ideal a longo prazo: exportar PNG/WebP **com alpha verdadeiro** do design (sem fundo).
+- Hard refresh / CDN após deploy para limpar favicon em cache.
 
-## Comparação visual (local, não versionada)
+## Fora de escopo
 
-Arquivos em `tmp/admin-visual/` (gitignored):
-
-| Arquivo | Conteúdo |
-|---|---|
-| `instagram-icon-BEFORE-96.png` | Simulação do ativo antigo (~96px) |
-| `instagram-icon-AFTER-320.png` | Ativo atual 320×320 opaco |
-| `instagram-BEFORE-AFTER-compare.png` | Lado a lado em fundo escuro (como o painel) |
-| `instagram-after-1366.png` / `instagram-after-375.png` | Bloco na home |
-| `header-after-1366.png` / `footer-after-1366.png` | Header e rodapé |
-
-**Antes:** ícone ~96×96 (~3 KB) em `h-24 w-24` → pixelado ao ampliar.
-**Depois:** `/brand/icon-instagram.webp` 320×320 (~18 KB), exibição 144–192px, fundo branco opaco para contraste no painel escuro.
-
-## Tabela resumo
-
-| ÁREA | IMAGEM | PROBLEMA | CORREÇÃO | DESKTOP | MOBILE | ESTADO |
-|---|---|---|---|---|---|---|
-| Home Instagram | icon.webp 96px | pequena / pouco nítida | icon-instagram.webp 320px + CSS maior | OK | OK | corrigido |
-| Favicon aba | favicon antigo/baixo detalhe | ilegível em 16–32 | PNGs 16/32/48 + ico do ícone oficial | OK | OK | corrigido |
-| Header | logo horizontal | presença variável | logo 800w + dimensões CSS | OK | OK | corrigido |
-| Footer | logo em fundo escuro | possível pequeno/borrado | mesmas dimensões + asset 800w | OK | OK | corrigido |
-| Manifest/PWA | icon-192/512 | garantir existência | regenerados do ícone oficial | OK | n/a | corrigido |
-| OG default | logo-horizontal.png | fallback social | 800px PNG oficial público | OK | n/a | ok |
-| Web Stories | mídia editorial | depende de conteúdo | fixtures E2E; painel autenticado OK | OK | OK | ok |
-
-## Arquivos modificados (código / públicos)
-
-- `scripts/generate-brand-public-assets.mjs` (novo)
-- `apps/web/public/brand/*` (derivados)
-- `apps/web/public/favicon-*.png`, `favicon.ico`, `apple-touch-icon.png`, `icon-192.png`, `icon-512.png`, `site.webmanifest`
-- `apps/web/src/components/InstagramFollow.astro`
-- `apps/web/src/components/SiteHeader.astro` / `SiteFooter.astro` (somente classes de dimensão)
-- `apps/web/src/layouts/BaseLayout.astro` (links de favicon)
-- `apps/web/src/lib/brand/constants.ts` (`INSTAGRAM_IMAGE`)
-- `apps/web/src/lib/brand-assets-public.test.ts`
-- `tests/e2e/admin-crud-authenticated.spec.ts` (marca + CRUD autenticado)
-
-## O que não foi feito
-
-- Alteração de `Logo/` (preservada)
-- Mudança de paleta / redesign
-- Commit, push ou deploy
-- Screenshots versionados no git (`tmp/admin-visual/` local)
-
-## Validação visual
-
-Capturas locais (não versionar): `tmp/admin-visual/`
-
-Larguras obrigatórias: 375, 768, 1024, 1366, 1920 (cobertas pelo spec E2E de marca).
-
-## Pendências de licença
-
-Ativos de marca: propriedade do projeto (origem `Logo/`).
-Imagens editoriais de terceiros: fora deste lote; manter crédito/origem no painel quando aplicável.
+- Alterar arquivos em `Logo/`  
+- Redesign de mascote / tipografia  
+- Paleta CSS do site  

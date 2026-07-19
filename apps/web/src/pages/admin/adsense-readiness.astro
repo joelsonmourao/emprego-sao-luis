@@ -43,6 +43,38 @@ const tone =
     )}
   </section>
 
+  <section class="mt-6 rounded-2xl border border-slate-200 bg-white p-6">
+    <h2 class="text-xl font-black">Meta editorial interna</h2>
+    <p class="mt-2 text-sm text-[var(--text-secondary)]">
+      O Google não publica quantidade mínima oficial. Internamente exigimos
+      {report.editorialMeta.minPublished} posts com ≥{report.editorialMeta.minUsefulChars} caracteres úteis,
+      autoria, fontes e pilar/cluster antes de marcar “Pronto para solicitar análise”.
+    </p>
+    <div class="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <article>
+        <p class="text-sm">Substanciais publicados</p>
+        <strong class="text-3xl">{report.editorialMeta.substantialPublished}/{report.editorialMeta.minPublished}</strong>
+      </article>
+      <article>
+        <p class="text-sm">Publicados (total)</p>
+        <strong class="text-3xl">{report.editorialMeta.published}</strong>
+      </article>
+      <article>
+        <p class="text-sm">Agendados</p>
+        <strong class="text-3xl">{report.editorialMeta.scheduled}</strong>
+      </article>
+      <article>
+        <p class="text-sm">Web Stories publicadas</p>
+        <strong class="text-3xl">{report.editorialMeta.publishedStories}</strong>
+      </article>
+    </div>
+    <p class="mt-4 text-sm">
+      Seed: <code class="rounded bg-slate-100 px-1">npm run seed:adsense-editorial</code> (dry-run) ·
+      <code class="rounded bg-slate-100 px-1">npm run seed:adsense-editorial -- --write</code> ·
+      calendário em <a class="font-bold underline" href="/admin/calendario-editorial">/admin/calendario-editorial</a>.
+    </p>
+  </section>
+
   <div class="mt-6 grid gap-4 md:grid-cols-3">
     <article class="rounded-xl bg-white p-5"><p class="text-sm">Bloqueadores</p><strong class="text-3xl">{report.blockers.length}</strong></article>
     <article class="rounded-xl bg-white p-5"><p class="text-sm">Verificações</p><strong class="text-3xl">{report.checks.length}</strong></article>

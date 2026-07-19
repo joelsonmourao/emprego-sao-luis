@@ -1,5 +1,6 @@
 ---
 import type { BrandAssetKey } from "../lib/brand/constants";
+import { FALLBACK_PATHS } from "../lib/brand/constants";
 import { getBrandIdentity } from "../lib/brand/identity-service";
 
 interface Props {
@@ -27,7 +28,7 @@ const {
 const identity = await getBrandIdentity();
 const asset = identity.assets[assetKey];
 const resolvedAlt = alt ?? asset?.altText ?? identity.logoAlt;
-const url = asset?.url ?? `/brand/logo-horizontal.webp`;
+const url = asset?.url ?? FALLBACK_PATHS[assetKey];
 const webp = variant && asset?.variants[variant] ? asset.variants[variant] : (asset?.variants.medium ?? url);
 const png = asset?.variants["medium-png"] ?? asset?.originalUrl ?? url;
 const isWebp = webp.endsWith(".webp") || webp.includes("image/webp");
