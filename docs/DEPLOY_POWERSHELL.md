@@ -77,7 +77,7 @@ Confira:
 4. **Não** use o seed `adsense-editorial-*` para pedir AdSense (template). Se já estiver no ar, despublique via migrate one-shot:
    - `RUN_UNPUBLISH_ADSENSE_EDITORIAL=true` + `ADSENSE_EDITORIAL_ALLOW_PRODUCTION=1`
    - redeploy migrate → logs OK → **remova** as duas envs → redeploy web
-5. Pacote local agendado (45 posts, capas únicas): ver [LOCAL_EDITORIAL_SCHEDULE.md](./LOCAL_EDITORIAL_SCHEDULE.md) — redeploy **web** primeiro, depois migrate com `RUN_SEED_LOCAL_EDITORIAL=true`.
+5. Pacote local agendado: ver [LOCAL_EDITORIAL_SCHEDULE.md](./LOCAL_EDITORIAL_SCHEDULE.md) — editar no **admin**; seed só uma vez via Terminal (não pelo migrate).
 6. Quando a Rota da Aprovação estiver **Pronto** (posts já publicados) e você tiver conta AdSense: Publisher ID / ads.txt; só então `PUBLIC_ADSENSE_ENABLED=true`.
 
 ## 6. Limpeza de vagas lixo (opcional)

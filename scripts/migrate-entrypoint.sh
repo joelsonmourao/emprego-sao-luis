@@ -39,45 +39,7 @@ if [ "${RUN_SEED_SYSTEM_DEFAULTS:-}" = "true" ]; then
   echo "[migrate] Seed de padrões estruturais concluído."
 fi
 
-# Seed editorial AdSense (one-shot). Remova a variável após o sucesso.
-if [ "${RUN_SEED_ADSENSE_EDITORIAL:-}" = "true" ]; then
-  if [ "${ADSENSE_EDITORIAL_ALLOW_PRODUCTION:-}" != "1" ]; then
-    echo "[migrate] ERRO: RUN_SEED_ADSENSE_EDITORIAL=true exige ADSENSE_EDITORIAL_ALLOW_PRODUCTION=1." >&2
-    exit 1
-  fi
-  if [ -z "${SITE_URL:-}" ]; then
-    echo "[migrate] ERRO: RUN_SEED_ADSENSE_EDITORIAL=true exige SITE_URL." >&2
-    exit 1
-  fi
-  echo "[migrate] Executando seed editorial AdSense (produção autorizada)..."
-  node scripts/seed-adsense-editorial-schedule.mjs --write --i-understand-production
-  echo "[migrate] Seed editorial AdSense concluído."
-fi
-
-# Despublica template adsense-editorial-* (one-shot). Remova a variável após o sucesso.
-if [ "${RUN_UNPUBLISH_ADSENSE_EDITORIAL:-}" = "true" ]; then
-  if [ "${ADSENSE_EDITORIAL_ALLOW_PRODUCTION:-}" != "1" ]; then
-    echo "[migrate] ERRO: RUN_UNPUBLISH_ADSENSE_EDITORIAL=true exige ADSENSE_EDITORIAL_ALLOW_PRODUCTION=1." >&2
-    exit 1
-  fi
-  echo "[migrate] Despublicando seed editorial template (DRAFT)..."
-  node scripts/unpublish-adsense-editorial-seed.mjs --write --i-understand-production
-  echo "[migrate] Unpublish editorial concluído."
-fi
-
-# Seed editorial local sl-local-* (45 SCHEDULED). Remova a variável após o sucesso.
-if [ "${RUN_SEED_LOCAL_EDITORIAL:-}" = "true" ]; then
-  if [ "${ADSENSE_EDITORIAL_ALLOW_PRODUCTION:-}" != "1" ]; then
-    echo "[migrate] ERRO: RUN_SEED_LOCAL_EDITORIAL=true exige ADSENSE_EDITORIAL_ALLOW_PRODUCTION=1." >&2
-    exit 1
-  fi
-  if [ -z "${SITE_URL:-}" ]; then
-    echo "[migrate] ERRO: RUN_SEED_LOCAL_EDITORIAL=true exige SITE_URL." >&2
-    exit 1
-  fi
-  echo "[migrate] Executando seed editorial local (45 SCHEDULED)..."
-  node scripts/seed-local-editorial-schedule.mjs --write --i-understand-production
-  echo "[migrate] Seed editorial local concluído."
-fi
+# Conteúdo editorial (sl-local / adsense-editorial) NÃO roda no migrate.
+# Edite no admin; seed one-shot só via Terminal: ver docs/LOCAL_EDITORIAL_SCHEDULE.md
 
 echo "[migrate] Execução finalizada. Encerrando container."

@@ -57,17 +57,14 @@ Worker precisa estar ativo para publicar `SCHEDULED`.
 
 O pacote `adsense-editorial-*` é template (frases repetidas, capa compartilhada). A Rota da Aprovação **ignora** esses slugs e bloqueia se ainda estiverem `PUBLISHED`. Prefira posts reais no admin (Pilares → Post Magnético / Notícia) com **capa própria**.
 
-### Despublicar o seed em produção (Coolify one-shot)
+### Despublicar o seed em produção (Terminal, uma vez)
 
-1. Backup do PostgreSQL.
-2. No serviço **migrate-staging** (imagem `Dockerfile.migrate`):
-   - Defina `RUN_UNPUBLISH_ADSENSE_EDITORIAL=true`
-   - Defina `ADSENSE_EDITORIAL_ALLOW_PRODUCTION=1`
-   - Remova `RUN_SEED_ADSENSE_EDITORIAL` se existir
-3. Force rebuild / redeploy do migrate na branch `codex/admin-negocio-completo`.
-4. Nos logs: `Unpublish editorial concluído`.
-5. **Remova** `RUN_UNPUBLISH_ADSENSE_EDITORIAL` e `ADSENSE_EDITORIAL_ALLOW_PRODUCTION` (one-shot).
-6. Redeploy do **web**.
+O migrate **não** roda mais unpublish/seed editorial por env. No Terminal Coolify (container com o script + `DATABASE_URL`):
+
+```sh
+export ADSENSE_EDITORIAL_ALLOW_PRODUCTION=1
+node scripts/unpublish-adsense-editorial-seed.mjs --write --i-understand-production
+```
 
 Local:
 

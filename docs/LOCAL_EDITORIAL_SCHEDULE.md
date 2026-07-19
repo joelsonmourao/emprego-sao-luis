@@ -1,47 +1,44 @@
 # Pacote editorial local (45 posts em ~2 semanas)
 
-Agenda **45** artigos `sl-local-*` com status `SCHEDULED`, ~**3 por dia** (09:00 / 13:00 / 17:00 America/São_Paulo), cada um com **capa exclusiva** em `/covers/sl-local/{slug}.webp`.
+## Onde atualizar conteúdo (um só lugar)
 
-Isso alimenta a meta interna da Rota da Aprovação. **Não garante** aprovação do Google AdSense.
+**Admin** → Notícias e guias / Calendário editorial.  
+O serviço **migrate** só aplica migrations de banco — **não** cria nem reescreve posts.
 
-## Gerar capas (local / CI)
+## Seed (só uma vez, se ainda não rodou)
+
+Capas no deploy do **web** (`/covers/sl-local/`). Depois, **uma vez** no Terminal do Coolify (container que tenha o script + `DATABASE_URL`), não por variável permanente no migrate:
+
+```sh
+cd /app
+export ADSENSE_EDITORIAL_ALLOW_PRODUCTION=1
+export SITE_URL=https://empregossaoluis.com.br
+node scripts/seed-local-editorial-schedule.mjs --write --i-understand-production
+```
+
+Se os 45 `sl-local-*` já existem, o script **não altera nada**.
+
+Corrigir título SEO (≤70) / URL de capa em lote **só se pedir**:
+
+```sh
+node scripts/seed-local-editorial-schedule.mjs --write --i-understand-production --fix-seo
+```
+
+## Coolify — o que apagar nas envs do migrate
+
+Remova se ainda existirem (evitam loop/restart):
+
+- `RUN_SEED_LOCAL_EDITORIAL`
+- `RUN_SEED_ADSENSE_EDITORIAL`
+- `RUN_UNPUBLISH_ADSENSE_EDITORIAL`
+- `ADSENSE_EDITORIAL_ALLOW_PRODUCTION` (se só servia para isso)
+
+## Gerar capas (dev)
 
 ```powershell
 npm run generate:sl-local-covers
 ```
 
-## Dry-run / write
-
-```powershell
-npm run seed:local-editorial
-# staging/local E2E:
-npm run seed:local-editorial -- --write
-```
-
-## Produção (Coolify one-shot)
-
-1. **Redeploy web** na branch `codex/admin-negocio-completo` (leva as capas em `public/covers/sl-local/`).
-2. No **migrate-staging**:
-   - `RUN_SEED_LOCAL_EDITORIAL=true`
-   - `ADSENSE_EDITORIAL_ALLOW_PRODUCTION=1`
-   - `SITE_URL=https://empregossaoluis.com.br`
-   - Remova `RUN_SEED_ADSENSE_EDITORIAL` / `RUN_UNPUBLISH_ADSENSE_EDITORIAL` se não forem necessários.
-3. Force rebuild do migrate.
-4. Logs: `Seed editorial local concluído` com `scheduled: 45`.
-5. **Apague obrigatoriamente** `RUN_SEED_LOCAL_EDITORIAL` e `ADSENSE_EDITORIAL_ALLOW_PRODUCTION` (senão o migrate reinicia em loop).
-6. Confirme **worker** ativo (publica quando `scheduled_at <= now`).
-7. Confira `/admin/calendario-editorial`.
-
-Idempotente: se já existirem slugs `sl-local-*`, o script **não faz nada** (não fica regravando a cada migrate).
-
-Ajuste pontual de SEO/capa (máx. 70 chars):  
-`node scripts/seed-local-editorial-schedule.mjs --write --fix-seo --i-understand-production`  
-Depois **remova** `RUN_SEED_LOCAL_EDITORIAL` do Coolify para o migrate não reiniciar em loop.
-
-### Erro “Campos editoriais inválidos” no admin
-
-Causa comum: **Título SEO > 70 caracteres**. Encurte o campo ou rode uma vez com `--fix-seo`. Ao salvar `SCHEDULED`, a data/hora precisa estar **no futuro**.
-
 ## Pedido AdSense
 
-Só após a janela de publicação (~15 dias), Rota **Pronto** com posts reais no ar, institucionais ok, anúncios ainda off.
+Só após a janela de publicação, Rota **Pronto**, institucionais ok — anúncios ainda off.

@@ -5,8 +5,9 @@
  *
  *   node scripts/seed-local-editorial-schedule.mjs
  *   node scripts/seed-local-editorial-schedule.mjs --write
+ *   node scripts/seed-local-editorial-schedule.mjs --write --fix-seo
  *
- * Produção: ADSENSE_EDITORIAL_ALLOW_PRODUCTION=1 e --i-understand-production
+ * Não roda no migrate. Produção: ADSENSE_EDITORIAL_ALLOW_PRODUCTION=1 + --i-understand-production
  * Remoto: ADSENSE_EDITORIAL_ALLOW_REMOTE=1
  */
 import { existsSync } from "node:fs";
@@ -205,7 +206,7 @@ try {
         JSON.stringify({
           ok: true,
           skipped: true,
-          reason: `Já existem ${existing.length} artigo(s) ${SLUG_BASE}-*. Nada a fazer (idempotente). Use --fix-seo só se precisar encurtar SEO/capa uma vez.`,
+          reason: `Já existem ${existing.length} artigo(s) ${SLUG_BASE}-*. Nada alterado. Edite no admin; use --fix-seo só se precisar corrigir título SEO/capa em lote.`,
           sample: existing.slice(0, 3).map((r) => r.slug)
         })
       );
@@ -229,9 +230,9 @@ try {
     console.log(
       JSON.stringify({
         ok: true,
-        skippedInsert: true,
+        fixSeo: true,
         seoFixed,
-        note: "Ajuste único concluído. Remova RUN_SEED_LOCAL_EDITORIAL do Coolify."
+        sample: existing.slice(0, 3).map((r) => r.slug)
       })
     );
     process.exit(0);
