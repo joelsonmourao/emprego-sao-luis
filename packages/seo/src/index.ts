@@ -29,7 +29,7 @@ export interface JobPostingInput {
   companyWebsiteUrl?: string | null;
   cityName: string;
   stateCode: string;
-  applicationUrl: string;
+  applicationUrl?: string | null;
   applicationType?: string;
   salaryMin?: string | null;
   salaryMax?: string | null;
@@ -120,7 +120,6 @@ export function validateJobPosting(input: JobPostingInput) {
   )
     missing.push("publicHiringOrganization");
   if (input.publicationStatus && input.publicationStatus !== "PUBLISHED") missing.push("publicationStatus");
-  if (!input.applicationUrl.trim()) missing.push("applicationUrl");
   if (input.workplaceType !== "remoto" && (!input.cityName.trim() || !input.stateCode.trim()))
     missing.push("jobLocation");
   if (!input.publicCode?.trim()) missing.push("identifier");

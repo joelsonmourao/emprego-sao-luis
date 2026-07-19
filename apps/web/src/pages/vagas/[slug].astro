@@ -1,10 +1,20 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import AdSlot from "../../components/AdSlot.astro";
+import ApplicationChannels from "../../components/ApplicationChannels.astro";
 import Breadcrumbs from "../../components/ui/Breadcrumbs.astro";
 import JobCard from "../../components/ui/JobCard.astro";
 import SectionHeading from "../../components/ui/SectionHeading.astro";
 import { buildJobPosting } from "@es/seo";
+import {
+  buildMailtoUrl,
+  buildWhatsappUrl,
+  defaultEmailSubject,
+  defaultWhatsappMessage,
+  normalizeApplicationEmail,
+  normalizeApplicationUrl,
+  normalizeApplicationWhatsapp
+} from "@es/shared";
 import { formatRelativeDate, formatSalary, formatWorkplace } from "../../lib/job-presenter";
 import { findPublishedJob, listRelatedJobs } from "../../lib/jobs";
 
@@ -14,6 +24,61 @@ if (!job) return Astro.redirect(`/vagas/indisponivel/${encodeURIComponent(slug)}
 
 const record = job.job;
 const canonicalUrl = record.canonicalUrl || new URL(`/vagas/${record.slug}`, Astro.site).toString();
+const applicationUrl = normalizeApplicationUrl(record.applicationUrl);
+const applicationEmail = normalizeApplicationEmail(record.applicationEmail);
+const applicationWhatsapp = normalizeApplicationWhatsapp(record.applicationWhatsapp);
+const whatsappUrl = applicationWhatsapp.normalized
+  ? buildWhatsappUrl(applicationWhatsapp.normalized, record.applicationWhatsappMessage || defaultWhatsappMessage(record.normalizedTitle))
+  : null;
+const emailSubject = record.applicationEmailSubject || defaultEmailSubject(record.normalizedTitle);
+const emailUrl = applicationEmail.normalized ? buildMailtoUrl(applicationEmail.normalized, emailSubject) : null;
+const hasApplicationChannel = applicationUrl.valid || Boolean(whatsappUrl) || Boolean(emailUrl);
+const acceptingApplications =
+  record.publicationStatus === "PUBLISHED" &&
+  record.applicationUrlStatus !== "CLOSED" &&
+  Boolean(record.expiresAt && record.expiresAt > new Date()) &&
+  hasApplicationChannel;
+
+const primaryType = record.applicationType?.toUpperCase();
+const channels: Array<{
+  type: "URL" | "WHATSAPP" | "EMAIL";
+  href?: string | null;
+  label: string;
+  hint: string;
+  email?: string | null;
+  subject?: string | null;
+  primary?: boolean;
+}> = [];
+if (applicationUrl.valid && applicationUrl.normalized) {
+  channels.push({
+    type: "URL",
+    href: applicationUrl.normalized,
+    label: "Candidatura no site da empresa",
+    hint: "Você será direcionado ao site ou plataforma externa informada pela empresa.",
+    primary: primaryType === "URL"
+  });
+}
+if (whatsappUrl) {
+  channels.push({
+    type: "WHATSAPP",
+    href: whatsappUrl,
+    label: "Candidatura pelo WhatsApp",
+    hint: "A conversa abre no WhatsApp oficial com mensagem inicial. Revise antes de enviar.",
+    primary: primaryType === "WHATSAPP"
+  });
+}
+if (applicationEmail.normalized) {
+  channels.push({
+    type: "EMAIL",
+    href: emailUrl,
+    label: "Candidatura por e-mail",
+    hint: "O primeiro clique revela o e-mail nesta página. Copiar ou abrir o aplicativo fica opcional.",
+    email: applicationEmail.normalized,
+    subject: emailSubject,
+    primary: primaryType === "EMAIL"
+  });
+}
+
 const jsonLd = buildJobPosting({
   title: record.normalizedTitle,
   description: record.descriptionHtml,
@@ -40,11 +105,16 @@ const jsonLd = buildJobPosting({
   organizationPubliclyIdentifiable: !record.confidentialCompany && !record.unidentifiedCompany
 });
 
-const related = await listRelatedJobs({ jobId: record.id, companyId: record.companyId, categoryId: record.categoryId, cityId: record.cityId, limit: 4 });
+const related = await listRelatedJobs({
+  jobId: record.id,
+  companyId: record.companyId,
+  categoryId: record.categoryId,
+  cityId: record.cityId,
+  limit: 4
+});
 const salary = formatSalary(record);
 const shareUrl = canonicalUrl;
-const acceptingApplications = record.publicationStatus === "PUBLISHED" && Boolean(record.expiresAt && record.expiresAt > new Date());
-const noindex = record.publicationStatus !== "PUBLISHED";
+const noindex = record.publicationStatus !== "PUBLISHED" || !acceptingApplications;
 ---
 <BaseLayout
   title={record.seoTitle || `${record.normalizedTitle} — Empregos São Luís`}
@@ -54,7 +124,6 @@ const noindex = record.publicationStatus !== "PUBLISHED";
   noindex={noindex}
   schemas={jsonLd ? [jsonLd] : []}
 >
-
   <section class="es-section bg-white pt-8">
     <div class="es-container">
       <Breadcrumbs items={[{ name: "Início", url: "/" }, { name: "Vagas", url: "/vagas" }, { name: record.normalizedTitle }]} />
@@ -94,15 +163,46 @@ const noindex = record.publicationStatus !== "PUBLISHED";
             {record.schedule && <div><dt class="text-xs font-bold uppercase text-[var(--es-muted)]">Jornada</dt><dd>{record.schedule}</dd></div>}
           </dl>
 
-          {!acceptingApplications && <p class="mt-6 rounded-xl border border-amber-200 bg-amber-50 p-4 font-semibold text-amber-950" role="status">Esta vaga está encerrada ou temporariamente pausada. A candidatura não está disponível.</p>}
+          {!acceptingApplications && (
+            <p class="mt-6 rounded-xl border border-amber-200 bg-amber-50 p-4 font-semibold text-amber-950" role="status">
+              Esta vaga está encerrada ou temporariamente pausada. A candidatura não está disponível.
+            </p>
+          )}
+
+          <ApplicationChannels
+            jobId={record.id}
+            accepting={acceptingApplications}
+            instructions={record.applicationInstructions}
+            channels={channels}
+            placement="summary"
+          />
+
+          <section class="mt-8">
+            <h2 class="font-display text-2xl font-black">Descrição da vaga</h2>
+            <div class="es-prose mt-4 max-w-none" set:html={record.descriptionHtml} />
+          </section>
+
+          <ApplicationChannels
+            jobId={record.id}
+            accepting={acceptingApplications}
+            instructions={record.applicationInstructions}
+            channels={channels}
+            placement="footer"
+          />
 
           <AdSlot slot="job-content-mid" pageType="job" citySlug={job.citySlug} companySlug={job.companySlug} workplaceType={record.workplaceType} />
 
-          <section class="mt-8"><h2 class="font-display text-2xl font-black">Descrição da vaga</h2><div class="es-prose mt-4 max-w-none" set:html={record.descriptionHtml} /></section>
+          <section class="mt-8 rounded-2xl border border-[var(--es-border)] bg-[var(--es-cream)] p-5">
+            <h2 class="font-display text-lg font-black">Fonte da oportunidade</h2>
+            <p class="mt-2 text-sm text-[var(--es-muted)]">
+              {record.sourceUrl ? <a class="font-semibold underline" href={record.sourceUrl} rel="nofollow noopener noreferrer">{record.sourceName}</a> : record.sourceName}
+            </p>
+            <p class="mt-2 text-xs text-[var(--es-muted)]">A fonte indica onde a oportunidade foi encontrada. Use os canais de candidatura exibidos separadamente.</p>
+          </section>
 
           <section class="mt-8 rounded-2xl border border-amber-200 bg-amber-50 p-5">
             <h2 class="font-display text-lg font-black text-amber-950">Aviso de segurança</h2>
-            <p class="mt-2 text-sm text-amber-900">Nunca pague para conseguir emprego. Confirme se o link de candidatura é oficial da empresa. <a class="underline" href="/seguranca-candidatos">Saiba mais</a>.</p>
+            <p class="mt-2 text-sm text-amber-900">Nunca pague para conseguir emprego. Confirme se o canal de candidatura é oficial da empresa. <a class="underline" href="/seguranca-candidatos">Saiba mais</a>.</p>
           </section>
 
           {related.length > 0 && (
@@ -116,26 +216,32 @@ const noindex = record.publicationStatus !== "PUBLISHED";
         </article>
 
         <aside class="space-y-5">
-          {acceptingApplications && <div class="es-card sticky top-24 space-y-4 p-6" id="candidatura">
-            <h2 class="font-display text-xl font-black">Candidatura</h2>
-            <p class="text-sm text-[var(--es-muted)]">Você será direcionado ao canal oficial da empresa. Não é necessário criar conta.</p>
-            <a class="es-btn es-btn-primary w-full py-3.5 text-base" href={record.applicationUrl} rel="nofollow noopener noreferrer">Candidatar-se agora</a>
-            <form method="post" action="/api/account/saved-jobs">
-              <input type="hidden" name="jobId" value={record.id} />
-              <input type="hidden" name="action" value="save" />
-              <button class="es-btn es-btn-secondary w-full" type="submit">Salvar vaga</button>
-            </form>
-            <div class="grid grid-cols-2 gap-2 text-sm">
-              <a class="es-btn es-btn-secondary" href={`https://wa.me/?text=${encodeURIComponent(`${record.normalizedTitle} - ${shareUrl}`)}`} rel="noopener noreferrer">WhatsApp</a>
-              <button class="es-btn es-btn-secondary" type="button" data-share-url={shareUrl} id="copy-share-link">Copiar link</button>
+          {acceptingApplications && (
+            <div class="es-card sticky top-24 space-y-4 p-6" id="candidatura">
+              <h2 class="font-display text-xl font-black">Candidatura gratuita</h2>
+              <p class="text-sm text-[var(--es-muted)]">Os mesmos canais do resumo, sem cadastro obrigatório.</p>
+              <a class="es-btn es-btn-primary w-full py-3 text-center" href="#candidatura-summary">Ver canais de candidatura</a>
+              <form method="post" action="/api/account/saved-jobs">
+                <input type="hidden" name="jobId" value={record.id} />
+                <input type="hidden" name="action" value="save" />
+                <button class="es-btn es-btn-secondary w-full" type="submit">Salvar vaga</button>
+              </form>
+              <div class="grid grid-cols-2 gap-2 text-sm">
+                <a class="es-btn es-btn-secondary" href={`https://wa.me/?text=${encodeURIComponent(`${record.normalizedTitle} - ${shareUrl}`)}`} rel="noopener noreferrer">Compartilhar</a>
+                <button class="es-btn es-btn-secondary" type="button" data-share-url={shareUrl} id="copy-share-link">Copiar link</button>
+              </div>
             </div>
-          </div>}
-          <AdSlot slot="job-sidebar" pageType="job" citySlug={job.citySlug} companySlug={job.companySlug} workplaceType={record.workplaceType} />
-          {!record.confidentialCompany && <article class="es-card p-5">
-            <h3 class="font-display font-black">Sobre a empresa</h3>
-            <p class="mt-2 font-semibold">{job.companyName}</p>
-            <a class="mt-3 inline-flex text-sm font-bold text-[var(--brand-primary)]" href={`/empresas/${job.companySlug}`}>Ver perfil da empresa →</a>
-          </article>}
+          )}
+          {!record.confidentialCompany && (
+            <article class="es-card p-5">
+              <h3 class="font-display font-black">Sobre a empresa</h3>
+              <p class="mt-2 font-semibold">{job.companyName}</p>
+              <a class="mt-3 inline-flex text-sm font-bold text-[var(--brand-primary)]" href={`/empresas/${job.companySlug}`}>Ver perfil da empresa →</a>
+            </article>
+          )}
+          <div class="pt-8">
+            <AdSlot slot="job-sidebar" pageType="job" citySlug={job.citySlug} companySlug={job.companySlug} workplaceType={record.workplaceType} />
+          </div>
         </aside>
       </div>
     </div>
