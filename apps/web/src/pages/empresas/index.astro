@@ -10,19 +10,20 @@ let rows: Array<{ name: string; slug: string; logo: string | null; total: number
 if (process.env.DATABASE_URL) {
   const connection = createDatabase(process.env.DATABASE_URL);
   try {
-    rows = await connection.db
+    const listed = await connection.db
       .select({ name: companies.name, slug: companies.slug, logo: companies.logoUrl, total: count(jobs.id) })
       .from(companies)
-      .leftJoin(jobs, and(eq(jobs.companyId, companies.id), eq(jobs.publicationStatus, "PUBLISHED"), gt(jobs.expiresAt, new Date())))
+      .innerJoin(jobs, and(eq(jobs.companyId, companies.id), eq(jobs.publicationStatus, "PUBLISHED"), gt(jobs.expiresAt, new Date())))
       .where(eq(companies.active, true))
       .groupBy(companies.id)
       .orderBy(asc(companies.name));
+    rows = listed.filter((item) => item.total > 0);
   } finally {
     await connection.close();
   }
 }
 ---
-<BaseLayout title="Empresas com vagas — Empregos São Luís" description="Conheça empresas e consulte oportunidades abertas em São Luís e no Maranhão." breadcrumbs={[{ name: "Empresas", url: "/empresas" }]} pageSchemaType="CollectionPage">
+<BaseLayout title="Empresas com vagas — Empregos São Luís" description="Conheça empresas e consulte oportunidades abertas em São Luís e no Maranhão." breadcrumbs={[{ name: "Empresas", url: "/empresas" }]} pageSchemaType="CollectionPage" noindex={rows.length === 0}>
   <PageHero kicker="Empresas" title="Empresas que contratam na região" description="Consulte perfis e vagas abertas com fonte identificada." pattern={false} />
   <section class="es-section pt-0">
     <div class="es-container">

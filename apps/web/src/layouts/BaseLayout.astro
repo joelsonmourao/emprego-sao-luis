@@ -62,6 +62,7 @@ const seoGraph = disableSeoGraph ? null : {
   "@graph": [organizationNode, websiteNode, pageNode, ...(breadcrumbSchema ? [withoutContext(breadcrumbSchema)] : []), ...schemas.map(withoutContext)]
 };
 const currentPath = Astro.url.pathname;
+const robotsValue = noindex ? "noindex,follow" : robots.includes("max-image-preview") ? robots : `${robots},max-image-preview:large`;
 ---
 <!doctype html>
 <html lang={seo.language}>
@@ -69,7 +70,7 @@ const currentPath = Astro.url.pathname;
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width" />
     <meta name="description" content={description} />
-    <meta name="robots" content={noindex ? "noindex,follow" : robots} />
+    <meta name="robots" content={robotsValue} />
     <meta name="generator" content={Astro.generator} />
     {seo.verifications.google && <meta name="google-site-verification" content={seo.verifications.google} />}
     {seo.verifications.bing && <meta name="msvalidate.01" content={seo.verifications.bing} />}
@@ -92,6 +93,6 @@ const currentPath = Astro.url.pathname;
     <SiteHeader identity={identity} currentPath={currentPath} />
     <main id="conteudo"><slot /></main>
     <SiteFooter identity={identity} />
-    {!consentChoice && <CookieConsent />}
+    <CookieConsent initiallyHidden={Boolean(consentChoice)} />
   </body>
 </html>

@@ -9,7 +9,7 @@ const items = await listPublishedArticles(50, undefined, "NEWS");
 const featured = items[0];
 const rest = items.slice(1);
 ---
-<BaseLayout title="Notícias de emprego — Empregos São Luís" description="Notícias sobre mercado de trabalho, concursos e oportunidades em São Luís e no Maranhão." breadcrumbs={[{ name: "Notícias", url: "/noticias" }]} pageSchemaType="CollectionPage">
+<BaseLayout title="Notícias de emprego — Empregos São Luís" description="Notícias sobre mercado de trabalho, concursos e oportunidades em São Luís e no Maranhão." breadcrumbs={[{ name: "Notícias", url: "/noticias" }]} pageSchemaType="CollectionPage" noindex={items.length === 0}>
   <PageHero kicker="Editorial" title="Notícias e orientação profissional" description="Conteúdo sobre mercado de trabalho, carreira e oportunidades na região." pattern={false} />
 
   <section class="es-section pt-0">

@@ -45,7 +45,7 @@ if (!category) {
   });
 }
 ---
-<BaseLayout title={category.seoTitle ?? `${category.name} — vagas de emprego`} description={category.metaDescription ?? `Vagas na categoria ${category.name}.`} breadcrumbs={[{ name: "Categorias", url: "/categorias" }, { name: category.name, url: `/categorias/${category.slug}` }]}>
+<BaseLayout title={category.seoTitle ?? `${category.name} — vagas de emprego`} description={category.metaDescription ?? `Vagas na categoria ${category.name}.`} breadcrumbs={[{ name: "Categorias", url: "/categorias" }, { name: category.name, url: `/categorias/${category.slug}` }]} noindex={rows.length === 0 || !category.description?.trim()}>
   <section class="es-section bg-white">
     <div class="es-container">
       <Breadcrumbs items={[{ name: "Início", url: "/" }, { name: "Categorias", url: "/categorias" }, { name: category.name }]} />

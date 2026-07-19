@@ -3,11 +3,11 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
 import PageHero from "../../components/ui/PageHero.astro";
 import { loadPublicationPageState } from "../../lib/commercial/publication-page-state";
 
-const { plans, paymentAvailable, commercialContactUrl } = await loadPublicationPageState();
+const { plans, paymentAvailable } = await loadPublicationPageState();
 const faqs = [
   ["Como funciona?", "Escolha um plano, informe os dados da empresa, conclua o pagamento e cadastre a vaga após liberação do crédito."],
   ["Quando a vaga é publicada?", "Por padrão, após revisão da equipe. Planos podem incluir destaque no site e no Instagram."],
-  ["Posso publicar sem pagar online?", "Se o pagamento online estiver indisponível, use o contato comercial. A vaga só é liberada após confirmação."],
+  ["Posso publicar sem pagar online?", "A contratação é um serviço destinado à empresa. O pedido segue pelo plano e pela etapa de pagamento; quando o pagamento estiver indisponível, novas compras ficam pausadas."],
   ["O portal garante contratação?", "Não. Divulgamos a oportunidade e direcionamos ao canal oficial da empresa."]
 ];
 ---
@@ -26,6 +26,7 @@ const faqs = [
   <section class="es-section !pt-0">
     <div class="es-container grid gap-10 lg:grid-cols-[1.2fr_1fr]">
       <div>
+        <p class="mb-6 rounded-xl border border-emerald-200 bg-emerald-50 p-4 text-sm font-semibold text-emerald-950">Empresas pagam para divulgar e destacar oportunidades. Candidatos acessam vagas e canais de candidatura gratuitamente.</p>
         <h2 class="font-display text-3xl font-black">Benefícios</h2>
         <ul class="mt-4 grid gap-3 text-[var(--text-secondary)]">
           <li>• Página da vaga com código ES rastreável e SEO local</li>
@@ -49,9 +50,7 @@ const faqs = [
         <h2 class="font-display text-2xl font-black">Planos disponíveis</h2>
         {!paymentAvailable && (
           <p class="mt-3 rounded-xl border border-[var(--warning)] bg-yellow-50 p-3 text-sm text-yellow-900">
-            {commercialContactUrl
-              ? "Pagamento online temporariamente indisponível. Fale com o atendimento comercial."
-              : "Pagamento temporariamente indisponível. Tente novamente mais tarde."}
+            Pagamento temporariamente indisponível. Novos pedidos permanecem pausados até a configuração empresarial ser concluída.
           </p>
         )}
         <div class="mt-4 grid gap-4">
@@ -73,16 +72,14 @@ const faqs = [
                 </ul>
                 {paymentAvailable
                   ? <a class="es-btn es-btn-primary mt-4 w-full" href={`/publicar-vaga/plano/${plan.slug}`}>Escolher plano</a>
-                  : commercialContactUrl
-                    ? <a class="es-btn es-btn-secondary mt-4 w-full" href={commercialContactUrl}>Falar com o comercial</a>
-                    : <span class="mt-4 block rounded-xl bg-slate-100 p-3 text-center text-sm font-bold text-slate-600">Compra temporariamente indisponível</span>}
+                  : <span class="mt-4 block rounded-xl bg-slate-100 p-3 text-center text-sm font-bold text-slate-600">Compra temporariamente indisponível</span>}
               </article>
             );
           }) : (
             <div class="es-card rounded-2xl p-5" role="status">
               <h3 class="font-display text-xl font-black">Publicação de vagas em configuração</h3>
               <p class="mt-2 text-[var(--text-secondary)]">Os planos para publicação ainda estão sendo preparados.</p>
-              {commercialContactUrl && <a class="es-btn es-btn-secondary mt-4" href={commercialContactUrl}>Falar com o comercial</a>}
+              <a class="es-btn es-btn-secondary mt-4" href="/empresa/login">Acompanhar pedidos da empresa</a>
             </div>
           )}
         </div>
