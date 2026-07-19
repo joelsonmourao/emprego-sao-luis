@@ -1,0 +1,338 @@
+#!/usr/bin/env node
+/**
+ * Agenda 45 posts locais (sl-local-*) como SCHEDULED em ~15 dias × 3 horários.
+ * Capas: /covers/sl-local/{slug}.webp (gere antes com generate-sl-local-covers.mjs).
+ *
+ *   node scripts/seed-local-editorial-schedule.mjs
+ *   node scripts/seed-local-editorial-schedule.mjs --write
+ *
+ * Produção: ADSENSE_EDITORIAL_ALLOW_PRODUCTION=1 e --i-understand-production
+ * Remoto: ADSENSE_EDITORIAL_ALLOW_REMOTE=1
+ */
+import { existsSync } from "node:fs";
+import { dirname, resolve } from "node:path";
+import { fileURLToPath } from "node:url";
+import postgres from "postgres";
+import {
+  MIN_USEFUL_CHARS,
+  SLUG_BASE,
+  catalog,
+  slugFor
+} from "./data/sl-local-editorial-catalog.mjs";
+
+const write = process.argv.includes("--write");
+const understandProduction = process.argv.includes("--i-understand-production");
+const allowRemote = process.env.ADSENSE_EDITORIAL_ALLOW_REMOTE === "1";
+const allowProduction = process.env.ADSENSE_EDITORIAL_ALLOW_PRODUCTION === "1";
+const databaseUrl = process.env.DATABASE_URL;
+const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
+
+if (!databaseUrl) {
+  console.error("DATABASE_URL é obrigatória.");
+  process.exit(1);
+}
+
+function describeDbUrl(url) {
+  try {
+    const parsed = new URL(url);
+    return {
+      host: parsed.hostname,
+      port: parsed.port || "(default)",
+      database: parsed.pathname.replace(/^\//, ""),
+      user: parsed.username || "(none)"
+    };
+  } catch {
+    return { error: "URL inválida" };
+  }
+}
+
+const target = describeDbUrl(databaseUrl);
+if (target.error) {
+  console.error("Recusa: DATABASE_URL inválida.");
+  process.exit(1);
+}
+
+console.log(
+  JSON.stringify(
+    { ok: true, target: { host: target.host, port: target.port, database: target.database, user: target.user } },
+    null,
+    2
+  )
+);
+
+const hostIsLocal = target.host === "127.0.0.1" || target.host === "localhost";
+const hostLooksDockerInternal =
+  !hostIsLocal && !String(target.host).includes(".") && /^[a-z0-9]{8,}$/i.test(String(target.host));
+const looksProduction =
+  /empregossaoluis\.com\.br|production/i.test(databaseUrl) ||
+  /prod/i.test(String(target.database)) ||
+  process.env.APP_ENV === "production" ||
+  hostLooksDockerInternal;
+const localOk = hostIsLocal && String(target.port) === "55432" && /staging|e2e/i.test(String(target.database));
+const productionWriteOk = allowProduction && understandProduction;
+const remoteWriteOk = allowRemote === true;
+
+if (looksProduction && !productionWriteOk) {
+  console.error(
+    "Recusa fail-closed: alvo parece produção/Coolify. Defina ADSENSE_EDITORIAL_ALLOW_PRODUCTION=1 e --i-understand-production."
+  );
+  process.exit(1);
+}
+
+const siteUrl = (process.env.SITE_URL || "https://empregossaoluis.com.br").replace(/\/$/, "");
+
+/** 15 dias × 3 horários (09/13/17 America/Sao_Paulo = UTC-3) = 45 slots, a partir de amanhã. */
+function buildScheduleSlots(count, from = new Date()) {
+  const hoursBrt = [9, 13, 17];
+  const slots = [];
+  const cursor = new Date(from);
+  cursor.setUTCHours(12, 0, 0, 0);
+  cursor.setUTCDate(cursor.getUTCDate() + 1);
+  while (slots.length < count) {
+    const y = cursor.getUTCFullYear();
+    const m = cursor.getUTCMonth();
+    const d = cursor.getUTCDate();
+    for (const hour of hoursBrt) {
+      if (slots.length >= count) break;
+      // BRT = UTC-3 → UTC = hour+3
+      slots.push(new Date(Date.UTC(y, m, d, hour + 3, 0, 0)));
+    }
+    cursor.setUTCDate(cursor.getUTCDate() + 1);
+  }
+  return slots;
+}
+
+function buildHtml(item) {
+  const tips = item.tips.map((t) => `<li>${t}</li>`).join("");
+  const paragraphs = [
+    `<p>${item.lead}</p>`,
+    `<p><strong>${item.title}</strong> — orientação prática do Empregos São Luís para candidatos da Grande Ilha. A candidatura do trabalhador no portal continua gratuita e sem cadastro obrigatório.</p>`,
+    `<p>${item.localAngle}</p>`,
+    `<p>Antes de se candidatar, leia o anúncio completo: cidade, bairro quando houver, tipo de contrato, horário e canal oficial (site, e-mail ou WhatsApp). Compare o título com a descrição e desconfie de cobranças ao candidato.</p>`,
+    `<h2>Passos recomendados</h2><ol>${tips}</ol>`,
+    `<p>Organize um controle simples com data, cargo, empresa ou intermediário, canal usado e retorno. Isso evita reenvio confuso e ajuda a perceber quais tipos de vaga respondem melhor ao seu perfil em São Luís.</p>`,
+    `<p>Na entrevista presencial, planeje o deslocamento com margem para trânsito e chuva. Leve documento com foto e uma cópia do currículo. Em canais digitais, use mensagem objetiva: nome, vaga, disponibilidade e anexo — sem dados bancários ou documentos sensíveis no primeiro contato.</p>`,
+    `<p>Este texto é original do Empregos São Luís, com fontes institucionais internas (política editorial e de fontes). Integra a programação editorial local com capa exclusiva por peça. Não garante aprovação do Google AdSense; a análise final é do Google.</p>`,
+    `<p>Próximo passo: abra a busca de vagas no portal, filtre pelo seu perfil e candidate-se apenas pelos canais oficiais. Em dúvida sobre golpe, consulte a página de segurança do candidato. Palavra-chave editorial: ${item.keyword}.</p>`,
+    `<p>Contexto adicional para ${item.section}: mantenha postura profissional, registre combinados por escrito quando possível e priorize oportunidades com empresa ou intermediário identificável na Grande Ilha. Persistência metódica rende mais do que candidaturas em massa sem leitura.</p>`,
+    `<p>Se precisar retomar a busca depois de uma pausa, volte a este material e revise o checklist: documentos em ordem, currículo atualizado, canal oficial da vaga e deslocamento planejado. O Empregos São Luís publica orientação contínua para quem busca trabalho na capital maranhense com segurança e objetividade — use o portal como base, não como atalho duvidoso.</p>`
+  ];
+  const html = paragraphs.join("\n");
+  const plain = html.replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim();
+  if (plain.length < MIN_USEFUL_CHARS) {
+    throw new Error(`HTML abaixo da meta (${plain.length} < ${MIN_USEFUL_CHARS}) para: ${item.title}`);
+  }
+  return html;
+}
+
+function coverPathFor(slug) {
+  return resolve(root, "apps/web/public/covers/sl-local", `${slug}.webp`);
+}
+
+const scheduleSlots = buildScheduleSlots(catalog.length);
+const missingCovers = catalog.filter((item) => !existsSync(coverPathFor(slugFor(item)))).map((i) => slugFor(i));
+
+if (!write) {
+  console.log(
+    JSON.stringify(
+      {
+        ok: true,
+        dryRun: true,
+        marker: "SL-LOCAL-EDITORIAL-SCHEDULE",
+        plan: {
+          articles: catalog.length,
+          allScheduled: true,
+          slotsPerDay: 3,
+          days: Math.ceil(catalog.length / 3),
+          firstSlot: scheduleSlots[0]?.toISOString(),
+          lastSlot: scheduleSlots[scheduleSlots.length - 1]?.toISOString(),
+          minUsefulChars: MIN_USEFUL_CHARS,
+          coverPattern: "/covers/sl-local/{slug}.webp",
+          missingCovers: missingCovers.length
+        },
+        checks: { localOk, allowRemote, allowProduction, looksProduction }
+      },
+      null,
+      2
+    )
+  );
+  if (missingCovers.length) {
+    console.log(`Aviso: ${missingCovers.length} capa(s) ausente(s). Rode: node scripts/generate-sl-local-covers.mjs`);
+  }
+  console.log("Dry-run concluído. Nenhuma gravação.");
+  process.exit(0);
+}
+
+if (!localOk && !remoteWriteOk && !productionWriteOk) {
+  console.error(
+    "Recusa fail-closed: local E2E, ADSENSE_EDITORIAL_ALLOW_REMOTE=1, ou ALLOW_PRODUCTION + --i-understand-production."
+  );
+  process.exit(1);
+}
+
+if (missingCovers.length) {
+  // No Coolify migrate as capas ficam no deploy do web (/covers/sl-local/), não na imagem migrate.
+  if (productionWriteOk || remoteWriteOk) {
+    console.warn(
+      `[seed] Aviso: ${missingCovers.length} capa(s) ausente(s) neste filesystem. Continuando — redeploy do web deve servir /covers/sl-local/.`
+    );
+  } else {
+    console.error(`Capas ausentes (${missingCovers.length}). Rode: npm run generate:sl-local-covers`);
+    console.error(missingCovers.slice(0, 5).join(", "));
+    process.exit(1);
+  }
+}
+
+const sql = postgres(databaseUrl, { max: 1, prepare: false });
+
+try {
+  const existing = await sql`select slug from es_articles where slug like ${`${SLUG_BASE}%`}`;
+  if (existing.length) {
+    console.log(
+      JSON.stringify({
+        ok: true,
+        skipped: true,
+        reason: `Já existem ${existing.length} artigo(s) ${SLUG_BASE}-*. Nenhuma alteração (idempotente).`,
+        sample: existing.slice(0, 3).map((r) => r.slug)
+      })
+    );
+    process.exit(0);
+  }
+
+  let [author] = await sql`select id from es_authors where slug = ${`${SLUG_BASE}-autor`} limit 1`;
+  if (!author) {
+    [author] = await sql`
+      insert into es_authors (name, slug, bio)
+      values (
+        ${"Redação Empregos São Luís"},
+        ${`${SLUG_BASE}-autor`},
+        ${"Equipe editorial do Empregos São Luís. Conteúdo local para candidatos da Grande Ilha, com capas exclusivas por peça."}
+      )
+      returning id
+    `;
+  }
+
+  let [pillar] = await sql`select id from es_content_pillars where slug = ${`${SLUG_BASE}-pilar`} limit 1`;
+  if (!pillar) {
+    [pillar] = await sql`
+      insert into es_content_pillars (name, slug, description, audience, active)
+      values (
+        ${"Emprego local — Grande Ilha"},
+        ${`${SLUG_BASE}-pilar`},
+        ${"Pilar editorial de guias e notícias locais para candidatos em São Luís."},
+        ${"CANDIDATE"},
+        true
+      )
+      returning id
+    `;
+  }
+
+  let clusters = await sql`select id, slug from es_content_clusters where slug like ${`${SLUG_BASE}-%`}`;
+  if (clusters.length < 3) {
+    clusters = await sql`
+      insert into es_content_clusters (pillar_id, name, slug, description, active)
+      values
+        (${pillar.id}, ${"Busca segura"}, ${`${SLUG_BASE}-busca-segura`}, ${"Golpes, canais e checagem"}, true),
+        (${pillar.id}, ${"Candidatura prática"}, ${`${SLUG_BASE}-candidatura`}, ${"Currículo, entrevista e rotina"}, true),
+        (${pillar.id}, ${"Mercado local"}, ${`${SLUG_BASE}-mercado`}, ${"Comércio, bairros e deslocamento"}, true)
+      returning id, slug
+    `;
+  }
+
+  let scheduled = 0;
+  for (let index = 0; index < catalog.length; index += 1) {
+    const item = catalog[index];
+    const slug = slugFor(item);
+    const html = buildHtml(item);
+    const cluster = clusters[index % clusters.length];
+    const excerpt = `${item.title}. Orientação prática e local para candidatos em São Luís e região.`;
+    const coverUrl = `${siteUrl}/covers/sl-local/${slug}.webp`;
+    const sources = [
+      { name: "Empregos São Luís — política editorial", url: `${siteUrl}/politica-editorial` },
+      { name: "Empregos São Luís — política de fontes", url: `${siteUrl}/politica-fontes` },
+      { name: "Empregos São Luís — segurança do candidato", url: `${siteUrl}/seguranca-candidatos` }
+    ];
+    const scheduledAt = scheduleSlots[index];
+    const coverAlt = `Capa ilustrada: ${item.title}`;
+    const coverCaption = `Ilustração editorial exclusiva para “${item.title}”.`;
+    const coverCredit = "Empregos São Luís — ilustração editorial gerada para este post";
+
+    await sql`
+      insert into es_articles (
+        type, author_id, pillar_id, cluster_id, title, slug, excerpt, content_html,
+        cover_image_url, cover_image_alt, cover_image_caption, cover_image_credit,
+        cover_image_width, cover_image_height, og_image_url,
+        section, tags, source_name, source_url, sources,
+        seo_title, meta_description, primary_keyword, search_intent,
+        editorial_template, direct_answer, local_hook, audience, candidate_cta,
+        editorial_stage, status, published_at, scheduled_at,
+        news_eligible, discover_eligible, web_story_eligible, ai_assisted, fact_checked_at
+      ) values (
+        ${item.type},
+        ${author.id},
+        ${pillar.id},
+        ${cluster.id},
+        ${item.title},
+        ${slug},
+        ${excerpt},
+        ${html},
+        ${coverUrl},
+        ${coverAlt},
+        ${coverCaption},
+        ${coverCredit},
+        ${1200},
+        ${630},
+        ${coverUrl},
+        ${item.section},
+        ${sql.json(["sao-luis", "emprego", "sl-local", item.section])},
+        ${"Empregos São Luís"},
+        ${`${siteUrl}/politica-editorial`},
+        ${sql.json(sources)},
+        ${`${item.title} | Empregos São Luís`},
+        ${excerpt.slice(0, 155)},
+        ${item.keyword},
+        ${"informational"},
+        ${item.template},
+        ${item.lead.slice(0, 280)},
+        ${item.localAngle.slice(0, 280)},
+        ${"CANDIDATE"},
+        ${"Ver vagas gratuitas em São Luís"},
+        ${"APPROVED"},
+        ${"SCHEDULED"},
+        ${null},
+        ${scheduledAt},
+        ${item.type === "NEWS"},
+        ${false},
+        ${item.template === "POST_MAGNETICO"},
+        ${true},
+        ${new Date()}
+      )
+    `;
+    scheduled += 1;
+  }
+
+  const proof = await sql`
+    select status, count(*)::int as n from es_articles
+    where slug like ${`${SLUG_BASE}%`} group by status
+  `;
+
+  console.log(
+    JSON.stringify(
+      {
+        ok: true,
+        written: true,
+        marker: "SL-LOCAL-EDITORIAL-SCHEDULE",
+        scheduled,
+        firstSlot: scheduleSlots[0]?.toISOString(),
+        lastSlot: scheduleSlots[scheduleSlots.length - 1]?.toISOString(),
+        coverBase: `${siteUrl}/covers/sl-local/`,
+        note: "Worker publica SCHEDULED quando scheduled_at <= now. Capas servidas pelo web em /covers/sl-local/.",
+        proof: proof.map((r) => ({ status: r.status, n: r.n }))
+      },
+      null,
+      2
+    )
+  );
+} finally {
+  await sql.end({ timeout: 5 });
+}

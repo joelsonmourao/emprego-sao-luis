@@ -18,6 +18,8 @@ COPY packages/shared packages/shared
 COPY scripts/migrate-entrypoint.sh scripts/migrate-entrypoint.sh
 COPY scripts/seed-adsense-editorial-schedule.mjs scripts/seed-adsense-editorial-schedule.mjs
 COPY scripts/unpublish-adsense-editorial-seed.mjs scripts/unpublish-adsense-editorial-seed.mjs
+COPY scripts/seed-local-editorial-schedule.mjs scripts/seed-local-editorial-schedule.mjs
+COPY scripts/data/sl-local-editorial-catalog.mjs scripts/data/sl-local-editorial-catalog.mjs
 RUN chmod +x scripts/migrate-entrypoint.sh
 USER node
 CMD ["sh", "scripts/migrate-entrypoint.sh"]

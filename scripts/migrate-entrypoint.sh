@@ -65,4 +65,19 @@ if [ "${RUN_UNPUBLISH_ADSENSE_EDITORIAL:-}" = "true" ]; then
   echo "[migrate] Unpublish editorial concluído."
 fi
 
+# Seed editorial local sl-local-* (45 SCHEDULED). Remova a variável após o sucesso.
+if [ "${RUN_SEED_LOCAL_EDITORIAL:-}" = "true" ]; then
+  if [ "${ADSENSE_EDITORIAL_ALLOW_PRODUCTION:-}" != "1" ]; then
+    echo "[migrate] ERRO: RUN_SEED_LOCAL_EDITORIAL=true exige ADSENSE_EDITORIAL_ALLOW_PRODUCTION=1." >&2
+    exit 1
+  fi
+  if [ -z "${SITE_URL:-}" ]; then
+    echo "[migrate] ERRO: RUN_SEED_LOCAL_EDITORIAL=true exige SITE_URL." >&2
+    exit 1
+  fi
+  echo "[migrate] Executando seed editorial local (45 SCHEDULED)..."
+  node scripts/seed-local-editorial-schedule.mjs --write --i-understand-production
+  echo "[migrate] Seed editorial local concluído."
+fi
+
 echo "[migrate] Execução finalizada. Encerrando container."

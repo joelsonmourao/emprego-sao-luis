@@ -55,6 +55,8 @@
     "seed:staging-fixtures": "node scripts/seed-staging-fixtures.mjs",
     "seed:adsense-editorial": "node scripts/seed-adsense-editorial-schedule.mjs",
     "unpublish:adsense-editorial": "node scripts/unpublish-adsense-editorial-seed.mjs",
+    "generate:sl-local-covers": "node scripts/generate-sl-local-covers.mjs",
+    "seed:local-editorial": "node scripts/seed-local-editorial-schedule.mjs",
     "audit:performance": "node scripts/audit-performance.mjs",
     "audit:admin": "node scripts/audit-admin.mjs",
     "audit:site": "node scripts/audit-site.mjs",
