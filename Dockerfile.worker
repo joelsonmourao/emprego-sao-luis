@@ -34,5 +34,6 @@ RUN mkdir -p /app/data/imports /app/data/media /app/data/brand /app/data/reports
 COPY --from=build --chown=app:app /app/apps/worker/dist ./dist
 COPY --from=deps --chown=app:app /app/node_modules ./node_modules
 COPY --from=build --chown=app:app /app/packages ./packages
+COPY --chown=app:app scripts/seed-adsense-editorial-schedule.mjs scripts/seed-adsense-editorial-schedule.mjs
 USER app
 CMD ["node", "dist/index.js"]
