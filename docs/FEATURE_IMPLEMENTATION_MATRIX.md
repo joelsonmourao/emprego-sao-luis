@@ -64,4 +64,5 @@ Critério **FUNCIONAL**: menu + tela + API + banco + persistência + permissão 
 | `audit:critical-routes` | OK (adsense false) |
 | Seed E2E fail-closed | OK (host 127.0.0.1:55432 / `empregos_staging`, `--write` idempotente) |
 | Imagens / favicons | OK — ver `docs/IMAGE_ASSET_AUDIT.md` |
-| Push / deploy / produção | **Não realizados** |
+| Push / deploy Coolify | Operador: branch `codex/admin-negocio-completo` + smoke em `docs/DEPLOY_SMOKE_CHECKLIST.md` |
+| Admin Operação do dia | 6 atalhos no dashboard + menu; modelo Excel destacado; bairro opcional explícito |

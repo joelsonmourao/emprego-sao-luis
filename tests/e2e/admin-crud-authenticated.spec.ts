@@ -66,8 +66,12 @@ test.describe("CRUD autenticado — persistência admin", () => {
   test("importação XLSX/CSV e contatos autenticados", async ({ page }) => {
     await page.goto("/admin/vagas/importar");
     expect(page.url()).not.toContain("/admin/login");
+    await expect(page.getByRole("heading", { name: /Baixe o modelo oficial/i })).toBeVisible();
+    await expect(page.getByText(/não precisa de bairro/i)).toBeVisible();
     await expect(page.getByRole("link", { name: /Baixar modelo Excel/i })).toBeVisible();
     await expect(page.getByRole("link", { name: /Baixar modelo CSV/i })).toBeVisible();
+    const xlsx = await page.request.get("/modelos/modelo-importacao-vagas.xlsx");
+    expect(xlsx.status()).toBe(200);
     await page.goto("/admin/vagas/importar-contatos");
     await expect(page.getByRole("heading", { name: /Importar vagas por links/i })).toBeVisible();
     await page.screenshot({ path: resolve(shotDir, "crud-import.png"), fullPage: true });

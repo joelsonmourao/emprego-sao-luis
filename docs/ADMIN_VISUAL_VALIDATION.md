@@ -1,7 +1,7 @@
 # Validação visual do admin — Empregos São Luís
 
 **Branch:** `codex/admin-negocio-completo`
-**Atualizado:** 19/07/2026 (continuação — correção E2E)
+**Atualizado:** 19/07/2026 (Operação do dia + importação + deploy smoke)
 **Ambiente:** `es-e2e` · web `:4321` · Postgres `127.0.0.1:55432/empregos_staging` · Valkey
 **Auth:** `storageState` via `tests/e2e/global-setup.ts` (login real antes dos testes)
 **Screenshots locais:** `tmp/admin-visual/*.png` (fora do Git)

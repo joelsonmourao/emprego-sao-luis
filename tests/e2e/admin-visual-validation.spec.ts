@@ -48,15 +48,17 @@ test.describe("validação visual admin — continuidade", () => {
     });
   }
 
-  test("menu lista áreas novas", async ({ page }) => {
+  test("menu lista Operação do dia e áreas de continuidade", async ({ page }) => {
     await page.goto("/admin");
+    await expect(page.getByRole("heading", { name: /Operação do dia/i })).toBeVisible();
     const nav = page.locator("aside nav");
-    await expect(nav.getByRole("link", { name: /Importar por links/i })).toBeVisible();
-    await expect(nav.getByRole("link", { name: /Revisão e aprovação/i })).toBeVisible();
-    await expect(nav.getByRole("link", { name: /Monitor de candidaturas/i })).toBeVisible();
+    await expect(nav.getByRole("link", { name: /1\.\s*Importar vagas/i })).toBeVisible();
+    await expect(nav.getByRole("link", { name: /2\.\s*Revisar e publicar/i })).toBeVisible();
+    await expect(nav.getByRole("link", { name: /3\.\s*Monitor de candidaturas/i })).toBeVisible();
+    await expect(nav.getByRole("link", { name: /4\.\s*Post Magnético/i })).toBeVisible();
+    await expect(nav.getByRole("link", { name: /5\.\s*Rota da Aprovação/i })).toBeVisible();
     await expect(nav.getByRole("link", { name: /Pilares e clusters/i })).toBeVisible();
-    await expect(nav.getByRole("link", { name: /Post Magnético/i })).toBeVisible();
-    await expect(nav.getByRole("link", { name: /Rota da Aprovação/i })).toBeVisible();
+    await expect(nav.getByRole("link", { name: /Importar por links/i })).toBeVisible();
     await page.screenshot({ path: resolve(shotDir, "menu-completo.png"), fullPage: true });
   });
 });

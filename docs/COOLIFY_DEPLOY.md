@@ -1,6 +1,8 @@
 # Deploy seguro no Coolify
 
-Este guia usa a branch `codex/reconstrucao-astro`, migrations Drizzle versionadas e três imagens independentes. Nunca use `drizzle push` em produção.
+Este guia usa a branch **`codex/admin-negocio-completo`** (SHA de referência recente: `3eb4d57` ou tip atual), migrations Drizzle versionadas e três imagens independentes. Nunca use `drizzle push` em produção.
+
+**Ordem:** staging → validar smoke → promover o **mesmo SHA** à produção.
 
 ## 1. PostgreSQL
 
@@ -12,7 +14,7 @@ Crie Valkey ou Redis com persistência, senha e rede interna. Guarde a URL inter
 
 ## 3. Aplicação web
 
-Crie um recurso conectado ao repositório `joelsonmourao/emprego-sao-luis`, branch `codex/reconstrucao-astro`, contexto raiz e `Dockerfile.web`. Configure porta `4321`, healthcheck `/api/health` e domínio inicialmente de staging. O endpoint `/api/ready` deve retornar `database`, `schema` e `redis` como `ok`.
+Crie um recurso conectado ao repositório `joelsonmourao/emprego-sao-luis`, branch **`codex/admin-negocio-completo`**, contexto raiz e `Dockerfile.web`. Configure porta `4321`, healthcheck `/api/health` e domínio inicialmente de staging. O endpoint `/api/ready` deve retornar `database`, `schema` e `redis` como `ok`.
 
 ## 4. Job de migration
 
@@ -54,7 +56,7 @@ Nunca grave segredos no Git. Configure no Coolify por serviço.
 
 ### Staging vs produção
 
-- Staging: branch `codex/reconstrucao-astro`, banco/Valkey/volume/segredos **separados**, `APP_ENV=staging`, AdSense off, Indexing/IndexNow/Meta off, `robots.txt` com `Disallow: /`.
+- Staging: branch `codex/admin-negocio-completo`, banco/Valkey/volume/segredos **separados**, `APP_ENV=staging`, AdSense off, Indexing/IndexNow/Meta off, `robots.txt` com `Disallow: /`.
 - Nunca reutilize `AUTH_SECRET` ou `DATABASE_URL` de produção no staging.
 - Detalhes e checklist: [STAGING_VALIDATION.md](./STAGING_VALIDATION.md).
 

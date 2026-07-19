@@ -14,6 +14,15 @@ if (process.env.DATABASE_URL) {
 }
 ---
 <AdminLayout title="Web Stories">
+  <nav class="mb-4 flex flex-wrap gap-2 text-sm" aria-label="Fluxo editorial">
+    <a class="rounded-lg border px-3 py-1.5 font-bold" href="/admin/conteudo/pilares">1. Pilares</a>
+    <span class="self-center text-[var(--text-secondary)]" aria-hidden="true">→</span>
+    <a class="rounded-lg border px-3 py-1.5 font-bold" href="/admin/conteudo/post-magnetico">2. Post Magnético</a>
+    <span class="self-center text-[var(--text-secondary)]" aria-hidden="true">→</span>
+    <span class="rounded-lg bg-red-700 px-3 py-1.5 font-bold text-white">3. Web Stories</span>
+    <span class="self-center text-[var(--text-secondary)]" aria-hidden="true">→</span>
+    <a class="rounded-lg border px-3 py-1.5 font-bold" href="/admin/adsense-readiness">4. Rota da Aprovação</a>
+  </nav>
   <div class="flex flex-wrap items-start justify-between gap-4">
     <div>
       <h1 class="text-3xl font-black">Web Stories</h1>

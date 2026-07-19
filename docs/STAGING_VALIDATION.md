@@ -1,8 +1,8 @@
 # Homologação em staging — Empregos São Luís
 
-**Branch:** `codex/reconstrucao-astro`  
-**Tag local de segurança:** `pre-staging-empregos-sao-luis-2026-07`  
-**Data:** 19/07/2026  
+**Branch:** `codex/admin-negocio-completo`
+**Tag local de segurança:** `pre-staging-empregos-sao-luis-2026-07`
+**Data:** 19/07/2026
 
 ## Estado validado antes do push
 
@@ -44,11 +44,11 @@ Quando `APP_ENV` ∈ `staging|homolog|homologacao|preview|e2e` ou `FORCE_NOINDEX
 
 ### Serviços (recursos separados da produção)
 
-1. **PostgreSQL** staging — volume próprio, sem porta pública.  
-2. **Valkey** staging — rede interna.  
-3. **Volume** `UPLOADS_DIR=/app/data` — montar em **web** e **worker**, UID 1001.  
-4. **migrate** (`Dockerfile.migrate`) — 1 réplica, sem restart, branch `codex/reconstrucao-astro`.  
-5. **web** (`Dockerfile.web`) — porta 4321, health `/api/health`, domínio de staging.  
+1. **PostgreSQL** staging — volume próprio, sem porta pública.
+2. **Valkey** staging — rede interna.
+3. **Volume** `UPLOADS_DIR=/app/data` — montar em **web** e **worker**, UID 1001.
+4. **migrate** (`Dockerfile.migrate`) — 1 réplica, sem restart, branch `codex/admin-negocio-completo`.
+5. **web** (`Dockerfile.web`) — porta 4321, health `/api/health`, domínio de staging.
 6. **worker** (`Dockerfile.worker`) — sem domínio público.
 
 ### Ordem
@@ -79,10 +79,10 @@ Fixtures: `npm run seed:staging-fixtures` (dry-run) / `--write` só no banco sta
 
 ### Rollback de staging
 
-1. Parar worker.  
-2. Republicar imagem web/worker do commit anterior.  
-3. Restaurar backup do Postgres staging se migration for o problema.  
-4. Migrations aditivas: não “desfazer” schema automaticamente.  
+1. Parar worker.
+2. Republicar imagem web/worker do commit anterior.
+3. Restaurar backup do Postgres staging se migration for o problema.
+4. Migrations aditivas: não “desfazer” schema automaticamente.
 5. Desligar domínio de staging se necessário.
 
 ## Playwright contra staging (após deploy)
@@ -109,10 +109,10 @@ Não gravar relatório com PII no Git. Correção só após revisão humana.
 
 ## Pendências externas desta etapa
 
-- Deploy Coolify staging (acesso operador).  
-- Domínio HTTPS de staging.  
-- Playwright apontando ao domínio real.  
-- Auditoria visual no domínio real.  
-- Auditoria de placeholders em produção (acesso autorizado).  
-- Decisão sobre ativos em `Logo/`.  
+- Deploy Coolify staging (acesso operador).
+- Domínio HTTPS de staging.
+- Playwright apontando ao domínio real.
+- Auditoria visual no domínio real.
+- Auditoria de placeholders em produção (acesso autorizado).
+- Decisão sobre ativos em `Logo/`.
 - Merge na main e produção: **bloqueados** até aceite de staging.

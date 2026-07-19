@@ -1,11 +1,15 @@
 ---
 import AdminLayout from "../../layouts/AdminLayout.astro";
 import { getAdminDashboardMetrics } from "../../lib/admin-dashboard";
+import { filterDayOps } from "../../lib/admin-nav";
 import { countOpenSeoIssues } from "../../lib/seo-audit";
 
 const metrics = await getAdminDashboardMetrics();
 const seoIssues = await countOpenSeoIssues();
 metrics.seoIssues = seoIssues;
+
+const permissions = Astro.locals.auth?.permissions ?? [];
+const dayOps = filterDayOps(permissions);
 
 const fmtCurrency = (v: number) => v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 
@@ -20,28 +24,45 @@ const commercialCards = [
   ["Pedidos pendentes", metrics.pendingOrders],
   ["Pagamentos em revisão", metrics.manualReviewPayments],
   ["Receita confirmada", fmtCurrency(metrics.paidRevenue)],
-  ["Planos ativos", metrics.activePlans],
-  ["Créditos emitidos", metrics.creditsIssued],
-  ["Créditos utilizados", metrics.creditsUsed],
-  ["Empresas com crédito", metrics.companiesWithCredit],
-  ["Contatos abertos", metrics.openContacts]
+  ["Planos ativos", metrics.activePlans]
 ];
 
-const opsCards = [
-  ["Falhas de webhook", metrics.webhookFailures],
-  ["Problemas SEO abertos", metrics.seoIssues]
-];
+const dayHints: Record<string, string> = {
+  "/admin/vagas/importar": "Excel/CSV ou links — bairro opcional; WhatsApp e e-mail são canais válidos",
+  "/admin/vagas/revisao": "Aprove só o que estiver completo e seguro",
+  "/admin/vagas/monitor-candidaturas": "Acompanhe canais site, WhatsApp e e-mail",
+  "/admin/conteudo/post-magnetico": "Pilares → Post Magnético → Web Story",
+  "/admin/adsense-readiness": "Checklist interno — AdSense no site só depois do OK",
+  "/admin/comercial/planos": "Receita B2B; candidato permanece gratuito"
+};
 ---
 <AdminLayout title="Visão geral">
   <div class="flex flex-wrap items-end justify-between gap-4">
     <div>
-      <h1 class="font-display text-3xl font-black">Visão geral</h1>
-      <p class="mt-3 text-[var(--text-secondary)]">Métricas operacionais e comerciais consultadas no PostgreSQL.</p>
+      <h1 class="font-display text-3xl font-black">Operação do dia</h1>
+      <p class="mt-3 max-w-2xl text-[var(--text-secondary)]">
+        Seis ações com controle total. O restante do painel fica em “Mais ferramentas” no menu.
+      </p>
     </div>
-    <a class="es-btn es-btn-secondary" href="/admin/saude">Ver saúde da infraestrutura</a>
+    <a class="es-btn es-btn-secondary" href="/admin/saude">Saúde da infraestrutura</a>
   </div>
 
-  <h2 class="mt-8 text-sm font-bold uppercase tracking-wide text-[var(--text-secondary)]">Vagas</h2>
+  <ol class="mt-8 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+    {dayOps.map((item, index) => (
+      <li>
+        <a
+          class="flex h-full flex-col rounded-2xl border border-[var(--brand-border)] bg-white p-5 shadow-sm transition hover:border-[var(--brand-primary)]"
+          href={item.href}
+        >
+          <span class="text-xs font-bold uppercase tracking-wide text-[var(--brand-primary)]">Passo {index + 1}</span>
+          <strong class="mt-2 font-display text-xl font-black">{item.label}</strong>
+          <p class="mt-2 text-sm text-[var(--text-secondary)]">{dayHints[item.href] ?? "Abrir área"}</p>
+        </a>
+      </li>
+    ))}
+  </ol>
+
+  <h2 class="mt-10 text-sm font-bold uppercase tracking-wide text-[var(--text-secondary)]">Vagas</h2>
   <div class="mt-3 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
     {jobCards.map(([label, value]) => (
       <section class="rounded-2xl border border-[var(--brand-border)] bg-white p-5">
@@ -51,7 +72,7 @@ const opsCards = [
     ))}
   </div>
 
-  <h2 class="mt-8 text-sm font-bold uppercase tracking-wide text-[var(--text-secondary)]">Comercial</h2>
+  <h2 class="mt-8 text-sm font-bold uppercase tracking-wide text-[var(--text-secondary)]">Comercial B2B</h2>
   <div class="mt-3 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
     {commercialCards.map(([label, value]) => (
       <section class="rounded-2xl border border-[var(--brand-border)] bg-white p-5">
@@ -61,21 +82,10 @@ const opsCards = [
     ))}
   </div>
 
-  <h2 class="mt-8 text-sm font-bold uppercase tracking-wide text-[var(--text-secondary)]">Operação</h2>
-  <div class="mt-3 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-    {opsCards.map(([label, value]) => (
-      <section class="rounded-2xl border border-[var(--brand-border)] bg-white p-5">
-        <p class="text-sm text-[var(--text-secondary)]">{label}</p>
-        <strong class="mt-2 block font-display text-3xl">{value}</strong>
-      </section>
-    ))}
-  </div>
-
-  <div class="mt-8 flex flex-wrap gap-3">
-    <a class="es-btn es-btn-primary" href="/admin/vagas/nova">Cadastrar vaga</a>
-    <a class="es-btn es-btn-secondary" href="/admin/comercial/planos">Planos comerciais</a>
-    <a class="es-btn es-btn-secondary" href="/admin/comercial/pedidos">Pedidos</a>
-    <a class="es-btn es-btn-secondary" href="/admin/comercial/pagamentos">Pagamentos</a>
-    <a class="es-btn es-btn-secondary" href="/admin/seo/auditoria">Auditoria SEO</a>
-  </div>
+  <p class="mt-6 text-sm text-[var(--text-secondary)]">
+    Problemas SEO abertos: <strong>{seoIssues}</strong>
+    · <a class="font-bold text-[var(--brand-primary)]" href="/admin/seo/auditoria">Auditoria SEO</a>
+    · <a class="font-bold text-[var(--brand-primary)]" href="/admin/conteudo/pilares">Pilares e clusters</a>
+    · <a class="font-bold text-[var(--brand-primary)]" href="/admin/web-stories">Web Stories</a>
+  </p>
 </AdminLayout>

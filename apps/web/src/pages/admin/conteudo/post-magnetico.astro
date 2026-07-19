@@ -44,6 +44,15 @@ if (process.env.DATABASE_URL) {
 }
 ---
 <AdminLayout title="Post Magnético">
+  <nav class="mb-4 flex flex-wrap gap-2 text-sm" aria-label="Fluxo editorial">
+    <a class="rounded-lg border px-3 py-1.5 font-bold" href="/admin/conteudo/pilares">1. Pilares</a>
+    <span class="self-center text-[var(--text-secondary)]" aria-hidden="true">→</span>
+    <span class="rounded-lg bg-red-700 px-3 py-1.5 font-bold text-white">2. Post Magnético</span>
+    <span class="self-center text-[var(--text-secondary)]" aria-hidden="true">→</span>
+    <a class="rounded-lg border px-3 py-1.5 font-bold" href="/admin/web-stories">3. Web Stories</a>
+    <span class="self-center text-[var(--text-secondary)]" aria-hidden="true">→</span>
+    <a class="rounded-lg border px-3 py-1.5 font-bold" href="/admin/adsense-readiness">4. Rota da Aprovação</a>
+  </nav>
   <div class="flex flex-wrap items-start justify-between gap-4">
     <div>
       <p class="text-sm font-bold uppercase tracking-wide text-red-700">Conteúdo</p>
