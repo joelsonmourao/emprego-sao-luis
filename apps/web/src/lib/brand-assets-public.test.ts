@@ -73,7 +73,11 @@ describe("ativos de marca públicos", () => {
     const sharp = (await import("sharp")).default;
     const logo = await sharp(resolve(publicRoot, "brand/logo-horizontal.webp")).ensureAlpha().raw().toBuffer({ resolveWithObject: true });
     let transparent = 0;
-    for (let i = 3; i < logo.data.length; i += 4) if (logo.data[i] < 10) transparent += 1;
+    const pixels = logo.data;
+    for (let i = 3; i < pixels.length; i += 4) {
+      const alpha = pixels[i] ?? 255;
+      if (alpha < 10) transparent += 1;
+    }
     const pct = transparent / (logo.info.width * logo.info.height);
     expect(pct).toBeGreaterThan(0.4);
   });
