@@ -24,35 +24,82 @@ Não configure seed nesse job. O primeiro administrador é criado separadamente 
 
 Crie um terceiro recurso usando `Dockerfile.worker`, sem domínio e sem porta pública. Compartilhe `DATABASE_URL`, `REDIS_URL`, armazenamento, e-mail, Sentry, Google e Meta apenas quando necessários. Configure restart `unless-stopped`/automático em falha. O processo executado é `node dist/index.js`, registra `worker.started` e encerra filas com segurança em SIGTERM/SIGINT.
 
-## 6. Variáveis
+## 6. Volume persistente
 
-Obrigatórias: `APP_ENV=production`, `SITE_URL=https://empregossaoluis.com.br`, `DATABASE_URL`, `REDIS_URL` e `AUTH_SECRET`. Para upload/social: `S3_ENDPOINT`, `S3_REGION`, `S3_BUCKET`, `S3_ACCESS_KEY_ID`, `S3_SECRET_ACCESS_KEY`, `S3_PUBLIC_URL`, `S3_FORCE_PATH_STYLE`. Integrações opcionais: `RESEND_API_KEY`, `EMAIL_FROM`, `SENTRY_DSN`, `INDEXNOW_KEY`, credenciais Google e Meta, `PUBLIC_ADSENSE_CLIENT_ID`, `PUBLIC_ADSENSE_ENABLED`, `TURNSTILE_SITE_KEY`, `TURNSTILE_SECRET_KEY`, `VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`. Nunca grave valores no Git.
+Monte o **mesmo volume** em web e worker:
 
-## 7. Domínio e HTTPS
+```dotenv
+UPLOADS_DIR=/app/data
+```
+
+Estrutura esperada: `/app/data/{imports,media,brand,reports,temp,receipts}`. Sem volume compartilhado, importações e mídia ficam inconsistentes entre processos. Detalhes: [COOLIFY_STORAGE.md](./COOLIFY_STORAGE.md).
+
+## 7. Variáveis de ambiente
+
+Nunca grave segredos no Git. Configure no Coolify por serviço.
+
+### Obrigatórias (web + worker + migrate)
+
+| Variável | Uso |
+|----------|-----|
+| `APP_ENV` | `production` |
+| `SITE_URL` | URL pública canônica (ex.: `https://empregossaoluis.com.br`) |
+| `DATABASE_URL` | PostgreSQL interno |
+| `REDIS_URL` | Valkey/Redis interno |
+| `AUTH_SECRET` | Sessões e tokens |
+| `UPLOADS_DIR` | `/app/data` |
+| `COOKIE_SECURE` | `true` em produção |
+
+### Web (público / build)
+
+| Variável | Uso |
+|----------|-----|
+| `PUBLIC_ADSENSE_CLIENT_ID` | Cliente AdSense (somente após conta real) |
+| `PUBLIC_ADSENSE_PUBLISHER_ID` | Publisher `pub-…` (somente após conta real) |
+| `PUBLIC_ADSENSE_ENABLED` | `false` até Rota da Aprovação OK |
+| `TURNSTILE_SITE_KEY` | Captcha público (se ativo) |
+
+### Worker e integrações (quando usadas)
+
+| Variável | Uso |
+|----------|-----|
+| `RESEND_API_KEY`, `EMAIL_FROM` | E-mail transacional |
+| `SENTRY_DSN` | Monitoramento |
+| `INDEXNOW_KEY` | IndexNow |
+| Credenciais Google / Meta | Indexing, social (conforme módulo) |
+| `S3_*` | R2/S3 opcional (fallback: volume) |
+| `PAYMENT_PROVIDER`, `MERCADOPAGO_*` | Gateway B2B (pendente credenciais) |
+| `TURNSTILE_SECRET_KEY` | Captcha servidor |
+| `VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY` | Push (se ativo) |
+
+Seeds **somente** no job migrate, quando intencional: `RUN_SEED_LOCATIONS`, `RUN_SEED_CATEGORIES`, `RUN_SEED_SYSTEM_DEFAULTS`. RBAC inicial: processo separado `db:seed-rbac` (não no start do web).
+
+## 8. Domínio e HTTPS
 
 Valide primeiro em subdomínio de staging com `noindex`. Depois associe o domínio, confira HTTPS/renovação e somente então promova. Confirme que DNS e proxy apontam para o recurso Astro correto, não para a implantação legada.
 
-## 8. Healthcheck
+## 9. Healthcheck
 
 `/api/health` confirma que o processo web está vivo. `/api/ready` confirma conexão com PostgreSQL, presença do schema Drizzle e Redis. Um banco vazio deve produzir `schema: migrations_required` e HTTP 503.
 
-## 9. Primeiro deploy
+## 10. Primeiro deploy
 
-1. Faça backup do PostgreSQL.
-2. Execute o job de migration uma vez e confira as migrations `0012`–`0016` (inclui publicidade Fase 10).
-3. Consulte `/api/ready` e exija todos os checks `ok`.
-4. Implante web e teste `/`, `/vagas`, `/admin/login`, `/contato`, `/sitemap.xml`, `/admin/operacao` e uma consulta real.
-5. Implante worker e confira `worker.started`, zero reinícios e ausência de `relation does not exist`.
-6. Crie o primeiro administrador pelo processo separado e remova a senha do ambiente.
+1. Faça backup do PostgreSQL e do volume `/app/data`.
+2. Monte `/app/data` idêntico em web e worker.
+3. Execute o job de migration (`Dockerfile.migrate`) uma vez; confira `0024` e `0025` (candidatura multicanal, Web Stories, classificação) com `applied: true`.
+4. Consulte `/api/ready` e exija `database`, `schema` e `redis` como `ok`.
+5. Implante web e teste `/`, `/vagas`, `/admin/login`, `/contato`, `/sitemap.xml`, `/admin/adsense-readiness`, `/admin/operacao` e upload de mídia.
+6. Implante worker e confira `worker.started`, filas de importação e ausência de `relation does not exist`.
+7. Crie o primeiro administrador pelo processo separado e remova credenciais temporárias do ambiente.
 
-## 10. Deploy futuro
+## 11. Deploy futuro
 
 Faça backup, publique a nova imagem de migration, execute-a uma vez, confira o relatório, publique web e worker e execute smoke tests. Migration nunca faz parte do comando de start e nunca roda em várias réplicas.
 
-## 11. Rollback
+## 12. Rollback
 
 Pare o worker novo, restaure as imagens anteriores do web/worker e mantenha as migrations aditivas. Não reverta schema automaticamente. Se uma migration incompatível exigir reversão, preserve o delta, restaure o backup em banco separado e valide antes de trocar conexões.
 
-## 12. Backup
+## 13. Backup
 
 Configure `pg_dump` diário, retenção, cópia externa criptografada e teste mensal de restauração. Ative versionamento/replicação do bucket de mídia. Antes de migration ou troca de domínio, gere backup sob demanda e registre data, tamanho, checksum e responsável.
