@@ -54,6 +54,7 @@
     "audit:critical-routes": "node scripts/audit-critical-routes.mjs",
     "seed:staging-fixtures": "node scripts/seed-staging-fixtures.mjs",
     "seed:adsense-editorial": "node scripts/seed-adsense-editorial-schedule.mjs",
+    "unpublish:adsense-editorial": "node scripts/unpublish-adsense-editorial-seed.mjs",
     "audit:performance": "node scripts/audit-performance.mjs",
     "audit:admin": "node scripts/audit-admin.mjs",
     "audit:site": "node scripts/audit-site.mjs",

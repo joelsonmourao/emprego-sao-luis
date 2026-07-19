@@ -134,15 +134,37 @@ async function buildAdsenseReadiness(baseUrl: URL) {
   /** Meta interna ×3 (não é número oficial do Google). Usada para “Pronto para solicitar análise”. */
   const MIN_PUBLISHED_ARTICLES = 45;
   const MIN_USEFUL_CHARS = 2400;
-  const publishedArticles = articleRows.filter((article) => article.status === "PUBLISHED");
-  const scheduledArticles = articleRows.filter((article) => article.status === "SCHEDULED");
-  const substantialPublished = publishedArticles.filter((article) => plainLength(article.contentHtml) >= MIN_USEFUL_CHARS);
-  const missingCover = publishedArticles.filter(
+  const isTemplateSeed = (slug: string) => slug.startsWith("adsense-editorial");
+  const allPublished = articleRows.filter((article) => article.status === "PUBLISHED");
+  const templatePublished = allPublished.filter((article) => isTemplateSeed(article.slug));
+  /** Conta só conteúdo real — seed template não entra na meta. */
+  const publishedArticles = allPublished.filter((article) => !isTemplateSeed(article.slug));
+  const scheduledArticles = articleRows.filter(
+    (article) => article.status === "SCHEDULED" && !isTemplateSeed(article.slug)
+  );
+  const coverComplete = (article: (typeof publishedArticles)[number]) =>
+    Boolean(
+      article.coverImageUrl &&
+        article.coverImageAlt?.trim() &&
+        article.coverImageCaption?.trim() &&
+        article.coverImageCredit?.trim()
+    );
+  const missingCover = publishedArticles.filter((article) => !coverComplete(article));
+  const coverUrlCounts = new Map<string, number>();
+  for (const article of publishedArticles) {
+    if (!article.coverImageUrl) continue;
+    const key = article.coverImageUrl.trim();
+    coverUrlCounts.set(key, (coverUrlCounts.get(key) ?? 0) + 1);
+  }
+  const duplicateCoverUrls = [...coverUrlCounts.entries()].filter(([, n]) => n > 1).map(([url]) => url);
+  const uniqueCoverPublished = publishedArticles.filter(
     (article) =>
-      !article.coverImageUrl ||
-      !article.coverImageAlt?.trim() ||
-      !article.coverImageCaption?.trim() ||
-      !article.coverImageCredit?.trim()
+      coverComplete(article) &&
+      article.coverImageUrl &&
+      (coverUrlCounts.get(article.coverImageUrl.trim()) ?? 0) === 1
+  );
+  const substantialPublished = uniqueCoverPublished.filter(
+    (article) => plainLength(article.contentHtml) >= MIN_USEFUL_CHARS
   );
   checks.push(
     pass({
@@ -152,7 +174,7 @@ async function buildAdsenseReadiness(baseUrl: URL) {
       kind: "OFFICIAL",
       severity: "P0",
       status: publishedArticles.length ? "APROVADO_INTERNAMENTE" : "BLOQUEADOR",
-      evidence: `${publishedArticles.length} publicado(s); ${scheduledArticles.length} agendado(s). O Google não publica quantidade mínima oficial.`,
+      evidence: `${publishedArticles.length} real(is) publicado(s); ${scheduledArticles.length} agendado(s); ${templatePublished.length} template seed ignorado(s). O Google não publica quantidade mínima oficial.`,
       action: "/admin/conteudo/estrategia"
     })
   );
@@ -160,7 +182,7 @@ async function buildAdsenseReadiness(baseUrl: URL) {
     pass({
       id: "content-volume-internal",
       stage: "ETAPA_2",
-      label: `Meta interna: ${MIN_PUBLISHED_ARTICLES} posts substanciais`,
+      label: `Meta interna: ${MIN_PUBLISHED_ARTICLES} posts reais substanciais`,
       kind: "INTERNAL",
       severity: "P0",
       status:
@@ -169,8 +191,8 @@ async function buildAdsenseReadiness(baseUrl: URL) {
           : publishedArticles.length === 0
             ? "BLOQUEADOR"
             : "PENDENTE",
-      evidence: `${substantialPublished.length}/${MIN_PUBLISHED_ARTICLES} publicados com ≥${MIN_USEFUL_CHARS} caracteres úteis. Agendados: ${scheduledArticles.length}. Use o seed editorial ou o calendário.`,
-      action: "/admin/calendario-editorial"
+      evidence: `${substantialPublished.length}/${MIN_PUBLISHED_ARTICLES} reais com ≥${MIN_USEFUL_CHARS} caracteres e capa exclusiva. Seed adsense-editorial-* não conta. Produza no admin.`,
+      action: "/admin/conteudo/estrategia"
     })
   );
   const thin = publishedArticles.filter((article) => plainLength(article.contentHtml) < MIN_USEFUL_CHARS);
@@ -182,7 +204,7 @@ async function buildAdsenseReadiness(baseUrl: URL) {
       kind: "INTERNAL",
       severity: "P1",
       status: thin.length ? "BLOQUEADOR" : "APROVADO_INTERNAMENTE",
-      evidence: `${thin.length} conteúdo(s) publicado(s) abaixo da meta interna de ${MIN_USEFUL_CHARS} caracteres úteis.`,
+      evidence: `${thin.length} conteúdo(s) real(is) publicado(s) abaixo da meta interna de ${MIN_USEFUL_CHARS} caracteres úteis.`,
       action: thin.length ? "/admin/conteudo/estrategia" : undefined
     })
   );
@@ -195,11 +217,39 @@ async function buildAdsenseReadiness(baseUrl: URL) {
       severity: "P1",
       status: missingCover.length ? "PENDENTE" : "APROVADO_INTERNAMENTE",
       evidence: missingCover.length
-        ? `${missingCover.length} publicado(s) sem capa completa (URL, ALT, legenda e crédito). O Google não exige capa oficialmente; a meta interna exige para qualidade visual.`
-        : "Publicados com capa, ALT, legenda e crédito.",
+        ? `${missingCover.length} publicado(s) sem capa completa (URL, ALT, legenda e crédito).`
+        : "Publicados reais com capa, ALT, legenda e crédito.",
       action: missingCover.length ? "/admin/conteudo/estrategia" : undefined
     })
   );
+  checks.push(
+    pass({
+      id: "unique-covers",
+      stage: "ETAPA_3",
+      label: "Capas distintas por post",
+      kind: "INTERNAL",
+      severity: "P1",
+      status: duplicateCoverUrls.length ? "PENDENTE" : "APROVADO_INTERNAMENTE",
+      evidence: duplicateCoverUrls.length
+        ? `${duplicateCoverUrls.length} URL(s) de capa repetida(s) entre posts reais (ex.: mesma og-default). Cada post precisa de capa própria.`
+        : "Nenhuma capa duplicada entre posts reais contados na meta.",
+      action: duplicateCoverUrls.length ? "/admin/conteudo/estrategia" : undefined
+    })
+  );
+  if (templatePublished.length) {
+    checks.push(
+      pass({
+        id: "template-seed",
+        stage: "ETAPA_3",
+        label: "Seed template no ar",
+        kind: "INTERNAL",
+        severity: "P0",
+        status: "BLOQUEADOR",
+        evidence: `${templatePublished.length} post(s) adsense-editorial-* ainda PUBLISHED. Despublique (DRAFT) antes de pedir AdSense.`,
+        action: "/admin/conteudo/estrategia"
+      })
+    );
+  }
   const noAuthorSource = publishedArticles.filter(
     (article) => !article.authorId || (!article.sourceUrl && (!Array.isArray(article.sources) || article.sources.length === 0))
   );
@@ -423,7 +473,9 @@ async function buildAdsenseReadiness(baseUrl: URL) {
     thin.length === 0 &&
     noAuthorSource.length === 0 &&
     missingPillar.length === 0 &&
-    missingCover.length === 0;
+    missingCover.length === 0 &&
+    duplicateCoverUrls.length === 0 &&
+    templatePublished.length === 0;
   const classification = ready
     ? "PRONTO PARA SOLICITAR ANÁLISE"
     : blockers.some((item) => item.severity === "P0")
@@ -444,15 +496,17 @@ async function buildAdsenseReadiness(baseUrl: URL) {
   return {
     classification,
     readyForRequest: ready,
-    disclaimer: "Esta verificação é interna e não garante aprovação pelo Google AdSense.",
+    disclaimer:
+      "Verificação interna apenas. A aprovação final é do Google AdSense — “Pronto” aqui não garante aprovação. Seed template e capas repetidas não contam.",
     editorialMeta: {
       minPublished: MIN_PUBLISHED_ARTICLES,
       minUsefulChars: MIN_USEFUL_CHARS,
       published: publishedArticles.length,
       substantialPublished: substantialPublished.length,
       scheduled: scheduledArticles.length,
-      withCover: publishedArticles.length - missingCover.length,
-      publishedStories: storyRows.filter((story) => story.status === "PUBLISHED").length
+      withCover: uniqueCoverPublished.length,
+      templateIgnored: templatePublished.length,
+      publishedStories: storyRows.filter((story) => story.status === "PUBLISHED" && !story.slug.startsWith("adsense-editorial")).length
     },
     checks,
     stages,

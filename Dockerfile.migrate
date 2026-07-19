@@ -17,6 +17,7 @@ COPY packages/db packages/db
 COPY packages/shared packages/shared
 COPY scripts/migrate-entrypoint.sh scripts/migrate-entrypoint.sh
 COPY scripts/seed-adsense-editorial-schedule.mjs scripts/seed-adsense-editorial-schedule.mjs
+COPY scripts/unpublish-adsense-editorial-seed.mjs scripts/unpublish-adsense-editorial-seed.mjs
 RUN chmod +x scripts/migrate-entrypoint.sh
 USER node
 CMD ["sh", "scripts/migrate-entrypoint.sh"]

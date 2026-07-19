@@ -24,7 +24,7 @@ API de apoio: `/api/admin/adsense-readiness`
 
 ## Botão “Pronto para solicitar análise”
 
-Só aparece quando não há bloqueadores P0 relevantes, institucionais estão completos, candidatura funciona e há **meta interna ×3: 45 posts substanciais** (≥2400 caracteres) com autoria, fontes, pilar/cluster e capa creditada. Mesmo assim o disclaimer permanece visível — **não garante** aprovação do Google.
+Só aparece quando não há bloqueadores P0 relevantes, institucionais estão completos, candidatura funciona e há **meta interna ×3: 45 posts reais substanciais** (≥2400 caracteres) com autoria, fontes, pilar/cluster e **capa exclusiva** (seed `adsense-editorial-*` não conta). Mesmo assim o disclaimer permanece visível — **quem aprova é o Google AdSense**.
 
 Agenda automática: [ADSENSE_EDITORIAL_SCHEDULE.md](./ADSENSE_EDITORIAL_SCHEDULE.md).
 

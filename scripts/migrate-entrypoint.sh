@@ -54,4 +54,15 @@ if [ "${RUN_SEED_ADSENSE_EDITORIAL:-}" = "true" ]; then
   echo "[migrate] Seed editorial AdSense concluído."
 fi
 
+# Despublica template adsense-editorial-* (one-shot). Remova a variável após o sucesso.
+if [ "${RUN_UNPUBLISH_ADSENSE_EDITORIAL:-}" = "true" ]; then
+  if [ "${ADSENSE_EDITORIAL_ALLOW_PRODUCTION:-}" != "1" ]; then
+    echo "[migrate] ERRO: RUN_UNPUBLISH_ADSENSE_EDITORIAL=true exige ADSENSE_EDITORIAL_ALLOW_PRODUCTION=1." >&2
+    exit 1
+  fi
+  echo "[migrate] Despublicando seed editorial template (DRAFT)..."
+  node scripts/unpublish-adsense-editorial-seed.mjs --write --i-understand-production
+  echo "[migrate] Unpublish editorial concluído."
+fi
+
 echo "[migrate] Execução finalizada. Encerrando container."

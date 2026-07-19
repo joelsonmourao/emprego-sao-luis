@@ -53,6 +53,29 @@ npm run seed:adsense-editorial -- --write
 
 Worker precisa estar ativo para publicar `SCHEDULED`.
 
+### Não use este seed para pedir AdSense
+
+O pacote `adsense-editorial-*` é template (frases repetidas, capa compartilhada). A Rota da Aprovação **ignora** esses slugs e bloqueia se ainda estiverem `PUBLISHED`. Prefira posts reais no admin (Pilares → Post Magnético / Notícia) com **capa própria**.
+
+### Despublicar o seed em produção (Coolify one-shot)
+
+1. Backup do PostgreSQL.
+2. No serviço **migrate-staging** (imagem `Dockerfile.migrate`):
+   - Defina `RUN_UNPUBLISH_ADSENSE_EDITORIAL=true`
+   - Defina `ADSENSE_EDITORIAL_ALLOW_PRODUCTION=1`
+   - Remova `RUN_SEED_ADSENSE_EDITORIAL` se existir
+3. Force rebuild / redeploy do migrate na branch `codex/admin-negocio-completo`.
+4. Nos logs: `Unpublish editorial concluído`.
+5. **Remova** `RUN_UNPUBLISH_ADSENSE_EDITORIAL` e `ADSENSE_EDITORIAL_ALLOW_PRODUCTION` (one-shot).
+6. Redeploy do **web**.
+
+Local:
+
+```powershell
+npm run unpublish:adsense-editorial
+npm run unpublish:adsense-editorial -- --write
+```
+
 ## Quando pedir AdSense
 
-Só quando `/admin/adsense-readiness` mostrar **Pronto para solicitar análise** (45 substanciais + capas + institucionais sem placeholder + demais checks verdes). Depois: conta real → Publisher ID → `ads.txt` → só então `PUBLIC_ADSENSE_ENABLED=true`.
+Só quando `/admin/adsense-readiness` mostrar **Pronto para solicitar análise** com posts **reais** (45 substanciais + capas exclusivas + institucionais sem placeholder + demais checks verdes). “Pronto” interno **não** é aprovação do Google. Depois: conta real → Publisher ID → `ads.txt` → só então `PUBLIC_ADSENSE_ENABLED=true`.
