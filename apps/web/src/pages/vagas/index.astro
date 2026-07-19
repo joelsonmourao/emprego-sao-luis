@@ -83,7 +83,7 @@ const activeFilters = [
   workplace && ["Modalidade", workplace],
   contract && ["Contrato", contract]
 ].filter(Boolean) as Array<[string, string]>;
-const noindex = rows.length === 0 || activeFilters.length > 0 || order !== "recentes";
+const noindex = activeFilters.length > 0 || order !== "recentes";
 const canonical = new URL(page > 1 ? `/vagas?pagina=${page}` : "/vagas", Astro.site).toString();
 const itemListSchema = {
   "@type": "ItemList",

@@ -1,13 +1,6 @@
 import { createHash } from "node:crypto";
 import type { APIRoute } from "astro";
-import {
-  consolidateJobContent,
-  evaluateJobPublication,
-  jobDraftSchema,
-  normalizeNeighborhood,
-  UNIDENTIFIED_COMPANY_ID,
-  validateApplicationChannels
-} from "@es/shared";
+import { consolidateJobContent, jobDraftSchema, UNIDENTIFIED_COMPANY_ID } from "@es/shared";
 import {
   auditLogs,
   categories,
@@ -66,13 +59,13 @@ export const POST: APIRoute = async ({ params, request, locals, clientAddress })
         .where(eq(states.id, parsed.data.stateId))
         .limit(1),
       connection.db
-        .select({ id: companies.id, name: companies.name })
+        .select({ id: companies.id })
         .from(companies)
         .where(eq(companies.id, parsed.data.companyId))
         .limit(1),
       parsed.data.categoryId
         ? connection.db
-            .select({ id: categories.id, name: categories.name })
+            .select({ id: categories.id })
             .from(categories)
             .where(eq(categories.id, parsed.data.categoryId))
             .limit(1)
@@ -83,31 +76,6 @@ export const POST: APIRoute = async ({ params, request, locals, clientAddress })
     if (!company) return adminJsonError("Empresa não encontrada.", 422, { code: "COMPANY_NOT_FOUND" });
     if (parsed.data.categoryId && !categoryRows[0])
       return adminJsonError("Categoria não encontrada.", 422, { code: "CATEGORY_NOT_FOUND" });
-
-    const channels = validateApplicationChannels(parsed.data);
-    const requiresReview = ["APPROVED", "SCHEDULED", "PUBLISHED"].includes(parsed.data.publicationStatus);
-    const reviewConfirmed = form.get("reviewConfirmed") === "on";
-    const quality = evaluateJobPublication({
-      title: parsed.data.normalizedTitle,
-      companyName: company.name,
-      description: content.descriptionHtml,
-      cityName: city.name,
-      stateCode: state.code,
-      categoryName: categoryRows[0]?.name ?? null,
-      sourceName: parsed.data.sourceName,
-      sourceUrl: parsed.data.sourceUrl ?? null,
-      applicationUrl: channels.url.normalized,
-      applicationEmail: channels.email.normalized,
-      applicationWhatsapp: channels.whatsapp.normalized,
-      verificationStatus: requiresReview ? "SOURCE_CONFIRMED" : "NEEDS_REVIEW",
-      publicationStatus: parsed.data.publicationStatus,
-      expiresAt: parsed.data.expiresAt
-    });
-    if (requiresReview && (!reviewConfirmed || !quality.valid))
-      return adminJsonError("A vaga não passou pela revisão obrigatória.", 422, {
-        code: "JOB_PUBLICATION_BLOCKED",
-        details: [...(!reviewConfirmed ? ["Confirme a revisão editorial antes de aprovar, agendar ou publicar."] : []), ...quality.errors]
-      });
 
     const slug = await resolveRequestedJobSlug(
       connection.db,
@@ -136,32 +104,8 @@ export const POST: APIRoute = async ({ params, request, locals, clientAddress })
           unidentifiedCompany,
           slug,
           categoryId: parsed.data.categoryId ?? null,
-          neighborhood: normalizeNeighborhood(parsed.data.neighborhood),
           sourceUrl: parsed.data.sourceUrl ?? null,
           sourceEvidence: parsed.data.sourceEvidence ?? null,
-          applicationUrl: channels.url.normalized,
-          applicationEmail: channels.email.normalized,
-          applicationWhatsapp: channels.whatsapp.normalized,
-          applicationWhatsappOriginal: channels.whatsapp.original,
-          applicationWhatsappMessage: parsed.data.applicationWhatsappMessage ?? null,
-          applicationWhatsappValid: channels.whatsapp.valid,
-          applicationWhatsappValidatedAt: channels.whatsapp.original ? new Date() : null,
-          applicationWhatsappSource: channels.whatsapp.original ? "MANUAL" : null,
-          applicationEmailSubject: parsed.data.applicationEmailSubject ?? null,
-          applicationEmailInstructions: parsed.data.applicationInstructions ?? null,
-          applicationEmailValid: channels.email.valid,
-          applicationEmailValidatedAt: channels.email.original ? new Date() : null,
-          applicationEmailSource: channels.email.original ? "MANUAL" : null,
-          applicationInstructions: parsed.data.applicationInstructions ?? null,
-          applicationType: channels.validTypes.length > 1 ? "MULTIPLE" : channels.validTypes[0] ?? "NONE",
-          applicationUrlStatus: channels.url.valid ? (before.applicationUrl === channels.url.normalized ? before.applicationUrlStatus : "UNCHECKED") : "NOT_APPLICABLE",
-          applicationUrlCheckedAt: before.applicationUrl === channels.url.normalized ? before.applicationUrlCheckedAt : null,
-          applicationUrlHttpStatus: before.applicationUrl === channels.url.normalized ? before.applicationUrlHttpStatus : null,
-          applicationUrlFinalUrl: before.applicationUrl === channels.url.normalized ? before.applicationUrlFinalUrl : null,
-          applicationUrlCheckReason: before.applicationUrl === channels.url.normalized ? before.applicationUrlCheckReason : null,
-          verificationStatus: requiresReview ? "SOURCE_CONFIRMED" : parsed.data.publicationStatus === "PENDING_REVIEW" ? "NEEDS_REVIEW" : "UNVERIFIED",
-          reviewedBy: requiresReview ? auth.id : null,
-          reviewedAt: requiresReview ? new Date() : null,
           salaryMin: parsed.data.salaryMin?.toString(),
           salaryMax: parsed.data.salaryMax?.toString(),
           salaryVisible:

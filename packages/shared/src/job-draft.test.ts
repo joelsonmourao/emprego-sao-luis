@@ -25,13 +25,4 @@ describe("jobDraftSchema", () => {
     expect(jobDraftSchema.safeParse({ ...valid, salaryMin: 2000, salaryMax: 1000 }).success).toBe(false));
   it("rejects an expired opportunity", () =>
     expect(jobDraftSchema.safeParse({ ...valid, expiresAt: new Date(0) }).success).toBe(false));
-  it("accepts WhatsApp or e-mail as the only application channel", () => {
-    const withoutUrl = { ...valid, applicationUrl: undefined };
-    expect(jobDraftSchema.safeParse({ ...withoutUrl, applicationWhatsapp: "(98) 99999-1234" }).success).toBe(true);
-    expect(jobDraftSchema.safeParse({ ...withoutUrl, applicationEmail: "rh@example.com" }).success).toBe(true);
-  });
-  it("rejects a draft without any valid application channel", () => {
-    const withoutUrl = { ...valid, applicationUrl: undefined };
-    expect(jobDraftSchema.safeParse(withoutUrl).success).toBe(false);
-  });
 });

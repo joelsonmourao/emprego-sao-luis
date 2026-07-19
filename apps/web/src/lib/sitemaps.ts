@@ -1,9 +1,14 @@
-import { and, desc, eq, gt, inArray, isNull, or } from "drizzle-orm";
-import { articles, categories, cities, companies, createDatabase, jobs, states, webStories } from "@es/db";
+import { and, desc, eq, gt, inArray } from "drizzle-orm";
+import { articles, categories, cities, companies, createDatabase, jobs, states } from "@es/db";
 import { dedupeEntries, normalizeLastmod, type SitemapEntry } from "@es/seo";
 
 const INSTITUTIONAL_PATHS = [
   "/",
+  "/vagas",
+  "/empresas",
+  "/categorias",
+  "/blog",
+  "/noticias",
   "/quem-somos",
   "/contato",
   "/privacidade",
@@ -15,7 +20,7 @@ const INSTITUTIONAL_PATHS = [
 ];
 
 export async function listSitemapEntries(
-  category: "static" | "jobs" | "companies" | "cities" | "categories" | "blog" | "news" | "web-stories"
+  category: "static" | "jobs" | "companies" | "cities" | "categories" | "blog" | "news"
 ) {
   if (!process.env.DATABASE_URL) return [] as SitemapEntry[];
   const connection = createDatabase(process.env.DATABASE_URL);
@@ -34,21 +39,12 @@ export async function listSitemapEntries(
     return entry;
   };
   try {
-    if (category === "static") {
-      const now = new Date();
-      const [[activeJob], [activeCompany], [news], [guide]] = await Promise.all([
-        connection.db.select({ id: jobs.id }).from(jobs).where(and(eq(jobs.publicationStatus, "PUBLISHED"), gt(jobs.expiresAt, now))).limit(1),
-        connection.db.select({ id: companies.id }).from(companies).innerJoin(jobs, eq(jobs.companyId, companies.id)).where(and(eq(companies.active, true), eq(jobs.publicationStatus, "PUBLISHED"), gt(jobs.expiresAt, now))).limit(1),
-        connection.db.select({ id: articles.id }).from(articles).where(and(eq(articles.status, "PUBLISHED"), eq(articles.type, "NEWS"))).limit(1),
-        connection.db.select({ id: articles.id }).from(articles).where(and(eq(articles.status, "PUBLISHED"), inArray(articles.type, ["GUIDE", "DATA_REPORT"]))).limit(1)
-      ]);
-      const paths = [...INSTITUTIONAL_PATHS, ...(activeJob ? ["/vagas", "/categorias"] : []), ...(activeCompany ? ["/empresas"] : []), ...(news ? ["/noticias"] : []), ...(guide ? ["/blog"] : [])];
+    if (category === "static")
       return dedupeEntries(
-        paths.map((path) =>
+        INSTITUTIONAL_PATHS.map((path) =>
           toEntry(path, undefined, path === "/" ? "daily" : "monthly", path === "/" ? 1 : 0.5)
         )
       );
-    }
     if (category === "jobs") {
       const rows = await connection.db
         .select({ slug: jobs.slug, updatedAt: jobs.updatedAt })
@@ -61,9 +57,7 @@ export async function listSitemapEntries(
       const rows = await connection.db
         .select({ slug: companies.slug, updatedAt: companies.updatedAt })
         .from(companies)
-        .innerJoin(jobs, eq(jobs.companyId, companies.id))
-        .where(and(eq(companies.active, true), eq(jobs.publicationStatus, "PUBLISHED"), gt(jobs.expiresAt, new Date())))
-        .groupBy(companies.id)
+        .where(eq(companies.active, true))
         .orderBy(desc(companies.updatedAt));
       return dedupeEntries(rows.map((row) => toEntry(`/empresas/${row.slug}`, row.updatedAt, "weekly", 0.6)));
     }
@@ -72,9 +66,7 @@ export async function listSitemapEntries(
         .select({ slug: cities.slug, updatedAt: cities.updatedAt })
         .from(cities)
         .innerJoin(states, eq(cities.stateId, states.id))
-        .innerJoin(jobs, eq(jobs.cityId, cities.id))
-        .where(and(eq(cities.active, true), eq(states.code, "MA"), eq(jobs.publicationStatus, "PUBLISHED"), gt(jobs.expiresAt, new Date())))
-        .groupBy(cities.id)
+        .where(and(eq(cities.active, true), eq(states.code, "MA")))
         .orderBy(desc(cities.updatedAt));
       return dedupeEntries(
         rows.map((row) => toEntry(`/vagas/cidade/${row.slug}`, row.updatedAt, "weekly", 0.7))
@@ -84,27 +76,11 @@ export async function listSitemapEntries(
       const rows = await connection.db
         .select({ slug: categories.slug, updatedAt: categories.updatedAt })
         .from(categories)
-        .innerJoin(jobs, eq(jobs.categoryId, categories.id))
-        .where(and(eq(categories.active, true), eq(jobs.publicationStatus, "PUBLISHED"), gt(jobs.expiresAt, new Date())))
-        .groupBy(categories.id)
+        .where(eq(categories.active, true))
         .orderBy(desc(categories.updatedAt));
       return dedupeEntries(
         rows.map((row) => toEntry(`/categorias/${row.slug}`, row.updatedAt, "weekly", 0.6))
       );
-    }
-    if (category === "web-stories") {
-      const now = new Date();
-      const rows = await connection.db
-        .select({ slug: webStories.slug, updatedAt: webStories.updatedAt })
-        .from(webStories)
-        .where(
-          and(
-            eq(webStories.status, "PUBLISHED"),
-            or(isNull(webStories.expiresAt), gt(webStories.expiresAt, now))
-          )
-        )
-        .orderBy(desc(webStories.updatedAt));
-      return dedupeEntries(rows.map((row) => toEntry(`/web-stories/${row.slug}`, row.updatedAt, "weekly", 0.5)));
     }
     const articleTypes = category === "news" ? (["NEWS"] as const) : (["GUIDE", "DATA_REPORT"] as const);
     const rows = await connection.db
@@ -128,7 +104,7 @@ export async function listSitemapEntries(
 }
 
 export async function listSitemapManifest() {
-  const categories = ["static", "jobs", "companies", "cities", "categories", "blog", "news", "web-stories"] as const;
+  const categories = ["static", "jobs", "companies", "cities", "categories", "blog", "news"] as const;
   const siteUrl = process.env.SITE_URL ?? "http://localhost:4321";
   const files: Array<{ slug: string; loc: string; lastmod?: string; count: number }> = [];
   for (const category of categories) {

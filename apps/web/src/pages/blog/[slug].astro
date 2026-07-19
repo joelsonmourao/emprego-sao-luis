@@ -1,22 +1,6 @@
 ---
-import BaseLayout from "../../layouts/BaseLayout.astro";
-import Breadcrumbs from "../../components/ui/Breadcrumbs.astro";
-import { findPublishedArticle } from "../../lib/articles";
-const result = await findPublishedArticle(Astro.params.slug ?? "", ["GUIDE", "DATA_REPORT"]);
-if (!result) return new Response("Conteúdo não encontrado", { status: 404, headers: { "X-Robots-Tag": "noindex, follow" } });
-const { article, authorName } = result;
-const canonical = article.canonicalUrl || new URL(`/blog/${article.slug}`, Astro.site).toString();
-const schema = { "@type": "Article", headline: article.title, description: article.excerpt, datePublished: article.publishedAt?.toISOString(), dateModified: article.updatedAt.toISOString(), author: { "@type": "Person", name: authorName }, mainEntityOfPage: canonical, ...(article.coverImageUrl ? { image: [article.coverImageUrl] } : {}), ...(article.sponsoredContent ? { isAccessibleForFree: true } : {}) };
+import BaseLayout from "../../layouts/BaseLayout.astro"; import { findPublishedArticle } from "../../lib/articles";
+const result = await findPublishedArticle(Astro.params.slug ?? ""); if (!result) { Astro.response.status = 404; return new Response("Conteúdo não encontrado", { status: 404 }); }
+const { article, authorName } = result; const schemaType = article.type === "NEWS" ? "NewsArticle" : "Article"; const jsonLd = { "@context": "https://schema.org", "@type": schemaType, headline: article.title, datePublished: article.publishedAt?.toISOString(), dateModified: article.updatedAt.toISOString(), author: { "@type": "Person", name: authorName }, publisher: { "@type": "Organization", name: "Empregos São Luís" }, ...(article.coverImageUrl ? { image: [article.coverImageUrl] } : {}) };
 ---
-<BaseLayout title={article.seoTitle || article.title} description={article.metaDescription || article.excerpt} canonical={canonical} ogImage={article.ogImageUrl ?? article.coverImageUrl ?? undefined} breadcrumbs={[{ name: "Guias", url: "/blog" }, { name: article.title, url: `/blog/${article.slug}` }]} schemas={[schema]}>
-  <article class="es-section bg-white"><div class="mx-auto max-w-3xl px-4">
-    <Breadcrumbs items={[{ name: "Início", url: "/" }, { name: "Guias", url: "/blog" }, { name: article.title }]} />
-    {article.sponsoredContent && <p class="mt-6 rounded-lg bg-amber-50 p-3 text-sm font-bold text-amber-950">Conteúdo patrocinado{article.sponsorshipDisclosure ? ` — ${article.sponsorshipDisclosure}` : ""}</p>}
-    <p class="es-kicker mt-6">{article.type === "DATA_REPORT" ? "Relatório" : "Guia gratuito"}</p><h1 class="font-display mt-3 text-4xl font-black sm:text-5xl">{article.title}</h1>
-    {article.subtitle && <p class="mt-4 text-xl text-[var(--es-muted)]">{article.subtitle}</p>}<p class="mt-4 text-sm text-[var(--es-muted)]">Por {authorName} · {article.publishedAt?.toLocaleDateString("pt-BR")}</p>
-    {article.coverImageUrl && <figure class="mt-8"><img src={article.coverImageUrl} alt={article.coverImageAlt ?? article.title} class="w-full rounded-2xl" width={article.coverImageWidth ?? undefined} height={article.coverImageHeight ?? undefined} /><figcaption class="mt-2 text-xs text-[var(--es-muted)]">{article.coverImageCaption}{article.coverImageCredit ? ` · ${article.coverImageCredit}` : ""}</figcaption></figure>}
-    <div class="es-prose mt-8 max-w-none" set:html={article.contentHtml} />
-    {article.sourceUrl && <p class="mt-8 text-sm">Fonte: <a class="underline" href={article.sourceUrl} rel="nofollow noopener">{article.sourceName ?? "fonte original"}</a></p>}
-    <aside class="mt-10 rounded-2xl bg-[var(--es-cream)] p-5"><p class="font-bold">Continue gratuitamente</p><div class="mt-3 flex flex-wrap gap-3"><a class="es-btn es-btn-primary" href="/vagas">Ver vagas</a><a class="es-btn es-btn-secondary" href="/alertas">Criar alerta gratuito</a></div></aside>
-  </div></article>
-</BaseLayout>
+<BaseLayout title={`${article.title} — Empregos São Luís`} description={article.excerpt}><script is:inline type="application/ld+json" set:html={JSON.stringify(jsonLd)}/><article class="mx-auto max-w-3xl px-4 py-12"><p class="font-bold text-red-700">{article.type === "NEWS" ? "Notícia" : "Guia"}</p><h1 class="mt-3 text-4xl font-black">{article.title}</h1><p class="mt-4 text-slate-600">Por {authorName}</p><div class="prose mt-8 max-w-none" set:html={article.contentHtml}/></article></BaseLayout>

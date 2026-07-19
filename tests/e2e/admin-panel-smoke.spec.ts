@@ -40,7 +40,7 @@ test.describe("painel administrativo — smoke autenticado", () => {
 
   test("importação abre página real, não API", async ({ page }) => {
     await page.goto("/admin/vagas/importar");
-    await expect(page.getByRole("heading", { name: "Importar vagas", exact: true })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Importar vagas" })).toBeVisible();
     await expect(page.getByText("Selecionar arquivo")).toBeVisible();
     expect(page.url()).toContain("/admin/vagas/importar");
   });

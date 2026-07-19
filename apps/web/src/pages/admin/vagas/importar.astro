@@ -2,8 +2,8 @@
 import AdminLayout from "../../../layouts/AdminLayout.astro";
 import { can } from "../../../lib/auth";
 import { getImportStorageInfo } from "../../../lib/import-storage";
-import { createDatabase, importBatches, importMappingTemplates, importRows } from "@es/db";
-import { asc, desc, eq } from "drizzle-orm";
+import { createDatabase, importBatches, importMappingTemplates } from "@es/db";
+import { desc, eq } from "drizzle-orm";
 
 const auth = Astro.locals.auth!;
 if (!can(auth, "imports.manage")) {
@@ -18,7 +18,6 @@ let batch: (typeof importBatches.$inferSelect) | null = null;
 let templates: Array<{ id: string; name: string }> = [];
 let history: Array<{ id: string; fileName: string; status: string; createdAt: Date | null; totalRows: number; validRows: number; rejectedRows: number; settings: unknown }> = [];
 let loadError: string | null = null;
-let previewRows: typeof importRows.$inferSelect[] = [];
 
 if (process.env.DATABASE_URL) {
   const connection = createDatabase(process.env.DATABASE_URL);
@@ -26,7 +25,6 @@ if (process.env.DATABASE_URL) {
     if (batchId) {
       const rows = await connection.db.select().from(importBatches).where(eq(importBatches.id, batchId)).limit(1);
       batch = rows[0] ?? null;
-      if (batch) previewRows = await connection.db.select().from(importRows).where(eq(importRows.batchId, batch.id)).orderBy(asc(importRows.rowNumber)).limit(100);
     }
     templates = await connection.db
       .select({ id: importMappingTemplates.id, name: importMappingTemplates.name })
@@ -71,14 +69,13 @@ const config = batch?.settings as
 
 const fields: Array<[string, string]> = [
   ["originalTitle", "Título original"], ["title", "Título público"], ["company", "Empresa"], ["category", "Categoria"],
-  ["locality", "Localidade"], ["city", "Cidade"], ["state", "UF"], ["neighborhood", "Bairro"], ["workplaceType", "Modalidade"],
+  ["city", "Cidade"], ["state", "UF"], ["neighborhood", "Bairro"], ["workplaceType", "Modalidade"],
   ["employmentType", "Tipo de contratação"], ["description", "Descrição"], ["summary", "Resumo"], ["activities", "Atividades"],
-  ["requirements", "Requisitos"], ["benefits", "Benefícios"], ["numberOfOpenings", "Quantidade de vagas"], ["salary", "Salário/faixa"], ["salaryMin", "Salário mínimo"], ["salaryMax", "Salário máximo"],
-  ["applicationUrl", "URL de candidatura"], ["applicationEmail", "E-mail de candidatura"], ["applicationWhatsapp", "WhatsApp de candidatura"], ["whatsappMessage", "Mensagem WhatsApp"], ["emailSubject", "Assunto do e-mail"], ["applicationInstructions", "Instruções de candidatura"],
-  ["sourceName", "Fonte"], ["sourceUrl", "URL da fonte"], ["publishedAt", "Data de publicação"],
+  ["requirements", "Requisitos"], ["benefits", "Benefícios"], ["salaryMin", "Salário"], ["salaryMax", "Salário máximo"],
+  ["applyUrl", "URL de candidatura"], ["source", "Fonte"], ["sourceUrl", "URL da fonte"], ["publishedAt", "Data de publicação"],
   ["expiresAt", "Validade"], ["sourceStatus", "Status de origem"], ["featured", "Destaque"], ["externalId", "Código externo"]
 ];
-const requiredFields = ["title", "company", "description", "sourceName"];
+const requiredFields = ["title", "company", "city", "state", "description", "applyUrl", "source", "expiresAt"];
 const headers = [...new Set(config?.sheets?.flatMap((sheet) => sheet.headers) ?? [])];
 const storage = getImportStorageInfo();
 const steps = [
@@ -105,12 +102,6 @@ const steps = [
     Envie a planilha, revise o mapeamento, valide os dados e só então confirme a importação.
     Armazenamento: <strong>{storage.mode === "s3" ? "R2/S3" : "volume local"}</strong>.
   </p>
-  <div class="mt-5 flex flex-wrap gap-3">
-    <a class="rounded-lg bg-emerald-700 px-4 py-2 font-bold text-white" href="/modelos/modelo-importacao-vagas.xlsx" download>Baixar modelo Excel</a>
-    <a class="rounded-lg border border-emerald-700 px-4 py-2 font-bold text-emerald-800" href="/api/admin/import-template.csv" data-admin-download data-filename="modelo-importacao-vagas.csv">Baixar modelo CSV</a>
-    <a class="rounded-lg border px-4 py-2 font-bold" href="#links-contatos">Importar vagas por links ou contatos</a>
-  </div>
-  <p class="mt-3 max-w-4xl text-sm text-[var(--text-secondary)]">Preencha a aba “Vagas”. Título, empresa, descrição, fonte, localidade e ao menos um canal de candidatura são necessários. Categoria, bairro, salário e quantidade são opcionais. A linha de exemplo é ignorada automaticamente.</p>
 
   {loadError && (
     <p class="mt-6 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-900" role="alert">
@@ -160,6 +151,7 @@ const steps = [
               <option value="DRY_RUN">Somente validar</option>
               <option value="DRAFT">Rascunho</option>
               <option value="PENDING_REVIEW">Revisão</option>
+              <option value="PUBLISHED">Publicar</option>
             </select>
           </label>
           <label>
@@ -239,43 +231,11 @@ const steps = [
             <button class="rounded-lg border border-red-300 px-4 py-2 text-red-700" type="submit">Desfazer lote</button>
           </form>
         )}
-        {batch.status === "COMPLETED" && config?.stage === "IMPORTED" && previewRows.some((row) => row.reviewStatus === "READY_FOR_REVIEW" && row.jobId) && (
-          <form method="post" action={`/api/admin/imports/${batch.id}/approve-ready`}>
-            <button class="rounded-lg bg-emerald-700 px-4 py-2 font-bold text-white" type="submit">Aprovar e publicar vagas de alta confiança</button>
-          </form>
-        )}
       </div>
       {config?.analysis?.consolidation && (
         <p class="mt-4 rounded-lg bg-slate-50 p-3 text-xs text-slate-700">
           Conteúdo consolidado: {(config.analysis.consolidation.sectionsMerged ?? []).join(", ") || "descrição"}; duplicações removidas: {config.analysis.consolidation.duplicateItemsRemoved ?? 0}.
         </p>
-      )}
-      {previewRows.length > 0 && (
-        <div class="mt-6 overflow-x-auto">
-          <h3 class="font-black">Prévia normalizada e validação</h3>
-          {config?.stage === "IMPORTED" && previewRows.some((row) => row.jobId) && (
-            <form class="my-4 grid gap-3 rounded-xl border bg-slate-50 p-4 md:grid-cols-[minmax(12rem,1fr)_minmax(12rem,1fr)_minmax(12rem,2fr)_auto]" method="post" action={`/api/admin/imports/${batch.id}/bulk-correct`}>
-              <label class="text-xs font-bold">Linhas (Ctrl/Cmd para várias)
-                <select class="mt-1 h-28 w-full rounded-lg border p-2 font-normal" name="rowId" multiple required>
-                  {previewRows.filter((row) => row.jobId).map((row) => <option value={row.id}>Linha {row.rowNumber} · {row.reviewStatus}</option>)}
-                </select>
-              </label>
-              <label class="text-xs font-bold">Campo
-                <select class="mt-1 w-full rounded-lg border p-2 font-normal" name="field" required>
-                  <option value="applicationUrl">URL de candidatura</option><option value="applicationEmail">E-mail de candidatura</option><option value="applicationWhatsapp">WhatsApp</option><option value="whatsappMessage">Mensagem WhatsApp</option><option value="applicationInstructions">Instruções</option><option value="expiresAt">Data de encerramento</option><option value="sourceName">Fonte</option><option value="workplaceType">Modalidade</option>
-                </select>
-              </label>
-              <label class="text-xs font-bold">Novo valor
-                <input class="mt-1 w-full rounded-lg border p-2 font-normal" name="value" required />
-              </label>
-              <button class="self-end rounded-lg bg-slate-900 px-4 py-2 font-bold text-white">Aplicar correção em lote</button>
-            </form>
-          )}
-          <table class="mt-3 min-w-full text-xs">
-            <thead><tr class="border-b text-left"><th class="p-2">Linha</th><th class="p-2">Original</th><th class="p-2">Normalizado</th><th class="p-2">Sugestões/confiança</th><th class="p-2">Avisos e erros</th><th class="p-2">Situação</th></tr></thead>
-            <tbody>{previewRows.map((row) => <tr class="border-b align-top"><td class="p-2">{row.rowNumber}</td><td class="max-w-xs p-2"><pre class="whitespace-pre-wrap">{JSON.stringify(row.raw, null, 2)}</pre></td><td class="max-w-xs p-2"><pre class="whitespace-pre-wrap">{JSON.stringify(row.normalized, null, 2)}</pre></td><td class="max-w-xs p-2"><pre class="whitespace-pre-wrap">{JSON.stringify(row.suggestions, null, 2)}</pre><strong>{row.confidence ?? "—"}</strong></td><td class="max-w-xs p-2"><pre class="whitespace-pre-wrap text-amber-800">{JSON.stringify(row.warnings, null, 2)}</pre><pre class="whitespace-pre-wrap text-red-700">{JSON.stringify(row.errors, null, 2)}</pre></td><td class="p-2 font-bold">{row.reviewStatus}</td></tr>)}</tbody>
-          </table>
-        </div>
       )}
     </section>
   )}
@@ -295,6 +255,7 @@ const steps = [
             <option value="DRY_RUN">Somente validar</option>
             <option value="DRAFT">Rascunho</option>
             <option value="PENDING_REVIEW">Revisão</option>
+            <option value="PUBLISHED">Publicar após validação</option>
           </select>
         </label>
         <button class="rounded-xl bg-red-700 p-4 font-bold text-white" type="submit">
@@ -303,15 +264,6 @@ const steps = [
       </form>
     </section>
   )}
-
-  <section id="links-contatos" class="mt-10 max-w-4xl rounded-2xl border border-[var(--brand-border)] bg-white p-6">
-    <h2 class="text-xl font-black">Importar vagas por links ou contatos</h2>
-    <p class="mt-2 text-sm text-[var(--text-secondary)]">Cole uma entrada por linha: URL, e-mail, WhatsApp ou uma combinação. O sistema cria somente uma prévia; não contorna login, CAPTCHA ou proteção de terceiros.</p>
-    <form class="mt-4 grid gap-4" method="post" action="/api/admin/imports/contacts">
-      <textarea class="min-h-40 rounded-lg border p-3 font-mono text-sm" name="entries" required placeholder="https://empresa.com/vaga recrutamento@empresa.com.br&#10;+55 98 99999-9999"></textarea>
-      <button class="rounded-xl bg-slate-950 p-4 font-bold text-white">Gerar prévia de links e contatos</button>
-    </form>
-  </section>
 
   <section class="mt-10">
     <h2 class="text-xl font-black">Histórico de importações</h2>

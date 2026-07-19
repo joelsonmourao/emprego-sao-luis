@@ -7,7 +7,6 @@ import { ADMIN_COOKIE, verifySession } from "./lib/auth";
 import { CANDIDATE_COOKIE, verifyCandidateSession } from "./lib/candidate-auth";
 import { COMPANY_COOKIE, verifyCompanySession } from "./lib/company-auth";
 import { logServerError } from "./lib/server-error";
-import { getAppEnv, isStagingLikeEnvironment, stagingRobotsDirective } from "./lib/runtime-env";
 import { isJsonAuthApiPath, isTrustedApiOrigin } from "./lib/trusted-origin";
 
 const CANONICAL_HOST = "empregossaoluis.com.br";
@@ -15,10 +14,8 @@ const PUBLIC_ADMIN_PATHS = new Set(["/admin/login", "/admin/esqueci-senha", "/ad
 const isRouteWithin = (path: string, prefix: string) => path === prefix || path.startsWith(`${prefix}/`);
 
 export const onRequest = defineMiddleware(async (context, next) => {
-  const stagingLike = isStagingLikeEnvironment();
   const host = context.url.hostname.toLowerCase();
-  // Nunca redirecionar hosts de staging/homologação para o domínio canônico de produção.
-  if (!stagingLike && host === `www.${CANONICAL_HOST}`) {
+  if (host === `www.${CANONICAL_HOST}`) {
     const target = new URL(context.url);
     target.hostname = CANONICAL_HOST;
     target.protocol = "https:";
@@ -132,12 +129,10 @@ export const onRequest = defineMiddleware(async (context, next) => {
   if (isAdminApi) response = await normalizeAdminApiResponse(response, requestId!);
   response.headers.set("X-ES-App", "astro");
   response.headers.set("X-Content-Type-Options", "nosniff");
-  if (stagingLike) {
-    response.headers.set("X-Robots-Tag", stagingRobotsDirective());
-    response.headers.set("X-ES-Environment", getAppEnv());
-  } else if (path.startsWith("/admin") || path.startsWith("/api/admin")) {
+  if (path.startsWith("/admin") || path.startsWith("/api/admin")) {
     response.headers.set("X-Robots-Tag", "noindex, nofollow");
-  } else if (isRouteWithin(path, "/empresa") || isRouteWithin(path, "/api/empresa")) {
+  }
+  if (isRouteWithin(path, "/empresa") || isRouteWithin(path, "/api/empresa")) {
     response.headers.set("X-Robots-Tag", "noindex, nofollow");
   }
   const privateResponse =

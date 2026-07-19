@@ -1,13 +1,8 @@
----
-interface Props { initiallyHidden?: boolean }
-const { initiallyHidden = false } = Astro.props;
----
 <div
   class="fixed bottom-4 left-4 right-4 z-50 mx-auto max-w-xl rounded-2xl border border-[var(--es-border)] bg-white p-4 shadow-[var(--es-shadow)] sm:left-auto"
   role="dialog"
   aria-label="Consentimento de cookies"
   data-cookie-consent
-  hidden={initiallyHidden}
 >
   <p class="text-sm text-[var(--es-muted)]">
     Usamos cookies essenciais e, com seu consentimento, cookies de medição e publicidade.
@@ -63,13 +58,6 @@ const { initiallyHidden = false } = Astro.props;
         });
       }
     }
-    document.addEventListener("cookie-consent:open", () => {
-      const root = document.querySelector<HTMLElement>("[data-cookie-consent]");
-      if (!root) return;
-      root.hidden = false;
-      root.scrollIntoView({ behavior: "smooth", block: "center" });
-      root.querySelector<HTMLButtonElement>("[data-cookie-choice]")?.focus();
-    });
   };
 
   const requestIdle = (window as Partial<Window>).requestIdleCallback;

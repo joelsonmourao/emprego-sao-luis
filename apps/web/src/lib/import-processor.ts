@@ -3,27 +3,15 @@ import { and, eq, sql } from "drizzle-orm";
 import {
   categories,
   cities,
-  classificationRules,
   companies,
   createDatabase,
   importBatches,
   importRows,
+  indexingEvents,
   jobs,
-  neighborhoods,
   states
 } from "@es/db";
-import {
-  consolidateJobContent,
-  evaluateJobPublication,
-  extractNeighborhood,
-  importJobRowSchema,
-  importModeSchema,
-  normalizeImportRow,
-  parseBrazilianLocation,
-  shouldSkipImportRow,
-  suggestCategory,
-  validateApplicationChannels
-} from "@es/shared";
+import { consolidateJobContent, importJobRowSchema, importModeSchema, normalizeImportRow } from "@es/shared";
 import * as XLSX from "xlsx";
 import { getImportFile } from "./import-storage";
 
@@ -45,12 +33,6 @@ const slugify = (value: string) =>
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-|-$/g, "")
     .slice(0, 150);
-
-function salaryRange(value: string | undefined, explicitMin?: number, explicitMax?: number) {
-  if (explicitMin !== undefined || explicitMax !== undefined) return { min: explicitMin, max: explicitMax };
-  const numbers = (value ?? "").match(/[\d.]+(?:,\d{1,2})?/g)?.map((item) => Number(item.replace(/\./g, "").replace(",", "."))).filter(Number.isFinite) ?? [];
-  return { min: numbers[0], max: numbers[1] };
-}
 
 export async function processImport(payload: ImportPayload) {
   const mode = importModeSchema.parse(payload.mode);
@@ -86,7 +68,6 @@ export async function processImport(payload: ImportPayload) {
         ? XLSX.utils
             .sheet_to_json<Record<string, unknown>>(sheet, { defval: "" })
             .map((row) => ({ ...row, __sheet: sheetName }) as Record<string, unknown>)
-            .filter((row) => !shouldSkipImportRow(row))
         : [];
     });
     if (rawRows.length === 0) throw new Error("A planilha não contém linhas de dados.");
@@ -96,10 +77,6 @@ export async function processImport(payload: ImportPayload) {
     let rejectedRows = 0;
     const consolidatedSections = new Set<string>();
     let duplicateContentItemsRemoved = 0;
-    const availableCategories = await connection.db
-      .select({ id: categories.id, name: categories.name, slug: categories.slug })
-      .from(categories);
-    const adminRules = await connection.db.select().from(classificationRules);
 
     for (const [position, raw] of rawRows.entries()) {
       const normalized = payload.mapping
@@ -119,24 +96,7 @@ export async function processImport(payload: ImportPayload) {
         continue;
       }
 
-      const parsedValue = parsed.data;
-      const location = parseBrazilianLocation({ locality: parsedValue.locality, city: parsedValue.city, state: parsedValue.state });
-      if (location.status !== "EXACT" || !location.city || !location.state) {
-        rejectedRows++;
-        await connection.db.insert(importRows).values({
-          batchId: payload.batchId,
-          rowNumber: position + 2,
-          raw,
-          normalized: parsedValue,
-          errors: [location.reason],
-          warnings: [],
-          suggestions: { location },
-          reviewStatus: "REJECTED",
-          action: "REJECTED"
-        });
-        continue;
-      }
-      const value = { ...parsedValue, city: location.city, state: location.state };
+      const value = parsed.data;
       const content = consolidateJobContent({
         description: value.description,
         summary: value.summary,
@@ -159,62 +119,18 @@ export async function processImport(payload: ImportPayload) {
             .where(and(eq(cities.stateId, state.id), sql`lower(${cities.name}) = lower(${value.city})`))
             .limit(1)
         : [];
-      const category = value.category
-        ? availableCategories.find((item) => item.name.localeCompare(value.category!, "pt-BR", { sensitivity: "base" }) === 0)
-        : undefined;
-      const categorySuggestion = suggestCategory(
-        {
-          title: value.title,
-          description: content.plainText,
-          requirements: Array.isArray(value.requirements) ? value.requirements.join(" ") : String(value.requirements ?? ""),
-          companyName: value.company
-        },
-        availableCategories,
-        adminRules.map((rule) => ({
-          categorySlug: rule.categorySlug,
-          categoryName: rule.categoryName,
-          keywords: Array.isArray(rule.keywords) ? (rule.keywords as string[]) : [],
-          synonyms: Array.isArray(rule.synonyms) ? (rule.synonyms as string[]) : [],
-          priority: rule.priority,
-          active: rule.active
-        }))
-      );
-      const selectedCategory =
-        category ??
-        ((categorySuggestion.level === "HIGH" || categorySuggestion.level === "MEDIUM") &&
-        categorySuggestion.categoryId
-          ? availableCategories.find((item) => item.id === categorySuggestion.categoryId)
-          : undefined);
-      const channels = validateApplicationChannels(value);
-      const quality = evaluateJobPublication({
-        title: value.title,
-        companyName: value.company,
-        description: content.descriptionHtml,
-        cityName: value.city,
-        stateCode: value.state,
-        categoryName: selectedCategory?.name ?? null,
-        sourceName: value.sourceName,
-        sourceUrl: value.sourceUrl ?? null,
-        applicationUrl: channels.url.normalized,
-        applicationEmail: channels.email.normalized,
-        applicationWhatsapp: channels.whatsapp.normalized,
-        publicationStatus: mode === "DRY_RUN" ? "PENDING_REVIEW" : mode,
-        verificationStatus: "NEEDS_REVIEW",
-        expiresAt: value.expiresAt ?? null
-      });
-      const qualityWarnings = [
-        ...quality.warnings,
-        ...(value.category && !category ? ["Categoria informada não existe; a vaga seguirá sem categoria."] : [])
-      ];
+      const [category] = value.category
+        ? await connection.db
+            .select()
+            .from(categories)
+            .where(sql`lower(${categories.name}) = lower(${value.category})`)
+            .limit(1)
+        : [];
 
       const relationErrors = [
         !company ? "Empresa não cadastrada." : null,
         !state ? "UF não cadastrada." : null,
-        !city ? "Cidade não cadastrada." : null,
-        ...quality.errors,
-        value.category && category && categorySuggestion.level === "HIGH" && categorySuggestion.categoryName && categorySuggestion.categoryName !== category.name
-          ? `Categoria incompatível com o conteúdo; sugestão: ${categorySuggestion.categoryName}.`
-          : null
+        !city ? "Cidade não cadastrada." : null
       ].filter((item): item is string => item !== null);
 
       if (relationErrors.length) {
@@ -225,11 +141,6 @@ export async function processImport(payload: ImportPayload) {
           raw,
           normalized: { ...value, _consolidation: content.report },
           errors: relationErrors,
-          warnings: qualityWarnings,
-          suggestions: { category: categorySuggestion, location },
-          confidence: String(Math.max(0, Math.min(1, (categorySuggestion.confidence + 2) / 3))),
-          reviewStatus: "REJECTED",
-          applicationChannels: channels.validTypes,
           action: "REJECTED"
         });
         continue;
@@ -247,7 +158,7 @@ export async function processImport(payload: ImportPayload) {
         ? await connection.db
             .select()
             .from(jobs)
-            .where(and(eq(jobs.externalId, value.externalId), eq(jobs.sourceName, value.sourceName)))
+            .where(and(eq(jobs.externalId, value.externalId), eq(jobs.sourceName, value.source)))
             .limit(1)
         : [];
       const [duplicateExisting] =
@@ -269,11 +180,6 @@ export async function processImport(payload: ImportPayload) {
           raw,
           normalized: value,
           errors: ["Vaga duplicada."],
-          warnings: qualityWarnings,
-          suggestions: { category: categorySuggestion, location },
-          confidence: "0",
-          reviewStatus: "REJECTED",
-          applicationChannels: channels.validTypes,
           action: "DUPLICATE",
           jobId: duplicate.id
         });
@@ -288,24 +194,6 @@ export async function processImport(payload: ImportPayload) {
           raw,
           normalized: value,
           errors: [],
-          warnings: qualityWarnings,
-          suggestions: {
-            category: categorySuggestion,
-            location,
-            neighborhood: extractNeighborhood({
-              title: value.title,
-              description: content.plainText,
-              address: value.locality,
-              instructions: value.applicationInstructions,
-              neighborhood: value.neighborhood
-            })
-          },
-          confidence: String(Math.max(0, Math.min(1, (categorySuggestion.confidence + 2) / 3))),
-          reviewStatus:
-            categorySuggestion.level === "LOW" || categorySuggestion.level === "MEDIUM"
-              ? "NEEDS_REVIEW"
-              : quality.status,
-          applicationChannels: channels.validTypes,
           action: existing ? "WOULD_UPDATE" : "WOULD_CREATE",
           jobId: existing?.id
         });
@@ -322,8 +210,6 @@ export async function processImport(payload: ImportPayload) {
             employmentType: existing.employmentType,
             workplaceType: existing.workplaceType,
             applicationUrl: existing.applicationUrl,
-            applicationEmail: existing.applicationEmail,
-            applicationWhatsapp: existing.applicationWhatsapp,
             sourceUrl: existing.sourceUrl,
             expiresAt: existing.expiresAt?.toISOString() ?? null,
             salaryMin: existing.salaryMin,
@@ -335,28 +221,12 @@ export async function processImport(payload: ImportPayload) {
           }
         : null;
 
-      const knownNeighborhoods = city
-        ? await connection.db
-            .select({ name: neighborhoods.name })
-            .from(neighborhoods)
-            .where(eq(neighborhoods.cityId, city.id))
-        : [];
-      const neighborhoodExtraction = extractNeighborhood({
-        title: value.title,
-        description: content.plainText,
-        address: value.locality,
-        instructions: value.applicationInstructions,
-        neighborhood: value.neighborhood,
-        knownNeighborhoods: knownNeighborhoods.map((item) => item.name)
-      });
-
       const job = await connection.db.transaction(async (tx) => {
         const [sequence] = await tx.execute(
           sql<{ value: string }>`select nextval('es_job_public_code_seq')::text as value`
         );
         const publicCode = `ES-${String(sequence?.value ?? "0").padStart(6, "0")}`;
         const slug = `${slugify(`${value.title}-${value.company}-${value.city}`)}-${duplicateHash.slice(0, 8)}`;
-        const salary = salaryRange(value.salary, value.salaryMin, value.salaryMax);
         const row = {
           publicCode,
           externalId: value.externalId ?? null,
@@ -366,49 +236,28 @@ export async function processImport(payload: ImportPayload) {
           companyId: company!.id,
           cityId: city!.id,
           stateId: state!.id,
-          categoryId: selectedCategory?.id ?? null,
-          neighborhood: neighborhoodExtraction.neighborhood,
+          categoryId: category?.id ?? null,
+          neighborhood: value.neighborhood ?? null,
           employmentType: value.employmentType,
           workplaceType: value.workplaceType,
-          numberOfOpenings: value.numberOfOpenings,
           summary: content.summary,
           description: content.plainText,
           descriptionHtml: content.descriptionHtml,
           activities: [],
           requirements: [],
           benefits: [],
-          applicationUrl: channels.url.normalized,
-          applicationEmail: channels.email.normalized,
-          applicationWhatsapp: channels.whatsapp.normalized,
-          applicationWhatsappOriginal: channels.whatsapp.original,
-          applicationWhatsappMessage: value.whatsappMessage ?? null,
-          applicationWhatsappValid: channels.whatsapp.valid,
-          applicationWhatsappValidatedAt: channels.whatsapp.original ? new Date() : null,
-          applicationWhatsappSource: channels.whatsapp.original ? "SPREADSHEET" : null,
-          applicationEmailSubject: value.emailSubject ?? null,
-          applicationEmailInstructions: value.applicationInstructions ?? null,
-          applicationEmailValid: channels.email.valid,
-          applicationEmailValidatedAt: channels.email.original ? new Date() : null,
-          applicationEmailSource: channels.email.original ? "SPREADSHEET" : null,
-          applicationInstructions: value.applicationInstructions ?? null,
-          applicationType: channels.validTypes.length > 1 ? "MULTIPLE" : channels.validTypes[0] ?? "NONE",
-          applicationUrlStatus: channels.url.valid ? "UNCHECKED" : "NOT_APPLICABLE",
-          sourceName: value.sourceName,
+          applicationUrl: value.applyUrl,
+          sourceName: value.source,
           sourceUrl: value.sourceUrl ?? null,
           originType: "SPREADSHEET" as const,
           duplicateHash,
           verificationStatus: "NEEDS_REVIEW" as const,
           publicationStatus: mode,
-          publishedAt: null,
+          publishedAt: mode === "PUBLISHED" ? (value.publishedAt ?? new Date()) : null,
           expiresAt: value.expiresAt,
-          salaryMin: salary.min?.toString() ?? null,
-          salaryMax: salary.max?.toString() ?? null,
-          salaryVisible: salary.min !== undefined || salary.max !== undefined,
-          categorySuggestion: categorySuggestion.categoryName,
-          categorySuggestionConfidence: String(categorySuggestion.confidence),
-          categorySuggestionReason: categorySuggestion.reason,
-          categorySuggestionSource: categorySuggestion.source,
-          categorySuggestedAt: new Date(),
+          salaryMin: value.salaryMin?.toString() ?? null,
+          salaryMax: value.salaryMax?.toString() ?? null,
+          salaryVisible: value.salaryMin !== undefined || value.salaryMax !== undefined,
           featured: value.featured ?? false
         };
 
@@ -455,16 +304,36 @@ export async function processImport(payload: ImportPayload) {
         raw,
         normalized: { ...value, _consolidation: content.report },
         errors: [],
-        warnings: qualityWarnings,
-        suggestions: { category: categorySuggestion, location },
-        confidence: String(Math.max(0, Math.min(1, (categorySuggestion.confidence + 2) / 3))),
-        reviewStatus: quality.status,
-        applicationChannels: channels.validTypes,
         action: existing ? "UPDATED" : "CREATED",
         beforeSnapshot,
         jobId: job?.id
       });
 
+      if (mode === "PUBLISHED" && job) {
+        const url = new URL(
+          `/vagas/${job.slug}`,
+          process.env.SITE_URL ?? "https://empregossaoluis.com.br"
+        ).toString();
+        await connection.db
+          .insert(indexingEvents)
+          .values([
+            {
+              dedupeKey: `import:${payload.batchId}:${position + 2}:google`,
+              jobId: job.id,
+              provider: "GOOGLE",
+              url,
+              notificationType: "URL_UPDATED"
+            },
+            {
+              dedupeKey: `import:${payload.batchId}:${position + 2}:indexnow`,
+              jobId: job.id,
+              provider: "INDEXNOW",
+              url,
+              notificationType: "URL_UPDATED"
+            }
+          ])
+          .onConflictDoNothing();
+      }
     }
 
     await connection.db

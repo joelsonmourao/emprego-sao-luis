@@ -40,9 +40,6 @@ export const ADMIN_NAV_GROUPS: AdminNavGroup[] = [
     title: "Conteúdo",
     items: [
       { label: "Notícias e blog", href: "/admin/conteudo", permission: "content.manage" },
-      { label: "Estratégia editorial", href: "/admin/conteudo/estrategia", permission: "content.manage" },
-      { label: "Web Stories", href: "/admin/web-stories", permission: "content.manage" },
-      { label: "Regras de classificação", href: "/admin/classificacao", permission: "content.manage" },
       { label: "Páginas institucionais", href: "/admin/paginas", permission: "content.manage" },
       { label: "Mídia", href: "/admin/midia", permission: "media.manage" },
       { label: "Aparência", href: "/admin/aparencia", permission: "settings.manage" }
@@ -68,8 +65,7 @@ export const ADMIN_NAV_GROUPS: AdminNavGroup[] = [
     title: "SEO e indexação",
     items: [
       { label: "Configurações SEO", href: "/admin/seo", permission: "seo.manage" },
-      { label: "Auditoria SEO", href: "/admin/seo/auditoria", permission: "seo.manage" },
-      { label: "Rota da Aprovação", href: "/admin/adsense-readiness", permission: "seo.manage" }
+      { label: "Auditoria SEO", href: "/admin/seo/auditoria", permission: "seo.manage" }
     ]
   },
   {

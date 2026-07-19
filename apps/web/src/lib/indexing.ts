@@ -1,5 +1,3 @@
-import { isStagingLikeEnvironment } from "@es/shared";
-
 export function publicJobUrl(slug: string, siteUrl = process.env.SITE_URL ?? "https://empregossaoluis.com.br") {
   return new URL(`/vagas/${slug}`, siteUrl).toString();
 }
@@ -41,14 +39,7 @@ export function buildArticleIndexingEvent(input: { id: string; slug: string; typ
 }
 
 export function isGoogleIndexingEnabled() {
-  if (process.env.GOOGLE_INDEXING_ENABLED === "false") return false;
-  if (isStagingLikeEnvironment()) return false;
-  return true;
-}
-
-export function isIndexNowEnabled() {
-  if (isStagingLikeEnvironment()) return false;
-  return Boolean(process.env.INDEXNOW_KEY && process.env.SITE_URL);
+  return process.env.GOOGLE_INDEXING_ENABLED !== "false";
 }
 
 export function indexingIntegrationStatus() {
@@ -58,12 +49,10 @@ export function indexingIntegrationStatus() {
       enabled: isGoogleIndexingEnabled()
     },
     indexNow: {
-      configured: Boolean(process.env.INDEXNOW_KEY && process.env.SITE_URL),
-      enabled: isIndexNowEnabled()
+      configured: Boolean(process.env.INDEXNOW_KEY && process.env.SITE_URL)
     },
     meta: {
-      configured: Boolean(process.env.META_INSTAGRAM_ACCOUNT_ID && process.env.META_PAGE_ACCESS_TOKEN),
-      enabled: !isStagingLikeEnvironment()
+      configured: Boolean(process.env.META_INSTAGRAM_ACCOUNT_ID && process.env.META_PAGE_ACCESS_TOKEN)
     }
   };
 }

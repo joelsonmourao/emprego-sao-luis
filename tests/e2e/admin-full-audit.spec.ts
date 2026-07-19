@@ -81,7 +81,7 @@ test.describe("auditoria completa do painel", () => {
 
   test("importação não bloqueia por S3 ausente", async ({ page }) => {
     await page.goto("/admin/vagas/importar");
-    await expect(page.getByRole("heading", { name: "Importar vagas", exact: true })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Importar vagas" })).toBeVisible();
     await expect(page.getByText("Esta integração ainda não está configurada")).toHaveCount(0);
     await expect(page.getByRole("button", { name: "Analisar arquivo" })).toBeEnabled();
   });

@@ -18,7 +18,6 @@ const fields = [
   "originalTitle",
   "title",
   "company",
-  "locality",
   "city",
   "state",
   "category",
@@ -28,15 +27,8 @@ const fields = [
   "activities",
   "requirements",
   "benefits",
-  "numberOfOpenings",
-  "salary",
-  "applicationUrl",
-  "applicationEmail",
-  "applicationWhatsapp",
-  "whatsappMessage",
-  "emailSubject",
-  "applicationInstructions",
-  "sourceName",
+  "applyUrl",
+  "source",
   "sourceUrl",
   "publishedAt",
   "expiresAt",
@@ -50,18 +42,18 @@ const fields = [
 const requiredFields = [
   "title",
   "company",
+  "city",
+  "state",
   "description",
-  "sourceName"
+  "applyUrl",
+  "source",
+  "expiresAt"
 ] as const;
 const mappingSchema = z.record(z.enum(fields), z.string().min(1)).superRefine((mapping, context) => {
   for (const field of requiredFields) {
     if (!mapping[field])
       context.addIssue({ code: "custom", path: [field], message: `Mapeie o campo obrigatório ${field}.` });
   }
-  if (!mapping.locality && (!mapping.city || !mapping.state))
-    context.addIssue({ code: "custom", path: ["locality"], message: "Mapeie localidade ou cidade e UF." });
-  if (!mapping.applicationUrl && !mapping.applicationEmail && !mapping.applicationWhatsapp)
-    context.addIssue({ code: "custom", path: ["applicationUrl"], message: "Mapeie ao menos um canal de candidatura." });
 });
 const settingsSchema = z.object({
   storageKey: z.string(),

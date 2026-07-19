@@ -202,33 +202,12 @@ const formData = {
       <h2 class="text-lg font-black">Candidatura e fonte</h2>
       <div class="grid gap-4 md:grid-cols-2">
         <label>
-          URL de candidatura (opcional)
-          <input class="mt-1 w-full rounded-lg border p-3" type="url" name="applicationUrl" placeholder="https://" />
-        </label>
-        <label>
-          E-mail de candidatura (opcional)
-          <input class="mt-1 w-full rounded-lg border p-3" type="email" name="applicationEmail" placeholder="recrutamento@empresa.com.br" />
-        </label>
-        <label>
-          WhatsApp de candidatura (opcional)
-          <input class="mt-1 w-full rounded-lg border p-3" type="tel" name="applicationWhatsapp" placeholder="+55 98 99999-9999" />
-          <span class="mt-1 block text-xs text-[var(--text-secondary)]">Informe país, DDD e número. O sistema valida apenas o formato e não envia mensagem.</span>
-        </label>
-        <label>
-          Mensagem inicial do WhatsApp (opcional)
-          <input class="mt-1 w-full rounded-lg border p-3" name="applicationWhatsappMessage" maxlength="500" placeholder="Se vazio, será usada a mensagem padrão da vaga." />
-        </label>
-        <label>
-          Assunto do e-mail (opcional)
-          <input class="mt-1 w-full rounded-lg border p-3" name="applicationEmailSubject" maxlength="300" placeholder="Se vazio, será usado Candidatura – Título da vaga." />
-        </label>
-        <label>
-          Instruções de candidatura (opcional)
-          <textarea class="mt-1 min-h-24 w-full rounded-lg border p-3" name="applicationInstructions" maxlength="2000"></textarea>
+          URL de candidatura
+          <input class="mt-1 w-full rounded-lg border p-3" type="url" name="applicationUrl" required placeholder="https://" />
         </label>
         <label>
           Fonte
-          <input class="mt-1 w-full rounded-lg border p-3" name="sourceName" required placeholder="Informe a origem real da vaga" />
+          <input class="mt-1 w-full rounded-lg border p-3" name="sourceName" required value="Empregos São Luís" />
         </label>
         <label>
           URL da fonte (opcional)
@@ -266,10 +245,6 @@ const formData = {
         <input class="mt-1 w-full max-w-md rounded-lg border p-3" type="datetime-local" name="scheduledAt" />
       </label>
       <label class="flex items-center gap-2"><input type="checkbox" name="featured" /> Destacar vaga</label>
-      <label class="flex items-start gap-2 rounded-lg border border-amber-200 bg-amber-50 p-3 text-sm text-amber-950">
-        <input type="checkbox" name="reviewConfirmed" />
-        Confirmo que revisei título, empresa, descrição, cidade/UF, fonte e canais de candidatura. Obrigatório para aprovar, agendar ou publicar.
-      </label>
       <button class="rounded-xl bg-red-700 p-4 font-bold text-white" type="submit">Salvar vaga</button>
     </section>
   </form>

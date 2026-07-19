@@ -37,7 +37,7 @@ Use esta lista antes de solicitar aprovação no Google AdSense.
 
 ## Anúncios
 
-- [ ] `PUBLIC_ADSENSE_ENABLED=true` e `PUBLIC_ADSENSE_CLIENT_ID` configurados somente após aprovação
+- [ ] `NEXT_PUBLIC_ADSENSE_CLIENT_ID` configurado somente após aprovação
 - [ ] Sem anúncios excessivos antes da aprovação
 - [ ] Sem pop-up de anúncio
 - [ ] Sem redirecionamento automático para anúncios

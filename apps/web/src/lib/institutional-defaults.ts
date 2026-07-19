@@ -1,5 +1,8 @@
 import type { InstitutionalSlug } from "./site-pages";
 
+const contactPlaceholder = (field: string) =>
+  `<span data-admin-field="${field}">[configurável no painel administrativo]</span>`;
+
 export const INSTITUTIONAL_DEFAULTS_HTML: Record<InstitutionalSlug, string> = {
   "quem-somos": `
 <p>O <strong>Empregos São Luís</strong> é o portal de vagas com foco em São Luís, Região Metropolitana e cidades do Maranhão. Nosso propósito é conectar empresas e candidatos com informação clara, gratuita para quem busca emprego e alinhada ao que já conhecem no Instagram <a href="https://www.instagram.com/empregosaoluis/" target="_blank" rel="noopener">@empregosaoluis</a>.</p>
@@ -42,8 +45,9 @@ export const INSTITUTIONAL_DEFAULTS_HTML: Record<InstitutionalSlug, string> = {
 <li>Privacidade e LGPD</li>
 <li>Outros assuntos</li>
 </ul>
-<h2>Canal oficial de atendimento</h2>
-<p>O canal principal é o <a href="/contato">formulário de contato</a>, que gera protocolo e registro no painel administrativo. Quando um e-mail ou WhatsApp institucional estiver publicado pela equipe, ele será informado nesta página sem placeholders.</p>
+<h2>Outros canais</h2>
+<p>E-mail institucional: ${contactPlaceholder("contactEmail")}</p>
+<p>WhatsApp (quando disponível): ${contactPlaceholder("whatsapp")}</p>
 <p>Horário de resposta: em dias úteis, conforme disponibilidade da equipe.</p>
 `,
   privacidade: `
@@ -65,10 +69,10 @@ export const INSTITUTIONAL_DEFAULTS_HTML: Record<InstitutionalSlug, string> = {
 <h2>Retenção</h2>
 <p>Mantemos dados pelo tempo necessário às finalidades ou exigências legais. Contatos e pedidos comerciais permanecem em registros de auditoria conforme política interna.</p>
 <h2>Direitos do titular</h2>
-<p>Você pode solicitar acesso, correção, exclusão ou revogação de consentimento pelo <a href="/contato">formulário de contato</a> na categoria Privacidade/LGPD. A equipe registra o protocolo e responde em prazo razoável.</p>
+<p>Você pode solicitar acesso, correção, exclusão ou revogação de consentimento pelo canal LGPD: ${contactPlaceholder("lgpdEmail")} ou pelo <a href="/contato">formulário de contato</a> (categoria Privacidade/LGPD).</p>
 <h2>Encarregado</h2>
-<p>O responsável LGPD é indicado publicamente nesta página quando nomeado formalmente. Até lá, use o formulário de contato com a categoria Privacidade/LGPD.</p>
-<p><em>Última atualização: julho de 2026.</em></p>
+<p>Responsável LGPD: ${contactPlaceholder("lgpdOfficer")}</p>
+<p><em>Última atualização: junho de 2026.</em></p>
 `,
   cookies: `
 <p>Esta Política de Cookies explica como o Empregos São Luís utiliza cookies e tecnologias semelhantes.</p>
@@ -118,9 +122,9 @@ export const INSTITUTIONAL_DEFAULTS_HTML: Record<InstitutionalSlug, string> = {
 <li>Informação sobre compartilhamento</li>
 </ul>
 <h2>Como solicitar</h2>
-<p>Envie pedido pelo <a href="/contato">formulário</a> na categoria Privacidade/LGPD. Cada solicitação recebe protocolo e acompanhamento interno.</p>
+<p>Envie pedido pelo <a href="/contato">formulário</a> (categoria Privacidade/LGPD) ou e-mail ${contactPlaceholder("lgpdEmail")}. Responderemos em prazo razoável.</p>
 <h2>Encarregado</h2>
-<p>Quando houver encarregado nomeado, o nome e o canal oficial constarão nesta página. Enquanto isso, o atendimento LGPD é feito pelo formulário de contato.</p>
+<p>${contactPlaceholder("lgpdOfficer")}</p>
 `,
   "politica-editorial": `
 <p>Conteúdos de notícias e blog seguem critérios de clareza, fonte identificada e relevância para o mercado de trabalho em São Luís e Maranhão.</p>
