@@ -32,7 +32,11 @@ npm run seed:local-editorial -- --write
 6. Confirme **worker** ativo (publica quando `scheduled_at <= now`).
 7. Confira `/admin/calendario-editorial`.
 
-Idempotente: se já existirem slugs `sl-local-*`, o script não duplica.
+Idempotente: se já existirem slugs `sl-local-*`, o script **não duplica**; na reexecução ele **corrige** `seo_title` (máx. 70 chars do admin) e a URL da capa `/covers/sl-local/...`.
+
+### Erro “Campos editoriais inválidos” no admin
+
+Causa comum: **Título SEO > 70 caracteres**. Encurte o campo ou rode de novo o migrate com `RUN_SEED_LOCAL_EDITORIAL=true` (ajuste automático). Ao salvar `SCHEDULED`, a data/hora também precisa estar **no futuro**.
 
 ## Pedido AdSense
 

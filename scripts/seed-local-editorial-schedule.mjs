@@ -129,6 +129,17 @@ function coverPathFor(slug) {
   return resolve(root, "apps/web/public/covers/sl-local", `${slug}.webp`);
 }
 
+/** Título SEO do admin aceita no máximo 70 caracteres. */
+function seoTitleFor(title) {
+  const suffix = " | Empregos São Luís";
+  const max = 70;
+  if (`${title}${suffix}`.length <= max) return `${title}${suffix}`;
+  const room = max - suffix.length;
+  if (room < 12) return title.slice(0, max);
+  const trimmed = title.slice(0, room).replace(/\s+\S*$/, "").replace(/[:\-–—]\s*$/, "").trim();
+  return `${trimmed || title.slice(0, room)}${suffix}`.slice(0, max);
+}
+
 const scheduleSlots = buildScheduleSlots(catalog.length);
 const missingCovers = catalog.filter((item) => !existsSync(coverPathFor(slugFor(item)))).map((i) => slugFor(i));
 
@@ -186,13 +197,29 @@ if (missingCovers.length) {
 const sql = postgres(databaseUrl, { max: 1, prepare: false });
 
 try {
-  const existing = await sql`select slug from es_articles where slug like ${`${SLUG_BASE}%`}`;
+  const existing = await sql`select id, slug, title, seo_title from es_articles where slug like ${`${SLUG_BASE}%`}`;
   if (existing.length) {
+    let seoFixed = 0;
+    for (const row of existing) {
+      const item = catalog.find((entry) => slugFor(entry) === row.slug);
+      const nextSeo = seoTitleFor(item?.title || row.title || "");
+      const nextCover = `${siteUrl}/covers/sl-local/${row.slug}.webp`;
+      await sql`
+        update es_articles
+        set seo_title = ${nextSeo},
+            cover_image_url = ${nextCover},
+            og_image_url = ${nextCover},
+            updated_at = now()
+        where id = ${row.id}
+      `;
+      seoFixed += 1;
+    }
     console.log(
       JSON.stringify({
         ok: true,
-        skipped: true,
-        reason: `Já existem ${existing.length} artigo(s) ${SLUG_BASE}-*. Nenhuma alteração (idempotente).`,
+        skippedInsert: true,
+        reason: `Já existem ${existing.length} artigo(s) ${SLUG_BASE}-*. Ajustados título SEO (≤70) e URL de capa.`,
+        seoFixed,
         sample: existing.slice(0, 3).map((r) => r.slug)
       })
     );
@@ -288,7 +315,7 @@ try {
         ${"Empregos São Luís"},
         ${`${siteUrl}/politica-editorial`},
         ${sql.json(sources)},
-        ${`${item.title} | Empregos São Luís`},
+        ${seoTitleFor(item.title)},
         ${excerpt.slice(0, 155)},
         ${item.keyword},
         ${"informational"},

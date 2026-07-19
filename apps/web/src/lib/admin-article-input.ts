@@ -59,13 +59,42 @@ function dateOrNull(value: string | undefined): Date | null | "invalid" {
 
 const nullable = (value: string | undefined) => value?.trim() || null;
 
+function emptyToUndefined(value: FormDataEntryValue | null) {
+  if (value == null) return undefined;
+  if (typeof value !== "string") return value;
+  return value.trim() === "" ? undefined : value;
+}
+
 export function parseArticleForm(form: FormData, now = new Date()) {
-  const parsed = schema.safeParse(Object.fromEntries(form));
+  const raw = Object.fromEntries(form);
+  // Selects/opcionais vazios chegam como "" e quebram z.enum / z.string().url()
+  for (const key of [
+    "reviewerId",
+    "pillarId",
+    "clusterId",
+    "subtitle",
+    "coverImageUrl",
+    "sourceUrl",
+    "canonicalUrl",
+    "searchIntent",
+    "scheduledAt",
+    "expiresAt",
+    "factCheckedAt",
+    "seoTitle",
+    "metaDescription"
+  ] as const) {
+    if (key in raw) raw[key] = emptyToUndefined(raw[key] as FormDataEntryValue) as string;
+  }
+  const parsed = schema.safeParse(raw);
   if (!parsed.success) {
+    const details = parsed.error.issues.map((issue) => {
+      const path = issue.path.join(".") || "campo";
+      return `${path}: ${issue.message}`;
+    });
     return {
       ok: false as const,
-      error: "Campos editoriais inválidos.",
-      details: parsed.error.issues.map((issue) => issue.message)
+      error: details[0] ? `Campos editoriais inválidos. ${details[0]}` : "Campos editoriais inválidos.",
+      details
     };
   }
   const scheduledAt = dateOrNull(parsed.data.scheduledAt);

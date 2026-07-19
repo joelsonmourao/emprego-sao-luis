@@ -34,4 +34,18 @@ describe("article form", () => {
     form.set("scheduledAt", "2025-01-01T10:00");
     expect(parseArticleForm(form, new Date("2026-01-01T00:00:00Z")).ok).toBe(false);
   });
+
+  it("explica título SEO acima de 70 caracteres", () => {
+    const form = validForm();
+    form.set(
+      "seoTitle",
+      "Próximos passos no Empregos São Luís após ler este guia | Empregos São Luís"
+    );
+    const parsed = parseArticleForm(form);
+    expect(parsed.ok).toBe(false);
+    if (!parsed.ok) {
+      expect(parsed.error).toMatch(/seoTitle/i);
+      expect(parsed.details.some((item) => /seoTitle/i.test(item))).toBe(true);
+    }
+  });
 });
