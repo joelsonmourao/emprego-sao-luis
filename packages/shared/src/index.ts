@@ -1,9 +1,18 @@
 import { z } from "zod";
+import { validateApplicationChannels } from "./application-channels.js";
 export * from "./publication-schedule.js";
 export * from "./admin-password.js";
 export * from "./zod-fields.js";
 export * from "./import-row.js";
 export * from "./job-content.js";
+export * from "./application-channels.js";
+export * from "./application-monitor.js";
+export * from "./job-classification.js";
+export * from "./job-location.js";
+export * from "./job-quality.js";
+export * from "./import-template.js";
+export * from "./post-magnetico.js";
+export * from "./web-story.js";
 
 export const publicCodeSchema = z.string().regex(/^ES-\d{6}$/);
 
@@ -37,7 +46,12 @@ export const jobDraftSchema = z
     workplaceType: z.enum(["presencial", "hibrido", "remoto"]),
     descriptionHtml: z.string().trim().min(80).max(100_000),
     schedule: optionalText(300),
-    applicationUrl: z.string().url(),
+    applicationUrl: optionalUrl,
+    applicationEmail: optionalText(254),
+    applicationWhatsapp: optionalText(40),
+    applicationWhatsappMessage: optionalText(500),
+    applicationEmailSubject: optionalText(300),
+    applicationInstructions: optionalText(2_000),
     sourceName: z.string().trim().min(2).max(120),
     sourceUrl: optionalUrl,
     sourceEvidence: optionalText(2_000),
@@ -56,6 +70,13 @@ export const jobDraftSchema = z
     canonicalUrl: optionalUrl
   })
   .superRefine((value, context) => {
+    const channels = validateApplicationChannels(value);
+    if (!channels.valid)
+      context.addIssue({
+        code: "custom",
+        path: ["applicationUrl"],
+        message: "Informe candidatura válida por site, WhatsApp ou e-mail."
+      });
     if (value.salaryMin !== undefined && value.salaryMax !== undefined && value.salaryMax < value.salaryMin)
       context.addIssue({
         code: "custom",

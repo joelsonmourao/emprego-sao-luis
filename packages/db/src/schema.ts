@@ -297,15 +297,33 @@ export const jobs = pgTable(
     experienceLevel: text("experience_level"),
     pcd: boolean("pcd").notNull().default(false),
     applicationType: text("application_type").notNull().default("URL"),
-    applicationUrl: text("application_url").notNull(),
+    applicationUrl: text("application_url"),
     applicationEmail: text("application_email"),
     applicationWhatsapp: text("application_whatsapp"),
+    applicationWhatsappOriginal: text("application_whatsapp_original"),
+    applicationWhatsappMessage: text("application_whatsapp_message"),
+    applicationWhatsappValid: boolean("application_whatsapp_valid").notNull().default(false),
+    applicationWhatsappValidatedAt: timestamp("application_whatsapp_validated_at", { withTimezone: true }),
+    applicationWhatsappSource: text("application_whatsapp_source"),
+    applicationEmailSubject: text("application_email_subject"),
+    applicationEmailInstructions: text("application_email_instructions"),
+    applicationEmailValid: boolean("application_email_valid").notNull().default(false),
+    applicationEmailValidatedAt: timestamp("application_email_validated_at", { withTimezone: true }),
+    applicationEmailSource: text("application_email_source"),
+    applicationInstructions: text("application_instructions"),
+    applicationUrlStatus: text("application_url_status").notNull().default("UNCHECKED"),
+    applicationUrlHttpStatus: integer("application_url_http_status"),
+    applicationUrlFinalUrl: text("application_url_final_url"),
+    applicationUrlCheckedAt: timestamp("application_url_checked_at", { withTimezone: true }),
+    applicationUrlCheckReason: text("application_url_check_reason"),
     sourceUrl: text("source_url"),
     sourceName: text("source_name").notNull(),
     sourceEvidence: text("source_evidence"),
     originType: originType("origin_type").notNull(),
     duplicateHash: text("duplicate_hash").notNull(),
     verificationStatus: verificationStatus("verification_status").notNull().default("UNVERIFIED"),
+    reviewedBy: uuid("reviewed_by").references(() => users.id),
+    reviewedAt: timestamp("reviewed_at", { withTimezone: true }),
     publicationStatus: publicationStatus("publication_status").notNull().default("DRAFT"),
     publishedAt: timestamp("published_at", { withTimezone: true }),
     scheduledAt: timestamp("scheduled_at", { withTimezone: true }),
@@ -321,6 +339,11 @@ export const jobs = pgTable(
     seoTitle: text("seo_title"),
     metaDescription: text("meta_description"),
     canonicalUrl: text("canonical_url"),
+    categorySuggestion: text("category_suggestion"),
+    categorySuggestionConfidence: numeric("category_suggestion_confidence"),
+    categorySuggestionReason: text("category_suggestion_reason"),
+    categorySuggestionSource: text("category_suggestion_source"),
+    categorySuggestedAt: timestamp("category_suggested_at", { withTimezone: true }),
     ...timestamps
   },
   (t) => [
@@ -376,6 +399,28 @@ export const authors = pgTable("es_authors", {
   avatarUrl: text("avatar_url"),
   ...timestamps
 });
+export const contentPillars = pgTable("es_content_pillars", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  name: text("name").notNull(),
+  slug: text("slug").notNull().unique(),
+  description: text("description"),
+  audience: text("audience").notNull().default("CANDIDATE"),
+  active: boolean("active").notNull().default(true),
+  ...timestamps
+});
+export const contentClusters = pgTable(
+  "es_content_clusters",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    pillarId: uuid("pillar_id").notNull().references(() => contentPillars.id, { onDelete: "cascade" }),
+    name: text("name").notNull(),
+    slug: text("slug").notNull(),
+    description: text("description"),
+    active: boolean("active").notNull().default(true),
+    ...timestamps
+  },
+  (t) => [uniqueIndex("es_content_clusters_pillar_slug_uq").on(t.pillarId, t.slug)]
+);
 export const articles = pgTable(
   "es_articles",
   {
@@ -384,6 +429,9 @@ export const articles = pgTable(
     authorId: uuid("author_id")
       .notNull()
       .references(() => authors.id),
+    reviewerId: uuid("reviewer_id").references(() => users.id),
+    pillarId: uuid("pillar_id").references(() => contentPillars.id),
+    clusterId: uuid("cluster_id").references(() => contentClusters.id),
     title: text("title").notNull(),
     subtitle: text("subtitle"),
     slug: text("slug").notNull().unique(),
@@ -406,6 +454,32 @@ export const articles = pgTable(
     metaDescription: text("meta_description"),
     canonicalUrl: text("canonical_url"),
     internalNotes: text("internal_notes"),
+    primaryKeyword: text("primary_keyword"),
+    searchIntent: text("search_intent"),
+    sources: jsonb("sources").notNull().default([]),
+    aiAssisted: boolean("ai_assisted").notNull().default(false),
+    factCheckedAt: timestamp("fact_checked_at", { withTimezone: true }),
+    sponsoredContent: boolean("sponsored_content").notNull().default(false),
+    sponsorshipDisclosure: text("sponsorship_disclosure"),
+    relatedArticleIds: jsonb("related_article_ids").notNull().default([]),
+    relatedJobIds: jsonb("related_job_ids").notNull().default([]),
+    internalLinkSuggestions: jsonb("internal_link_suggestions").notNull().default([]),
+    editorialStage: text("editorial_stage").notNull().default("PITCH"),
+    reviewedAt: timestamp("reviewed_at", { withTimezone: true }),
+    factReviewNotes: text("fact_review_notes"),
+    editorialTemplate: text("editorial_template").notNull().default("STANDARD"),
+    directAnswer: text("direct_answer"),
+    localHook: text("local_hook"),
+    audience: text("audience"),
+    faqJson: jsonb("faq_json").notNull().default([]),
+    candidateCta: text("candidate_cta"),
+    companyCta: text("company_cta"),
+    discoverEligible: boolean("discover_eligible").notNull().default(false),
+    newsEligible: boolean("news_eligible").notNull().default(false),
+    webStoryEligible: boolean("web_story_eligible").notNull().default(false),
+    editorialScore: jsonb("editorial_score").notNull().default({}),
+    reviewDueAt: timestamp("review_due_at", { withTimezone: true }),
+    alternativeTitles: jsonb("alternative_titles").notNull().default([]),
     status: publicationStatus("status").notNull().default("DRAFT"),
     publishedAt: timestamp("published_at", { withTimezone: true }),
     scheduledAt: timestamp("scheduled_at", { withTimezone: true }),
@@ -416,6 +490,70 @@ export const articles = pgTable(
   },
   (t) => [index("es_articles_publication_idx").on(t.status, t.publishedAt)]
 );
+export const classificationRules = pgTable(
+  "es_classification_rules",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    categorySlug: text("category_slug").notNull().unique(),
+    categoryName: text("category_name").notNull(),
+    keywords: jsonb("keywords").notNull().default([]),
+    synonyms: jsonb("synonyms").notNull().default([]),
+    priority: integer("priority").notNull().default(100),
+    active: boolean("active").notNull().default(true),
+    ...timestamps
+  }
+);
+export const webStories = pgTable(
+  "es_web_stories",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    title: text("title").notNull(),
+    slug: text("slug").notNull().unique(),
+    articleId: uuid("article_id").references(() => articles.id),
+    authorId: uuid("author_id").references(() => authors.id),
+    reviewerId: uuid("reviewer_id").references(() => users.id),
+    status: publicationStatus("status").notNull().default("DRAFT"),
+    pages: jsonb("pages").notNull().default([]),
+    posterUrl: text("poster_url"),
+    posterAlt: text("poster_alt"),
+    canonicalUrl: text("canonical_url"),
+    seoTitle: text("seo_title"),
+    metaDescription: text("meta_description"),
+    ctaLabel: text("cta_label"),
+    ctaUrl: text("cta_url"),
+    eligibilityNotes: text("eligibility_notes"),
+    rejectionReason: text("rejection_reason"),
+    publishedAt: timestamp("published_at", { withTimezone: true }),
+    scheduledAt: timestamp("scheduled_at", { withTimezone: true }),
+    expiresAt: timestamp("expires_at", { withTimezone: true }),
+    reviewedAt: timestamp("reviewed_at", { withTimezone: true }),
+    ...timestamps
+  },
+  (t) => [index("es_web_stories_status_idx").on(t.status, t.publishedAt)]
+);
+export const jobApplicationEvents = pgTable(
+  "es_job_application_events",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    jobId: uuid("job_id")
+      .notNull()
+      .references(() => jobs.id, { onDelete: "cascade" }),
+    channel: text("channel").notNull(),
+    action: text("action").notNull(),
+    placement: text("placement"),
+    userAgent: text("user_agent"),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow()
+  },
+  (t) => [index("es_job_application_events_job_idx").on(t.jobId, t.createdAt)]
+);
+export const adsenseReadinessHistory = pgTable("es_adsense_readiness_history", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  classification: text("classification").notNull(),
+  stageSnapshot: jsonb("stage_snapshot").notNull().default({}),
+  generatedAt: timestamp("generated_at", { withTimezone: true }).notNull().defaultNow(),
+  actorId: uuid("actor_id").references(() => users.id),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow()
+});
 export const articleRevisions = pgTable(
   "es_article_revisions",
   {
@@ -518,6 +656,14 @@ export const importRows = pgTable(
     raw: jsonb("raw").notNull(),
     normalized: jsonb("normalized"),
     errors: jsonb("errors").notNull().default([]),
+    warnings: jsonb("warnings").notNull().default([]),
+    suggestions: jsonb("suggestions").notNull().default({}),
+    confidence: numeric("confidence"),
+    reviewStatus: text("review_status").notNull().default("NEEDS_REVIEW"),
+    approvedBy: uuid("approved_by").references(() => users.id),
+    approvedAt: timestamp("approved_at", { withTimezone: true }),
+    changedFields: jsonb("changed_fields").notNull().default({}),
+    applicationChannels: jsonb("application_channels").notNull().default([]),
     action: text("action").notNull().default("REJECTED"),
     beforeSnapshot: jsonb("before_snapshot"),
     jobId: uuid("job_id").references(() => jobs.id),

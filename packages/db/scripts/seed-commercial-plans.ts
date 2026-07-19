@@ -40,6 +40,16 @@ const SEED_PLANS = [
     publishStories: true,
     publishFeed: true,
     sortOrder: 3
+  },
+  {
+    slug: "recrutador-mensal",
+    name: "Plano mensal para recrutadores",
+    shortDescription: "Créditos recorrentes para equipes de recrutamento.",
+    description: "Estrutura de assinatura B2B com múltiplos usuários, créditos e relatórios. Configure preço antes de ativar.",
+    jobCredits: 10,
+    durationDays: 30,
+    billingType: "subscription",
+    sortOrder: 4
   }
 ] as const;
 
@@ -66,6 +76,7 @@ export async function seedCommercialPlans() {
         highlightDays: "highlightDays" in plan ? plan.highlightDays : 0,
         publishStories: "publishStories" in plan ? plan.publishStories : false,
         publishFeed: "publishFeed" in plan ? plan.publishFeed : false,
+        billingType: "billingType" in plan ? plan.billingType : "one_time",
         active: false,
         setupRequired: true,
         archived: false,
