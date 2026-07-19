@@ -28,15 +28,19 @@ npm run seed:local-editorial -- --write
    - Remova `RUN_SEED_ADSENSE_EDITORIAL` / `RUN_UNPUBLISH_ADSENSE_EDITORIAL` se não forem necessários.
 3. Force rebuild do migrate.
 4. Logs: `Seed editorial local concluído` com `scheduled: 45`.
-5. **Apague** `RUN_SEED_LOCAL_EDITORIAL` e `ADSENSE_EDITORIAL_ALLOW_PRODUCTION`.
+5. **Apague obrigatoriamente** `RUN_SEED_LOCAL_EDITORIAL` e `ADSENSE_EDITORIAL_ALLOW_PRODUCTION` (senão o migrate reinicia em loop).
 6. Confirme **worker** ativo (publica quando `scheduled_at <= now`).
 7. Confira `/admin/calendario-editorial`.
 
-Idempotente: se já existirem slugs `sl-local-*`, o script **não duplica**; na reexecução ele **corrige** `seo_title` (máx. 70 chars do admin) e a URL da capa `/covers/sl-local/...`.
+Idempotente: se já existirem slugs `sl-local-*`, o script **não faz nada** (não fica regravando a cada migrate).
+
+Ajuste pontual de SEO/capa (máx. 70 chars):  
+`node scripts/seed-local-editorial-schedule.mjs --write --fix-seo --i-understand-production`  
+Depois **remova** `RUN_SEED_LOCAL_EDITORIAL` do Coolify para o migrate não reiniciar em loop.
 
 ### Erro “Campos editoriais inválidos” no admin
 
-Causa comum: **Título SEO > 70 caracteres**. Encurte o campo ou rode de novo o migrate com `RUN_SEED_LOCAL_EDITORIAL=true` (ajuste automático). Ao salvar `SCHEDULED`, a data/hora também precisa estar **no futuro**.
+Causa comum: **Título SEO > 70 caracteres**. Encurte o campo ou rode uma vez com `--fix-seo`. Ao salvar `SCHEDULED`, a data/hora precisa estar **no futuro**.
 
 ## Pedido AdSense
 

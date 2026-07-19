@@ -21,6 +21,7 @@ import {
 } from "./data/sl-local-editorial-catalog.mjs";
 
 const write = process.argv.includes("--write");
+const fixSeo = process.argv.includes("--fix-seo");
 const understandProduction = process.argv.includes("--i-understand-production");
 const allowRemote = process.env.ADSENSE_EDITORIAL_ALLOW_REMOTE === "1";
 const allowProduction = process.env.ADSENSE_EDITORIAL_ALLOW_PRODUCTION === "1";
@@ -199,6 +200,17 @@ const sql = postgres(databaseUrl, { max: 1, prepare: false });
 try {
   const existing = await sql`select id, slug, title, seo_title from es_articles where slug like ${`${SLUG_BASE}%`}`;
   if (existing.length) {
+    if (!fixSeo) {
+      console.log(
+        JSON.stringify({
+          ok: true,
+          skipped: true,
+          reason: `Já existem ${existing.length} artigo(s) ${SLUG_BASE}-*. Nada a fazer (idempotente). Use --fix-seo só se precisar encurtar SEO/capa uma vez.`,
+          sample: existing.slice(0, 3).map((r) => r.slug)
+        })
+      );
+      process.exit(0);
+    }
     let seoFixed = 0;
     for (const row of existing) {
       const item = catalog.find((entry) => slugFor(entry) === row.slug);
@@ -218,9 +230,8 @@ try {
       JSON.stringify({
         ok: true,
         skippedInsert: true,
-        reason: `Já existem ${existing.length} artigo(s) ${SLUG_BASE}-*. Ajustados título SEO (≤70) e URL de capa.`,
         seoFixed,
-        sample: existing.slice(0, 3).map((r) => r.slug)
+        note: "Ajuste único concluído. Remova RUN_SEED_LOCAL_EDITORIAL do Coolify."
       })
     );
     process.exit(0);
