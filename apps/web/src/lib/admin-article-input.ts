@@ -108,7 +108,7 @@ export function parseArticleForm(form: FormData, now = new Date()) {
   if (parsed.data.sourceName || parsed.data.sourceUrl) sources.push({ name: parsed.data.sourceName?.trim() || null, url: parsed.data.sourceUrl?.trim() || null });
   if (parsed.data.status === "PUBLISHED") {
     const blockers = [
-      plainLength < 800 ? "Conteúdo publicado precisa ter ao menos 800 caracteres úteis." : null,
+      plainLength < 2400 ? "Conteúdo publicado precisa ter ao menos 2400 caracteres úteis (meta interna ×3)." : null,
       !parsed.data.reviewerId ? "Selecione um revisor." : null,
       !parsed.data.pillarId || !parsed.data.clusterId ? "Associe pilar e cluster." : null,
       !parsed.data.primaryKeyword?.trim() ? "Informe a palavra-chave principal." : null,

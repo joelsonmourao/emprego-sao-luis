@@ -2,9 +2,13 @@
 /**
  * Agenda pacote editorial interno para a Rota da Aprovação (AdSense).
  *
- * Meta interna (NÃO é regra oficial do Google): 15 posts publicados com ≥800 caracteres úteis,
- * com autoria, fontes, pilar/cluster. Este script cria 18 peças (6 publicadas agora + 12 agendadas
- * em dias úteis) e 3 Web Stories ligadas aos Posts Magnéticos.
+ * Meta interna (NÃO é regra oficial do Google) — escala ×3:
+ *   - 45 posts publicados com ≥2400 caracteres úteis
+ *   - capa com ALT/legenda/crédito (ativo de marca)
+ *   - autoria, fontes, pilar/cluster
+ *
+ * Este script cria 54 peças (18 publicadas agora + 36 agendadas em dias úteis)
+ * e 9 Web Stories ligadas a Posts Magnéticos.
  *
  * Uso:
  *   node scripts/seed-adsense-editorial-schedule.mjs
@@ -16,6 +20,13 @@
  *   - produção: ADSENSE_EDITORIAL_ALLOW_PRODUCTION=1 e --i-understand-production
  */
 import postgres from "postgres";
+
+const SCALE = 3;
+const PUBLISH_NOW = 6 * SCALE; // 18
+const SCHEDULE_COUNT = 12 * SCALE; // 36
+const STORY_COUNT = 3 * SCALE; // 9
+const MIN_USEFUL_CHARS = 800 * SCALE; // 2400
+const READY_AT = 15 * SCALE; // 45
 
 const write = process.argv.includes("--write");
 const understandProduction = process.argv.includes("--i-understand-production");
@@ -84,11 +95,13 @@ if (!write) {
         dryRun: true,
         marker: "ADSENSE-EDITORIAL-SCHEDULE",
         plan: {
-          publishedNow: 6,
-          scheduledWeekdays: 12,
-          webStories: 3,
-          minUsefulChars: 800,
-          internalReadyAt: "quando substantialPublished >= 15 (worker publica agendados)"
+          scale: SCALE,
+          publishedNow: PUBLISH_NOW,
+          scheduledWeekdays: SCHEDULE_COUNT,
+          webStories: STORY_COUNT,
+          minUsefulChars: MIN_USEFUL_CHARS,
+          coverImage: "/brand/og-default.png",
+          internalReadyAt: `quando substantialPublished >= ${READY_AT} (worker publica agendados)`
         },
         checks: { localOk, allowRemote, allowProduction, looksProduction }
       },
@@ -110,147 +123,61 @@ if (!localOk && !allowRemote && !(looksProduction && allowProduction && understa
 const mark = "ADSENSE-EDITORIAL-SCHEDULE";
 const slugBase = "adsense-editorial";
 const siteUrl = (process.env.SITE_URL || "https://empregossaoluis.com.br").replace(/\/$/, "");
+const coverUrl = `${siteUrl}/brand/og-default.png`;
 
 /** @type {Array<{ title: string; type: "NEWS"|"GUIDE"|"DATA_REPORT"; template: string; keyword: string; section: string }>} */
-const catalog = [
-  {
-    title: "Como buscar vagas em São Luís sem cair em golpe",
-    type: "GUIDE",
-    template: "POST_MAGNETICO",
-    keyword: "vagas sao luis golpe",
-    section: "guia"
-  },
-  {
-    title: "CLT ou temporário na Grande Ilha: o que comparar antes de candidatar",
-    type: "GUIDE",
-    template: "STANDARD",
-    keyword: "clt temporario sao luis",
-    section: "guia"
-  },
-  {
-    title: "Bairros com mais oportunidades recentes em São Luís",
-    type: "DATA_REPORT",
-    template: "STANDARD",
-    keyword: "vagas por bairro sao luis",
-    section: "dados"
-  },
-  {
-    title: "Currículo para vagas de atendimento no Maranhão",
-    type: "GUIDE",
-    template: "POST_MAGNETICO",
-    keyword: "curriculo atendimento maranhao",
-    section: "guia"
-  },
-  {
-    title: "WhatsApp na candidatura: como se apresentar com segurança",
-    type: "GUIDE",
-    template: "STANDARD",
-    keyword: "candidatura whatsapp sao luis",
-    section: "guia"
-  },
-  {
-    title: "Primeiro emprego em São Luís: passos práticos nesta semana",
-    type: "NEWS",
-    template: "STANDARD",
-    keyword: "primeiro emprego sao luis",
-    section: "noticias"
-  },
-  {
-    title: "Vagas presenciais versus híbridas na capital maranhense",
-    type: "GUIDE",
-    template: "STANDARD",
-    keyword: "vagas presenciais sao luis",
-    section: "guia"
-  },
-  {
-    title: "Documentos que empresas pedem com frequência no MA",
-    type: "GUIDE",
-    template: "POST_MAGNETICO",
-    keyword: "documentos admissao maranhao",
-    section: "guia"
-  },
-  {
-    title: "Como ler uma vaga e evitar descrição enganosa",
-    type: "GUIDE",
-    template: "STANDARD",
-    keyword: "ler vaga emprego",
-    section: "guia"
-  },
-  {
-    title: "Rotina de busca: 30 minutos por dia em São Luís",
-    type: "GUIDE",
-    template: "STANDARD",
-    keyword: "rotina busca emprego",
-    section: "guia"
-  },
-  {
-    title: "Cursos gratuitos e preparação para entrevistas locais",
-    type: "NEWS",
-    template: "STANDARD",
-    keyword: "cursos gratuitos emprego sao luis",
-    section: "noticias"
-  },
-  {
-    title: "Transporte e pontualidade: planejar o deslocamento até o trabalho",
-    type: "GUIDE",
-    template: "STANDARD",
-    keyword: "transporte trabalho sao luis",
-    section: "guia"
-  },
-  {
-    title: "Vagas no comércio da ilha: o que costuma ser avaliado",
-    type: "GUIDE",
-    template: "POST_MAGNETICO",
-    keyword: "vagas comercio sao luis",
-    section: "guia"
-  },
-  {
-    title: "E-mail de candidatura curto e claro (modelo local)",
-    type: "GUIDE",
-    template: "STANDARD",
-    keyword: "email candidatura modelo",
-    section: "guia"
-  },
-  {
-    title: "Quando desconfiar de pedido de pagamento para “garantir vaga”",
-    type: "NEWS",
-    template: "STANDARD",
-    keyword: "golpe pagamento vaga",
-    section: "noticias"
-  },
-  {
-    title: "Atualizar LinkedIn e perfil local sem inventar experiência",
-    type: "GUIDE",
-    template: "STANDARD",
-    keyword: "linkedin emprego sao luis",
-    section: "guia"
-  },
-  {
-    title: "Checklist da entrevista presencial em São Luís",
-    type: "GUIDE",
-    template: "POST_MAGNETICO",
-    keyword: "entrevista presencial sao luis",
-    section: "guia"
-  },
-  {
-    title: "Como o Empregos São Luís organiza vagas para o candidato",
-    type: "NEWS",
-    template: "STANDARD",
-    keyword: "como funciona empregos sao luis",
-    section: "noticias"
-  }
+const baseCatalog = [
+  { title: "Como buscar vagas em São Luís sem cair em golpe", type: "GUIDE", template: "POST_MAGNETICO", keyword: "vagas sao luis golpe", section: "guia" },
+  { title: "CLT ou temporário na Grande Ilha: o que comparar antes de candidatar", type: "GUIDE", template: "STANDARD", keyword: "clt temporario sao luis", section: "guia" },
+  { title: "Bairros com mais oportunidades recentes em São Luís", type: "DATA_REPORT", template: "STANDARD", keyword: "vagas por bairro sao luis", section: "dados" },
+  { title: "Currículo para vagas de atendimento no Maranhão", type: "GUIDE", template: "POST_MAGNETICO", keyword: "curriculo atendimento maranhao", section: "guia" },
+  { title: "WhatsApp na candidatura: como se apresentar com segurança", type: "GUIDE", template: "STANDARD", keyword: "candidatura whatsapp sao luis", section: "guia" },
+  { title: "Primeiro emprego em São Luís: passos práticos nesta semana", type: "NEWS", template: "STANDARD", keyword: "primeiro emprego sao luis", section: "noticias" },
+  { title: "Vagas presenciais versus híbridas na capital maranhense", type: "GUIDE", template: "STANDARD", keyword: "vagas presenciais sao luis", section: "guia" },
+  { title: "Documentos que empresas pedem com frequência no MA", type: "GUIDE", template: "POST_MAGNETICO", keyword: "documentos admissao maranhao", section: "guia" },
+  { title: "Como ler uma vaga e evitar descrição enganosa", type: "GUIDE", template: "STANDARD", keyword: "ler vaga emprego", section: "guia" },
+  { title: "Rotina de busca: 30 minutos por dia em São Luís", type: "GUIDE", template: "STANDARD", keyword: "rotina busca emprego", section: "guia" },
+  { title: "Cursos gratuitos e preparação para entrevistas locais", type: "NEWS", template: "STANDARD", keyword: "cursos gratuitos emprego sao luis", section: "noticias" },
+  { title: "Transporte e pontualidade: planejar o deslocamento até o trabalho", type: "GUIDE", template: "STANDARD", keyword: "transporte trabalho sao luis", section: "guia" },
+  { title: "Vagas no comércio da ilha: o que costuma ser avaliado", type: "GUIDE", template: "POST_MAGNETICO", keyword: "vagas comercio sao luis", section: "guia" },
+  { title: "E-mail de candidatura curto e claro (modelo local)", type: "GUIDE", template: "STANDARD", keyword: "email candidatura modelo", section: "guia" },
+  { title: "Quando desconfiar de pedido de pagamento para garantir vaga", type: "NEWS", template: "STANDARD", keyword: "golpe pagamento vaga", section: "noticias" },
+  { title: "Atualizar LinkedIn e perfil local sem inventar experiência", type: "GUIDE", template: "STANDARD", keyword: "linkedin emprego sao luis", section: "guia" },
+  { title: "Checklist da entrevista presencial em São Luís", type: "GUIDE", template: "POST_MAGNETICO", keyword: "entrevista presencial sao luis", section: "guia" },
+  { title: "Como o Empregos São Luís organiza vagas para o candidato", type: "NEWS", template: "STANDARD", keyword: "como funciona empregos sao luis", section: "noticias" }
 ];
+
+const seriesLabels = ["", " — aprofundamento", " — checklist prático"];
+const catalog = [];
+for (let series = 0; series < SCALE; series += 1) {
+  for (const item of baseCatalog) {
+    catalog.push({
+      ...item,
+      title: `${item.title}${seriesLabels[series]}`,
+      keyword: series === 0 ? item.keyword : `${item.keyword} ${series + 1}`,
+      series: series + 1
+    });
+  }
+}
 
 function buildHtml(item) {
   const paragraphs = [
-    `<p>Este guia do Empregos São Luís ajuda quem busca oportunidade na Grande Ilha a tomar decisões com mais clareza. O foco é prático: o que verificar na vaga, como se candidatar sem custo e quais sinais pedem atenção extra.</p>`,
-    `<p>Sobre <strong>${item.title}</strong>: comece pelo título e pela descrição completa. Confira cidade, bairro (quando informado), tipo de contrato e canal oficial de candidatura — site, WhatsApp ou e-mail. No portal, a candidatura do trabalhador permanece gratuita e sem cadastro obrigatório.</p>`,
-    `<p>Em São Luís e na região metropolitana, vale cruzar a informação da vaga com o contexto local: deslocamento, horário e requisitos reais. Se algo parecer confuso, peça esclarecimento pelo canal indicado antes de enviar documentos sensíveis.</p>`,
-    `<p>Palavra-chave de apoio: ${item.keyword}. Use-a apenas como referência de busca; o conteúdo abaixo prioriza utilidade para o candidato maranhense, não volume artificial de texto.</p>`,
-    `<p>Checklist rápido: (1) leia a vaga inteira; (2) confirme o canal de candidatura; (3) prepare um currículo objetivo; (4) não pague para “liberar” entrevista; (5) guarde prints se houver promessa suspeita. Volte ao portal para novas publicações e atualizações editoriais.</p>`,
-    `<p>Fonte editorial interna: equipe Empregos São Luís. Este texto é original do site, pensado para orientação local e para sustentar a qualidade exigida na Rota da Aprovação interna antes de qualquer ativação de anúncios.</p>`
+    `<p>Este material do Empregos São Luís foi escrito para quem busca oportunidade na Grande Ilha com segurança e objetividade. Não é texto genérico: o foco é o candidato em São Luís e região, com passos claros e sem promessa milagrosa.</p>`,
+    `<p><strong>${item.title}</strong>. Antes de qualquer candidatura, leia o anúncio completo. Confira cidade, bairro (quando houver), tipo de contrato, horário e o canal oficial — site, WhatsApp ou e-mail. No portal, a candidatura do trabalhador continua gratuita e sem cadastro obrigatório.</p>`,
+    `<p>Contexto local: deslocamento na ilha, chuva, trânsito e pontualidade pesam na prática. Se a descrição estiver vaga demais, pergunte pelo canal indicado. Nunca envie documentos sensíveis (RG, CPF, selfie com documento) a quem pede “taxa de liberação”, “kit de uniforme pago antecipado” ou depósito para “garantir entrevista”.</p>`,
+    `<p>Como avaliar qualidade da vaga: (1) empresa ou intermediário identificável; (2) canal de contato coerente; (3) requisitos proporcionais ao cargo; (4) ausência de cobrança ao candidato; (5) coerência entre título e descrição. Guarde prints se algo parecer irregular.</p>`,
+    `<p>Roteiro de ação nesta semana: atualize o currículo em uma página; prepare um parágrafo curto de apresentação; candidate-se só em vagas alinhadas; anote códigos ES quando existirem; acompanhe o retorno sem insistir de forma invasiva. Palavra-chave de apoio editorial: ${item.keyword}.</p>`,
+    `<p>Para entrevistas presenciais em São Luís, planeje o trajeto com margem, leve documento com foto e uma cópia do currículo. Em canais digitais, use mensagem objetiva: nome, cargo pretendido, disponibilidade e anexo ou link do currículo — sem áudios longos nem dados bancários.</p>`,
+    `<p>O Empregos São Luís prioriza orientação útil e transparência. Este texto é original do site, com fontes institucionais internas, e integra a meta editorial de qualidade (conteúdo substancial, autoria, fontes e imagem de capa creditada) usada na Rota da Aprovação interna — sem garantir aprovação do Google AdSense.</p>`,
+    `<p>Evite atalhos: não compartilhe senha de e-mail, não aceite “vaga garantida” via grupo fechado sem descrição pública e não pague para “entrar no banco de talentos”. Se a oferta parecer boa demais, compare com outras vagas semelhantes no portal e peça confirmação por escrito.</p>`,
+    `<p>Próximo passo: abra a busca de vagas no portal, filtre por cidade ou modalidade e candidate-se apenas pelos canais oficiais da publicação. Em caso de dúvida sobre golpe, consulte também a página de segurança do candidato e a política editorial do site.</p>`
   ];
-  return paragraphs.join("\n");
+  const html = paragraphs.join("\n");
+  const plain = html.replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim();
+  if (plain.length < MIN_USEFUL_CHARS) {
+    throw new Error(`HTML abaixo da meta (${plain.length} < ${MIN_USEFUL_CHARS}) para: ${item.title}`);
+  }
+  return html;
 }
 
 function nextWeekdays(count, from = new Date()) {
@@ -284,7 +211,7 @@ try {
     values (
       ${"Redação Empregos São Luís"},
       ${`${slugBase}-autor`},
-      ${"Equipe editorial do Empregos São Luís. Orienta candidatos da Grande Ilha com conteúdo original e checagem básica de fontes."}
+      ${"Equipe editorial do Empregos São Luís. Orienta candidatos da Grande Ilha com conteúdo original, fontes internas e imagens de marca creditadas."}
     )
     returning id
   `;
@@ -294,7 +221,7 @@ try {
     values (
       ${"Emprego na Grande Ilha"},
       ${`${slugBase}-pilar`},
-      ${"Pilar editorial interno para volume e qualidade na Rota da Aprovação."},
+      ${"Pilar editorial interno (meta ×3) para volume e qualidade na Rota da Aprovação."},
       ${"CANDIDATE"},
       true
     )
@@ -310,7 +237,7 @@ try {
     returning id, slug
   `;
 
-  const scheduleDates = nextWeekdays(12);
+  const scheduleDates = nextWeekdays(SCHEDULE_COUNT);
   let published = 0;
   let scheduled = 0;
   const magneticArticleIds = [];
@@ -320,24 +247,29 @@ try {
     const slug = `${slugBase}-${String(index + 1).padStart(2, "0")}`;
     const html = buildHtml(item);
     const cluster = clusters[index % clusters.length];
-    const excerpt = `${item.title}. Orientação prática para candidatos em São Luís e região.`;
+    const excerpt = `${item.title}. Orientação prática e local para candidatos em São Luís e região.`;
     const sources = [
       { name: "Empregos São Luís — política editorial", url: `${siteUrl}/politica-editorial` },
       { name: "Empregos São Luís — política de fontes", url: `${siteUrl}/politica-fontes` }
     ];
-    const isImmediate = index < 6;
+    const isImmediate = index < PUBLISH_NOW;
     const status = isImmediate ? "PUBLISHED" : "SCHEDULED";
     const publishedAt = isImmediate ? new Date() : null;
-    const scheduledAt = isImmediate ? null : scheduleDates[index - 6];
+    const scheduledAt = isImmediate ? null : scheduleDates[index - PUBLISH_NOW];
+    const coverAlt = `Capa editorial: ${item.title}`;
+    const coverCaption = "Identidade visual Empregos São Luís — material editorial interno.";
+    const coverCredit = "Empregos São Luís (marca própria)";
 
     const [row] = await sql`
       insert into es_articles (
         type, author_id, pillar_id, cluster_id, title, slug, excerpt, content_html,
+        cover_image_url, cover_image_alt, cover_image_caption, cover_image_credit,
+        cover_image_width, cover_image_height, og_image_url,
         section, tags, source_name, source_url, sources,
         seo_title, meta_description, primary_keyword, search_intent,
         editorial_template, direct_answer, local_hook, audience, candidate_cta,
         editorial_stage, status, published_at, scheduled_at,
-        news_eligible, discover_eligible, web_story_eligible, ai_assisted
+        news_eligible, discover_eligible, web_story_eligible, ai_assisted, fact_checked_at
       ) values (
         ${item.type},
         ${author.id},
@@ -347,8 +279,15 @@ try {
         ${slug},
         ${excerpt},
         ${html},
+        ${coverUrl},
+        ${coverAlt},
+        ${coverCaption},
+        ${coverCredit},
+        ${1200},
+        ${630},
+        ${coverUrl},
         ${item.section},
-        ${sql.json(["sao-luis", "emprego", item.section])},
+        ${sql.json(["sao-luis", "emprego", item.section, `serie-${item.series}`])},
         ${"Empregos São Luís"},
         ${`${siteUrl}/politica-editorial`},
         ${sql.json(sources)},
@@ -357,7 +296,7 @@ try {
         ${item.keyword},
         ${"informational"},
         ${item.template},
-        ${`Resumo: ${item.title}.`},
+        ${`Resumo direto: ${item.title}.`},
         ${"Contexto local: São Luís e Grande Ilha."},
         ${"CANDIDATE"},
         ${"Ver vagas gratuitas em São Luís"},
@@ -368,24 +307,23 @@ try {
         ${item.type === "NEWS"},
         ${false},
         ${item.template === "POST_MAGNETICO"},
-        ${false}
+        ${false},
+        ${new Date()}
       )
       returning id, slug, status
     `;
 
     if (status === "PUBLISHED") published += 1;
     else scheduled += 1;
-    if (item.template === "POST_MAGNETICO") magneticArticleIds.push(row);
+    if (item.template === "POST_MAGNETICO") magneticArticleIds.push({ ...row, title: item.title });
   }
 
-  const magneticCatalog = catalog.filter((item) => item.template === "POST_MAGNETICO");
   let stories = 0;
-  for (let i = 0; i < Math.min(3, magneticArticleIds.length); i += 1) {
+  for (let i = 0; i < Math.min(STORY_COUNT, magneticArticleIds.length); i += 1) {
     const article = magneticArticleIds[i];
-    const storyTitle = magneticCatalog[i]?.title ?? `Editorial ${i + 1}`;
-    const storySlug = `${slugBase}-story-${i + 1}`;
+    const storySlug = `${slugBase}-story-${String(i + 1).padStart(2, "0")}`;
     const pages = [
-      { title: "Contexto", bodyHtml: "<p>Dica rápida para candidatos em São Luís.</p>", alt: "Capa editorial" },
+      { title: "Contexto", bodyHtml: `<p>${article.title}</p>`, alt: "Capa editorial" },
       { title: "Ação", bodyHtml: "<p>Confira o canal oficial da vaga e candidate-se sem pagar.</p>", alt: "Ação" },
       { title: "Portal", bodyHtml: "<p>Empregos São Luís — candidatura gratuita.</p>", alt: "CTA" }
     ];
@@ -393,17 +331,20 @@ try {
     await sql`
       insert into es_web_stories (
         title, slug, article_id, author_id, status, pages,
+        poster_url, poster_alt,
         seo_title, meta_description, cta_label, cta_url,
         scheduled_at, published_at
       ) values (
-        ${`Web Story: ${storyTitle}`},
+        ${`Web Story: ${article.title}`},
         ${storySlug},
         ${article.id},
         ${author.id},
         ${"SCHEDULED"},
         ${sql.json(pages)},
-        ${`Web Story: ${storyTitle}`},
-        ${"Story interna para apoio editorial — sem publicação em massa."},
+        ${coverUrl},
+        ${`Capa: ${article.title}`},
+        ${`Web Story: ${article.title}`},
+        ${"Story editorial com imagem de marca — apoio à qualidade, sem spam."},
         ${"Ver vagas"},
         ${`${siteUrl}/vagas`},
         ${storyScheduled},
@@ -428,10 +369,14 @@ try {
         ok: true,
         written: true,
         marker: mark,
+        scale: SCALE,
         published,
         scheduled,
         stories,
-        note: "Worker deve estar ativo para publicar SCHEDULED. Meta interna: 15 posts substanciais. Páginas institucionais e Publisher ID real continuam manuais.",
+        minUsefulChars: MIN_USEFUL_CHARS,
+        readyAt: READY_AT,
+        coverImage: coverUrl,
+        note: `Worker deve publicar SCHEDULED. Meta interna: ${READY_AT} posts substanciais com capa. Institucionais e Publisher ID real continuam manuais.`,
         proof
       },
       null,

@@ -50,7 +50,7 @@ const tone =
       {report.editorialMeta.minPublished} posts com ≥{report.editorialMeta.minUsefulChars} caracteres úteis,
       autoria, fontes e pilar/cluster antes de marcar “Pronto para solicitar análise”.
     </p>
-    <div class="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+    <div class="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
       <article>
         <p class="text-sm">Substanciais publicados</p>
         <strong class="text-3xl">{report.editorialMeta.substantialPublished}/{report.editorialMeta.minPublished}</strong>
@@ -62,6 +62,10 @@ const tone =
       <article>
         <p class="text-sm">Agendados</p>
         <strong class="text-3xl">{report.editorialMeta.scheduled}</strong>
+      </article>
+      <article>
+        <p class="text-sm">Com capa completa</p>
+        <strong class="text-3xl">{report.editorialMeta.withCover}/{report.editorialMeta.published}</strong>
       </article>
       <article>
         <p class="text-sm">Web Stories publicadas</p>

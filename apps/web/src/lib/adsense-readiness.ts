@@ -131,12 +131,19 @@ async function buildAdsenseReadiness(baseUrl: URL) {
     })
   );
 
-  /** Meta interna (não é número oficial do Google). Usada para “Pronto para solicitar análise”. */
-  const MIN_PUBLISHED_ARTICLES = 15;
-  const MIN_USEFUL_CHARS = 800;
+  /** Meta interna ×3 (não é número oficial do Google). Usada para “Pronto para solicitar análise”. */
+  const MIN_PUBLISHED_ARTICLES = 45;
+  const MIN_USEFUL_CHARS = 2400;
   const publishedArticles = articleRows.filter((article) => article.status === "PUBLISHED");
   const scheduledArticles = articleRows.filter((article) => article.status === "SCHEDULED");
   const substantialPublished = publishedArticles.filter((article) => plainLength(article.contentHtml) >= MIN_USEFUL_CHARS);
+  const missingCover = publishedArticles.filter(
+    (article) =>
+      !article.coverImageUrl ||
+      !article.coverImageAlt?.trim() ||
+      !article.coverImageCaption?.trim() ||
+      !article.coverImageCredit?.trim()
+  );
   checks.push(
     pass({
       id: "content-volume",
@@ -177,6 +184,20 @@ async function buildAdsenseReadiness(baseUrl: URL) {
       status: thin.length ? "BLOQUEADOR" : "APROVADO_INTERNAMENTE",
       evidence: `${thin.length} conteúdo(s) publicado(s) abaixo da meta interna de ${MIN_USEFUL_CHARS} caracteres úteis.`,
       action: thin.length ? "/admin/conteudo/estrategia" : undefined
+    })
+  );
+  checks.push(
+    pass({
+      id: "cover-images",
+      stage: "ETAPA_3",
+      label: "Imagem de capa com crédito",
+      kind: "INTERNAL",
+      severity: "P1",
+      status: missingCover.length ? "PENDENTE" : "APROVADO_INTERNAMENTE",
+      evidence: missingCover.length
+        ? `${missingCover.length} publicado(s) sem capa completa (URL, ALT, legenda e crédito). O Google não exige capa oficialmente; a meta interna exige para qualidade visual.`
+        : "Publicados com capa, ALT, legenda e crédito.",
+      action: missingCover.length ? "/admin/conteudo/estrategia" : undefined
     })
   );
   const noAuthorSource = publishedArticles.filter(
@@ -401,7 +422,8 @@ async function buildAdsenseReadiness(baseUrl: URL) {
     substantialPublished.length >= MIN_PUBLISHED_ARTICLES &&
     thin.length === 0 &&
     noAuthorSource.length === 0 &&
-    missingPillar.length === 0;
+    missingPillar.length === 0 &&
+    missingCover.length === 0;
   const classification = ready
     ? "PRONTO PARA SOLICITAR ANÁLISE"
     : blockers.some((item) => item.severity === "P0")
@@ -429,6 +451,7 @@ async function buildAdsenseReadiness(baseUrl: URL) {
       published: publishedArticles.length,
       substantialPublished: substantialPublished.length,
       scheduled: scheduledArticles.length,
+      withCover: publishedArticles.length - missingCover.length,
       publishedStories: storyRows.filter((story) => story.status === "PUBLISHED").length
     },
     checks,

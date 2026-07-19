@@ -1,69 +1,38 @@
-# Agenda editorial interna (AdSense)
+# Agenda editorial interna (AdSense) — meta ×3
 
-**Aviso:** o Google **não** publica uma quantidade mínima oficial de posts para aprovar o AdSense. Os números abaixo são **meta interna** do Empregos São Luís para a Rota da Aprovação (`/admin/adsense-readiness`).
+**Aviso:** o Google **não** publica quantidade mínima oficial de posts. Números abaixo são **meta interna** do Empregos São Luís (benchmark de mercado ~15–30 artigos substanciais, aqui **triplicado** para margem de qualidade).
 
-## Meta interna
+## O que o Google de fato exige (oficial)
 
-| Item | Valor |
-|------|--------|
-| Posts publicados substanciais | **15** |
-| Caracteres úteis mínimos | **800** (HTML sem tags) |
-| Autoria + fontes | obrigatório em cada publicado |
-| Pilar + cluster | obrigatório para “Pronto para solicitar” |
-| Anúncios no site | `PUBLIC_ADSENSE_ENABLED=false` até checklist verde + Publisher ID real |
+- Conteúdo **original e de valor** (políticas AdSense)
+- Site próprio, HTTPS, conformidade com políticas
+- Páginas legais/institucionais (privacidade, contato, etc.)
+- **Não** há número oficial de posts nem obrigação explícita de imagem de capa
 
-## O que o seed cria
+## Meta interna ×3 (Rota da Aprovação)
 
-Script: `scripts/seed-adsense-editorial-schedule.mjs`
+| Item | Antes | Agora (×3) |
+|------|-------|------------|
+| Posts substanciais publicados | 15 | **45** |
+| Caracteres úteis mínimos | 800 | **2400** |
+| Seed: publicados agora | 6 | **18** |
+| Seed: agendados (dias úteis) | 12 | **36** |
+| Web Stories agendadas | 3 | **9** |
+| Capa (URL + ALT + legenda + crédito) | recomendado | **obrigatório** para “Pronto” |
 
-- 1 autor, 1 pilar, 3 clusters
-- **6** artigos **PUBLISHED** imediatamente (≥800 caracteres)
-- **12** artigos **SCHEDULED** em dias úteis (worker publica automaticamente)
-- **3** Web Stories **SCHEDULED** ligadas a Posts Magnéticos
+Imagens: o Google não lista “capa obrigatória”, mas capas genéricas sem crédito prejudicam a percepção de qualidade. Internamente exigimos capa creditada (seed usa `/brand/og-default.png` da marca).
 
-Quando o worker publicar os agendados, a meta de 15 substanciais é atingida (~4 semanas em ritmo de dias úteis).
-
-## Comandos
-
-Dry-run (sempre primeiro):
+## Seed
 
 ```powershell
 npm run seed:adsense-editorial
+# produção (após backup):
+# $env:ADSENSE_EDITORIAL_ALLOW_PRODUCTION="1"
+# npm run seed:adsense-editorial -- --write --i-understand-production
 ```
 
-Local E2E (`DATABASE_URL` em `127.0.0.1:55432`, banco com `staging` ou `e2e`):
+Worker precisa estar ativo para publicar `SCHEDULED`.
 
-```powershell
-npm run seed:adsense-editorial -- --write
-```
+## Quando pedir AdSense
 
-Staging remoto (Coolify / one-off), após backup:
-
-```powershell
-$env:ADSENSE_EDITORIAL_ALLOW_REMOTE="1"
-$env:DATABASE_URL="..."   # URL interna do staging — nunca cole senha no chat
-$env:SITE_URL="https://seu-staging.exemplo"
-npm run seed:adsense-editorial -- --write
-```
-
-Produção (só com backup + autorização explícita):
-
-```powershell
-$env:ADSENSE_EDITORIAL_ALLOW_PRODUCTION="1"
-$env:DATABASE_URL="..."
-npm run seed:adsense-editorial -- --write --i-understand-production
-```
-
-## O que ainda é manual (AdSense “cobra” na prática)
-
-1. Páginas institucionais sem placeholder (`/admin/paginas`): quem-somos, contato, privacidade, cookies, termos, política editorial/fontes/correções, LGPD.
-2. Conta AdSense real → `PUBLIC_ADSENSE_PUBLISHER_ID` / client + `ads.txt`.
-3. Só então `PUBLIC_ADSENSE_ENABLED=true` no Coolify (após “Pronto para solicitar análise”).
-4. Vagas reais válidas (não inventar empresas); limpar lixo com `archive-junk-jobs` se necessário.
-5. Validação mobile visual pós-deploy.
-
-## Painel
-
-- Checklist: `/admin/adsense-readiness`
-- Calendário: `/admin/calendario-editorial`
-- Fluxo: Pilares → Post Magnético → Web Stories → Rota da Aprovação
+Só quando `/admin/adsense-readiness` mostrar **Pronto para solicitar análise** (45 substanciais + capas + institucionais sem placeholder + demais checks verdes). Depois: conta real → Publisher ID → `ads.txt` → só então `PUBLIC_ADSENSE_ENABLED=true`.
