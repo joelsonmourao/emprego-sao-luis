@@ -70,19 +70,32 @@ console.log(
   )
 );
 
+const hostIsLocal = target.host === "127.0.0.1" || target.host === "localhost";
+/** Hostname Docker/Coolify interno (ex.: uuid do serviço) — não resolve no PC Windows. */
+const hostLooksDockerInternal =
+  !hostIsLocal &&
+  !String(target.host).includes(".") &&
+  /^[a-z0-9]{8,}$/i.test(String(target.host));
+
 const looksProduction =
   /empregossaoluis\.com\.br|production/i.test(databaseUrl) ||
   /prod/i.test(String(target.database)) ||
-  process.env.APP_ENV === "production";
+  process.env.APP_ENV === "production" ||
+  hostLooksDockerInternal;
 
-const hostOk = target.host === "127.0.0.1" || target.host === "localhost";
+const hostOk = hostIsLocal;
 const portOk = String(target.port) === "55432";
 const dbOk = /staging|e2e/i.test(String(target.database));
 const localOk = hostOk && portOk && dbOk;
+const productionWriteOk = allowProduction && understandProduction;
+const remoteWriteOk = allowRemote === true;
 
-if (looksProduction && !(allowProduction && understandProduction)) {
+if (looksProduction && !productionWriteOk) {
   console.error(
-    "Recusa fail-closed: alvo parece produção. Defina ADSENSE_EDITORIAL_ALLOW_PRODUCTION=1 e passe --i-understand-production após backup."
+    "Recusa fail-closed: alvo parece produção/Coolify. Defina ADSENSE_EDITORIAL_ALLOW_PRODUCTION=1 e passe --i-understand-production após backup."
+  );
+  console.error(
+    "Dica: hostname Docker interno (ex.: leaoz...) só funciona DENTRO do Coolify (Terminal do container), não no PowerShell do Windows."
   );
   process.exit(1);
 }
@@ -113,11 +126,24 @@ if (!write) {
   process.exit(0);
 }
 
-if (!localOk && !allowRemote && !(looksProduction && allowProduction && understandProduction)) {
+if (!localOk && !remoteWriteOk && !productionWriteOk) {
   console.error(
-    "Recusa fail-closed: use banco local E2E (55432) ou ADSENSE_EDITORIAL_ALLOW_REMOTE=1 (staging)."
+    "Recusa fail-closed: use banco local E2E (55432), ou ADSENSE_EDITORIAL_ALLOW_REMOTE=1 (staging), ou ADSENSE_EDITORIAL_ALLOW_PRODUCTION=1 + --i-understand-production."
   );
   process.exit(1);
+}
+
+if (hostLooksDockerInternal && productionWriteOk) {
+  console.log(
+    JSON.stringify(
+      {
+        ok: true,
+        hint: "Hostname Docker interno detectado. Este comando deve rodar no Terminal do Coolify (mesmo servidor/rede), não no PC."
+      },
+      null,
+      2
+    )
+  );
 }
 
 const mark = "ADSENSE-EDITORIAL-SCHEDULE";
