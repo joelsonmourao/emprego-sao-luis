@@ -9,6 +9,7 @@ const middleware = read("apps/web/src/middleware.ts");
 const robots = read("apps/web/src/pages/robots.txt.ts");
 const sitemaps = read("apps/web/src/lib/sitemaps.ts");
 const unavailable = read("apps/web/src/pages/vagas/indisponivel/[slug].astro");
+const sitemapRoute = read("apps/web/src/pages/sitemaps/[slug].xml.ts");
 
 for (const [label, condition] of [
   [
@@ -28,6 +29,7 @@ for (const [label, condition] of [
     sitemaps.includes('eq(jobs.publicationStatus, "PUBLISHED")') && sitemaps.includes("gt(jobs.expiresAt")
   ],
   ["vaga indisponível responde 410", unavailable.includes("status = 410")]
+  ,["rota de sitemap aceita parâmetro sem extensão duplicada", sitemapRoute.includes('(?:-(\\d+))?$/.exec(slug)')]
 ])
   if (!condition) failures.push(label);
 
@@ -56,6 +58,28 @@ if (process.argv.includes("--live")) {
       } catch (error) {
         failures.push(`${route}: ${error instanceof Error ? error.message : String(error)}`);
       }
+    }
+    try {
+      const sitemapIndexUrl = new URL("/sitemap.xml", base);
+      const indexResponse = await fetch(sitemapIndexUrl);
+      const indexBody = await indexResponse.text();
+      const childUrls = [...indexBody.matchAll(/<loc>([^<]+)<\/loc>/g)].map((match) => match[1]).filter(Boolean);
+      if (!childUrls.length) failures.push("/sitemap.xml não referencia sitemaps filhos.");
+      for (const child of childUrls) {
+        const childUrl = new URL(child, sitemapIndexUrl);
+        if (childUrl.origin !== sitemapIndexUrl.origin) {
+          failures.push(`sitemap externo não permitido: ${childUrl}`);
+          continue;
+        }
+        const response = await fetch(childUrl, { redirect: "follow" });
+        const body = await response.text();
+        if (response.status !== 200) failures.push(`${childUrl.pathname} retornou ${response.status}`);
+        if (!/application\/xml|text\/xml/i.test(response.headers.get("content-type") ?? ""))
+          failures.push(`${childUrl.pathname} não retornou Content-Type XML.`);
+        if (!/<(?:urlset|sitemapindex)[\s>]/.test(body)) failures.push(`${childUrl.pathname} não contém XML de sitemap válido.`);
+      }
+    } catch (error) {
+      failures.push(`falha ao validar sitemaps filhos: ${error instanceof Error ? error.message : String(error)}`);
     }
   }
 }
