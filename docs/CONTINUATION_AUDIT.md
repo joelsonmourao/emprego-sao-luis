@@ -77,4 +77,8 @@ Ver `docs/COOLIFY_DEPLOY.md`: serviços web, worker, migrate, PostgreSQL, Valkey
 
 ## Confirmação
 
-**Não houve push nem deploy em produção nesta continuidade.**
+**Push da branch `codex/reconstrucao-astro` para `origin` realizado em 19/07/2026 (HEAD `8fe30ad`).**  
+**Tag local** `pre-staging-empregos-sao-luis-2026-07` criada (não enviada ao remoto nesta etapa).  
+**Não houve merge na main nem deploy em produção.**  
+**Deploy Coolify staging:** pendente de acesso do operador — ver `docs/STAGING_VALIDATION.md`.  
+**WIP `Logo/`:** permanece apenas local, fora do push.
