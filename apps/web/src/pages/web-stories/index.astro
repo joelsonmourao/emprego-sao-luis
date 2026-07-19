@@ -22,6 +22,9 @@ if (process.env.DATABASE_URL) {
       )
       .orderBy(desc(webStories.updatedAt))
       .limit(48);
+  } catch (error) {
+    console.error("[web-stories.index]", error instanceof Error ? error.message : error);
+    items = [];
   } finally {
     await connection.close();
   }

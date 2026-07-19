@@ -13,6 +13,10 @@ export async function listPublishedArticles(limit = 50, since?: Date, type?: Art
       since ? gt(articles.publishedAt, since) : undefined,
       Array.isArray(type) ? inArray(articles.type, type) : type ? eq(articles.type, type) : undefined
     )).orderBy(desc(articles.publishedAt)).limit(limit);
+  } catch (error) {
+    // Schema incompleto (migrate pendente) não pode derrubar home/blog.
+    console.error("[articles.listPublishedArticles]", error instanceof Error ? error.message : error);
+    return [];
   } finally { await connection.close(); }
 }
 
@@ -26,5 +30,8 @@ export async function findPublishedArticle(slug: string, type?: ArticleType | Ar
       Array.isArray(type) ? inArray(articles.type, type) : type ? eq(articles.type, type) : undefined
     )).limit(1);
     return result ?? null;
+  } catch (error) {
+    console.error("[articles.findPublishedArticle]", error instanceof Error ? error.message : error);
+    return null;
   } finally { await connection.close(); }
 }
