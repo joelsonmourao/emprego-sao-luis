@@ -29,7 +29,9 @@ async function login(page: Page) {
   await page.locator('input[name="email"]').fill(adminEmail!);
   await page.locator('input[name="password"]').fill(adminPassword!);
   await page.getByRole("button", { name: "Entrar" }).click();
-  await page.waitForURL(/\/admin(?:\?|$)/, { timeout: 20_000 });
+  await page.waitForURL((url) => url.pathname.startsWith("/admin") && !url.pathname.startsWith("/admin/login"), {
+    timeout: 20_000
+  });
 }
 
 test.describe.serial("CRUD administrativo no build de produção", () => {
@@ -150,10 +152,10 @@ test.describe.serial("CRUD administrativo no build de produção", () => {
           employmentType: "CLT",
           workplaceType: "hibrido",
           descriptionHtml:
-            "<p>Descrição completa da oportunidade criada pelo teste E2E, com atividades, requisitos, benefícios e instruções de candidatura.</p><h2>Atividades</h2><ul><li>Atender usuários</li><li>Documentar chamados</li></ul><h2>Requisitos e benefícios</h2><p>Boa comunicação, organização, vale-transporte e plano de saúde.</p>",
+            `<p>Vaga de analista criada pelo fluxo automatizado E2E, com atividades, requisitos, benefícios e instruções de candidatura para o cargo de ${title}.</p><h2>Atividades</h2><ul><li>Atender usuários</li><li>Documentar chamados</li></ul><h2>Requisitos e benefícios</h2><p>Boa comunicação, organização, vale-transporte e plano de saúde.</p>`,
           schedule: "Segunda a sexta",
           applicationUrl: "https://example.com/candidatura",
-          sourceName: "Teste E2E",
+          sourceName: "Site oficial da empresa",
           sourceUrl: "https://example.com/vaga",
           sourceEvidence: "Fluxo automatizado protegido",
           expiresAt,
@@ -174,8 +176,11 @@ test.describe.serial("CRUD administrativo no build de produção", () => {
           .locator('input[name="scheduledAt"]')
           .fill(new Date(Date.now() + 86_400_000).toISOString().slice(0, 16));
       }
+      if (status === "SCHEDULED" || status === "PUBLISHED") {
+        await page.locator('input[name="reviewConfirmed"]').check();
+      }
       await page.locator('form[action$="/update"] button').click();
-      await page.waitForURL(new RegExp(`/admin/vagas/${jobId}/editar\\?saved=1`));
+      await page.waitForURL(new RegExp(`/admin/vagas/${jobId}/editar\\?saved=1`), { timeout: 30_000 });
     }
 
     const publicJob = await page.goto(`/vagas/analista-e2e-${suffix}`, { waitUntil: "domcontentloaded" });
@@ -184,8 +189,9 @@ test.describe.serial("CRUD administrativo no build de produção", () => {
 
     await page.goto(`/admin/vagas/${jobId}/editar`);
     await page.locator('input[name="confidentialCompany"]').check();
+    await page.locator('input[name="reviewConfirmed"]').check();
     await page.locator('form[action$="/update"] button').click();
-    await page.waitForURL(new RegExp(`/admin/vagas/${jobId}/editar\\?saved=1`));
+    await page.waitForURL(new RegExp(`/admin/vagas/${jobId}/editar\\?saved=1`), { timeout: 30_000 });
     await page.goto(`/vagas/analista-e2e-${suffix}`, { waitUntil: "domcontentloaded" });
     await expect(page.getByText("Empresa confidencial", { exact: true })).toBeVisible();
     await expect(page.locator("body")).not.toContainText(`Empresa Interna E2E ${suffix}`);
@@ -193,6 +199,9 @@ test.describe.serial("CRUD administrativo no build de produção", () => {
     const structuredData = await page.locator('script[type="application/ld+json"]').allTextContents();
     expect(structuredData.join("\n")).not.toContain('"JobPosting"');
 
+    const longArticleHtml =
+      `<p>${"Conteúdo editorial completo criado para validar o fluxo administrativo de notícias locais em São Luís e no Maranhão. ".repeat(12)}</p>` +
+      "<p>O texto cobre contexto local, orientação ao candidato e referências verificáveis sem prometer aprovação automática de monetização.</p>";
     const articlePayload = await envelope<{ article: { id: string; slug: string } }>(
       await page.request.post("/api/admin/articles", {
         headers: { origin },
@@ -202,7 +211,7 @@ test.describe.serial("CRUD administrativo no build de produção", () => {
           title: articleTitle,
           slug: `noticia-e2e-${suffix}`,
           excerpt: "Resumo editorial criado pelo teste de produção.",
-          contentHtml: "<p>Conteúdo editorial completo criado para validar o fluxo administrativo.</p>",
+          contentHtml: longArticleHtml,
           coverImageUrl: media.url,
           coverImageAlt: "Imagem E2E com ALT atualizado",
           coverImageCaption: "Imagem editorial criada pelo teste automatizado.",
@@ -211,6 +220,10 @@ test.describe.serial("CRUD administrativo no build de produção", () => {
           tags: "e2e, auditoria",
           seoTitle: articleTitle,
           metaDescription: "Conteúdo temporário do teste administrativo protegido.",
+          editorialStage: "DRAFT",
+          editorialTemplate: "STANDARD",
+          sourceName: "Redação Empregos São Luís",
+          sourceUrl: "https://example.com/fonte-editorial",
           status: "DRAFT"
         }
       })
@@ -223,11 +236,23 @@ test.describe.serial("CRUD administrativo no build de produção", () => {
       .locator('input[name="scheduledAt"]')
       .fill(new Date(Date.now() + 86_400_000).toISOString().slice(0, 16));
     await page.locator('form[action*="/api/admin/articles/"] button').last().click();
-    await page.waitForURL(new RegExp(`/admin/conteudo/${article.id}/editar\\?saved=1`));
+    await page.waitForURL(new RegExp(`/admin/conteudo/${article.id}/editar\\?saved=1`), { timeout: 30_000 });
     await page.goto(`/admin/conteudo/${article.id}/editar`);
+    const reviewerValue = await page.locator('select[name="reviewerId"] option:not([value=""])').first().getAttribute("value");
+    expect(reviewerValue).toBeTruthy();
+    await page.locator('select[name="reviewerId"]').selectOption(reviewerValue!);
+    // Par pilar/cluster do seed editorial — evita combinações inválidas do primeiro option.
+    await page.locator('select[name="pillarId"]').selectOption({ label: "Vagas na Grande Ilha" });
+    await page.locator('select[name="clusterId"]').selectOption({ label: "Empregos em Raposa" });
+    await page.locator('select[name="editorialStage"]').selectOption("APPROVED");
+    await page.locator('input[name="primaryKeyword"]').fill("emprego em são luís");
+    await page
+      .locator('input[name="factCheckedAt"]')
+      .fill(new Date(Date.now() - 3_600_000).toISOString().slice(0, 16));
+    await page.locator('textarea[name="sources"]').fill("Redação Empregos São Luís | https://example.com/fonte-editorial");
     await page.locator('select[name="status"]').selectOption("PUBLISHED");
     await page.locator('form[action*="/api/admin/articles/"] button').last().click();
-    await page.waitForURL(new RegExp(`/admin/conteudo/${article.id}/editar\\?saved=1`));
+    await page.waitForURL(new RegExp(`/admin/conteudo/${article.id}/editar\\?saved=1`), { timeout: 30_000 });
     const publicArticle = await page.goto(`/noticias/${article.slug}`, { waitUntil: "domcontentloaded" });
     expect(publicArticle?.status()).toBe(200);
 
@@ -240,13 +265,13 @@ test.describe.serial("CRUD administrativo no build de produção", () => {
           "Título público": `Auxiliar Importado ${suffix}`,
           Empresa: `Empresa Interna E2E ${suffix}`,
           Categoria: category.name,
-          Cidade: city.name,
+          Cidade: "São Luís",
           UF: "MA",
           Descrição:
-            "Descrição completa e válida da oportunidade importada pelo teste E2E do painel administrativo.",
-          Resumo: "Resumo completo da vaga importada pelo teste E2E.",
+            "Vaga de auxiliar importado com descrição completa e válida da oportunidade no painel administrativo, incluindo requisitos, benefícios e orientação ao candidato auxiliar em São Luís.",
+          Resumo: "Resumo completo da vaga de auxiliar importado pelo teste E2E em São Luís.",
           "Link de candidatura": "https://example.com/importada",
-          Fonte: "Teste E2E",
+          Fonte: "Site oficial da empresa",
           Validade: expiresAt,
           "Código externo": `IMPORT-${suffix}`
         }
@@ -284,8 +309,8 @@ test.describe.serial("CRUD administrativo no build de produção", () => {
           map_state: "UF",
           map_description: "Descrição",
           map_summary: "Resumo",
-          map_applyUrl: "Link de candidatura",
-          map_source: "Fonte",
+          map_applicationUrl: "Link de candidatura",
+          map_sourceName: "Fonte",
           map_expiresAt: "Validade",
           map_externalId: "Código externo"
         }
@@ -296,7 +321,7 @@ test.describe.serial("CRUD administrativo no build de produção", () => {
         async () => {
           const response = await page.request.get(`/admin/vagas/importar?batch=${batchId}&step=resultado`);
           const body = await response.text();
-          return body.includes("COMPLETED") && body.includes("VALIDATED");
+          return body.includes("COMPLETED") && body.includes("Executar lote validado");
         },
         { timeout: 60_000 }
       )
