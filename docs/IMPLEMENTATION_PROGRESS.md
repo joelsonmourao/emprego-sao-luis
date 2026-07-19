@@ -76,6 +76,7 @@ Trabalho local ainda **não commitado** na branch `codex/reconstrucao-astro`.
 - Docs novas: `CONTINUATION_AUDIT.md`, `BLOG_FANTASMA_ADAPTADO.md`, `ROTA_DA_APROVACAO.md`, `MONETIZACAO_B2B.md`, `CANDIDATURA_MULTICANAL.md`, `IMPORTACAO_DE_VAGAS.md`, `DISCOVER_NEWS_WEBSTORIES.md`.
 - Pendências externas: Publisher ID AdSense, gateway de pagamento, deploy Coolify / produção.
 - Validação isolada (`es-e2e`, 19/07/2026): `db:audit-schema` ok (65 tabelas / 816 colunas), E2E **121/121**, placeholders E2E = 0, AdSense desativado no HTML.
+- Homologação staging: noindex global (`APP_ENV=staging` / `FORCE_NOINDEX`); ver `docs/STAGING_VALIDATION.md`. Deploy Coolify staging pendente de acesso do operador. `Logo/` permanece WIP local.
 
 ## Checkpoint — continuação julho/2026
 

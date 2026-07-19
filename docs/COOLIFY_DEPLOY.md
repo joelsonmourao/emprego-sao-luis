@@ -42,13 +42,21 @@ Nunca grave segredos no Git. Configure no Coolify por serviço.
 
 | Variável | Uso |
 |----------|-----|
-| `APP_ENV` | `production` |
-| `SITE_URL` | URL pública canônica (ex.: `https://empregossaoluis.com.br`) |
-| `DATABASE_URL` | PostgreSQL interno |
-| `REDIS_URL` | Valkey/Redis interno |
-| `AUTH_SECRET` | Sessões e tokens |
+| `APP_ENV` | `staging` no ambiente de homologação; `production` só em produção |
+| `FORCE_NOINDEX` | `true` em staging (noindex global independente das páginas) |
+| `STAGING_NOINDEX` | alias opcional de `FORCE_NOINDEX` |
+| `SITE_URL` | URL pública **deste** ambiente (staging ≠ produção) |
+| `DATABASE_URL` | PostgreSQL interno **deste** ambiente |
+| `REDIS_URL` | Valkey/Redis interno **deste** ambiente |
+| `AUTH_SECRET` | Sessões e tokens (segredo exclusivo por ambiente) |
 | `UPLOADS_DIR` | `/app/data` |
-| `COOKIE_SECURE` | `true` em produção |
+| `COOKIE_SECURE` | `true` em HTTPS |
+
+### Staging vs produção
+
+- Staging: branch `codex/reconstrucao-astro`, banco/Valkey/volume/segredos **separados**, `APP_ENV=staging`, AdSense off, Indexing/IndexNow/Meta off, `robots.txt` com `Disallow: /`.
+- Nunca reutilize `AUTH_SECRET` ou `DATABASE_URL` de produção no staging.
+- Detalhes e checklist: [STAGING_VALIDATION.md](./STAGING_VALIDATION.md).
 
 ### Web (público / build)
 

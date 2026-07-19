@@ -9,6 +9,7 @@ import { BRAND_ASSETS } from "../lib/brand-assets";
 import { getBrandIdentity } from "../lib/brand/identity-service";
 import { getSeoSettings } from "../lib/seo-settings";
 import { getVisualIdentity } from "../lib/visual-identity";
+import { isStagingLikeEnvironment, stagingRobotsDirective } from "../lib/runtime-env";
 
 interface Props {
   title: string;
@@ -26,11 +27,16 @@ interface Props {
 const identity = await getVisualIdentity();
 const brand = await getBrandIdentity();
 const seo = await getSeoSettings();
+const stagingLike = isStagingLikeEnvironment();
 const { title, description = seo.defaultDescription, robots = seo.robotsDefault, canonical, ogImage = identity.ogImageUrl ?? seo.og.image, breadcrumbs, noindex = false, pageSchemaType = "WebPage", schemas = [], disableSeoGraph = false } = Astro.props;
 const pageTitle = title.includes(seo.titleSuffix) ? title : `${title} — ${seo.titleSuffix}`;
 const canonicalUrl = canonical ? new URL(canonical, Astro.site).toString() : new URL(Astro.url.pathname, Astro.site).toString();
 const consentChoice = Astro.cookies.get("es_consent_ads")?.value;
-const adsEnabled = import.meta.env.PUBLIC_ADSENSE_ENABLED === "true" && Boolean(import.meta.env.PUBLIC_ADSENSE_CLIENT_ID) && consentChoice === "yes";
+const adsEnabled =
+  !stagingLike &&
+  import.meta.env.PUBLIC_ADSENSE_ENABLED === "true" &&
+  Boolean(import.meta.env.PUBLIC_ADSENSE_CLIENT_ID) &&
+  consentChoice === "yes";
 const siteUrl = Astro.site?.toString() ?? process.env.SITE_URL ?? "https://empregossaoluis.com.br";
 const og = buildOpenGraphTags({ title: pageTitle, description, url: canonicalUrl, type: seo.og.type, siteName: seo.og.siteName, locale: seo.og.locale, ...(ogImage ? { image: ogImage } : {}) });
 const twitter = buildTwitterTags({ title: pageTitle, description, card: seo.twitter.card, ...(seo.twitter.site ? { site: seo.twitter.site } : {}), ...(seo.twitter.creator ? { creator: seo.twitter.creator } : {}), ...(ogImage ? { image: ogImage } : {}) });
@@ -57,12 +63,18 @@ const pageNode = {
   description,
   isPartOf: { "@id": `${siteUrl.replace(/\/$/, "")}#website` }
 };
-const seoGraph = disableSeoGraph ? null : {
+const seoGraph = disableSeoGraph || stagingLike ? null : {
   "@context": "https://schema.org",
   "@graph": [organizationNode, websiteNode, pageNode, ...(breadcrumbSchema ? [withoutContext(breadcrumbSchema)] : []), ...schemas.map(withoutContext)]
 };
 const currentPath = Astro.url.pathname;
-const robotsValue = noindex ? "noindex,follow" : robots.includes("max-image-preview") ? robots : `${robots},max-image-preview:large`;
+const robotsValue = stagingLike
+  ? stagingRobotsDirective()
+  : noindex
+    ? "noindex,follow"
+    : robots.includes("max-image-preview")
+      ? robots
+      : `${robots},max-image-preview:large`;
 ---
 <!doctype html>
 <html lang={seo.language}>
@@ -72,14 +84,14 @@ const robotsValue = noindex ? "noindex,follow" : robots.includes("max-image-prev
     <meta name="description" content={description} />
     <meta name="robots" content={robotsValue} />
     <meta name="generator" content={Astro.generator} />
-    {seo.verifications.google && <meta name="google-site-verification" content={seo.verifications.google} />}
-    {seo.verifications.bing && <meta name="msvalidate.01" content={seo.verifications.bing} />}
+    {!stagingLike && seo.verifications.google && <meta name="google-site-verification" content={seo.verifications.google} />}
+    {!stagingLike && seo.verifications.bing && <meta name="msvalidate.01" content={seo.verifications.bing} />}
     <link rel="icon" href={identity.faviconUrl ?? BRAND_ASSETS.faviconIco} sizes="any" />
     <link rel="icon" href={BRAND_ASSETS.faviconSvg} type="image/svg+xml" />
     <link rel="apple-touch-icon" href={identity.appleTouchIconUrl ?? BRAND_ASSETS.appleTouchIcon} />
     <link rel="manifest" href="/api/brand-manifest.webmanifest" />
     <meta name="theme-color" content={identity.themeColor ?? seo.themeColor ?? BRAND_ASSETS.themeColor} />
-    {!disableSeoGraph && <link rel="canonical" href={canonicalUrl} />}
+    {!disableSeoGraph && !stagingLike && <link rel="canonical" href={canonicalUrl} />}
     <title>{pageTitle}</title>
     <style is:inline set:html={cssVariablesFromIdentity(identity, brand.palette)} />
     {Object.entries(og).map(([key, value]) => <meta property={key} content={value} />)}
