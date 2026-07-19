@@ -1,13 +1,16 @@
 ---
 import { eq } from "drizzle-orm";
-import { articles, authors, createDatabase } from "@es/db";
+import { articles, authors, contentClusters, contentPillars, createDatabase, users } from "@es/db";
 import AdminLayout from "../../../../layouts/AdminLayout.astro";
 
 if (!process.env.DATABASE_URL) return Astro.redirect("/admin/conteudo");
 const connection = createDatabase(process.env.DATABASE_URL);
-const [articleRows, authorRows] = await Promise.all([
+const [articleRows, authorRows, reviewerRows, pillarRows, clusterRows] = await Promise.all([
   connection.db.select().from(articles).where(eq(articles.id, Astro.params.id!)).limit(1),
-  connection.db.select().from(authors).orderBy(authors.name)
+  connection.db.select().from(authors).orderBy(authors.name),
+  connection.db.select({ id: users.id, email: users.email }).from(users).orderBy(users.email),
+  connection.db.select().from(contentPillars).orderBy(contentPillars.name),
+  connection.db.select().from(contentClusters).orderBy(contentClusters.name)
 ]);
 await connection.close();
 const article = articleRows[0];
@@ -26,6 +29,14 @@ const localDate = (value: Date | null) => value ? new Date(value.getTime() - val
         <label>Autor<select class="mt-1 w-full rounded-lg border p-3" name="authorId">{authorRows.map((author)=><option value={author.id} selected={article.authorId===author.id}>{author.name}</option>)}</select></label>
         <label>Status<select class="mt-1 w-full rounded-lg border p-3" name="status">{["DRAFT","PENDING_REVIEW","SCHEDULED","PUBLISHED","ARCHIVED"].map((value)=><option value={value} selected={article.status===value}>{value}</option>)}</select></label>
       </div>
+      <div class="grid gap-4 md:grid-cols-3">
+        <label>Revisor<select class="mt-1 w-full rounded-lg border p-3" name="reviewerId"><option value="">Pendente</option>{reviewerRows.map((item)=><option value={item.id} selected={article.reviewerId===item.id}>{item.email}</option>)}</select></label>
+        <label>Pilar<select class="mt-1 w-full rounded-lg border p-3" name="pillarId"><option value="">Pendente</option>{pillarRows.map((item)=><option value={item.id} selected={article.pillarId===item.id}>{item.name}</option>)}</select></label>
+        <label>Cluster<select class="mt-1 w-full rounded-lg border p-3" name="clusterId"><option value="">Pendente</option>{clusterRows.map((item)=><option value={item.id} selected={article.clusterId===item.id}>{item.name}</option>)}</select></label>
+        <label>Etapa editorial<select class="mt-1 w-full rounded-lg border p-3" name="editorialStage">{["PITCH","SOURCES","BRIEF","DRAFT","FACT_REVIEW","EDITORIAL_REVIEW","INTERNAL_LINKS","SEO","APPROVED"].map((value)=><option value={value} selected={article.editorialStage===value}>{value}</option>)}</select></label>
+        <label>Intenção de busca<select class="mt-1 w-full rounded-lg border p-3" name="searchIntent">{["INFORMATIONAL","LOCAL","TRANSACTIONAL","NAVIGATIONAL"].map((value)=><option value={value} selected={article.searchIntent===value}>{value}</option>)}</select></label>
+        <label>Palavra-chave principal<input class="mt-1 w-full rounded-lg border p-3" name="primaryKeyword" value={article.primaryKeyword ?? ""}/></label>
+      </div>
       <label>Título<input class="mt-1 w-full rounded-lg border p-3" name="title" value={article.title} required/></label>
       <label>Subtítulo<input class="mt-1 w-full rounded-lg border p-3" name="subtitle" value={article.subtitle ?? ""}/></label>
       <label>Slug<input class="mt-1 w-full rounded-lg border p-3" name="slug" value={article.slug} required/></label>
@@ -40,6 +51,11 @@ const localDate = (value: Date | null) => value ? new Date(value.getTime() - val
         <label>Tags<input class="mt-1 w-full rounded-lg border p-3" name="tags" value={(article.tags as string[]).join(", ")}/></label>
         <label>Fonte<input class="mt-1 w-full rounded-lg border p-3" name="sourceName" value={article.sourceName ?? ""}/></label>
         <label>URL da fonte<input class="mt-1 w-full rounded-lg border p-3" name="sourceUrl" value={article.sourceUrl ?? ""}/></label>
+        <label class="md:col-span-2">Fontes adicionais (Nome | URL, uma por linha)<textarea class="mt-1 min-h-28 w-full rounded-lg border p-3" name="sources">{(article.sources as Array<{name?:string|null;url?:string|null}>).map((item)=>`${item.name ?? ""} | ${item.url ?? ""}`).join("\n")}</textarea></label>
+        <label>Revisão factual<input class="mt-1 w-full rounded-lg border p-3" name="factCheckedAt" type="datetime-local" value={localDate(article.factCheckedAt)}/></label>
+        <label>Notas da revisão factual<input class="mt-1 w-full rounded-lg border p-3" name="factReviewNotes" value={article.factReviewNotes ?? ""}/></label>
+        <label>Artigos relacionados<input class="mt-1 w-full rounded-lg border p-3" name="relatedArticleIds" value={(article.relatedArticleIds as string[]).join(", ")}/></label>
+        <label>Vagas relacionadas<input class="mt-1 w-full rounded-lg border p-3" name="relatedJobIds" value={(article.relatedJobIds as string[]).join(", ")}/></label>
         <label>Agendar<input class="mt-1 w-full rounded-lg border p-3" name="scheduledAt" type="datetime-local" value={localDate(article.scheduledAt)}/></label>
         <label>Expira<input class="mt-1 w-full rounded-lg border p-3" name="expiresAt" type="datetime-local" value={localDate(article.expiresAt)}/></label>
         <label>Título SEO<input class="mt-1 w-full rounded-lg border p-3" name="seoTitle" value={article.seoTitle ?? ""}/></label>
@@ -47,6 +63,9 @@ const localDate = (value: Date | null) => value ? new Date(value.getTime() - val
         <label>Canônica opcional<input class="mt-1 w-full rounded-lg border p-3" name="canonicalUrl" value={article.canonicalUrl ?? ""}/></label>
       </div>
       <label><input class="mr-2" name="featured" type="checkbox" checked={article.featured}/>Destaque</label>
+      <label><input class="mr-2" name="aiAssisted" type="checkbox" checked={article.aiAssisted}/>IA auxiliou no briefing ou rascunho</label>
+      <label><input class="mr-2" name="sponsoredContent" type="checkbox" checked={article.sponsoredContent}/>Conteúdo patrocinado</label>
+      <label>Identificação do patrocínio<input class="mt-1 w-full rounded-lg border p-3" name="sponsorshipDisclosure" value={article.sponsorshipDisclosure ?? ""}/></label>
       <label>Notas internas<textarea class="mt-1 w-full rounded-lg border p-3" name="internalNotes">{article.internalNotes}</textarea></label>
       <button class="rounded-xl bg-red-700 p-4 font-bold text-white">Salvar versão {article.version + 1}</button>
     </form>

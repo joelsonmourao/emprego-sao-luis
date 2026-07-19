@@ -9,6 +9,7 @@ function validForm() {
   form.set("excerpt", "Resumo completo da notícia publicada.");
   form.set("contentHtml", "<p>Conteúdo editorial completo para publicação.</p>");
   form.set("status", "DRAFT");
+  form.set("editorialStage", "DRAFT");
   return form;
 }
 
