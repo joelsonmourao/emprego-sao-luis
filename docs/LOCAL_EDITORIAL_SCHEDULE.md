@@ -1,44 +1,40 @@
-# Pacote editorial local (45 posts em ~2 semanas)
+# Pacote editorial local (45 posts)
 
-## Onde atualizar conteúdo (um só lugar)
+## Situação honesta
 
-**Admin** → Notícias e guias / Calendário editorial.  
-O serviço **migrate** só aplica migrations de banco — **não** cria nem reescreve posts.
+- Posts ficam **SCHEDULED** até o horário (ou até rodar o activate).
+- Capas fotográficas: `npm run fetch:sl-local-covers` → `/covers/sl-local/`.
+- **Migrate não publica conteúdo.** Atualize no **admin** ou rode o activate **uma vez** no Terminal.
 
-## Seed (só uma vez, se ainda não rodou)
+## Colocar no ar (uma vez no Coolify Terminal)
 
-Capas no deploy do **web** (`/covers/sl-local/`). Depois, **uma vez** no Terminal do Coolify (container que tenha o script + `DATABASE_URL`), não por variável permanente no migrate:
+1. Redeploy **web** (leva as capas novas).
+2. Confirme **worker** ligado.
+3. No Terminal (container com script + `DATABASE_URL`), **uma vez**:
 
 ```sh
 cd /app
 export ADSENSE_EDITORIAL_ALLOW_PRODUCTION=1
 export SITE_URL=https://empregossaoluis.com.br
-node scripts/seed-local-editorial-schedule.mjs --write --i-understand-production
+# opcional: quantos publicar agora (default 3)
+export SL_LOCAL_PUBLISH_NOW=3
+node scripts/activate-sl-local-editorial.mjs --write --i-understand-production
 ```
 
-Se os 45 `sl-local-*` já existem, o script **não altera nada**.
+Isso:
+- publica **3** posts agora (aparecem em `/blog` e `/noticias`)
+- agenda o restante ~3/dia
+- aplica créditos/URLs das capas de `credits.json`
 
-Corrigir título SEO (≤70) / URL de capa em lote **só se pedir**:
+Sem `--write` = dry-run.
 
-```sh
-node scripts/seed-local-editorial-schedule.mjs --write --i-understand-production --fix-seo
-```
+## Apagar envs do migrate
 
-## Coolify — o que apagar nas envs do migrate
+Não use `RUN_SEED_*` editorial no migrate. Remova se ainda existirem.
 
-Remova se ainda existirem (evitam loop/restart):
-
-- `RUN_SEED_LOCAL_EDITORIAL`
-- `RUN_SEED_ADSENSE_EDITORIAL`
-- `RUN_UNPUBLISH_ADSENSE_EDITORIAL`
-- `ADSENSE_EDITORIAL_ALLOW_PRODUCTION` (se só servia para isso)
-
-## Gerar capas (dev)
+## Dev
 
 ```powershell
-npm run generate:sl-local-covers
+npm run fetch:sl-local-covers
+npm run activate:local-editorial
 ```
-
-## Pedido AdSense
-
-Só após a janela de publicação, Rota **Pronto**, institucionais ok — anúncios ainda off.

@@ -1,0 +1,407 @@
+[
+  {
+    "slug": "sl-local-01-golpe-vagas",
+    "photoId": "1521737711867-e3b97375f902",
+    "source": "unsplash",
+    "photographer": "LinkedIn Sales Solutions",
+    "credit": "Foto: LinkedIn Sales Solutions / Unsplash",
+    "caption": "Imagem ilustrativa para “Como buscar vagas em São Luís sem cair em golpe”.",
+    "alt": "Capa: Como buscar vagas em São Luís sem cair em golpe"
+  },
+  {
+    "slug": "sl-local-02-clt-temporario",
+    "photoId": "1454165804606-c3d57bc86b40",
+    "source": "unsplash",
+    "photographer": "Scott Graham",
+    "credit": "Foto: Scott Graham / Unsplash",
+    "caption": "Imagem ilustrativa para “CLT ou temporário na Grande Ilha: o que comparar antes de candidatar”.",
+    "alt": "Capa: CLT ou temporário na Grande Ilha: o que comparar antes de candidatar"
+  },
+  {
+    "slug": "sl-local-03-bairros-oportunidades",
+    "photoId": "1551836022-d5d88e9218df",
+    "source": "unsplash",
+    "photographer": "Amy Hirschi",
+    "credit": "Foto: Amy Hirschi / Unsplash",
+    "caption": "Imagem ilustrativa para “Bairros e eixos com mais movimentação de vagas em São Luís”.",
+    "alt": "Capa: Bairros e eixos com mais movimentação de vagas em São Luís"
+  },
+  {
+    "slug": "sl-local-04-curriculo-atendimento",
+    "photoId": "1486312338219-ce68d2c6f44d",
+    "source": "unsplash",
+    "photographer": "Glenn Carstens-Peters",
+    "credit": "Foto: Glenn Carstens-Peters / Unsplash",
+    "caption": "Imagem ilustrativa para “Currículo para vagas de atendimento no Maranhão”.",
+    "alt": "Capa: Currículo para vagas de atendimento no Maranhão"
+  },
+  {
+    "slug": "sl-local-05-whatsapp-seguro",
+    "photoId": "1556761175-5973dc0f32e7",
+    "source": "unsplash",
+    "photographer": "LinkedIn Sales Solutions",
+    "credit": "Foto: LinkedIn Sales Solutions / Unsplash",
+    "caption": "Imagem ilustrativa para “WhatsApp na candidatura: como se apresentar com segurança”.",
+    "alt": "Capa: WhatsApp na candidatura: como se apresentar com segurança"
+  },
+  {
+    "slug": "sl-local-06-primeiro-emprego",
+    "photoId": "1522202176988-66273c2fd55f",
+    "source": "unsplash",
+    "photographer": "Brooke Cagle",
+    "credit": "Foto: Brooke Cagle / Unsplash",
+    "caption": "Imagem ilustrativa para “Primeiro emprego em São Luís: passos práticos nesta semana”.",
+    "alt": "Capa: Primeiro emprego em São Luís: passos práticos nesta semana"
+  },
+  {
+    "slug": "sl-local-07-presencial-hibrido",
+    "photoId": "1516321318423-f06f85e504b3",
+    "source": "unsplash",
+    "photographer": "Compare Fibre",
+    "credit": "Foto: Compare Fibre / Unsplash",
+    "caption": "Imagem ilustrativa para “Vagas presenciais versus híbridas na capital maranhense”.",
+    "alt": "Capa: Vagas presenciais versus híbridas na capital maranhense"
+  },
+  {
+    "slug": "sl-local-08-documentos-admissao",
+    "photoId": "1586281380349-632531db7ed4",
+    "source": "unsplash",
+    "photographer": "Resume Genius",
+    "credit": "Foto: Resume Genius / Unsplash",
+    "caption": "Imagem ilustrativa para “Documentos que empresas pedem com frequência no MA”.",
+    "alt": "Capa: Documentos que empresas pedem com frequência no MA"
+  },
+  {
+    "slug": "sl-local-09-ler-vaga",
+    "photoId": "1560250097-0b93528c311a",
+    "source": "unsplash",
+    "photographer": "LinkedIn Sales Solutions",
+    "credit": "Foto: LinkedIn Sales Solutions / Unsplash",
+    "caption": "Imagem ilustrativa para “Como ler uma vaga e evitar descrição enganosa”.",
+    "alt": "Capa: Como ler uma vaga e evitar descrição enganosa"
+  },
+  {
+    "slug": "sl-local-10-rotina-30min",
+    "photoId": "1573496359142-b8d87734a5a2",
+    "source": "unsplash",
+    "photographer": "Christina Wocintechchat",
+    "credit": "Foto: Christina Wocintechchat / Unsplash",
+    "caption": "Imagem ilustrativa para “Rotina de busca: 30 minutos por dia em São Luís”.",
+    "alt": "Capa: Rotina de busca: 30 minutos por dia em São Luís"
+  },
+  {
+    "slug": "sl-local-11-cursos-entrevistas",
+    "photoId": "1557804506-669a67965ba0",
+    "source": "unsplash",
+    "photographer": "Mimi Thian",
+    "credit": "Foto: Mimi Thian / Unsplash",
+    "caption": "Imagem ilustrativa para “Cursos gratuitos e preparação para entrevistas locais”.",
+    "alt": "Capa: Cursos gratuitos e preparação para entrevistas locais"
+  },
+  {
+    "slug": "sl-local-12-transporte-pontualidade",
+    "photoId": "1600880292203-757bb62b4baf",
+    "source": "unsplash",
+    "photographer": "Jason Goodman",
+    "credit": "Foto: Jason Goodman / Unsplash",
+    "caption": "Imagem ilustrativa para “Transporte e pontualidade: planejar o deslocamento até o trabalho”.",
+    "alt": "Capa: Transporte e pontualidade: planejar o deslocamento até o trabalho"
+  },
+  {
+    "slug": "sl-local-13-comercio-ilha",
+    "photoId": "1552664730-d307ca884978",
+    "source": "unsplash",
+    "photographer": "Headway",
+    "credit": "Foto: Headway / Unsplash",
+    "caption": "Imagem ilustrativa para “Vagas no comércio da ilha: o que costuma ser avaliado”.",
+    "alt": "Capa: Vagas no comércio da ilha: o que costuma ser avaliado"
+  },
+  {
+    "slug": "sl-local-14-email-candidatura",
+    "photoId": "1507679799987-c73779587ccf",
+    "source": "unsplash",
+    "photographer": "Hunter Johnson",
+    "credit": "Foto: Hunter Johnson / Unsplash",
+    "caption": "Imagem ilustrativa para “E-mail de candidatura curto e claro (modelo para São Luís)”.",
+    "alt": "Capa: E-mail de candidatura curto e claro (modelo para São Luís)"
+  },
+  {
+    "slug": "sl-local-15-pagamento-vaga",
+    "photoId": "1517245386807-bb43f82c33c4",
+    "source": "unsplash",
+    "photographer": "Brooke Cagle",
+    "credit": "Foto: Brooke Cagle / Unsplash",
+    "caption": "Imagem ilustrativa para “Quando desconfiar de pedido de pagamento para garantir vaga”.",
+    "alt": "Capa: Quando desconfiar de pedido de pagamento para garantir vaga"
+  },
+  {
+    "slug": "sl-local-16-linkedin-local",
+    "photoId": "1556742049-0cfed4f6a45d",
+    "source": "unsplash",
+    "photographer": "Blake Wisz",
+    "credit": "Foto: Blake Wisz / Unsplash",
+    "caption": "Imagem ilustrativa para “Atualizar LinkedIn e perfil local sem inventar experiência”.",
+    "alt": "Capa: Atualizar LinkedIn e perfil local sem inventar experiência"
+  },
+  {
+    "slug": "sl-local-17-entrevista-presencial",
+    "photoId": "1556740758-90decb4dfe80",
+    "source": "picsum",
+    "photographer": "Picsum Photos",
+    "credit": "Foto: Picsum Photos",
+    "caption": "Imagem ilustrativa para “Checklist da entrevista presencial em São Luís”.",
+    "alt": "Capa: Checklist da entrevista presencial em São Luís"
+  },
+  {
+    "slug": "sl-local-18-como-portal-funciona",
+    "photoId": "1441986300917-64674bd600d8",
+    "source": "unsplash",
+    "photographer": "Austin Distel",
+    "credit": "Foto: Austin Distel / Unsplash",
+    "caption": "Imagem ilustrativa para “Como o Empregos São Luís organiza vagas para o candidato”.",
+    "alt": "Capa: Como o Empregos São Luís organiza vagas para o candidato"
+  },
+  {
+    "slug": "sl-local-19-auxiliar-administrativo",
+    "photoId": "1556740738-b6a63e27c4df",
+    "source": "unsplash",
+    "photographer": "Blake Wisz",
+    "credit": "Foto: Blake Wisz / Unsplash",
+    "caption": "Imagem ilustrativa para “Como se preparar para vagas de auxiliar administrativo em São Luís”.",
+    "alt": "Capa: Como se preparar para vagas de auxiliar administrativo em São Luís"
+  },
+  {
+    "slug": "sl-local-20-operador-caixa",
+    "photoId": "1472851294608-73414d2799e8",
+    "source": "picsum",
+    "photographer": "Picsum Photos",
+    "credit": "Foto: Picsum Photos",
+    "caption": "Imagem ilustrativa para “Operador de caixa na Grande Ilha: rotina, metas e postura”.",
+    "alt": "Capa: Operador de caixa na Grande Ilha: rotina, metas e postura"
+  },
+  {
+    "slug": "sl-local-21-experiencia-informal",
+    "photoId": "1497366216548-37526070297c",
+    "source": "unsplash",
+    "photographer": "Nastuh Abootalebi",
+    "credit": "Foto: Nastuh Abootalebi / Unsplash",
+    "caption": "Imagem ilustrativa para “Como colocar experiência informal no currículo sem mentir”.",
+    "alt": "Capa: Como colocar experiência informal no currículo sem mentir"
+  },
+  {
+    "slug": "sl-local-22-jovem-aprendiz-contexto",
+    "photoId": "1497366754035-f200968a6e72",
+    "source": "unsplash",
+    "photographer": "Nastuh Abootalebi",
+    "credit": "Foto: Nastuh Abootalebi / Unsplash",
+    "caption": "Imagem ilustrativa para “Jovem profissional em São Luís: rotina de estudos e trabalho”.",
+    "alt": "Capa: Jovem profissional em São Luís: rotina de estudos e trabalho"
+  },
+  {
+    "slug": "sl-local-23-servicos-gerais",
+    "photoId": "1497215728101-536fc9f2276d",
+    "source": "picsum",
+    "photographer": "Picsum Photos",
+    "credit": "Foto: Picsum Photos",
+    "caption": "Imagem ilustrativa para “Vagas de serviços gerais: o que perguntar antes de aceitar”.",
+    "alt": "Capa: Vagas de serviços gerais: o que perguntar antes de aceitar"
+  },
+  {
+    "slug": "sl-local-24-recepcionista",
+    "photoId": "1486406146926-c627a92ad1ab",
+    "source": "unsplash",
+    "photographer": "Sean Pollock",
+    "credit": "Foto: Sean Pollock / Unsplash",
+    "caption": "Imagem ilustrativa para “Recepcionista em clínicas e escritórios: perfil pedido na capital”.",
+    "alt": "Capa: Recepcionista em clínicas e escritórios: perfil pedido na capital"
+  },
+  {
+    "slug": "sl-local-25-estoque-loja",
+    "photoId": "1460925895917-afdab827c52f",
+    "source": "unsplash",
+    "photographer": "Carlos Muza",
+    "credit": "Foto: Carlos Muza / Unsplash",
+    "caption": "Imagem ilustrativa para “Estoque e organização em loja: habilidades que abrem vaga”.",
+    "alt": "Capa: Estoque e organização em loja: habilidades que abrem vaga"
+  },
+  {
+    "slug": "sl-local-26-entrevista-online",
+    "photoId": "1553877522-43269d4ea984",
+    "source": "unsplash",
+    "photographer": "You X Ventures",
+    "credit": "Foto: You X Ventures / Unsplash",
+    "caption": "Imagem ilustrativa para “Entrevista por videochamada: checklist para candidatos no MA”.",
+    "alt": "Capa: Entrevista por videochamada: checklist para candidatos no MA"
+  },
+  {
+    "slug": "sl-local-27-salario-negociar",
+    "photoId": "1519389950473-47ba0277781c",
+    "source": "unsplash",
+    "photographer": "Marvin Meyer",
+    "credit": "Foto: Marvin Meyer / Unsplash",
+    "caption": "Imagem ilustrativa para “Como falar de pretensão salarial sem se prejudicar”.",
+    "alt": "Capa: Como falar de pretensão salarial sem se prejudicar"
+  },
+  {
+    "slug": "sl-local-28-demissao-proxima",
+    "photoId": "1531482615713-2afd69097998",
+    "source": "unsplash",
+    "photographer": "Christina Wocintechchat",
+    "credit": "Foto: Christina Wocintechchat / Unsplash",
+    "caption": "Imagem ilustrativa para “Está empregado e buscando outra vaga? Como fazer com ética”.",
+    "alt": "Capa: Está empregado e buscando outra vaga? Como fazer com ética"
+  },
+  {
+    "slug": "sl-local-29-pcd-inclusao",
+    "photoId": "1573164713714-d95e436ab8d6",
+    "source": "unsplash",
+    "photographer": "Christina Wocintechchat",
+    "credit": "Foto: Christina Wocintechchat / Unsplash",
+    "caption": "Imagem ilustrativa para “Candidatura inclusiva: direitos e preparação sem estigma”.",
+    "alt": "Capa: Candidatura inclusiva: direitos e preparação sem estigma"
+  },
+  {
+    "slug": "sl-local-30-mulheres-mercado",
+    "photoId": "1596524430615-b46475ddff6e",
+    "source": "unsplash",
+    "photographer": "Christina Wocintechchat",
+    "credit": "Foto: Christina Wocintechchat / Unsplash",
+    "caption": "Imagem ilustrativa para “Mulheres no mercado de São Luís: segurança na candidatura”.",
+    "alt": "Capa: Mulheres no mercado de São Luís: segurança na candidatura"
+  },
+  {
+    "slug": "sl-local-31-retorno-emprego",
+    "photoId": "1611224923853-80b023f02d71",
+    "source": "unsplash",
+    "photographer": "Windows",
+    "credit": "Foto: Windows / Unsplash",
+    "caption": "Imagem ilustrativa para “Voltando ao mercado após um tempo fora: roteiro de 14 dias”.",
+    "alt": "Capa: Voltando ao mercado após um tempo fora: roteiro de 14 dias"
+  },
+  {
+    "slug": "sl-local-32-freelancer-local",
+    "photoId": "1522071820081-009f0129c71c",
+    "source": "unsplash",
+    "photographer": "Austin Distel",
+    "credit": "Foto: Austin Distel / Unsplash",
+    "caption": "Imagem ilustrativa para “Serviços avulsos e freela local: organizar propostas com clareza”.",
+    "alt": "Capa: Serviços avulsos e freela local: organizar propostas com clareza"
+  },
+  {
+    "slug": "sl-local-33-seguranca-candidato",
+    "photoId": "1556761175-b39cc9c0f0b6",
+    "source": "picsum",
+    "photographer": "Picsum Photos",
+    "credit": "Foto: Picsum Photos",
+    "caption": "Imagem ilustrativa para “Segurança do candidato: checklist rápido antes de enviar dados”.",
+    "alt": "Capa: Segurança do candidato: checklist rápido antes de enviar dados"
+  },
+  {
+    "slug": "sl-local-34-ferias-direitos",
+    "photoId": "1563986768609-322da13575f3",
+    "source": "unsplash",
+    "photographer": "Christin Hume",
+    "credit": "Foto: Christin Hume / Unsplash",
+    "caption": "Imagem ilustrativa para “Férias, folgas e escala: perguntas básicas na admissão”.",
+    "alt": "Capa: Férias, folgas e escala: perguntas básicas na admissão"
+  },
+  {
+    "slug": "sl-local-35-soft-skills",
+    "photoId": "1516321497487-e849bc9f4b8e",
+    "source": "picsum",
+    "photographer": "Picsum Photos",
+    "credit": "Foto: Picsum Photos",
+    "caption": "Imagem ilustrativa para “Postura profissional que empregadores locais mais citam”.",
+    "alt": "Capa: Postura profissional que empregadores locais mais citam"
+  },
+  {
+    "slug": "sl-local-36-indicacao",
+    "photoId": "1434030216411-0b793f4b4173",
+    "source": "unsplash",
+    "photographer": "Green Chameleon",
+    "credit": "Foto: Green Chameleon / Unsplash",
+    "caption": "Imagem ilustrativa para “Indicação de emprego na Grande Ilha: como pedir sem constranger”.",
+    "alt": "Capa: Indicação de emprego na Grande Ilha: como pedir sem constranger"
+  },
+  {
+    "slug": "sl-local-37-home-office-mito",
+    "photoId": "1503676260728-1c00da094a0b",
+    "source": "unsplash",
+    "photographer": "Element5 Digital",
+    "credit": "Foto: Element5 Digital / Unsplash",
+    "caption": "Imagem ilustrativa para “Home office e vagas remotas: o que é realista no Maranhão”.",
+    "alt": "Capa: Home office e vagas remotas: o que é realista no Maranhão"
+  },
+  {
+    "slug": "sl-local-38-atualizacao-curriculo",
+    "photoId": "1450101499163-c8848c66ca85",
+    "source": "unsplash",
+    "photographer": "Scott Graham",
+    "credit": "Foto: Scott Graham / Unsplash",
+    "caption": "Imagem ilustrativa para “Quando e como atualizar o currículo sem reescrever tudo”.",
+    "alt": "Capa: Quando e como atualizar o currículo sem reescrever tudo"
+  },
+  {
+    "slug": "sl-local-39-feedback-negativo",
+    "photoId": "1551836022-4c4c79ecde51",
+    "source": "unsplash",
+    "photographer": "Amy Hirschi",
+    "credit": "Foto: Amy Hirschi / Unsplash",
+    "caption": "Imagem ilustrativa para “Não fui chamado: o que fazer depois de uma negativa”.",
+    "alt": "Capa: Não fui chamado: o que fazer depois de uma negativa"
+  },
+  {
+    "slug": "sl-local-40-dados-pessoais",
+    "photoId": "1498050108023-c5249f4df085",
+    "source": "unsplash",
+    "photographer": "Lee Campbell",
+    "credit": "Foto: Lee Campbell / Unsplash",
+    "caption": "Imagem ilustrativa para “LGPD na prática do candidato: o que compartilhar e quando”.",
+    "alt": "Capa: LGPD na prática do candidato: o que compartilhar e quando"
+  },
+  {
+    "slug": "sl-local-41-setor-alimentacao",
+    "photoId": "1515378791036-0648a3ef77b2",
+    "source": "unsplash",
+    "photographer": "Andrew Neel",
+    "credit": "Foto: Andrew Neel / Unsplash",
+    "caption": "Imagem ilustrativa para “Vagas em alimentação e panificação: ritmo e higiene”.",
+    "alt": "Capa: Vagas em alimentação e panificação: ritmo e higiene"
+  },
+  {
+    "slug": "sl-local-42-construcao-apoio",
+    "photoId": "1521737604893-d14cc237f11d",
+    "source": "unsplash",
+    "photographer": "LinkedIn Sales Solutions",
+    "credit": "Foto: LinkedIn Sales Solutions / Unsplash",
+    "caption": "Imagem ilustrativa para “Apoio em obra e serviços de manutenção: segurança em primeiro lugar”.",
+    "alt": "Capa: Apoio em obra e serviços de manutenção: segurança em primeiro lugar"
+  },
+  {
+    "slug": "sl-local-43-atendimento-telefone",
+    "photoId": "1517048676732-d65bc937f952",
+    "source": "unsplash",
+    "photographer": "Christina Wocintechchat",
+    "credit": "Foto: Christina Wocintechchat / Unsplash",
+    "caption": "Imagem ilustrativa para “Atendimento telefônico e WhatsApp Business no dia a dia”.",
+    "alt": "Capa: Atendimento telefônico e WhatsApp Business no dia a dia"
+  },
+  {
+    "slug": "sl-local-44-meta-semanal",
+    "photoId": "1523240795612-9a054b0db644",
+    "source": "unsplash",
+    "photographer": "Priscilla Du Preez",
+    "credit": "Foto: Priscilla Du Preez / Unsplash",
+    "caption": "Imagem ilustrativa para “Plano semanal de candidaturas: meta realista para a ilha”.",
+    "alt": "Capa: Plano semanal de candidaturas: meta realista para a ilha"
+  },
+  {
+    "slug": "sl-local-45-proximos-passos-portal",
+    "photoId": "1573497019940-1cfe6d66f2e8",
+    "source": "picsum",
+    "photographer": "Picsum Photos",
+    "credit": "Foto: Picsum Photos",
+    "caption": "Imagem ilustrativa para “Próximos passos no Empregos São Luís após ler este guia”.",
+    "alt": "Capa: Próximos passos no Empregos São Luís após ler este guia"
+  }
+]
