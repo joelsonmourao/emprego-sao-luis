@@ -28,6 +28,10 @@ RUN mkdir -p /app/data/imports /app/data/media /app/data/brand /app/data/reports
 COPY --from=build --chown=app:app /app/apps/web/dist ./dist
 COPY --from=deps --chown=app:app /app/node_modules ./node_modules
 COPY --from=build --chown=app:app /app/packages ./packages
+# One-shot editorial activate (Coolify Terminal do web)
+COPY --chown=app:app scripts/activate-sl-local-editorial.mjs scripts/activate-sl-local-editorial.mjs
+COPY --chown=app:app scripts/data/sl-local-editorial-catalog.mjs scripts/data/sl-local-editorial-catalog.mjs
+COPY --chown=app:app apps/web/public/covers/sl-local/credits.json apps/web/public/covers/sl-local/credits.json
 USER app
 EXPOSE 4321
 HEALTHCHECK --interval=30s --timeout=5s --start-period=15s --retries=3 CMD wget -qO- http://127.0.0.1:4321/api/health || exit 1

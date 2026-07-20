@@ -6,27 +6,24 @@
 - Capas fotográficas: `npm run fetch:sl-local-covers` → `/covers/sl-local/`.
 - **Migrate não publica conteúdo.** Atualize no **admin** ou rode o activate **uma vez** no Terminal.
 
-## Colocar no ar (uma vez no Coolify Terminal)
+## Colocar no ar (Terminal do **web**, depois do redeploy)
 
-1. Redeploy **web** (leva as capas novas).
-2. Confirme **worker** ligado.
-3. No Terminal (container com script + `DATABASE_URL`), **uma vez**:
+1. Coolify → serviço **web** Empregos São Luís  
+2. Branch `codex/admin-negocio-completo` → **Force rebuild** (precisa do SHA com o script na imagem)  
+3. Terminal do **mesmo** web → cole:
 
 ```sh
 cd /app
+ls scripts/activate-sl-local-editorial.mjs
 export ADSENSE_EDITORIAL_ALLOW_PRODUCTION=1
 export SITE_URL=https://empregossaoluis.com.br
-# opcional: quantos publicar agora (default 3)
 export SL_LOCAL_PUBLISH_NOW=3
 node scripts/activate-sl-local-editorial.mjs --write --i-understand-production
 ```
 
-Isso:
-- publica **3** posts agora (aparecem em `/blog` e `/noticias`)
-- agenda o restante ~3/dia
-- aplica créditos/URLs das capas de `credits.json`
+Se `ls` falhar, a imagem ainda é antiga — rebuild de novo.
 
-Sem `--write` = dry-run.
+Worker precisa estar ligado para o restante agendado.
 
 ## Apagar envs do migrate
 
