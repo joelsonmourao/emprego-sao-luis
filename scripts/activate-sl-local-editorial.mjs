@@ -172,7 +172,13 @@ try {
     console.error("Nenhum artigo sl-local-* no banco. Rode o seed antes.");
     process.exit(1);
   }
-  const bySlug = new Map(rows.map((r) => [r.slug, r]));
+
+  /** Casa sl-local-01-... com catalog[0], mesmo se o sufixo do slug mudou no código. */
+  function rowForIndex(index) {
+    const n = String(index + 1).padStart(2, "0");
+    return rows.find((r) => r.slug.startsWith(`${SLUG_BASE}-${n}-`)) || null;
+  }
+
   let published = 0;
   let scheduled = 0;
   let covers = 0;
@@ -181,15 +187,16 @@ try {
   let scheduleIdx = 0;
   const publishedSlugs = [];
 
-  for (let i = 0; i < order.length; i += 1) {
-    const slug = order[i];
-    const row = bySlug.get(slug);
+  for (let i = 0; i < catalog.length; i += 1) {
+    const item = catalog[i];
+    const row = rowForIndex(i);
     if (!row) {
       missing += 1;
       continue;
     }
-    const item = catalog[i];
-    const credit = creditBySlug.get(slug);
+    // Mantém slug/arquivo de capa já publicados; atualiza título e corpo.
+    const slug = row.slug;
+    const credit = creditBySlug.get(slug) || creditBySlug.get(slugFor(item));
     const coverUrl = `${siteUrl}/covers/sl-local/${slug}.webp`;
     const coverAlt = credit?.alt || `Capa: ${item.title}`;
     const coverCaption = credit?.caption || `Imagem para “${item.title}”.`;
@@ -198,15 +205,23 @@ try {
     const scheduledAt = goLive ? null : remainingSlots[scheduleIdx++];
     const status = goLive ? "PUBLISHED" : "SCHEDULED";
     const publishedAt = goLive ? now : null;
-    const contentHtml = rewriteBodies ? buildArticleHtml(item) : null;
+    const excerpt = `${item.title}. Orientação prática para candidatos em São Luís e região.`;
 
     if (rewriteBodies) {
+      const contentHtml = buildArticleHtml(item);
       await sql`
         update es_articles
-        set status = ${status},
+        set type = ${item.type},
+            title = ${item.title},
+            excerpt = ${excerpt},
+            status = ${status},
             published_at = ${publishedAt},
             scheduled_at = ${scheduledAt},
             seo_title = ${seoTitleFor(item.title)},
+            meta_description = ${excerpt.slice(0, 155)},
+            primary_keyword = ${item.keyword},
+            section = ${item.section},
+            editorial_template = ${item.template},
             content_html = ${contentHtml},
             direct_answer = ${item.lead.slice(0, 280)},
             local_hook = ${item.localAngle.slice(0, 280)},
@@ -217,6 +232,8 @@ try {
             cover_image_credit = ${coverCredit},
             cover_image_width = ${1200},
             cover_image_height = ${630},
+            news_eligible = ${item.type === "NEWS"},
+            web_story_eligible = ${item.template === "POST_MAGNETICO"},
             updated_at = now()
         where id = ${row.id}
       `;
@@ -241,7 +258,12 @@ try {
     covers += 1;
     if (goLive) {
       published += 1;
-      publishedSlugs.push({ slug, type: item.type, path: item.type === "NEWS" ? `/noticias/${slug}` : `/blog/${slug}` });
+      publishedSlugs.push({
+        slug,
+        type: item.type,
+        title: item.title,
+        path: item.type === "NEWS" ? `/noticias/${slug}` : `/blog/${slug}`
+      });
     } else scheduled += 1;
   }
 
@@ -256,7 +278,7 @@ try {
         coversUpdated: covers,
         bodiesRewritten: rewriteBodies,
         missingSlugs: missing,
-        note: "Guias em /blog · Notícias em /noticias. Use --rewrite-bodies para trocar textos fracos (sem AdSense no corpo)."
+        note: "Títulos/textos novos (inspiração Gupy/Sólides, sem plágio). Slugs de capa preservados. Rode no web Emprego São Luís."
       },
       null,
       2

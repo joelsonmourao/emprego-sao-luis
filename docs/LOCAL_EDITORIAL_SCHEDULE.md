@@ -25,13 +25,16 @@ Se `ls` falhar, a imagem ainda é antiga — rebuild de novo.
 
 Worker precisa estar ligado para o restante agendado.
 
-## Apagar envs do migrate
+## Atualizar textos (inspiração Gupy/Sólides, sem plágio)
 
-Não use `RUN_SEED_*` editorial no migrate. Remova se ainda existirem.
+No Terminal do **web Emprego São Luís** (nunca no Jovem Aprendiz), após redeploy:
 
-## Dev
-
-```powershell
-npm run fetch:sl-local-covers
-npm run activate:local-editorial
+```sh
+cd /app
+export ADSENSE_EDITORIAL_ALLOW_PRODUCTION=1
+export SITE_URL=https://empregossaoluis.com.br
+export SL_LOCAL_PUBLISH_NOW=6
+node scripts/activate-sl-local-editorial.mjs --write --i-understand-production --rewrite-bodies
 ```
+
+Isso troca títulos/corpos pelos temas novos (currículo ATS, férias/13º na visão do trabalhador, entrevista, etc.), mantém capas/slugs já no ar.
