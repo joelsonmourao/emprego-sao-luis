@@ -102,17 +102,44 @@ const credits = existsSync(creditsPath) ? JSON.parse(readFileSync(creditsPath, "
 const creditBySlug = new Map(credits.map((row) => [row.slug, row]));
 
 const order = catalog.map((item) => slugFor(item));
-const remainingSlots = buildRemainingSlots(Math.max(0, order.length - publishNowCount));
+
+/** Publica misturando GUIDE/DATA_REPORT e NEWS (senão /noticias fica vazio). */
+function pickGoLiveIndices(count) {
+  const guides = [];
+  const news = [];
+  catalog.forEach((item, index) => {
+    if (item.type === "NEWS") news.push(index);
+    else guides.push(index);
+  });
+  const chosen = [];
+  let g = 0;
+  let n = 0;
+  while (chosen.length < count && (g < guides.length || n < news.length)) {
+    if (g < guides.length) chosen.push(guides[g++]);
+    if (chosen.length >= count) break;
+    if (n < news.length) chosen.push(news[n++]);
+  }
+  return new Set(chosen);
+}
+
+const goLiveSet = pickGoLiveIndices(publishNowCount);
+const remainingCount = Math.max(0, order.length - goLiveSet.size);
+const remainingSlots = buildRemainingSlots(remainingCount);
 
 if (!write) {
+  const preview = [...goLiveSet].sort((a, b) => a - b).map((i) => ({
+    slug: order[i],
+    type: catalog[i].type,
+    title: catalog[i].title
+  }));
   console.log(
     JSON.stringify(
       {
         ok: true,
         dryRun: true,
         plan: {
-          publishNow: order.slice(0, publishNowCount),
-          scheduleRest: order.slice(publishNowCount).length,
+          publishNow: preview,
+          scheduleRest: remainingCount,
           firstScheduled: remainingSlots[0]?.toISOString() ?? null,
           lastScheduled: remainingSlots.at(-1)?.toISOString() ?? null,
           creditsLoaded: credits.length
@@ -149,6 +176,8 @@ try {
   let covers = 0;
   let missing = 0;
   const now = new Date();
+  let scheduleIdx = 0;
+  const publishedSlugs = [];
 
   for (let i = 0; i < order.length; i += 1) {
     const slug = order[i];
@@ -163,8 +192,8 @@ try {
     const coverAlt = credit?.alt || `Capa: ${item.title}`;
     const coverCaption = credit?.caption || `Imagem para “${item.title}”.`;
     const coverCredit = credit?.credit || "Empregos São Luís — capa editorial";
-    const goLive = i < publishNowCount;
-    const scheduledAt = goLive ? null : remainingSlots[i - publishNowCount];
+    const goLive = goLiveSet.has(i);
+    const scheduledAt = goLive ? null : remainingSlots[scheduleIdx++];
     const status = goLive ? "PUBLISHED" : "SCHEDULED";
     const publishedAt = goLive ? now : null;
 
@@ -185,8 +214,10 @@ try {
       where id = ${row.id}
     `;
     covers += 1;
-    if (goLive) published += 1;
-    else scheduled += 1;
+    if (goLive) {
+      published += 1;
+      publishedSlugs.push({ slug, type: item.type, path: item.type === "NEWS" ? `/noticias/${slug}` : `/blog/${slug}` });
+    } else scheduled += 1;
   }
 
   console.log(
@@ -196,9 +227,10 @@ try {
         written: true,
         published,
         scheduled,
+        publishedNow: publishedSlugs,
         coversUpdated: covers,
         missingSlugs: missing,
-        note: "Worker continua necessário para os SCHEDULED. Capas vêm do deploy web em /covers/sl-local/."
+        note: "Guias em /blog · Notícias em /noticias. Worker para o restante SCHEDULED."
       },
       null,
       2
