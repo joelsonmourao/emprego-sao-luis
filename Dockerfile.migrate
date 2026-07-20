@@ -22,6 +22,7 @@ COPY scripts/seed-local-editorial-schedule.mjs scripts/seed-local-editorial-sche
 COPY scripts/activate-sl-local-editorial.mjs scripts/activate-sl-local-editorial.mjs
 COPY scripts/data/sl-local-editorial-catalog.mjs scripts/data/sl-local-editorial-catalog.mjs
 COPY scripts/data/sl-local-article-html.mjs scripts/data/sl-local-article-html.mjs
+COPY scripts/data/sl-local-tip-followups-46-105.mjs scripts/data/sl-local-tip-followups-46-105.mjs
 COPY apps/web/public/covers/sl-local/credits.json apps/web/public/covers/sl-local/credits.json
 RUN chmod +x scripts/migrate-entrypoint.sh
 USER node

@@ -3,6 +3,7 @@
  * nem o mesmo bloco genérico em todos os artigos.
  */
 import { MIN_USEFUL_CHARS, catalog } from "./sl-local-editorial-catalog.mjs";
+import { tipFollowups46to105 } from "./sl-local-tip-followups-46-105.mjs";
 
 /** Cenas / ângulos únicos por chave (evita texto-clone). */
 const scenes = {
@@ -579,7 +580,8 @@ const tipFollowups = {
     "Um follow-up basta — bombardeio irrita.",
     "Semana com leitura completa costuma render entrevista melhor.",
     "Portal como fonte principal reduz ruído de grupo."
-  ]
+  ],
+  ...tipFollowups46to105
 };
 
 const closings = [
@@ -647,6 +649,15 @@ export function buildArticleHtml(item) {
   const deep = deepParagraph(item);
   const bridge = `No contexto de São Luís e do Maranhão, ${item.localAngle.charAt(0).toLowerCase()}${item.localAngle.slice(1)} Vale cruzar isso com a sua disponibilidade real de horário e com o custo de deslocamento até o posto.`;
 
+  const hubPath = item.type === "NEWS" ? "/noticias" : item.type === "DATA_REPORT" ? "/blog" : "/blog";
+  const ctaVariants = [
+    `Quando for candidatar-se, use a <a href="/vagas">busca de vagas em São Luís</a> e o canal oficial do anúncio. Em dúvida de golpe, veja <a href="/seguranca-candidatos">segurança do candidato</a>.`,
+    `Compare vagas abertas na <a href="/vagas">página de vagas</a> e leia mais orientações no <a href="${hubPath}">hub editorial</a>. Pedido de pagamento antecipado? Vá para <a href="/seguranca-candidatos">segurança do candidato</a>.`,
+    `Próximo passo: uma candidatura pelo canal do anúncio, via <a href="/vagas">Empregos São Luís</a>. Para checagem de risco, use <a href="/seguranca-candidatos">segurança do candidato</a>.`
+  ];
+  const cta = ctaVariants[(index < 0 ? 0 : index) % ctaVariants.length];
+  const legalBlock = item.legalDisclaimer ? `<p><em>Aviso:</em> este texto é orientação geral para candidatos em São Luís e no Maranhão. Não substitui advogado, contador, sindicato ou orientação oficial do empregador/governo. Regras e valores mudam — confira sempre a fonte oficial e o seu contrato.</p>` : "";
+
   const parts = [
     `<p>${item.lead}</p>`,
     `<h2>${heads.scene}</h2>`,
@@ -657,9 +668,10 @@ export function buildArticleHtml(item) {
     `<h2>${heads.practice}</h2>`,
     tipBlocks,
     `<h2>${heads.close}</h2>`,
-    `<p>${closing} Quando for candidatar-se, use a <a href="/vagas">busca de vagas</a> e o canal oficial do anúncio. Em caso de pedido estranho de pagamento ou documento cedo demais, veja a página de <a href="/seguranca-candidatos">segurança do candidato</a>.</p>`,
+    legalBlock,
+    `<p>${closing} ${cta}</p>`,
     `<p>A candidatura do trabalhador no Empregos São Luís continua gratuita e sem cadastro obrigatório. Avance com um envio bem feito hoje, em vez de guardar a vaga “para depois”.</p>`
-  ];
+  ].filter(Boolean);
 
   let html = parts.join("\n");
   // No máximo uma menção a “Grande Ilha” no corpo público

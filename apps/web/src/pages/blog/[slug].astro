@@ -2,8 +2,13 @@
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import Breadcrumbs from "../../components/ui/Breadcrumbs.astro";
 import { findPublishedArticle } from "../../lib/articles";
-const result = await findPublishedArticle(Astro.params.slug ?? "", ["GUIDE", "DATA_REPORT"]);
-if (!result) return new Response("Conteúdo não encontrado", { status: 404, headers: { "X-Robots-Tag": "noindex, follow" } });
+const slug = Astro.params.slug ?? "";
+const result = await findPublishedArticle(slug, ["GUIDE", "DATA_REPORT"]);
+if (!result) {
+  const news = await findPublishedArticle(slug, "NEWS");
+  if (news) return Astro.redirect(`/noticias/${slug}`, 301);
+  return new Response("Conteúdo não encontrado", { status: 404, headers: { "X-Robots-Tag": "noindex, follow" } });
+}
 const { article, authorName } = result;
 const canonical = article.canonicalUrl || new URL(`/blog/${article.slug}`, Astro.site).toString();
 const schema = { "@type": "Article", headline: article.title, description: article.excerpt, datePublished: article.publishedAt?.toISOString(), dateModified: article.updatedAt.toISOString(), author: { "@type": "Person", name: authorName }, mainEntityOfPage: canonical, ...(article.coverImageUrl ? { image: [article.coverImageUrl] } : {}), ...(article.sponsoredContent ? { isAccessibleForFree: true } : {}) };

@@ -3,8 +3,14 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
 import Breadcrumbs from "../../components/ui/Breadcrumbs.astro";
 import { findPublishedArticle } from "../../lib/articles";
 
-const result = await findPublishedArticle(Astro.params.slug!, "NEWS");
+const slug = Astro.params.slug!;
+const result = await findPublishedArticle(slug, "NEWS");
 if (!result) {
+  // SEO: posts reclassificados (NEWS → GUIDE/DATA) mantêm 301 a partir da URL antiga.
+  const retyped = await findPublishedArticle(slug, ["GUIDE", "DATA_REPORT"]);
+  if (retyped) {
+    return Astro.redirect(`/blog/${slug}`, 301);
+  }
   return new Response("Notícia não encontrada", {
     status: 404,
     headers: { "Content-Type": "text/plain; charset=utf-8", "X-Robots-Tag": "noindex, follow" }

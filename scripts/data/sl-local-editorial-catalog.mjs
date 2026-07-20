@@ -19,7 +19,7 @@ export const MIN_USEFUL_CHARS = 2400;
  * }} CatalogItem */
 
 /** @type {CatalogItem[]} */
-export const catalog = [
+const rawCatalog = [
   {
     key: "01-curriculo-ats",
     title: "Currículo com palavras-chave que sistemas ATS entendem",
@@ -2016,6 +2016,598 @@ export const catalog = [
     coverHue: 67
   }
 ];
+
+/** Overlay SEO/taxonomia (títulos, keywords, type/section). */
+const catalogPatchByKey = new Map([
+  {
+    "key": "06-produtividade-busca",
+    "title": "Busca de emprego em São Luís: bloco diário com mais retorno",
+    "keyword": "produtividade busca emprego sao luis"
+  },
+  {
+    "key": "37-plano-semanal-busca",
+    "title": "Plano semanal de vagas em São Luís: meta de segunda a sábado",
+    "keyword": "plano semanal vagas sao luis"
+  },
+  {
+    "key": "77-plano-90-dias",
+    "title": "Plano de 90 dias na busca de emprego: ritmo até a entrevista",
+    "keyword": "plano 90 dias emprego sao luis"
+  },
+  {
+    "key": "45-panorama-candidaturas",
+    "type": "DATA_REPORT",
+    "section": "dados",
+    "title": "Quantas vagas candidatar por semana: checklist volume × qualidade",
+    "keyword": "quantas vagas candidatar por semana"
+  },
+  {
+    "key": "01-curriculo-ats",
+    "title": "Currículo ATS em São Luís: palavras-chave que o filtro lê",
+    "keyword": "curriculo ats palavras chave sao luis"
+  },
+  {
+    "key": "28-erros-pdf-curriculo",
+    "title": "Erros de PDF no currículo que eliminam na triagem",
+    "keyword": "curriculo pdf erros triagem"
+  },
+  {
+    "key": "04-cursos-curriculo",
+    "title": "Cursos no currículo: como listar sem parecer enchimento",
+    "keyword": "cursos no curriculo sem enchimento"
+  },
+  {
+    "key": "102-certificado-vs-pratica",
+    "type": "GUIDE",
+    "section": "guia",
+    "title": "Certificado ou prática na triagem: o que priorizar no PDF",
+    "keyword": "certificado ou experiencia curriculo"
+  },
+  {
+    "key": "29-email-pitch",
+    "title": "E-mail de candidatura: assunto e corpo que geram resposta",
+    "keyword": "email candidatura emprego modelo"
+  },
+  {
+    "key": "42-whatsapp-candidatura",
+    "type": "GUIDE",
+    "section": "guia",
+    "title": "Candidatura por WhatsApp: mensagem curta que não queima a vaga",
+    "keyword": "candidatura whatsapp emprego mensagem"
+  },
+  {
+    "key": "62-carta-apresentacao",
+    "title": "Carta de apresentação curta: quando enviar e o que escrever",
+    "keyword": "carta apresentacao emprego curta"
+  },
+  {
+    "key": "104-mensagem-recrutador",
+    "title": "Mensagem fria a recrutador: template LinkedIn/WhatsApp sem spam",
+    "keyword": "mensagem fria recrutador linkedin"
+  },
+  {
+    "key": "18-pedir-salario",
+    "title": "Pretensão salarial na entrevista: faixa sem chute nem medo",
+    "keyword": "pretensao salarial entrevista dicas"
+  },
+  {
+    "key": "19-beneficios-vaga",
+    "type": "GUIDE",
+    "section": "guia",
+    "title": "Benefícios da vaga: checklist para comparar além do bruto",
+    "keyword": "comparar beneficios vaga emprego"
+  },
+  {
+    "key": "55-vale-alimentacao",
+    "type": "GUIDE",
+    "section": "guia",
+    "title": "Vale-alimentação ou refeição: diferença que muda o líquido",
+    "keyword": "vale alimentacao ou refeicao diferenca"
+  },
+  {
+    "key": "93-custo-vida-salario",
+    "type": "DATA_REPORT",
+    "section": "dados",
+    "title": "Salário × custo de vida em São Luís: conta antes de aceitar",
+    "keyword": "salario custo de vida sao luis"
+  },
+  {
+    "key": "20-trabalho-hibrido",
+    "type": "GUIDE",
+    "section": "guia",
+    "title": "Trabalho híbrido em São Luís: o que confirmar antes de aceitar",
+    "keyword": "trabalho hibrido sao luis checklist"
+  },
+  {
+    "key": "60-home-office-checklist",
+    "title": "Home office: checklist antes de aceitar vaga 100% remota",
+    "keyword": "home office remoto checklist vaga"
+  },
+  {
+    "key": "08-ir-2026-trabalhador",
+    "type": "NEWS",
+    "section": "noticias",
+    "title": "IR 2026 CLT: o básico para trabalhador sem cair em golpe",
+    "keyword": "imposto de renda 2026 trabalhador clt"
+  },
+  {
+    "key": "09-decimo-terceiro",
+    "type": "NEWS",
+    "section": "noticias",
+    "title": "13º salário na janela de pagamento: o que conferir no holerite",
+    "keyword": "decimo terceiro salario pagamento clt"
+  },
+  {
+    "key": "13-feriado-facultativo",
+    "type": "NEWS",
+    "section": "noticias",
+    "title": "Feriado ou facultativo em São Luís: como isso muda sua escala",
+    "keyword": "feriado ponto facultativo sao luis"
+  },
+  {
+    "key": "57-contrato-temporario",
+    "type": "NEWS",
+    "section": "noticias",
+    "title": "Contrato temporário na temporada: o que ler antes de assinar",
+    "keyword": "contrato temporario temporada direitos"
+  },
+  {
+    "key": "75-turismo-hotelaria",
+    "type": "NEWS",
+    "section": "noticias",
+    "title": "Vagas de hotelaria em São Luís: temporada e atendimento",
+    "keyword": "vagas hotelaria temporada sao luis"
+  },
+  {
+    "key": "105-panorama-mercado-local",
+    "type": "DATA_REPORT",
+    "section": "dados",
+    "title": "Busca de emprego em São Luís 2026: o que priorizar no semestre",
+    "keyword": "busca emprego sao luis 2026"
+  },
+  {
+    "key": "03-primeiro-emprego",
+    "type": "GUIDE",
+    "section": "guia",
+    "title": "Primeiro emprego em São Luís: checklist antes de candidatar",
+    "keyword": "primeiro emprego sao luis checklist"
+  },
+  {
+    "key": "07-vagas-afirmativas",
+    "type": "GUIDE",
+    "section": "guia",
+    "title": "Vagas afirmativas: ler o anúncio e candidatar com segurança",
+    "keyword": "vagas afirmativas como candidatar"
+  },
+  {
+    "key": "12-ponto-atraso",
+    "type": "GUIDE",
+    "section": "guia",
+    "title": "Ponto e atraso no trabalho: o que confirmar na prática",
+    "keyword": "ponto eletronico atraso trabalho"
+  },
+  {
+    "key": "24-retorno-ao-trabalho",
+    "type": "GUIDE",
+    "section": "guia",
+    "title": "Voltar ao mercado após pausa: explicar o gap no currículo",
+    "keyword": "retorno mercado trabalho gap curriculo"
+  },
+  {
+    "key": "25-seguranca-mulheres",
+    "type": "GUIDE",
+    "section": "guia",
+    "title": "Segurança de candidatas: entrevista e deslocamento com menos risco",
+    "keyword": "seguranca candidatas entrevista emprego"
+  },
+  {
+    "key": "31-testes-online",
+    "type": "GUIDE",
+    "section": "guia",
+    "title": "Teste online de seleção: o que fazer antes do cronômetro",
+    "keyword": "teste online processo seletivo dicas"
+  },
+  {
+    "key": "33-pedido-demissao",
+    "type": "GUIDE",
+    "section": "guia",
+    "title": "Pedido de demissão: aviso prévio, acerto e saída sem queimar ponte",
+    "keyword": "pedido demissao aviso previo acerto"
+  },
+  {
+    "key": "34-escala-6x1",
+    "type": "GUIDE",
+    "section": "guia",
+    "title": "Escala 6x1: perguntas essenciais antes de aceitar a vaga",
+    "keyword": "escala 6x1 o que perguntar"
+  },
+  {
+    "key": "39-entrevista-presencial",
+    "type": "GUIDE",
+    "section": "guia",
+    "title": "Entrevista presencial em São Luís: trajeto, horário e impressão",
+    "keyword": "entrevista presencial sao luis dicas"
+  },
+  {
+    "key": "44-transporte-entrevista",
+    "type": "GUIDE",
+    "section": "guia",
+    "title": "Transporte até a entrevista em São Luís: planejar para não atrasar",
+    "keyword": "transporte entrevista emprego sao luis"
+  },
+  {
+    "key": "48-rejeicao-candidatura",
+    "type": "GUIDE",
+    "section": "guia",
+    "title": "Rejeição no processo seletivo: reagir sem travar a busca",
+    "keyword": "rejeicao processo seletivo como reagir"
+  },
+  {
+    "key": "51-banco-horas",
+    "type": "GUIDE",
+    "section": "guia",
+    "title": "Banco de horas: o que confirmar no regulamento da empresa",
+    "keyword": "banco de horas direitos trabalhador"
+  },
+  {
+    "key": "54-seguro-desemprego",
+    "type": "GUIDE",
+    "section": "guia",
+    "title": "Seguro-desemprego: checklist após demissão sem justa causa",
+    "keyword": "seguro desemprego checklist documentos"
+  },
+  {
+    "key": "58-assedio-trabalho",
+    "type": "GUIDE",
+    "section": "guia",
+    "title": "Assédio no trabalho: sinais, registro e canais com menos risco",
+    "keyword": "assedio no trabalho o que fazer"
+  },
+  {
+    "key": "64-ofertas-multiplas",
+    "type": "GUIDE",
+    "section": "guia",
+    "title": "Duas ofertas de emprego: como comparar sem pressa tóxica",
+    "keyword": "comparar duas propostas emprego"
+  },
+  {
+    "key": "69-profissional-40-mais",
+    "type": "GUIDE",
+    "section": "guia",
+    "title": "Emprego após os 40: posicionar experiência sem se apagar",
+    "keyword": "emprego apos 40 anos curriculo"
+  },
+  {
+    "key": "78-sindicato-basico",
+    "type": "GUIDE",
+    "section": "guia",
+    "title": "Sindicato e trabalhador: o básico para não cair em boato",
+    "keyword": "sindicato trabalhador direitos basico"
+  },
+  {
+    "key": "81-acidente-trabalho",
+    "type": "GUIDE",
+    "section": "guia",
+    "title": "Acidente de trabalho: primeiros passos e registro sem pânico",
+    "keyword": "acidente de trabalho o que fazer"
+  },
+  {
+    "key": "83-trabalho-noturno",
+    "type": "GUIDE",
+    "section": "guia",
+    "title": "Trabalho noturno: adicional, sono e perguntas antes de aceitar",
+    "keyword": "trabalho noturno adicional o que perguntar"
+  },
+  {
+    "key": "92-mitos-direitos",
+    "type": "GUIDE",
+    "section": "guia",
+    "title": "Mitos trabalhistas no WhatsApp: como checar antes de decidir",
+    "keyword": "mitos direitos trabalhistas whatsapp"
+  },
+  {
+    "key": "95-trabalho-fim-semana",
+    "type": "GUIDE",
+    "section": "guia",
+    "title": "Trabalho no fim de semana: alinhar folga e adicional",
+    "keyword": "trabalhar fim de semana folga adicional"
+  },
+  {
+    "key": "98-entrevista-desligamento",
+    "type": "GUIDE",
+    "section": "guia",
+    "title": "Entrevista de desligamento: o que falar e o que guardar",
+    "keyword": "entrevista desligamento o que falar"
+  },
+  {
+    "key": "103-burnout-sinais",
+    "type": "GUIDE",
+    "section": "guia",
+    "title": "Esgotamento na busca de emprego: sinais e quando pausar",
+    "keyword": "esgotamento busca emprego sinais"
+  },
+  {
+    "key": "02-soft-hard-skills",
+    "type": "GUIDE",
+    "section": "guia",
+    "title": "Soft e hard skills no anúncio: como provar sem inventar",
+    "keyword": "soft skills hard skills curriculo"
+  },
+  {
+    "key": "40-setores-vagas",
+    "type": "DATA_REPORT",
+    "section": "dados",
+    "title": "Mapa de setores em São Luís: como priorizar sua busca",
+    "keyword": "mapa setores vagas sao luis"
+  },
+  {
+    "key": "43-comercio-servicos",
+    "type": "DATA_REPORT",
+    "section": "dados",
+    "title": "Comércio e serviços em São Luís: checklist do que o anúncio pede",
+    "keyword": "vagas comercio servicos sao luis perfil"
+  },
+  {
+    "key": "68-ingles-curriculo",
+    "type": "GUIDE",
+    "section": "guia",
+    "title": "Inglês no currículo: declarar nível sem inventar fluência",
+    "keyword": "ingles no curriculo nivel honesto"
+  },
+  {
+    "key": "74-vendas-balcao",
+    "type": "GUIDE",
+    "section": "guia",
+    "title": "Vendas no balcão: meta, comissão e tom que não afasta",
+    "keyword": "vagas vendedor loja comissao dicas"
+  },
+  {
+    "key": "79-acordo-coletivo",
+    "type": "GUIDE",
+    "section": "guia",
+    "title": "Acordo e convenção coletiva: o que isso muda no holerite",
+    "keyword": "convencao coletiva holerite trabalhador"
+  },
+  {
+    "key": "88-alfabetizacao-digital",
+    "type": "GUIDE",
+    "section": "guia",
+    "title": "Alfabetização digital para emprego: o mínimo que destrava",
+    "keyword": "alfabetizacao digital emprego basico"
+  },
+  {
+    "key": "99-vagas-sazonais",
+    "type": "GUIDE",
+    "section": "guia",
+    "title": "Vaga sazonal em São Luís: entrar no pico sem ilusão de efetivo",
+    "keyword": "vaga sazonal comercio sao luis"
+  },
+  {
+    "key": "90-comparar-portais",
+    "type": "DATA_REPORT",
+    "section": "dados",
+    "title": "Comparar portais de emprego: checklist anti-duplicata e golpe",
+    "keyword": "comparar portais emprego seguranca"
+  },
+  {
+    "key": "10-ferias-direitos",
+    "title": "Férias CLT: período aquisitivo e o que perguntar na admissão",
+    "keyword": "ferias clt periodo aquisitivo"
+  },
+  {
+    "key": "11-abono-pecuniario",
+    "title": "Abono pecuniário: vender 1/3 das férias sem se perder no holerite",
+    "keyword": "abono pecuniario ferias holerite"
+  },
+  {
+    "key": "14-ctps-digital",
+    "title": "CTPS digital: conferir vínculos e anotações no celular",
+    "keyword": "ctps digital carteira trabalho consultar"
+  },
+  {
+    "key": "15-auxiliar-administrativo",
+    "title": "Auxiliar administrativo em São Luís: prove além de organizado",
+    "keyword": "auxiliar administrativo vagas sao luis"
+  },
+  {
+    "key": "21-golpes-emprego",
+    "title": "Golpe de vaga em São Luís: sinais de alerta antes do PIX",
+    "keyword": "golpe vaga emprego sao luis"
+  },
+  {
+    "key": "22-documentos-admissao",
+    "title": "Documentos de admissão no MA: pasta pronta para o dia D",
+    "keyword": "documentos admissao emprego maranhao"
+  },
+  {
+    "key": "23-networking-local",
+    "title": "Networking em São Luís: pedidos que as pessoas respondem",
+    "keyword": "networking emprego sao luis"
+  },
+  {
+    "key": "32-ler-holerite",
+    "title": "Como ler holerite: bruto, descontos e o que conferir todo mês",
+    "keyword": "como ler holerite descontos"
+  },
+  {
+    "key": "35-alimentacao-servicos",
+    "title": "Vagas em restaurante em São Luís: higiene, pico e perguntas",
+    "keyword": "vagas restaurante sao luis dicas"
+  },
+  {
+    "key": "38-usar-portal-es",
+    "title": "Como usar o Empregos São Luís: filtro à candidatura segura",
+    "keyword": "como usar empregos sao luis"
+  },
+  {
+    "key": "41-experiencia-informal",
+    "title": "Experiência informal no currículo: descrever sem inventar cargo",
+    "keyword": "experiencia informal curriculo como colocar"
+  },
+  {
+    "key": "46-linkedin-candidato",
+    "title": "LinkedIn para vagas em São Luís: perfil que gera conversa",
+    "keyword": "linkedin emprego sao luis perfil"
+  },
+  {
+    "key": "47-follow-up-entrevista",
+    "title": "Follow-up após entrevista: quando mandar e o que escrever",
+    "keyword": "follow up apos entrevista mensagem"
+  },
+  {
+    "key": "50-pedir-aumento",
+    "title": "Como pedir aumento de salário: argumentos sem ultimato",
+    "keyword": "como pedir aumento salario"
+  },
+  {
+    "key": "52-hora-extra-direitos",
+    "title": "Hora extra no holerite: como conferir se o adicional entrou",
+    "keyword": "hora extra holerite como conferir"
+  },
+  {
+    "key": "53-fgts-basico",
+    "title": "FGTS do trabalhador CLT: o que acompanhar no app oficial",
+    "keyword": "fgts consultar trabalhador clt"
+  },
+  {
+    "key": "56-periodo-experiencia",
+    "title": "Período de experiência CLT: o que perguntar na admissão",
+    "keyword": "periodo experiencia clt o que saber"
+  },
+  {
+    "key": "61-mudanca-carreira",
+    "title": "Mudança de carreira em São Luís: transição sem apagar o passado",
+    "keyword": "mudanca de carreira sao luis curriculo"
+  },
+  {
+    "key": "65-agradecimento-pos",
+    "title": "Agradecimento pós-entrevista: mensagem curta que não parece robô",
+    "keyword": "agradecimento pos entrevista mensagem"
+  },
+  {
+    "key": "70-retorno-maternidade",
+    "title": "Volta ao trabalho após maternidade: currículo e conversa sem culpa",
+    "keyword": "retorno trabalho apos maternidade"
+  },
+  {
+    "key": "71-call-center-perfil",
+    "title": "Vagas de call center em São Luís: meta, voz e o que perguntar",
+    "keyword": "vagas call center sao luis"
+  },
+  {
+    "key": "72-recepcao-clinica",
+    "title": "Recepcionista de clínica em São Luís: o que o anúncio espera",
+    "keyword": "vaga recepcionista clinica sao luis"
+  },
+  {
+    "key": "73-estoque-logistica",
+    "title": "Vagas de estoque em São Luís: precisão sem jargão vazio",
+    "keyword": "vagas estoque logistica sao luis"
+  },
+  {
+    "key": "76-motorista-entregas",
+    "title": "Motorista e entregas em São Luís: documentos, rota e omissões",
+    "keyword": "vagas motorista entregador sao luis"
+  },
+  {
+    "key": "80-atestado-medico",
+    "title": "Atestado médico no emprego: prazo, entrega e cuidados",
+    "keyword": "atestado medico trabalho como entregar"
+  },
+  {
+    "key": "82-terceirizado-direitos",
+    "title": "Trabalho terceirizado: quem é o empregador e o que perguntar",
+    "keyword": "trabalhador terceirizado direitos"
+  },
+  {
+    "key": "84-conflito-lideranca",
+    "title": "Conflito com a chefia: documentar e falar com objetividade",
+    "keyword": "conflito com chefe trabalho dicas"
+  },
+  {
+    "key": "86-inteligencia-emocional",
+    "title": "Inteligência emocional na entrevista: calma na prática",
+    "keyword": "inteligencia emocional entrevista"
+  },
+  {
+    "key": "91-ler-contrato-clt",
+    "title": "Ler contrato CLT antes de assinar: cláusulas que pedem pausa",
+    "keyword": "ler contrato trabalho clt"
+  },
+  {
+    "key": "94-negociar-deslocamento",
+    "title": "Deslocamento longo ao emprego: negociar horário ou auxílio",
+    "keyword": "negociar horario deslocamento emprego"
+  },
+  {
+    "key": "96-transferencia-interna",
+    "title": "Transferência interna: pedir mudança de setor sem queimar ponte",
+    "keyword": "transferencia interna emprego como pedir"
+  },
+  {
+    "key": "100-empatia-atendimento",
+    "title": "Empatia no atendimento: soft skill que o anúncio não explica",
+    "keyword": "empatia atendimento cliente entrevista"
+  },
+  {
+    "key": "101-gap-habilidades",
+    "title": "Gap de habilidades na vaga: fechar o buraco até o anúncio",
+    "keyword": "gap habilidades candidatura como fechar"
+  }
+].map((p) => [p.key, p]));
+
+const legalDisclaimerKeys = new Set([
+  "07-vagas-afirmativas",
+  "08-ir-2026-trabalhador",
+  "09-decimo-terceiro",
+  "10-ferias-direitos",
+  "11-abono-pecuniario",
+  "12-ponto-atraso",
+  "13-feriado-facultativo",
+  "14-ctps-digital",
+  "26-inclusao-pcd",
+  "27-freela-vs-clt",
+  "32-ler-holerite",
+  "33-pedido-demissao",
+  "34-escala-6x1",
+  "51-banco-horas",
+  "52-hora-extra-direitos",
+  "53-fgts-basico",
+  "54-seguro-desemprego",
+  "56-periodo-experiencia",
+  "57-contrato-temporario",
+  "58-assedio-trabalho",
+  "78-sindicato-basico",
+  "79-acordo-coletivo",
+  "80-atestado-medico",
+  "81-acidente-trabalho",
+  "82-terceirizado-direitos",
+  "83-trabalho-noturno",
+  "91-ler-contrato-clt",
+  "92-mitos-direitos",
+  "95-trabalho-fim-semana",
+  "98-entrevista-desligamento"
+]);
+
+function sectionForType(type) {
+  if (type === "NEWS") return "noticias";
+  if (type === "DATA_REPORT") return "dados";
+  return "guia";
+}
+
+/** @type {CatalogItem[]} */
+export const catalog = rawCatalog.map((item) => {
+  const patch = catalogPatchByKey.get(item.key) || {};
+  const next = {
+    ...item,
+    ...(patch.type ? { type: patch.type } : {}),
+    ...(patch.title ? { title: patch.title } : {}),
+    ...(patch.keyword ? { keyword: patch.keyword } : {})
+  };
+  next.section = patch.section || sectionForType(next.type);
+  if (legalDisclaimerKeys.has(item.key)) next.legalDisclaimer = true;
+  return next;
+});
 
 /** @param {CatalogItem} item */
 export function slugFor(item) {

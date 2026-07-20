@@ -211,7 +211,7 @@ try {
       [pillar] = await sql`
         insert into es_content_pillars (name, slug, description, audience, active)
         values (
-          ${"Emprego local — Grande Ilha"},
+          ${"Emprego local — São Luís"},
           ${`${SLUG_BASE}-pilar`},
           ${"Pilar editorial local para candidatos em São Luís."},
           ${"CANDIDATE"},

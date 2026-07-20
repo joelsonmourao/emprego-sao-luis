@@ -32,6 +32,7 @@ COPY --from=build --chown=app:app /app/packages ./packages
 COPY --chown=app:app scripts/activate-sl-local-editorial.mjs scripts/activate-sl-local-editorial.mjs
 COPY --chown=app:app scripts/data/sl-local-editorial-catalog.mjs scripts/data/sl-local-editorial-catalog.mjs
 COPY --chown=app:app scripts/data/sl-local-article-html.mjs scripts/data/sl-local-article-html.mjs
+COPY --chown=app:app scripts/data/sl-local-tip-followups-46-105.mjs scripts/data/sl-local-tip-followups-46-105.mjs
 COPY --chown=app:app apps/web/public/covers/sl-local/credits.json apps/web/public/covers/sl-local/credits.json
 USER app
 EXPOSE 4321

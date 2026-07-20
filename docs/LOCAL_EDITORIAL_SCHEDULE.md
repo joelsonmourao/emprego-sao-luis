@@ -3,6 +3,9 @@
 ## Situação honesta
 
 - Corpo do post já nasce em **HTML** (`content_html`) — o site e o admin usam HTML, não Markdown.
+- Mix SEO: **5 NEWS** (gancho sazonal → `/noticias`) · **6 DATA_REPORT** (mapa/checklist) · restante **GUIDE** (`/blog`).
+- Títulos/keywords diferenciados por cluster (busca, currículo, mensagem, salário, remoto) para reduzir canibalização.
+- Posts de direitos trazem **aviso jurídico** no HTML (não substituem advogado/contador).
 - Posts ficam **SCHEDULED** até o horário (ou até rodar o activate).
 - Capas: `npm run generate:sl-local-covers` ou `npm run fetch:sl-local-covers` → `/covers/sl-local/`.
 - **Migrate não publica conteúdo.** Atualize no **admin** ou rode o activate **uma vez** no Terminal.
@@ -11,7 +14,7 @@
 ## Colocar no ar (Terminal do **web**, depois do redeploy)
 
 1. Coolify → serviço **web** Empregos São Luís  
-2. Branch `codex/admin-negocio-completo` → **Force rebuild** (precisa do SHA com catálogo 105 + script na imagem)  
+2. Branch `codex/admin-negocio-completo` → **Force rebuild** (precisa do SHA com catálogo 105 + tip-followups na imagem)  
 3. Terminal do **mesmo** web → cole:
 
 ```sh
@@ -30,4 +33,4 @@ Worker precisa estar ligado para o restante agendado.
 
 ## Atualizar textos
 
-Mesmo comando com `--rewrite-bodies` regenera título + HTML a partir do catálogo (temas originais para candidato; inspiração de mercado, sem plágio).
+Mesmo comando com `--rewrite-bodies` regenera título + HTML + SEO (type/keyword) a partir do catálogo.
