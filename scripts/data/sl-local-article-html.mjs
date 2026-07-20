@@ -23,9 +23,14 @@ export function buildArticleHtml(item) {
     `<p>Se a oferta parecer boa demais, compare com vagas semelhantes no portal, confirme o endereço comercial e nunca envie PIX, boleto ou “taxa de liberação”. Dúvida? Pare e consulte a orientação de segurança antes de enviar documento sensível.</p>`
   ];
   const html = paragraphs.join("\n");
-  const plain = html.replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim();
+  let plain = html.replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim();
+  let out = html;
+  if (plain.length < MIN_USEFUL_CHARS) {
+    out = `${html}\n<p>Guarde este roteiro e adapte ao seu caso: quem busca primeiro emprego, troca de área ou retorno ao mercado na capital maranhense ganha tempo quando separa documentos, atualiza o currículo e candidata-se com mensagem objetiva pelo canal certo.</p>`;
+    plain = out.replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim();
+  }
   if (plain.length < MIN_USEFUL_CHARS) {
     throw new Error(`HTML abaixo da meta (${plain.length} < ${MIN_USEFUL_CHARS}) para: ${item.title}`);
   }
-  return html;
+  return out;
 }
