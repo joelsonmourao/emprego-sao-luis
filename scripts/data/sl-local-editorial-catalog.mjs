@@ -1,5 +1,5 @@
 /**
- * Catálogo de 45 peças editoriais locais (São Luís / Maranhão).
+ * Catálogo de 105 peças editoriais locais (São Luís / Maranhão).
  * Usado por generate-sl-local-covers.mjs e seed-local-editorial-schedule.mjs.
  */
 export const SLUG_BASE = "sl-local";
@@ -874,6 +874,1146 @@ export const catalog = [
     ],
     localAngle: "Candidatos na região que medem o próprio funil (envio → resposta → entrevista) ajustam a busca mais rápido do que quem só “manda currículo o dia todo”.",
     coverHue: 356
+  },
+  {
+    key: "46-linkedin-candidato",
+    title: "LinkedIn para candidato em São Luís: perfil que gera conversa",
+    type: "GUIDE",
+    template: "POST_MAGNETICO",
+    keyword: "linkedin candidato emprego sao luis",
+    section: "guia",
+    lead: "Perfil vazio ou cheio de frase motivacional atrai pouco. Em processos locais, um LinkedIn útil tem cargo-alvo claro, experiências com resultado e foto sóbria — e serve de reforço ao PDF, não de substituto.",
+    tips: [
+      "Escreva o título com o cargo que você busca, não só o último emprego genérico.",
+      "Resuma em três linhas o que você entrega: setor, força e disponibilidade de cidade.",
+      "Liste experiências com verbos e um resultado simples (volume, prazo, melhoria).",
+      "Peça recomendações só a quem trabalhou com você de verdade.",
+      "Ative alertas de vaga com palavra-chave realista para São Luís e Maranhão.",
+      "Não copie texto de influenciador: recrutador local reconhece discurso genérico."
+    ],
+    localAngle: "Nem toda vaga da capital começa no LinkedIn, mas RH de escritório e clínicas costuma olhar o perfil depois do currículo — incoerência entre os dois fecha porta.",
+    coverHue: 0
+  },
+  {
+    key: "47-follow-up-entrevista",
+    title: "Follow-up após entrevista: quando mandar e o que escrever",
+    type: "GUIDE",
+    template: "STANDARD",
+    keyword: "follow up apos entrevista emprego",
+    section: "guia",
+    lead: "Silêncio depois da conversa gera ansiedade — e mensagem diária irrita. Um follow-up curto, no prazo combinado, reforça interesse sem pressão teatral.",
+    tips: [
+      "Anote na saída se combinaram prazo de retorno; espere esse prazo antes de cobrar.",
+      "Se não houve prazo, espere 5–7 dias úteis para a primeira mensagem educada.",
+      "Agradeça, cite o cargo e relembre um ponto forte alinhado à vaga em duas frases.",
+      "Pergunte se precisam de algum documento adicional — oferece utilidade, não só cobrança.",
+      "Um follow-up basta; o segundo só se o próprio recrutador abrir nova janela.",
+      "Guarde o print do envio e do anúncio original para referência futura."
+    ],
+    localAngle: "Processos em São Luís misturam WhatsApp e e-mail; use o mesmo canal da conversa oficial e mantenha tom profissional mesmo no chat.",
+    coverHue: 1
+  },
+  {
+    key: "48-rejeicao-candidatura",
+    title: "Rejeição na seleção: como reagir sem travar a busca inteira",
+    type: "NEWS",
+    template: "STANDARD",
+    keyword: "rejeicao processo seletivo dicas",
+    section: "noticias",
+    lead: "Não ser chamado não significa “inútil”. Significa que naquela rodada outro perfil encaixou — ou que o processo nem chegou a ler todo mundo. Separar ego de aprendizado mantém a semana produtiva.",
+    tips: [
+      "Espere 24 horas antes de reescrever o currículo por impulso após um “não”.",
+      "Peça feedback só se o canal for aberto e a relação já existir; aceite silêncio.",
+      "Compare o anúncio com o seu PDF: o gap costuma estar em ferramenta ou escala.",
+      "Registre a rejeição na planilha sem drama — volume sem registro vira paranoia.",
+      "Candidate-se a outra vaga alinhada no mesmo dia, em dose curta.",
+      "Evite desabafar com nome da empresa em rede pública enquanto outros processos rolam."
+    ],
+    localAngle: "Na capital, a mesma rede de varejo abre várias vezes no ano; queimar a marca por um “não” atrapalha a próxima janela.",
+    coverHue: 2
+  },
+  {
+    key: "49-primeira-semana-emprego",
+    title: "Primeira semana no emprego novo: o que observar e anotar",
+    type: "GUIDE",
+    template: "STANDARD",
+    keyword: "primeira semana emprego novo",
+    section: "guia",
+    lead: "Os primeiros dias definem ritmo, ponto e relações. Observar mais do que opinar — e anotar senhas, fluxos e nomes — reduz erro caro na semana dois.",
+    tips: [
+      "Confirme horário de entrada, intervalo e quem aprova falta ou atraso.",
+      "Anote o fluxo de tarefas críticas antes de sugerir “melhoria” no dia um.",
+      "Peça o organograma informal: quem resolve o quê na prática.",
+      "Guarde holerite e comunicado de benefícios desde o primeiro pagamento.",
+      "Apresente-se à recepção e a setores vizinhos com educação — eles destravam rotina.",
+      "Se algo do contrato divergir do combinado verbal, pergunte cedo e por escrito."
+    ],
+    localAngle: "Em lojas e clínicas de São Luís, a primeira semana costuma ser treinamento na correria; quem anota o básico sofre menos no sábado de pico.",
+    coverHue: 3
+  },
+  {
+    key: "50-pedir-aumento",
+    title: "Pedir aumento com argumentos: preparação sem ultimato",
+    type: "GUIDE",
+    template: "POST_MAGNETICO",
+    keyword: "como pedir aumento salario clt",
+    section: "guia",
+    lead: "Aumento raro cai do céu. Pedido bem preparado — com entregas, mercado e momento da empresa — conversa melhor do que ameaça de demissão inventada.",
+    tips: [
+      "Liste entregas dos últimos 6–12 meses com impacto (prazo, volume, qualidade).",
+      "Pesquise faixas de vagas semelhantes na região antes de citar número.",
+      "Marque conversa com a liderança, não jogue o pedido no grupo da equipe.",
+      "Ouça o “não” completo: às vezes há data de revisão ou meta intermediária.",
+      "Evite comparar salário de colega em público — foque no seu pacote e escopo.",
+      "Se a resposta for definitiva, decida com calma se busca externa faz sentido."
+    ],
+    localAngle: "No mercado da capital, pedido de aumento em mês de baixa ou logo após erro grave costuma falhar — escolha janela e evidência.",
+    coverHue: 5
+  },
+  {
+    key: "51-banco-horas",
+    title: "Banco de horas: o que confirmar no regulamento da empresa",
+    type: "NEWS",
+    template: "STANDARD",
+    keyword: "banco de horas direitos trabalhador",
+    section: "noticias",
+    lead: "Banco de horas não é “ficar a mais e ver depois”. Precisa de regra clara de acúmulo, compensação e prazo. Sem isso, o extra vira briga de memória.",
+    tips: [
+      "Pergunte se existe acordo ou política escrita de banco de horas no seu contrato.",
+      "Anote horas extras no mesmo dia — não confie só no sistema sem conferir.",
+      "Entenda o prazo máximo para compensar o saldo positivo.",
+      "Desconfie de “banco informal” só no caderno do supervisor.",
+      "Na saída do emprego, pergunte como o saldo será pago ou compensado.",
+      "Guarde prints de escala alterada e mensagens que pediram permanência além do horário."
+    ],
+    localAngle: "Comércio e serviços em São Luís usam banco com frequência em datas de pico — peça a regra antes do feriado, não depois.",
+    coverHue: 6
+  },
+  {
+    key: "52-hora-extra-direitos",
+    title: "Hora extra: como conferir se o adicional entrou no holerite",
+    type: "GUIDE",
+    template: "STANDARD",
+    keyword: "hora extra holerite como conferir",
+    section: "guia",
+    lead: "Trabalhar além da jornada sem ver a linha no demonstrativo é sinal de alerta. Conferir espelho de ponto e holerite no mesmo mês evita acúmulo de prejuízo.",
+    tips: [
+      "Some as horas extras do espelho de ponto antes de abrir o holerite.",
+      "Localize a linha de adicional e o percentual aplicado no demonstrativo.",
+      "Pergunte à RH com educação se o número não bater — leve os dois documentos.",
+      "Não aceite “depois a gente acerta” sem prazo e registro.",
+      "Evite bater ponto por colega ou pedir o contrário: isso contamina a prova.",
+      "Guarde os holerites do período com extra habitual — importam em dúvidas futuras."
+    ],
+    localAngle: "Em sazonalidade de comércio na capital, extra vira rotina; quem não confere mês a mês só descobre o buraco no acerto final.",
+    coverHue: 7
+  },
+  {
+    key: "53-fgts-basico",
+    title: "FGTS na prática: o que o trabalhador CLT deve acompanhar",
+    type: "GUIDE",
+    template: "POST_MAGNETICO",
+    keyword: "fgts trabalhador clt como consultar",
+    section: "guia",
+    lead: "O FGTS não é “dinheiro esquecido”: é depósito mensal que você deve acompanhar. Saber consultar o extrato e questionar atraso protege patrimônio do vínculo.",
+    tips: [
+      "Baixe o app oficial e acesse com conta gov.br segura — sem compartilhar senha.",
+      "Confira se os depósitos mensais aparecem após a admissão.",
+      "Anote meses em branco e leve a dúvida à empresa com calma e print.",
+      "Desconfie de “liberação de FGTS” pedindo PIX ou taxa a desconhecido.",
+      "Entenda que regras de saque mudam conforme modalidade — não creia em boato de grupo.",
+      "Guarde o histórico digital; ele ajuda em rescisão e conferências."
+    ],
+    localAngle: "Trabalhadores em São Luís que só olham o FGTS na demissão descobrem falha tarde — uma checagem trimestral evita surpresa.",
+    coverHue: 8
+  },
+  {
+    key: "54-seguro-desemprego",
+    title: "Seguro-desemprego: checklist básico após demissão sem justa causa",
+    type: "NEWS",
+    template: "STANDARD",
+    keyword: "seguro desemprego requisitos documentos",
+    section: "noticias",
+    lead: "Após demissão sem justa causa, o seguro-desemprego tem requisitos de tempo e documentação. Organizar papéis cedo reduz fila e informação errada de “despachante”.",
+    tips: [
+      "Guarde termo de rescisão, documentos pessoais e dados bancários atualizados.",
+      "Confirme se o seu caso se enquadra nos requisitos vigentes antes de prometer data a si mesmo.",
+      "Prefira canais oficiais de requerimento — desconfie de taxa para “agilizar”.",
+      "Anote prazos e números de protocolo de cada etapa.",
+      "Não compartilhe senha do gov.br com intermediário de WhatsApp.",
+      "Se houver dúvida complexa, busque orientação em órgão ou profissional de confiança."
+    ],
+    localAngle: "Na capital, a pressa pós-demissão alimenta golpe de “liberação rápida”; protocolo oficial e paciência protegida valem mais que atalho pago.",
+    coverHue: 9
+  },
+  {
+    key: "55-vale-alimentacao",
+    title: "Vale-alimentação e refeição: diferenças que mudam o líquido do mês",
+    type: "DATA_REPORT",
+    template: "STANDARD",
+    keyword: "vale alimentacao vale refeicao diferenca",
+    section: "dados",
+    lead: "VA e VR não são a mesma coisa no dia a dia: um costuma cobrir mercado, o outro refeição perto do posto. Comparar propostas só pelo bruto esconde esse detalhe.",
+    tips: [
+      "Pergunte o valor mensal e se há desconto em folha sobre o benefício.",
+      "Confirme se o cartão aceita o uso que você precisa (almoço x mercado).",
+      "Veja se há refeitório da empresa — isso muda o peso do VR.",
+      "Inclua o benefício na coluna ao lado do salário ao comparar duas ofertas.",
+      "Desconfie de benefício “a combinar” que nunca vira número no contrato.",
+      "Anote a data de crédito no cartão para planejar a semana sem surpresa."
+    ],
+    localAngle: "Quem trabalha longe do centro de São Luís sente no bolso se o VR não cobre o trajeto até um lugar de almoço viável — peça detalhe na proposta.",
+    coverHue: 10
+  },
+  {
+    key: "56-periodo-experiencia",
+    title: "Período de experiência: direitos e o que perguntar na admissão",
+    type: "GUIDE",
+    template: "STANDARD",
+    keyword: "periodo de experiencia clt direitos",
+    section: "guia",
+    lead: "Os primeiros 45 ou 90 dias não são “sem direito”. Há regras de registro, pagamento e término. Entender o combinado evita aceitar abuso disfarçado de teste.",
+    tips: [
+      "Confirme no contrato a duração do período de experiência e se há prorrogação prevista.",
+      "Peça clareza sobre critérios de avaliação antes do fim do prazo.",
+      "Trabalhe como se o registro valesse — porque vale — e guarde holerites.",
+      "Se pedirem demissão “de boca” sem documento, registre datas e busque orientação.",
+      "Pergunte sobre benefícios que começam só após a experiência.",
+      "Use o período para avaliar a empresa também: escala real, respeito e segurança."
+    ],
+    localAngle: "Em comércios da capital, renovação de experiência acontece; peça o papel, não só o “está tudo certo” no corredor.",
+    coverHue: 11
+  },
+  {
+    key: "57-contrato-temporario",
+    title: "Contrato temporário: o que ler antes de assinar a temporada",
+    type: "NEWS",
+    template: "STANDARD",
+    keyword: "contrato temporario emprego direitos",
+    section: "noticias",
+    lead: "Vaga temporária de fim de ano ou pico pode ser boa ponte — se prazo, remuneração e empresa estiverem claros. Assinar sem ler o fim do contrato é risco clássico.",
+    tips: [
+      "Leia data de início, término e se há possibilidade de prorrogação escrita.",
+      "Confirme salário, benefícios e local de trabalho no papel, não só no anúncio.",
+      "Pergunte quem é o empregador formal (empresa ou agência) e o canal de RH.",
+      "Entenda o que acontece no término: documentos e prazos de pagamento.",
+      "Desconfie de temporário eterno renovado sem transparência.",
+      "Guarde cópia do contrato e dos holerites da temporada."
+    ],
+    localAngle: "Sazonalidade de comércio em São Luís abre muitas temporárias; quem lê o prazo evita surpresa de “acabou ontem” sem acerto claro.",
+    coverHue: 13
+  },
+  {
+    key: "58-assedio-trabalho",
+    title: "Assédio no trabalho: sinais, registro e canais com menos risco",
+    type: "NEWS",
+    template: "POST_MAGNETICO",
+    keyword: "assedio no trabalho o que fazer",
+    section: "noticias",
+    lead: "Assédio não é “brincadeira de equipe”. Isolar, humilhar, sexualizar ou pressionar de forma abusiva exige registro e cuidado com a própria segurança ao buscar ajuda.",
+    tips: [
+      "Anote datas, locais, testemunhas e preserve mensagens sem editar o conteúdo.",
+      "Evite confrontar sozinho em local isolado se houver risco concreto.",
+      "Busque canal interno confiável (RH, ouvidoria) quando existir e for seguro.",
+      "Converse com alguém de confiança fora da empresa para apoio emocional.",
+      "Procure orientação em órgãos ou serviços especializados quando o caso exigir.",
+      "Não publique detalhes identificáveis em rede no calor do momento — priorize prova e segurança."
+    ],
+    localAngle: "Em cidades médias como São Luís, medo de “queimar o filme” silencia muita gente; registro discreto e canal adequado pesam mais que post impulsivo.",
+    coverHue: 14
+  },
+  {
+    key: "59-saude-mental-trabalho",
+    title: "Saúde mental e trabalho: limites saudáveis sem culpa excessiva",
+    type: "GUIDE",
+    template: "STANDARD",
+    keyword: "saude mental trabalho limites",
+    section: "guia",
+    lead: "Cansaço crônico, irritação e medo de errar o tempo todo são sinais — não “frescura”. Cuidar de limites e buscar apoio é parte de se manter empregável no longo prazo.",
+    tips: [
+      "Observe padrões: insônia, choro fácil, raiva ou apatia ligados à escala.",
+      "Use pausas reais no intervalo; celular de trabalho o tempo todo não é descanso.",
+      "Separe, quando possível, um ritual de fim de expediente (mesmo curto).",
+      "Peça ajuda profissional de saúde se os sintomas persistirem.",
+      "Na busca de vaga, inclua escala e deslocamento como critério de saúde, não só de dinheiro.",
+      "Evite normalizar humilhação como “cultura forte” do setor."
+    ],
+    localAngle: "Trajeto longo na capital soma ao estresse do posto; ao comparar propostas, some tempo de ônibus à conta de bem-estar.",
+    coverHue: 15
+  },
+  {
+    key: "60-home-office-checklist",
+    title: "Home office de verdade: checklist antes de aceitar remoto",
+    type: "GUIDE",
+    template: "POST_MAGNETICO",
+    keyword: "home office checklist candidato",
+    section: "guia",
+    lead: "Remoto mal combinado vira presencial disfarçado ou custo alto de internet e energia. Checklist curto evita romance de anúncio e surpresa na segunda semana.",
+    tips: [
+      "Confirme quantos dias remotos são regra e com que aviso a empresa pode mudar.",
+      "Pergunte sobre equipamento, auxílio internet e suporte de TI.",
+      "Teste sua conexão e um espaço mínimo silencioso com honestidade.",
+      "Esclareça horário de disponibilidade e se há plantão fora da jornada.",
+      "Desconfie de remoto com salário irreal e seleção só por pagamento antecipado.",
+      "Calcule o custo dos dias presenciais obrigatórios na proposta."
+    ],
+    localAngle: "Remoto pleno ainda é minoria em São Luís frente a comércio e serviços; leia o anúncio sem projetar o que não está escrito.",
+    coverHue: 16
+  },
+  {
+    key: "61-mudanca-carreira",
+    title: "Mudança de carreira na capital: como transição sem apagar o passado",
+    type: "GUIDE",
+    template: "STANDARD",
+    keyword: "mudanca de carreira curriculo dicas",
+    section: "guia",
+    lead: "Trocar de área não exige fingir que o emprego anterior não existiu. Traduza habilidades transferíveis e aceite degrau realista de entrada na nova função.",
+    tips: [
+      "Liste o que se repete entre a área antiga e a nova (atendimento, planilha, prazo).",
+      "Faça um curso curto só se ele destravar requisito explícito dos anúncios.",
+      "Reescreva o resumo do currículo com o cargo-alvo novo no topo.",
+      "Candidate-se a vagas ponte, não só ao cargo-sonho sênior imediato.",
+      "Prepare uma frase clara para a entrevista: por que a mudança agora.",
+      "Mantenha referência de quem pode falar da sua entrega na área anterior."
+    ],
+    localAngle: "No Maranhão, muita transição passa por comércio e serviços antes do escritório desejado — use a ponte com intenção, não com vergonha.",
+    coverHue: 17
+  },
+  {
+    key: "62-carta-apresentacao",
+    title: "Carta de apresentação curta: quando vale a pena enviar",
+    type: "GUIDE",
+    template: "STANDARD",
+    keyword: "carta de apresentacao emprego modelo curto",
+    section: "guia",
+    lead: "Carta longa e literária cansa. Em processos locais, um parágrafo objetivo no e-mail ou formulário — ligado ao anúncio — costuma bastar quando pedem.",
+    tips: [
+      "Só envie carta se o anúncio pedir ou se o e-mail for o canal principal.",
+      "Abra com o cargo e onde viu a vaga; nada de introdução de romance.",
+      "Cite duas provas de adequação alinhadas aos requisitos do texto.",
+      "Feche com telefone e disponibilidade para conversa.",
+      "Evite repetir o currículo inteiro — a carta é ponte, não cópia.",
+      "Revise nomes da empresa; erro de colar anúncio anterior elimina na hora."
+    ],
+    localAngle: "Em São Luís, WhatsApp frequentemente substitui carta formal; quando o canal for e-mail, o parágrafo curto ainda diferencia.",
+    coverHue: 18
+  },
+  {
+    key: "63-referencias-profissionais",
+    title: "Referências profissionais: quem pedir e como preparar o contato",
+    type: "GUIDE",
+    template: "STANDARD",
+    keyword: "referencias profissionais emprego",
+    section: "guia",
+    lead: "Referência boa é quem viu seu trabalho e pode falar com honestidade. Pedir a desconhecido “influencer” ou a parente sem contexto enfraquece a candidatura.",
+    tips: [
+      "Peça autorização antes de colocar nome e telefone no formulário.",
+      "Escolha liderança ou colega sênior que presenciou entrega real.",
+      "Avise a pessoa sobre o cargo e a empresa que podem ligar.",
+      "Mantenha o contato atualizado — número morto queima a etapa.",
+      "Não invente referência; checagem acontece mais do que se imagina.",
+      "Se só tiver experiência informal, use quem viu sua rotina com clareza."
+    ],
+    localAngle: "Rede curta na capital faz referência circular rápido — escolha quem realmente endossa, não quem só “conhece alguém”.",
+    coverHue: 19
+  },
+  {
+    key: "64-ofertas-multiplas",
+    title: "Duas ofertas na mesa: como comparar sem pressa tóxica",
+    type: "NEWS",
+    template: "STANDARD",
+    keyword: "comparar duas propostas de emprego",
+    section: "noticias",
+    lead: "Ter mais de uma proposta é ótimo — e estressante. Comparar bruto, benefício, escala e trajeto na mesma folha evita escolher só pelo número maior da mensagem.",
+    tips: [
+      "Monte uma tabela: salário, VA/VR, VT, saúde, escala, distância e clima da entrevista.",
+      "Peça prazo razoável para responder; pressão de “só até hoje à noite” merece cautela.",
+      "Não invente oferta fictícia para forçar contraproposta.",
+      "Considere crescimento e aprendizado se os líquidos forem parecidos.",
+      "Comunique a recusa com educação à empresa que não ficou — a cidade é pequena.",
+      "Assine só quando o combinado essencial estiver por escrito."
+    ],
+    localAngle: "Em São Luís, queimar ponte na recusa mal educada volta em indicação futura; firmeza e respeito cabem no mesmo áudio.",
+    coverHue: 21
+  },
+  {
+    key: "65-agradecimento-pos",
+    title: "Mensagem de agradecimento pós-entrevista que não parece robô",
+    type: "GUIDE",
+    template: "POST_MAGNETICO",
+    keyword: "mensagem agradecimento pos entrevista",
+    section: "guia",
+    lead: "Agradecer no mesmo dia reforça interesse. Texto genérico de internet soa falso; duas frases pessoais ligadas à conversa funcionam melhor.",
+    tips: [
+      "Envie em até 24 horas pelo mesmo canal da entrevista.",
+      "Cite um tema específico discutido (ferramenta, escala, meta do time).",
+      "Reafirme disponibilidade e interesse em uma linha.",
+      "Evite emoji em excesso e áudio longo de “filosofia de vida”.",
+      "Não anexe currículo de novo sem pedido — a menos que tenham pedido ajuste.",
+      "Se errar o nome da pessoa, corrija com educação em mensagem seguinte curta."
+    ],
+    localAngle: "Recrutadores locais leem dezenas de “obrigado pela oportunidade” idênticos; um detalhe da conversa real destaca você.",
+    coverHue: 22
+  },
+  {
+    key: "66-codigo-vestimenta",
+    title: "O que vestir na entrevista: leitura do setor sem exagero",
+    type: "GUIDE",
+    template: "STANDARD",
+    keyword: "o que vestir entrevista emprego",
+    section: "guia",
+    lead: "Roupa não substitui resposta boa, mas desalinhamento extremo distrai. Ler o setor — escritório, loja, cozinha — evita terno em padaria e bermuda em banco.",
+    tips: [
+      "Observe fotos oficiais da empresa e o tom do anúncio para calibrar.",
+      "Prefira limpeza, caimento e conforto para o clima da capital.",
+      "Evite perfume forte, estampa agressiva e acessório barulhento.",
+      "Leve um agasalho leve se o ar-condicionado do escritório for gelado.",
+      "Para vaga operacional, pergunte se haverá teste prático com uniforme.",
+      "O que importa é parecer cuidado e coerente com a função, não “de revista”."
+    ],
+    localAngle: "Calor e umidade em São Luís pedem tecido respirável; passar mal de calor na entrevista não é estratégia de autenticidade.",
+    coverHue: 23
+  },
+  {
+    key: "67-excel-basico-vagas",
+    title: "Excel pedida em vaga local: o que treinar de verdade",
+    type: "GUIDE",
+    template: "POST_MAGNETICO",
+    keyword: "excel basico vagas emprego",
+    section: "guia",
+    lead: "Muitos anúncios pedem Excel “intermediário” e testam o básico bem feito. Saber filtrar, somar e organizar planilha pesa mais que dizer que “domina macros”.",
+    tips: [
+      "Treine SOMA, filtro, ordenação e formatação de data/número.",
+      "Monte uma planilha simples de controle (estoque, agenda ou despesas).",
+      "Saiba explicar no que já usou planilha no trabalho ou estudo.",
+      "Não finja VBA se nunca abriu o editor — o teste prático denuncia.",
+      "Leve exemplo anonimizado só se pedirem e se não houver dado sensível.",
+      "No currículo, escreva “Excel: tabelas, filtros e fórmulas básicas” com honestidade."
+    ],
+    localAngle: "Escritórios e estoques em São Luís usam planilha no dia a dia; demonstração curta e correta vence currículo com “expert” vazio.",
+    coverHue: 24
+  },
+  {
+    key: "68-ingles-curriculo",
+    title: "Inglês no currículo: como declarar nível sem inventar fluência",
+    type: "DATA_REPORT",
+    template: "STANDARD",
+    keyword: "ingles no curriculo nivel",
+    section: "dados",
+    lead: "Declarar fluência sem conseguir se apresentar trava na primeira pergunta. Nível honesto e prova (curso, uso real) protegem melhor do que adjetivo inflado.",
+    tips: [
+      "Use escala clara: básico, intermediário, avançado — e esteja pronto para provar.",
+      "Cite contexto de uso: e-mail, atendimento, leitura de manual.",
+      "Inclua curso só se recente ou relevante ao cargo.",
+      "Se a vaga exige inglês diário, ensaie uma apresentação curta no idioma.",
+      "Não cole certificado antigo sem lembrar o conteúdo.",
+      "Para vagas 100% em português, inglês é diferencial — não o centro do PDF."
+    ],
+    localAngle: "Poucas vagas operacionais da capital exigem inglês diário; quando pedirem, a entrevista costuma testar na hora — honestidade evita constrangimento.",
+    coverHue: 25
+  },
+  {
+    key: "69-profissional-40-mais",
+    title: "Profissional 40+: como posicionar experiência sem se apagar",
+    type: "NEWS",
+    template: "STANDARD",
+    keyword: "emprego apos 40 anos curriculo",
+    section: "noticias",
+    lead: "Etarismo existe, mas currículo que esconde década inteira também atrapalha. Foque em resultado recente, atualização prática e energia para o posto — sem pedir desculpas pela idade.",
+    tips: [
+      "Destaque os últimos 10–15 anos com mais detalhe; resuma o início se preciso.",
+      "Mostre ferramenta atual que você usa de verdade (sistema, planilha, PDV).",
+      "Evite foto datada ou discurso de “ainda tenho fôlego” — mostre entrega.",
+      "Candidate-se a vagas com encaixe real de escopo, não só a título de status antigo.",
+      "Prepare resposta curta para “por que essa vaga agora”.",
+      "Use rede de indicação com quem viu seu trabalho recente."
+    ],
+    localAngle: "Em serviços e comércio de São Luís, experiência estável ainda abre porta — desde que o PDF fale do presente, não só de 1998.",
+    coverHue: 26
+  },
+  {
+    key: "70-retorno-maternidade",
+    title: "Volta ao mercado após maternidade: currículo e conversa sem culpa",
+    type: "GUIDE",
+    template: "STANDARD",
+    keyword: "retorno ao trabalho apos maternidade",
+    section: "guia",
+    lead: "Pausa por maternidade não precisa de novela nem de silêncio constrangedor. Uma linha clara, foco no que você entrega agora e perguntas práticas sobre escala ajudam.",
+    tips: [
+      "Explique o intervalo em uma frase objetiva, sem excesso de detalhe íntimo.",
+      "Atualize habilidades e contato; gap com telefone morto dobra rejeição.",
+      "Pergunte sobre escala e flexibilidade com educação, não com pedido genérico.",
+      "Organize rede de apoio e documentos antes de aceitar horário impossível.",
+      "Treine a resposta para não soar defensiva nem pedindo permissão para existir.",
+      "Peça referências de quem trabalhou com você antes da pausa."
+    ],
+    localAngle: "Recrutadores na capital veem retornos o tempo todo; o que pesa é clareza de disponibilidade e preparo de documentos, não discurso de culpa.",
+    coverHue: 27
+  },
+  {
+    key: "71-call-center-perfil",
+    title: "Vagas de call center: voz, meta e o que perguntar na seleção",
+    type: "GUIDE",
+    template: "POST_MAGNETICO",
+    keyword: "vagas call center sao luis dicas",
+    section: "guia",
+    lead: "Atendimento ativo ou receptivo pede voz clara, paciência e meta. Entender turno, fone e cobrança de resultado evita surpresa no primeiro mês de headset.",
+    tips: [
+      "Pergunte se a meta é individual, por equipe e como é medida.",
+      "Confirme turno, intervalo e política de pausa para banheiro e água.",
+      "Teste sua voz e postura sentada — a entrevista pode incluir simulação.",
+      "Esclareça se o home office de call center inclui equipamento e internet.",
+      "Prepare exemplo de cliente irritado resolvido com educação.",
+      "Leia o contrato sobre descontos e “qualidade” antes de assinar."
+    ],
+    localAngle: "Operações de atendimento que contratam em São Luís variam muito de clima; meta sem pausa real é sinal para questionar na entrevista.",
+    coverHue: 29
+  },
+  {
+    key: "72-recepcao-clinica",
+    title: "Recepção em clínica e consultório: o que o anúncio espera de você",
+    type: "GUIDE",
+    template: "STANDARD",
+    keyword: "vaga recepcionista clinica sao luis",
+    section: "guia",
+    lead: "Recepção misturagenda, telefone, WhatsApp e sigilo. Quem descreve organização de fila e cuidado com dado de paciente conquista mais do que “sou simpática”.",
+    tips: [
+      "Cite experiência com agenda, confirmação de horário ou atendimento telefônico.",
+      "Destaque discrição: prontuário e conversa de corredor não se misturam.",
+      "Prepare-se para lidar com atraso de paciente e profissional com calma.",
+      "Pergunte sobre sistema de marcação e volume típico de atendimentos.",
+      "Vista-se de forma limpa e sóbria — o setor valoriza apresentação cuidadosa.",
+      "Confirme horário de sábado e feriado se a clínica abrir nesses dias."
+    ],
+    localAngle: "Clínicas na capital pedem recepcionista que segure WhatsApp e presencial ao mesmo tempo — mostre que você prioriza sem perder educação.",
+    coverHue: 30
+  },
+  {
+    key: "73-estoque-logistica",
+    title: "Estoque e logística leve: como mostrar precisão sem jargão vazio",
+    type: "GUIDE",
+    template: "STANDARD",
+    keyword: "vagas estoque logistica sao luis",
+    section: "guia",
+    lead: "Conferir nota, organizar prateleira e evitar extravio são o coração do estoque. Currículo com verbos concretos vence frase de “proativo e dinâmico”.",
+    tips: [
+      "Descreva conferência de mercadoria, inventário ou organização de área.",
+      "Cite ferramentas: leitor, planilha, sistema simples de entrada e saída.",
+      "Fale de cuidado com validade e ruptura se tiver experiência em varejo.",
+      "Pergunte sobre peso, altura de prateleira e EPI no posto.",
+      "Confirme escala de recebimento noturno ou madrugada se houver.",
+      "Mostre atenção a erro de nota — exemplo curto impressiona mais que adjetivo."
+    ],
+    localAngle: "Centros de distribuição e lojas em São Luís valorizam quem reduz diferença de inventário; prepare um exemplo real de correção de erro.",
+    coverHue: 31
+  },
+  {
+    key: "74-vendas-balcao",
+    title: "Vendas no balcão: meta, comissão e tom que não afasta cliente",
+    type: "DATA_REPORT",
+    template: "STANDARD",
+    keyword: "vagas vendedor loja comissao",
+    section: "dados",
+    lead: "Anúncio de vendedor mistura “meta desafiadora” e sorriso. Entender se a renda depende de comissão — e como ela é calculada — evita líquido ilusório.",
+    tips: [
+      "Pergunte o salário-base, o percentual de comissão e o histórico realista do time.",
+      "Esclareça se devolução de venda desconta comissão depois.",
+      "Prepare exemplos de abordagem educada, não de pressão agressiva.",
+      "Confirme horário de shopping ou rua e trabalho em feriado.",
+      "Observe na entrevista se a liderança fala só de meta ou também de treinamento.",
+      "Compare duas lojas do mesmo corredor antes de aceitar a primeira oferta."
+    ],
+    localAngle: "Corredores comerciais de São Luís vivem de fim de semana; comissão bonita no papel precisa sobreviver a terça vazia — peça número completo.",
+    coverHue: 32
+  },
+  {
+    key: "75-turismo-hotelaria",
+    title: "Hotelaria e turismo local: sazonalidade e postura de atendimento",
+    type: "NEWS",
+    template: "STANDARD",
+    keyword: "vagas hotelaria turismo sao luis",
+    section: "noticias",
+    lead: "Alta temporada e eventos mudam o ritmo de hotéis e atrações. Quem entende pico, uniformidade de atendimento e escala irregular se prepara melhor para a seleção.",
+    tips: [
+      "Destaque experiência com público, idiomas básicos ou organização de check-in se tiver.",
+      "Pergunte sobre temporada alta, hora extra e dormida em plantão.",
+      "Prepare-se para falar de reclamação de hóspede resolvida com calma.",
+      "Confirme uniforme, apresentação e regras de uso de celular no posto.",
+      "Leia se a vaga é sazonal ou efetiva antes de planejar a renda anual.",
+      "Desconfie de “ajuda” sem registro em período de festa lotada."
+    ],
+    localAngle: "Eventos e feriados em São Luís enchem hospedagem; pergunte a escala real da alta, não só o anúncio de baixa temporada.",
+    coverHue: 33
+  },
+  {
+    key: "76-motorista-entregas",
+    title: "Motorista e entregas: documentos, rota e o que o anúncio omite",
+    type: "GUIDE",
+    template: "STANDARD",
+    keyword: "vagas motorista entregador sao luis",
+    section: "guia",
+    lead: "CNH válida é só o começo. Veículo, app, seguro e tempo de rota mudam o ganho. Ler o que a empresa fornece evita aceitar custo escondido.",
+    tips: [
+      "Confirme se o veículo é da empresa ou próprio e quem paga combustível/manutenção.",
+      "Peça clareza sobre meta de entregas e área de cobertura.",
+      "Mantenha CNH, CRLV e documentos pessoais em dia e legíveis.",
+      "Pergunte sobre seguro e procedimento em caso de sinistro ou assalto.",
+      "Calcule tempo real de trânsito na capital no horário da rota.",
+      "Recuse proposta que peça taxa para “liberar” rota ou app."
+    ],
+    localAngle: "Trânsito e chuva em São Luís alteram rota de entrega; combine expectativa de tempo com a operação antes de prometer o impossível.",
+    coverHue: 34
+  },
+  {
+    key: "77-plano-90-dias",
+    title: "Plano de 90 dias na busca: ritmo sustentável até a entrevista",
+    type: "GUIDE",
+    template: "POST_MAGNETICO",
+    keyword: "plano 90 dias busca emprego",
+    section: "guia",
+    lead: "Busca sem horizonte vira ansiedade infinita. Um bloco de 90 dias com metas mensais — currículo, volume de qualidade, treino de entrevista — organiza energia.",
+    tips: [
+      "Mês 1: PDF sólido, pasta de documentos e 3 histórias comportamentais.",
+      "Mês 2: candidaturas adaptadas e follow-ups com registro em planilha.",
+      "Mês 3: reforço de rede, simulação de entrevista e ajuste fino do material.",
+      "Revise métricas a cada 15 dias: envios, respostas, entrevistas.",
+      "Inclua descanso semanal — burnout de busca piora o tom das mensagens.",
+      "Se em 90 dias a taxa for zero, mude o material antes de só aumentar volume."
+    ],
+    localAngle: "Quem busca em São Luís conciliando bico precisa de plano longo o bastante para não desistir na terceira semana silenciosa.",
+    coverHue: 35
+  },
+  {
+    key: "78-sindicato-basico",
+    title: "Sindicato e trabalhador: o básico para não cair em boato",
+    type: "NEWS",
+    template: "STANDARD",
+    keyword: "sindicato trabalhador direitos basico",
+    section: "noticias",
+    lead: "Sindicato não é vilão automático nem salvador mágico. Entender categoria, contribuição e canais oficiais ajuda a buscar informação sem depender de áudio de grupo.",
+    tips: [
+      "Identifique a categoria do seu cargo e se há convenção aplicável.",
+      "Prefira informação em canal oficial do sindicato da categoria.",
+      "Desconfie de cobrança estranha feita por desconhecido no WhatsApp.",
+      "Guarde boletos e comprovantes se houver contribuição formal.",
+      "Em dúvida de direito específico, anote a pergunta antes de ligar ou ir ao atendimento.",
+      "Não misture boato de reajuste com o que está escrito no acordo."
+    ],
+    localAngle: "Trabalhadores da capital maranhense ganham tempo quando separam convenção real de correntes de mensagem com percentual inventado.",
+    coverHue: 37
+  },
+  {
+    key: "79-acordo-coletivo",
+    title: "Acordo e convenção coletiva: o que isso muda no seu holerite",
+    type: "DATA_REPORT",
+    template: "STANDARD",
+    keyword: "convencao coletiva holerite trabalhador",
+    section: "dados",
+    lead: "Piso, adicional e regra de jornada podem vir de norma coletiva, não só da lei geral. Saber que o documento existe ajuda a questionar valor estranho com base.",
+    tips: [
+      "Pergunte à RH qual convenção ou acordo se aplica ao seu contrato.",
+      "Compare o piso da categoria com o seu salário-base no demonstrativo.",
+      "Anote cláusulas de VT, refeição ou adicional noturno se existirem.",
+      "Guarde PDF ou link oficial da norma quando disponível.",
+      "Não confunda proposta de empresa com regra já negociada da categoria.",
+      "Em divergência, leve o documento e o holerite juntos à conversa."
+    ],
+    localAngle: "Em setores de São Luís com forte convenção, o “sempre foi assim” do corredor pode estar desatualizado — o texto da norma manda mais.",
+    coverHue: 38
+  },
+  {
+    key: "80-atestado-medico",
+    title: "Atestado médico no emprego: entrega, prazo e cuidados com o documento",
+    type: "GUIDE",
+    template: "STANDARD",
+    keyword: "atestado medico trabalho como entregar",
+    section: "guia",
+    lead: "Atestado existe para justificar ausência por saúde. Entregar no canal certo, no prazo da empresa e sem adulterar o papel evita problema disciplinar grave.",
+    tips: [
+      "Conheça o prazo e o canal (e-mail, RH, sistema) para envio do atestado.",
+      "Guarde cópia legível do documento e do comprovante de entrega.",
+      "Nunca adultere data, CID ou assinatura — a consequência é séria.",
+      "Se o sistema rejeitar o arquivo, avise na hora e reenvie por canal alternativo oficial.",
+      "Esclareça se a empresa exige presencial após certo número de dias.",
+      "Cuide da própria saúde de verdade; atestado não é ferramenta de folga combinada."
+    ],
+    localAngle: "Políticas de atestado variam entre empresas da capital; perguntar na admissão evita descobrir regra rígida só na primeira gripe.",
+    coverHue: 39
+  },
+  {
+    key: "81-acidente-trabalho",
+    title: "Acidente de trabalho: primeiros passos e registro sem pânico",
+    type: "NEWS",
+    template: "STANDARD",
+    keyword: "acidente de trabalho o que fazer",
+    section: "noticias",
+    lead: "Acidente no posto exige cuidado imediato com a saúde e registro. Improvisar “fica quieto que a gente resolve” pode prejudicar tratamento e direitos depois.",
+    tips: [
+      "Busque atendimento médico adequado o quanto antes.",
+      "Comunique a liderança e a área responsável assim que possível.",
+      "Preserve evidências simples: local, horário, testemunhas, fotos se seguro.",
+      "Pergunte sobre abertura de comunicação de acidente conforme o caso.",
+      "Não assine documento que não entendeu — peça cópia e tempo para ler.",
+      "Acompanhe afastamento e retorno com orientação de saúde ocupacional quando houver."
+    ],
+    localAngle: "Em operações de São Luís com risco físico (limpeza, carga, cozinha), EPI e treino importam antes do acidente — e registro importa depois.",
+    coverHue: 40
+  },
+  {
+    key: "82-terceirizado-direitos",
+    title: "Trabalho terceirizado: quem é o empregador e o que perguntar",
+    type: "GUIDE",
+    template: "STANDARD",
+    keyword: "trabalhador terceirizado direitos",
+    section: "guia",
+    lead: "Crachá da empresa tomadora e contrato com a prestadora confundem. Saber quem paga, quem demite e onde reclamar evita cobrança no lugar errado.",
+    tips: [
+      "Identifique no contrato o nome da empregadora formal.",
+      "Guarde holerites e comunicados da prestadora, não só da empresa do local.",
+      "Pergunte sobre benefícios e escala no papel da contratante certa.",
+      "Em atraso de pagamento, registre e busque o canal da empregadora.",
+      "Desconfie de “ajuda” permanente sem registro no local da tomadora.",
+      "Mantenha cópia de crachá, contrato e aditivos."
+    ],
+    localAngle: "Prédios, hospitais e shoppings em São Luís concentram terceirizados; clareza de vínculo protege na hora do acerto.",
+    coverHue: 41
+  },
+  {
+    key: "83-trabalho-noturno",
+    title: "Trabalho noturno: adicional, sono e perguntas antes de aceitar",
+    type: "NEWS",
+    template: "STANDARD",
+    keyword: "trabalho noturno adicional direitos",
+    section: "noticias",
+    lead: "Turno da noite muda corpo e rotina familiar. Além do adicional, pergunte transporte, refeição e como a empresa trata troca de escala.",
+    tips: [
+      "Confirme se há adicional noturno e como aparece no holerite.",
+      "Pergunte sobre transporte de madrugada e segurança do trajeto.",
+      "Entenda intervalo e política de troca de turno.",
+      "Calcule impacto no sono e na vida pessoal antes de aceitar só pelo valor.",
+      "Se já tiver outro emprego diurno, avalie legalidade e saúde da dupla jornada.",
+      "Guarde escalas publicadas — mudança verbal frequente é sinal de atenção."
+    ],
+    localAngle: "Hospitais, segurança e alguns comércios da capital usam noite; trajeto vazio de ônibus às 4h precisa entrar na conta da proposta.",
+    coverHue: 42
+  },
+  {
+    key: "84-conflito-lideranca",
+    title: "Conflito com a liderança: como documentar e falar com objetividade",
+    type: "GUIDE",
+    template: "STANDARD",
+    keyword: "conflito com chefe trabalho dicas",
+    section: "guia",
+    lead: "Desacordo de meta ou tom não se resolve só com silêncio. Falar com fatos, buscar mediação interna e saber a hora de sair protege carreira e saúde.",
+    tips: [
+      "Separe fato (data, tarefa, combinado) de interpretação emocional no rascunho.",
+      "Peça conversa privada com pauta clara — não discuta raiva no grupo.",
+      "Se houver RH ou mediação, use o canal com registro objetivo.",
+      "Evite fofoca paralela que vira “você contra o time”.",
+      "Cuide da própria performance documentada enquanto o conflito existe.",
+      "Se o ambiente for abusivo, priorize segurança e plano de saída estruturado."
+    ],
+    localAngle: "Em equipes pequenas de São Luís, conflito mal conduzido vaza rápido; objetividade e registro valem mais que áudio inflamado.",
+    coverHue: 43
+  },
+  {
+    key: "85-feedback-entrevista",
+    title: "Feedback na entrevista: como pedir e o que fazer com a resposta",
+    type: "GUIDE",
+    template: "POST_MAGNETICO",
+    keyword: "pedir feedback entrevista emprego",
+    section: "guia",
+    lead: "Poucos processos dão retorno detalhado — mas quando dão, é ouro. Pedir feedback com educação e aplicar no próximo envio acelera a curva.",
+    tips: [
+      "Peça feedback só após resposta final ou quando o recrutador se mostrar aberto.",
+      "Pergunte o que poderia fortalecer no perfil para vagas semelhantes.",
+      "Agradeça mesmo se a crítica doer; processe depois, não na hora.",
+      "Traduza o feedback em um ajuste concreto no PDF ou na fala.",
+      "Não discuta a decisão tentando “reverter” com argumentação longa.",
+      "Se não houver feedback, revise sozinho anúncio versus currículo."
+    ],
+    localAngle: "RH local com agenda cheia raramente escreve laudo; uma pergunta curta no WhatsApp oficial tem mais chance do que e-mail de duas páginas.",
+    coverHue: 45
+  },
+  {
+    key: "86-inteligencia-emocional",
+    title: "Inteligência emocional na seleção: calma que se demonstra na prática",
+    type: "GUIDE",
+    template: "STANDARD",
+    keyword: "inteligencia emocional entrevista emprego",
+    section: "guia",
+    lead: "Não é discurso de coach: é não explodir com provocação leve, ouvir até o fim e responder com respeito. Processos locais testam isso em dinâmica e no balcão.",
+    tips: [
+      "Treine pausa de dois segundos antes de responder pergunta difícil.",
+      "Nomeie o fato sem atacar a pessoa na história comportamental.",
+      "Mostre que você pede ajuda quando o limite técnico aparece.",
+      "Evite ironizar o processo ou o entrevistador — mesmo se a pergunta for ruim.",
+      "Na dinâmica, escute quem fala pouco e incorpore uma ideia alheia.",
+      "Depois da entrevista, não desconte raiva em avaliação pública da empresa."
+    ],
+    localAngle: "Fila, calor e atraso de ônibus em São Luís já testam o humor antes da sala; chegar composto é parte da demonstração.",
+    coverHue: 46
+  },
+  {
+    key: "87-gestao-tempo-posto",
+    title: "Gestão de tempo no posto novo: priorizar sem parecer lento",
+    type: "GUIDE",
+    template: "STANDARD",
+    keyword: "gestao de tempo trabalho dicas",
+    section: "guia",
+    lead: "No emprego novo, tudo parece urgente. Aprender a priorizar com a liderança — e comunicar atraso cedo — evita imagem de desorganização injusta.",
+    tips: [
+      "Peça a ordem de prioridade do dia na primeira semana.",
+      "Use lista simples no papel ou no celular para não perder demanda oral.",
+      "Avise cedo se o prazo vai estourar — surpresa no fim do dia piora.",
+      "Agrupe tarefas parecidas (ligações, arquivos) para reduzir troca de contexto.",
+      "Proteja o intervalo: trabalhar sem pausa não prova valor eterno.",
+      "Revise no fim do expediente o que ficou pendente para o dia seguinte."
+    ],
+    localAngle: "Times enxutos na capital empilham tarefa; quem alinha prioridade com o chefe sofre menos acusação de “não rende”.",
+    coverHue: 47
+  },
+  {
+    key: "88-alfabetizacao-digital",
+    title: "Alfabetização digital para vagas locais: o mínimo que destrava",
+    type: "DATA_REPORT",
+    template: "STANDARD",
+    keyword: "alfabetizacao digital emprego basico",
+    section: "dados",
+    lead: "PDF, e-mail, nuvem e formulário online são o chão de muitas seleções. Sem isso, candidato bom trava no envio — não na entrevista.",
+    tips: [
+      "Saiba anexar PDF, compactar foto de documento e nomear arquivo.",
+      "Crie e organize uma pasta no Drive ou similar só para candidaturas.",
+      "Treine preencher formulário sem fechar a aba no meio.",
+      "Use senha forte no e-mail e no gov.br — sem anotar em post público.",
+      "Peça ajuda a alguém de confiança para um ensaio de envio, se precisar.",
+      "Não pague “curso milagroso” de celular que promete emprego garantido."
+    ],
+    localAngle: "Processos em São Luís pedem cada vez mais envio digital; quem só domina o papel precisa de um treino curto antes da próxima vaga.",
+    coverHue: 48
+  },
+  {
+    key: "89-portfolio-simples",
+    title: "Portfólio simples sem ser designer: quando e como montar",
+    type: "GUIDE",
+    template: "STANDARD",
+    keyword: "portfolio simples candidato emprego",
+    section: "guia",
+    lead: "Nem toda vaga pede portfólio, mas atendimento, admin e operação podem mostrar “antes e depois” de organização. Um PDF curto com 3 provas basta.",
+    tips: [
+      "Escolha três exemplos anonimizados: planilha, fluxo, peça de comunicação.",
+      "Tire dados sensíveis de cliente e colega antes de compartilhar.",
+      "Explique em uma linha o problema e o resultado de cada peça.",
+      "Envie só se pedirem ou se reforçar fortemente o anúncio.",
+      "Mantenha o arquivo leve para WhatsApp.",
+      "Atualize o portfólio quando mudar de área-alvo."
+    ],
+    localAngle: "Em processos da capital, portfólio curto e legível no celular funciona melhor que site pesado que não abre no 4G.",
+    coverHue: 49
+  },
+  {
+    key: "90-comparar-portais",
+    title: "Portais de vaga: como comparar fontes sem cair em duplicata e golpe",
+    type: "DATA_REPORT",
+    template: "STANDARD",
+    keyword: "comparar portais de emprego seguranca",
+    section: "dados",
+    lead: "A mesma vaga aparece em três sites com textos diferentes. Cruzar fonte, data e canal oficial reduz candidatura duplicada e anúncio falso.",
+    tips: [
+      "Prefira o canal indicado no Empregos São Luís quando a vaga estiver lá.",
+      "Compare razão social e cidade antes de enviar documento.",
+      "Desconfie de republicação com salário milagroso e zero requisito.",
+      "Anote onde já se candidatou para não spammar o mesmo RH.",
+      "Trate grupo de Telegram/WhatsApp como ruído a filtrar, não como fonte principal.",
+      "Se pedir taxa para “destaque no portal”, encerre."
+    ],
+    localAngle: "Candidatos em São Luís perdem tempo com a mesma vaga colada em cinco grupos; uma planilha mínima de origem evita reenvio cego.",
+    coverHue: 50
+  },
+  {
+    key: "91-ler-contrato-clt",
+    title: "Ler o contrato CLT antes de assinar: cláusulas que merecem pausa",
+    type: "GUIDE",
+    template: "POST_MAGNETICO",
+    keyword: "ler contrato trabalho clt dicas",
+    section: "guia",
+    lead: "Assinar sem ler é clássico de arrependimento. Cargo, salário, local, jornada e período de experiência precisam bater com o que foi falado na proposta.",
+    tips: [
+      "Compare salário e benefícios do papel com a mensagem da oferta.",
+      "Confirme endereço ou área de trabalho e possibilidade de transferência.",
+      "Leia jornada, intervalo e se há banco de horas citado.",
+      "Peça cópia assinada para você — não fique só com o “depois te mando”.",
+      "Se algo divergir, pergunte antes de assinar; pressão extrema é sinal.",
+      "Guarde o PDF/foto legível do contrato com os holerites."
+    ],
+    localAngle: "Admissões rápidas de comércio em São Luís não eliminam o direito de ler; dois minutos a mais evitam mês inteiro de discussão.",
+    coverHue: 51
+  },
+  {
+    key: "92-mitos-direitos",
+    title: "Mitos de direitos trabalhistas que circulam em grupo de WhatsApp",
+    type: "NEWS",
+    template: "STANDARD",
+    keyword: "mitos direitos trabalhistas whatsapp",
+    section: "noticias",
+    lead: "Áudio confiante não é lei. Percentual de adicional, regra de falta e “posso processar por isso” precisam de fonte — não de corrente encaminhada.",
+    tips: [
+      "Desconfie de mensagem sem data, sem fonte e com urgência de compartilhar.",
+      "Confira informação em canal oficial ou profissional de confiança.",
+      "Não tome decisão de demissão ou confrontação só com base em boato.",
+      "Guarde o holerite e o contrato — eles pesam mais que print de desconhecido.",
+      "Evite pagar consulta milagrosa vendida no mesmo grupo do boato.",
+      "Se a dúvida for séria, anote os fatos do seu caso antes de buscar orientação."
+    ],
+    localAngle: "Grupos de emprego em São Luís misturam vaga útil e mito perigoso; separar os dois é habilidade de candidato moderno.",
+    coverHue: 53
+  },
+  {
+    key: "93-custo-vida-salario",
+    title: "Custo de vida e salário em São Luís: conta mínima antes de aceitar",
+    type: "DATA_REPORT",
+    template: "POST_MAGNETICO",
+    keyword: "custo de vida salario sao luis",
+    section: "dados",
+    lead: "O bruto bonito encolhe com condução, almoço e tempo. Uma conta mínima de deslocamento e alimentação mostra se a proposta sustenta o mês.",
+    tips: [
+      "Some passagens do mês no horário real da escala.",
+      "Estime almoço fora se não houver VR/refeitório suficiente.",
+      "Inclua custo de dados móveis se o trabalho exigir app o tempo todo.",
+      "Compare líquido estimado entre duas propostas na mesma folha.",
+      "Considere tempo de trajeto como custo de vida — não só dinheiro.",
+      "Deixe margem para imprevisto; proposta no limite exato aperta no primeiro atraso."
+    ],
+    localAngle: "Morar longe do posto em São Luís transforma salário “ok” em apertado; faça a conta com honestidade geográfica.",
+    coverHue: 54
+  },
+  {
+    key: "94-negociar-deslocamento",
+    title: "Deslocamento longo: como negociar horário ou auxílio com educação",
+    type: "GUIDE",
+    template: "STANDARD",
+    keyword: "negociar horario deslocamento emprego",
+    section: "guia",
+    lead: "Às vezes o salário fecha e o trajeto não. Negociar entrada diferenciada, VT completo ou home parcial — quando fizer sentido — exige dado, não drama.",
+    tips: [
+      "Leve o tempo real de trajeto (teste feito) para a conversa.",
+      "Peça ajuste específico: 30 minutos, VT integral, dia remoto.",
+      "Mostre compromisso com pontualidade se o ajuste for concedido.",
+      "Aceite o “não” sem ameaça; use a informação para decidir se fica.",
+      "Evite negociar isso só no corredor sem registro do combinado.",
+      "Se o trajeto for inviável, recusar a tempo é profissionalismo."
+    ],
+    localAngle: "Empresas da capital conhecem o problema do deslocamento; pedido concreto e educado tem mais chance do que reclamação genérica de trânsito.",
+    coverHue: 55
+  },
+  {
+    key: "95-trabalho-fim-semana",
+    title: "Trabalho no fim de semana: o que alinhar sobre folga e adicional",
+    type: "NEWS",
+    template: "STANDARD",
+    keyword: "trabalhar fim de semana direitos folga",
+    section: "noticias",
+    lead: "Sábado e domingo no posto são comuns em comércio e serviços. O que importa é saber se a folga compensa, se há adicional e como a escala é publicada.",
+    tips: [
+      "Pergunte quantos fins de semana por mês são regra no setor.",
+      "Confirme se folga compensatória ou adicional aparece no holerite.",
+      "Peça a escala com antecedência razoável — surpresa semanal cansa.",
+      "Calcule impacto em estudo, família e segundo vínculo antes de aceitar.",
+      "Guarde prints de escala quando houver troca de última hora frequente.",
+      "Se o anúncio esconde o domingo, trate como risco na entrevista."
+    ],
+    localAngle: "Alimentação e varejo em São Luís giram no fim de semana; alinhar expectativa na seleção evita pedido de demissão no segundo mês.",
+    coverHue: 56
+  },
+  {
+    key: "96-transferencia-interna",
+    title: "Transferência interna: como pedir mudança de setor sem queimar ponte",
+    type: "GUIDE",
+    template: "STANDARD",
+    keyword: "transferencia interna emprego dicas",
+    section: "guia",
+    lead: "Mudar de setor na mesma empresa pode ser crescimento — ou fuga mal explicada. Pedido com motivo profissional e histórico bom de entrega conversa melhor.",
+    tips: [
+      "Espere ter entregas sólidas no posto atual antes de pedir troca.",
+      "Fale primeiro com a liderança atual, salvo risco de retaliação grave.",
+      "Explique o interesse pelo novo setor com skill transferível, não só “cansei”.",
+      "Aceite que a empresa pode dizer não e prepare plano B externo.",
+      "Evite campanha paralela de fofoca para forçar a mudança.",
+      "Se aprovado, faça transição limpa: passe o bastão documentado."
+    ],
+    localAngle: "Em grupos econômicos presentes em São Luís, indicação interna move vaga; reputação no setor atual pesa tanto quanto o pedido.",
+    coverHue: 57
+  },
+  {
+    key: "97-avaliacao-desempenho",
+    title: "Avaliação de desempenho: como se preparar sem teatro",
+    type: "GUIDE",
+    template: "STANDARD",
+    keyword: "avaliacao de desempenho preparacao",
+    section: "guia",
+    lead: "Avaliação boa não é discurso de autoelogio. É evidência de meta, exemplo de melhoria e pergunta sobre o próximo ciclo. Chegue com fatos, não com surpresa.",
+    tips: [
+      "Reúna números e exemplos dos últimos meses antes da conversa.",
+      "Liste um ponto a melhorar com plano simples — mostra maturidade.",
+      "Peça clareza sobre critérios se a nota parecer subjetiva demais.",
+      "Anote combinados de desenvolvimento e cobrado prazo depois.",
+      "Evite comparar colega na frente do avaliador.",
+      "Use o feedback para ajustar busca interna ou externa com calma."
+    ],
+    localAngle: "Nem toda empresa da capital tem ciclo formal; se não houver, peça feedback trimestral informal registrado por e-mail ou mensagem.",
+    coverHue: 58
+  },
+  {
+    key: "98-entrevista-desligamento",
+    title: "Entrevista de desligamento: o que falar e o que guardar",
+    type: "NEWS",
+    template: "STANDARD",
+    keyword: "entrevista de desligamento dicas",
+    section: "noticias",
+    lead: "Na saída, a empresa pode perguntar motivos. Honestidade estratégica — fatos sem ataque pessoal — protege referência e acerto, sem transformar a sala em tribunal.",
+    tips: [
+      "Prepare duas ou três razões profissionais objetivas se for demissão a pedido.",
+      "Evite xingar nomes; descreva processo ou condição, não personagem.",
+      "Pergunte prazos de documentos e pagamentos com educação.",
+      "Devolva equipamentos com protocolo.",
+      "Guarde cópias do que assinar no desligamento.",
+      "Não grave conversa às escondidas se isso gerar risco legal — busque orientação adequada."
+    ],
+    localAngle: "Mercado local lembra saída tumultuada; tom firme e curto na despedida costuma ser o melhor legado.",
+    coverHue: 59
+  },
+  {
+    key: "99-vagas-sazonais",
+    title: "Contratação sazonal: como entrar no pico sem ilusão de efetivo",
+    type: "DATA_REPORT",
+    template: "STANDARD",
+    keyword: "vagas sazonais comercio sao luis",
+    section: "dados",
+    lead: "Pico de datas comemorativas abre vaga rápida e prazo curto. Tratar sazonal como ponte — com contrato lido — evita frustração de quem esperava efetivação automática.",
+    tips: [
+      "Pergunte taxa histórica de efetivação sem acreditar em promessa vaga.",
+      "Organize a renda sabendo a data de término.",
+      "Entregue desempenho alto: indicação interna ainda acontece.",
+      "Mantenha a busca paralela leve nas últimas semanas do contrato.",
+      "Guarde avaliações e contatos de liderança para referência.",
+      "Leia multa, aviso e pagamento no término antes de assinar."
+    ],
+    localAngle: "Comércio de São Luís incha em datas certas do calendário; quem entra ciente do fim planeja o mês seguinte com menos susto.",
+    coverHue: 61
+  },
+  {
+    key: "100-empatia-atendimento",
+    title: "Empatia no atendimento: soft skill que anúncios pedem sem explicar",
+    type: "GUIDE",
+    template: "POST_MAGNETICO",
+    keyword: "empatia atendimento cliente entrevista",
+    section: "guia",
+    lead: "“Ter empatia” no anúncio significa ouvir, não concordar com tudo. Na entrevista, uma cena de cliente irritado resolvido com respeito vale mais que a palavra solta.",
+    tips: [
+      "Prepare uma história: escutou, reformulou o problema, propôs próximo passo.",
+      "Mostre limite saudável: empatia não é aceitar abuso.",
+      "Evite resposta robótica de script decorado sem exemplo.",
+      "Na dinâmica, pratique incluir quem está calado.",
+      "Cite aprendizado de uma reclamação que você melhorou depois.",
+      "No currículo, troque “empático” por resultado de atendimento."
+    ],
+    localAngle: "Lojas e clínicas da capital vivem de reclamação no balcão; recrutador local quer ver calma sob pressão, não discurso de palestra.",
+    coverHue: 62
+  },
+  {
+    key: "101-gap-habilidades",
+    title: "Gap de habilidades: como fechar buraco entre você e o anúncio",
+    type: "GUIDE",
+    template: "STANDARD",
+    keyword: "gap de habilidades candidatura",
+    section: "guia",
+    lead: "O anúncio pede três ferramentas e você tem uma. Em vez de desistir ou mentir, mapeie o buraco, treine o essencial e candidate-se com honestidade estratégica.",
+    tips: [
+      "Liste requisitos obrigatórios versus desejáveis no anúncio.",
+      "Treine só o que aparece em vários anúncios do mesmo cargo.",
+      "No PDF, destaque o que você já tem e o plano curto do que está aprendendo.",
+      "Na entrevista, não finja domínio — mostre velocidade de aprendizado com exemplo.",
+      "Evite dez cursos simultâneos; um requisito fechado por vez rende mais.",
+      "Revise o gap a cada duas semanas conforme o portal."
+    ],
+    localAngle: "Mercado de São Luís repete certas ferramentas por setor; fechar o gap do que se repete destrava mais entrevista do que curso aleatório da moda.",
+    coverHue: 63
+  },
+  {
+    key: "102-certificado-vs-pratica",
+    title: "Certificado ou prática: o que pesa mais na triagem local",
+    type: "DATA_REPORT",
+    template: "STANDARD",
+    keyword: "certificado ou experiencia emprego",
+    section: "dados",
+    lead: "Certificado abre conversa; prática sustenta. Anúncios locais misturam os dois — ler o que é obrigatório evita acumular PDF decorativo sem hora de mesa.",
+    tips: [
+      "Se o anúncio exige certificado específico, priorize isso.",
+      "Se pede “experiência com”, prepare exemplo — papel sozinho não basta.",
+      "No currículo, coloque prática recente acima de curso antigo irrelevante.",
+      "Use certificado para cobrir gap real, não para enfeitar margem.",
+      "Esteja pronto para teste prático mesmo com diploma na pasta.",
+      "Compare duas vagas: o que se repete como obrigatório é o núcleo."
+    ],
+    localAngle: "Clínicas e lojas em São Luís pedem curso curto com frequência, mas a entrevista ainda testa o dia a dia — equilibre os dois.",
+    coverHue: 64
+  },
+  {
+    key: "103-burnout-sinais",
+    title: "Sinais de esgotamento na busca e no emprego: quando pausar",
+    type: "NEWS",
+    template: "POST_MAGNETICO",
+    keyword: "burnout busca emprego sinais",
+    section: "noticias",
+    lead: "Mandar currículo às 2h da manhã com raiva raramente melhora a taxa de resposta. Reconhecer esgotamento — e pausar com método — é estratégia, não fraqueza.",
+    tips: [
+      "Note se irritação, insônia e catastrofismo dominam cada envio.",
+      "Faça pausa de 48 horas com regra: zero candidatura, só descanso básico.",
+      "Volte com meta menor e material revisado, não com maratona de culpa.",
+      "No emprego atual, observe se erro por cansaço está subindo — peça ajuda.",
+      "Busque apoio de saúde se os sintomas forem intensos ou persistentes.",
+      "Inclua sono e alimentação como parte do “plano de busca”, não como luxo."
+    ],
+    localAngle: "Calor, deslocamento e pressão financeira em São Luís somam no esgotamento; candidato que pausa com método sustenta a corrida mais longa.",
+    coverHue: 65
+  },
+  {
+    key: "104-mensagem-recrutador",
+    title: "Mensagem fria para recrutador: template curto que não parece spam",
+    type: "GUIDE",
+    template: "POST_MAGNETICO",
+    keyword: "mensagem para recrutador linkedin whatsapp",
+    section: "guia",
+    lead: "“Oi, tem vaga?” não funciona. Mensagem fria útil cita cargo, uma prova de adequação e pedido específico — com respeito ao tempo de quem recebe dezenas por dia.",
+    tips: [
+      "Abra com nome, cargo-alvo e por que aquela pessoa/empresa.",
+      "Em duas linhas, cite experiência alinhada ao que eles publicam.",
+      "Peça algo concreto: indicação de canal ou se há processo aberto.",
+      "Anexe PDF só se o canal permitir e o arquivo for leve.",
+      "Evite sequência diária de cobrança se não houver resposta.",
+      "Revise ortografia; erro no primeiro contato pesa desproporcionalmente."
+    ],
+    localAngle: "Recrutadores que atuam em São Luís respondem mais a especificidade local (setor, disponibilidade, bairro alcançável) do que a elogio genérico.",
+    coverHue: 66
+  },
+  {
+    key: "105-panorama-mercado-local",
+    title: "Panorama 2026 da busca local: o que priorizar nos próximos meses",
+    type: "DATA_REPORT",
+    template: "STANDARD",
+    keyword: "mercado de trabalho sao luis 2026",
+    section: "dados",
+    lead: "Sem prever milagre, o candidato ganha ao olhar padrão: setores que mais anunciam, peso de escala e cuidado com golpe. Um panorama simples orienta a meta semanal.",
+    tips: [
+      "Revise no portal quais cargos se repetem na sua região de deslocamento.",
+      "Priorize qualidade de envio em comércio, serviços e apoio administrativo se for o seu encaixe.",
+      "Mantenha pasta de documentos sempre pronta — processos locais são rápidos.",
+      "Trate segurança da candidatura como filtro permanente, não como paranoia.",
+      "Meça seu funil a cada duas semanas e ajuste PDF antes de só aumentar volume.",
+      "Use o Empregos São Luís como âncora e filtre ruído de grupo paralelo."
+    ],
+    localAngle: "Quem busca emprego em São Luís em 2026 ainda compete por vaga operacional e de atendimento; consistência e canal seguro continuam sendo o diferencial prático.",
+    coverHue: 67
   }
 ];
 

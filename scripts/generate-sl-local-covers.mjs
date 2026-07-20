@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Gera 45 capas únicas (1200×630) em apps/web/public/covers/sl-local/.
+ * Gera capas ilustradas (1200×630) em apps/web/public/covers/sl-local/ para o catálogo inteiro.
  * node scripts/generate-sl-local-covers.mjs
  */
 import { mkdirSync } from "node:fs";

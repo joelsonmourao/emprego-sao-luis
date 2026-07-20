@@ -1,407 +1,842 @@
 [
   {
-    "slug": "sl-local-01-golpe-vagas",
-    "photoId": "1521737711867-e3b97375f902",
-    "source": "unsplash",
-    "photographer": "LinkedIn Sales Solutions",
-    "credit": "Foto: LinkedIn Sales Solutions / Unsplash",
-    "caption": "Imagem ilustrativa para “Como buscar vagas em São Luís sem cair em golpe”.",
-    "alt": "Capa: Como buscar vagas em São Luís sem cair em golpe"
+    "slug": "sl-local-01-curriculo-ats",
+    "source": "illustrated",
+    "photographer": "Empregos Sao Luis",
+    "credit": "Empregos Sao Luis — ilustracao editorial",
+    "caption": "Ilustracao editorial para Currículo com palavras-chave que sistemas ATS entendem",
+    "alt": "Capa: Currículo com palavras-chave que sistemas ATS entendem"
   },
   {
-    "slug": "sl-local-02-clt-temporario",
-    "photoId": "1454165804606-c3d57bc86b40",
-    "source": "unsplash",
-    "photographer": "Scott Graham",
-    "credit": "Foto: Scott Graham / Unsplash",
-    "caption": "Imagem ilustrativa para “CLT ou temporário na Grande Ilha: o que comparar antes de candidatar”.",
-    "alt": "Capa: CLT ou temporário na Grande Ilha: o que comparar antes de candidatar"
+    "slug": "sl-local-02-soft-hard-skills",
+    "source": "illustrated",
+    "photographer": "Empregos Sao Luis",
+    "credit": "Empregos Sao Luis — ilustracao editorial",
+    "caption": "Ilustracao editorial para Soft skills e hard skills: o que os anúncios locais pedem de verdade",
+    "alt": "Capa: Soft skills e hard skills: o que os anúncios locais pedem de verdade"
   },
   {
-    "slug": "sl-local-03-bairros-oportunidades",
-    "photoId": "1551836022-d5d88e9218df",
-    "source": "unsplash",
-    "photographer": "Amy Hirschi",
-    "credit": "Foto: Amy Hirschi / Unsplash",
-    "caption": "Imagem ilustrativa para “Bairros e eixos com mais movimentação de vagas em São Luís”.",
-    "alt": "Capa: Bairros e eixos com mais movimentação de vagas em São Luís"
+    "slug": "sl-local-03-primeiro-emprego",
+    "source": "illustrated",
+    "photographer": "Empregos Sao Luis",
+    "credit": "Empregos Sao Luis — ilustracao editorial",
+    "caption": "Ilustracao editorial para Primeiro emprego em São Luís: o que montar antes de candidatar",
+    "alt": "Capa: Primeiro emprego em São Luís: o que montar antes de candidatar"
   },
   {
-    "slug": "sl-local-04-curriculo-atendimento",
-    "photoId": "1486312338219-ce68d2c6f44d",
-    "source": "unsplash",
-    "photographer": "Glenn Carstens-Peters",
-    "credit": "Foto: Glenn Carstens-Peters / Unsplash",
-    "caption": "Imagem ilustrativa para “Currículo para vagas de atendimento no Maranhão”.",
-    "alt": "Capa: Currículo para vagas de atendimento no Maranhão"
+    "slug": "sl-local-04-cursos-curriculo",
+    "source": "illustrated",
+    "photographer": "Empregos Sao Luis",
+    "credit": "Empregos Sao Luis — ilustracao editorial",
+    "caption": "Ilustracao editorial para Como colocar cursos no currículo sem parecer enchimento",
+    "alt": "Capa: Como colocar cursos no currículo sem parecer enchimento"
   },
   {
-    "slug": "sl-local-05-whatsapp-seguro",
-    "photoId": "1556761175-5973dc0f32e7",
-    "source": "unsplash",
-    "photographer": "LinkedIn Sales Solutions",
-    "credit": "Foto: LinkedIn Sales Solutions / Unsplash",
-    "caption": "Imagem ilustrativa para “WhatsApp na candidatura: como se apresentar com segurança”.",
-    "alt": "Capa: WhatsApp na candidatura: como se apresentar com segurança"
+    "slug": "sl-local-05-marca-pessoal",
+    "source": "illustrated",
+    "photographer": "Empregos Sao Luis",
+    "credit": "Empregos Sao Luis — ilustracao editorial",
+    "caption": "Ilustracao editorial para Marca pessoal barata e útil para candidato em São Luís",
+    "alt": "Capa: Marca pessoal barata e útil para candidato em São Luís"
   },
   {
-    "slug": "sl-local-06-primeiro-emprego",
-    "photoId": "1522202176988-66273c2fd55f",
-    "source": "unsplash",
-    "photographer": "Brooke Cagle",
-    "credit": "Foto: Brooke Cagle / Unsplash",
-    "caption": "Imagem ilustrativa para “Primeiro emprego em São Luís: passos práticos nesta semana”.",
-    "alt": "Capa: Primeiro emprego em São Luís: passos práticos nesta semana"
+    "slug": "sl-local-06-produtividade-busca",
+    "source": "illustrated",
+    "photographer": "Empregos Sao Luis",
+    "credit": "Empregos Sao Luis — ilustracao editorial",
+    "caption": "Ilustracao editorial para Produtividade na busca de emprego: menos abas, mais retorno",
+    "alt": "Capa: Produtividade na busca de emprego: menos abas, mais retorno"
   },
   {
-    "slug": "sl-local-07-presencial-hibrido",
-    "photoId": "1516321318423-f06f85e504b3",
-    "source": "unsplash",
-    "photographer": "Compare Fibre",
-    "credit": "Foto: Compare Fibre / Unsplash",
-    "caption": "Imagem ilustrativa para “Vagas presenciais versus híbridas na capital maranhense”.",
-    "alt": "Capa: Vagas presenciais versus híbridas na capital maranhense"
+    "slug": "sl-local-07-vagas-afirmativas",
+    "source": "illustrated",
+    "photographer": "Empregos Sao Luis",
+    "credit": "Empregos Sao Luis — ilustracao editorial",
+    "caption": "Ilustracao editorial para Vagas afirmativas: como ler o anúncio e se candidatar com segurança",
+    "alt": "Capa: Vagas afirmativas: como ler o anúncio e se candidatar com segurança"
   },
   {
-    "slug": "sl-local-08-documentos-admissao",
-    "photoId": "1586281380349-632531db7ed4",
-    "source": "unsplash",
-    "photographer": "Resume Genius",
-    "credit": "Foto: Resume Genius / Unsplash",
-    "caption": "Imagem ilustrativa para “Documentos que empresas pedem com frequência no MA”.",
-    "alt": "Capa: Documentos que empresas pedem com frequência no MA"
+    "slug": "sl-local-08-ir-2026-trabalhador",
+    "source": "illustrated",
+    "photographer": "Empregos Sao Luis",
+    "credit": "Empregos Sao Luis — ilustracao editorial",
+    "caption": "Ilustracao editorial para IR 2026 para quem trabalha de carteira: o básico sem pânico",
+    "alt": "Capa: IR 2026 para quem trabalha de carteira: o básico sem pânico"
   },
   {
-    "slug": "sl-local-09-ler-vaga",
-    "photoId": "1560250097-0b93528c311a",
-    "source": "unsplash",
-    "photographer": "LinkedIn Sales Solutions",
-    "credit": "Foto: LinkedIn Sales Solutions / Unsplash",
-    "caption": "Imagem ilustrativa para “Como ler uma vaga e evitar descrição enganosa”.",
-    "alt": "Capa: Como ler uma vaga e evitar descrição enganosa"
+    "slug": "sl-local-09-decimo-terceiro",
+    "source": "illustrated",
+    "photographer": "Empregos Sao Luis",
+    "credit": "Empregos Sao Luis — ilustracao editorial",
+    "caption": "Ilustracao editorial para 13º salário: o que o trabalhador CLT deve conferir no pagamento",
+    "alt": "Capa: 13º salário: o que o trabalhador CLT deve conferir no pagamento"
   },
   {
-    "slug": "sl-local-10-rotina-30min",
-    "photoId": "1573496359142-b8d87734a5a2",
-    "source": "unsplash",
-    "photographer": "Christina Wocintechchat",
-    "credit": "Foto: Christina Wocintechchat / Unsplash",
-    "caption": "Imagem ilustrativa para “Rotina de busca: 30 minutos por dia em São Luís”.",
-    "alt": "Capa: Rotina de busca: 30 minutos por dia em São Luís"
+    "slug": "sl-local-10-ferias-direitos",
+    "source": "illustrated",
+    "photographer": "Empregos Sao Luis",
+    "credit": "Empregos Sao Luis — ilustracao editorial",
+    "caption": "Ilustracao editorial para Férias: como entender período aquisitivo e o que perguntar na admissão",
+    "alt": "Capa: Férias: como entender período aquisitivo e o que perguntar na admissão"
   },
   {
-    "slug": "sl-local-11-cursos-entrevistas",
-    "photoId": "1557804506-669a67965ba0",
-    "source": "unsplash",
-    "photographer": "Mimi Thian",
-    "credit": "Foto: Mimi Thian / Unsplash",
-    "caption": "Imagem ilustrativa para “Cursos gratuitos e preparação para entrevistas locais”.",
-    "alt": "Capa: Cursos gratuitos e preparação para entrevistas locais"
+    "slug": "sl-local-11-abono-pecuniario",
+    "source": "illustrated",
+    "photographer": "Empregos Sao Luis",
+    "credit": "Empregos Sao Luis — ilustracao editorial",
+    "caption": "Ilustracao editorial para Abono pecuniário: vender um terço das férias sem se perder no holerite",
+    "alt": "Capa: Abono pecuniário: vender um terço das férias sem se perder no holerite"
   },
   {
-    "slug": "sl-local-12-transporte-pontualidade",
-    "photoId": "1600880292203-757bb62b4baf",
-    "source": "unsplash",
-    "photographer": "Jason Goodman",
-    "credit": "Foto: Jason Goodman / Unsplash",
-    "caption": "Imagem ilustrativa para “Transporte e pontualidade: planejar o deslocamento até o trabalho”.",
-    "alt": "Capa: Transporte e pontualidade: planejar o deslocamento até o trabalho"
+    "slug": "sl-local-12-ponto-atraso",
+    "source": "illustrated",
+    "photographer": "Empregos Sao Luis",
+    "credit": "Empregos Sao Luis — ilustracao editorial",
+    "caption": "Ilustracao editorial para Ponto e atraso: o que costuma valer na prática do dia a dia",
+    "alt": "Capa: Ponto e atraso: o que costuma valer na prática do dia a dia"
   },
   {
-    "slug": "sl-local-13-comercio-ilha",
-    "photoId": "1552664730-d307ca884978",
-    "source": "unsplash",
-    "photographer": "Headway",
-    "credit": "Foto: Headway / Unsplash",
-    "caption": "Imagem ilustrativa para “Vagas no comércio da ilha: o que costuma ser avaliado”.",
-    "alt": "Capa: Vagas no comércio da ilha: o que costuma ser avaliado"
+    "slug": "sl-local-13-feriado-facultativo",
+    "source": "illustrated",
+    "photographer": "Empregos Sao Luis",
+    "credit": "Empregos Sao Luis — ilustracao editorial",
+    "caption": "Ilustracao editorial para Feriado ou ponto facultativo: como isso muda sua escala",
+    "alt": "Capa: Feriado ou ponto facultativo: como isso muda sua escala"
   },
   {
-    "slug": "sl-local-14-email-candidatura",
-    "photoId": "1507679799987-c73779587ccf",
-    "source": "unsplash",
-    "photographer": "Hunter Johnson",
-    "credit": "Foto: Hunter Johnson / Unsplash",
-    "caption": "Imagem ilustrativa para “E-mail de candidatura curto e claro (modelo para São Luís)”.",
-    "alt": "Capa: E-mail de candidatura curto e claro (modelo para São Luís)"
+    "slug": "sl-local-14-ctps-digital",
+    "source": "illustrated",
+    "photographer": "Empregos Sao Luis",
+    "credit": "Empregos Sao Luis — ilustracao editorial",
+    "caption": "Ilustracao editorial para CTPS digital: como conferir vínculos e anotações no celular",
+    "alt": "Capa: CTPS digital: como conferir vínculos e anotações no celular"
   },
   {
-    "slug": "sl-local-15-pagamento-vaga",
-    "photoId": "1517245386807-bb43f82c33c4",
-    "source": "unsplash",
-    "photographer": "Brooke Cagle",
-    "credit": "Foto: Brooke Cagle / Unsplash",
-    "caption": "Imagem ilustrativa para “Quando desconfiar de pedido de pagamento para garantir vaga”.",
-    "alt": "Capa: Quando desconfiar de pedido de pagamento para garantir vaga"
+    "slug": "sl-local-15-auxiliar-administrativo",
+    "source": "illustrated",
+    "photographer": "Empregos Sao Luis",
+    "credit": "Empregos Sao Luis — ilustracao editorial",
+    "caption": "Ilustracao editorial para Auxiliar administrativo: o que mostrar além de “sou organizado”",
+    "alt": "Capa: Auxiliar administrativo: o que mostrar além de “sou organizado”"
   },
   {
-    "slug": "sl-local-16-linkedin-local",
-    "photoId": "1556742049-0cfed4f6a45d",
-    "source": "unsplash",
-    "photographer": "Blake Wisz",
-    "credit": "Foto: Blake Wisz / Unsplash",
-    "caption": "Imagem ilustrativa para “Atualizar LinkedIn e perfil local sem inventar experiência”.",
-    "alt": "Capa: Atualizar LinkedIn e perfil local sem inventar experiência"
+    "slug": "sl-local-16-entrevista-video",
+    "source": "illustrated",
+    "photographer": "Empregos Sao Luis",
+    "credit": "Empregos Sao Luis — ilustracao editorial",
+    "caption": "Ilustracao editorial para Entrevista por vídeo: checklist técnico e de postura",
+    "alt": "Capa: Entrevista por vídeo: checklist técnico e de postura"
   },
   {
-    "slug": "sl-local-17-entrevista-presencial",
-    "photoId": "1556740758-90decb4dfe80",
-    "source": "picsum",
-    "photographer": "Picsum Photos",
-    "credit": "Foto: Picsum Photos",
-    "caption": "Imagem ilustrativa para “Checklist da entrevista presencial em São Luís”.",
-    "alt": "Capa: Checklist da entrevista presencial em São Luís"
+    "slug": "sl-local-17-respostas-comportamentais",
+    "source": "illustrated",
+    "photographer": "Empregos Sao Luis",
+    "credit": "Empregos Sao Luis — ilustracao editorial",
+    "caption": "Ilustracao editorial para Respostas comportamentais: método simples para não travar",
+    "alt": "Capa: Respostas comportamentais: método simples para não travar"
   },
   {
-    "slug": "sl-local-18-como-portal-funciona",
-    "photoId": "1441986300917-64674bd600d8",
-    "source": "unsplash",
-    "photographer": "Austin Distel",
-    "credit": "Foto: Austin Distel / Unsplash",
-    "caption": "Imagem ilustrativa para “Como o Empregos São Luís organiza vagas para o candidato”.",
-    "alt": "Capa: Como o Empregos São Luís organiza vagas para o candidato"
+    "slug": "sl-local-18-pedir-salario",
+    "source": "illustrated",
+    "photographer": "Empregos Sao Luis",
+    "credit": "Empregos Sao Luis — ilustracao editorial",
+    "caption": "Ilustracao editorial para Como falar de pretensão salarial sem chute nem medo",
+    "alt": "Capa: Como falar de pretensão salarial sem chute nem medo"
   },
   {
-    "slug": "sl-local-19-auxiliar-administrativo",
-    "photoId": "1556740738-b6a63e27c4df",
-    "source": "unsplash",
-    "photographer": "Blake Wisz",
-    "credit": "Foto: Blake Wisz / Unsplash",
-    "caption": "Imagem ilustrativa para “Como se preparar para vagas de auxiliar administrativo em São Luís”.",
-    "alt": "Capa: Como se preparar para vagas de auxiliar administrativo em São Luís"
+    "slug": "sl-local-19-beneficios-vaga",
+    "source": "illustrated",
+    "photographer": "Empregos Sao Luis",
+    "credit": "Empregos Sao Luis — ilustracao editorial",
+    "caption": "Ilustracao editorial para Benefícios além do salário: o que comparar no anúncio",
+    "alt": "Capa: Benefícios além do salário: o que comparar no anúncio"
   },
   {
-    "slug": "sl-local-20-operador-caixa",
-    "photoId": "1472851294608-73414d2799e8",
-    "source": "picsum",
-    "photographer": "Picsum Photos",
-    "credit": "Foto: Picsum Photos",
-    "caption": "Imagem ilustrativa para “Operador de caixa na Grande Ilha: rotina, metas e postura”.",
-    "alt": "Capa: Operador de caixa na Grande Ilha: rotina, metas e postura"
+    "slug": "sl-local-20-trabalho-hibrido",
+    "source": "illustrated",
+    "photographer": "Empregos Sao Luis",
+    "credit": "Empregos Sao Luis — ilustracao editorial",
+    "caption": "Ilustracao editorial para Trabalho híbrido na capital: o que confirmar antes de aceitar",
+    "alt": "Capa: Trabalho híbrido na capital: o que confirmar antes de aceitar"
   },
   {
-    "slug": "sl-local-21-experiencia-informal",
-    "photoId": "1497366216548-37526070297c",
-    "source": "unsplash",
-    "photographer": "Nastuh Abootalebi",
-    "credit": "Foto: Nastuh Abootalebi / Unsplash",
-    "caption": "Imagem ilustrativa para “Como colocar experiência informal no currículo sem mentir”.",
-    "alt": "Capa: Como colocar experiência informal no currículo sem mentir"
+    "slug": "sl-local-21-golpes-emprego",
+    "source": "illustrated",
+    "photographer": "Empregos Sao Luis",
+    "credit": "Empregos Sao Luis — ilustracao editorial",
+    "caption": "Ilustracao editorial para Golpes de emprego: sinais de alerta antes do PIX",
+    "alt": "Capa: Golpes de emprego: sinais de alerta antes do PIX"
   },
   {
-    "slug": "sl-local-22-jovem-aprendiz-contexto",
-    "photoId": "1497366754035-f200968a6e72",
-    "source": "unsplash",
-    "photographer": "Nastuh Abootalebi",
-    "credit": "Foto: Nastuh Abootalebi / Unsplash",
-    "caption": "Imagem ilustrativa para “Jovem profissional em São Luís: rotina de estudos e trabalho”.",
-    "alt": "Capa: Jovem profissional em São Luís: rotina de estudos e trabalho"
+    "slug": "sl-local-22-documentos-admissao",
+    "source": "illustrated",
+    "photographer": "Empregos Sao Luis",
+    "credit": "Empregos Sao Luis — ilustracao editorial",
+    "caption": "Ilustracao editorial para Documentos de admissão: pasta pronta para o dia D",
+    "alt": "Capa: Documentos de admissão: pasta pronta para o dia D"
   },
   {
-    "slug": "sl-local-23-servicos-gerais",
-    "photoId": "1497215728101-536fc9f2276d",
-    "source": "picsum",
-    "photographer": "Picsum Photos",
-    "credit": "Foto: Picsum Photos",
-    "caption": "Imagem ilustrativa para “Vagas de serviços gerais: o que perguntar antes de aceitar”.",
-    "alt": "Capa: Vagas de serviços gerais: o que perguntar antes de aceitar"
+    "slug": "sl-local-23-networking-local",
+    "source": "illustrated",
+    "photographer": "Empregos Sao Luis",
+    "credit": "Empregos Sao Luis — ilustracao editorial",
+    "caption": "Ilustracao editorial para Networking sem constrangimento: pedidos que as pessoas respondem",
+    "alt": "Capa: Networking sem constrangimento: pedidos que as pessoas respondem"
   },
   {
-    "slug": "sl-local-24-recepcionista",
-    "photoId": "1486406146926-c627a92ad1ab",
-    "source": "unsplash",
-    "photographer": "Sean Pollock",
-    "credit": "Foto: Sean Pollock / Unsplash",
-    "caption": "Imagem ilustrativa para “Recepcionista em clínicas e escritórios: perfil pedido na capital”.",
-    "alt": "Capa: Recepcionista em clínicas e escritórios: perfil pedido na capital"
+    "slug": "sl-local-24-retorno-ao-trabalho",
+    "source": "illustrated",
+    "photographer": "Empregos Sao Luis",
+    "credit": "Empregos Sao Luis — ilustracao editorial",
+    "caption": "Ilustracao editorial para Voltar ao mercado após pausa: como explicar o gap no currículo",
+    "alt": "Capa: Voltar ao mercado após pausa: como explicar o gap no currículo"
   },
   {
-    "slug": "sl-local-25-estoque-loja",
-    "photoId": "1460925895917-afdab827c52f",
-    "source": "unsplash",
-    "photographer": "Carlos Muza",
-    "credit": "Foto: Carlos Muza / Unsplash",
-    "caption": "Imagem ilustrativa para “Estoque e organização em loja: habilidades que abrem vaga”.",
-    "alt": "Capa: Estoque e organização em loja: habilidades que abrem vaga"
+    "slug": "sl-local-25-seguranca-mulheres",
+    "source": "illustrated",
+    "photographer": "Empregos Sao Luis",
+    "credit": "Empregos Sao Luis — ilustracao editorial",
+    "caption": "Ilustracao editorial para Segurança de candidatas: entrevistas e deslocamentos com menos risco",
+    "alt": "Capa: Segurança de candidatas: entrevistas e deslocamentos com menos risco"
   },
   {
-    "slug": "sl-local-26-entrevista-online",
-    "photoId": "1553877522-43269d4ea984",
-    "source": "unsplash",
-    "photographer": "You X Ventures",
-    "credit": "Foto: You X Ventures / Unsplash",
-    "caption": "Imagem ilustrativa para “Entrevista por videochamada: checklist para candidatos no MA”.",
-    "alt": "Capa: Entrevista por videochamada: checklist para candidatos no MA"
+    "slug": "sl-local-26-inclusao-pcd",
+    "source": "illustrated",
+    "photographer": "Empregos Sao Luis",
+    "credit": "Empregos Sao Luis — ilustracao editorial",
+    "caption": "Ilustracao editorial para Inclusão e PcD: perguntas práticas sobre o posto de trabalho",
+    "alt": "Capa: Inclusão e PcD: perguntas práticas sobre o posto de trabalho"
   },
   {
-    "slug": "sl-local-27-salario-negociar",
-    "photoId": "1519389950473-47ba0277781c",
-    "source": "unsplash",
-    "photographer": "Marvin Meyer",
-    "credit": "Foto: Marvin Meyer / Unsplash",
-    "caption": "Imagem ilustrativa para “Como falar de pretensão salarial sem se prejudicar”.",
-    "alt": "Capa: Como falar de pretensão salarial sem se prejudicar"
+    "slug": "sl-local-27-freela-vs-clt",
+    "source": "illustrated",
+    "photographer": "Empregos Sao Luis",
+    "credit": "Empregos Sao Luis — ilustracao editorial",
+    "caption": "Ilustracao editorial para Freela ou CLT: o que comparar antes de escolher o vínculo",
+    "alt": "Capa: Freela ou CLT: o que comparar antes de escolher o vínculo"
   },
   {
-    "slug": "sl-local-28-demissao-proxima",
-    "photoId": "1531482615713-2afd69097998",
-    "source": "unsplash",
-    "photographer": "Christina Wocintechchat",
-    "credit": "Foto: Christina Wocintechchat / Unsplash",
-    "caption": "Imagem ilustrativa para “Está empregado e buscando outra vaga? Como fazer com ética”.",
-    "alt": "Capa: Está empregado e buscando outra vaga? Como fazer com ética"
+    "slug": "sl-local-28-erros-pdf-curriculo",
+    "source": "illustrated",
+    "photographer": "Empregos Sao Luis",
+    "credit": "Empregos Sao Luis — ilustracao editorial",
+    "caption": "Ilustracao editorial para Erros de PDF no currículo que eliminam candidato bom",
+    "alt": "Capa: Erros de PDF no currículo que eliminam candidato bom"
   },
   {
-    "slug": "sl-local-29-pcd-inclusao",
-    "photoId": "1573164713714-d95e436ab8d6",
-    "source": "unsplash",
-    "photographer": "Christina Wocintechchat",
-    "credit": "Foto: Christina Wocintechchat / Unsplash",
-    "caption": "Imagem ilustrativa para “Candidatura inclusiva: direitos e preparação sem estigma”.",
-    "alt": "Capa: Candidatura inclusiva: direitos e preparação sem estigma"
+    "slug": "sl-local-29-email-pitch",
+    "source": "illustrated",
+    "photographer": "Empregos Sao Luis",
+    "credit": "Empregos Sao Luis — ilustracao editorial",
+    "caption": "Ilustracao editorial para E-mail de candidatura: assunto e corpo que abrem resposta",
+    "alt": "Capa: E-mail de candidatura: assunto e corpo que abrem resposta"
   },
   {
-    "slug": "sl-local-30-mulheres-mercado",
-    "photoId": "1596524430615-b46475ddff6e",
-    "source": "unsplash",
-    "photographer": "Christina Wocintechchat",
-    "credit": "Foto: Christina Wocintechchat / Unsplash",
-    "caption": "Imagem ilustrativa para “Mulheres no mercado de São Luís: segurança na candidatura”.",
-    "alt": "Capa: Mulheres no mercado de São Luís: segurança na candidatura"
+    "slug": "sl-local-30-dinamica-grupo",
+    "source": "illustrated",
+    "photographer": "Empregos Sao Luis",
+    "credit": "Empregos Sao Luis — ilustracao editorial",
+    "caption": "Ilustracao editorial para Dinâmica de grupo: como participar sem forçar liderança falsa",
+    "alt": "Capa: Dinâmica de grupo: como participar sem forçar liderança falsa"
   },
   {
-    "slug": "sl-local-31-retorno-emprego",
-    "photoId": "1611224923853-80b023f02d71",
-    "source": "unsplash",
-    "photographer": "Windows",
-    "credit": "Foto: Windows / Unsplash",
-    "caption": "Imagem ilustrativa para “Voltando ao mercado após um tempo fora: roteiro de 14 dias”.",
-    "alt": "Capa: Voltando ao mercado após um tempo fora: roteiro de 14 dias"
+    "slug": "sl-local-31-testes-online",
+    "source": "illustrated",
+    "photographer": "Empregos Sao Luis",
+    "credit": "Empregos Sao Luis — ilustracao editorial",
+    "caption": "Ilustracao editorial para Testes online de seleção: o que fazer antes do cronômetro",
+    "alt": "Capa: Testes online de seleção: o que fazer antes do cronômetro"
   },
   {
-    "slug": "sl-local-32-freelancer-local",
-    "photoId": "1522071820081-009f0129c71c",
-    "source": "unsplash",
-    "photographer": "Austin Distel",
-    "credit": "Foto: Austin Distel / Unsplash",
-    "caption": "Imagem ilustrativa para “Serviços avulsos e freela local: organizar propostas com clareza”.",
-    "alt": "Capa: Serviços avulsos e freela local: organizar propostas com clareza"
+    "slug": "sl-local-32-ler-holerite",
+    "source": "illustrated",
+    "photographer": "Empregos Sao Luis",
+    "credit": "Empregos Sao Luis — ilustracao editorial",
+    "caption": "Ilustracao editorial para Holerite sem mistério: bruto, descontos e o que conferir todo mês",
+    "alt": "Capa: Holerite sem mistério: bruto, descontos e o que conferir todo mês"
   },
   {
-    "slug": "sl-local-33-seguranca-candidato",
-    "photoId": "1556761175-b39cc9c0f0b6",
-    "source": "picsum",
-    "photographer": "Picsum Photos",
-    "credit": "Foto: Picsum Photos",
-    "caption": "Imagem ilustrativa para “Segurança do candidato: checklist rápido antes de enviar dados”.",
-    "alt": "Capa: Segurança do candidato: checklist rápido antes de enviar dados"
+    "slug": "sl-local-33-pedido-demissao",
+    "source": "illustrated",
+    "photographer": "Empregos Sao Luis",
+    "credit": "Empregos Sao Luis — ilustracao editorial",
+    "caption": "Ilustracao editorial para Pedido de demissão: aviso prévio, acerto e postura na saída",
+    "alt": "Capa: Pedido de demissão: aviso prévio, acerto e postura na saída"
   },
   {
-    "slug": "sl-local-34-ferias-direitos",
-    "photoId": "1563986768609-322da13575f3",
-    "source": "unsplash",
-    "photographer": "Christin Hume",
-    "credit": "Foto: Christin Hume / Unsplash",
-    "caption": "Imagem ilustrativa para “Férias, folgas e escala: perguntas básicas na admissão”.",
-    "alt": "Capa: Férias, folgas e escala: perguntas básicas na admissão"
+    "slug": "sl-local-34-escala-6x1",
+    "source": "illustrated",
+    "photographer": "Empregos Sao Luis",
+    "credit": "Empregos Sao Luis — ilustracao editorial",
+    "caption": "Ilustracao editorial para Escala 6x1: perguntas essenciais antes de aceitar a vaga",
+    "alt": "Capa: Escala 6x1: perguntas essenciais antes de aceitar a vaga"
   },
   {
-    "slug": "sl-local-35-soft-skills",
-    "photoId": "1516321497487-e849bc9f4b8e",
-    "source": "picsum",
-    "photographer": "Picsum Photos",
-    "credit": "Foto: Picsum Photos",
-    "caption": "Imagem ilustrativa para “Postura profissional que empregadores locais mais citam”.",
-    "alt": "Capa: Postura profissional que empregadores locais mais citam"
+    "slug": "sl-local-35-alimentacao-servicos",
+    "source": "illustrated",
+    "photographer": "Empregos Sao Luis",
+    "credit": "Empregos Sao Luis — ilustracao editorial",
+    "caption": "Ilustracao editorial para Vagas em alimentação: higiene, pico e o que perguntar no salão",
+    "alt": "Capa: Vagas em alimentação: higiene, pico e o que perguntar no salão"
   },
   {
-    "slug": "sl-local-36-indicacao",
-    "photoId": "1434030216411-0b793f4b4173",
-    "source": "unsplash",
-    "photographer": "Green Chameleon",
-    "credit": "Foto: Green Chameleon / Unsplash",
-    "caption": "Imagem ilustrativa para “Indicação de emprego na Grande Ilha: como pedir sem constranger”.",
-    "alt": "Capa: Indicação de emprego na Grande Ilha: como pedir sem constranger"
+    "slug": "sl-local-36-servicos-gerais-epi",
+    "source": "illustrated",
+    "photographer": "Empregos Sao Luis",
+    "credit": "Empregos Sao Luis — ilustracao editorial",
+    "caption": "Ilustracao editorial para Serviços gerais e EPI: escopo da função e proteção no posto",
+    "alt": "Capa: Serviços gerais e EPI: escopo da função e proteção no posto"
   },
   {
-    "slug": "sl-local-37-home-office-mito",
-    "photoId": "1503676260728-1c00da094a0b",
-    "source": "unsplash",
-    "photographer": "Element5 Digital",
-    "credit": "Foto: Element5 Digital / Unsplash",
-    "caption": "Imagem ilustrativa para “Home office e vagas remotas: o que é realista no Maranhão”.",
-    "alt": "Capa: Home office e vagas remotas: o que é realista no Maranhão"
+    "slug": "sl-local-37-plano-semanal-busca",
+    "source": "illustrated",
+    "photographer": "Empregos Sao Luis",
+    "credit": "Empregos Sao Luis — ilustracao editorial",
+    "caption": "Ilustracao editorial para Plano semanal de busca: segunda a sábado com meta realista",
+    "alt": "Capa: Plano semanal de busca: segunda a sábado com meta realista"
   },
   {
-    "slug": "sl-local-38-atualizacao-curriculo",
-    "photoId": "1450101499163-c8848c66ca85",
-    "source": "unsplash",
-    "photographer": "Scott Graham",
-    "credit": "Foto: Scott Graham / Unsplash",
-    "caption": "Imagem ilustrativa para “Quando e como atualizar o currículo sem reescrever tudo”.",
-    "alt": "Capa: Quando e como atualizar o currículo sem reescrever tudo"
+    "slug": "sl-local-38-usar-portal-es",
+    "source": "illustrated",
+    "photographer": "Empregos Sao Luis",
+    "credit": "Empregos Sao Luis — ilustracao editorial",
+    "caption": "Ilustracao editorial para Como usar o Empregos São Luís: do filtro à candidatura segura",
+    "alt": "Capa: Como usar o Empregos São Luís: do filtro à candidatura segura"
   },
   {
-    "slug": "sl-local-39-feedback-negativo",
-    "photoId": "1551836022-4c4c79ecde51",
-    "source": "unsplash",
-    "photographer": "Amy Hirschi",
-    "credit": "Foto: Amy Hirschi / Unsplash",
-    "caption": "Imagem ilustrativa para “Não fui chamado: o que fazer depois de uma negativa”.",
-    "alt": "Capa: Não fui chamado: o que fazer depois de uma negativa"
+    "slug": "sl-local-39-entrevista-presencial",
+    "source": "illustrated",
+    "photographer": "Empregos Sao Luis",
+    "credit": "Empregos Sao Luis — ilustracao editorial",
+    "caption": "Ilustracao editorial para Entrevista presencial na capital: trajeto, horário e primeira impressão",
+    "alt": "Capa: Entrevista presencial na capital: trajeto, horário e primeira impressão"
   },
   {
-    "slug": "sl-local-40-dados-pessoais",
-    "photoId": "1498050108023-c5249f4df085",
-    "source": "unsplash",
-    "photographer": "Lee Campbell",
-    "credit": "Foto: Lee Campbell / Unsplash",
-    "caption": "Imagem ilustrativa para “LGPD na prática do candidato: o que compartilhar e quando”.",
-    "alt": "Capa: LGPD na prática do candidato: o que compartilhar e quando"
+    "slug": "sl-local-40-setores-vagas",
+    "source": "illustrated",
+    "photographer": "Empregos Sao Luis",
+    "credit": "Empregos Sao Luis — ilustracao editorial",
+    "caption": "Ilustracao editorial para Setores com mais abertura de vagas: como priorizar a busca",
+    "alt": "Capa: Setores com mais abertura de vagas: como priorizar a busca"
   },
   {
-    "slug": "sl-local-41-setor-alimentacao",
-    "photoId": "1515378791036-0648a3ef77b2",
-    "source": "unsplash",
-    "photographer": "Andrew Neel",
-    "credit": "Foto: Andrew Neel / Unsplash",
-    "caption": "Imagem ilustrativa para “Vagas em alimentação e panificação: ritmo e higiene”.",
-    "alt": "Capa: Vagas em alimentação e panificação: ritmo e higiene"
+    "slug": "sl-local-41-experiencia-informal",
+    "source": "illustrated",
+    "photographer": "Empregos Sao Luis",
+    "credit": "Empregos Sao Luis — ilustracao editorial",
+    "caption": "Ilustracao editorial para Experiência informal no currículo: como descrever sem inventar cargo",
+    "alt": "Capa: Experiência informal no currículo: como descrever sem inventar cargo"
   },
   {
-    "slug": "sl-local-42-construcao-apoio",
-    "photoId": "1521737604893-d14cc237f11d",
-    "source": "unsplash",
-    "photographer": "LinkedIn Sales Solutions",
-    "credit": "Foto: LinkedIn Sales Solutions / Unsplash",
-    "caption": "Imagem ilustrativa para “Apoio em obra e serviços de manutenção: segurança em primeiro lugar”.",
-    "alt": "Capa: Apoio em obra e serviços de manutenção: segurança em primeiro lugar"
+    "slug": "sl-local-42-whatsapp-candidatura",
+    "source": "illustrated",
+    "photographer": "Empregos Sao Luis",
+    "credit": "Empregos Sao Luis — ilustracao editorial",
+    "caption": "Ilustracao editorial para Candidatura por WhatsApp: mensagem curta que não queima a chance",
+    "alt": "Capa: Candidatura por WhatsApp: mensagem curta que não queima a chance"
   },
   {
-    "slug": "sl-local-43-atendimento-telefone",
-    "photoId": "1517048676732-d65bc937f952",
-    "source": "unsplash",
-    "photographer": "Christina Wocintechchat",
-    "credit": "Foto: Christina Wocintechchat / Unsplash",
-    "caption": "Imagem ilustrativa para “Atendimento telefônico e WhatsApp Business no dia a dia”.",
-    "alt": "Capa: Atendimento telefônico e WhatsApp Business no dia a dia"
+    "slug": "sl-local-43-comercio-servicos",
+    "source": "illustrated",
+    "photographer": "Empregos Sao Luis",
+    "credit": "Empregos Sao Luis — ilustracao editorial",
+    "caption": "Ilustracao editorial para Comércio e serviços: o que os anúncios repetem sobre perfil",
+    "alt": "Capa: Comércio e serviços: o que os anúncios repetem sobre perfil"
   },
   {
-    "slug": "sl-local-44-meta-semanal",
-    "photoId": "1523240795612-9a054b0db644",
-    "source": "unsplash",
-    "photographer": "Priscilla Du Preez",
-    "credit": "Foto: Priscilla Du Preez / Unsplash",
-    "caption": "Imagem ilustrativa para “Plano semanal de candidaturas: meta realista para a ilha”.",
-    "alt": "Capa: Plano semanal de candidaturas: meta realista para a ilha"
+    "slug": "sl-local-44-transporte-entrevista",
+    "source": "illustrated",
+    "photographer": "Empregos Sao Luis",
+    "credit": "Empregos Sao Luis — ilustracao editorial",
+    "caption": "Ilustracao editorial para Transporte até a entrevista: planejar trajeto para não chegar atrasado",
+    "alt": "Capa: Transporte até a entrevista: planejar trajeto para não chegar atrasado"
   },
   {
-    "slug": "sl-local-45-proximos-passos-portal",
-    "photoId": "1573497019940-1cfe6d66f2e8",
-    "source": "picsum",
-    "photographer": "Picsum Photos",
-    "credit": "Foto: Picsum Photos",
-    "caption": "Imagem ilustrativa para “Próximos passos no Empregos São Luís após ler este guia”.",
-    "alt": "Capa: Próximos passos no Empregos São Luís após ler este guia"
+    "slug": "sl-local-45-panorama-candidaturas",
+    "source": "illustrated",
+    "photographer": "Empregos Sao Luis",
+    "credit": "Empregos Sao Luis — ilustracao editorial",
+    "caption": "Ilustracao editorial para Panorama da candidatura: volume versus qualidade na busca local",
+    "alt": "Capa: Panorama da candidatura: volume versus qualidade na busca local"
+  },
+  {
+    "slug": "sl-local-46-linkedin-candidato",
+    "source": "illustrated",
+    "photographer": "Empregos Sao Luis",
+    "credit": "Empregos Sao Luis — ilustracao editorial",
+    "caption": "Ilustracao editorial para LinkedIn para candidato em São Luís: perfil que gera conversa",
+    "alt": "Capa: LinkedIn para candidato em São Luís: perfil que gera conversa"
+  },
+  {
+    "slug": "sl-local-47-follow-up-entrevista",
+    "source": "illustrated",
+    "photographer": "Empregos Sao Luis",
+    "credit": "Empregos Sao Luis — ilustracao editorial",
+    "caption": "Ilustracao editorial para Follow-up após entrevista: quando mandar e o que escrever",
+    "alt": "Capa: Follow-up após entrevista: quando mandar e o que escrever"
+  },
+  {
+    "slug": "sl-local-48-rejeicao-candidatura",
+    "source": "illustrated",
+    "photographer": "Empregos Sao Luis",
+    "credit": "Empregos Sao Luis — ilustracao editorial",
+    "caption": "Ilustracao editorial para Rejeição na seleção: como reagir sem travar a busca inteira",
+    "alt": "Capa: Rejeição na seleção: como reagir sem travar a busca inteira"
+  },
+  {
+    "slug": "sl-local-49-primeira-semana-emprego",
+    "source": "illustrated",
+    "photographer": "Empregos Sao Luis",
+    "credit": "Empregos Sao Luis — ilustracao editorial",
+    "caption": "Ilustracao editorial para Primeira semana no emprego novo: o que observar e anotar",
+    "alt": "Capa: Primeira semana no emprego novo: o que observar e anotar"
+  },
+  {
+    "slug": "sl-local-50-pedir-aumento",
+    "source": "illustrated",
+    "photographer": "Empregos Sao Luis",
+    "credit": "Empregos Sao Luis — ilustracao editorial",
+    "caption": "Ilustracao editorial para Pedir aumento com argumentos: preparação sem ultimato",
+    "alt": "Capa: Pedir aumento com argumentos: preparação sem ultimato"
+  },
+  {
+    "slug": "sl-local-51-banco-horas",
+    "source": "illustrated",
+    "photographer": "Empregos Sao Luis",
+    "credit": "Empregos Sao Luis — ilustracao editorial",
+    "caption": "Ilustracao editorial para Banco de horas: o que confirmar no regulamento da empresa",
+    "alt": "Capa: Banco de horas: o que confirmar no regulamento da empresa"
+  },
+  {
+    "slug": "sl-local-52-hora-extra-direitos",
+    "source": "illustrated",
+    "photographer": "Empregos Sao Luis",
+    "credit": "Empregos Sao Luis — ilustracao editorial",
+    "caption": "Ilustracao editorial para Hora extra: como conferir se o adicional entrou no holerite",
+    "alt": "Capa: Hora extra: como conferir se o adicional entrou no holerite"
+  },
+  {
+    "slug": "sl-local-53-fgts-basico",
+    "source": "illustrated",
+    "photographer": "Empregos Sao Luis",
+    "credit": "Empregos Sao Luis — ilustracao editorial",
+    "caption": "Ilustracao editorial para FGTS na prática: o que o trabalhador CLT deve acompanhar",
+    "alt": "Capa: FGTS na prática: o que o trabalhador CLT deve acompanhar"
+  },
+  {
+    "slug": "sl-local-54-seguro-desemprego",
+    "source": "illustrated",
+    "photographer": "Empregos Sao Luis",
+    "credit": "Empregos Sao Luis — ilustracao editorial",
+    "caption": "Ilustracao editorial para Seguro-desemprego: checklist básico após demissão sem justa causa",
+    "alt": "Capa: Seguro-desemprego: checklist básico após demissão sem justa causa"
+  },
+  {
+    "slug": "sl-local-55-vale-alimentacao",
+    "source": "illustrated",
+    "photographer": "Empregos Sao Luis",
+    "credit": "Empregos Sao Luis — ilustracao editorial",
+    "caption": "Ilustracao editorial para Vale-alimentação e refeição: diferenças que mudam o líquido do mês",
+    "alt": "Capa: Vale-alimentação e refeição: diferenças que mudam o líquido do mês"
+  },
+  {
+    "slug": "sl-local-56-periodo-experiencia",
+    "source": "illustrated",
+    "photographer": "Empregos Sao Luis",
+    "credit": "Empregos Sao Luis — ilustracao editorial",
+    "caption": "Ilustracao editorial para Período de experiência: direitos e o que perguntar na admissão",
+    "alt": "Capa: Período de experiência: direitos e o que perguntar na admissão"
+  },
+  {
+    "slug": "sl-local-57-contrato-temporario",
+    "source": "illustrated",
+    "photographer": "Empregos Sao Luis",
+    "credit": "Empregos Sao Luis — ilustracao editorial",
+    "caption": "Ilustracao editorial para Contrato temporário: o que ler antes de assinar a temporada",
+    "alt": "Capa: Contrato temporário: o que ler antes de assinar a temporada"
+  },
+  {
+    "slug": "sl-local-58-assedio-trabalho",
+    "source": "illustrated",
+    "photographer": "Empregos Sao Luis",
+    "credit": "Empregos Sao Luis — ilustracao editorial",
+    "caption": "Ilustracao editorial para Assédio no trabalho: sinais, registro e canais com menos risco",
+    "alt": "Capa: Assédio no trabalho: sinais, registro e canais com menos risco"
+  },
+  {
+    "slug": "sl-local-59-saude-mental-trabalho",
+    "source": "illustrated",
+    "photographer": "Empregos Sao Luis",
+    "credit": "Empregos Sao Luis — ilustracao editorial",
+    "caption": "Ilustracao editorial para Saúde mental e trabalho: limites saudáveis sem culpa excessiva",
+    "alt": "Capa: Saúde mental e trabalho: limites saudáveis sem culpa excessiva"
+  },
+  {
+    "slug": "sl-local-60-home-office-checklist",
+    "source": "illustrated",
+    "photographer": "Empregos Sao Luis",
+    "credit": "Empregos Sao Luis — ilustracao editorial",
+    "caption": "Ilustracao editorial para Home office de verdade: checklist antes de aceitar remoto",
+    "alt": "Capa: Home office de verdade: checklist antes de aceitar remoto"
+  },
+  {
+    "slug": "sl-local-61-mudanca-carreira",
+    "source": "illustrated",
+    "photographer": "Empregos Sao Luis",
+    "credit": "Empregos Sao Luis — ilustracao editorial",
+    "caption": "Ilustracao editorial para Mudança de carreira na capital: como transição sem apagar o passado",
+    "alt": "Capa: Mudança de carreira na capital: como transição sem apagar o passado"
+  },
+  {
+    "slug": "sl-local-62-carta-apresentacao",
+    "source": "illustrated",
+    "photographer": "Empregos Sao Luis",
+    "credit": "Empregos Sao Luis — ilustracao editorial",
+    "caption": "Ilustracao editorial para Carta de apresentação curta: quando vale a pena enviar",
+    "alt": "Capa: Carta de apresentação curta: quando vale a pena enviar"
+  },
+  {
+    "slug": "sl-local-63-referencias-profissionais",
+    "source": "illustrated",
+    "photographer": "Empregos Sao Luis",
+    "credit": "Empregos Sao Luis — ilustracao editorial",
+    "caption": "Ilustracao editorial para Referências profissionais: quem pedir e como preparar o contato",
+    "alt": "Capa: Referências profissionais: quem pedir e como preparar o contato"
+  },
+  {
+    "slug": "sl-local-64-ofertas-multiplas",
+    "source": "illustrated",
+    "photographer": "Empregos Sao Luis",
+    "credit": "Empregos Sao Luis — ilustracao editorial",
+    "caption": "Ilustracao editorial para Duas ofertas na mesa: como comparar sem pressa tóxica",
+    "alt": "Capa: Duas ofertas na mesa: como comparar sem pressa tóxica"
+  },
+  {
+    "slug": "sl-local-65-agradecimento-pos",
+    "source": "illustrated",
+    "photographer": "Empregos Sao Luis",
+    "credit": "Empregos Sao Luis — ilustracao editorial",
+    "caption": "Ilustracao editorial para Mensagem de agradecimento pós-entrevista que não parece robô",
+    "alt": "Capa: Mensagem de agradecimento pós-entrevista que não parece robô"
+  },
+  {
+    "slug": "sl-local-66-codigo-vestimenta",
+    "source": "illustrated",
+    "photographer": "Empregos Sao Luis",
+    "credit": "Empregos Sao Luis — ilustracao editorial",
+    "caption": "Ilustracao editorial para O que vestir na entrevista: leitura do setor sem exagero",
+    "alt": "Capa: O que vestir na entrevista: leitura do setor sem exagero"
+  },
+  {
+    "slug": "sl-local-67-excel-basico-vagas",
+    "source": "illustrated",
+    "photographer": "Empregos Sao Luis",
+    "credit": "Empregos Sao Luis — ilustracao editorial",
+    "caption": "Ilustracao editorial para Excel pedida em vaga local: o que treinar de verdade",
+    "alt": "Capa: Excel pedida em vaga local: o que treinar de verdade"
+  },
+  {
+    "slug": "sl-local-68-ingles-curriculo",
+    "source": "illustrated",
+    "photographer": "Empregos Sao Luis",
+    "credit": "Empregos Sao Luis — ilustracao editorial",
+    "caption": "Ilustracao editorial para Inglês no currículo: como declarar nível sem inventar fluência",
+    "alt": "Capa: Inglês no currículo: como declarar nível sem inventar fluência"
+  },
+  {
+    "slug": "sl-local-69-profissional-40-mais",
+    "source": "illustrated",
+    "photographer": "Empregos Sao Luis",
+    "credit": "Empregos Sao Luis — ilustracao editorial",
+    "caption": "Ilustracao editorial para Profissional 40+: como posicionar experiência sem se apagar",
+    "alt": "Capa: Profissional 40+: como posicionar experiência sem se apagar"
+  },
+  {
+    "slug": "sl-local-70-retorno-maternidade",
+    "source": "illustrated",
+    "photographer": "Empregos Sao Luis",
+    "credit": "Empregos Sao Luis — ilustracao editorial",
+    "caption": "Ilustracao editorial para Volta ao mercado após maternidade: currículo e conversa sem culpa",
+    "alt": "Capa: Volta ao mercado após maternidade: currículo e conversa sem culpa"
+  },
+  {
+    "slug": "sl-local-71-call-center-perfil",
+    "source": "illustrated",
+    "photographer": "Empregos Sao Luis",
+    "credit": "Empregos Sao Luis — ilustracao editorial",
+    "caption": "Ilustracao editorial para Vagas de call center: voz, meta e o que perguntar na seleção",
+    "alt": "Capa: Vagas de call center: voz, meta e o que perguntar na seleção"
+  },
+  {
+    "slug": "sl-local-72-recepcao-clinica",
+    "source": "illustrated",
+    "photographer": "Empregos Sao Luis",
+    "credit": "Empregos Sao Luis — ilustracao editorial",
+    "caption": "Ilustracao editorial para Recepção em clínica e consultório: o que o anúncio espera de você",
+    "alt": "Capa: Recepção em clínica e consultório: o que o anúncio espera de você"
+  },
+  {
+    "slug": "sl-local-73-estoque-logistica",
+    "source": "illustrated",
+    "photographer": "Empregos Sao Luis",
+    "credit": "Empregos Sao Luis — ilustracao editorial",
+    "caption": "Ilustracao editorial para Estoque e logística leve: como mostrar precisão sem jargão vazio",
+    "alt": "Capa: Estoque e logística leve: como mostrar precisão sem jargão vazio"
+  },
+  {
+    "slug": "sl-local-74-vendas-balcao",
+    "source": "illustrated",
+    "photographer": "Empregos Sao Luis",
+    "credit": "Empregos Sao Luis — ilustracao editorial",
+    "caption": "Ilustracao editorial para Vendas no balcão: meta, comissão e tom que não afasta cliente",
+    "alt": "Capa: Vendas no balcão: meta, comissão e tom que não afasta cliente"
+  },
+  {
+    "slug": "sl-local-75-turismo-hotelaria",
+    "source": "illustrated",
+    "photographer": "Empregos Sao Luis",
+    "credit": "Empregos Sao Luis — ilustracao editorial",
+    "caption": "Ilustracao editorial para Hotelaria e turismo local: sazonalidade e postura de atendimento",
+    "alt": "Capa: Hotelaria e turismo local: sazonalidade e postura de atendimento"
+  },
+  {
+    "slug": "sl-local-76-motorista-entregas",
+    "source": "illustrated",
+    "photographer": "Empregos Sao Luis",
+    "credit": "Empregos Sao Luis — ilustracao editorial",
+    "caption": "Ilustracao editorial para Motorista e entregas: documentos, rota e o que o anúncio omite",
+    "alt": "Capa: Motorista e entregas: documentos, rota e o que o anúncio omite"
+  },
+  {
+    "slug": "sl-local-77-plano-90-dias",
+    "source": "illustrated",
+    "photographer": "Empregos Sao Luis",
+    "credit": "Empregos Sao Luis — ilustracao editorial",
+    "caption": "Ilustracao editorial para Plano de 90 dias na busca: ritmo sustentável até a entrevista",
+    "alt": "Capa: Plano de 90 dias na busca: ritmo sustentável até a entrevista"
+  },
+  {
+    "slug": "sl-local-78-sindicato-basico",
+    "source": "illustrated",
+    "photographer": "Empregos Sao Luis",
+    "credit": "Empregos Sao Luis — ilustracao editorial",
+    "caption": "Ilustracao editorial para Sindicato e trabalhador: o básico para não cair em boato",
+    "alt": "Capa: Sindicato e trabalhador: o básico para não cair em boato"
+  },
+  {
+    "slug": "sl-local-79-acordo-coletivo",
+    "source": "illustrated",
+    "photographer": "Empregos Sao Luis",
+    "credit": "Empregos Sao Luis — ilustracao editorial",
+    "caption": "Ilustracao editorial para Acordo e convenção coletiva: o que isso muda no seu holerite",
+    "alt": "Capa: Acordo e convenção coletiva: o que isso muda no seu holerite"
+  },
+  {
+    "slug": "sl-local-80-atestado-medico",
+    "source": "illustrated",
+    "photographer": "Empregos Sao Luis",
+    "credit": "Empregos Sao Luis — ilustracao editorial",
+    "caption": "Ilustracao editorial para Atestado médico no emprego: entrega, prazo e cuidados com o documento",
+    "alt": "Capa: Atestado médico no emprego: entrega, prazo e cuidados com o documento"
+  },
+  {
+    "slug": "sl-local-81-acidente-trabalho",
+    "source": "illustrated",
+    "photographer": "Empregos Sao Luis",
+    "credit": "Empregos Sao Luis — ilustracao editorial",
+    "caption": "Ilustracao editorial para Acidente de trabalho: primeiros passos e registro sem pânico",
+    "alt": "Capa: Acidente de trabalho: primeiros passos e registro sem pânico"
+  },
+  {
+    "slug": "sl-local-82-terceirizado-direitos",
+    "source": "illustrated",
+    "photographer": "Empregos Sao Luis",
+    "credit": "Empregos Sao Luis — ilustracao editorial",
+    "caption": "Ilustracao editorial para Trabalho terceirizado: quem é o empregador e o que perguntar",
+    "alt": "Capa: Trabalho terceirizado: quem é o empregador e o que perguntar"
+  },
+  {
+    "slug": "sl-local-83-trabalho-noturno",
+    "source": "illustrated",
+    "photographer": "Empregos Sao Luis",
+    "credit": "Empregos Sao Luis — ilustracao editorial",
+    "caption": "Ilustracao editorial para Trabalho noturno: adicional, sono e perguntas antes de aceitar",
+    "alt": "Capa: Trabalho noturno: adicional, sono e perguntas antes de aceitar"
+  },
+  {
+    "slug": "sl-local-84-conflito-lideranca",
+    "source": "illustrated",
+    "photographer": "Empregos Sao Luis",
+    "credit": "Empregos Sao Luis — ilustracao editorial",
+    "caption": "Ilustracao editorial para Conflito com a liderança: como documentar e falar com objetividade",
+    "alt": "Capa: Conflito com a liderança: como documentar e falar com objetividade"
+  },
+  {
+    "slug": "sl-local-85-feedback-entrevista",
+    "source": "illustrated",
+    "photographer": "Empregos Sao Luis",
+    "credit": "Empregos Sao Luis — ilustracao editorial",
+    "caption": "Ilustracao editorial para Feedback na entrevista: como pedir e o que fazer com a resposta",
+    "alt": "Capa: Feedback na entrevista: como pedir e o que fazer com a resposta"
+  },
+  {
+    "slug": "sl-local-86-inteligencia-emocional",
+    "source": "illustrated",
+    "photographer": "Empregos Sao Luis",
+    "credit": "Empregos Sao Luis — ilustracao editorial",
+    "caption": "Ilustracao editorial para Inteligência emocional na seleção: calma que se demonstra na prática",
+    "alt": "Capa: Inteligência emocional na seleção: calma que se demonstra na prática"
+  },
+  {
+    "slug": "sl-local-87-gestao-tempo-posto",
+    "source": "illustrated",
+    "photographer": "Empregos Sao Luis",
+    "credit": "Empregos Sao Luis — ilustracao editorial",
+    "caption": "Ilustracao editorial para Gestão de tempo no posto novo: priorizar sem parecer lento",
+    "alt": "Capa: Gestão de tempo no posto novo: priorizar sem parecer lento"
+  },
+  {
+    "slug": "sl-local-88-alfabetizacao-digital",
+    "source": "illustrated",
+    "photographer": "Empregos Sao Luis",
+    "credit": "Empregos Sao Luis — ilustracao editorial",
+    "caption": "Ilustracao editorial para Alfabetização digital para vagas locais: o mínimo que destrava",
+    "alt": "Capa: Alfabetização digital para vagas locais: o mínimo que destrava"
+  },
+  {
+    "slug": "sl-local-89-portfolio-simples",
+    "source": "illustrated",
+    "photographer": "Empregos Sao Luis",
+    "credit": "Empregos Sao Luis — ilustracao editorial",
+    "caption": "Ilustracao editorial para Portfólio simples sem ser designer: quando e como montar",
+    "alt": "Capa: Portfólio simples sem ser designer: quando e como montar"
+  },
+  {
+    "slug": "sl-local-90-comparar-portais",
+    "source": "illustrated",
+    "photographer": "Empregos Sao Luis",
+    "credit": "Empregos Sao Luis — ilustracao editorial",
+    "caption": "Ilustracao editorial para Portais de vaga: como comparar fontes sem cair em duplicata e golpe",
+    "alt": "Capa: Portais de vaga: como comparar fontes sem cair em duplicata e golpe"
+  },
+  {
+    "slug": "sl-local-91-ler-contrato-clt",
+    "source": "illustrated",
+    "photographer": "Empregos Sao Luis",
+    "credit": "Empregos Sao Luis — ilustracao editorial",
+    "caption": "Ilustracao editorial para Ler o contrato CLT antes de assinar: cláusulas que merecem pausa",
+    "alt": "Capa: Ler o contrato CLT antes de assinar: cláusulas que merecem pausa"
+  },
+  {
+    "slug": "sl-local-92-mitos-direitos",
+    "source": "illustrated",
+    "photographer": "Empregos Sao Luis",
+    "credit": "Empregos Sao Luis — ilustracao editorial",
+    "caption": "Ilustracao editorial para Mitos de direitos trabalhistas que circulam em grupo de WhatsApp",
+    "alt": "Capa: Mitos de direitos trabalhistas que circulam em grupo de WhatsApp"
+  },
+  {
+    "slug": "sl-local-93-custo-vida-salario",
+    "source": "illustrated",
+    "photographer": "Empregos Sao Luis",
+    "credit": "Empregos Sao Luis — ilustracao editorial",
+    "caption": "Ilustracao editorial para Custo de vida e salário em São Luís: conta mínima antes de aceitar",
+    "alt": "Capa: Custo de vida e salário em São Luís: conta mínima antes de aceitar"
+  },
+  {
+    "slug": "sl-local-94-negociar-deslocamento",
+    "source": "illustrated",
+    "photographer": "Empregos Sao Luis",
+    "credit": "Empregos Sao Luis — ilustracao editorial",
+    "caption": "Ilustracao editorial para Deslocamento longo: como negociar horário ou auxílio com educação",
+    "alt": "Capa: Deslocamento longo: como negociar horário ou auxílio com educação"
+  },
+  {
+    "slug": "sl-local-95-trabalho-fim-semana",
+    "source": "illustrated",
+    "photographer": "Empregos Sao Luis",
+    "credit": "Empregos Sao Luis — ilustracao editorial",
+    "caption": "Ilustracao editorial para Trabalho no fim de semana: o que alinhar sobre folga e adicional",
+    "alt": "Capa: Trabalho no fim de semana: o que alinhar sobre folga e adicional"
+  },
+  {
+    "slug": "sl-local-96-transferencia-interna",
+    "source": "illustrated",
+    "photographer": "Empregos Sao Luis",
+    "credit": "Empregos Sao Luis — ilustracao editorial",
+    "caption": "Ilustracao editorial para Transferência interna: como pedir mudança de setor sem queimar ponte",
+    "alt": "Capa: Transferência interna: como pedir mudança de setor sem queimar ponte"
+  },
+  {
+    "slug": "sl-local-97-avaliacao-desempenho",
+    "source": "illustrated",
+    "photographer": "Empregos Sao Luis",
+    "credit": "Empregos Sao Luis — ilustracao editorial",
+    "caption": "Ilustracao editorial para Avaliação de desempenho: como se preparar sem teatro",
+    "alt": "Capa: Avaliação de desempenho: como se preparar sem teatro"
+  },
+  {
+    "slug": "sl-local-98-entrevista-desligamento",
+    "source": "illustrated",
+    "photographer": "Empregos Sao Luis",
+    "credit": "Empregos Sao Luis — ilustracao editorial",
+    "caption": "Ilustracao editorial para Entrevista de desligamento: o que falar e o que guardar",
+    "alt": "Capa: Entrevista de desligamento: o que falar e o que guardar"
+  },
+  {
+    "slug": "sl-local-99-vagas-sazonais",
+    "source": "illustrated",
+    "photographer": "Empregos Sao Luis",
+    "credit": "Empregos Sao Luis — ilustracao editorial",
+    "caption": "Ilustracao editorial para Contratação sazonal: como entrar no pico sem ilusão de efetivo",
+    "alt": "Capa: Contratação sazonal: como entrar no pico sem ilusão de efetivo"
+  },
+  {
+    "slug": "sl-local-100-empatia-atendimento",
+    "source": "illustrated",
+    "photographer": "Empregos Sao Luis",
+    "credit": "Empregos Sao Luis — ilustracao editorial",
+    "caption": "Ilustracao editorial para Empatia no atendimento: soft skill que anúncios pedem sem explicar",
+    "alt": "Capa: Empatia no atendimento: soft skill que anúncios pedem sem explicar"
+  },
+  {
+    "slug": "sl-local-101-gap-habilidades",
+    "source": "illustrated",
+    "photographer": "Empregos Sao Luis",
+    "credit": "Empregos Sao Luis — ilustracao editorial",
+    "caption": "Ilustracao editorial para Gap de habilidades: como fechar buraco entre você e o anúncio",
+    "alt": "Capa: Gap de habilidades: como fechar buraco entre você e o anúncio"
+  },
+  {
+    "slug": "sl-local-102-certificado-vs-pratica",
+    "source": "illustrated",
+    "photographer": "Empregos Sao Luis",
+    "credit": "Empregos Sao Luis — ilustracao editorial",
+    "caption": "Ilustracao editorial para Certificado ou prática: o que pesa mais na triagem local",
+    "alt": "Capa: Certificado ou prática: o que pesa mais na triagem local"
+  },
+  {
+    "slug": "sl-local-103-burnout-sinais",
+    "source": "illustrated",
+    "photographer": "Empregos Sao Luis",
+    "credit": "Empregos Sao Luis — ilustracao editorial",
+    "caption": "Ilustracao editorial para Sinais de esgotamento na busca e no emprego: quando pausar",
+    "alt": "Capa: Sinais de esgotamento na busca e no emprego: quando pausar"
+  },
+  {
+    "slug": "sl-local-104-mensagem-recrutador",
+    "source": "illustrated",
+    "photographer": "Empregos Sao Luis",
+    "credit": "Empregos Sao Luis — ilustracao editorial",
+    "caption": "Ilustracao editorial para Mensagem fria para recrutador: template curto que não parece spam",
+    "alt": "Capa: Mensagem fria para recrutador: template curto que não parece spam"
+  },
+  {
+    "slug": "sl-local-105-panorama-mercado-local",
+    "source": "illustrated",
+    "photographer": "Empregos Sao Luis",
+    "credit": "Empregos Sao Luis — ilustracao editorial",
+    "caption": "Ilustracao editorial para Panorama 2026 da busca local: o que priorizar nos próximos meses",
+    "alt": "Capa: Panorama 2026 da busca local: o que priorizar nos próximos meses"
   }
 ]

@@ -95,7 +95,127 @@ const scenes = {
   "44-transporte-entrevista":
     "Desculpa de ônibus na primeira conversa já nasce frágil. Ensaio de trajeto no horário real, crédito pronto e telefone do contato para atraso excepcional são preparação, não paranoia.",
   "45-panorama-candidaturas":
-    "Vinte envios genéricos e zero resposta não pedem “mais volume”. Pedem planilha mínima: o que enviou, o que voltou, o que adaptar no PDF. Qualidade medida bate maratona cega."
+    "Vinte envios genéricos e zero resposta não pedem “mais volume”. Pedem planilha mínima: o que enviou, o que voltou, o que adaptar no PDF. Qualidade medida bate maratona cega.",
+  "46-linkedin-candidato":
+    "O PDF chegou limpo, mas o perfil online conta outra história: cargo genérico, foto de festa e zero resultado. Em vários processos da capital, o recrutador cruza as duas fontes depois da triagem. Alinhar título, experiências e tom profissional transforma o LinkedIn em reforço — não em contradição.",
+  "47-follow-up-entrevista":
+    "A conversa foi bem e o silêncio de dez dias vira spiral de áudios ansiosos. Follow-up único, no canal oficial, citando o cargo e um ponto da entrevista, reabre a porta sem parecer cobrança diária. Prazo combinado na saída continua sendo a melhor bússola.",
+  "48-rejeicao-candidatura":
+    "O “não” chega num dia em que a conta aperta. Reagir reescrevendo o currículo à noite inteira costuma piorar o material. Registrar a rejeição, ajustar um gap real frente ao anúncio e enviar outra candidatura alinhada no dia seguinte mantém o funil vivo.",
+  "49-primeira-semana-emprego":
+    "No emprego novo, todo mundo aponta um fluxo diferente. Quem anota ponto, senhas básicas e nomes-chave na primeira semana evita erro público no sábado de pico. Observar antes de “revolucionar o processo” no dia dois também protege a imagem.",
+  "50-pedir-aumento":
+    "Pedir aumento com ameaça de demissão inventada queima confiança. Chegar com entregas dos últimos meses, faixa de mercado e pergunta sobre janela de revisão transforma a conversa em negociação. O “não” com data ainda é informação útil.",
+  "51-banco-horas":
+    "“Fica mais uma e a gente compensa” sem regra escrita vira saldo invisível. Banco de horas sério tem política, registro e prazo. Anotar o extra no mesmo dia e pedir o regulamento antes do feriado evita briga de memória no mês seguinte.",
+  "52-hora-extra-direitos":
+    "O espelho de ponto mostra duas horas a mais; o holerite não. Cruzar os dois documentos no mesmo mês — e perguntar com educação — é o caminho curto. “Depois a gente acerta” sem prazo é o caminho longo do prejuízo.",
+  "53-fgts-basico":
+    "Muita gente só abre o FGTS na demissão e encontra buraco. Consulta periódica no app oficial, com senha protegida, transforma surpresa em cobrança precoce. Oferta de “liberação via PIX” de desconhecido continua sendo golpe clássico.",
+  "54-seguro-desemprego":
+    "A demissão sem justa causa mistura alívio e medo. Organizar documentos e usar canal oficial do requerimento reduz fila emocional e intermediação paga suspeita. Protocolo anotado vale mais que promessa de despachante no WhatsApp.",
+  "55-vale-alimentacao":
+    "Duas propostas com o mesmo bruto divergem no cartão: uma alimenta o almoço perto do posto, outra o mercado do mês. Colocar VA/VR na tabela ao lado do salário revela o líquido da vida real — especialmente com trajeto longo.",
+  "56-periodo-experiencia":
+    "Os primeiros 45 ou 90 dias não são terra sem lei. Duração, critério de avaliação e benefícios precisam estar claros. Usar o período para avaliar a empresa — escala, respeito, segurança — é tão legítimo quanto ser avaliado.",
+  "57-contrato-temporario":
+    "A vaga de temporada paga rápido e termina na data. Quem lê início, fim e empregador formal evita o susto de “acabou ontem” sem acerto. Temporário eterno renovado sem transparência merece pergunta dura antes da assinatura.",
+  "58-assedio-trabalho":
+    "Humilhação repetida ou conduta sexualizada não é cultura de time. Registrar datas e mensagens, buscar canal seguro e priorizar a própria integridade é resposta adulta. Post público no calor do momento raramente substitui prova e orientação.",
+  "59-saude-mental-trabalho":
+    "Insônia, irritação e medo constante de errar não são medalha de dedicação. Limitar o celular de trabalho no intervalo, observar a escala e buscar apoio quando o corpo pede são parte de se manter capaz de trabalhar — e de buscar outra vaga se preciso.",
+  "60-home-office-checklist":
+    "O anúncio vende liberdade; a segunda-feira exige presença “só dessa vez” toda semana. Confirmar dias remotos, equipamento e auxílio de internet antes do aceite evita romance furado. Remoto com taxa de liberação continua sendo fraude.",
+  "61-mudanca-carreira":
+    "Apagar o emprego anterior do PDF não convence. Traduzir o que se repete — atendimento, prazo, planilha — e aceitar um degrau de entrada na área nova costuma funcionar melhor do que fingir expertise sênior do dia para a noite.",
+  "62-carta-apresentacao":
+    "Carta de uma página com biografia completa perde para um parágrafo no e-mail: cargo, duas provas, telefone. Em processos locais que ainda usam caixa de entrada, objetividade abre; literatura fecha a aba.",
+  "63-referencias-profissionais":
+    "Colocar telefone de alguém que não autorizou é tiro no pé. Referência útil avisada, atualizada e capaz de falar da sua entrega real ainda move processo na capital — inventar contato é descoberta rápida.",
+  "64-ofertas-multiplas":
+    "Duas propostas na mesma semana pedem tabela, não impulso. Bruto, benefício, escala e trajeto na mesma folha mostram o líquido. Recusar com educação preserva ponte numa cidade onde indicação circular importa.",
+  "65-agradecimento-pos":
+    "“Obrigado pela oportunidade” idêntico ao de todo mundo some. Duas frases no mesmo dia, citando um tema real da conversa, reforçam interesse sem parecer robô de internet. Canal oficial da entrevista continua sendo o certo.",
+  "66-codigo-vestimenta":
+    "Terno em cozinha e bermuda em escritório bancário distraem pelo motivo errado. Ler o setor, priorizar limpeza e sobreviver ao calor da capital com tecido respirável é o meio-termo que deixa a resposta brilhar.",
+  "67-excel-basico-vagas":
+    "O anúncio pede Excel intermediário e o teste pede filtro e SOMA. Treinar o básico bem feito e declarar o nível com honestidade evita o constrangimento do “domino macros” que trava no primeiro critério.",
+  "68-ingles-curriculo":
+    "Fluência no PDF e silêncio na saudação em inglês quebram a entrevista em trinta segundos. Nível honesto, contexto de uso e ensaio curto quando a vaga exige o idioma protegem mais do que adjetivo inflado.",
+  "69-profissional-40-mais":
+    "Esconder vinte anos de história ou romantizar “ainda corro” são extremos ruins. Destacar entrega recente, ferramenta atual e motivo claro para a vaga posiciona experiência como ativo — não como peso a justificar.",
+  "70-retorno-maternidade":
+    "A pausa existe; a culpa excessiva na entrevista não precisa. Uma linha objetiva, contato atualizado e perguntas práticas de escala mostram preparo. Recrutadores veem retornos o tempo todo — confusão na história é que atrapalha.",
+  "71-call-center-perfil":
+    "Headset, meta e pausa curta definem o posto mais do que o sorriso do anúncio. Perguntar como a qualidade é medida e se o equipamento home office existe evita mês um de surpresa. Simulação de cliente irritado ainda é comum na seleção.",
+  "72-recepcao-clinica":
+    "Recepção de clínica é fila, WhatsApp e sigilo ao mesmo tempo. Quem descreve organização de agenda e discrição com dado de paciente fala a língua do anúncio melhor do que “sou comunicativa” sem cena.",
+  "73-estoque-logistica":
+    "Diferença de inventário e nota conferida errada custam caro. Currículo com verbos de conferência, organização e correção de erro concreto convence mais que lista de soft skills de poster motivacional.",
+  "74-vendas-balcao":
+    "Comissão no cartaz e terça vazia na loja são a mesma proposta vista de dois ângulos. Perguntar base, percentual e estorno de devolução revela o líquido. Abordagem educada ainda vende mais do que pressão que afasta.",
+  "75-turismo-hotelaria":
+    "Alta temporada enche o lobby e a escala. Candidato que pergunta sobre pico, plantão e se a vaga é sazonal ou efetiva chega menos iludido — e demonstra leitura do setor de hospedagem da capital.",
+  "76-motorista-entregas":
+    "CNH ok não paga combustível sozinha. Combinar veículo, meta, seguro e tempo real de rota com chuva e trânsito evita aceite que só fecha a conta no papel. Taxa para liberar rota continua sendo sinal vermelho.",
+  "77-plano-90-dias":
+    "Busca sem horizonte vira culpa diária. Noventa dias com metas de material, envio de qualidade e treino de entrevista organizam energia. Se a taxa de resposta for zero no fim, muda-se o PDF — não só o volume.",
+  "78-sindicato-basico":
+    "Áudio de grupo com percentual de reajuste não substitui convenção. Identificar categoria e buscar canal oficial reduz decisão tomada no susto. Contribuição estranha cobrada por desconhecido merece pausa.",
+  "79-acordo-coletivo":
+    "Piso e adicional podem estar na norma coletiva, não só no “combinado” do supervisor. Pedir qual acordo se aplica e cruzar com o holerite transforma achismo em pergunta com documento.",
+  "80-atestado-medico":
+    "Atestado adulterado é problema grave; atestado legítimo entregue no canal errado também vira dor de cabeça. Conhecer prazo e guardar comprovante de envio são o básico que a admissão deveria esclarecer.",
+  "81-acidente-trabalho":
+    "Depois do susto, a pressão para “deixar quieto” aparece. Saúde primeiro, comunicação à liderança e registro de fatos protegem o depois. Assinar o que não se entendeu na pressa é risco evitável.",
+  "82-terceirizado-direitos":
+    "O crachá é de um nome; o holerite é de outro. Saber quem é o empregador formal define onde cobrar atraso e como guardar documentos. Terceirização séria explica o vínculo — improviso eterno não.",
+  "83-trabalho-noturno":
+    "Adicional noturno atrai; sono e ônibus de madrugada cobram. Confirmar transporte, refeição e publicação de escala antes do aceite evita descobrir o custo humano só na terceira semana.",
+  "84-conflito-lideranca":
+    "Conflito de meta vira guerra de corredor quando só existe áudio inflamado. Fatos, conversa privada e canal interno objetivo reduzem dano. Ambiente abusivo pede plano de segurança e saída — não só paciência infinita.",
+  "85-feedback-entrevista":
+    "Poucos retornos vêm detalhados; quando vêm, viram ajuste de PDF na mesma semana. Pedir com educação, agradecer e não tentar reverter a decisão na hora transforma “não” em dado de mercado pessoal.",
+  "86-inteligencia-emocional":
+    "A pergunta foi injusta e a vontade é ironizar. Pausa curta, resposta respeitosa e história sem ataque pessoal demonstram o que o anúncio chama de inteligência emocional — sem precisar usar a palavra.",
+  "87-gestao-tempo-posto":
+    "No time enxuto, tudo parece prioridade máxima. Alinhar a ordem do dia com a liderança e avisar atraso cedo evita rótulo de lento. Lista simples no bolso ainda salva demanda oral esquecida.",
+  "88-alfabetizacao-digital":
+    "A vaga morre no formulário que não envia, no PDF que não anexa, na foto de documento ilegível. Treino curto de envio digital destrava mais candidatura local do que curso caro que promete emprego garantido.",
+  "89-portfolio-simples":
+    "Três provas anonimizadas em PDF leve mostram organização melhor do que site que não carrega no 4G. Portfólio só entra quando reforça o anúncio — e nunca com dado sensível de cliente.",
+  "90-comparar-portais":
+    "A mesma vaga em cinco grupos com salários diferentes é armadilha de tempo e golpe. Âncora no canal oficial, registro de onde já enviou e recusa a taxa de “destaque” mantêm a busca limpa.",
+  "91-ler-contrato-clt":
+    "A caneta está na mesa e a loja quer você “já”. Dois minutos para cruzar salário, jornada e local com a proposta verbal evitam mês de “mas me falaram outra coisa”. Cópia para você não é frescura.",
+  "92-mitos-direitos":
+    "Corrente de WhatsApp com tom de certeza jurídica empurra gente para decisão ruim. Fonte, data e documento do próprio contrato pesam mais. Boato de reajuste não paga conta — e às vezes cria briga desnecessária.",
+  "93-custo-vida-salario":
+    "O bruto cabe no print; a passagem do mês não. Somar condução, almoço e tempo de trajeto na capital revela se a proposta sustenta. Comparar dois líquidos na mesma folha mata ilusão rápido.",
+  "94-negociar-deslocamento":
+    "O salário fecha e o ônibus não. Levar tempo real de trajeto e pedir ajuste específico — VT, horário, dia remoto — é negociação adulta. Recusar a tempo quando inviável também é.",
+  "95-trabalho-fim-semana":
+    "O anúncio fala segunda a sexta; a escala mostra domingo. Alinhar fim de semana, folga e adicional na entrevista evita demissão emocional no segundo mês de varejo ou alimentação.",
+  "96-transferencia-interna":
+    "Pedir troca de setor só com “cansei” raramente funciona. Histórico bom, motivo profissional e transição limpa preservam ponte. Fofoca paralela para forçar mudança costuma voltar como bloqueio.",
+  "97-avaliacao-desempenho":
+    "Avaliação sem evidência vira teatro. Chegar com números, um ponto de melhoria e pergunta sobre o próximo ciclo transforma a conversa em plano. Se não houver ciclo formal, pedir feedback registrado ainda ajuda.",
+  "98-entrevista-desligamento":
+    "Na saída, desabafo com nome e xingamento vira lenda local. Razões objetivas, pergunta de acerto e devolução protocolada fecham o ciclo com menos dano à próxima indicação.",
+  "99-vagas-sazonais":
+    "Pico de calendário abre porta rápida e fecha na data. Tratar sazonal como ponte — contrato lido, busca paralela no fim — evita a ilusão de efetivo automático que ninguém prometeu por escrito.",
+  "100-empatia-atendimento":
+    "Empatia no anúncio não é concordar com grito. É ouvir, reformular o problema e propor próximo passo sem aceitar abuso. Uma cena real na entrevista fala mais alto que a palavra colada no currículo.",
+  "101-gap-habilidades":
+    "Três requisitos, uma skill sua. Mapear obrigatório versus desejável, treinar o que se repete nos anúncios e declarar aprendizado com honestidade rende mais do que mentir domínio na ficha.",
+  "102-certificado-vs-pratica":
+    "Certificado sem hora de prática trava no teste; prática sem papel perde vaga que exige o curso. Ler o que é obrigatório no anúncio e equilibrar os dois evita pasta decorativa e entrevista vazia.",
+  "103-burnout-sinais":
+    "Candidatura às duas da manhã com raiva raramente melhora a taxa. Pausar 48 horas, dormir e voltar com meta menor é método. Esgotamento disfarçado de “dedicação” queima material e saúde.",
+  "104-mensagem-recrutador":
+    "Mensagem fria genérica vira spam na caixa do recrutador. Cargo, uma prova, pedido específico e zero cobrança diária respeitam o tempo de quem tria. Ortografia no primeiro contato ainda elimina gente boa.",
+  "105-panorama-mercado-local":
+    "Sem bola de cristal, o panorama útil é padrão: setores que mais anunciam, peso da escala e golpe a filtrar. Medir o próprio funil e usar canal seguro continua sendo a estratégia prática para 2026 na capital."
 };
 
 /** Follow-ups únicos por chave (6 cada) — evitam parágrafo-clone entre posts. */

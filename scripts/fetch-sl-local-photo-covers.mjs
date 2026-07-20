@@ -1,16 +1,20 @@
 #!/usr/bin/env node
 /**
- * Baixa 45 fotos reais (licença Unsplash) → apps/web/public/covers/sl-local/{slug}.webp
+ * Baixa fotos (Unsplash / Picsum) → apps/web/public/covers/sl-local/{slug}.webp
+ * Cobre o catálogo inteiro (105+). Já existentes são pulados (use --force para refazer).
  *   node scripts/fetch-sl-local-photo-covers.mjs
+ *   node scripts/fetch-sl-local-photo-covers.mjs --force
  */
-import { mkdirSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import sharp from "sharp";
 import { catalog, slugFor } from "./data/sl-local-editorial-catalog.mjs";
 
+const force = process.argv.includes("--force");
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const outDir = resolve(root, "apps/web/public/covers/sl-local");
+const creditsPath = resolve(outDir, "credits.json");
 mkdirSync(outDir, { recursive: true });
 
 /** @type {Array<{ id: string; photographer: string }>} */
@@ -59,37 +63,65 @@ const stock = [
   { id: "1521737604893-d14cc237f11d", photographer: "LinkedIn Sales Solutions" },
   { id: "1517048676732-d65bc937f952", photographer: "Christina Wocintechchat" },
   { id: "1523240795612-9a054b0db644", photographer: "Priscilla Du Preez" },
-  { id: "1573497019940-1cfe6d66f2e8", photographer: "Christina Wocintechchat" }
+  { id: "1573497019940-1cfe6d66f2e8", photographer: "Christina Wocintechchat" },
+  { id: "1542744173-8e7e53415bb0", photographer: "Campaign Creators" },
+  { id: "1552664730-d307ca884978", photographer: "Headway" },
+  { id: "1600880292089-2c1b7b6c8a0e", photographer: "Jason Goodman" },
+  { id: "1559136555-9303accfa9f9", photographer: "You X Ventures" },
+  { id: "1517245386807-bb43f82c33c4", photographer: "Brooke Cagle" },
+  { id: "1522071820081-009f0129c71c", photographer: "Austin Distel" },
+  { id: "1556761175-4b46d2e0f4e2", photographer: "LinkedIn Sales Solutions" },
+  { id: "1486312338219-ce68d2c6f44d", photographer: "Glenn Carstens-Peters" },
+  { id: "1454165804606-c3d57bc86b40", photographer: "Scott Graham" },
+  { id: "1497215728101-536fc9f2276d", photographer: "Alesia Kazantceva" },
+  { id: "1460925895917-afdab827c52f", photographer: "Carlos Muza" },
+  { id: "1553877522-43269d4ea984", photographer: "You X Ventures" },
+  { id: "1519389950473-47ba0277781c", photographer: "Marvin Meyer" },
+  { id: "1573164713714-d95e436ab8d6", photographer: "Christina Wocintechchat" },
+  { id: "1522202176988-66273c2fd55f", photographer: "Brooke Cagle" }
 ];
 
-if (stock.length !== 45 || catalog.length !== 45) {
-  console.error(`Esperado 45 fotos e 45 posts; got stock=${stock.length} catalog=${catalog.length}`);
-  process.exit(1);
-}
+const previous = existsSync(creditsPath) ? JSON.parse(readFileSync(creditsPath, "utf8")) : [];
+const metaBySlug = new Map(previous.map((row) => [row.slug, row]));
 
-const meta = [];
+let written = 0;
+let skipped = 0;
+
 for (let i = 0; i < catalog.length; i += 1) {
   const item = catalog[i];
   const slug = slugFor(item);
-  const photo = stock[i];
-  const primary = `https://images.unsplash.com/photo-${photo.id}?auto=format&fit=crop&w=1400&h=735&q=82`;
-  const fallback = `https://picsum.photos/seed/${encodeURIComponent(slug)}/1400/735`;
-  process.stdout.write(`\r[photos] ${i + 1}/45 ${slug}                    `);
+  const outFile = resolve(outDir, `${slug}.webp`);
+  if (!force && existsSync(outFile) && metaBySlug.has(slug)) {
+    skipped += 1;
+    process.stdout.write(`\r[photos] skip ${i + 1}/${catalog.length} ${slug}                    `);
+    continue;
+  }
+
+  const photo = stock[i % stock.length];
+  const preferPicsum = i >= stock.length;
+  const primary = preferPicsum
+    ? `https://picsum.photos/seed/${encodeURIComponent(slug)}/1400/735`
+    : `https://images.unsplash.com/photo-${photo.id}?auto=format&fit=crop&w=1400&h=735&q=82`;
+  const fallback = preferPicsum
+    ? `https://images.unsplash.com/photo-${photo.id}?auto=format&fit=crop&w=1400&h=735&q=82`
+    : `https://picsum.photos/seed/${encodeURIComponent(slug)}/1400/735`;
+
+  process.stdout.write(`\r[photos] ${i + 1}/${catalog.length} ${slug}                    `);
   let res = await fetch(primary, { redirect: "follow", signal: AbortSignal.timeout(45_000) });
-  let source = "unsplash";
-  let photographer = photo.photographer;
+  let source = preferPicsum ? "picsum" : "unsplash";
+  let photographer = preferPicsum ? "Picsum Photos" : photo.photographer;
   if (!res.ok) {
     res = await fetch(fallback, { redirect: "follow", signal: AbortSignal.timeout(45_000) });
-    source = "picsum";
-    photographer = "Picsum Photos";
+    source = preferPicsum ? "unsplash" : "picsum";
+    photographer = preferPicsum ? photo.photographer : "Picsum Photos";
   }
   if (!res.ok) {
     console.error(`\nFalha ${res.status}: ${primary}`);
     process.exit(1);
   }
   const buf = Buffer.from(await res.arrayBuffer());
-  await sharp(buf).resize(1200, 630, { fit: "cover", position: "centre" }).webp({ quality: 84 }).toFile(resolve(outDir, `${slug}.webp`));
-  meta.push({
+  await sharp(buf).resize(1200, 630, { fit: "cover", position: "centre" }).webp({ quality: 84 }).toFile(outFile);
+  metaBySlug.set(slug, {
     slug,
     photoId: photo.id,
     source,
@@ -98,7 +130,9 @@ for (let i = 0; i < catalog.length; i += 1) {
     caption: `Imagem ilustrativa para “${item.title}”.`,
     alt: `Capa: ${item.title}`
   });
+  written += 1;
 }
 
-writeFileSync(resolve(outDir, "credits.json"), JSON.stringify(meta, null, 2), "utf8");
-console.log(`\n[photos] OK — 45 capas + credits.json`);
+const meta = catalog.map((item) => metaBySlug.get(slugFor(item))).filter(Boolean);
+writeFileSync(creditsPath, JSON.stringify(meta, null, 2), "utf8");
+console.log(`\n[photos] OK — catalog=${catalog.length} written=${written} skipped=${skipped} credits=${meta.length}`);

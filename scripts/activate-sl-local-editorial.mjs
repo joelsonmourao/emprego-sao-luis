@@ -1,14 +1,16 @@
 #!/usr/bin/env node
 /**
- * Ativa o pacote sl-local-* já existente no banco:
- *  - publica os primeiros N agora (default 3)
+ * Ativa o pacote sl-local-* (105 no catálogo):
+ *  - insere índices faltantes (ex.: 46–105) se o banco só tiver parte do pacote
+ *  - publica N agora (default 3; misturando GUIDE/NEWS)
  *  - reagenda o restante ~3/dia a partir de amanhã
  *  - atualiza capa/crédito a partir de credits.json (fotos reais)
+ *  - --rewrite-bodies: regenera título + contentHtml (HTML)
  *
  *   node scripts/activate-sl-local-editorial.mjs
- *   node scripts/activate-sl-local-editorial.mjs --write --i-understand-production
+ *   node scripts/activate-sl-local-editorial.mjs --write --i-understand-production --rewrite-bodies
  *
- * Não usa migrate. Rode uma vez no Terminal Coolify (com DATABASE_URL + SITE_URL).
+ * Não usa migrate. Rode uma vez no Terminal Coolify do web Emprego São Luís.
  */
 import { existsSync, readFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";
@@ -139,12 +141,14 @@ if (!write) {
       {
         ok: true,
         dryRun: true,
+        catalogSize: catalog.length,
         plan: {
           publishNow: preview,
           scheduleRest: remainingCount,
           firstScheduled: remainingSlots[0]?.toISOString() ?? null,
           lastScheduled: remainingSlots.at(-1)?.toISOString() ?? null,
-          creditsLoaded: credits.length
+          creditsLoaded: credits.length,
+          note: "Com --write, índices faltantes no banco são inseridos automaticamente."
         },
         checks: { localOk, allowRemote, allowProduction, looksProduction }
       },
@@ -162,18 +166,152 @@ if (!localOk && !remoteWriteOk && !productionWriteOk) {
 }
 
 const sql = postgres(databaseUrl, { max: 1, prepare: false });
+
+/** Casa sl-local-01-... com catalog[0], mesmo se o sufixo do slug mudou no código. */
+function catalogIndexFromSlug(slug) {
+  const match = String(slug).match(new RegExp(`^${SLUG_BASE}-(\\d+)-`));
+  if (!match) return null;
+  const index = Number(match[1]) - 1;
+  return Number.isInteger(index) && index >= 0 && index < catalog.length ? index : null;
+}
+
 try {
-  const rows = await sql`
+  let rows = await sql`
     select id, slug, status, scheduled_at
     from es_articles
     where slug like ${`${SLUG_BASE}%`}
   `;
+
+  const covered = new Set();
+  for (const row of rows) {
+    const idx = catalogIndexFromSlug(row.slug);
+    if (idx != null) covered.add(idx);
+  }
+  const missingIndices = [];
+  for (let i = 0; i < catalog.length; i += 1) {
+    if (!covered.has(i)) missingIndices.push(i);
+  }
+
+  let inserted = 0;
+  if (missingIndices.length) {
+    let [author] = await sql`select id from es_authors where slug = ${`${SLUG_BASE}-autor`} limit 1`;
+    if (!author) {
+      [author] = await sql`
+        insert into es_authors (name, slug, bio)
+        values (
+          ${"Redação Empregos São Luís"},
+          ${`${SLUG_BASE}-autor`},
+          ${"Equipe editorial do Empregos São Luís."}
+        )
+        returning id
+      `;
+    }
+    let [pillar] = await sql`select id from es_content_pillars where slug = ${`${SLUG_BASE}-pilar`} limit 1`;
+    if (!pillar) {
+      [pillar] = await sql`
+        insert into es_content_pillars (name, slug, description, audience, active)
+        values (
+          ${"Emprego local — Grande Ilha"},
+          ${`${SLUG_BASE}-pilar`},
+          ${"Pilar editorial local para candidatos em São Luís."},
+          ${"CANDIDATE"},
+          true
+        )
+        returning id
+      `;
+    }
+    let clusters = await sql`select id, slug from es_content_clusters where slug like ${`${SLUG_BASE}-%`}`;
+    if (clusters.length < 3) {
+      clusters = await sql`
+        insert into es_content_clusters (pillar_id, name, slug, description, active)
+        values
+          (${pillar.id}, ${"Busca segura"}, ${`${SLUG_BASE}-busca-segura`}, ${"Golpes, canais e checagem"}, true),
+          (${pillar.id}, ${"Candidatura prática"}, ${`${SLUG_BASE}-candidatura`}, ${"Currículo, entrevista e rotina"}, true),
+          (${pillar.id}, ${"Mercado local"}, ${`${SLUG_BASE}-mercado`}, ${"Comércio, bairros e deslocamento"}, true)
+        returning id, slug
+      `;
+    }
+
+    const insertSlots = buildRemainingSlots(missingIndices.length);
+    for (let slotIdx = 0; slotIdx < missingIndices.length; slotIdx += 1) {
+      const index = missingIndices[slotIdx];
+      const item = catalog[index];
+      const slug = slugFor(item);
+      const cluster = clusters[index % clusters.length];
+      const excerpt = `${item.title}. Orientação prática para candidatos em São Luís e região.`;
+      const coverUrl = `${siteUrl}/covers/sl-local/${slug}.webp`;
+      const contentHtml = buildArticleHtml(item);
+      const sources = [
+        { name: "Empregos São Luís — política editorial", url: `${siteUrl}/politica-editorial` },
+        { name: "Empregos São Luís — política de fontes", url: `${siteUrl}/politica-fontes` },
+        { name: "Empregos São Luís — segurança do candidato", url: `${siteUrl}/seguranca-candidatos` }
+      ];
+      await sql`
+        insert into es_articles (
+          type, author_id, pillar_id, cluster_id, title, slug, excerpt, content_html,
+          cover_image_url, cover_image_alt, cover_image_caption, cover_image_credit,
+          cover_image_width, cover_image_height, og_image_url,
+          section, tags, source_name, source_url, sources,
+          seo_title, meta_description, primary_keyword, search_intent,
+          editorial_template, direct_answer, local_hook, audience, candidate_cta,
+          editorial_stage, status, published_at, scheduled_at,
+          news_eligible, discover_eligible, web_story_eligible, ai_assisted, fact_checked_at
+        ) values (
+          ${item.type},
+          ${author.id},
+          ${pillar.id},
+          ${cluster.id},
+          ${item.title},
+          ${slug},
+          ${excerpt},
+          ${contentHtml},
+          ${coverUrl},
+          ${`Capa: ${item.title}`},
+          ${`Imagem para “${item.title}”.`},
+          ${"Empregos São Luís — capa editorial"},
+          ${1200},
+          ${630},
+          ${coverUrl},
+          ${item.section},
+          ${sql.json(["sao-luis", "emprego", "sl-local", item.section])},
+          ${"Empregos São Luís"},
+          ${`${siteUrl}/politica-editorial`},
+          ${sql.json(sources)},
+          ${seoTitleFor(item.title)},
+          ${excerpt.slice(0, 155)},
+          ${item.keyword},
+          ${"informational"},
+          ${item.template},
+          ${item.lead.slice(0, 280)},
+          ${item.localAngle.slice(0, 280)},
+          ${"CANDIDATE"},
+          ${"Ver vagas gratuitas em São Luís"},
+          ${"APPROVED"},
+          ${"SCHEDULED"},
+          ${null},
+          ${insertSlots[slotIdx]},
+          ${item.type === "NEWS"},
+          ${false},
+          ${item.template === "POST_MAGNETICO"},
+          ${true},
+          ${new Date()}
+        )
+      `;
+      inserted += 1;
+    }
+
+    rows = await sql`
+      select id, slug, status, scheduled_at
+      from es_articles
+      where slug like ${`${SLUG_BASE}%`}
+    `;
+  }
+
   if (!rows.length) {
-    console.error("Nenhum artigo sl-local-* no banco. Rode o seed antes.");
+    console.error("Nenhum artigo sl-local-* no banco após insert. Verifique o catálogo/DB.");
     process.exit(1);
   }
 
-  /** Casa sl-local-01-... com catalog[0], mesmo se o sufixo do slug mudou no código. */
   function rowForIndex(index) {
     const n = String(index + 1).padStart(2, "0");
     return rows.find((r) => r.slug.startsWith(`${SLUG_BASE}-${n}-`)) || null;
@@ -272,13 +410,15 @@ try {
       {
         ok: true,
         written: true,
+        catalogSize: catalog.length,
+        insertedMissing: inserted,
         published,
         scheduled,
         publishedNow: publishedSlugs,
         coversUpdated: covers,
         bodiesRewritten: rewriteBodies,
-        missingSlugs: missing,
-        note: "Títulos/textos novos (inspiração Gupy/Sólides, sem plágio). Slugs de capa preservados. Rode no web Emprego São Luís."
+        stillMissing: missing,
+        note: "Corpo já em HTML (content_html). Capas em /covers/sl-local/. Rode no web Emprego São Luís."
       },
       null,
       2

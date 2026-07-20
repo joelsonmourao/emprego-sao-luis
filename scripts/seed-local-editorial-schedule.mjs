@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 /**
- * Agenda 45 posts locais (sl-local-*) como SCHEDULED em ~15 dias × 3 horários.
- * Capas: /covers/sl-local/{slug}.webp (gere antes com generate-sl-local-covers.mjs).
+ * Agenda posts locais (sl-local-*, hoje 105) como SCHEDULED (~3/dia).
+ * Capas: /covers/sl-local/{slug}.webp (gere antes com fetch/generate covers).
+ * Se já existir parte do pacote, só insere os índices faltantes (ex.: 46–105).
  *
  *   node scripts/seed-local-editorial-schedule.mjs
  *   node scripts/seed-local-editorial-schedule.mjs --write
@@ -84,7 +85,7 @@ if (looksProduction && !productionWriteOk) {
 
 const siteUrl = (process.env.SITE_URL || "https://empregossaoluis.com.br").replace(/\/$/, "");
 
-/** 15 dias × 3 horários (09/13/17 America/Sao_Paulo = UTC-3) = 45 slots, a partir de amanhã. */
+/** 3 horários/dia (09/13/17 America/Sao_Paulo = UTC-3), a partir de amanhã. */
 function buildScheduleSlots(count, from = new Date()) {
   const hoursBrt = [9, 13, 17];
   const slots = [];
@@ -111,6 +112,14 @@ function buildHtml(item) {
 
 function coverPathFor(slug) {
   return resolve(root, "apps/web/public/covers/sl-local", `${slug}.webp`);
+}
+
+/** Casa sl-local-01-... → índice 0 mesmo se o sufixo do slug mudou. */
+function catalogIndexFromSlug(slug) {
+  const match = String(slug).match(new RegExp(`^${SLUG_BASE}-(\\d+)-`));
+  if (!match) return null;
+  const index = Number(match[1]) - 1;
+  return Number.isInteger(index) && index >= 0 && index < catalog.length ? index : null;
 }
 
 /** Título SEO do admin aceita no máximo 70 caracteres. */
@@ -180,46 +189,7 @@ if (missingCovers.length) {
 
 const sql = postgres(databaseUrl, { max: 1, prepare: false });
 
-try {
-  const existing = await sql`select id, slug, title, seo_title from es_articles where slug like ${`${SLUG_BASE}%`}`;
-  if (existing.length) {
-    if (!fixSeo) {
-      console.log(
-        JSON.stringify({
-          ok: true,
-          skipped: true,
-          reason: `Já existem ${existing.length} artigo(s) ${SLUG_BASE}-*. Nada alterado. Edite no admin; use --fix-seo só se precisar corrigir título SEO/capa em lote.`,
-          sample: existing.slice(0, 3).map((r) => r.slug)
-        })
-      );
-      process.exit(0);
-    }
-    let seoFixed = 0;
-    for (const row of existing) {
-      const item = catalog.find((entry) => slugFor(entry) === row.slug);
-      const nextSeo = seoTitleFor(item?.title || row.title || "");
-      const nextCover = `${siteUrl}/covers/sl-local/${row.slug}.webp`;
-      await sql`
-        update es_articles
-        set seo_title = ${nextSeo},
-            cover_image_url = ${nextCover},
-            og_image_url = ${nextCover},
-            updated_at = now()
-        where id = ${row.id}
-      `;
-      seoFixed += 1;
-    }
-    console.log(
-      JSON.stringify({
-        ok: true,
-        fixSeo: true,
-        seoFixed,
-        sample: existing.slice(0, 3).map((r) => r.slug)
-      })
-    );
-    process.exit(0);
-  }
-
+async function ensureAuthorPillarClusters() {
   let [author] = await sql`select id from es_authors where slug = ${`${SLUG_BASE}-autor`} limit 1`;
   if (!author) {
     [author] = await sql`
@@ -259,9 +229,13 @@ try {
       returning id, slug
     `;
   }
+  return { author, pillar, clusters };
+}
 
+async function insertCatalogIndices(indices, slots, author, pillar, clusters) {
   let scheduled = 0;
-  for (let index = 0; index < catalog.length; index += 1) {
+  for (let slotIdx = 0; slotIdx < indices.length; slotIdx += 1) {
+    const index = indices[slotIdx];
     const item = catalog[index];
     const slug = slugFor(item);
     const html = buildHtml(item);
@@ -273,7 +247,7 @@ try {
       { name: "Empregos São Luís — política de fontes", url: `${siteUrl}/politica-fontes` },
       { name: "Empregos São Luís — segurança do candidato", url: `${siteUrl}/seguranca-candidatos` }
     ];
-    const scheduledAt = scheduleSlots[index];
+    const scheduledAt = slots[slotIdx];
     const coverAlt = `Capa ilustrada: ${item.title}`;
     const coverCaption = `Ilustração editorial exclusiva para “${item.title}”.`;
     const coverCredit = "Empregos São Luís — ilustração editorial gerada para este post";
@@ -331,6 +305,63 @@ try {
     `;
     scheduled += 1;
   }
+  return scheduled;
+}
+
+try {
+  const existing = await sql`select id, slug, title, seo_title from es_articles where slug like ${`${SLUG_BASE}%`}`;
+  const covered = new Set();
+  for (const row of existing) {
+    const idx = catalogIndexFromSlug(row.slug);
+    if (idx != null) covered.add(idx);
+  }
+  const missingIndices = [];
+  for (let i = 0; i < catalog.length; i += 1) {
+    if (!covered.has(i)) missingIndices.push(i);
+  }
+
+  if (existing.length && missingIndices.length === 0) {
+    if (!fixSeo) {
+      console.log(
+        JSON.stringify({
+          ok: true,
+          skipped: true,
+          reason: `Pacote completo: ${existing.length} artigo(s) cobrem os ${catalog.length} índices do catálogo. Edite no admin; use --fix-seo para título SEO/capa em lote.`,
+          sample: existing.slice(0, 3).map((r) => r.slug)
+        })
+      );
+      process.exit(0);
+    }
+    let seoFixed = 0;
+    for (const row of existing) {
+      const idx = catalogIndexFromSlug(row.slug);
+      const item = idx != null ? catalog[idx] : catalog.find((entry) => slugFor(entry) === row.slug);
+      const nextSeo = seoTitleFor(item?.title || row.title || "");
+      const nextCover = `${siteUrl}/covers/sl-local/${row.slug}.webp`;
+      await sql`
+        update es_articles
+        set seo_title = ${nextSeo},
+            cover_image_url = ${nextCover},
+            og_image_url = ${nextCover},
+            updated_at = now()
+        where id = ${row.id}
+      `;
+      seoFixed += 1;
+    }
+    console.log(
+      JSON.stringify({
+        ok: true,
+        fixSeo: true,
+        seoFixed,
+        sample: existing.slice(0, 3).map((r) => r.slug)
+      })
+    );
+    process.exit(0);
+  }
+
+  const { author, pillar, clusters } = await ensureAuthorPillarClusters();
+  const insertSlots = buildScheduleSlots(missingIndices.length);
+  const scheduled = await insertCatalogIndices(missingIndices, insertSlots, author, pillar, clusters);
 
   const proof = await sql`
     select status, count(*)::int as n from es_articles
@@ -343,9 +374,12 @@ try {
         ok: true,
         written: true,
         marker: "SL-LOCAL-EDITORIAL-SCHEDULE",
-        scheduled,
-        firstSlot: scheduleSlots[0]?.toISOString(),
-        lastSlot: scheduleSlots[scheduleSlots.length - 1]?.toISOString(),
+        catalogSize: catalog.length,
+        alreadyPresent: existing.length,
+        inserted: scheduled,
+        missingWere: missingIndices.map((i) => slugFor(catalog[i])).slice(0, 8),
+        firstSlot: insertSlots[0]?.toISOString() ?? null,
+        lastSlot: insertSlots.at(-1)?.toISOString() ?? null,
         coverBase: `${siteUrl}/covers/sl-local/`,
         note: "Worker publica SCHEDULED quando scheduled_at <= now. Capas servidas pelo web em /covers/sl-local/.",
         proof: proof.map((r) => ({ status: r.status, n: r.n }))
