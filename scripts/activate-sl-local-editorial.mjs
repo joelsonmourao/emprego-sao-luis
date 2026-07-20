@@ -15,8 +15,10 @@ import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import postgres from "postgres";
 import { SLUG_BASE, catalog, slugFor } from "./data/sl-local-editorial-catalog.mjs";
+import { buildArticleHtml } from "./data/sl-local-article-html.mjs";
 
 const write = process.argv.includes("--write");
+const rewriteBodies = process.argv.includes("--rewrite-bodies");
 const understandProduction = process.argv.includes("--i-understand-production");
 const allowRemote = process.env.ADSENSE_EDITORIAL_ALLOW_REMOTE === "1";
 const allowProduction = process.env.ADSENSE_EDITORIAL_ALLOW_PRODUCTION === "1";
@@ -196,23 +198,46 @@ try {
     const scheduledAt = goLive ? null : remainingSlots[scheduleIdx++];
     const status = goLive ? "PUBLISHED" : "SCHEDULED";
     const publishedAt = goLive ? now : null;
+    const contentHtml = rewriteBodies ? buildArticleHtml(item) : null;
 
-    await sql`
-      update es_articles
-      set status = ${status},
-          published_at = ${publishedAt},
-          scheduled_at = ${scheduledAt},
-          seo_title = ${seoTitleFor(item.title)},
-          cover_image_url = ${coverUrl},
-          og_image_url = ${coverUrl},
-          cover_image_alt = ${coverAlt},
-          cover_image_caption = ${coverCaption},
-          cover_image_credit = ${coverCredit},
-          cover_image_width = ${1200},
-          cover_image_height = ${630},
-          updated_at = now()
-      where id = ${row.id}
-    `;
+    if (rewriteBodies) {
+      await sql`
+        update es_articles
+        set status = ${status},
+            published_at = ${publishedAt},
+            scheduled_at = ${scheduledAt},
+            seo_title = ${seoTitleFor(item.title)},
+            content_html = ${contentHtml},
+            direct_answer = ${item.lead.slice(0, 280)},
+            local_hook = ${item.localAngle.slice(0, 280)},
+            cover_image_url = ${coverUrl},
+            og_image_url = ${coverUrl},
+            cover_image_alt = ${coverAlt},
+            cover_image_caption = ${coverCaption},
+            cover_image_credit = ${coverCredit},
+            cover_image_width = ${1200},
+            cover_image_height = ${630},
+            updated_at = now()
+        where id = ${row.id}
+      `;
+    } else {
+      await sql`
+        update es_articles
+        set status = ${status},
+            published_at = ${publishedAt},
+            scheduled_at = ${scheduledAt},
+            seo_title = ${seoTitleFor(item.title)},
+            cover_image_url = ${coverUrl},
+            og_image_url = ${coverUrl},
+            cover_image_alt = ${coverAlt},
+            cover_image_caption = ${coverCaption},
+            cover_image_credit = ${coverCredit},
+            cover_image_width = ${1200},
+            cover_image_height = ${630},
+            updated_at = now()
+        where id = ${row.id}
+      `;
+    }
     covers += 1;
     if (goLive) {
       published += 1;
@@ -229,8 +254,9 @@ try {
         scheduled,
         publishedNow: publishedSlugs,
         coversUpdated: covers,
+        bodiesRewritten: rewriteBodies,
         missingSlugs: missing,
-        note: "Guias em /blog · Notícias em /noticias. Worker para o restante SCHEDULED."
+        note: "Guias em /blog · Notícias em /noticias. Use --rewrite-bodies para trocar textos fracos (sem AdSense no corpo)."
       },
       null,
       2

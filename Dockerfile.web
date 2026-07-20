@@ -31,6 +31,7 @@ COPY --from=build --chown=app:app /app/packages ./packages
 # One-shot editorial activate (Coolify Terminal do web)
 COPY --chown=app:app scripts/activate-sl-local-editorial.mjs scripts/activate-sl-local-editorial.mjs
 COPY --chown=app:app scripts/data/sl-local-editorial-catalog.mjs scripts/data/sl-local-editorial-catalog.mjs
+COPY --chown=app:app scripts/data/sl-local-article-html.mjs scripts/data/sl-local-article-html.mjs
 COPY --chown=app:app apps/web/public/covers/sl-local/credits.json apps/web/public/covers/sl-local/credits.json
 USER app
 EXPOSE 4321

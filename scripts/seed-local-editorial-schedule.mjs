@@ -20,6 +20,7 @@ import {
   catalog,
   slugFor
 } from "./data/sl-local-editorial-catalog.mjs";
+import { buildArticleHtml } from "./data/sl-local-article-html.mjs";
 
 const write = process.argv.includes("--write");
 const fixSeo = process.argv.includes("--fix-seo");
@@ -105,26 +106,7 @@ function buildScheduleSlots(count, from = new Date()) {
 }
 
 function buildHtml(item) {
-  const tips = item.tips.map((t) => `<li>${t}</li>`).join("");
-  const paragraphs = [
-    `<p>${item.lead}</p>`,
-    `<p><strong>${item.title}</strong> — orientação prática do Empregos São Luís para candidatos da Grande Ilha. A candidatura do trabalhador no portal continua gratuita e sem cadastro obrigatório.</p>`,
-    `<p>${item.localAngle}</p>`,
-    `<p>Antes de se candidatar, leia o anúncio completo: cidade, bairro quando houver, tipo de contrato, horário e canal oficial (site, e-mail ou WhatsApp). Compare o título com a descrição e desconfie de cobranças ao candidato.</p>`,
-    `<h2>Passos recomendados</h2><ol>${tips}</ol>`,
-    `<p>Organize um controle simples com data, cargo, empresa ou intermediário, canal usado e retorno. Isso evita reenvio confuso e ajuda a perceber quais tipos de vaga respondem melhor ao seu perfil em São Luís.</p>`,
-    `<p>Na entrevista presencial, planeje o deslocamento com margem para trânsito e chuva. Leve documento com foto e uma cópia do currículo. Em canais digitais, use mensagem objetiva: nome, vaga, disponibilidade e anexo — sem dados bancários ou documentos sensíveis no primeiro contato.</p>`,
-    `<p>Este texto é original do Empregos São Luís, com fontes institucionais internas (política editorial e de fontes). Integra a programação editorial local com capa exclusiva por peça. Não garante aprovação do Google AdSense; a análise final é do Google.</p>`,
-    `<p>Próximo passo: abra a busca de vagas no portal, filtre pelo seu perfil e candidate-se apenas pelos canais oficiais. Em dúvida sobre golpe, consulte a página de segurança do candidato. Palavra-chave editorial: ${item.keyword}.</p>`,
-    `<p>Contexto adicional para ${item.section}: mantenha postura profissional, registre combinados por escrito quando possível e priorize oportunidades com empresa ou intermediário identificável na Grande Ilha. Persistência metódica rende mais do que candidaturas em massa sem leitura.</p>`,
-    `<p>Se precisar retomar a busca depois de uma pausa, volte a este material e revise o checklist: documentos em ordem, currículo atualizado, canal oficial da vaga e deslocamento planejado. O Empregos São Luís publica orientação contínua para quem busca trabalho na capital maranhense com segurança e objetividade — use o portal como base, não como atalho duvidoso.</p>`
-  ];
-  const html = paragraphs.join("\n");
-  const plain = html.replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim();
-  if (plain.length < MIN_USEFUL_CHARS) {
-    throw new Error(`HTML abaixo da meta (${plain.length} < ${MIN_USEFUL_CHARS}) para: ${item.title}`);
-  }
-  return html;
+  return buildArticleHtml(item);
 }
 
 function coverPathFor(slug) {
