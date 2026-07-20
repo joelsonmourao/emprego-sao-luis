@@ -19,7 +19,8 @@ export function buildArticleHtml(item) {
     `<h2>Próximo passo</h2>`,
     `<p>Abra a <a href="/vagas">busca de vagas</a> no Empregos São Luís, filtre pelo seu perfil e candidate-se só pelos canais oficiais da publicação. Em dúvida sobre golpe, veja a página de <a href="/seguranca-candidatos">segurança do candidato</a>. A candidatura do trabalhador no portal continua gratuita e sem cadastro obrigatório.</p>`,
     `<p>Sobre <strong>${item.title}</strong>: use este guia como checklist prático, não como promessa de contratação. Priorize empresas identificáveis, combine por escrito o que for possível e mantenha ritmo constante de candidaturas bem lidas — qualidade rende mais do que volume sem critério.</p>`,
-    `<p>Em São Luís e na Grande Ilha, deslocamento, horário de comércio e clareza do anúncio pesam tanto quanto o currículo. Revise este material quando mudar de área ou retomar a busca, e combine com candidaturas no <a href="/vagas">portal de vagas</a>.</p>`
+    `<p>Em São Luís e na Grande Ilha, deslocamento, horário de comércio e clareza do anúncio pesam tanto quanto o currículo. Revise este material quando mudar de área ou retomar a busca, e combine com candidaturas no <a href="/vagas">portal de vagas</a>.</p>`,
+    `<p>Se a oferta parecer boa demais, compare com vagas semelhantes no portal, confirme o endereço comercial e nunca envie PIX, boleto ou “taxa de liberação”. Dúvida? Pare e consulte a orientação de segurança antes de enviar documento sensível.</p>`
   ];
   const html = paragraphs.join("\n");
   const plain = html.replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim();
