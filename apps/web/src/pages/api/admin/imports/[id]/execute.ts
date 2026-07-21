@@ -8,6 +8,7 @@ import {
   adminMethodNotAllowed
 } from "../../../../../lib/admin-api-response";
 import { can } from "../../../../../lib/auth";
+import { shouldProcessImportOnWeb } from "../../../../../lib/import-dispatch";
 import { processImport } from "../../../../../lib/import-processor";
 import { logServerError } from "../../../../../lib/server-error";
 import { createImportQueue } from "../../../../../lib/queue";
@@ -63,8 +64,10 @@ export const POST: APIRoute = async ({ params, request, locals }) => {
       })
       .where(eq(importBatches.id, batch.id));
 
+    const processOnWeb = shouldProcessImportOnWeb() || !process.env.REDIS_URL;
     let queued = false;
-    if (process.env.REDIS_URL) {
+
+    if (!processOnWeb) {
       try {
         const queue = createImportQueue();
         try {
@@ -104,7 +107,14 @@ export const POST: APIRoute = async ({ params, request, locals }) => {
         return adminJsonRedirect(`/admin/vagas/importar?batch=${batch.id}&step=resultado`);
       } catch (error) {
         logServerError("route:/api/admin/imports/execute:inline", error);
-        return adminJsonError("Não foi possível processar o lote.", 500);
+        const message = error instanceof Error ? error.message : "Erro desconhecido";
+        return adminJsonError(
+          message.includes("não encontrado")
+            ? "Arquivo da planilha não está no armazenamento. Envie o XLSX de novo após conferir /admin/saude."
+            : "Não foi possível processar o lote.",
+          500,
+          { details: [message] }
+        );
       }
     }
     return adminJsonRedirect(`/admin/vagas/importar?batch=${batch.id}&step=acompanhar`);

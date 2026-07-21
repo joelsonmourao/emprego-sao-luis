@@ -6,7 +6,7 @@ import { desc, eq } from "drizzle-orm";
 import { can } from "../../../../lib/auth";
 import { adminJsonError, adminJsonRedirect, adminMethodNotAllowed } from "../../../../lib/admin-api-response";
 import { logServerError } from "../../../../lib/server-error";
-import { getImportStorageInfo, putImportFile } from "../../../../lib/import-storage";
+import { getImportFile, getImportStorageInfo, putImportFile } from "../../../../lib/import-storage";
 import * as XLSX from "xlsx";
 import { StorageError } from "@es/storage";
 import { validateImportFile } from "../../../../lib/import-file-validation";
@@ -104,6 +104,10 @@ export const POST: APIRoute = async ({ request, locals }) => {
 
     try {
       await putImportFile(storageKey, bytes, file.type || "application/octet-stream");
+      const stored = await getImportFile(storageKey);
+      if (stored.byteLength !== bytes.byteLength) {
+        throw new StorageError("STORAGE_NOT_WRITABLE", "Arquivo gravado com tamanho inconsistente.");
+      }
     } catch (error) {
       logServerError("route:/api/admin/imports:storage", error);
       return adminJsonError("O armazenamento local não está disponível.", 503, {

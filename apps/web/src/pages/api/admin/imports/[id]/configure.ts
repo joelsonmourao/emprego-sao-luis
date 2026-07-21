@@ -10,6 +10,7 @@ import {
   adminMethodNotAllowed
 } from "../../../../../lib/admin-api-response";
 import { logServerError } from "../../../../../lib/server-error";
+import { shouldProcessImportOnWeb } from "../../../../../lib/import-dispatch";
 import { createImportQueue } from "../../../../../lib/queue";
 import { processImport } from "../../../../../lib/import-processor";
 
@@ -167,8 +168,9 @@ export const POST: APIRoute = async ({ params, request, locals, clientAddress })
 
     let queueWarning: string | undefined;
     let processedInline = false;
+    const processOnWeb = shouldProcessImportOnWeb() || !process.env.REDIS_URL;
 
-    if (process.env.REDIS_URL) {
+    if (!processOnWeb) {
       try {
         const queue = createImportQueue();
         try {
@@ -194,7 +196,7 @@ export const POST: APIRoute = async ({ params, request, locals, clientAddress })
       }
     }
 
-    if (!process.env.REDIS_URL || queueWarning) {
+    if (processOnWeb || queueWarning) {
       try {
         await processImport({
           batchId: batch.id,
@@ -209,9 +211,14 @@ export const POST: APIRoute = async ({ params, request, locals, clientAddress })
         queueWarning = undefined;
       } catch (error) {
         logServerError("route:/api/admin/imports/configure:sync", error);
-        if (!queueWarning) {
-          queueWarning = "Não foi possível processar o lote automaticamente. Tente novamente em Operação.";
-        }
+        const message = error instanceof Error ? error.message : "Erro desconhecido";
+        return adminJsonError(
+          message.includes("não encontrado")
+            ? "Arquivo da planilha não está no armazenamento do servidor. Confira o volume UPLOADS_DIR em /admin/saude e envie o arquivo de novo."
+            : "Não foi possível validar o lote.",
+          500,
+          { details: [message] }
+        );
       }
     }
 
