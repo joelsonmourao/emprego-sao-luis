@@ -240,7 +240,7 @@ async function insertCatalogIndices(indices, slots, author, pillar, clusters) {
     const slug = slugFor(item);
     const html = buildHtml(item);
     const cluster = clusters[index % clusters.length];
-    const excerpt = `${item.title}. Orientação prática e local para candidatos em São Luís e região.`;
+    const excerpt = `${item.lead}`.replace(/\s+/g, " ").trim().slice(0, 220);
     const coverUrl = `${siteUrl}/covers/sl-local/${slug}.webp`;
     const sources = [
       { name: "Empregos São Luís — política editorial", url: `${siteUrl}/politica-editorial` },

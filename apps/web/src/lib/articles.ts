@@ -1,4 +1,4 @@
-import { and, count, desc, eq, gt, inArray, isNull, lte, or, type SQL } from "drizzle-orm";
+import { and, count, desc, eq, gt, inArray, isNull, like, lte, or, type SQL } from "drizzle-orm";
 import { articles, authors, createDatabase } from "@es/db";
 
 type ArticleType = "NEWS" | "GUIDE" | "DATA_REPORT";
@@ -76,13 +76,50 @@ export async function findPublishedArticle(slug: string, type?: ArticleType | Ar
   const connection = createDatabase(process.env.DATABASE_URL);
   const now = new Date();
   try {
-    const [result] = await connection.db.select({ article: articles, authorName: authors.name }).from(articles).innerJoin(authors, eq(articles.authorId, authors.id)).where(and(
-      eq(articles.slug, slug), eq(articles.status, "PUBLISHED"), lte(articles.publishedAt, now), or(isNull(articles.expiresAt), gt(articles.expiresAt, now)),
-      Array.isArray(type) ? inArray(articles.type, type) : type ? eq(articles.type, type) : undefined
-    )).limit(1);
+    const [result] = await connection.db
+      .select({ article: articles, authorName: authors.name })
+      .from(articles)
+      .innerJoin(authors, eq(articles.authorId, authors.id))
+      .where(
+        and(
+          eq(articles.slug, slug),
+          eq(articles.status, "PUBLISHED"),
+          lte(articles.publishedAt, now),
+          or(isNull(articles.expiresAt), gt(articles.expiresAt, now)),
+          Array.isArray(type) ? inArray(articles.type, type) : type ? eq(articles.type, type) : undefined
+        )
+      )
+      .limit(1);
     return result ?? null;
   } catch (error) {
     console.error("[articles.findPublishedArticle]", error instanceof Error ? error.message : error);
     return null;
-  } finally { await connection.close(); }
+  } finally {
+    await connection.close();
+  }
+}
+
+/** SEO: slug antigo sl-local-01-golpe-... → artigo atual sl-local-01-*. */
+export async function findPublishedSlLocalByNumber(slug: string, type?: ArticleType | ArticleType[]) {
+  const match = String(slug).match(/^sl-local-(\d+)-/i);
+  if (!match || !process.env.DATABASE_URL) return null;
+  const prefix = `sl-local-${match[1]}-`;
+  const connection = createDatabase(process.env.DATABASE_URL);
+  const now = new Date();
+  try {
+    const [result] = await connection.db
+      .select({ article: articles, authorName: authors.name })
+      .from(articles)
+      .innerJoin(authors, eq(articles.authorId, authors.id))
+      .where(and(publishedWhere(now, undefined, type), like(articles.slug, `${prefix}%`)))
+      .orderBy(desc(articles.updatedAt))
+      .limit(1);
+    if (!result || result.article.slug === slug) return null;
+    return result;
+  } catch (error) {
+    console.error("[articles.findPublishedSlLocalByNumber]", error instanceof Error ? error.message : error);
+    return null;
+  } finally {
+    await connection.close();
+  }
 }

@@ -1,7 +1,7 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import Breadcrumbs from "../../components/ui/Breadcrumbs.astro";
-import { findPublishedArticle } from "../../lib/articles";
+import { articlePublicPath, findPublishedArticle, findPublishedSlLocalByNumber } from "../../lib/articles";
 
 const slug = Astro.params.slug!;
 const result = await findPublishedArticle(slug, "NEWS");
@@ -11,6 +11,8 @@ if (!result) {
   if (retyped) {
     return Astro.redirect(`/blog/${slug}`, 301);
   }
+  const renamed = await findPublishedSlLocalByNumber(slug, ["GUIDE", "DATA_REPORT", "NEWS"]);
+  if (renamed) return Astro.redirect(articlePublicPath(renamed.article.type, renamed.article.slug), 301);
   return new Response("Notícia não encontrada", {
     status: 404,
     headers: { "Content-Type": "text/plain; charset=utf-8", "X-Robots-Tag": "noindex, follow" }

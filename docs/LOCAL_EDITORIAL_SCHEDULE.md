@@ -3,19 +3,20 @@
 ## Situação honesta
 
 - Corpo do post já nasce em **HTML** (`content_html`) — o site e o admin usam HTML, não Markdown.
+- **Resumo / descrição SEO:** texto puro (não HTML, não Markdown).
 - Mix SEO: **5 NEWS** (gancho sazonal → `/noticias`) · **6 DATA_REPORT** (mapa/checklist) · restante **GUIDE** (`/blog`).
-- Títulos/keywords diferenciados por cluster (busca, currículo, mensagem, salário, remoto) para reduzir canibalização.
-- Posts de direitos trazem **aviso jurídico** no HTML (não substituem advogado/contador).
-- Posts ficam **SCHEDULED** até o horário (ou até rodar o activate).
-- Capas: `npm run generate:sl-local-covers` ou `npm run fetch:sl-local-covers` → `/covers/sl-local/`.
+- Capas: gerar **depois** do catálogo e só então activate — URL = `/covers/sl-local/{slug-do-catálogo}.webp`.
 - **Migrate não publica conteúdo.** Atualize no **admin** ou rode o activate **uma vez** no Terminal.
 - Volume alto ajuda rotina editorial; **não garante** aprovação AdSense.
 
-## Colocar no ar (Terminal do **web**, depois do redeploy)
+## Capas (ordem correta)
 
-1. Coolify → serviço **web** Empregos São Luís  
-2. Branch `codex/admin-negocio-completo` → **Force rebuild** (precisa do SHA com catálogo 105 + tip-followups na imagem)  
-3. Terminal do **mesmo** web → cole:
+1. `npm run generate:sl-local-covers` **ou** `npm run fetch:sl-local-covers`
+2. Commit das webps + `credits.json`
+3. Force rebuild do **web** (precisa servir `/covers/sl-local/*.webp` no `dist`)
+4. Terminal do web → activate com `--rewrite-bodies` (sincroniza **slug + capa** com o catálogo)
+
+## Colocar no ar (Terminal do **web**, depois do redeploy)
 
 ```sh
 cd /app
@@ -26,11 +27,4 @@ export SL_LOCAL_PUBLISH_NOW=6
 node scripts/activate-sl-local-editorial.mjs --write --i-understand-production --rewrite-bodies
 ```
 
-Se o banco só tiver ~45 posts, o activate **insere os faltantes** (46–105) e agenda ~3/dia.  
-Se `ls` falhar, a imagem ainda é antiga — rebuild de novo.
-
 Worker precisa estar ligado para o restante agendado.
-
-## Atualizar textos
-
-Mesmo comando com `--rewrite-bodies` regenera título + HTML + SEO (type/keyword) a partir do catálogo.

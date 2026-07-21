@@ -238,7 +238,7 @@ try {
       const item = catalog[index];
       const slug = slugFor(item);
       const cluster = clusters[index % clusters.length];
-      const excerpt = `${item.title}. Orientação prática para candidatos em São Luís e região.`;
+      const excerpt = `${item.lead}`.replace(/\s+/g, " ").trim().slice(0, 220);
       const coverUrl = `${siteUrl}/covers/sl-local/${slug}.webp`;
       const contentHtml = buildArticleHtml(item);
       const sources = [
@@ -332,9 +332,10 @@ try {
       missing += 1;
       continue;
     }
-    // Mantém slug/arquivo de capa já publicados; atualiza título e corpo.
-    const slug = row.slug;
-    const credit = creditBySlug.get(slug) || creditBySlug.get(slugFor(item));
+    // Sincroniza slug + capa com o catálogo atual (evita título novo com capa/slug antigo).
+    const slug = slugFor(item);
+    const previousSlug = row.slug;
+    const credit = creditBySlug.get(slug) || creditBySlug.get(previousSlug);
     const coverUrl = `${siteUrl}/covers/sl-local/${slug}.webp`;
     const coverAlt = credit?.alt || `Capa: ${item.title}`;
     const coverCaption = credit?.caption || `Imagem para “${item.title}”.`;
@@ -343,7 +344,8 @@ try {
     const scheduledAt = goLive ? null : remainingSlots[scheduleIdx++];
     const status = goLive ? "PUBLISHED" : "SCHEDULED";
     const publishedAt = goLive ? now : null;
-    const excerpt = `${item.title}. Orientação prática para candidatos em São Luís e região.`;
+    const excerpt = `${item.lead}`.replace(/\s+/g, " ").trim().slice(0, 220);
+    const metaDescription = excerpt.slice(0, 155);
 
     if (rewriteBodies) {
       const contentHtml = buildArticleHtml(item);
@@ -351,12 +353,13 @@ try {
         update es_articles
         set type = ${item.type},
             title = ${item.title},
+            slug = ${slug},
             excerpt = ${excerpt},
             status = ${status},
             published_at = ${publishedAt},
             scheduled_at = ${scheduledAt},
             seo_title = ${seoTitleFor(item.title)},
-            meta_description = ${excerpt.slice(0, 155)},
+            meta_description = ${metaDescription},
             primary_keyword = ${item.keyword},
             section = ${item.section},
             editorial_template = ${item.template},
@@ -370,6 +373,7 @@ try {
             cover_image_credit = ${coverCredit},
             cover_image_width = ${1200},
             cover_image_height = ${630},
+            cover_image_variants = ${sql.json({})},
             news_eligible = ${item.type === "NEWS"},
             web_story_eligible = ${item.template === "POST_MAGNETICO"},
             updated_at = now()
@@ -378,7 +382,8 @@ try {
     } else {
       await sql`
         update es_articles
-        set status = ${status},
+        set slug = ${slug},
+            status = ${status},
             published_at = ${publishedAt},
             scheduled_at = ${scheduledAt},
             seo_title = ${seoTitleFor(item.title)},
@@ -389,6 +394,7 @@ try {
             cover_image_credit = ${coverCredit},
             cover_image_width = ${1200},
             cover_image_height = ${630},
+            cover_image_variants = ${sql.json({})},
             updated_at = now()
         where id = ${row.id}
       `;

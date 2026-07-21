@@ -1,12 +1,14 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import Breadcrumbs from "../../components/ui/Breadcrumbs.astro";
-import { findPublishedArticle } from "../../lib/articles";
+import { articlePublicPath, findPublishedArticle, findPublishedSlLocalByNumber } from "../../lib/articles";
 const slug = Astro.params.slug ?? "";
 const result = await findPublishedArticle(slug, ["GUIDE", "DATA_REPORT"]);
 if (!result) {
   const news = await findPublishedArticle(slug, "NEWS");
   if (news) return Astro.redirect(`/noticias/${slug}`, 301);
+  const renamed = await findPublishedSlLocalByNumber(slug, ["GUIDE", "DATA_REPORT", "NEWS"]);
+  if (renamed) return Astro.redirect(articlePublicPath(renamed.article.type, renamed.article.slug), 301);
   return new Response("Conteúdo não encontrado", { status: 404, headers: { "X-Robots-Tag": "noindex, follow" } });
 }
 const { article, authorName } = result;
