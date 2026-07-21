@@ -2,16 +2,14 @@
 import AdminLayout from "../../../layouts/AdminLayout.astro";
 import { can } from "../../../lib/auth";
 import { EMPLOYMENT_TYPES, getJobFormOptions, WORKPLACE_TYPES } from "../../../lib/admin-data";
-import { UNIDENTIFIED_COMPANY_ID } from "@es/shared";
+import { toDatetimeLocalValue, UNIDENTIFIED_COMPANY_ID } from "@es/shared";
 
 const auth = Astro.locals.auth!;
 if (!can(auth, "jobs.create")) return Astro.redirect("/admin?error=sem-permissao");
 
 const options = await getJobFormOptions();
 const defaultExpires = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
-const defaultExpiresLocal = new Date(defaultExpires.getTime() - defaultExpires.getTimezoneOffset() * 60000)
-  .toISOString()
-  .slice(0, 16);
+const defaultExpiresLocal = toDatetimeLocalValue(defaultExpires);
 
 const formData = {
   companies: JSON.stringify(options.companies),

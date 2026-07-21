@@ -4,7 +4,7 @@ import { eq } from "drizzle-orm";
 import AdminLayout from "../../../../layouts/AdminLayout.astro";
 import { getJobFormOptions, EMPLOYMENT_TYPES, WORKPLACE_TYPES } from "../../../../lib/admin-data";
 import { can } from "../../../../lib/auth";
-import { plainTextFromHtml, UNIDENTIFIED_COMPANY_ID } from "@es/shared";
+import { plainTextFromHtml, toDatetimeLocalValue, UNIDENTIFIED_COMPANY_ID } from "@es/shared";
 import { validateJobPosting } from "@es/seo";
 
 const auth = Astro.locals.auth!;
@@ -43,7 +43,7 @@ const schemaDiagnosis = validateJobPosting({
   unidentifiedCompany: job.unidentifiedCompany,
   organizationPubliclyIdentifiable: !job.confidentialCompany && !job.unidentifiedCompany
 });
-const localDate = (value: Date | null) => value ? new Date(value.getTime() - value.getTimezoneOffset() * 60_000).toISOString().slice(0, 16) : "";
+const localDate = (value: Date | null) => toDatetimeLocalValue(value);
 ---
 
 <AdminLayout title={`Editar ${job.publicCode}`}>

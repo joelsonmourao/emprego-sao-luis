@@ -53,6 +53,8 @@ Nunca grave segredos no Git. Configure no Coolify por serviço.
 | `AUTH_SECRET` | Sessões e tokens (segredo exclusivo por ambiente) |
 | `UPLOADS_DIR` | `/app/data` |
 | `COOKIE_SECURE` | `true` em HTTPS |
+| `TZ` | `America/Sao_Paulo` (já vem no Dockerfile; confirme no Coolify) |
+| `APP_TIME_ZONE` | `America/Sao_Paulo` (exibição/agendamento no fuso do Brasil) |
 
 ### Staging vs produção
 
