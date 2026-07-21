@@ -13,9 +13,12 @@ import {
   states
 } from "@es/db";
 import {
+  buildContentDuplicateHash,
   consolidateJobContent,
+  createImportExternalId,
   evaluateJobPublication,
   extractNeighborhood,
+  formatImportRowErrors,
   importJobRowSchema,
   importModeSchema,
   normalizeImportRow,
@@ -55,7 +58,7 @@ function salaryRange(value: string | undefined, explicitMin?: number, explicitMa
 export async function processImport(payload: ImportPayload) {
   const mode = importModeSchema.parse(payload.mode);
   const databaseUrl = process.env.DATABASE_URL;
-  if (!databaseUrl) throw new Error("DATABASE_URL nÃ£o configurada.");
+  if (!databaseUrl) throw new Error("DATABASE_URL não configurada.");
 
   const connection = createDatabase(databaseUrl);
   const [currentBatch] = await connection.db
@@ -65,7 +68,7 @@ export async function processImport(payload: ImportPayload) {
     .limit(1);
   if (!currentBatch) {
     await connection.close();
-    throw new Error("Lote de importaÃ§Ã£o nÃ£o encontrado.");
+    throw new Error("Lote de importação não encontrado.");
   }
   await connection.db
     .update(importBatches)
@@ -78,7 +81,7 @@ export async function processImport(payload: ImportPayload) {
     const selectedSheets = payload.sheetName
       ? workbook.SheetNames.filter((name) => name === payload.sheetName)
       : workbook.SheetNames;
-    if (!selectedSheets.length) throw new Error(`Aba nÃ£o encontrada: ${payload.sheetName}`);
+    if (!selectedSheets.length) throw new Error(`Aba não encontrada: ${payload.sheetName}`);
 
     const rawRows: Array<Record<string, unknown>> = selectedSheets.flatMap((sheetName) => {
       const sheet = workbook.Sheets[sheetName];
@@ -89,7 +92,7 @@ export async function processImport(payload: ImportPayload) {
             .filter((row) => !shouldSkipImportRow(row))
         : [];
     });
-    if (rawRows.length === 0) throw new Error("A planilha nÃ£o contÃ©m linhas de dados.");
+    if (rawRows.length === 0) throw new Error("A planilha não contém linhas de dados.");
 
     await connection.db.delete(importRows).where(eq(importRows.batchId, payload.batchId));
     let validRows = 0;
@@ -113,7 +116,7 @@ export async function processImport(payload: ImportPayload) {
           rowNumber: position + 2,
           raw,
           normalized,
-          errors: parsed.error.issues,
+          errors: formatImportRowErrors(parsed.error.issues),
           action: "REJECTED"
         });
         continue;
@@ -136,7 +139,19 @@ export async function processImport(payload: ImportPayload) {
         });
         continue;
       }
-      const value = { ...parsedValue, city: location.city, state: location.state };
+      const value = {
+        ...parsedValue,
+        city: location.city,
+        state: location.state,
+        externalId: createImportExternalId({
+          externalId: parsedValue.externalId,
+          title: parsedValue.title,
+          company: parsedValue.company,
+          city: location.city,
+          state: location.state,
+          applicationUrl: parsedValue.applicationUrl
+        })
+      };
       const content = consolidateJobContent({
         description: value.description,
         summary: value.summary,
@@ -204,16 +219,19 @@ export async function processImport(payload: ImportPayload) {
       });
       const qualityWarnings = [
         ...quality.warnings,
-        ...(value.category && !category ? ["Categoria informada nÃ£o existe; a vaga seguirÃ¡ sem categoria."] : [])
+        ...(value.category && !category ? ["Categoria informada não existe; a vaga seguirá sem categoria."] : []),
+        ...(!value.expiresAt
+          ? ["dataEncerramento vazia: obrigatória antes da publicação pública (validThrough no JobPosting)."]
+          : [])
       ];
 
       const relationErrors = [
-        !company ? "Empresa nÃ£o cadastrada." : null,
-        !state ? "UF nÃ£o cadastrada." : null,
-        !city ? "Cidade nÃ£o cadastrada." : null,
+        !company ? "Empresa não cadastrada." : null,
+        !state ? "UF não cadastrada." : null,
+        !city ? "Cidade não cadastrada." : null,
         ...quality.errors,
         value.category && category && categorySuggestion.level === "HIGH" && categorySuggestion.categoryName && categorySuggestion.categoryName !== category.name
-          ? `Categoria incompatÃ­vel com o conteÃºdo; sugestÃ£o: ${categorySuggestion.categoryName}.`
+          ? `Categoria incompatível com o conteúdo; sugestão: ${categorySuggestion.categoryName}.`
           : null
       ].filter((item): item is string => item !== null);
 
@@ -235,30 +253,53 @@ export async function processImport(payload: ImportPayload) {
         continue;
       }
 
+      const contentDuplicateHash = buildContentDuplicateHash({
+        title: value.title,
+        company: value.company,
+        city: value.city,
+        state: value.state
+      });
+      // Fingerprint titulo+empresa+cidade+uf; inclui companyId/cityId para estabilidade no banco.
       const duplicateHash = createHash("sha256")
+        .update(`${contentDuplicateHash}|${company!.id}|${city!.id}`)
+        .digest("hex");
+
+      const [externalExisting] = await connection.db
+        .select()
+        .from(jobs)
+        .where(and(eq(jobs.externalId, value.externalId!), eq(jobs.sourceName, value.sourceName)))
+        .limit(1);
+
+      const applicationUrl = channels.url.normalized;
+      const [urlExisting] =
+        !externalExisting && applicationUrl
+          ? await connection.db.select().from(jobs).where(eq(jobs.applicationUrl, applicationUrl)).limit(1)
+          : [];
+
+      const legacyHash = createHash("sha256")
         .update(`${value.title}|${company!.id}|${city!.id}`)
         .digest("hex");
-      const [duplicate] = await connection.db
-        .select({ id: jobs.id })
-        .from(jobs)
-        .where(eq(jobs.duplicateHash, duplicateHash))
-        .limit(1);
-      const [externalExisting] = value.externalId
-        ? await connection.db
-            .select()
-            .from(jobs)
-            .where(and(eq(jobs.externalId, value.externalId), eq(jobs.sourceName, value.sourceName)))
-            .limit(1)
-        : [];
+      const [hashExisting] =
+        !externalExisting && !urlExisting
+          ? await connection.db
+              .select()
+              .from(jobs)
+              .where(sql`(${jobs.duplicateHash} = ${duplicateHash} or ${jobs.duplicateHash} = ${legacyHash})`)
+              .limit(1)
+          : [];
+
+      const duplicate = urlExisting ?? hashExisting;
       const [duplicateExisting] =
         !externalExisting && duplicate && payload.duplicateStrategy === "UPDATE"
           ? await connection.db.select().from(jobs).where(eq(jobs.id, duplicate.id)).limit(1)
           : [];
-      const existing = externalExisting ?? duplicateExisting;
+      const existing =
+        externalExisting ??
+        duplicateExisting ??
+        (payload.duplicateStrategy === "UPDATE" ? duplicate : undefined);
 
       if (
-        duplicate &&
-        !value.externalId &&
+        (externalExisting || duplicate) &&
         payload.duplicateStrategy !== "CREATE_NEW" &&
         payload.duplicateStrategy !== "UPDATE"
       ) {
@@ -268,14 +309,20 @@ export async function processImport(payload: ImportPayload) {
           rowNumber: position + 2,
           raw,
           normalized: value,
-          errors: ["Vaga duplicada."],
+          errors: [
+            externalExisting
+              ? `Duplicada pelo id (${value.externalId}).`
+              : urlExisting
+                ? "Duplicada pela candidaturaUrl."
+                : "Duplicada por titulo+empresa+cidade+uf."
+          ],
           warnings: qualityWarnings,
           suggestions: { category: categorySuggestion, location },
           confidence: "0",
           reviewStatus: "REJECTED",
           applicationChannels: channels.validTypes,
           action: "DUPLICATE",
-          jobId: duplicate.id
+          jobId: (externalExisting ?? duplicate)?.id
         });
         continue;
       }
@@ -289,9 +336,22 @@ export async function processImport(payload: ImportPayload) {
           normalized: value,
           errors: [],
           warnings: qualityWarnings,
-          suggestions: { category: categorySuggestion, location },
+          suggestions: {
+            category: categorySuggestion,
+            location,
+            neighborhood: extractNeighborhood({
+              title: value.title,
+              description: content.plainText,
+              address: value.locality,
+              instructions: value.applicationInstructions,
+              neighborhood: value.neighborhood
+            })
+          },
           confidence: String(Math.max(0, Math.min(1, (categorySuggestion.confidence + 2) / 3))),
-          reviewStatus: quality.status,
+          reviewStatus:
+            categorySuggestion.level === "LOW" || categorySuggestion.level === "MEDIUM"
+              ? "NEEDS_REVIEW"
+              : quality.status,
           applicationChannels: channels.validTypes,
           action: existing ? "WOULD_UPDATE" : "WOULD_CREATE",
           jobId: existing?.id
@@ -399,13 +459,14 @@ export async function processImport(payload: ImportPayload) {
           featured: value.featured ?? false
         };
 
-        if (existing && !value.externalId) {
+        if (existing) {
           const [saved] = await tx
             .update(jobs)
             .set({
               ...row,
               publicCode: existing.publicCode,
               slug: existing.slug,
+              externalId: existing.externalId ?? row.externalId,
               version: existing.version + 1,
               updatedAt: new Date()
             })
@@ -414,24 +475,19 @@ export async function processImport(payload: ImportPayload) {
           return saved;
         }
 
-        if (value.externalId) {
-          const [saved] = await tx
-            .insert(jobs)
-            .values(row)
-            .onConflictDoUpdate({
-              target: [jobs.externalId, jobs.sourceName],
-              set: {
-                ...row,
-                publicCode: sql`${jobs.publicCode}`,
-                slug: sql`${jobs.slug}`,
-                updatedAt: new Date()
-              }
-            })
-            .returning();
-          return saved;
-        }
-
-        const [saved] = await tx.insert(jobs).values(row).returning();
+        const [saved] = await tx
+          .insert(jobs)
+          .values(row)
+          .onConflictDoUpdate({
+            target: [jobs.externalId, jobs.sourceName],
+            set: {
+              ...row,
+              publicCode: sql`${jobs.publicCode}`,
+              slug: sql`${jobs.slug}`,
+              updatedAt: new Date()
+            }
+          })
+          .returning();
         return saved;
       });
 
@@ -510,4 +566,3 @@ export async function processImport(payload: ImportPayload) {
     await connection.close();
   }
 }
-

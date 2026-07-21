@@ -74,6 +74,7 @@ export function buildJobPosting(input: JobPostingInput) {
     "@context": "https://schema.org",
     "@type": "JobPosting",
     title: input.title,
+    // Google JobPosting: description em HTML (não Markdown).
     description: input.description,
     datePosted: input.publishedAt.toISOString(),
     validThrough: input.expiresAt.toISOString(),

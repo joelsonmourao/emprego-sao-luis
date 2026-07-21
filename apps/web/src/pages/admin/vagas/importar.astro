@@ -70,13 +70,38 @@ const config = batch?.settings as
   | undefined;
 
 const fields: Array<[string, string]> = [
-  ["originalTitle", "Título original"], ["title", "Título público"], ["company", "Empresa"], ["category", "Categoria"],
-  ["locality", "Localidade"], ["city", "Cidade"], ["state", "UF"], ["neighborhood", "Bairro"], ["workplaceType", "Modalidade"],
-  ["employmentType", "Tipo de contratação"], ["description", "Descrição"], ["summary", "Resumo"], ["activities", "Atividades"],
-  ["requirements", "Requisitos"], ["benefits", "Benefícios"], ["numberOfOpenings", "Quantidade de vagas"], ["salary", "Salário/faixa"], ["salaryMin", "Salário mínimo"], ["salaryMax", "Salário máximo"],
-  ["applicationUrl", "URL de candidatura"], ["applicationEmail", "E-mail de candidatura"], ["applicationWhatsapp", "WhatsApp de candidatura"], ["whatsappMessage", "Mensagem WhatsApp"], ["emailSubject", "Assunto do e-mail"], ["applicationInstructions", "Instruções de candidatura"],
-  ["sourceName", "Fonte"], ["sourceUrl", "URL da fonte"], ["publishedAt", "Data de publicação"],
-  ["expiresAt", "Validade"], ["sourceStatus", "Status de origem"], ["featured", "Destaque"], ["externalId", "Código externo"]
+  ["externalId", "ID (externo)"],
+  ["originalTitle", "Título original"],
+  ["title", "Título público"],
+  ["company", "Empresa"],
+  ["category", "Categoria"],
+  ["locality", "Localidade"],
+  ["city", "Cidade"],
+  ["state", "UF"],
+  ["neighborhood", "Bairro"],
+  ["workplaceType", "Modalidade"],
+  ["employmentType", "Tipo de contratação"],
+  ["description", "Descrição (HTML ok)"],
+  ["summary", "Resumo"],
+  ["activities", "Atividades"],
+  ["requirements", "Requisitos"],
+  ["benefits", "Benefícios"],
+  ["numberOfOpenings", "Quantidade de vagas"],
+  ["salary", "Salário/faixa"],
+  ["salaryMin", "Salário mínimo"],
+  ["salaryMax", "Salário máximo"],
+  ["applicationUrl", "URL de candidatura"],
+  ["applicationEmail", "E-mail de candidatura"],
+  ["applicationWhatsapp", "WhatsApp de candidatura"],
+  ["whatsappMessage", "Mensagem WhatsApp"],
+  ["emailSubject", "Assunto do e-mail"],
+  ["applicationInstructions", "Instruções de candidatura"],
+  ["sourceName", "Fonte (fonteNome)"],
+  ["sourceUrl", "URL da fonte"],
+  ["publishedAt", "Data de publicação"],
+  ["expiresAt", "Data de encerramento"],
+  ["sourceStatus", "Status de origem"],
+  ["featured", "Destaque"]
 ];
 const requiredFields = ["title", "company", "description", "sourceName"];
 const headers = [...new Set(config?.sheets?.flatMap((sheet) => sheet.headers) ?? [])];
@@ -109,18 +134,42 @@ const steps = [
   <section class="mt-6 rounded-2xl border-2 border-emerald-700/30 bg-emerald-50 p-6" aria-labelledby="import-model-title">
     <h2 id="import-model-title" class="text-xl font-black text-emerald-950">1. Baixe o modelo oficial</h2>
     <p class="mt-2 max-w-3xl text-sm text-emerald-950/80">
-      Use sempre este modelo. A maioria das vagas <strong>não precisa de bairro</strong> — deixe a coluna vazia quando não houver.
-      URL do site, WhatsApp ou e-mail são canais válidos (basta um).
+      Planilha unificada SLZ (só cabeçalho + valores). Bairro e categoria são opcionais. URL, WhatsApp ou e-mail — basta um canal.
     </p>
     <div class="mt-5 flex flex-wrap gap-3">
       <a class="rounded-xl bg-emerald-700 px-5 py-3 text-base font-bold text-white shadow-sm" href="/modelos/modelo-importacao-vagas.xlsx" download>Baixar modelo Excel (.xlsx)</a>
       <a class="rounded-xl border-2 border-emerald-700 bg-white px-5 py-3 text-base font-bold text-emerald-900" href="/api/admin/import-template.csv" data-admin-download data-filename="modelo-importacao-vagas.csv">Baixar modelo CSV</a>
       <a class="rounded-xl border border-emerald-800/20 bg-white px-5 py-3 text-base font-bold text-emerald-950" href="/admin/vagas/importar-contatos">Importar por links ou contatos</a>
     </div>
+    <details class="mt-5 rounded-xl border border-emerald-800/20 bg-white/70 p-4 open:shadow-sm">
+      <summary class="cursor-pointer text-base font-black text-emerald-950">Instruções — contrato da planilha</summary>
+      <div class="mt-3 space-y-3 text-sm text-emerald-950/90">
+        <p>
+          <strong>Colunas (nessa ordem; extras são ignoráveis):</strong>
+          <code class="block break-all rounded bg-emerald-100/80 p-2 text-xs">
+            id, titulo, empresa, descricao, localidade, cidade, uf, modalidade, quantidadeVagas, salario,
+            dataPublicacao, dataEncerramento, fonteNome, fonteUrl, categoria, bairro, candidaturaUrl,
+            candidaturaEmail, candidaturaWhatsApp, mensagemWhatsApp, instrucoesCandidatura
+          </code>
+        </p>
+        <ul class="list-disc space-y-1.5 pl-5">
+          <li><strong>id</strong> (opcional): identificador estável (ex. SLZ-ABC123DEF0). Vazio → o sistema gera um id interno. Usado na deduplicação.</li>
+          <li><strong>descricao</strong>: HTML (padrão JobPosting) ou texto. Não exige Markdown.</li>
+          <li><strong>localidade</strong>: condicional. Se <em>cidade</em> + <em>uf</em> estiverem preenchidos, pode ficar vazia.</li>
+          <li><strong>modalidade</strong>: Presencial | Hibrido | Remoto (maiúsculas/minúsculas ok). Interno: presencial, hibrido, remoto.</li>
+          <li><strong>Datas</strong>: DD/MM/AAAA (Brasil) ou AAAA-MM-DD. No JobPosting viram ISO 8601. <em>dataEncerramento</em> é necessária antes de publicar.</li>
+          <li><strong>fonteNome</strong>: obrigatório (InfoJobs, Indeed, LinkedIn…). Não misturar com candidaturaUrl.</li>
+          <li><strong>categoria</strong> / <strong>bairro</strong>: opcionais. Bairro nunca é inventado.</li>
+          <li><strong>Canais</strong>: pelo menos um entre candidaturaUrl, e-mail ou WhatsApp. mensagemWhatsApp e instrucoesCandidatura são opcionais.</li>
+          <li><strong>Deduplicação</strong>: 1) id → 2) candidaturaUrl → 3) titulo+empresa+cidade+uf.</li>
+          <li>Planilhas antigas (sem coluna id / com datas ISO) continuam válidas. A linha de exemplo é ignorada.</li>
+        </ul>
+      </div>
+    </details>
     <ul class="mt-4 list-disc space-y-1 pl-5 text-sm text-emerald-950/80">
-      <li><strong>Obrigatório:</strong> título, empresa, descrição, fonte e ao menos um canal (URL, e-mail ou WhatsApp).</li>
-      <li><strong>Opcional:</strong> bairro, categoria, salário, quantidade — deixe em branco se não souber.</li>
-      <li>A linha de exemplo marcada como exemplo é ignorada automaticamente.</li>
+      <li><strong>Obrigatório:</strong> titulo, empresa, descricao, fonteNome e ao menos um canal.</li>
+      <li><strong>Local:</strong> localidade OU (cidade + uf).</li>
+      <li>Erros aparecem por linha na validação (mensagem clara do campo).</li>
     </ul>
   </section>
 
