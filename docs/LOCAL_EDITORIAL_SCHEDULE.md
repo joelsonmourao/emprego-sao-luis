@@ -11,10 +11,13 @@
 
 ## Capas (ordem correta)
 
-1. `npm run generate:sl-local-covers` **ou** `npm run fetch:sl-local-covers`
-2. Commit das webps + `credits.json`
-3. Force rebuild do **web** (precisa servir `/covers/sl-local/*.webp` no `dist`)
-4. Terminal do web → activate com `--rewrite-bodies` (sincroniza **slug + capa** com o catálogo)
+1. Capas já usam o **slug SEO** (ex.: `decimo-terceiro-salario-pagamento-clt.webp`).
+2. Commit das webps + `credits.json` + `apps/web/src/data/sl-local-slug-map.ts`
+3. Force rebuild do **web**
+4. Terminal → activate `--rewrite-bodies` (atualiza slug no banco + capa)
+
+URL antiga `/noticias/sl-local-09-decimo-terceiro` → **301** para `/noticias/decimo-terceiro-salario-pagamento-clt`.
+
 
 ## Colocar no ar (Terminal do **web**, depois do redeploy)
 

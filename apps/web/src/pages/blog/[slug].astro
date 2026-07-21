@@ -1,8 +1,18 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import Breadcrumbs from "../../components/ui/Breadcrumbs.astro";
-import { articlePublicPath, findPublishedArticle, findPublishedSlLocalByNumber } from "../../lib/articles";
+import {
+  articlePublicPath,
+  findPublishedArticle,
+  findPublishedSlLocalByNumber,
+  resolveSlLocalSeoSlug
+} from "../../lib/articles";
 const slug = Astro.params.slug ?? "";
+const seoFromLegacy = resolveSlLocalSeoSlug(slug);
+if (seoFromLegacy && seoFromLegacy !== slug) {
+  const moved = await findPublishedArticle(seoFromLegacy, ["GUIDE", "DATA_REPORT", "NEWS"]);
+  if (moved) return Astro.redirect(articlePublicPath(moved.article.type, moved.article.slug), 301);
+}
 const result = await findPublishedArticle(slug, ["GUIDE", "DATA_REPORT"]);
 if (!result) {
   const news = await findPublishedArticle(slug, "NEWS");

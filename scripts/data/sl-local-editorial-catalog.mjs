@@ -2610,6 +2610,52 @@ export const catalog = rawCatalog.map((item) => {
 });
 
 /** @param {CatalogItem} item */
-export function slugFor(item) {
+export function legacySlugFor(item) {
   return `${SLUG_BASE}-${item.key}`;
+}
+
+/** Slug público SEO (sem prefixo sl-local-NN). */
+export function slugifyKeyword(keyword) {
+  return String(keyword || "")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .replace(/-+/g, "-")
+    .slice(0, 72);
+}
+
+/** @param {CatalogItem} item */
+export function slugFor(item) {
+  const fromKeyword = slugifyKeyword(item.keyword);
+  if (fromKeyword.length >= 8) return fromKeyword;
+  return slugifyKeyword(item.title) || legacySlugFor(item);
+}
+
+/** Índice do catálogo a partir de slug SEO, legado sl-local-KEY ou sl-local-NN-*. */
+export function catalogIndexFromSlug(slug) {
+  const exact = catalog.findIndex((item) => slugFor(item) === slug || legacySlugFor(item) === slug);
+  if (exact >= 0) return exact;
+  const match = String(slug).match(new RegExp(`^${SLUG_BASE}-(\\d+)-`));
+  if (!match) return null;
+  const index = Number(match[1]) - 1;
+  return Number.isInteger(index) && index >= 0 && index < catalog.length ? index : null;
+}
+
+/** Mapa para redirects 301 no site. */
+export function buildSlugRedirectMap() {
+  /** @type {Record<string, string>} */
+  const exact = {};
+  /** @type {Record<string, string>} */
+  const byNumber = {};
+  for (let i = 0; i < catalog.length; i += 1) {
+    const item = catalog[i];
+    const seo = slugFor(item);
+    exact[legacySlugFor(item)] = seo;
+    const n = String(i + 1).padStart(2, "0");
+    byNumber[String(i + 1)] = seo;
+    byNumber[n] = seo;
+  }
+  return { exact, byNumber };
 }

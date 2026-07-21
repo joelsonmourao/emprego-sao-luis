@@ -16,7 +16,7 @@ import { existsSync, readFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import postgres from "postgres";
-import { SLUG_BASE, catalog, slugFor } from "./data/sl-local-editorial-catalog.mjs";
+import { SLUG_BASE, catalog, catalogIndexFromSlug, slugFor } from "./data/sl-local-editorial-catalog.mjs";
 import { buildArticleHtml } from "./data/sl-local-article-html.mjs";
 
 const write = process.argv.includes("--write");
@@ -167,19 +167,15 @@ if (!localOk && !remoteWriteOk && !productionWriteOk) {
 
 const sql = postgres(databaseUrl, { max: 1, prepare: false });
 
-/** Casa sl-local-01-... com catalog[0], mesmo se o sufixo do slug mudou no código. */
-function catalogIndexFromSlug(slug) {
-  const match = String(slug).match(new RegExp(`^${SLUG_BASE}-(\\d+)-`));
-  if (!match) return null;
-  const index = Number(match[1]) - 1;
-  return Number.isInteger(index) && index >= 0 && index < catalog.length ? index : null;
-}
+const seoSlugs = catalog.map((item) => slugFor(item));
 
 try {
   let rows = await sql`
     select id, slug, status, scheduled_at
     from es_articles
-    where slug like ${`${SLUG_BASE}%`}
+    where slug like ${`${SLUG_BASE}-%`}
+       or slug = any(${seoSlugs})
+       or tags @> ${sql.json(["sl-local"])}
   `;
 
   const covered = new Set();
@@ -303,7 +299,9 @@ try {
     rows = await sql`
       select id, slug, status, scheduled_at
       from es_articles
-      where slug like ${`${SLUG_BASE}%`}
+      where slug like ${`${SLUG_BASE}-%`}
+         or slug = any(${seoSlugs})
+         or tags @> ${sql.json(["sl-local"])}
     `;
   }
 
@@ -313,8 +311,15 @@ try {
   }
 
   function rowForIndex(index) {
+    const item = catalog[index];
+    const seo = slugFor(item);
     const n = String(index + 1).padStart(2, "0");
-    return rows.find((r) => r.slug.startsWith(`${SLUG_BASE}-${n}-`)) || null;
+    return (
+      rows.find((r) => r.slug === seo) ||
+      rows.find((r) => r.slug === `${SLUG_BASE}-${item.key}`) ||
+      rows.find((r) => r.slug.startsWith(`${SLUG_BASE}-${n}-`)) ||
+      null
+    );
   }
 
   let published = 0;

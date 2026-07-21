@@ -19,6 +19,7 @@ import {
   MIN_USEFUL_CHARS,
   SLUG_BASE,
   catalog,
+  catalogIndexFromSlug,
   slugFor
 } from "./data/sl-local-editorial-catalog.mjs";
 import { buildArticleHtml } from "./data/sl-local-article-html.mjs";
@@ -112,14 +113,6 @@ function buildHtml(item) {
 
 function coverPathFor(slug) {
   return resolve(root, "apps/web/public/covers/sl-local", `${slug}.webp`);
-}
-
-/** Casa sl-local-01-... → índice 0 mesmo se o sufixo do slug mudou. */
-function catalogIndexFromSlug(slug) {
-  const match = String(slug).match(new RegExp(`^${SLUG_BASE}-(\\d+)-`));
-  if (!match) return null;
-  const index = Number(match[1]) - 1;
-  return Number.isInteger(index) && index >= 0 && index < catalog.length ? index : null;
 }
 
 /** Título SEO do admin aceita no máximo 70 caracteres. */
@@ -309,7 +302,12 @@ async function insertCatalogIndices(indices, slots, author, pillar, clusters) {
 }
 
 try {
-  const existing = await sql`select id, slug, title, seo_title from es_articles where slug like ${`${SLUG_BASE}%`}`;
+  const existing = await sql`
+    select id, slug, title, seo_title from es_articles
+    where slug like ${`${SLUG_BASE}-%`}
+       or slug = any(${catalog.map((item) => slugFor(item))})
+       or tags @> ${sql.json(["sl-local"])}
+  `;
   const covered = new Set();
   for (const row of existing) {
     const idx = catalogIndexFromSlug(row.slug);
@@ -365,7 +363,10 @@ try {
 
   const proof = await sql`
     select status, count(*)::int as n from es_articles
-    where slug like ${`${SLUG_BASE}%`} group by status
+    where slug like ${`${SLUG_BASE}-%`}
+       or slug = any(${catalog.map((item) => slugFor(item))})
+       or tags @> ${sql.json(["sl-local"])}
+    group by status
   `;
 
   console.log(

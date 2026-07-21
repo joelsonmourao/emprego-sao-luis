@@ -1,10 +1,22 @@
 import { and, count, desc, eq, gt, inArray, isNull, like, lte, or, type SQL } from "drizzle-orm";
 import { articles, authors, createDatabase } from "@es/db";
+import { slLocalSlugMap } from "../data/sl-local-slug-map";
 
 type ArticleType = "NEWS" | "GUIDE" | "DATA_REPORT";
 
 export function articlePublicPath(type: ArticleType | string, slug: string) {
   return type === "NEWS" ? `/noticias/${slug}` : `/blog/${slug}`;
+}
+
+/** Resolve slug legado sl-local-* → slug SEO atual. */
+export function resolveSlLocalSeoSlug(slug: string): string | null {
+  const exact = slLocalSlugMap.exact[slug as keyof typeof slLocalSlugMap.exact];
+  if (exact) return exact;
+  const match = String(slug).match(/^sl-local-(\d+)-/i);
+  if (!match) return null;
+  const key = match[1] as keyof typeof slLocalSlugMap.byNumber;
+  const padded = match[1].padStart(2, "0") as keyof typeof slLocalSlugMap.byNumber;
+  return slLocalSlugMap.byNumber[key] || slLocalSlugMap.byNumber[padded] || null;
 }
 
 function publishedWhere(now: Date, since?: Date, type?: ArticleType | ArticleType[]) {
@@ -30,7 +42,6 @@ export async function listPublishedArticles(limit = 50, since?: Date, type?: Art
       .orderBy(desc(articles.publishedAt))
       .limit(limit);
   } catch (error) {
-    // Schema incompleto (migrate pendente) não pode derrubar home/blog.
     console.error("[articles.listPublishedArticles]", error instanceof Error ? error.message : error);
     return [];
   } finally {
@@ -99,8 +110,13 @@ export async function findPublishedArticle(slug: string, type?: ArticleType | Ar
   }
 }
 
-/** SEO: slug antigo sl-local-01-golpe-... → artigo atual sl-local-01-*. */
+/** SEO: slug antigo sl-local-* → artigo com slug SEO atual. */
 export async function findPublishedSlLocalByNumber(slug: string, type?: ArticleType | ArticleType[]) {
+  const seo = resolveSlLocalSeoSlug(slug);
+  if (seo && seo !== slug) {
+    const bySeo = await findPublishedArticle(seo, type);
+    if (bySeo) return bySeo;
+  }
   const match = String(slug).match(/^sl-local-(\d+)-/i);
   if (!match || !process.env.DATABASE_URL) return null;
   const prefix = `sl-local-${match[1]}-`;
