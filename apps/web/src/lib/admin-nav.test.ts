@@ -47,6 +47,7 @@ describe("admin navigation", () => {
       "/admin/conteudo/pilares",
       "/admin/conteudo/post-magnetico",
       "/admin/adsense-readiness",
+      "/admin/integracoes",
       "/admin/web-stories",
       "/admin/calendario-editorial",
       "/admin/autores",

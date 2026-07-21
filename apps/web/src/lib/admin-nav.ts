@@ -77,6 +77,7 @@ export const ADMIN_NAV_GROUPS: AdminNavGroup[] = [
       { label: "Social Studio", href: "/admin/social", permission: "social.manage" },
       { label: "Instagram", href: "/admin/instagram", permission: "social.manage" },
       { label: "Configurações SEO", href: "/admin/seo", permission: "seo.manage" },
+      { label: "Integrações", href: "/admin/integracoes", permission: "seo.manage" },
       { label: "Auditoria SEO", href: "/admin/seo/auditoria", permission: "seo.manage" },
       { label: "Links internos", href: "/admin/seo/links-internos", permission: "seo.manage" },
       { label: "Conteúdo órfão e canibalização", href: "/admin/seo/canibalizacao", permission: "seo.manage" },

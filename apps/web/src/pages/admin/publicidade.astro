@@ -39,7 +39,10 @@ const envAdsense = import.meta.env.PUBLIC_ADSENSE_CLIENT_ID ?? "";
 ---
 <AdminLayout title="Publicidade">
   <h1 class="text-3xl font-black">Publicidade e monetização</h1>
-  <p class="mt-2 text-slate-600">Espaços, campanhas diretas, AdSense e relatórios reais.</p>
+  <p class="mt-2 text-slate-600">
+    Espaços, campanhas diretas, AdSense e relatórios reais. Publisher ID e ads.txt também ficam em
+    <a class="font-semibold underline" href="/admin/integracoes">Integrações</a>.
+  </p>
   {saved && <p class="mt-4 rounded-xl border border-green-200 bg-green-50 p-4 text-green-800">Configurações salvas.</p>}
 
   <section class="mt-8 grid gap-4 md:grid-cols-4">

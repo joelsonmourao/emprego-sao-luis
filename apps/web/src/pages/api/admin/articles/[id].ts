@@ -1,9 +1,10 @@
 import type { APIRoute } from "astro";
-import { articleRevisions, articles, auditLogs, createDatabase, mediaAssets } from "@es/db";
+import { articleRevisions, articles, auditLogs, createDatabase, indexingEvents, mediaAssets, webStories } from "@es/db";
 import { and, eq, ne } from "drizzle-orm";
 import { adminJsonError, adminJsonRedirect } from "../../../../lib/admin-api-response";
 import { parseArticleForm } from "../../../../lib/admin-article-input";
 import { can } from "../../../../lib/auth";
+import { indexingDedupeKey, publicArticleUrl } from "../../../../lib/indexing";
 import { logServerError } from "../../../../lib/server-error";
 import { validateNewsImageAsset } from "../../../../lib/news-image";
 
@@ -18,6 +19,46 @@ export const POST: APIRoute = async ({ params, request, locals }) => {
   try {
     const [before] = await connection.db.select().from(articles).where(eq(articles.id, params.id)).limit(1);
     if (!before) return adminJsonError("Conteúdo não encontrado.", 404);
+
+    if (form.get("action") === "DELETE") {
+      await connection.db.transaction(async (tx) => {
+        await tx
+          .update(webStories)
+          .set({ articleId: null, updatedAt: new Date() })
+          .where(eq(webStories.articleId, before.id));
+        if (before.status === "PUBLISHED") {
+          const url = publicArticleUrl(before.slug, before.type as "NEWS" | "GUIDE" | "DATA_REPORT");
+          await tx
+            .insert(indexingEvents)
+            .values([
+              {
+                dedupeKey: indexingDedupeKey("article-delete", before.id, "google"),
+                provider: "GOOGLE",
+                url,
+                notificationType: "URL_DELETED"
+              },
+              {
+                dedupeKey: indexingDedupeKey("article-delete", before.id, "indexnow"),
+                provider: "INDEXNOW",
+                url,
+                notificationType: "URL_DELETED"
+              }
+            ])
+            .onConflictDoNothing();
+        }
+        await tx.delete(articles).where(eq(articles.id, before.id));
+        await tx.insert(auditLogs).values({
+          actorId: auth.id,
+          action: "DELETE",
+          entityType: "ARTICLE",
+          entityId: before.id,
+          before,
+          after: { deleted: true },
+          origin: "ADMIN"
+        });
+      });
+      return adminJsonRedirect("/admin/conteudo?deleted=1");
+    }
 
     if (form.get("action") === "DUPLICATE") {
       const suffix = Date.now().toString(36);

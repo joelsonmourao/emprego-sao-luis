@@ -1,64 +1,319 @@
 ---
-import { articles, authors, createDatabase } from "@es/db";
-import { desc } from "drizzle-orm";
+import { articles, createDatabase } from "@es/db";
+import { and, count, desc, eq, ilike, or, type SQL } from "drizzle-orm";
 import AdminLayout from "../../layouts/AdminLayout.astro";
+import { can } from "../../lib/auth";
+import { articlePublicPath } from "../../lib/articles";
 
-let items: typeof articles.$inferSelect[] = [];
-let authorRows: typeof authors.$inferSelect[] = [];
+const auth = Astro.locals.auth!;
+if (!can(auth, "content.manage")) return new Response("Proibido", { status: 403 });
+
+const query = Astro.url.searchParams.get("q")?.trim() ?? "";
+const status = Astro.url.searchParams.get("status") ?? "";
+const type = Astro.url.searchParams.get("type") ?? "";
+const page = Math.max(1, Number(Astro.url.searchParams.get("page") ?? 1) || 1);
+const pageSize = 40;
+const bulk = Astro.url.searchParams.get("bulk");
+const deleted = Astro.url.searchParams.get("deleted") === "1";
+
+const statusLabels: Record<string, string> = {
+  DRAFT: "Rascunho",
+  PENDING_REVIEW: "Em revisão",
+  SCHEDULED: "Agendada",
+  PUBLISHED: "Publicada",
+  ARCHIVED: "Arquivada"
+};
+const typeLabels: Record<string, string> = {
+  NEWS: "Notícia",
+  GUIDE: "Guia / Blog",
+  DATA_REPORT: "Relatório"
+};
+
+const conditions: SQL[] = [];
+if (query) {
+  conditions.push(
+    or(ilike(articles.title, `%${query}%`), ilike(articles.slug, `%${query}%`), ilike(articles.excerpt, `%${query}%`))!
+  );
+}
+if (status && status in statusLabels) {
+  conditions.push(eq(articles.status, status as typeof articles.status.enumValues[number]));
+}
+if (type && type in typeLabels) {
+  conditions.push(eq(articles.type, type as "NEWS" | "GUIDE" | "DATA_REPORT"));
+}
+
+let items: Array<typeof articles.$inferSelect> = [];
+let total = 0;
 if (process.env.DATABASE_URL) {
   const connection = createDatabase(process.env.DATABASE_URL);
   try {
-    [items, authorRows] = await Promise.all([
-      connection.db.select().from(articles).orderBy(desc(articles.updatedAt)).limit(100),
-      connection.db.select().from(authors).orderBy(authors.name)
+    const where = conditions.length ? and(...conditions) : undefined;
+    const [[summary], rows] = await Promise.all([
+      connection.db.select({ value: count() }).from(articles).where(where),
+      connection.db
+        .select()
+        .from(articles)
+        .where(where)
+        .orderBy(desc(articles.updatedAt))
+        .limit(pageSize)
+        .offset((page - 1) * pageSize)
     ]);
+    total = summary?.value ?? 0;
+    items = rows;
   } finally {
     await connection.close();
   }
 }
+
+const pages = Math.max(1, Math.ceil(total / pageSize));
+const qs = (extra: Record<string, string | number> = {}) => {
+  const params = new URLSearchParams();
+  if (query) params.set("q", query);
+  if (status) params.set("status", status);
+  if (type) params.set("type", type);
+  for (const [key, value] of Object.entries(extra)) params.set(key, String(value));
+  const text = params.toString();
+  return text ? `?${text}` : "";
+};
+
+const bulkMessages: Record<string, string> = {
+  DELETE: "Postagens excluídas permanentemente.",
+  ARCHIVED: "Postagens arquivadas.",
+  DRAFT: "Postagens movidas para rascunho.",
+  PENDING_REVIEW: "Postagens enviadas para revisão."
+};
 ---
 
 <AdminLayout title="Conteúdo">
   <div class="flex flex-wrap items-center justify-between gap-3">
-    <div><h1 class="text-3xl font-black">Conteúdo editorial</h1><p class="mt-2 text-slate-600">Notícias, guias, relatórios, autoria, SEO e histórico.</p></div>
-    <a class="rounded-xl bg-red-700 px-5 py-3 font-bold text-white" href="/admin/conteudo/novo">Novo conteúdo</a>
-  </div>
-  <section class="mt-8 rounded-2xl bg-white p-6">
-    <h2 class="text-xl font-black">Autores</h2>
-    <form class="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-5" method="post" action="/api/admin/authors">
-      <input type="hidden" name="returnTo" value="content" />
-      <input class="rounded-lg border p-3" name="name" placeholder="Nome" minlength="2" required />
-      <input class="rounded-lg border p-3" name="slug" placeholder="slug opcional" />
-      <input class="rounded-lg border p-3" name="bio" placeholder="Biografia curta" />
-      <input class="rounded-lg border p-3" name="avatarUrl" type="url" placeholder="URL do avatar (opcional)" />
-      <button class="rounded-lg border font-bold">Cadastrar autor</button>
-    </form>
-    <div class="mt-6 grid gap-4 lg:grid-cols-2">
-      {authorRows.map((author) => (
-        <article class="rounded-xl border p-4">
-          <form class="grid gap-3" method="post" action={`/api/admin/authors/${author.id}`}>
-            <input type="hidden" name="action" value="UPDATE" />
-            <div class="grid gap-3 sm:grid-cols-2">
-              <label class="text-xs font-bold">Nome<input class="mt-1 w-full rounded-lg border p-2 text-sm" name="name" value={author.name} required /></label>
-              <label class="text-xs font-bold">Slug<input class="mt-1 w-full rounded-lg border p-2 text-sm" name="slug" value={author.slug} required /></label>
-            </div>
-            <label class="text-xs font-bold">Biografia<input class="mt-1 w-full rounded-lg border p-2 text-sm" name="bio" value={author.bio ?? ""} /></label>
-            <label class="text-xs font-bold">Avatar<input class="mt-1 w-full rounded-lg border p-2 text-sm" name="avatarUrl" type="url" value={author.avatarUrl ?? ""} /></label>
-            <button class="rounded-lg border px-3 py-2 text-sm font-bold">Salvar autor</button>
-          </form>
-          <form class="mt-2" method="post" action={`/api/admin/authors/${author.id}`}>
-            <input type="hidden" name="action" value="DELETE" />
-            <button class="text-sm font-bold text-red-700">Excluir se não estiver em uso</button>
-          </form>
-        </article>
-      ))}
+    <div>
+      <h1 class="text-3xl font-black">Posts, notícias e guias</h1>
+      <p class="mt-2 text-slate-600">
+        {total} postagem(ns). Selecione várias para arquivar ou excluir de uma vez — como no WordPress.
+      </p>
     </div>
-    {authorRows.length === 0 && <p class="mt-4 text-sm text-slate-600">Cadastre o primeiro autor antes de criar conteúdo.</p>}
-  </section>
-  <div class="mt-8 overflow-auto rounded-2xl bg-white">
-    <table class="w-full text-left"><thead><tr class="border-b"><th class="p-4">Título</th><th>Tipo</th><th>Status</th><th>Atualizado</th><th></th></tr></thead>
-      <tbody>{items.map((article) => <tr class="border-b"><td class="p-4 font-bold">{article.title}<div class="text-xs font-normal text-slate-500">/{article.slug} · v{article.version}</div></td><td>{article.type}</td><td>{article.status}</td><td>{article.updatedAt.toLocaleString("pt-BR")}</td><td class="p-4"><a class="text-red-700" href={`/admin/conteudo/${article.id}/editar`}>Editar</a></td></tr>)}</tbody>
-    </table>
-    {items.length === 0 && <p class="p-6">Nenhum conteúdo cadastrado.</p>}
+    <div class="flex flex-wrap gap-2">
+      <a class="rounded-xl border px-4 py-3 font-bold" href="/admin/autores">Autores</a>
+      <a class="rounded-xl border px-4 py-3 font-bold" href="/admin/midia">Mídia</a>
+      <a class="rounded-xl bg-red-700 px-5 py-3 font-bold text-white" href="/admin/conteudo/novo">Nova postagem</a>
+    </div>
   </div>
+
+  {deleted && (
+    <p class="mt-4 rounded-xl border border-green-200 bg-green-50 p-4 text-green-800">Postagem excluída.</p>
+  )}
+  {bulk && bulkMessages[bulk] && (
+    <p class="mt-4 rounded-xl border border-green-200 bg-green-50 p-4 text-green-800">{bulkMessages[bulk]}</p>
+  )}
+
+  <form class="mt-6 grid gap-3 rounded-2xl bg-white p-4 md:grid-cols-[1fr_180px_180px_auto]" method="get">
+    <label>
+      <span class="sr-only">Buscar</span>
+      <input class="w-full rounded-lg border p-3" name="q" value={query} placeholder="Buscar por título, slug ou resumo…" />
+    </label>
+    <label>
+      <span class="sr-only">Tipo</span>
+      <select class="w-full rounded-lg border p-3" name="type">
+        <option value="">Todos os tipos</option>
+        {Object.entries(typeLabels).map(([value, label]) => (
+          <option value={value} selected={type === value}>{label}</option>
+        ))}
+      </select>
+    </label>
+    <label>
+      <span class="sr-only">Status</span>
+      <select class="w-full rounded-lg border p-3" name="status">
+        <option value="">Todos os status</option>
+        {Object.entries(statusLabels).map(([value, label]) => (
+          <option value={value} selected={status === value}>{label}</option>
+        ))}
+      </select>
+    </label>
+    <button class="rounded-lg bg-slate-900 px-5 font-bold text-white">Filtrar</button>
+  </form>
+
+  <form id="bulk-articles" class="mt-4" method="post" action="/api/admin/articles/bulk">
+    <div class="sticky top-0 z-10 flex flex-wrap items-center gap-3 rounded-2xl border bg-white p-4 shadow-sm">
+      <label class="flex items-center gap-2 text-sm font-bold">
+        <input id="select-all-articles" type="checkbox" />
+        Selecionar todas nesta página
+      </label>
+      <span id="selected-count" class="text-sm text-slate-500">0 selecionada(s)</span>
+      <label class="flex items-center gap-2 text-sm">
+        Ação em massa
+        <select class="rounded-lg border p-2" name="action" required>
+          <option value="">Escolha…</option>
+          <option value="ARCHIVED">Arquivar</option>
+          <option value="DRAFT">Mover para rascunho</option>
+          <option value="PENDING_REVIEW">Enviar para revisão</option>
+          <option value="DELETE">Excluir permanentemente</option>
+        </select>
+      </label>
+      <button
+        id="bulk-apply"
+        class="rounded-lg bg-slate-900 px-4 py-2 font-bold text-white disabled:opacity-40"
+        type="submit"
+        disabled
+        onclick="return window.esConfirmBulkArticles ? window.esConfirmBulkArticles() : true"
+      >
+        Aplicar
+      </button>
+    </div>
+
+    <div class="mt-4 overflow-x-auto rounded-2xl bg-white">
+      <table class="w-full min-w-[920px] text-left">
+        <thead class="border-b bg-slate-50 text-sm">
+          <tr>
+            <th class="w-12 p-4"></th>
+            <th class="p-4">Título</th>
+            <th class="p-4">Tipo</th>
+            <th class="p-4">Status</th>
+            <th class="p-4">Atualizado</th>
+            <th class="p-4">Ações</th>
+          </tr>
+        </thead>
+        <tbody>
+          {items.length === 0 ? (
+            <tr>
+              <td class="p-8 text-center text-slate-600" colspan="6">Nenhuma postagem encontrada.</td>
+            </tr>
+          ) : (
+            items.map((article) => (
+              <tr class="border-b align-top hover:bg-slate-50/80">
+                <td class="p-4">
+                  <input class="article-check h-4 w-4" type="checkbox" name="articleId" value={article.id} />
+                </td>
+                <td class="p-4">
+                  <strong class="font-bold">{article.title}</strong>
+                  <div class="mt-1 text-xs text-slate-500">/{article.slug} · v{article.version}</div>
+                </td>
+                <td class="p-4 text-sm">{typeLabels[article.type] ?? article.type}</td>
+                <td class="p-4 text-sm">{statusLabels[article.status] ?? article.status}</td>
+                <td class="p-4 text-sm whitespace-nowrap">{article.updatedAt.toLocaleString("pt-BR")}</td>
+                <td class="p-4">
+                  <div class="flex flex-wrap gap-2 text-sm">
+                    <a class="rounded border px-3 py-1 font-semibold text-red-700" href={`/admin/conteudo/${article.id}/editar`}>
+                      Editar
+                    </a>
+                    {article.status === "PUBLISHED" && (
+                      <a
+                        class="rounded border px-3 py-1"
+                        href={articlePublicPath(article.type, article.slug)}
+                        target="_blank"
+                        rel="noreferrer"
+                      >
+                        Ver
+                      </a>
+                    )}
+                    <button
+                      class="rounded border border-red-300 px-3 py-1 text-red-700"
+                      type="submit"
+                      name="action"
+                      value="DELETE"
+                      formaction="/api/admin/articles/bulk"
+                      formmethod="post"
+                      data-single-delete={article.id}
+                      onclick="return window.esPrepareSingleArticleDelete ? window.esPrepareSingleArticleDelete(this) : confirm('Excluir esta postagem?')"
+                    >
+                      Excluir
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            ))
+          )}
+        </tbody>
+      </table>
+    </div>
+  </form>
+
+  <nav class="mt-6 flex items-center justify-between" aria-label="Paginação">
+    <span class="text-sm text-slate-600">Página {page} de {pages}</span>
+    <div class="flex gap-2">
+      {page > 1 && (
+        <a class="rounded border bg-white px-4 py-2" href={qs({ page: page - 1 })}>Anterior</a>
+      )}
+      {page < pages && (
+        <a class="rounded border bg-white px-4 py-2" href={qs({ page: page + 1 })}>Próxima</a>
+      )}
+    </div>
+  </nav>
 </AdminLayout>
+
+<script is:inline>
+  (function () {
+    const form = document.getElementById("bulk-articles");
+    if (!form) return;
+    const selectAll = document.getElementById("select-all-articles");
+    const applyBtn = document.getElementById("bulk-apply");
+    const countEl = document.getElementById("selected-count");
+    const actionSelect = form.querySelector('select[name="action"]');
+
+    function checks() {
+      return Array.from(form.querySelectorAll(".article-check"));
+    }
+
+    function sync() {
+      const selected = checks().filter(function (el) {
+        return el.checked;
+      });
+      if (countEl) countEl.textContent = selected.length + " selecionada(s)";
+      if (applyBtn) applyBtn.disabled = selected.length === 0 || !actionSelect || !actionSelect.value;
+      if (selectAll) {
+        const all = checks();
+        selectAll.checked = all.length > 0 && selected.length === all.length;
+        selectAll.indeterminate = selected.length > 0 && selected.length < all.length;
+      }
+    }
+
+    window.esPrepareSingleArticleDelete = function (button) {
+      const id = button.getAttribute("data-single-delete");
+      if (!id) return false;
+      if (!confirm("Excluir esta postagem permanentemente? Essa ação não pode ser desfeita.")) return false;
+      checks().forEach(function (el) {
+        el.checked = el.value === id;
+      });
+      if (actionSelect) actionSelect.value = "DELETE";
+      sync();
+      return true;
+    };
+
+    window.esConfirmBulkArticles = function () {
+      const selected = checks().filter(function (el) {
+        return el.checked;
+      });
+      if (!selected.length) {
+        alert("Selecione ao menos uma postagem.");
+        return false;
+      }
+      if (!actionSelect || !actionSelect.value) {
+        alert("Escolha uma ação em massa.");
+        return false;
+      }
+      if (actionSelect.value === "DELETE") {
+        return confirm(
+          "Excluir " + selected.length + " postagem(ns) permanentemente? Essa ação não pode ser desfeita."
+        );
+      }
+      return true;
+    };
+
+    selectAll?.addEventListener("change", function () {
+      checks().forEach(function (el) {
+        el.checked = selectAll.checked;
+      });
+      sync();
+    });
+
+    form.addEventListener("change", function (event) {
+      if (
+        event.target &&
+        (event.target.classList.contains("article-check") || event.target === actionSelect)
+      ) {
+        sync();
+      }
+    });
+
+    sync();
+  })();
+</script>

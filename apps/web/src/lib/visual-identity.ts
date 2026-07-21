@@ -22,7 +22,7 @@ const defaults: VisualIdentity = {
   logoUrl: BRAND_ASSETS.logoHorizontalWebp,
   logoUrlDark: BRAND_ASSETS.logoHorizontalOnDarkWebp,
   iconUrl: BRAND_ASSETS.iconWebp,
-  tagline: "Vagas verificadas em São Luís e no Maranhão",
+  tagline: "Vagas SLZ e empregos verificados em São Luís e no Maranhão",
   faviconUrl: BRAND_ASSETS.faviconSvg,
   appleTouchIconUrl: BRAND_ASSETS.appleTouchIcon,
   ogImageUrl: `${process.env.SITE_URL ?? "https://empregossaoluis.com.br"}/brand/og-default.png`,

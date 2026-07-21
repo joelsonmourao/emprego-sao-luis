@@ -1,7 +1,7 @@
 const normalizeText = (value: string) => value.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
 
 const GRANDE_ILHA = [
-  { city: "São Luís", aliases: ["sao luis", "são luís"], uf: "MA" },
+  { city: "São Luís", aliases: ["sao luis", "são luís", "slz"], uf: "MA" },
   { city: "São José de Ribamar", aliases: ["sao jose de ribamar", "são josé de ribamar"], uf: "MA" },
   { city: "Paço do Lumiar", aliases: ["paco do lumiar", "paço do lumiar"], uf: "MA" },
   { city: "Raposa", aliases: ["raposa"], uf: "MA" }

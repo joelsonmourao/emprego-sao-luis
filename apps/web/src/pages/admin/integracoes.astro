@@ -1,0 +1,243 @@
+---
+import AdminLayout from "../../layouts/AdminLayout.astro";
+import { can } from "../../lib/auth";
+import {
+  getSiteIntegrations,
+  normalizeAdsenseClientId,
+  normalizePubIdForAdsTxt
+} from "../../lib/site-integrations";
+
+const auth = Astro.locals.auth!;
+if (!can(auth, "seo.manage") && !can(auth, "settings.manage")) {
+  return new Response("Proibido", { status: 403 });
+}
+
+const integrations = await getSiteIntegrations();
+const saved = Astro.url.searchParams.get("saved") === "1";
+const clientId = normalizeAdsenseClientId(integrations.adsensePublisherId);
+const pubId = normalizePubIdForAdsTxt(clientId);
+const gaOk = /^G-[A-Z0-9]+$/i.test(integrations.ga4MeasurementId) || /^GT-[A-Z0-9]+$/i.test(integrations.ga4MeasurementId);
+const gtmOk = /^GTM-[A-Z0-9]+$/i.test(integrations.gtmContainerId);
+const adsOk = /^ca-pub-\d+$/i.test(clientId);
+const gscOk = Boolean(integrations.searchConsoleVerification.trim());
+---
+<AdminLayout title="Integrações">
+  <h1 class="text-3xl font-black">Integrações</h1>
+  <p class="mt-2 max-w-3xl text-slate-600">
+    Centralize AdSense, Google Search Console, Analytics, Tag Manager e Pixel — tudo o que ajuda a medir e crescer visitas
+    com consentimento do visitante.
+  </p>
+  {saved && <p class="mt-4 rounded-xl border border-green-200 bg-green-50 p-4 text-green-800">Integrações salvas.</p>}
+
+  <section class="mt-8 grid gap-4 md:grid-cols-4">
+    <article class="rounded-2xl bg-white p-5">
+      <p class="text-sm text-slate-500">Search Console</p>
+      <p class:list={["mt-2 font-black", gscOk ? "text-emerald-700" : "text-slate-700"]}>{gscOk ? "Configurado" : "Pendente"}</p>
+    </article>
+    <article class="rounded-2xl bg-white p-5">
+      <p class="text-sm text-slate-500">GA4</p>
+      <p class:list={["mt-2 font-black", gaOk ? "text-emerald-700" : "text-slate-700"]}>{gaOk ? "ID válido" : "Não configurado"}</p>
+    </article>
+    <article class="rounded-2xl bg-white p-5">
+      <p class="text-sm text-slate-500">GTM</p>
+      <p class:list={["mt-2 font-black", gtmOk ? "text-emerald-700" : "text-slate-700"]}>{gtmOk ? "ID válido" : "Não configurado"}</p>
+    </article>
+    <article class="rounded-2xl bg-white p-5">
+      <p class="text-sm text-slate-500">AdSense</p>
+      <p class:list={["mt-2 font-black", adsOk ? "text-emerald-700" : "text-slate-700"]}>{adsOk ? "Publisher OK" : "Não configurado"}</p>
+    </article>
+  </section>
+
+  <form class="mt-8 grid gap-6" method="post" action="/api/admin/integracoes">
+    <section class="grid gap-4 rounded-2xl bg-white p-6">
+      <h2 class="text-xl font-black">Consentimento</h2>
+      <p class="text-sm text-slate-600">
+        Com Consent Mode ligado, Analytics/publicidade só carregam depois do visitante aceitar cookies (banner atual do
+        site).
+      </p>
+      <label class="flex items-start gap-3 rounded-xl border p-4">
+        <input class="mt-1" type="checkbox" name="consentModeEnabled" checked={integrations.consentModeEnabled} />
+        <span>
+          <span class="font-semibold">Consent Mode do Google</span>
+          <span class="mt-1 block text-sm text-slate-600">Bloqueia medição/anúncios até o aceite.</span>
+        </span>
+      </label>
+    </section>
+
+    <section class="grid gap-4 rounded-2xl bg-white p-6">
+      <h2 class="text-xl font-black">Google Search Console</h2>
+      <p class="text-sm text-slate-600">
+        Cole o código de verificação HTML (só o valor, ou a linha completa). Também sincroniza com a tela de SEO.
+      </p>
+      <label>
+        Código de verificação
+        <input
+          class="mt-1 w-full rounded-lg border p-3 font-mono text-sm"
+          name="searchConsoleVerification"
+          value={integrations.searchConsoleVerification}
+          placeholder="AbCdEf123… ou google-site-verification=…"
+        />
+      </label>
+      <label>
+        Verificação Bing (opcional)
+        <input
+          class="mt-1 w-full rounded-lg border p-3 font-mono text-sm"
+          name="bingVerification"
+          value={integrations.bingVerification}
+          placeholder="código msvalidate.01"
+        />
+      </label>
+      <div class="grid gap-4 md:grid-cols-2">
+        <label>
+          URL da propriedade
+          <input
+            class="mt-1 w-full rounded-lg border p-3"
+            type="url"
+            name="searchConsolePropertyUrl"
+            value={integrations.searchConsolePropertyUrl}
+            placeholder="https://search.google.com/search-console?resource_id=…"
+          />
+        </label>
+        <label>
+          Relatórios (atalho)
+          <input
+            class="mt-1 w-full rounded-lg border p-3"
+            type="url"
+            name="searchConsoleReportsUrl"
+            value={integrations.searchConsoleReportsUrl}
+            placeholder="https://search.google.com/search-console/performance/…"
+          />
+        </label>
+      </div>
+      {(integrations.searchConsolePropertyUrl || integrations.searchConsoleReportsUrl) && (
+        <p class="text-sm">
+          {integrations.searchConsolePropertyUrl && (
+            <a class="font-semibold text-red-700 underline" href={integrations.searchConsolePropertyUrl} target="_blank" rel="noreferrer"
+              >Abrir Search Console</a
+            >
+          )}
+          {integrations.searchConsoleReportsUrl && (
+            <>
+              {" · "}
+              <a class="font-semibold text-red-700 underline" href={integrations.searchConsoleReportsUrl} target="_blank" rel="noreferrer"
+                >Performance</a
+              >
+            </>
+          )}
+        </p>
+      )}
+    </section>
+
+    <section class="grid gap-4 rounded-2xl bg-white p-6">
+      <h2 class="text-xl font-black">Google Analytics 4 e Tag Manager</h2>
+      <label class="flex items-start gap-3 rounded-xl border p-4">
+        <input class="mt-1" type="checkbox" name="analyticsEnabled" checked={integrations.analyticsEnabled} />
+        <span>
+          <span class="font-semibold">Ativar mensuração</span>
+          <span class="mt-1 block text-sm text-slate-600">Carrega GA4 e/ou GTM no site público (respeitando consentimento).</span>
+        </span>
+      </label>
+      <div class="grid gap-4 md:grid-cols-2">
+        <label>
+          GA4 Measurement ID
+          <input
+            class="mt-1 w-full rounded-lg border p-3 font-mono"
+            name="ga4MeasurementId"
+            value={integrations.ga4MeasurementId}
+            placeholder="G-XXXXXXXXXX"
+          />
+        </label>
+        <label>
+          Google Tag Manager
+          <input
+            class="mt-1 w-full rounded-lg border p-3 font-mono"
+            name="gtmContainerId"
+            value={integrations.gtmContainerId}
+            placeholder="GTM-XXXXXXX"
+          />
+        </label>
+      </div>
+      <div class="grid gap-4 md:grid-cols-2">
+        <label>
+          Atalho Looker Studio
+          <input
+            class="mt-1 w-full rounded-lg border p-3"
+            type="url"
+            name="lookerStudioUrl"
+            value={integrations.lookerStudioUrl}
+            placeholder="https://lookerstudio.google.com/…"
+          />
+        </label>
+        <label>
+          Atalho relatórios GA4
+          <input
+            class="mt-1 w-full rounded-lg border p-3"
+            type="url"
+            name="ga4ReportsUrl"
+            value={integrations.ga4ReportsUrl}
+            placeholder="https://analytics.google.com/…"
+          />
+        </label>
+      </div>
+    </section>
+
+    <section class="grid gap-4 rounded-2xl bg-white p-6">
+      <h2 class="text-xl font-black">AdSense e ads.txt</h2>
+      <p class="text-sm text-slate-600">
+        Use também a <a class="underline" href="/admin/adsense-readiness">Rota da Aprovação</a> antes de ligar anúncios em
+        produção. Publisher ID: <code class="rounded bg-slate-100 px-1">ca-pub-…</code> ou <code class="rounded bg-slate-100 px-1">pub-…</code>.
+      </p>
+      <label class="flex items-start gap-3 rounded-xl border p-4">
+        <input class="mt-1" type="checkbox" name="adsenseEnabled" checked={integrations.adsenseEnabled} />
+        <span>
+          <span class="font-semibold">Ativar AdSense no site</span>
+          <span class="mt-1 block text-sm text-slate-600">Injeta o script após consentimento de publicidade.</span>
+        </span>
+      </label>
+      <label class="flex items-start gap-3 rounded-xl border p-4">
+        <input class="mt-1" type="checkbox" name="adsenseAutoAds" checked={integrations.adsenseAutoAds} />
+        <span>
+          <span class="font-semibold">Auto Ads</span>
+          <span class="mt-1 block text-sm text-slate-600">Deixa o AdSense decidir inventário automático (use com cautela).</span>
+        </span>
+      </label>
+      <label>
+        Publisher ID
+        <input
+          class="mt-1 w-full rounded-lg border p-3 font-mono"
+          name="adsensePublisherId"
+          value={integrations.adsensePublisherId}
+          placeholder="ca-pub-0000000000000000"
+        />
+      </label>
+      <label>
+        Conteúdo de ads.txt (opcional)
+        <textarea class="mt-1 min-h-28 w-full rounded-lg border p-3 font-mono text-xs" name="adsTxtContent" placeholder="google.com, pub-…, DIRECT, f08c47fec0942fa0">{integrations.adsTxtContent}</textarea>
+        <span class="mt-1 block text-xs text-slate-500">
+          Se vazio e o Publisher estiver ok, o site gera automaticamente em <a class="underline" href="/ads.txt" target="_blank">/ads.txt</a>
+          {pubId ? ` → google.com, ${pubId}, DIRECT, f08c47fec0942fa0` : ""}.
+        </span>
+      </label>
+    </section>
+
+    <section class="grid gap-4 rounded-2xl bg-white p-6">
+      <h2 class="text-xl font-black">Meta Pixel (opcional)</h2>
+      <p class="text-sm text-slate-600">Útil para campanhas no Instagram/Facebook que trazem visitas ao portal.</p>
+      <label>
+        Pixel ID
+        <input
+          class="mt-1 w-full rounded-lg border p-3 font-mono"
+          name="metaPixelId"
+          value={integrations.metaPixelId}
+          placeholder="000000000000000"
+        />
+      </label>
+    </section>
+
+    <div class="flex flex-wrap gap-3">
+      <button class="rounded-xl bg-red-700 px-6 py-4 font-bold text-white" type="submit">Salvar integrações</button>
+      <a class="rounded-xl border px-6 py-4 font-bold" href="/admin/seo">Ir para SEO</a>
+      <a class="rounded-xl border px-6 py-4 font-bold" href="/admin/adsense-readiness">Rota da Aprovação</a>
+    </div>
+  </form>
+</AdminLayout>

@@ -8,6 +8,7 @@ import { cssVariablesFromIdentity } from "../lib/design-tokens";
 import { BRAND_ASSETS } from "../lib/brand-assets";
 import { getBrandIdentity } from "../lib/brand/identity-service";
 import { getSeoSettings } from "../lib/seo-settings";
+import { getSiteIntegrations, normalizeAdsenseClientId } from "../lib/site-integrations";
 import { getVisualIdentity } from "../lib/visual-identity";
 import { isStagingLikeEnvironment, stagingRobotsDirective } from "../lib/runtime-env";
 
@@ -27,16 +28,36 @@ interface Props {
 const identity = await getVisualIdentity();
 const brand = await getBrandIdentity();
 const seo = await getSeoSettings();
+const integrations = await getSiteIntegrations();
 const stagingLike = isStagingLikeEnvironment();
 const { title, description = seo.defaultDescription, robots = seo.robotsDefault, canonical, ogImage = identity.ogImageUrl ?? seo.og.image, breadcrumbs, noindex = false, pageSchemaType = "WebPage", schemas = [], disableSeoGraph = false } = Astro.props;
 const pageTitle = title.includes(seo.titleSuffix) ? title : `${title} — ${seo.titleSuffix}`;
 const canonicalUrl = canonical ? new URL(canonical, Astro.site).toString() : new URL(Astro.url.pathname, Astro.site).toString();
 const consentChoice = Astro.cookies.get("es_consent_ads")?.value;
-const adsEnabled =
-  !stagingLike &&
-  import.meta.env.PUBLIC_ADSENSE_ENABLED === "true" &&
-  Boolean(import.meta.env.PUBLIC_ADSENSE_CLIENT_ID) &&
-  consentChoice === "yes";
+const consentOk = !integrations.consentModeEnabled || consentChoice === "yes";
+
+const googleVerification = integrations.searchConsoleVerification.trim() || seo.verifications.google;
+const bingVerification = integrations.bingVerification.trim() || seo.verifications.bing;
+
+const adsenseClientId =
+  normalizeAdsenseClientId(integrations.adsensePublisherId) ||
+  String(import.meta.env.PUBLIC_ADSENSE_CLIENT_ID ?? "").trim();
+const adsWanted = integrations.persisted
+  ? integrations.adsenseEnabled
+  : integrations.adsenseEnabled || import.meta.env.PUBLIC_ADSENSE_ENABLED === "true";
+const adsEnabled = !stagingLike && adsWanted && Boolean(adsenseClientId) && consentOk;
+
+const ga4Id = integrations.ga4MeasurementId.trim();
+const gtmId = integrations.gtmContainerId.trim().toUpperCase();
+const ga4Ok = /^G-[A-Z0-9]+$/i.test(ga4Id) || /^GT-[A-Z0-9]+$/i.test(ga4Id);
+const gtmOk = /^GTM-[A-Z0-9]+$/i.test(gtmId);
+const analyticsEnabled =
+  !stagingLike && integrations.analyticsEnabled && consentOk && (gtmOk || ga4Ok);
+
+const metaPixelId = integrations.metaPixelId.trim();
+const metaPixelOk = /^\d{5,20}$/.test(metaPixelId);
+const metaEnabled = !stagingLike && metaPixelOk && consentOk;
+
 const siteUrl = Astro.site?.toString() ?? process.env.SITE_URL ?? "https://empregossaoluis.com.br";
 const og = buildOpenGraphTags({ title: pageTitle, description, url: canonicalUrl, type: seo.og.type, siteName: seo.og.siteName, locale: seo.og.locale, ...(ogImage ? { image: ogImage } : {}) });
 const twitter = buildTwitterTags({ title: pageTitle, description, card: seo.twitter.card, ...(seo.twitter.site ? { site: seo.twitter.site } : {}), ...(seo.twitter.creator ? { creator: seo.twitter.creator } : {}), ...(ogImage ? { image: ogImage } : {}) });
@@ -75,6 +96,16 @@ const robotsValue = stagingLike
     : robots.includes("max-image-preview")
       ? robots
       : `${robots},max-image-preview:large`;
+
+const gtmBootstrap = gtmOk
+  ? `(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','${gtmId}');`
+  : "";
+const ga4Bootstrap = ga4Ok && !gtmOk
+  ? `window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','${ga4Id}');`
+  : "";
+const metaBootstrap = metaEnabled
+  ? `!function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');fbq('init','${metaPixelId}');fbq('track','PageView');`
+  : "";
 ---
 <!doctype html>
 <html lang={seo.language}>
@@ -84,8 +115,8 @@ const robotsValue = stagingLike
     <meta name="description" content={description} />
     <meta name="robots" content={robotsValue} />
     <meta name="generator" content={Astro.generator} />
-    {!stagingLike && seo.verifications.google && <meta name="google-site-verification" content={seo.verifications.google} />}
-    {!stagingLike && seo.verifications.bing && <meta name="msvalidate.01" content={seo.verifications.bing} />}
+    {!stagingLike && googleVerification && <meta name="google-site-verification" content={googleVerification} />}
+    {!stagingLike && bingVerification && <meta name="msvalidate.01" content={bingVerification} />}
     <link rel="icon" type="image/svg+xml" href={BRAND_ASSETS.faviconSvg} />
     <link rel="icon" type="image/png" sizes="32x32" href={BRAND_ASSETS.favicon32} />
     <link rel="icon" type="image/png" sizes="16x16" href={BRAND_ASSETS.favicon16} />
@@ -101,9 +132,27 @@ const robotsValue = stagingLike
     {ogImage && <meta property="og:image:alt" content={seo.defaultOgImageAlt} />}
     {Object.entries(twitter).map(([key, value]) => <meta name={key} content={value} />)}
     {seoGraph && <script is:inline type="application/ld+json" set:html={JSON.stringify(seoGraph)} />}
-    {adsEnabled && <script is:inline async src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${import.meta.env.PUBLIC_ADSENSE_CLIENT_ID}`} crossorigin="anonymous"></script>}
+    {analyticsEnabled && gtmOk && <script is:inline set:html={gtmBootstrap} />}
+    {analyticsEnabled && ga4Ok && !gtmOk && <script is:inline async src={`https://www.googletagmanager.com/gtag/js?id=${ga4Id}`} />}
+    {analyticsEnabled && ga4Ok && !gtmOk && <script is:inline set:html={ga4Bootstrap} />}
+    {metaEnabled && <script is:inline set:html={metaBootstrap} />}
+    {adsEnabled && <script is:inline async src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${adsenseClientId}`} crossorigin="anonymous"></script>}
+    {adsEnabled && integrations.adsenseAutoAds && (
+      <script is:inline set:html={`(adsbygoogle=window.adsbygoogle||[]).push({google_ad_client:"${adsenseClientId}",enable_page_level_ads:true});`} />
+    )}
   </head>
   <body>
+    {analyticsEnabled && gtmOk && (
+      <noscript>
+        <iframe
+          src={`https://www.googletagmanager.com/ns.html?id=${gtmId}`}
+          height="0"
+          width="0"
+          style="display:none;visibility:hidden"
+          title="Google Tag Manager"
+        ></iframe>
+      </noscript>
+    )}
     <a class="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:rounded-lg focus:bg-white focus:px-4 focus:py-2" href="#conteudo">Ir para o conteúdo</a>
     <SiteHeader identity={identity} currentPath={currentPath} />
     <main id="conteudo"><slot /></main>

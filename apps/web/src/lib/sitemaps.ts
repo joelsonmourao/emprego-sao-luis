@@ -4,6 +4,7 @@ import { dedupeEntries, normalizeLastmod, type SitemapEntry } from "@es/seo";
 
 const INSTITUTIONAL_PATHS = [
   "/",
+  "/vagas-slz",
   "/quem-somos",
   "/contato",
   "/privacidade",
@@ -45,7 +46,12 @@ export async function listSitemapEntries(
       const paths = [...INSTITUTIONAL_PATHS, ...(activeJob ? ["/vagas", "/categorias"] : []), ...(activeCompany ? ["/empresas"] : []), ...(news ? ["/noticias"] : []), ...(guide ? ["/blog"] : [])];
       return dedupeEntries(
         paths.map((path) =>
-          toEntry(path, undefined, path === "/" ? "daily" : "monthly", path === "/" ? 1 : 0.5)
+          toEntry(
+            path,
+            undefined,
+            path === "/" || path === "/vagas-slz" ? "daily" : "monthly",
+            path === "/" ? 1 : path === "/vagas-slz" ? 0.9 : 0.5
+          )
         )
       );
     }

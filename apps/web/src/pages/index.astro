@@ -56,9 +56,10 @@ if (process.env.DATABASE_URL) {
 const articles = await listPublishedArticles(4);
 const displayFeatured = featured.length ? featured : recent.slice(0, 3);
 const quickFilters = [
+  ["Vagas SLZ", "/vagas-slz"],
+  ["São Luís", "/vagas/cidade/sao-luis"],
   ["Presencial", "/vagas?modalidade=presencial"],
   ["Remoto", "/vagas?modalidade=remoto"],
-  ["São Luís", "/vagas?cidade=São Luís"],
   ["Auxiliar", "/vagas?q=auxiliar"],
   ["Vendedor", "/vagas?q=vendedor"]
 ];
@@ -67,9 +68,16 @@ const steps = [
   ["Compare", "Veja empresa, local, contrato e fonte da vaga."],
   ["Candidate-se", "Acesse o link oficial sem cadastro obrigatório."]
 ];
+const homeTitle = "Empregos São Luís — Vagas SLZ e empregos em São Luís";
+const homeDescription =
+  "Vagas SLZ e empregos SLZ em São Luís e no Maranhão. Encontre oportunidades atualizadas na capital maranhense.";
 ---
-<BaseLayout title="Empregos São Luís — Vagas em São Luís e Maranhão" description={identity.tagline}>
-  <PageHero kicker={identity.siteName} title="Seu próximo trabalho pode estar mais perto do que você imagina." description={identity.tagline}>
+<BaseLayout title={homeTitle} description={homeDescription}>
+  <PageHero
+    kicker={identity.siteName}
+    title="Vagas SLZ em São Luís — seu próximo emprego na capital"
+    description={homeDescription}
+  >
     <form class="hero-search-panel mt-8 rounded-3xl border p-4 shadow-2xl sm:p-5" action="/vagas" method="get" role="search">
       <div class="grid gap-3 lg:grid-cols-4">
         <label class="grid gap-1 text-sm font-semibold lg:col-span-2">

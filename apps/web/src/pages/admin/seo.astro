@@ -40,7 +40,10 @@ const preview = {
 ---
 <AdminLayout title="SEO e indexação">
   <h1 class="text-3xl font-black">SEO e indexação</h1>
-  <p class="mt-2 text-slate-600">Configurações globais, integrações e histórico de envio.</p>
+  <p class="mt-2 text-slate-600">
+    Configurações globais, indexação e histórico de envio. Para AdSense, Analytics, Search Console e Pixel use
+    <a class="font-semibold underline" href="/admin/integracoes">Integrações</a>.
+  </p>
   {saved && <p class="mt-4 rounded-xl border border-green-200 bg-green-50 p-4 text-green-800">Configurações SEO salvas com auditoria.</p>}
   {retry && <p class="mt-4 rounded-xl border border-blue-200 bg-blue-50 p-4 text-blue-800">Evento reenfileirado para processamento.</p>}
 

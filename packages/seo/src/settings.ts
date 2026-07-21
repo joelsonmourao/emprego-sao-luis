@@ -8,7 +8,7 @@ const contentTypeSeoSchema = z.object({
 
 export const seoSettingsSchema = z.object({
   defaultTitle: z.string().min(1).default("Empregos São Luís"),
-  defaultDescription: z.string().min(1).default("Vagas verificadas em São Luís e no Maranhão."),
+  defaultDescription: z.string().min(1).default("Vagas SLZ e empregos verificados em São Luís e no Maranhão."),
   canonicalDomain: z.string().default("https://empregossaoluis.com.br"),
   language: z.string().default("pt-BR"),
   titleSuffix: z.string().default("Empregos São Luís"),
