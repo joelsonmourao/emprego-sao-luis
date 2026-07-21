@@ -75,8 +75,12 @@ const gscOk = Boolean(integrations.searchConsoleVerification.trim());
           class="mt-1 w-full rounded-lg border p-3 font-mono text-sm"
           name="searchConsoleVerification"
           value={integrations.searchConsoleVerification}
-          placeholder="AbCdEf123… ou google-site-verification=…"
+          placeholder="Cole só o código: 8BKJ9… (ou a tag completa — o sistema extrai o content)"
         />
+        <span class="mt-1 block text-xs text-slate-500">
+          Não cole a tag inteira no HTML do site: este campo gera a meta automaticamente. Preferível só o valor de
+          <code class="rounded bg-slate-100 px-1">content="…"</code>.
+        </span>
       </label>
       <label>
         Verificação Bing (opcional)

@@ -62,12 +62,20 @@ export function normalizePubIdForAdsTxt(clientId: string): string {
   return normalized.replace(/^ca-/i, "");
 }
 
+/** Extrai só o token do Search Console (aceita tag completa ou só o content). */
 export function normalizeSearchConsoleToken(raw: string): string {
-  return raw
-    .trim()
+  const value = raw.trim();
+  if (!value) return "";
+
+  const fromMeta = value.match(/content\s*=\s*["']([^"']+)["']/i);
+  if (fromMeta?.[1]) return fromMeta[1].trim();
+
+  return value
+    .replace(/^<meta\b[^>]*>$/i, "")
     .replace(/^google-site-verification=/i, "")
     .replace(/^content=/i, "")
-    .replace(/^["']|["']$/g, "");
+    .replace(/^["']|["']$/g, "")
+    .trim();
 }
 
 export async function getSiteIntegrations(): Promise<SiteIntegrations & { persisted: boolean }> {

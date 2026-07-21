@@ -8,7 +8,7 @@ import { cssVariablesFromIdentity } from "../lib/design-tokens";
 import { BRAND_ASSETS } from "../lib/brand-assets";
 import { getBrandIdentity } from "../lib/brand/identity-service";
 import { getSeoSettings } from "../lib/seo-settings";
-import { getSiteIntegrations, normalizeAdsenseClientId } from "../lib/site-integrations";
+import { getSiteIntegrations, normalizeAdsenseClientId, normalizeSearchConsoleToken } from "../lib/site-integrations";
 import { getVisualIdentity } from "../lib/visual-identity";
 import { isStagingLikeEnvironment, stagingRobotsDirective } from "../lib/runtime-env";
 
@@ -36,8 +36,10 @@ const canonicalUrl = canonical ? new URL(canonical, Astro.site).toString() : new
 const consentChoice = Astro.cookies.get("es_consent_ads")?.value;
 const consentOk = !integrations.consentModeEnabled || consentChoice === "yes";
 
-const googleVerification = integrations.searchConsoleVerification.trim() || seo.verifications.google;
-const bingVerification = integrations.bingVerification.trim() || seo.verifications.bing;
+const googleVerification = normalizeSearchConsoleToken(
+  integrations.searchConsoleVerification.trim() || seo.verifications.google
+);
+const bingVerification = (integrations.bingVerification.trim() || seo.verifications.bing).trim();
 
 const adsenseClientId =
   normalizeAdsenseClientId(integrations.adsensePublisherId) ||
