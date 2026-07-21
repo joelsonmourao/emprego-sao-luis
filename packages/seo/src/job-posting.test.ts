@@ -51,4 +51,15 @@ describe("JobPosting", () => {
     expect(result.missing).toContain("identifier");
     expect(result.missing).toContain("canonicalUrl");
   });
+
+  it("includes site logo on hiringOrganization", () => {
+    const result = buildJobPosting({
+      ...input,
+      organizationLogoUrl: "/brand/logo-horizontal.webp"
+    })!;
+    expect(result.hiringOrganization.logo).toEqual({
+      "@type": "ImageObject",
+      url: "https://empregossaoluis.com.br/brand/logo-horizontal.webp"
+    });
+  });
 });

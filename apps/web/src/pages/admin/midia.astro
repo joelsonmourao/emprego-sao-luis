@@ -2,85 +2,207 @@
 import { adCreatives, articles, brandAssets, companies, createDatabase, mediaAssets } from "@es/db";
 import { desc, isNotNull } from "drizzle-orm";
 import AdminLayout from "../../layouts/AdminLayout.astro";
+import { listSiteStaticImages, resolveMediaDisplayUrl } from "../../lib/media-display";
+import { can } from "../../lib/auth";
+
+const auth = Astro.locals.auth!;
+if (!can(auth, "media.manage") && !can(auth, "content.manage") && !can(auth, "settings.manage")) {
+  return new Response("Proibido", { status: 403 });
+}
+
+const tab = Astro.url.searchParams.get("tab") === "imagens" ? "imagens" : "biblioteca";
+const uploaded = Astro.url.searchParams.get("uploaded") === "1";
+const deleted = Astro.url.searchParams.get("deleted") === "1";
 
 let assets: typeof mediaAssets.$inferSelect[] = [];
 const usage = new Map<string, number>();
 if (process.env.DATABASE_URL) {
   const connection = createDatabase(process.env.DATABASE_URL);
   try {
-    assets = await connection.db.select().from(mediaAssets).orderBy(desc(mediaAssets.createdAt)).limit(200);
+    assets = await connection.db.select().from(mediaAssets).orderBy(desc(mediaAssets.createdAt)).limit(300);
     const [articleUrls, companyUrls, creativeUrls, brandMedia] = await Promise.all([
       connection.db.select({ url: articles.coverImageUrl }).from(articles).where(isNotNull(articles.coverImageUrl)),
       connection.db.select({ url: companies.logoUrl }).from(companies).where(isNotNull(companies.logoUrl)),
       connection.db.select({ url: adCreatives.imageUrl }).from(adCreatives),
-      connection.db.select({ id: brandAssets.mediaId }).from(brandAssets).where(isNotNull(brandAssets.mediaId))
+      connection.db.select({ id: brandAssets.mediaId, url: brandAssets.url }).from(brandAssets)
     ]);
     for (const row of [...articleUrls, ...companyUrls, ...creativeUrls]) {
       if (row.url) usage.set(row.url, (usage.get(row.url) ?? 0) + 1);
     }
     for (const row of brandMedia) {
       if (row.id) usage.set(row.id, (usage.get(row.id) ?? 0) + 1);
+      if (row.url) usage.set(row.url, (usage.get(row.url) ?? 0) + 1);
     }
   } finally {
     await connection.close();
   }
 }
+
+const siteImages = listSiteStaticImages();
+const brandImages = siteImages.filter((item) => item.group === "brand");
+const coverImages = siteImages.filter((item) => item.group === "covers");
+const iconImages = siteImages.filter((item) => item.group === "icons");
 ---
 
 <AdminLayout title="Mídia">
   <div class="flex flex-wrap justify-between gap-3">
     <div>
-      <h1 class="text-3xl font-black">Biblioteca de mídia</h1>
-      <p class="mt-2 text-slate-600">Imagens persistidas em R2/S3 ou no volume local compartilhado.</p>
+      <h1 class="text-3xl font-black">Mídia e imagens</h1>
+      <p class="mt-2 text-slate-600">Biblioteca enviada + imagens estáticas do site (brand, capas, ícones).</p>
     </div>
-    <a class="rounded-lg border px-4 py-2" href="/admin/aparencia">Aparência do portal</a>
+    <a class="rounded-lg border px-4 py-2 font-bold" href="/admin/configuracoes/identidade-visual">Identidade visual</a>
   </div>
 
-  <form class="mt-6 grid gap-4 rounded-2xl bg-white p-6" method="post" action="/api/admin/media" enctype="multipart/form-data">
-    <label>
-      Imagem (JPEG, PNG, WebP ou GIF; até 10 MB)
-      <input class="mt-1 block w-full rounded-lg border p-3" type="file" name="file" accept="image/jpeg,image/png,image/webp,image/gif" required />
-    </label>
-    <label>
-      Texto alternativo
-      <input class="mt-1 w-full rounded-lg border p-3" name="altText" required maxlength="240" />
-    </label>
-    <button class="rounded-xl bg-red-700 p-4 font-bold text-white">Enviar para o armazenamento</button>
-  </form>
+  {uploaded && <p class="mt-4 rounded-xl border border-green-200 bg-green-50 p-4 text-green-800">Imagem enviada.</p>}
+  {deleted && <p class="mt-4 rounded-xl border border-green-200 bg-green-50 p-4 text-green-800">Imagem excluída.</p>}
 
-  <section class="mt-8 grid gap-5 sm:grid-cols-2 xl:grid-cols-4">
-    {assets.map((asset) => {
-      const used = (usage.get(asset.url) ?? 0) + (usage.get(asset.id) ?? 0);
-      return (
-        <article class="overflow-hidden rounded-2xl bg-white">
-          <img class="aspect-video w-full object-cover" src={asset.url} alt={asset.altText ?? ""} />
-          <div class="grid gap-3 p-4">
-            <strong class="break-all text-sm">{asset.originalName}</strong>
-            <p class="text-xs text-slate-600">{asset.mimeType} · {(asset.size / 1024).toFixed(1)} KB</p>
-            <p class="text-xs font-semibold text-slate-600">{used > 0 ? `Em uso em ${used} local(is)` : "Sem uso ativo detectado"}</p>
-            <form class="grid gap-2" method="post" action={`/api/admin/media/${asset.id}`}>
-              <input type="hidden" name="action" value="UPDATE_ALT" />
-              <label class="text-xs font-bold">Texto alternativo
-                <input class="mt-1 w-full rounded-lg border p-2 text-sm" name="altText" value={asset.altText ?? ""} required maxlength="240" />
-              </label>
-              <button class="rounded-lg border px-3 py-2 text-sm font-bold">Atualizar ALT</button>
-            </form>
-            <button class="text-sm font-bold text-red-700" type="button" data-copy={asset.url}>Copiar URL</button>
-            <form method="post" action={`/api/admin/media/${asset.id}`}>
-              <input type="hidden" name="action" value="DELETE" />
-              <button class="w-full rounded-lg border border-red-200 px-3 py-2 text-sm font-bold text-red-700 disabled:opacity-50" disabled={used > 0}>
-                {used > 0 ? "Em uso: exclusão bloqueada" : "Excluir com segurança"}
-              </button>
-            </form>
-          </div>
-        </article>
-      );
-    })}
-  </section>
-  {assets.length === 0 && <p class="mt-8 rounded-xl border bg-white p-6">Nenhuma mídia cadastrada.</p>}
+  <nav class="mt-6 flex flex-wrap gap-2" aria-label="Abas de mídia">
+    <a
+      class={`rounded-xl px-4 py-2 font-bold ${tab === "biblioteca" ? "bg-red-700 text-white" : "border bg-white"}`}
+      href="/admin/midia?tab=biblioteca"
+    >
+      Biblioteca ({assets.length})
+    </a>
+    <a
+      class={`rounded-xl px-4 py-2 font-bold ${tab === "imagens" ? "bg-red-700 text-white" : "border bg-white"}`}
+      href="/admin/midia?tab=imagens"
+    >
+      Imagens do site ({siteImages.length})
+    </a>
+  </nav>
+
+  {tab === "biblioteca" && (
+    <>
+      <form class="mt-6 grid gap-4 rounded-2xl bg-white p-6" method="post" action="/api/admin/media" enctype="multipart/form-data">
+        <label>
+          Imagem (JPEG, PNG, WebP ou GIF; até 10 MB)
+          <input class="mt-1 block w-full rounded-lg border p-3" type="file" name="file" accept="image/jpeg,image/png,image/webp,image/gif" required />
+        </label>
+        <label>
+          Texto alternativo
+          <input class="mt-1 w-full rounded-lg border p-3" name="altText" required maxlength="240" />
+        </label>
+        <button class="rounded-xl bg-red-700 p-4 font-bold text-white">Enviar para o armazenamento</button>
+      </form>
+
+      <section class="mt-8 grid gap-5 sm:grid-cols-2 xl:grid-cols-4">
+        {assets.map((asset) => {
+          const displayUrl = resolveMediaDisplayUrl({ url: asset.url, storageKey: asset.storageKey });
+          const used = (usage.get(asset.url) ?? 0) + (usage.get(asset.id) ?? 0) + (usage.get(displayUrl) ?? 0);
+          return (
+            <article class="overflow-hidden rounded-2xl border bg-white">
+              <div class="flex aspect-video items-center justify-center bg-slate-100">
+                <img
+                  class="max-h-full max-w-full object-contain"
+                  src={displayUrl}
+                  alt={asset.altText ?? ""}
+                  loading="lazy"
+                  data-media-preview
+                />
+              </div>
+              <div class="grid gap-3 p-4">
+                <strong class="break-all text-sm">{asset.originalName}</strong>
+                <p class="text-xs text-slate-600">{asset.mimeType} · {(asset.size / 1024).toFixed(1)} KB</p>
+                <p class="break-all text-[10px] text-slate-500">{displayUrl}</p>
+                <p class="text-xs font-semibold text-slate-600">{used > 0 ? `Em uso em ${used} local(is)` : "Sem uso ativo detectado"}</p>
+                <form class="grid gap-2" method="post" action={`/api/admin/media/${asset.id}`}>
+                  <input type="hidden" name="action" value="UPDATE_ALT" />
+                  <label class="text-xs font-bold">
+                    Texto alternativo
+                    <input class="mt-1 w-full rounded-lg border p-2 text-sm" name="altText" value={asset.altText ?? ""} required maxlength="240" />
+                  </label>
+                  <button class="rounded-lg border px-3 py-2 text-sm font-bold">Atualizar ALT</button>
+                </form>
+                <button class="text-sm font-bold text-red-700" type="button" data-copy={displayUrl}>Copiar URL</button>
+                <form method="post" action={`/api/admin/media/${asset.id}`}>
+                  <input type="hidden" name="action" value="DELETE" />
+                  <button class="w-full rounded-lg border border-red-200 px-3 py-2 text-sm font-bold text-red-700 disabled:opacity-50" disabled={used > 0}>
+                    {used > 0 ? "Em uso: exclusão bloqueada" : "Excluir com segurança"}
+                  </button>
+                </form>
+              </div>
+            </article>
+          );
+        })}
+      </section>
+      {assets.length === 0 && <p class="mt-8 rounded-xl border bg-white p-6">Nenhuma mídia cadastrada na biblioteca. Use o envio acima ou veja a aba Imagens do site.</p>}
+    </>
+  )}
+
+  {tab === "imagens" && (
+    <div class="mt-8 grid gap-10">
+      <section>
+        <h2 class="text-xl font-black">Brand / logo ({brandImages.length})</h2>
+        <div class="mt-4 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+          {brandImages.map((item) => (
+            <article class="overflow-hidden rounded-2xl border bg-white">
+              <div class="flex aspect-video items-center justify-center bg-slate-50 p-4">
+                <img class="max-h-full max-w-full object-contain" src={item.path} alt={item.name} loading="lazy" />
+              </div>
+              <div class="grid gap-2 p-4">
+                <strong class="break-all text-sm">{item.name}</strong>
+                <code class="break-all text-[10px] text-slate-500">{item.path}</code>
+                <button class="text-left text-sm font-bold text-red-700" type="button" data-copy={item.path}>Copiar URL</button>
+              </div>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <section>
+        <h2 class="text-xl font-black">Ícones ({iconImages.length})</h2>
+        <div class="mt-4 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+          {iconImages.map((item) => (
+            <article class="overflow-hidden rounded-2xl border bg-white">
+              <div class="flex aspect-video items-center justify-center bg-slate-50 p-4">
+                <img class="max-h-24 max-w-full object-contain" src={item.path} alt={item.name} loading="lazy" />
+              </div>
+              <div class="grid gap-2 p-4">
+                <strong class="break-all text-sm">{item.name}</strong>
+                <code class="break-all text-[10px] text-slate-500">{item.path}</code>
+                <button class="text-left text-sm font-bold text-red-700" type="button" data-copy={item.path}>Copiar URL</button>
+              </div>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <section>
+        <h2 class="text-xl font-black">Capas editoriais ({coverImages.length})</h2>
+        <p class="mt-1 text-sm text-slate-600">Arquivos em <code>/covers/…</code> usados pelos posts.</p>
+        <div class="mt-4 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+          {coverImages.map((item) => (
+            <article class="overflow-hidden rounded-2xl border bg-white">
+              <div class="flex aspect-video items-center justify-center bg-slate-100">
+                <img class="h-full w-full object-cover" src={item.path} alt={item.name} loading="lazy" />
+              </div>
+              <div class="grid gap-2 p-4">
+                <strong class="break-all text-sm">{item.name}</strong>
+                <code class="break-all text-[10px] text-slate-500">{item.path}</code>
+                <button class="text-left text-sm font-bold text-red-700" type="button" data-copy={item.path}>Copiar URL</button>
+              </div>
+            </article>
+          ))}
+        </div>
+        {coverImages.length === 0 && <p class="mt-4 text-sm text-slate-600">Nenhuma capa em public/covers.</p>}
+      </section>
+    </div>
+  )}
+
   <script>
-    document.querySelectorAll<HTMLElement>("[data-copy]").forEach((button) =>
-      button.addEventListener("click", () => navigator.clipboard.writeText(button.dataset.copy ?? ""))
+    document.querySelectorAll("[data-copy]").forEach((button) =>
+      button.addEventListener("click", () => {
+        const value = button.getAttribute("data-copy") ?? "";
+        navigator.clipboard.writeText(value);
+      })
     );
+    document.querySelectorAll("img[data-media-preview]").forEach((img) => {
+      img.addEventListener("error", () => {
+        const note = document.createElement("p");
+        note.className = "p-4 text-center text-xs text-rose-700";
+        note.textContent = "Prévia indisponível (arquivo ausente no volume/R2)";
+        img.replaceWith(note);
+      });
+    });
   </script>
 </AdminLayout>

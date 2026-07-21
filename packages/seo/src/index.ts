@@ -27,6 +27,8 @@ export interface JobPostingInput {
   workplaceType: string;
   companyName: string;
   companyWebsiteUrl?: string | null;
+  /** Logo do site (ou empresa) — vira hiringOrganization.logo */
+  organizationLogoUrl?: string | null;
   cityName: string;
   stateCode: string;
   applicationUrl?: string | null;
@@ -43,6 +45,14 @@ export interface JobPostingInput {
   unidentifiedCompany?: boolean;
   organizationPubliclyIdentifiable?: boolean;
   directApply?: boolean;
+}
+
+function absoluteAssetUrl(url: string | null | undefined): string | undefined {
+  const value = String(url ?? "").trim();
+  if (!value) return undefined;
+  if (/^https?:\/\//i.test(value)) return value;
+  const base = (process.env.SITE_URL || "https://empregossaoluis.com.br").replace(/\/$/, "");
+  return value.startsWith("/") ? `${base}${value}` : `${base}/${value}`;
 }
 
 export function buildJobPosting(input: JobPostingInput) {
@@ -70,6 +80,7 @@ export function buildJobPosting(input: JobPostingInput) {
         }
       }
     : undefined;
+  const logoUrl = absoluteAssetUrl(input.organizationLogoUrl);
   return {
     "@context": "https://schema.org",
     "@type": "JobPosting",
@@ -82,7 +93,8 @@ export function buildJobPosting(input: JobPostingInput) {
     hiringOrganization: {
       "@type": "Organization",
       name: input.companyName,
-      ...(input.companyWebsiteUrl ? { sameAs: input.companyWebsiteUrl } : {})
+      ...(input.companyWebsiteUrl ? { sameAs: input.companyWebsiteUrl } : {}),
+      ...(logoUrl ? { logo: { "@type": "ImageObject", url: logoUrl } } : {})
     },
     ...(input.publicCode
       ? { identifier: { "@type": "PropertyValue", name: "Código ES", value: input.publicCode } }

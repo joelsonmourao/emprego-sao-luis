@@ -169,12 +169,12 @@ export async function deleteStorageObject(storageKey: string): Promise<void> {
 export function buildStoragePublicUrl(storageKey: string, siteUrl?: string): string {
   const key = normalizeStorageKey(storageKey);
   const publicBase = isS3Configured() ? process.env.S3_PUBLIC_URL?.trim().replace(/\/$/, "") : "";
-  if (publicBase) return `${publicBase}/${key}`;
-  const base = (siteUrl || process.env.SITE_URL || "https://empregossaoluis.com.br")
-    .replace(/\/$/, "")
-    .replace("://www.", "://");
   const encoded = key.split("/").map(encodeURIComponent).join("/");
-  return `${base}/api/uploads/${encoded}`;
+  // R2/CDN com base pública absoluta
+  if (publicBase) return `${publicBase}/${encoded}`;
+  // Volume local: URL relativa — funciona no admin e no site sem depender de SITE_URL.
+  void siteUrl;
+  return `/api/uploads/${encoded}`;
 }
 
 export function guessStorageContentType(storageKey: string): string {

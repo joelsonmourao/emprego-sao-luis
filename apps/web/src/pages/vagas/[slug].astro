@@ -17,6 +17,8 @@ import {
 } from "@es/shared";
 import { formatRelativeDate, formatSalary, formatWorkplace } from "../../lib/job-presenter";
 import { findPublishedJob, listRelatedJobs } from "../../lib/jobs";
+import { getVisualIdentity } from "../../lib/visual-identity";
+import { BRAND_ASSETS } from "../../lib/brand-assets";
 
 const slug = Astro.params.slug ?? "";
 const job = await findPublishedJob(slug);
@@ -79,6 +81,9 @@ if (applicationEmail.normalized) {
   });
 }
 
+const identity = await getVisualIdentity();
+const siteLogo = identity.logoUrl || BRAND_ASSETS.logoHorizontalWebp;
+
 const jsonLd = buildJobPosting({
   title: record.normalizedTitle,
   description: record.descriptionHtml,
@@ -88,6 +93,7 @@ const jsonLd = buildJobPosting({
   workplaceType: record.workplaceType,
   companyName: job.companyName,
   companyWebsiteUrl: job.companyWebsiteUrl,
+  organizationLogoUrl: siteLogo,
   cityName: job.cityName,
   stateCode: job.stateCode,
   applicationUrl: record.applicationUrl,

@@ -48,10 +48,10 @@ describe("storage service", () => {
     expect(() => normalizeStorageKey("media/../../segredo.txt")).toThrow("inválido");
   });
 
-  it("gera URL local servida pelo Astro", async () => {
+  it("gera URL relativa local servida pelo Astro", async () => {
     await localRoot();
     expect(buildStoragePublicUrl("media/2026/imagem.png", "https://www.empregossaoluis.com.br"))
-      .toBe("https://empregossaoluis.com.br/api/uploads/media/2026/imagem.png");
+      .toBe("/api/uploads/media/2026/imagem.png");
   });
 
   it("não considera configuração S3 parcial", async () => {
