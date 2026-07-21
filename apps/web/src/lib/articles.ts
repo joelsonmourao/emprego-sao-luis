@@ -13,10 +13,11 @@ export function resolveSlLocalSeoSlug(slug: string): string | null {
   const exact = slLocalSlugMap.exact[slug as keyof typeof slLocalSlugMap.exact];
   if (exact) return exact;
   const match = String(slug).match(/^sl-local-(\d+)-/i);
-  if (!match) return null;
-  const key = match[1] as keyof typeof slLocalSlugMap.byNumber;
-  const padded = match[1].padStart(2, "0") as keyof typeof slLocalSlugMap.byNumber;
-  return slLocalSlugMap.byNumber[key] || slLocalSlugMap.byNumber[padded] || null;
+  const num = match?.[1];
+  if (!num) return null;
+  const padded = num.padStart(2, "0");
+  const byNumber = slLocalSlugMap.byNumber as Record<string, string>;
+  return byNumber[num] || byNumber[padded] || null;
 }
 
 function publishedWhere(now: Date, since?: Date, type?: ArticleType | ArticleType[]) {
