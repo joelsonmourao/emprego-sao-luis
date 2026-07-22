@@ -124,13 +124,12 @@ export const POST: APIRoute = async ({ params, request, locals, clientAddress })
       ...(typeof batch.settings === "object" && batch.settings ? batch.settings : {}),
       stage: "QUEUED_VALIDATION",
       mode: "DRY_RUN",
-      targetMode: mode.data === "DRY_RUN" ? "DRAFT" : mode.data,
+      targetMode: mode.data === "DRY_RUN" ? "PUBLISH_BY_DATE" : mode.data,
       analysisValid: false,
       sheetName: sheetName.data,
       mapping: mapping.data,
       duplicateStrategy: duplicateStrategy.data
     };
-
     await connection.db.transaction(async (tx) => {
       await tx
         .update(importBatches)
@@ -180,6 +179,7 @@ export const POST: APIRoute = async ({ params, request, locals, clientAddress })
               batchId: batch.id,
               storageKey: current.data.storageKey,
               mode: "DRY_RUN",
+              targetMode: mode.data === "DRY_RUN" ? "PUBLISH_BY_DATE" : mode.data,
               sheetName: sheetName.data,
               mapping: mapping.data,
               duplicateStrategy: duplicateStrategy.data,
@@ -202,6 +202,7 @@ export const POST: APIRoute = async ({ params, request, locals, clientAddress })
           batchId: batch.id,
           storageKey: current.data.storageKey,
           mode: "DRY_RUN",
+          targetMode: mode.data === "DRY_RUN" ? "PUBLISH_BY_DATE" : mode.data,
           sheetName: sheetName.data,
           mapping: mapping.data,
           duplicateStrategy: duplicateStrategy.data,

@@ -1,7 +1,7 @@
 import type { APIRoute } from "astro";
 import { createDatabase, importBatches } from "@es/db";
+import { importExecuteModeSchema } from "@es/shared";
 import { eq } from "drizzle-orm";
-import { z } from "zod";
 import {
   adminJsonError,
   adminJsonRedirect,
@@ -29,9 +29,7 @@ export const GET: APIRoute = () => adminMethodNotAllowed("POST");
 
 export const POST: APIRoute = async ({ params, request, locals }) => {
   if (!locals.auth || !can(locals.auth, "imports.manage")) return adminJsonError("Sem permissão.", 403);
-  const mode = z
-    .enum(["DRAFT", "PENDING_REVIEW"])
-    .safeParse((await request.formData()).get("mode"));
+  const mode = importExecuteModeSchema.safeParse((await request.formData()).get("mode"));
   if (!mode.success || !params.id || !process.env.DATABASE_URL)
     return adminJsonError("Dados inválidos.", 400);
 

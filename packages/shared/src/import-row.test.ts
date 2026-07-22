@@ -59,8 +59,9 @@ describe("spreadsheet import", () => {
     expect(parsed.success).toBe(false);
   });
 
-  it("never accepts direct publication as an import mode", () => {
+  it("accepts publish-by-date mode but not raw PUBLISHED", () => {
     expect(importModeSchema.parse("DRY_RUN")).toBe("DRY_RUN");
+    expect(importModeSchema.parse("PUBLISH_BY_DATE")).toBe("PUBLISH_BY_DATE");
     expect(importModeSchema.safeParse("PUBLISHED").success).toBe(false);
   });
 

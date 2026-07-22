@@ -23,6 +23,7 @@ import {
   importModeSchema,
   normalizeImportRow,
   parseBrazilianLocation,
+  resolveImportPublication,
   shouldSkipImportRow,
   suggestCategory,
   validateApplicationChannels
@@ -34,6 +35,8 @@ export interface ImportPayload {
   batchId: string;
   storageKey: string;
   mode: string;
+  /** Modo pretendido na validação (DRY_RUN), ex.: PUBLISH_BY_DATE — usado só para avisos/preview. */
+  targetMode?: string;
   sheetName?: string;
   mapping?: Record<string, string>;
   duplicateStrategy?: "IGNORE" | "UPDATE" | "CREATE_NEW";
@@ -201,6 +204,15 @@ export async function processImport(payload: ImportPayload) {
           ? availableCategories.find((item) => item.id === categorySuggestion.categoryId)
           : undefined);
       const channels = validateApplicationChannels(value);
+      const publicationMode =
+        mode === "DRY_RUN"
+          ? (payload.targetMode && payload.targetMode !== "DRY_RUN" ? payload.targetMode : "PUBLISH_BY_DATE")
+          : mode;
+      const publication = resolveImportPublication({
+        mode: publicationMode as "DRAFT" | "PENDING_REVIEW" | "PUBLISH_BY_DATE",
+        publishedAt: value.publishedAt ?? null,
+        expiresAt: value.expiresAt ?? null
+      });
       const quality = evaluateJobPublication({
         title: value.title,
         companyName: value.company,
@@ -213,15 +225,22 @@ export async function processImport(payload: ImportPayload) {
         applicationUrl: channels.url.normalized,
         applicationEmail: channels.email.normalized,
         applicationWhatsapp: channels.whatsapp.normalized,
-        publicationStatus: mode === "DRY_RUN" ? "PENDING_REVIEW" : mode,
-        verificationStatus: "NEEDS_REVIEW",
+        publicationStatus: publication.publicationStatus,
+        verificationStatus: publication.verificationStatus,
         expiresAt: value.expiresAt ?? null
       });
       const qualityWarnings = [
         ...quality.warnings,
+        ...(publication.warning ? [publication.warning] : []),
         ...(value.category && !category ? ["Categoria informada não existe; a vaga seguirá sem categoria."] : []),
         ...(!value.expiresAt
           ? ["dataEncerramento vazia: obrigatória antes da publicação pública (validThrough no JobPosting)."]
+          : []),
+        ...(publicationMode === "PUBLISH_BY_DATE" && publication.publicationStatus === "PUBLISHED"
+          ? ["Será publicada imediatamente (dataPublicacao ≤ agora)."]
+          : []),
+        ...(publicationMode === "PUBLISH_BY_DATE" && publication.publicationStatus === "SCHEDULED"
+          ? [`Será agendada para ${publication.scheduledAt?.toLocaleString("pt-BR", { timeZone: "America/Sao_Paulo" }) ?? "dataPublicacao"}.`]
           : [])
       ];
 
@@ -378,6 +397,7 @@ export async function processImport(payload: ImportPayload) {
             salaryVisible: existing.salaryVisible,
             publicationStatus: existing.publicationStatus,
             publishedAt: existing.publishedAt?.toISOString() ?? null,
+            scheduledAt: existing.scheduledAt?.toISOString() ?? null,
             categoryId: existing.categoryId
           }
         : null;
@@ -444,9 +464,10 @@ export async function processImport(payload: ImportPayload) {
           sourceUrl: value.sourceUrl ?? null,
           originType: "SPREADSHEET" as const,
           duplicateHash,
-          verificationStatus: "NEEDS_REVIEW" as const,
-          publicationStatus: mode,
-          publishedAt: null,
+          verificationStatus: publication.verificationStatus,
+          publicationStatus: publication.publicationStatus,
+          publishedAt: publication.publishedAt,
+          scheduledAt: publication.scheduledAt,
           expiresAt: value.expiresAt,
           salaryMin: salary.min?.toString() ?? null,
           salaryMax: salary.max?.toString() ?? null,

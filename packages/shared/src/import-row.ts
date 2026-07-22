@@ -2,6 +2,7 @@ import { createHash } from "node:crypto";
 import { z } from "zod";
 import { validateApplicationChannels } from "./application-channels.js";
 import { isTemplateExampleRow } from "./import-template.js";
+import { fromDatetimeLocalValue } from "./timezone.js";
 
 const normalizeText = (value: string) => value.normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim().toLowerCase();
 const optionalText = (max: number) =>
@@ -47,14 +48,16 @@ export function parseImportDate(value: unknown): Date | undefined {
     const minute = Number(br[5] ?? 0);
     const second = Number(br[6] ?? 0);
     if (month < 1 || month > 12 || day < 1 || day > 31) return undefined;
-    const date = new Date(Date.UTC(year, month - 1, day, hour, minute, second));
-    return Number.isNaN(date.getTime()) ? undefined : date;
+    const local = `${String(year).padStart(4, "0")}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}T${String(hour).padStart(2, "0")}:${String(minute).padStart(2, "0")}:${String(second).padStart(2, "0")}`;
+    return fromDatetimeLocalValue(local) ?? undefined;
   }
 
-  const isoDay = raw.match(/^(\d{4})-(\d{2})-(\d{2})(?:[T\s].*)?$/);
-  if (isoDay) {
-    const date = new Date(raw.includes("T") || raw.includes(" ") ? raw : `${raw}T00:00:00.000Z`);
-    return Number.isNaN(date.getTime()) ? undefined : date;
+  const isoDay = raw.match(/^(\d{4})-(\d{2})-(\d{2})(?:[T\s](\d{2}):(\d{2})(?::(\d{2}))?)?/);
+  if (isoDay && !raw.includes("Z") && !/[+-]\d{2}:?\d{2}$/.test(raw)) {
+    const hour = isoDay[4] ?? "00";
+    const minute = isoDay[5] ?? "00";
+    const second = isoDay[6] ?? "00";
+    return fromDatetimeLocalValue(`${isoDay[1]}-${isoDay[2]}-${isoDay[3]}T${hour}:${minute}:${second}`) ?? undefined;
   }
 
   const fallback = new Date(raw);
@@ -76,7 +79,7 @@ const workplaceType = z.preprocess((value) => {
   return "presencial";
 }, z.enum(["presencial", "hibrido", "remoto"]));
 
-export const importModeSchema = z.enum(["DRY_RUN", "DRAFT", "PENDING_REVIEW"]);
+export const importModeSchema = z.enum(["DRY_RUN", "DRAFT", "PENDING_REVIEW", "PUBLISH_BY_DATE"]);
 
 export const importJobRowSchema = z
   .object({

@@ -3,6 +3,7 @@ import AdminLayout from "../../../layouts/AdminLayout.astro";
 import { can } from "../../../lib/auth";
 import { getImportStorageInfo } from "../../../lib/import-storage";
 import { createDatabase, importBatches, importMappingTemplates, importRows } from "@es/db";
+import { isOfficialImportMappingReady } from "@es/shared";
 import { asc, desc, eq } from "drizzle-orm";
 
 const auth = Astro.locals.auth!;
@@ -13,6 +14,7 @@ if (!can(auth, "imports.manage")) {
 const batchId = Astro.url.searchParams.get("batch");
 const step = Astro.url.searchParams.get("step") ?? (batchId ? "mapear" : "arquivo");
 const reused = Astro.url.searchParams.get("reused") === "1";
+const autoValidated = Astro.url.searchParams.get("auto") === "1";
 
 let batch: (typeof importBatches.$inferSelect) | null = null;
 let templates: Array<{ id: string; name: string }> = [];
@@ -59,15 +61,19 @@ const config = batch?.settings as
   | {
       stage?: string;
       mode?: string;
+      targetMode?: string;
       sheets?: Array<{ name: string; headers: string[]; preview: Array<Record<string, unknown>> }>;
       sheetName?: string;
       mapping?: Record<string, string>;
       error?: string;
       failureRequestId?: string | null;
       analysisValid?: boolean;
+      autoMapped?: boolean;
       analysis?: { consolidation?: { sectionsMerged?: string[]; duplicateItemsRemoved?: number } };
     }
   | undefined;
+
+const mappingReady = isOfficialImportMappingReady(config?.mapping ?? {});
 
 const fields: Array<[string, string]> = [
   ["externalId", "ID (externo)"],
@@ -127,53 +133,60 @@ const steps = [
 
   <h1 class="mt-3 text-3xl font-black">Importar vagas</h1>
   <p class="mt-2 max-w-3xl text-[var(--text-secondary)]">
-    Envie a planilha, revise o mapeamento, valide os dados e só então confirme a importação.
-    Armazenamento: <strong>{storage.mode === "s3" ? "R2/S3" : "volume local"}</strong>.
+    Caminho rápido: baixe o modelo → preencha → envie → confirme. Com o modelo oficial, a validação começa sozinha.
   </p>
 
+  <ol class="mt-6 grid gap-3 md:grid-cols-3">
+    <li class="rounded-2xl border border-emerald-700/25 bg-emerald-50 p-4">
+      <p class="text-xs font-bold uppercase tracking-wide text-emerald-900/70">Passo 1</p>
+      <p class="mt-1 font-black text-emerald-950">Baixe e preencha o modelo</p>
+      <p class="mt-2 text-sm text-emerald-950/80">Use as colunas oficiais. Datas em DD/MM/AAAA.</p>
+    </li>
+    <li class="rounded-2xl border border-sky-700/20 bg-sky-50 p-4">
+      <p class="text-xs font-bold uppercase tracking-wide text-sky-900/70">Passo 2</p>
+      <p class="mt-1 font-black text-sky-950">Envie o Excel/CSV</p>
+      <p class="mt-2 text-sm text-sky-950/80">Se o cabeçalho bater com o modelo, validamos na hora.</p>
+    </li>
+    <li class="rounded-2xl border border-amber-700/25 bg-amber-50 p-4">
+      <p class="text-xs font-bold uppercase tracking-wide text-amber-900/70">Passo 3</p>
+      <p class="mt-1 font-black text-amber-950">Publique pela dataPublicacao</p>
+      <p class="mt-2 text-sm text-amber-950/80">Passada/hoje = publica. Futura = agenda. Sem data = rascunho.</p>
+    </li>
+  </ol>
+
   <section class="mt-6 rounded-2xl border-2 border-emerald-700/30 bg-emerald-50 p-6" aria-labelledby="import-model-title">
-    <h2 id="import-model-title" class="text-xl font-black text-emerald-950">1. Baixe o modelo oficial</h2>
+    <h2 id="import-model-title" class="text-xl font-black text-emerald-950">Modelo oficial</h2>
     <p class="mt-2 max-w-3xl text-sm text-emerald-950/80">
-      Planilha unificada SLZ (só cabeçalho + valores). Bairro e categoria são opcionais. URL, WhatsApp ou e-mail — basta um canal.
+      Prefira este arquivo. <strong>dataPublicacao</strong> controla publicação/agendamento;
+      <strong> dataEncerramento</strong> é obrigatória para ir ao ar.
     </p>
     <div class="mt-5 flex flex-wrap gap-3">
-      <a class="rounded-xl bg-emerald-700 px-5 py-3 text-base font-bold text-white shadow-sm" href="/modelos/modelo-importacao-vagas.xlsx" download>Baixar modelo Excel (.xlsx)</a>
-      <a class="rounded-xl border-2 border-emerald-700 bg-white px-5 py-3 text-base font-bold text-emerald-900" href="/api/admin/import-template.csv" data-admin-download data-filename="modelo-importacao-vagas.csv">Baixar modelo CSV</a>
-      <a class="rounded-xl border border-emerald-800/20 bg-white px-5 py-3 text-base font-bold text-emerald-950" href="/admin/vagas/importar-contatos">Importar por links ou contatos</a>
+      <a class="rounded-xl bg-emerald-700 px-5 py-3 text-base font-bold text-white shadow-sm" href="/modelos/modelo-importacao-vagas.xlsx" download>Baixar Excel (.xlsx)</a>
+      <a class="rounded-xl border-2 border-emerald-700 bg-white px-5 py-3 text-base font-bold text-emerald-900" href="/api/admin/import-template.csv" data-admin-download data-filename="modelo-importacao-vagas.csv">Baixar CSV</a>
+      <a class="rounded-xl border border-emerald-800/20 bg-white px-5 py-3 text-base font-bold text-emerald-950" href="/admin/vagas/importar-contatos">Importar por links</a>
     </div>
-    <details class="mt-5 rounded-xl border border-emerald-800/20 bg-white/70 p-4 open:shadow-sm">
-      <summary class="cursor-pointer text-base font-black text-emerald-950">Instruções — contrato da planilha</summary>
+    <details class="mt-5 rounded-xl border border-emerald-800/20 bg-white/70 p-4">
+      <summary class="cursor-pointer text-base font-black text-emerald-950">Regras da planilha (abrir se precisar)</summary>
       <div class="mt-3 space-y-3 text-sm text-emerald-950/90">
         <p>
-          <strong>Colunas (nessa ordem; extras são ignoráveis):</strong>
-          <code class="block break-all rounded bg-emerald-100/80 p-2 text-xs">
+          <strong>Colunas:</strong>
+          <code class="mt-1 block break-all rounded bg-emerald-100/80 p-2 text-xs">
             id, titulo, empresa, descricao, localidade, cidade, uf, modalidade, quantidadeVagas, salario,
             dataPublicacao, dataEncerramento, fonteNome, fonteUrl, categoria, bairro, candidaturaUrl,
             candidaturaEmail, candidaturaWhatsApp, mensagemWhatsApp, instrucoesCandidatura
           </code>
         </p>
         <ul class="list-disc space-y-1.5 pl-5">
-          <li><strong>id</strong> (opcional): identificador estável (ex. SLZ-ABC123DEF0). Vazio → o sistema gera um id interno. Usado na deduplicação.</li>
-          <li><strong>descricao</strong>: HTML (padrão JobPosting) ou texto. Não exige Markdown.</li>
-          <li><strong>localidade</strong>: condicional. Se <em>cidade</em> + <em>uf</em> estiverem preenchidos, pode ficar vazia.</li>
-          <li><strong>modalidade</strong>: Presencial | Hibrido | Remoto (maiúsculas/minúsculas ok). Interno: presencial, hibrido, remoto.</li>
-          <li><strong>Datas</strong>: DD/MM/AAAA (Brasil) ou AAAA-MM-DD. No JobPosting viram ISO 8601. <em>dataEncerramento</em> é necessária antes de publicar.</li>
-          <li><strong>fonteNome</strong>: obrigatório (InfoJobs, Indeed, LinkedIn…). Não misturar com candidaturaUrl.</li>
-          <li><strong>categoria</strong> / <strong>bairro</strong>: opcionais. Bairro nunca é inventado.</li>
-          <li><strong>Canais</strong>: pelo menos um entre candidaturaUrl, e-mail ou WhatsApp. mensagemWhatsApp e instrucoesCandidatura são opcionais.</li>
-          <li><strong>Deduplicação</strong>: 1) id → 2) candidaturaUrl → 3) titulo+empresa+cidade+uf.</li>
-          <li>Planilhas antigas (sem coluna id / com datas ISO) continuam válidas. A linha de exemplo é ignorada.</li>
+          <li><strong>Obrigatório:</strong> titulo, empresa, descricao, fonteNome + 1 canal (URL, e-mail ou WhatsApp).</li>
+          <li><strong>Local:</strong> localidade OU (cidade + uf).</li>
+          <li><strong>dataPublicacao:</strong> DD/MM/AAAA. Hoje/passado → publica; futuro → agenda; vazia → rascunho.</li>
+          <li><strong>dataEncerramento:</strong> necessária para publicar ou agendar.</li>
+          <li><strong>Deduplicação:</strong> id → candidaturaUrl → titulo+empresa+cidade+uf.</li>
+          <li>Linha de exemplo do modelo é ignorada. HTML na descrição é aceito.</li>
         </ul>
       </div>
     </details>
-    <ul class="mt-4 list-disc space-y-1 pl-5 text-sm text-emerald-950/80">
-      <li><strong>Obrigatório:</strong> titulo, empresa, descricao, fonteNome e ao menos um canal.</li>
-      <li><strong>Local:</strong> localidade OU (cidade + uf).</li>
-      <li>Erros aparecem por linha na validação (mensagem clara do campo).</li>
-    </ul>
   </section>
-
-  <p class="mt-6 text-sm font-bold uppercase tracking-wide text-[var(--text-secondary)]">2. Envie o arquivo preenchido</p>
 
   {loadError && (
     <p class="mt-6 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-900" role="alert">
@@ -205,8 +218,16 @@ const steps = [
 
   {batch && config?.stage === "CONFIGURE" && (
     <section class="mt-8 rounded-2xl border border-[var(--brand-border)] bg-white p-6">
-      <h2 class="text-xl font-black">Mapear colunas — {batch.fileName}</h2>
-      <p class="mt-2 text-sm text-[var(--text-secondary)]">Revise a aba, o destino e o mapeamento antes de validar.</p>
+      <h2 class="text-xl font-black">Revisar e validar — {batch.fileName}</h2>
+      {mappingReady ? (
+        <p class="mt-2 rounded-xl border border-emerald-200 bg-emerald-50 p-3 text-sm text-emerald-950">
+          Cabeçalhos do modelo detectados (inclui <strong>dataPublicacao</strong>). Pode validar direto.
+        </p>
+      ) : (
+        <p class="mt-2 text-sm text-[var(--text-secondary)]">
+          Ajuste o mapeamento das colunas obrigatórias e valide. Depois você escolhe publicar pela dataPublicacao.
+        </p>
+      )}
       <form class="mt-5 grid gap-4" method="post" action={`/api/admin/imports/${batch.id}/configure`}>
         <div class="grid gap-4 md:grid-cols-3">
           <label>
@@ -218,43 +239,47 @@ const steps = [
             </select>
           </label>
           <label>
-            Destino
+            Após validar, destino pretendido
             <select class="mt-1 w-full rounded-lg border p-3" name="mode">
+              <option value="PUBLISH_BY_DATE" selected>Publicar/agendar por dataPublicacao</option>
+              <option value="DRAFT">Só rascunho</option>
+              <option value="PENDING_REVIEW">Fila de revisão</option>
               <option value="DRY_RUN">Somente validar</option>
-              <option value="DRAFT">Rascunho</option>
-              <option value="PENDING_REVIEW">Revisão</option>
             </select>
           </label>
           <label>
             Duplicidades
             <select class="mt-1 w-full rounded-lg border p-3" name="duplicateStrategy">
-              <option value="IGNORE">Ignorar</option>
+              <option value="IGNORE">Ignorar duplicadas</option>
               <option value="UPDATE">Atualizar existente</option>
               <option value="CREATE_NEW">Importar como nova</option>
             </select>
           </label>
         </div>
-        <div class="grid gap-3 md:grid-cols-2">
-          {fields.map(([field, label]) => (
-            <label>
-              {label}{requiredFields.includes(field) && " *"}
-              <select class="mt-1 w-full rounded-lg border p-3" name={`map_${field}`} required={requiredFields.includes(field)}>
-                <option value="">Não mapear</option>
-                {headers.map((header) => (
-                  <option value={header} selected={config.mapping?.[field] === header}>{header}</option>
-                ))}
-              </select>
-            </label>
-          ))}
-        </div>
+        <details class="rounded-xl border p-4" open={!mappingReady}>
+          <summary class="cursor-pointer font-bold">Mapeamento de colunas {mappingReady ? "(já preenchido — opcional revisar)" : "*"}</summary>
+          <div class="mt-4 grid gap-3 md:grid-cols-2">
+            {fields.map(([field, label]) => (
+              <label>
+                {label}{requiredFields.includes(field) && " *"}
+                <select class="mt-1 w-full rounded-lg border p-3" name={`map_${field}`} required={requiredFields.includes(field)}>
+                  <option value="">Não mapear</option>
+                  {headers.map((header) => (
+                    <option value={header} selected={config.mapping?.[field] === header}>{header}</option>
+                  ))}
+                </select>
+              </label>
+            ))}
+          </div>
+        </details>
         <label>
-          Salvar modelo reutilizável
+          Salvar modelo reutilizável (opcional)
           <input class="mt-1 w-full rounded-lg border p-3" name="templateName" list="mapping-templates" />
           <datalist id="mapping-templates">
             {templates.map((item) => <option value={item.name} />)}
           </datalist>
         </label>
-        <button class="rounded-xl bg-red-700 p-4 font-bold text-white" type="submit">Validar e enfileirar</button>
+        <button class="rounded-xl bg-red-700 p-4 font-bold text-white" type="submit">Validar planilha</button>
       </form>
       <details class="mt-6">
         <summary class="cursor-pointer font-bold">Prévia das primeiras linhas</summary>
@@ -266,7 +291,12 @@ const steps = [
   {batch && config?.stage !== "CONFIGURE" && (
     <section class="mt-8 rounded-2xl border border-[var(--brand-border)] bg-white p-6">
       <h2 class="text-xl font-black">Lote {batch.fileName}</h2>
-      <p class="mt-2 text-sm">Status: <strong>{batch.status}</strong></p>
+      <p class="mt-2 text-sm">Status: <strong>{batch.status}</strong>{config?.stage ? ` · ${config.stage}` : ""}</p>
+      {autoValidated && (
+        <p class="mt-3 rounded-xl border border-emerald-200 bg-emerald-50 p-3 text-sm text-emerald-950" role="status">
+          Modelo oficial detectado: validação automática concluída. Confirme abaixo para importar.
+        </p>
+      )}
       {config?.stage === "FAILED" && (
         <div class="mt-4 rounded-xl border border-rose-200 bg-rose-50 p-4 text-sm text-rose-950" role="alert">
           <p><strong>Falha:</strong> {config.error || "A causa não foi registrada."}</p>
@@ -290,13 +320,23 @@ const steps = [
         >
           Baixar rejeitadas
         </a>}
-        {batch.status === "COMPLETED" && config?.stage === "VALIDATED" && config.analysisValid && batch.validRows > 0 && <form method="post" action={`/api/admin/imports/${batch.id}/execute`}>
-          <select class="rounded-l-lg border p-2" name="mode">
-            <option value="DRAFT">Importar rascunhos</option>
-            <option value="PENDING_REVIEW">Enviar para revisão</option>
-          </select>
-          <button class="rounded-r-lg bg-slate-950 p-2 text-white" type="submit">Executar lote validado</button>
-        </form>}
+        {batch.status === "COMPLETED" && config?.stage === "VALIDATED" && config.analysisValid && batch.validRows > 0 && (
+          <form class="flex w-full max-w-xl flex-col gap-3 rounded-2xl border-2 border-amber-300 bg-amber-50 p-4" method="post" action={`/api/admin/imports/${batch.id}/execute`}>
+            <p class="text-sm font-bold text-amber-950">Importar vagas válidas</p>
+            <label class="text-sm text-amber-950/90">
+              Como publicar
+              <select class="mt-1 w-full rounded-lg border border-amber-300 bg-white p-3 font-semibold" name="mode">
+                <option value="PUBLISH_BY_DATE" selected>Usar dataPublicacao (publicar ou agendar)</option>
+                <option value="DRAFT">Importar só como rascunho</option>
+                <option value="PENDING_REVIEW">Enviar para revisão</option>
+              </select>
+            </label>
+            <p class="text-xs text-amber-950/80">
+              dataPublicacao ≤ agora → publica já. Futura → agenda. Sem data ou sem dataEncerramento válida → rascunho/revisão.
+            </p>
+            <button class="rounded-xl bg-red-700 px-4 py-3 font-bold text-white" type="submit">Confirmar importação</button>
+          </form>
+        )}
         {batch.status === "COMPLETED" && config?.stage === "IMPORTED" && !batch.undoneAt && (
           <form method="post" action={`/api/admin/imports/${batch.id}/undo`}>
             <button class="rounded-lg border border-red-300 px-4 py-2 text-red-700" type="submit">Desfazer lote</button>
@@ -345,23 +385,17 @@ const steps = [
 
   {!batch && (
     <section class="mt-8 max-w-2xl rounded-2xl border border-[var(--brand-border)] bg-white p-6">
-      <h2 class="text-xl font-black">Selecionar arquivo</h2>
-      <p class="mt-2 text-sm text-[var(--text-secondary)]">O envio apenas analisa o arquivo. A importação só começa após confirmação.</p>
+      <h2 class="text-xl font-black">Enviar planilha</h2>
+      <p class="mt-2 text-sm text-[var(--text-secondary)]">
+        Com o modelo oficial, validamos automaticamente. A importação real só acontece depois que você confirmar.
+      </p>
       <form id="import-upload-form" class="mt-5 grid gap-5" method="post" action="/api/admin/imports" enctype="multipart/form-data">
         <label>
           Arquivo XLSX ou CSV
           <input class="mt-2 block w-full rounded-lg border p-3" type="file" name="file" accept=".xlsx,.csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,text/csv" required />
         </label>
-        <label>
-          Destino inicial
-          <select class="mt-2 block w-full rounded-lg border p-3" name="mode">
-            <option value="DRY_RUN">Somente validar</option>
-            <option value="DRAFT">Rascunho</option>
-            <option value="PENDING_REVIEW">Revisão</option>
-          </select>
-        </label>
         <button class="rounded-xl bg-red-700 p-4 font-bold text-white" type="submit">
-          Analisar arquivo
+          Enviar e validar
         </button>
       </form>
     </section>

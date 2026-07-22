@@ -44,6 +44,7 @@ const snapshotSchema = z.object({
     "ARCHIVED"
   ]),
   publishedAt: z.string().nullable(),
+  scheduledAt: z.string().nullable().optional(),
   categoryId: z.string().uuid().nullable()
 });
 
@@ -96,6 +97,7 @@ export const POST: APIRoute = async ({ params, locals }) => {
               ...value,
               expiresAt: value.expiresAt ? new Date(value.expiresAt) : null,
               publishedAt: value.publishedAt ? new Date(value.publishedAt) : null,
+              scheduledAt: value.scheduledAt ? new Date(value.scheduledAt) : null,
               updatedAt: new Date()
             })
             .where(eq(jobs.id, row.jobId));

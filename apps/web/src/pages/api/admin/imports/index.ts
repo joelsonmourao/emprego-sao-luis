@@ -1,10 +1,11 @@
 import { createHash } from "node:crypto";
 import type { APIRoute } from "astro";
-import { importModeSchema, suggestImportMapping } from "@es/shared";
+import { isOfficialImportMappingReady, suggestImportMapping } from "@es/shared";
 import { createDatabase, importBatches } from "@es/db";
 import { desc, eq } from "drizzle-orm";
 import { can } from "../../../../lib/auth";
 import { adminJsonError, adminJsonRedirect, adminMethodNotAllowed } from "../../../../lib/admin-api-response";
+import { processImport } from "../../../../lib/import-processor";
 import { logServerError } from "../../../../lib/server-error";
 import { getImportFile, getImportStorageInfo, putImportFile } from "../../../../lib/import-storage";
 import * as XLSX from "xlsx";
@@ -28,10 +29,9 @@ export const POST: APIRoute = async ({ request, locals }) => {
   }
 
   const file = form.get("file");
-  const mode = importModeSchema.safeParse(form.get("mode"));
-  if (!(file instanceof File) || !mode.success) {
-    return adminJsonError("Arquivo ou modo inválido.", 400, {
-      details: ["Envie um arquivo XLSX/CSV e selecione o destino."]
+  if (!(file instanceof File)) {
+    return adminJsonError("Arquivo inválido.", 400, {
+      details: ["Envie um arquivo XLSX ou CSV no modelo oficial."]
     });
   }
 
@@ -116,6 +116,8 @@ export const POST: APIRoute = async ({ request, locals }) => {
     }
 
     const first = sheets[0]!;
+    const mapping = suggestImportMapping(first.headers);
+    const autoReady = isOfficialImportMappingReady(mapping);
     const [batch] = await connection.db.transaction(async (tx) => {
       if (existing?.status === "FAILED") {
         const previousSettings =
@@ -141,17 +143,18 @@ export const POST: APIRoute = async ({ request, locals }) => {
           fileHash,
           fileName: file.name,
           settings: {
-            stage: "CONFIGURE",
+            stage: autoReady ? "QUEUED_VALIDATION" : "CONFIGURE",
             storageKey,
-            mode: mode.data,
-            targetMode: mode.data === "DRY_RUN" ? "DRAFT" : mode.data,
+            mode: "DRY_RUN",
+            targetMode: "PUBLISH_BY_DATE",
             sheets,
             sheetName: first.name,
-            mapping: suggestImportMapping(first.headers),
+            mapping,
             duplicateStrategy: "IGNORE",
             contentHashAlgorithm: "sha256",
             retryOf: existing?.status === "FAILED" ? existing.id : null,
-            analysisValid: false
+            analysisValid: false,
+            autoMapped: autoReady
           },
           createdBy: auth.id
         })
@@ -161,6 +164,32 @@ export const POST: APIRoute = async ({ request, locals }) => {
     if (!batch) {
       logServerError("route:/api/admin/imports:batch", new Error("Falha ao criar lote."));
       return adminJsonError("Não foi possível criar o lote.", 500);
+    }
+
+    if (autoReady) {
+      try {
+        await processImport({
+          batchId: batch.id,
+          storageKey,
+          mode: "DRY_RUN",
+          targetMode: "PUBLISH_BY_DATE",
+          sheetName: first.name,
+          mapping,
+          duplicateStrategy: "IGNORE",
+          ...(locals.requestId ? { requestId: locals.requestId } : {})
+        });
+        return adminJsonRedirect(`/admin/vagas/importar?batch=${batch.id}&step=resultado&auto=1`, {
+          batchId: batch.id,
+          autoValidated: true,
+          retryOf: existing?.status === "FAILED" ? existing.id : null
+        });
+      } catch (error) {
+        logServerError("route:/api/admin/imports:auto-validate", error);
+        return adminJsonRedirect(`/admin/vagas/importar?batch=${batch.id}&step=mapear`, {
+          batchId: batch.id,
+          warning: "Validação automática falhou. Revise o mapeamento e tente de novo."
+        });
+      }
     }
 
     return adminJsonRedirect(`/admin/vagas/importar?batch=${batch.id}&step=mapear`, {
