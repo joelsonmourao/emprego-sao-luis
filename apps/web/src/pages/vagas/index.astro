@@ -4,6 +4,7 @@ import Breadcrumbs from "../../components/ui/Breadcrumbs.astro";
 import EmptyState from "../../components/ui/EmptyState.astro";
 import JobCard from "../../components/ui/JobCard.astro";
 import PageHero from "../../components/ui/PageHero.astro";
+import Pagination from "../../components/ui/Pagination.astro";
 import { categories, cities, companies, createDatabase, jobs, neighborhoods, states } from "@es/db";
 import { and, asc, count, desc, eq, gt, ilike, or, sql, type SQL } from "drizzle-orm";
 
@@ -73,7 +74,13 @@ if (process.env.DATABASE_URL) {
 }
 
 const pages = Math.max(1, Math.ceil(total / pageSize));
-const pageUrl = (target: number) => { const params = new URLSearchParams(Astro.url.searchParams); params.set("pagina", String(target)); return `?${params}`; };
+const pageUrl = (target: number) => {
+  const params = new URLSearchParams(Astro.url.searchParams);
+  if (target <= 1) params.delete("pagina");
+  else params.set("pagina", String(target));
+  const query = params.toString();
+  return query ? `?${query}` : "/vagas";
+};
 const clearUrl = "/vagas";
 const activeFilters = [
   q && ["Cargo", q],
@@ -169,13 +176,7 @@ const itemListSchema = {
             </div>
           )}
 
-          <nav class="mt-8 flex items-center justify-between" aria-label="Paginação">
-            <span class="text-sm text-[var(--es-muted)]">Página {page} de {pages}</span>
-            <div class="flex gap-2">
-              {page > 1 && <a class="es-btn es-btn-secondary" href={pageUrl(page - 1)}>Anterior</a>}
-              {page < pages && <a class="es-btn es-btn-secondary" href={pageUrl(page + 1)}>Próxima</a>}
-            </div>
-          </nav>
+          <Pagination current={page} pages={pages} hrefForPage={pageUrl} />
         </div>
       </div>
     </div>

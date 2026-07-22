@@ -19,13 +19,13 @@ const input = {
 };
 
 describe("JobPosting", () => {
-  it("uses the hiring company and puts baseSalary value 0 when salary absent", () => {
+  it("uses the hiring company and puts QuantitativeValue 0 with unitText when salary absent", () => {
     const result = buildJobPosting(input)!;
     expect(result.hiringOrganization.name).toBe("Empresa Real");
     expect(result.baseSalary).toEqual({
       "@type": "MonetaryAmount",
       currency: "BRL",
-      value: 0
+      value: { "@type": "QuantitativeValue", value: 0, unitText: "MONTH" }
     });
     expect(result.identifier).toEqual({ "@type": "PropertyValue", name: "Código ES", value: "ES-000123" });
     expect(result).not.toHaveProperty("directApply");
@@ -71,12 +71,12 @@ describe("JobPosting", () => {
     ]);
   });
 
-  it("puts MonetaryAmount value 0 when salary amounts are missing", () => {
+  it("puts QuantitativeValue value 0 with unitText when salary amounts are missing", () => {
     const result = buildJobPosting({ ...input, salaryVisible: true })!;
     expect(result.baseSalary).toEqual({
       "@type": "MonetaryAmount",
       currency: "BRL",
-      value: 0
+      value: { "@type": "QuantitativeValue", value: 0, unitText: "MONTH" }
     });
   });
 

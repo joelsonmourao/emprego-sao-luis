@@ -3,6 +3,7 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
 import Breadcrumbs from "../../components/ui/Breadcrumbs.astro";
 import EmptyState from "../../components/ui/EmptyState.astro";
 import PageHero from "../../components/ui/PageHero.astro";
+import Pagination from "../../components/ui/Pagination.astro";
 import { listPublishedArticlesPage } from "../../lib/articles";
 
 const pageSize = 12;
@@ -61,19 +62,7 @@ const canonical = new URL(current > 1 ? `/blog?pagina=${current}` : "/blog", Ast
               </li>
             ))}
           </ul>
-          {pages > 1 && (
-            <nav class="mt-8 flex items-center justify-between" aria-label="Paginação">
-              <span class="text-sm text-[var(--text-secondary)]">Página {current} de {pages}</span>
-              <div class="flex gap-2">
-                {current > 1 && (
-                  <a class="rounded-xl border bg-white px-4 py-2 text-sm font-semibold" href={pageUrl(current - 1)}>Anterior</a>
-                )}
-                {current < pages && (
-                  <a class="rounded-xl border bg-white px-4 py-2 text-sm font-semibold" href={pageUrl(current + 1)}>Próxima</a>
-                )}
-              </div>
-            </nav>
-          )}
+          <Pagination current={current} pages={pages} hrefForPage={pageUrl} />
         </>
       )}
     </div>

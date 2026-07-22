@@ -71,44 +71,41 @@ export function buildJobPosting(input: JobPostingInput) {
     !input.companyName.trim()
   )
     return null;
-  const salaryMin = input.salaryMin != null && String(input.salaryMin).trim() !== ""
-    ? Number(input.salaryMin)
-    : undefined;
-  const salaryMax = input.salaryMax != null && String(input.salaryMax).trim() !== ""
-    ? Number(input.salaryMax)
-    : undefined;
-  const hasSalaryNumber =
-    Boolean(input.salaryVisible) &&
-    ((salaryMin !== undefined && Number.isFinite(salaryMin)) ||
-      (salaryMax !== undefined && Number.isFinite(salaryMax)));
-  // Google espera MonetaryAmount.value = número OU QuantitativeValue.
-  // Sem salário informado: value fica direto em MonetaryAmount (não aninhado).
-  const baseSalary = hasSalaryNumber
-    ? {
-        "@type": "MonetaryAmount",
-        currency: input.salaryCurrency || "BRL",
-        value: {
+  const salaryMin =
+    input.salaryMin != null && String(input.salaryMin).trim() !== ""
+      ? Number(input.salaryMin)
+      : undefined;
+  const salaryMax =
+    input.salaryMax != null && String(input.salaryMax).trim() !== ""
+      ? Number(input.salaryMax)
+      : undefined;
+  const validMin = salaryMin !== undefined && Number.isFinite(salaryMin) && salaryMin > 0 ? salaryMin : undefined;
+  const validMax = salaryMax !== undefined && Number.isFinite(salaryMax) && salaryMax > 0 ? salaryMax : undefined;
+  const hasSalaryNumber = Boolean(input.salaryVisible) && (validMin !== undefined || validMax !== undefined);
+  const unitText = input.salaryPeriod?.trim() || "MONTH";
+
+  // Google JobPosting: MonetaryAmount.value deve ser QuantitativeValue com value/min/max + unitText.
+  const baseSalary = {
+    "@type": "MonetaryAmount",
+    currency: input.salaryCurrency || "BRL",
+    value: hasSalaryNumber
+      ? {
           "@type": "QuantitativeValue",
-          ...(salaryMin !== undefined && Number.isFinite(salaryMin) ? { minValue: salaryMin } : {}),
-          ...(salaryMax !== undefined && Number.isFinite(salaryMax) ? { maxValue: salaryMax } : {}),
-          ...(salaryMin !== undefined &&
-          Number.isFinite(salaryMin) &&
-          (salaryMax === undefined || !Number.isFinite(salaryMax))
-            ? { value: salaryMin }
+          ...(validMin !== undefined ? { minValue: validMin } : {}),
+          ...(validMax !== undefined ? { maxValue: validMax } : {}),
+          ...(validMin !== undefined && validMax === undefined ? { value: validMin } : {}),
+          ...(validMax !== undefined && validMin === undefined ? { value: validMax } : {}),
+          ...(validMin !== undefined && validMax !== undefined && validMin === validMax
+            ? { value: validMin }
             : {}),
-          ...(salaryMax !== undefined &&
-          Number.isFinite(salaryMax) &&
-          (salaryMin === undefined || !Number.isFinite(salaryMin))
-            ? { value: salaryMax }
-            : {}),
-          unitText: input.salaryPeriod || "MONTH"
+          unitText
         }
-      }
-    : {
-        "@type": "MonetaryAmount",
-        currency: input.salaryCurrency || "BRL",
-        value: 0
-      };
+      : {
+          "@type": "QuantitativeValue",
+          value: 0,
+          unitText
+        }
+  };
   const brandLogos = DEFAULT_ORG_LOGOS.map((path) => ({
     "@type": "ImageObject" as const,
     url: absoluteAssetUrl(path)!
