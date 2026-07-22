@@ -27,6 +27,7 @@ import {
   parseBrazilianLocation,
   resolveImportPublication,
   shouldSkipImportRow,
+  splitImportQualityErrors,
   suggestCategory,
   UNIDENTIFIED_COMPANY_ID,
   validateApplicationChannels
@@ -282,7 +283,7 @@ export async function processImport(payload: ImportPayload) {
       });
       const quality = evaluateJobPublication({
         title: value.title,
-        companyName: value.company,
+        companyName: confidentialCompany ? "Empresa parceira" : value.company,
         description: content.descriptionHtml,
         cityName: value.city,
         stateCode: value.state,
@@ -292,12 +293,14 @@ export async function processImport(payload: ImportPayload) {
         applicationUrl: channels.url.normalized,
         applicationEmail: channels.email.normalized,
         applicationWhatsapp: channels.whatsapp.normalized,
-        publicationStatus: publication.publicationStatus,
-        verificationStatus: publication.verificationStatus,
+        publicationStatus: "DRAFT",
+        verificationStatus: "NEEDS_REVIEW",
         expiresAt: value.expiresAt ?? null
       });
+      const { blocking: blockingQuality, soft: softQuality } = splitImportQualityErrors(quality.errors);
       const qualityWarnings = [
         ...quality.warnings,
+        ...softQuality,
         ...(publication.warning ? [publication.warning] : []),
         ...autoCreateNotes,
         ...(mode === "DRY_RUN" && !company && !confidentialCompany
@@ -324,7 +327,7 @@ export async function processImport(payload: ImportPayload) {
         mode !== "DRY_RUN" && !company ? "Empresa não cadastrada." : null,
         !state ? "UF não cadastrada." : null,
         mode !== "DRY_RUN" && !city ? "Cidade não cadastrada." : null,
-        ...quality.errors
+        ...blockingQuality
       ].filter((item): item is string => item !== null);
 
       if (relationErrors.length) {
