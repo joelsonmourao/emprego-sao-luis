@@ -21,11 +21,14 @@ import {
   formatImportRowErrors,
   importJobRowSchema,
   importModeSchema,
+  isConfidentialCompanyName,
+  normalizeEntityKey,
   normalizeImportRow,
   parseBrazilianLocation,
   resolveImportPublication,
   shouldSkipImportRow,
   suggestCategory,
+  UNIDENTIFIED_COMPANY_ID,
   validateApplicationChannels
 } from "@es/shared";
 import * as XLSX from "xlsx";
@@ -163,19 +166,79 @@ export async function processImport(payload: ImportPayload) {
       });
       content.report.sectionsMerged.forEach((section) => consolidatedSections.add(section));
       duplicateContentItemsRemoved += content.report.duplicateItemsRemoved;
-      const [company] = await connection.db
-        .select()
-        .from(companies)
-        .where(sql`lower(${companies.name}) = lower(${value.company})`)
-        .limit(1);
       const [state] = await connection.db.select().from(states).where(eq(states.code, value.state)).limit(1);
-      const [city] = state
+      let [city] = state
         ? await connection.db
             .select()
             .from(cities)
             .where(and(eq(cities.stateId, state.id), sql`lower(${cities.name}) = lower(${value.city})`))
             .limit(1)
         : [];
+      const confidentialCompany = isConfidentialCompanyName(value.company);
+      let [company] = confidentialCompany
+        ? await connection.db.select().from(companies).where(eq(companies.id, UNIDENTIFIED_COMPANY_ID)).limit(1)
+        : await connection.db
+            .select()
+            .from(companies)
+            .where(
+              sql`lower(${companies.name}) = lower(${value.company}) or lower(coalesce(${companies.publicName}, '')) = lower(${value.company}) or ${companies.normalizedName} = ${normalizeEntityKey(value.company)}`
+            )
+            .limit(1);
+
+      const autoCreateNotes: string[] = [];
+      if (mode !== "DRY_RUN" && state && !city) {
+        const baseSlug = slugify(value.city);
+        let slug = baseSlug || "cidade";
+        let suffix = 2;
+        while (true) {
+          const [slugHit] = await connection.db
+            .select({ id: cities.id })
+            .from(cities)
+            .where(and(eq(cities.stateId, state.id), eq(cities.slug, slug)))
+            .limit(1);
+          if (!slugHit) break;
+          slug = `${baseSlug}-${suffix}`;
+          suffix += 1;
+        }
+        const [createdCity] = await connection.db
+          .insert(cities)
+          .values({
+            name: value.city,
+            normalizedName: normalizeEntityKey(value.city),
+            slug,
+            stateId: state.id,
+            active: true
+          })
+          .returning();
+        city = createdCity;
+        autoCreateNotes.push(`Cidade cadastrada automaticamente: ${value.city}/${value.state}.`);
+      }
+
+      if (mode !== "DRY_RUN" && !company && !confidentialCompany) {
+        const baseSlug = slugify(value.company);
+        let slug = baseSlug || "empresa";
+        let suffix = 2;
+        while (true) {
+          const [slugHit] = await connection.db.select({ id: companies.id }).from(companies).where(eq(companies.slug, slug)).limit(1);
+          if (!slugHit) break;
+          slug = `${baseSlug}-${suffix}`;
+          suffix += 1;
+        }
+        const [createdCompany] = await connection.db
+          .insert(companies)
+          .values({
+            name: value.company,
+            publicName: value.company,
+            normalizedName: normalizeEntityKey(value.company),
+            slug,
+            cityId: city?.id ?? null,
+            active: true
+          })
+          .returning();
+        company = createdCompany;
+        autoCreateNotes.push(`Empresa cadastrada automaticamente: ${value.company}.`);
+      }
+
       const category = value.category
         ? availableCategories.find((item) => item.name.localeCompare(value.category!, "pt-BR", { sensitivity: "base" }) === 0)
         : undefined;
@@ -196,12 +259,17 @@ export async function processImport(payload: ImportPayload) {
           active: rule.active
         }))
       );
-      const selectedCategory =
+      let selectedCategory =
         category ??
         ((categorySuggestion.level === "HIGH" || categorySuggestion.level === "MEDIUM") &&
         categorySuggestion.categoryId
           ? availableCategories.find((item) => item.id === categorySuggestion.categoryId)
           : undefined);
+      const categoryMismatch =
+        Boolean(value.category && category && categorySuggestion.level === "HIGH" && categorySuggestion.categoryName && categorySuggestion.categoryName !== category.name);
+      if (categoryMismatch && categorySuggestion.categoryId) {
+        selectedCategory = availableCategories.find((item) => item.id === categorySuggestion.categoryId) ?? selectedCategory;
+      }
       const channels = validateApplicationChannels(value);
       const publicationMode =
         mode === "DRY_RUN"
@@ -231,7 +299,16 @@ export async function processImport(payload: ImportPayload) {
       const qualityWarnings = [
         ...quality.warnings,
         ...(publication.warning ? [publication.warning] : []),
-        ...(value.category && !category ? ["Categoria informada não existe; a vaga seguirá sem categoria."] : []),
+        ...autoCreateNotes,
+        ...(mode === "DRY_RUN" && !company && !confidentialCompany
+          ? [`Empresa será cadastrada automaticamente: ${value.company}.`]
+          : []),
+        ...(mode === "DRY_RUN" && confidentialCompany ? ["Empresa confidencial → contratante não identificada."] : []),
+        ...(mode === "DRY_RUN" && state && !city ? [`Cidade será cadastrada automaticamente: ${value.city}/${value.state}.`] : []),
+        ...(value.category && !category ? ["Categoria informada não existe; usando sugestão automática quando houver."] : []),
+        ...(categoryMismatch && categorySuggestion.categoryName
+          ? [`Categoria "${value.category}" incompatível; usando sugestão: ${categorySuggestion.categoryName}.`]
+          : []),
         ...(!value.expiresAt
           ? ["dataEncerramento vazia: obrigatória antes da publicação pública (validThrough no JobPosting)."]
           : []),
@@ -244,13 +321,10 @@ export async function processImport(payload: ImportPayload) {
       ];
 
       const relationErrors = [
-        !company ? "Empresa não cadastrada." : null,
+        mode !== "DRY_RUN" && !company ? "Empresa não cadastrada." : null,
         !state ? "UF não cadastrada." : null,
-        !city ? "Cidade não cadastrada." : null,
-        ...quality.errors,
-        value.category && category && categorySuggestion.level === "HIGH" && categorySuggestion.categoryName && categorySuggestion.categoryName !== category.name
-          ? `Categoria incompatível com o conteúdo; sugestão: ${categorySuggestion.categoryName}.`
-          : null
+        mode !== "DRY_RUN" && !city ? "Cidade não cadastrada." : null,
+        ...quality.errors
       ].filter((item): item is string => item !== null);
 
       if (relationErrors.length) {
@@ -277,9 +351,11 @@ export async function processImport(payload: ImportPayload) {
         city: value.city,
         state: value.state
       });
-      // Fingerprint titulo+empresa+cidade+uf; inclui companyId/cityId para estabilidade no banco.
+      const companyKey = company?.id ?? `name:${normalizeEntityKey(value.company)}`;
+      const cityKey = city?.id ?? `name:${normalizeEntityKey(value.city)}|${value.state}`;
+      // Fingerprint titulo+empresa+cidade+uf; inclui companyId/cityId quando já existem.
       const duplicateHash = createHash("sha256")
-        .update(`${contentDuplicateHash}|${company!.id}|${city!.id}`)
+        .update(`${contentDuplicateHash}|${companyKey}|${cityKey}`)
         .digest("hex");
 
       const [externalExisting] = await connection.db
@@ -295,7 +371,7 @@ export async function processImport(payload: ImportPayload) {
           : [];
 
       const legacyHash = createHash("sha256")
-        .update(`${value.title}|${company!.id}|${city!.id}`)
+        .update(`${value.title}|${companyKey}|${cityKey}`)
         .digest("hex");
       const [hashExisting] =
         !externalExisting && !urlExisting
@@ -351,7 +427,14 @@ export async function processImport(payload: ImportPayload) {
           batchId: payload.batchId,
           rowNumber: position + 2,
           raw,
-          normalized: value,
+          normalized: {
+            ...value,
+            _publication: {
+              status: publication.publicationStatus,
+              publishedAt: publication.publishedAt?.toISOString() ?? null,
+              scheduledAt: publication.scheduledAt?.toISOString() ?? null
+            }
+          },
           errors: [],
           warnings: qualityWarnings,
           suggestions: {

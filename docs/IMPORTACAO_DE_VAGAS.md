@@ -44,6 +44,10 @@ Colunas extras na planilha são ignoráveis. Planilhas antigas (sem `id`, datas 
 2. Preencher e enviar — cabeçalho oficial valida sozinho
 3. Confirmar com **Usar dataPublicacao (publicar ou agendar)**
 
+Empresa e cidade da planilha são **criadas automaticamente** se ainda não existirem.  
+Nomes “Confidencial” usam a contratante não identificada.  
+Categoria incompatível vira aviso + sugestão (não rejeita a linha).
+
 ## Publicação / JobPosting
 
 Modo padrão de execução: `PUBLISH_BY_DATE`. Schema.org `JobPosting.description` usa HTML (`descriptionHtml`). Datas no schema saem em ISO 8601. Vagas `SCHEDULED` sobem quando o worker processa `scheduledAt`.
