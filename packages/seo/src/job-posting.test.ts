@@ -25,7 +25,7 @@ describe("JobPosting", () => {
     expect(result.baseSalary).toEqual({
       "@type": "MonetaryAmount",
       currency: "BRL",
-      value: { "@type": "QuantitativeValue", value: "0" }
+      value: 0
     });
     expect(result.identifier).toEqual({ "@type": "PropertyValue", name: "Código ES", value: "ES-000123" });
     expect(result).not.toHaveProperty("directApply");
@@ -71,11 +71,13 @@ describe("JobPosting", () => {
     ]);
   });
 
-  it("puts QuantitativeValue value 0 when salary amounts are missing", () => {
+  it("puts MonetaryAmount value 0 when salary amounts are missing", () => {
     const result = buildJobPosting({ ...input, salaryVisible: true })!;
-    expect(result.baseSalary.value).toEqual(
-      expect.objectContaining({ "@type": "QuantitativeValue", value: "0" })
-    );
+    expect(result.baseSalary).toEqual({
+      "@type": "MonetaryAmount",
+      currency: "BRL",
+      value: 0
+    });
   });
 
   it("keeps min/max when salary is informed", () => {

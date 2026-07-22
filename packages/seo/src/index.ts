@@ -81,20 +81,34 @@ export function buildJobPosting(input: JobPostingInput) {
     Boolean(input.salaryVisible) &&
     ((salaryMin !== undefined && Number.isFinite(salaryMin)) ||
       (salaryMax !== undefined && Number.isFinite(salaryMax)));
-  const baseSalary = {
-    "@type": "MonetaryAmount",
-    currency: input.salaryCurrency || "BRL",
-    value: {
-      "@type": "QuantitativeValue",
-      ...(hasSalaryNumber
-        ? {
-            ...(salaryMin !== undefined && Number.isFinite(salaryMin) ? { minValue: salaryMin } : {}),
-            ...(salaryMax !== undefined && Number.isFinite(salaryMax) ? { maxValue: salaryMax } : {})
-          }
-        : { value: "0" }),
-      ...(hasSalaryNumber && input.salaryPeriod ? { unitText: input.salaryPeriod } : {})
-    }
-  };
+  // Google espera MonetaryAmount.value = número OU QuantitativeValue.
+  // Sem salário informado: value fica direto em MonetaryAmount (não aninhado).
+  const baseSalary = hasSalaryNumber
+    ? {
+        "@type": "MonetaryAmount",
+        currency: input.salaryCurrency || "BRL",
+        value: {
+          "@type": "QuantitativeValue",
+          ...(salaryMin !== undefined && Number.isFinite(salaryMin) ? { minValue: salaryMin } : {}),
+          ...(salaryMax !== undefined && Number.isFinite(salaryMax) ? { maxValue: salaryMax } : {}),
+          ...(salaryMin !== undefined &&
+          Number.isFinite(salaryMin) &&
+          (salaryMax === undefined || !Number.isFinite(salaryMax))
+            ? { value: salaryMin }
+            : {}),
+          ...(salaryMax !== undefined &&
+          Number.isFinite(salaryMax) &&
+          (salaryMin === undefined || !Number.isFinite(salaryMin))
+            ? { value: salaryMax }
+            : {}),
+          unitText: input.salaryPeriod || "MONTH"
+        }
+      }
+    : {
+        "@type": "MonetaryAmount",
+        currency: input.salaryCurrency || "BRL",
+        value: 0
+      };
   const brandLogos = DEFAULT_ORG_LOGOS.map((path) => ({
     "@type": "ImageObject" as const,
     url: absoluteAssetUrl(path)!

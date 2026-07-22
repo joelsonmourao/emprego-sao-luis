@@ -123,6 +123,8 @@ const salary = formatSalary(record);
 const shareUrl = canonicalUrl;
 const descriptionHtml = formatJobDescriptionHtml(record.descriptionHtml);
 const noindex = record.publicationStatus !== "PUBLISHED" || !acceptingApplications;
+const isCandidate = Boolean(Astro.locals.candidate);
+const saveStatus = Astro.url.searchParams.get("salvar");
 ---
 <BaseLayout
   title={record.seoTitle || `${record.normalizedTitle} — Empregos São Luís`}
@@ -187,14 +189,6 @@ const noindex = record.publicationStatus !== "PUBLISHED" || !acceptingApplicatio
 
           <AdSlot slot="job-content-mid" pageType="job" citySlug={job.citySlug} companySlug={job.companySlug} workplaceType={record.workplaceType} />
 
-          <section class="mt-8 rounded-2xl border border-[var(--es-border)] bg-[var(--es-cream)] p-5">
-            <h2 class="font-display text-lg font-black">Fonte da oportunidade</h2>
-            <p class="mt-2 text-sm text-[var(--es-muted)]">
-              {record.sourceUrl ? <a class="font-semibold underline" href={record.sourceUrl} rel="nofollow noopener noreferrer">{record.sourceName}</a> : record.sourceName}
-            </p>
-            <p class="mt-2 text-xs text-[var(--es-muted)]">A fonte indica onde a oportunidade foi encontrada. Use os canais de candidatura exibidos separadamente.</p>
-          </section>
-
           <section class="mt-8 rounded-2xl border border-amber-200 bg-amber-50 p-5">
             <h2 class="font-display text-lg font-black text-amber-950">Aviso de segurança</h2>
             <p class="mt-2 text-sm text-amber-900">Nunca pague para conseguir emprego. Confirme se o canal de candidatura é oficial da empresa. <a class="underline" href="/seguranca-candidatos">Saiba mais</a>.</p>
@@ -207,6 +201,12 @@ const noindex = record.publicationStatus !== "PUBLISHED" || !acceptingApplicatio
             channels={channels}
             placement="footer"
           />
+
+          <section class="mt-8 rounded-2xl border border-[var(--es-border)] bg-[var(--es-cream)] p-5">
+            <h2 class="font-display text-lg font-black">Fonte da oportunidade</h2>
+            <p class="mt-2 text-sm font-semibold text-[var(--text-primary)]">{record.sourceName}</p>
+            <p class="mt-2 text-xs text-[var(--es-muted)]">A fonte indica onde a oportunidade foi encontrada. Use os canais de candidatura exibidos acima.</p>
+          </section>
 
           <div class="mt-8">
             <JobInstagramCta />
@@ -229,11 +229,23 @@ const noindex = record.publicationStatus !== "PUBLISHED" || !acceptingApplicatio
               <h2 class="font-display text-xl font-black">Candidatura gratuita</h2>
               <p class="text-sm text-[var(--es-muted)]">Canais no final da página, sem cadastro obrigatório.</p>
               <a class="es-btn es-btn-primary w-full py-3 text-center" href="#candidatura-footer">Ver canais de candidatura</a>
-              <form method="post" action="/api/account/saved-jobs">
-                <input type="hidden" name="jobId" value={record.id} />
-                <input type="hidden" name="action" value="save" />
-                <button class="es-btn es-btn-secondary w-full" type="submit">Salvar vaga</button>
-              </form>
+              {isCandidate ? (
+                <form method="post" action="/api/account/saved-jobs">
+                  <input type="hidden" name="jobId" value={record.id} />
+                  <input type="hidden" name="action" value="save" />
+                  <input type="hidden" name="returnTo" value={`/vagas/${record.slug}`} />
+                  <button class="es-btn es-btn-secondary w-full" type="submit">Salvar vaga</button>
+                </form>
+              ) : (
+                <a
+                  class="es-btn es-btn-secondary w-full text-center"
+                  href={`/entrar?next=${encodeURIComponent(`/vagas/${record.slug}`)}&motivo=salvar-vaga`}
+                >
+                  Entrar para salvar vaga
+                </a>
+              )}
+              {saveStatus === "ok" && <p class="text-sm font-semibold text-emerald-700">Vaga salva na sua conta.</p>}
+              {saveStatus === "erro" && <p class="text-sm font-semibold text-red-700">Não foi possível salvar agora.</p>}
               <SocialShare title={record.normalizedTitle} url={shareUrl} summary={record.summary} />
             </div>
           )}
