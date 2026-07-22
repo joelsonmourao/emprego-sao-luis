@@ -1,6 +1,7 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
 import Breadcrumbs from "./ui/Breadcrumbs.astro";
+import { normalizeEditorialHtml } from "@es/shared";
 import { getInstitutionalPage } from "../lib/site-pages";
 
 interface Props {
@@ -10,6 +11,7 @@ interface Props {
 
 const { slug, showContactForm = slug === "contato" } = Astro.props;
 const page = await getInstitutionalPage(slug);
+const contentHtml = normalizeEditorialHtml(page.contentHtml, { baseHeadingLevel: 2 });
 const sent = Astro.url.searchParams.get("sent") === "1";
 const protocol = Astro.url.searchParams.get("protocolo");
 const error = Astro.url.searchParams.get("error");
@@ -32,7 +34,7 @@ const categories = [
       <Breadcrumbs items={[{ name: "Início", url: "/" }, { name: page.title }]} />
       <p class="es-kicker mt-6">Institucional</p>
       <h1 class="font-display mt-2 text-4xl font-black sm:text-5xl">{page.title}</h1>
-      <div class="es-prose mt-8 rounded-3xl border border-[var(--brand-border)] bg-[var(--brand-surface)] p-6 sm:p-8" set:html={page.contentHtml} />
+      <div class="es-prose mt-8 rounded-3xl border border-[var(--brand-border)] bg-[var(--brand-surface)] p-6 sm:p-8" set:html={contentHtml} />
       {showContactForm && (
         <section class="es-card mt-8 p-6 sm:p-8">
           <h2 class="font-display text-2xl font-black">Envie sua mensagem</h2>

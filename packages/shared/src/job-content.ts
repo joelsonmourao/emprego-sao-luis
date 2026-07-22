@@ -178,6 +178,11 @@ export function formatJobDescriptionHtml(html: string): string {
   return richTextFromInput(html, { baseHeadingLevel: 2 });
 }
 
+/** Normaliza HTML, Markdown ou texto puro para HTML editorial (vagas e postagens). */
+export function normalizeEditorialHtml(input: string, options?: { baseHeadingLevel?: number }) {
+  return richTextFromInput(input, options);
+}
+
 function normalizeBlock(value: unknown): string[] {
   const values = Array.isArray(value) ? value : typeof value === "string" ? value.split(/\r?\n|;/) : [];
   return values

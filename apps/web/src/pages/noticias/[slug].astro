@@ -7,6 +7,7 @@ import {
   findPublishedSlLocalByNumber,
   resolveSlLocalSeoSlug
 } from "../../lib/articles";
+import { normalizeEditorialHtml } from "@es/shared";
 
 const slug = Astro.params.slug!;
 const seoFromLegacy = resolveSlLocalSeoSlug(slug);
@@ -29,6 +30,7 @@ if (!result) {
   });
 }
 const { article, authorName } = result;
+const contentHtml = normalizeEditorialHtml(article.contentHtml, { baseHeadingLevel: 2 });
 const canonical = article.canonicalUrl ?? new URL(`/noticias/${article.slug}`, Astro.site).toString();
 const variants = article.coverImageVariants && typeof article.coverImageVariants === "object"
   ? article.coverImageVariants as Record<string, { url?: string; width?: number; height?: number }>
@@ -70,7 +72,7 @@ const jsonLd = {
           {(article.coverImageCaption || article.coverImageCredit) && <figcaption class="mt-2 text-sm text-[var(--es-muted)]">{article.coverImageCaption}{article.coverImageCaption && article.coverImageCredit ? " · " : ""}{article.coverImageCredit ? `Crédito: ${article.coverImageCredit}` : ""}</figcaption>}
         </figure>
       )}
-      <div class="es-prose mt-8 max-w-none text-[1.05rem] leading-8" set:html={article.contentHtml} />
+      <div class="es-prose mt-8 max-w-none text-[1.05rem] leading-8" set:html={contentHtml} />
       {article.sourceUrl && <p class="mt-8 text-sm">Fonte: <a class="underline" href={article.sourceUrl} rel="nofollow noopener">{article.sourceName ?? "fonte original"}</a></p>}
       <div class="mt-8 flex flex-wrap gap-3">
         <a class="es-btn es-btn-secondary" href={`https://wa.me/?text=${encodeURIComponent(`${article.title} - ${canonical}`)}`} rel="noopener noreferrer">Compartilhar</a>

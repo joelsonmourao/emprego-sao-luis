@@ -13,7 +13,7 @@ export const IMPORT_TEMPLATE_FIELDS = [
     key: "description",
     label: "descricao",
     required: true,
-    description: "Descrição completa em HTML (padrão JobPosting) ou texto. Não exige Markdown. Mínimo ~80 caracteres úteis."
+    description: "Descrição completa em HTML ou Markdown (padrão JobPosting). Mínimo ~80 caracteres úteis."
   },
   {
     key: "locality",

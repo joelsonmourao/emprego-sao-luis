@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { normalizeEditorialHtml, plainTextFromHtml } from "@es/shared";
 import { slugify } from "./slug";
 
 const optionalUrl = z.union([z.string().trim().url(), z.literal("")]).optional();
@@ -128,7 +129,11 @@ export function parseArticleForm(form: FormData, now = new Date()) {
       details: []
     };
   }
-  const plainLength = parsed.data.contentHtml.replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim().length;
+  const contentHtml = normalizeEditorialHtml(parsed.data.contentHtml, { baseHeadingLevel: 2 });
+  if (!contentHtml.trim()) {
+    return { ok: false as const, error: "Conteúdo vazio após normalizar HTML/Markdown.", details: [] };
+  }
+  const plainLength = plainTextFromHtml(contentHtml).length;
   const sourceLines = (parsed.data.sources ?? "").split(/\r?\n/).map((line) => line.trim()).filter(Boolean);
   const sources = sourceLines.map((line) => {
     const [name, url] = line.split("|").map((part) => part.trim());
@@ -174,7 +179,7 @@ export function parseArticleForm(form: FormData, now = new Date()) {
       subtitle: nullable(parsed.data.subtitle),
       slug,
       excerpt: parsed.data.excerpt,
-      contentHtml: parsed.data.contentHtml,
+      contentHtml,
       coverImageUrl: nullable(parsed.data.coverImageUrl),
       coverImageAlt: nullable(parsed.data.coverImageAlt),
       coverImageCaption: nullable(parsed.data.coverImageCaption),

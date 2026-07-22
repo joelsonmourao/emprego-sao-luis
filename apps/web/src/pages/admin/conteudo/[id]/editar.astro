@@ -58,7 +58,11 @@ const localDate = (value: Date | null) => toDatetimeLocalValue(value);
       <label>Subtítulo<input class="mt-1 w-full rounded-lg border p-3" name="subtitle" value={article.subtitle ?? ""}/></label>
       <label>Slug<input class="mt-1 w-full rounded-lg border p-3" name="slug" value={article.slug} required/></label>
       <label>Resumo<textarea class="mt-1 w-full rounded-lg border p-3" name="excerpt" required>{article.excerpt}</textarea></label>
-      <label>Conteúdo HTML<textarea class="mt-1 min-h-72 w-full rounded-lg border p-3 font-mono" name="contentHtml" required>{article.contentHtml}</textarea></label>
+      <label>
+        Conteúdo (HTML ou Markdown)
+        <textarea class="mt-1 min-h-72 w-full rounded-lg border p-3 font-mono text-sm" name="contentHtml" required>{article.contentHtml}</textarea>
+        <span class="mt-1 block text-xs text-slate-500">Aceita HTML ou Markdown. Ao salvar, o conteúdo é normalizado para HTML.</span>
+      </label>
       <div class="grid gap-4 md:grid-cols-2">
         <label>Imagem principal da biblioteca<input class="mt-1 w-full rounded-lg border p-3" name="coverImageUrl" value={article.coverImageUrl ?? ""}/></label>
         <label>Texto alternativo (ALT)<input class="mt-1 w-full rounded-lg border p-3" name="coverImageAlt" value={article.coverImageAlt ?? ""}/></label>

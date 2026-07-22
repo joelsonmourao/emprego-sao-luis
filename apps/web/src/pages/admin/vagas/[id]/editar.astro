@@ -4,7 +4,7 @@ import { eq } from "drizzle-orm";
 import AdminLayout from "../../../../layouts/AdminLayout.astro";
 import { getJobFormOptions, EMPLOYMENT_TYPES, WORKPLACE_TYPES } from "../../../../lib/admin-data";
 import { can } from "../../../../lib/auth";
-import { plainTextFromHtml, toDatetimeLocalValue, UNIDENTIFIED_COMPANY_ID } from "@es/shared";
+import { toDatetimeLocalValue, UNIDENTIFIED_COMPANY_ID } from "@es/shared";
 import { validateJobPosting } from "@es/seo";
 
 const auth = Astro.locals.auth!;
@@ -73,7 +73,14 @@ const localDate = (value: Date | null) => toDatetimeLocalValue(value);
       <label>Jornada<input class="mt-1 w-full rounded-lg border p-3" name="schedule" value={job.schedule ?? ""}/></label>
     </div>
     <div class="grid gap-4 md:grid-cols-2"><label>Contrato<select class="mt-1 w-full rounded-lg border p-3" name="employmentType">{EMPLOYMENT_TYPES.map((value)=><option value={value} selected={value===job.employmentType}>{value}</option>)}</select></label><label>Modalidade<select class="mt-1 w-full rounded-lg border p-3" name="workplaceType">{WORKPLACE_TYPES.map((value)=><option value={value.value} selected={value.value===job.workplaceType}>{value.label}</option>)}</select></label></div>
-    <section><h2 class="text-lg font-black">Descrição da vaga</h2><label class="mt-2 block">Conteúdo completo<textarea class="mt-1 min-h-64 w-full rounded-lg border p-3" name="descriptionHtml" minlength="80" required>{plainTextFromHtml(job.descriptionHtml)}</textarea></label><p class="mt-1 text-xs text-slate-500">Campo editorial único usado no portal e nos dados estruturados.</p></section>
+    <section>
+      <h2 class="text-lg font-black">Descrição da vaga</h2>
+      <label class="mt-2 block">
+        Conteúdo completo (HTML ou Markdown)
+        <textarea class="mt-1 min-h-64 w-full rounded-lg border p-3 font-mono text-sm" name="descriptionHtml" minlength="80" required>{job.descriptionHtml}</textarea>
+      </label>
+      <p class="mt-1 text-xs text-slate-500">Aceita HTML ou Markdown. Ao salvar, o conteúdo é normalizado para HTML estruturado (portal + JobPosting).</p>
+    </section>
     <div class="grid gap-4 md:grid-cols-2">
       <label>Site de candidatura (opcional)<input class="mt-1 w-full rounded-lg border p-3" type="url" name="applicationUrl" value={job.applicationUrl ?? ""}/></label><label>Fonte<input class="mt-1 w-full rounded-lg border p-3" name="sourceName" value={job.sourceName} required/></label>
       <label>E-mail de candidatura (opcional)<input class="mt-1 w-full rounded-lg border p-3" type="email" name="applicationEmail" value={job.applicationEmail ?? ""}/></label><label>Assunto do e-mail (opcional)<input class="mt-1 w-full rounded-lg border p-3" name="applicationEmailSubject" value={job.applicationEmailSubject ?? ""}/></label>

@@ -1,5 +1,6 @@
 import type { APIRoute } from "astro";
 import { auditLogs, createDatabase } from "@es/db";
+import { normalizeEditorialHtml } from "@es/shared";
 import { z } from "zod";
 import { can } from "../../../lib/auth";
 import { INSTITUTIONAL_SLUGS, saveInstitutionalPages } from "../../../lib/site-pages";
@@ -27,7 +28,7 @@ export const POST: APIRoute = async ({ request, locals, redirect, clientAddress 
     seoTitle: parsed.data.seoTitle,
     metaDescription: parsed.data.metaDescription,
     canonicalPath: parsed.data.canonicalPath,
-    contentHtml: parsed.data.contentHtml,
+    contentHtml: normalizeEditorialHtml(parsed.data.contentHtml, { baseHeadingLevel: 2 }),
     published: parsed.data.published === "1"
   };
 

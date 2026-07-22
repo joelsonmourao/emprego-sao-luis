@@ -30,7 +30,11 @@ const saved = Astro.url.searchParams.get("saved") === "1";
         <label class="grid gap-1 text-sm font-semibold">SEO title<input class="rounded-lg border p-3" name="seoTitle" value={current.seoTitle} required /></label>
         <label class="grid gap-1 text-sm font-semibold">Meta description<textarea class="rounded-lg border p-3" name="metaDescription" required>{current.metaDescription}</textarea></label>
         <label class="grid gap-1 text-sm font-semibold">Canonical path<input class="rounded-lg border p-3" name="canonicalPath" value={current.canonicalPath} required /></label>
-        <label class="grid gap-1 text-sm font-semibold">Conteúdo HTML<textarea class="min-h-48 rounded-lg border p-3 font-mono text-sm" name="contentHtml" required>{current.contentHtml}</textarea></label>
+        <label class="grid gap-1 text-sm font-semibold">
+          Conteúdo (HTML ou Markdown)
+          <textarea class="min-h-48 rounded-lg border p-3 font-mono text-sm" name="contentHtml" required>{current.contentHtml}</textarea>
+          <span class="text-xs font-normal text-slate-500">Aceita HTML ou Markdown; ao salvar é convertido para HTML.</span>
+        </label>
         <label class="flex items-center gap-2 text-sm"><input type="checkbox" name="published" value="1" checked={current.published} /><span>Publicada</span></label>
       </div>
       <button class="mt-5 rounded-lg bg-slate-900 px-5 py-3 font-bold text-white">Salvar página</button>

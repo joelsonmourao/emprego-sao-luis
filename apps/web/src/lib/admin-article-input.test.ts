@@ -48,4 +48,17 @@ describe("article form", () => {
       expect(parsed.details.some((item) => /seoTitle/i.test(item))).toBe(true);
     }
   });
+
+  it("converte Markdown em HTML ao salvar", () => {
+    const form = validForm();
+    form.set("contentHtml", "## Abertura\n\nTexto com **destaque**.\n\n- item um\n- item dois");
+    const parsed = parseArticleForm(form);
+    expect(parsed.ok).toBe(true);
+    if (parsed.ok) {
+      expect(parsed.data.contentHtml).toContain("<h");
+      expect(parsed.data.contentHtml).toContain("<strong>");
+      expect(parsed.data.contentHtml).toContain("<ul>");
+      expect(parsed.data.contentHtml).toContain("<li>");
+    }
+  });
 });

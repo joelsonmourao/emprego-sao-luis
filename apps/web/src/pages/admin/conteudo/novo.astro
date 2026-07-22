@@ -68,7 +68,11 @@ const preferredTemplate = Astro.url.searchParams.get("template") === "POST_MAGNE
     <label>Subtítulo<input class="mt-1 w-full rounded-lg border p-3" name="subtitle" /></label>
     <label>Slug<input class="mt-1 w-full rounded-lg border p-3" name="slug" placeholder="gerado pelo título" /></label>
     <label>Resumo<textarea class="mt-1 w-full rounded-lg border p-3" name="excerpt" minlength="10" required></textarea></label>
-    <label>Conteúdo HTML<textarea id="article-content" class="mt-1 min-h-72 w-full rounded-lg border p-3 font-mono" name="contentHtml" minlength="20" required></textarea></label>
+    <label>
+      Conteúdo (HTML ou Markdown)
+      <textarea id="article-content" class="mt-1 min-h-72 w-full rounded-lg border p-3 font-mono text-sm" name="contentHtml" minlength="20" required placeholder={"## Título\n\nTexto em **Markdown** ou HTML.\n\n- item 1\n- item 2"}></textarea>
+      <span class="mt-1 block text-xs text-slate-500">Cole HTML completo ou Markdown (`##`, listas `-`, `**negrito**`, links `[texto](url)`). O sistema converte e armazena HTML seguro.</span>
+    </label>
     <label>Palavra-chave principal<input class="mt-1 w-full rounded-lg border p-3" name="primaryKeyword" maxlength="180" /></label>
     <div class="grid gap-4 md:grid-cols-2">
       <label>Imagem principal da biblioteca<input class="mt-1 w-full rounded-lg border p-3" name="coverImageUrl" type="url" /><span class="mt-1 block text-xs text-slate-500">Para publicar, use mídia processada com original de pelo menos 1200 px.</span></label><label>Texto alternativo (ALT)<input class="mt-1 w-full rounded-lg border p-3" name="coverImageAlt" /></label>

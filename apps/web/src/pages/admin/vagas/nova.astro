@@ -171,10 +171,10 @@ const formData = {
     <section class="grid gap-4">
       <h2 class="text-lg font-black">Descrição da vaga</h2>
       <label>
-        Conteúdo completo
-        <textarea class="mt-1 min-h-64 w-full rounded-lg border p-3" name="descriptionHtml" minlength="80" required placeholder="Reúna aqui a descrição, atividades, requisitos, benefícios e demais informações, sem repetir conteúdo."></textarea>
-        <span class="mt-1 block text-xs text-[var(--text-secondary)]">Este é o único conteúdo editorial exibido na página pública e usado no JobPosting.</span>
-      </label>
+      Conteúdo completo
+      <textarea class="mt-1 min-h-64 w-full rounded-lg border p-3 font-mono text-sm" name="descriptionHtml" minlength="80" required placeholder={"Aceita HTML ou Markdown.\n\n## Requisitos\n- Experiência\n- Ensino médio\n\n<p>Também pode colar HTML.</p>"}></textarea>
+      <span class="mt-1 block text-xs text-[var(--text-secondary)]">Aceita <strong>HTML</strong> ou <strong>Markdown</strong>. O portal converte e salva em HTML para a página pública e o JobPosting.</span>
+    </label>
       <label>Jornada/horário<input class="mt-1 w-full rounded-lg border p-3" name="schedule" /></label>
     </section>
 
