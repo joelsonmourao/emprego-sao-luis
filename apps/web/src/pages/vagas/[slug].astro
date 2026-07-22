@@ -4,13 +4,16 @@ import AdSlot from "../../components/AdSlot.astro";
 import ApplicationChannels from "../../components/ApplicationChannels.astro";
 import Breadcrumbs from "../../components/ui/Breadcrumbs.astro";
 import JobCard from "../../components/ui/JobCard.astro";
+import JobInstagramCta from "../../components/JobInstagramCta.astro";
 import SectionHeading from "../../components/ui/SectionHeading.astro";
+import SocialShare from "../../components/SocialShare.astro";
 import { buildJobPosting } from "@es/seo";
 import {
   buildMailtoUrl,
   buildWhatsappUrl,
   defaultEmailSubject,
   defaultWhatsappMessage,
+  formatJobDescriptionHtml,
   normalizeApplicationEmail,
   normalizeApplicationUrl,
   normalizeApplicationWhatsapp
@@ -84,7 +87,7 @@ const orgLogo = job.companyLogoUrl?.trim() || BRAND_ASSETS.iconWebp;
 
 const jsonLd = buildJobPosting({
   title: record.normalizedTitle,
-  description: record.descriptionHtml,
+  description: formatJobDescriptionHtml(record.descriptionHtml),
   publishedAt: record.publishedAt,
   expiresAt: record.expiresAt,
   employmentType: record.employmentType,
@@ -113,10 +116,12 @@ const related = await listRelatedJobs({
   companyId: record.companyId,
   categoryId: record.categoryId,
   cityId: record.cityId,
+  title: record.normalizedTitle,
   limit: 4
 });
 const salary = formatSalary(record);
 const shareUrl = canonicalUrl;
+const descriptionHtml = formatJobDescriptionHtml(record.descriptionHtml);
 const noindex = record.publicationStatus !== "PUBLISHED" || !acceptingApplications;
 ---
 <BaseLayout
@@ -177,7 +182,7 @@ const noindex = record.publicationStatus !== "PUBLISHED" || !acceptingApplicatio
 
           <section class="mt-8">
             <h2 class="font-display text-2xl font-black">Descrição da vaga</h2>
-            <div class="es-prose mt-4 max-w-none" set:html={record.descriptionHtml} />
+            <div class="es-prose mt-4 max-w-none" set:html={descriptionHtml} />
           </section>
 
           <AdSlot slot="job-content-mid" pageType="job" citySlug={job.citySlug} companySlug={job.companySlug} workplaceType={record.workplaceType} />
@@ -203,6 +208,10 @@ const noindex = record.publicationStatus !== "PUBLISHED" || !acceptingApplicatio
             placement="footer"
           />
 
+          <div class="mt-8">
+            <JobInstagramCta />
+          </div>
+
           {related.length > 0 && (
             <section class="mt-10">
               <SectionHeading title="Vagas relacionadas" />
@@ -214,6 +223,7 @@ const noindex = record.publicationStatus !== "PUBLISHED" || !acceptingApplicatio
         </article>
 
         <aside class="space-y-5">
+          <JobInstagramCta />
           {acceptingApplications && (
             <div class="es-card sticky top-24 space-y-4 p-6" id="candidatura">
               <h2 class="font-display text-xl font-black">Candidatura gratuita</h2>
@@ -224,10 +234,12 @@ const noindex = record.publicationStatus !== "PUBLISHED" || !acceptingApplicatio
                 <input type="hidden" name="action" value="save" />
                 <button class="es-btn es-btn-secondary w-full" type="submit">Salvar vaga</button>
               </form>
-              <div class="grid grid-cols-2 gap-2 text-sm">
-                <a class="es-btn es-btn-secondary" href={`https://wa.me/?text=${encodeURIComponent(`${record.normalizedTitle} - ${shareUrl}`)}`} rel="noopener noreferrer">Compartilhar</a>
-                <button class="es-btn es-btn-secondary" type="button" data-share-url={shareUrl} id="copy-share-link">Copiar link</button>
-              </div>
+              <SocialShare title={record.normalizedTitle} url={shareUrl} summary={record.summary} />
+            </div>
+          )}
+          {!acceptingApplications && (
+            <div class="es-card space-y-4 p-6">
+              <SocialShare title={record.normalizedTitle} url={shareUrl} summary={record.summary} />
             </div>
           )}
           {!record.confidentialCompany && (
@@ -244,10 +256,4 @@ const noindex = record.publicationStatus !== "PUBLISHED" || !acceptingApplicatio
       </div>
     </div>
   </section>
-  <script is:inline>
-    document.getElementById("copy-share-link")?.addEventListener("click", () => {
-      const url = document.getElementById("copy-share-link")?.getAttribute("data-share-url");
-      if (url) navigator.clipboard?.writeText(url);
-    });
-  </script>
 </BaseLayout>

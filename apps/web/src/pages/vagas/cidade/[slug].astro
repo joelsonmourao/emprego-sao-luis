@@ -1,11 +1,22 @@
 ---
 import BaseLayout from "../../../layouts/BaseLayout.astro";
+import JobCard from "../../../components/ui/JobCard.astro";
 import { cities, companies, createDatabase, jobs, states } from "@es/db";
 import { and, desc, eq, gt, sql } from "drizzle-orm";
 
 const slug = Astro.params.slug ?? "";
 let city: { id: string; name: string; state: string; seoTitle: string | null; metaDescription: string | null } | undefined;
-let rows: Array<{ title: string; slug: string; company: string }> = [];
+let rows: Array<{
+  title: string;
+  slug: string;
+  company: string;
+  city: string;
+  state: string;
+  workplace: string;
+  contract: string | null;
+  publishedAt: Date | null;
+  logoUrl: string | null;
+}> = [];
 
 if (process.env.DATABASE_URL) {
   const connection = createDatabase(process.env.DATABASE_URL);
@@ -23,17 +34,26 @@ if (process.env.DATABASE_URL) {
       .where(and(eq(cities.slug, slug), eq(cities.active, true)))
       .limit(1);
     if (city) {
-      rows = await connection.db
+      const jobRows = await connection.db
         .select({
           title: jobs.normalizedTitle,
           slug: jobs.slug,
-          company: sql<string>`case when ${jobs.confidentialCompany} then 'Empresa confidencial' else coalesce(${companies.publicName}, ${companies.name}) end`
+          company: sql<string>`case when ${jobs.confidentialCompany} then 'Empresa confidencial' else coalesce(${companies.publicName}, ${companies.name}) end`,
+          workplace: jobs.workplaceType,
+          contract: jobs.employmentType,
+          publishedAt: jobs.publishedAt,
+          logoUrl: sql<string | null>`case when ${jobs.confidentialCompany} then null else ${companies.logoUrl} end`
         })
         .from(jobs)
         .innerJoin(companies, eq(jobs.companyId, companies.id))
         .where(and(eq(jobs.cityId, city.id), eq(jobs.publicationStatus, "PUBLISHED"), gt(jobs.expiresAt, new Date())))
         .orderBy(desc(jobs.publishedAt))
         .limit(50);
+      rows = jobRows.map((job) => ({
+        ...job,
+        city: city!.name,
+        state: city!.state
+      }));
     }
   } finally {
     await connection.close();
@@ -59,33 +79,30 @@ const description =
     ? "Vagas e empregos SLZ em São Luís/MA. Confira oportunidades atualizadas na capital maranhense."
     : `Oportunidades abertas em ${city.name}/${city.state}.`);
 const h1 = isSaoLuis ? "Vagas em São Luís (SLZ)" : `Vagas em ${city.name}/${city.state}`;
-// São Luís always indexable when has jobs; other cities need SEO fields or jobs.
 const noindex = rows.length === 0 || (!isSaoLuis && !city.seoTitle && !city.metaDescription);
+const canonical = new URL(`/vagas/cidade/${slug}`, Astro.site).toString();
 ---
-<BaseLayout title={title} description={description} noindex={noindex}>
-  <section class="mx-auto max-w-5xl px-4 py-12">
-    <nav class="text-sm text-slate-600">
-      <a href="/">Início</a> / <a href="/vagas">Vagas</a> / {city.name}
-    </nav>
-    <h1 class="mt-4 text-4xl font-black">{h1}</h1>
-    {isSaoLuis && (
-      <p class="mt-3 max-w-2xl text-slate-600">
-        SLZ é a sigla de São Luís. Veja também a página
-        <a class="font-semibold text-red-700 underline" href="/vagas-slz">Vagas SLZ e Empregos SLZ</a>
-        com o resumo das oportunidades na capital.
-      </p>
-    )}
-    <div class="mt-8 grid gap-3">
-      {rows.length ? (
-        rows.map((job) => (
-          <a class="rounded-xl border bg-white p-5" href={`/vagas/${job.slug}`}>
-            <strong>{job.title}</strong>
-            <span class="mt-1 block text-sm text-slate-600">{job.company}</span>
-          </a>
-        ))
-      ) : (
-        <p class="rounded-xl border bg-white p-5">Nenhuma vaga ativa nesta cidade.</p>
+<BaseLayout title={title} description={description} canonical={canonical} noindex={noindex}>
+  <section class="es-section bg-white pt-8">
+    <div class="es-container">
+      <nav class="text-sm text-[var(--es-muted)]">
+        <a href="/">Início</a> / <a href="/cidades">Cidades</a> / {city.name}
+      </nav>
+      <h1 class="font-display mt-4 text-4xl font-black">{h1}</h1>
+      {isSaoLuis && (
+        <p class="mt-3 max-w-2xl text-[var(--es-muted)]">
+          SLZ é a sigla de São Luís. Veja também a página
+          <a class="font-semibold text-[var(--brand-primary)] underline" href="/vagas-slz">Vagas SLZ e Empregos SLZ</a>
+          com o resumo das oportunidades na capital.
+        </p>
       )}
+      <div class="mt-8 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+        {rows.length ? (
+          rows.map((job) => <JobCard {...job} compact />)
+        ) : (
+          <p class="es-card p-5 md:col-span-2 xl:col-span-3">Nenhuma vaga ativa nesta cidade.</p>
+        )}
+      </div>
     </div>
   </section>
 </BaseLayout>

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { consolidateJobContent } from "./job-content.js";
+import { consolidateJobContent, formatJobDescriptionHtml, markdownToHtml } from "./job-content.js";
 
 describe("consolidateJobContent", () => {
   it("preserves section order and removes repeated items", () => {
@@ -24,5 +24,24 @@ describe("consolidateJobContent", () => {
       description: "<script>alert(1)</script>Descrição segura e suficientemente completa para publicação."
     });
     expect(result.descriptionHtml).not.toContain("<script>");
+  });
+
+  it("formats markdown lists and headings", () => {
+    const html = markdownToHtml("## Requisitos\n- CNH\n- Experiência\n\nTexto final.", {
+      baseHeadingLevel: 2
+    });
+    expect(html).toContain("<h3>");
+    expect(html).toContain("<ul>");
+    expect(html).toContain("<li>");
+    expect(html).toContain("<p>");
+  });
+
+  it("repairs wall-of-text descriptions for display", () => {
+    const html = formatJobDescriptionHtml(
+      "Atividades:\n- Atender clientes\n- Organizar filas\n\nRequisitos:\n1. Ensino médio"
+    );
+    expect(html).toContain("<h3>");
+    expect(html).toContain("<ul>");
+    expect(html).toContain("<ol>");
   });
 });

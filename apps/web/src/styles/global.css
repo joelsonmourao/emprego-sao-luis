@@ -122,7 +122,11 @@ textarea:focus-visible {
 .es-prose h2 { margin-top: 1.75rem; font-size: 1.35rem; font-weight: 800; }
 .es-prose h3 { margin-top: 1.25rem; font-size: 1.1rem; font-weight: 700; }
 .es-prose ul { margin-top: 0.75rem; list-style: disc; padding-left: 1.25rem; }
+.es-prose ol { margin-top: 0.75rem; list-style: decimal; padding-left: 1.25rem; }
+.es-prose li + li { margin-top: 0.35rem; }
+.es-prose strong { font-weight: 700; }
 .es-prose a { color: var(--brand-primary); text-decoration: underline; }
+.es-prose br { display: block; content: ""; margin-top: 0.35rem; }
 
 .hero-pattern {
   background:

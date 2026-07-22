@@ -1,0 +1,114 @@
+---
+import { BRAND_ASSETS } from "../lib/brand-assets";
+
+interface Props {
+  title: string;
+  url: string;
+  summary?: string | null;
+}
+
+const { title, url, summary } = Astro.props;
+const text = summary?.trim()
+  ? `${title} — ${summary.trim().slice(0, 120)}`
+  : `${title} — Vaga no Empregos São Luís`;
+const encodedUrl = encodeURIComponent(url);
+const encodedText = encodeURIComponent(`${text}\n${url}`);
+const encodedTitle = encodeURIComponent(title);
+
+const networks = [
+  {
+    label: "WhatsApp",
+    href: `https://wa.me/?text=${encodedText}`,
+    className: "bg-emerald-700 text-white hover:bg-emerald-800"
+  },
+  {
+    label: "LinkedIn",
+    href: `https://www.linkedin.com/sharing/share-offsite/?url=${encodedUrl}`,
+    className: "bg-[#0A66C2] text-white hover:bg-[#084e96]"
+  },
+  {
+    label: "Facebook",
+    href: `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`,
+    className: "bg-[#1877F2] text-white hover:bg-[#0f5fcc]"
+  },
+  {
+    label: "X",
+    href: `https://twitter.com/intent/tweet?url=${encodedUrl}&text=${encodedTitle}`,
+    className: "bg-[#111111] text-white hover:bg-black"
+  },
+  {
+    label: "Telegram",
+    href: `https://t.me/share/url?url=${encodedUrl}&text=${encodedTitle}`,
+    className: "bg-[#229ED9] text-white hover:bg-[#1b86b8]"
+  }
+] as const;
+---
+<div class="space-y-3" data-social-share>
+  <p class="text-xs font-bold uppercase tracking-wide text-[var(--es-muted)]">Compartilhar vaga</p>
+  <div class="grid grid-cols-2 gap-2">
+    {networks.map((network) => (
+      <a
+        class={`inline-flex items-center justify-center rounded-xl px-3 py-2.5 text-sm font-bold transition ${network.className}`}
+        href={network.href}
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        {network.label}
+      </a>
+    ))}
+    <button
+      class="inline-flex items-center justify-center rounded-xl border border-[var(--es-border)] bg-white px-3 py-2.5 text-sm font-bold text-[#111827] transition hover:border-[var(--brand-primary)] hover:text-[var(--brand-primary)]"
+      type="button"
+      data-share-copy
+      data-share-url={url}
+    >
+      Copiar link
+    </button>
+    <button
+      class="inline-flex items-center justify-center rounded-xl border border-pink-200 bg-pink-50 px-3 py-2.5 text-sm font-bold text-pink-800 transition hover:border-pink-400"
+      type="button"
+      data-share-instagram
+      data-share-text={`${text}\n${url}`}
+      data-instagram-url={BRAND_ASSETS.instagramUrl}
+      title="O Instagram não tem compartilhamento web direto: copiamos o texto e abrimos o perfil"
+    >
+      Instagram
+    </button>
+  </div>
+  <p class="text-xs text-[var(--es-muted)]" data-share-status role="status" aria-live="polite"></p>
+</div>
+<script is:inline>
+  document.querySelectorAll("[data-social-share]").forEach((root) => {
+    if (root.dataset.bound === "1") return;
+    root.dataset.bound = "1";
+    const status = root.querySelector("[data-share-status]");
+    const setStatus = (message) => {
+      if (status) status.textContent = message;
+    };
+    const copy = async (value) => {
+      try {
+        await navigator.clipboard.writeText(value);
+        return true;
+      } catch {
+        return false;
+      }
+    };
+    root.querySelector("[data-share-copy]")?.addEventListener("click", async (event) => {
+      const button = event.currentTarget;
+      const shareUrl = button.getAttribute("data-share-url") || "";
+      setStatus((await copy(shareUrl)) ? "Link copiado." : "Não foi possível copiar.");
+    });
+    root.querySelector("[data-share-instagram]")?.addEventListener("click", async (event) => {
+      const button = event.currentTarget;
+      const shareText = button.getAttribute("data-share-text") || "";
+      const profile = button.getAttribute("data-instagram-url") || "https://www.instagram.com/empregosaoluis/";
+      const ok = await copy(shareText);
+      setStatus(
+        ok
+          ? "Texto copiado. Cole no Instagram (Stories/Direct)."
+          : "Abra o Instagram e cole o link da vaga."
+      );
+      window.open(profile, "_blank", "noopener,noreferrer");
+    });
+  });
+</script>

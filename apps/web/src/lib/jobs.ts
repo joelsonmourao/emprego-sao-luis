@@ -1,4 +1,4 @@
-import { and, desc, eq, gt, inArray, ne, sql } from "drizzle-orm";
+import { and, desc, eq, gt, ilike, inArray, ne, notInArray, sql } from "drizzle-orm";
 import { categories, cities, companies, createDatabase, jobs, neighborhoods, states } from "@es/db";
 
 export async function listPublishedJobs(limit = 24) {
@@ -57,15 +57,41 @@ export async function findPublishedJob(slug: string) {
   }
 }
 
+function titleKeyword(title: string | null | undefined) {
+  const token = String(title ?? "")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-zA-Z0-9\s]/g, " ")
+    .trim()
+    .split(/\s+/)
+    .find((part) => part.length >= 4);
+  return token || null;
+}
+
+type RelatedJob = {
+  id: string;
+  title: string;
+  slug: string;
+  company: string;
+  city: string;
+  state: string;
+  workplace: string;
+  contract: string | null;
+  publishedAt: Date | null;
+  logoUrl: string | null;
+};
+
 export async function listRelatedJobs(input: {
   jobId: string;
   companyId: string;
   categoryId: string | null;
   cityId: string;
+  title?: string | null;
   limit?: number;
-}) {
+}): Promise<RelatedJob[]> {
   if (!process.env.DATABASE_URL) return [];
   const connection = createDatabase(process.env.DATABASE_URL);
+  const limit = input.limit ?? 4;
   try {
     const active = and(
       eq(jobs.publicationStatus, "PUBLISHED"),
@@ -84,29 +110,60 @@ export async function listRelatedJobs(input: {
       publishedAt: jobs.publishedAt,
       logoUrl: sql<string | null>`case when ${jobs.confidentialCompany} then null else ${companies.logoUrl} end`
     };
-    const byCompany = await connection.db
-      .select(fields)
-      .from(jobs)
-      .innerJoin(companies, eq(jobs.companyId, companies.id))
-      .innerJoin(cities, eq(jobs.cityId, cities.id))
-      .innerJoin(states, eq(jobs.stateId, states.id))
-      .where(and(active, eq(jobs.companyId, input.companyId)))
-      .orderBy(desc(jobs.publishedAt))
-      .limit(input.limit ?? 4);
-    if (byCompany.length >= (input.limit ?? 4)) return byCompany;
-    const remaining = (input.limit ?? 4) - byCompany.length;
-    const related = input.categoryId
-      ? await connection.db
-          .select(fields)
-          .from(jobs)
-          .innerJoin(companies, eq(jobs.companyId, companies.id))
-          .innerJoin(cities, eq(jobs.cityId, cities.id))
-          .innerJoin(states, eq(jobs.stateId, states.id))
-          .where(and(active, eq(jobs.categoryId, input.categoryId), eq(jobs.cityId, input.cityId)))
+
+    const selectRelated = () =>
+      connection.db
+        .select(fields)
+        .from(jobs)
+        .innerJoin(companies, eq(jobs.companyId, companies.id))
+        .innerJoin(cities, eq(jobs.cityId, cities.id))
+        .innerJoin(states, eq(jobs.stateId, states.id));
+
+    const collected: RelatedJob[] = [];
+    const pushUnique = (rows: RelatedJob[]) => {
+      for (const row of rows) {
+        if (collected.some((item) => item.id === row.id)) continue;
+        collected.push(row);
+        if (collected.length >= limit) break;
+      }
+    };
+
+    // 1) Mesma cidade
+    pushUnique(
+      await selectRelated()
+        .where(and(active, eq(jobs.cityId, input.cityId)))
+        .orderBy(desc(jobs.publishedAt))
+        .limit(limit)
+    );
+    if (collected.length >= limit) return collected.slice(0, limit);
+
+    const remaining = () => limit - collected.length;
+
+    // 2) Mesma função/categoria
+    if (input.categoryId) {
+      const exclude = [input.jobId, ...collected.map((row) => row.id)];
+      pushUnique(
+        await selectRelated()
+          .where(and(active, eq(jobs.categoryId, input.categoryId), notInArray(jobs.id, exclude)))
           .orderBy(desc(jobs.publishedAt))
-          .limit(remaining)
-      : [];
-    return [...byCompany, ...related].slice(0, input.limit ?? 4);
+          .limit(remaining())
+      );
+    }
+    if (collected.length >= limit) return collected.slice(0, limit);
+
+    // 3) Função aproximada pelo título
+    const keyword = titleKeyword(input.title);
+    if (keyword) {
+      const exclude = [input.jobId, ...collected.map((row) => row.id)];
+      pushUnique(
+        await selectRelated()
+          .where(and(active, ilike(jobs.normalizedTitle, `%${keyword}%`), notInArray(jobs.id, exclude)))
+          .orderBy(desc(jobs.publishedAt))
+          .limit(remaining())
+      );
+    }
+
+    return collected.slice(0, limit);
   } finally {
     await connection.close();
   }

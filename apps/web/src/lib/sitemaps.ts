@@ -11,6 +11,7 @@ const INSTITUTIONAL_PATHS = [
   "/termos",
   "/cookies",
   "/publicar-vaga",
+  "/cidades",
   "/area-empresas",
   "/instagram"
 ];
