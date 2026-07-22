@@ -19,10 +19,14 @@ const input = {
 };
 
 describe("JobPosting", () => {
-  it("uses the hiring company and omits absent salary", () => {
+  it("uses the hiring company and puts baseSalary value 0 when salary absent", () => {
     const result = buildJobPosting(input)!;
     expect(result.hiringOrganization.name).toBe("Empresa Real");
-    expect(result).not.toHaveProperty("baseSalary");
+    expect(result.baseSalary).toEqual({
+      "@type": "MonetaryAmount",
+      currency: "BRL",
+      value: { "@type": "QuantitativeValue", value: "0" }
+    });
     expect(result.identifier).toEqual({ "@type": "PropertyValue", name: "Código ES", value: "ES-000123" });
     expect(result).not.toHaveProperty("directApply");
   });
@@ -67,10 +71,26 @@ describe("JobPosting", () => {
     ]);
   });
 
-  it("puts QuantitativeValue value 0 when salary visible but amounts missing", () => {
+  it("puts QuantitativeValue value 0 when salary amounts are missing", () => {
     const result = buildJobPosting({ ...input, salaryVisible: true })!;
     expect(result.baseSalary.value).toEqual(
-      expect.objectContaining({ "@type": "QuantitativeValue", value: 0 })
+      expect.objectContaining({ "@type": "QuantitativeValue", value: "0" })
     );
+  });
+
+  it("keeps min/max when salary is informed", () => {
+    const result = buildJobPosting({
+      ...input,
+      salaryVisible: true,
+      salaryMin: "1500",
+      salaryMax: "2000",
+      salaryPeriod: "MONTH"
+    })!;
+    expect(result.baseSalary.value).toEqual({
+      "@type": "QuantitativeValue",
+      minValue: 1500,
+      maxValue: 2000,
+      unitText: "MONTH"
+    });
   });
 });

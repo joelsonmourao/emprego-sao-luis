@@ -71,28 +71,30 @@ export function buildJobPosting(input: JobPostingInput) {
     !input.companyName.trim()
   )
     return null;
-  const showSalary = Boolean(input.salaryVisible && (input.salaryMin || input.salaryMax));
-  const salaryMin = input.salaryMin ? Number(input.salaryMin) : undefined;
-  const salaryMax = input.salaryMax ? Number(input.salaryMax) : undefined;
-  const hasSalaryNumber =
-    (salaryMin !== undefined && Number.isFinite(salaryMin)) ||
-    (salaryMax !== undefined && Number.isFinite(salaryMax));
-  const baseSalary = input.salaryVisible
-    ? {
-        "@type": "MonetaryAmount",
-        currency: input.salaryCurrency || "BRL",
-        value: {
-          "@type": "QuantitativeValue",
-          ...(hasSalaryNumber
-            ? {
-                ...(salaryMin !== undefined && Number.isFinite(salaryMin) ? { minValue: salaryMin } : {}),
-                ...(salaryMax !== undefined && Number.isFinite(salaryMax) ? { maxValue: salaryMax } : {})
-              }
-            : { value: 0 }),
-          ...(input.salaryPeriod ? { unitText: input.salaryPeriod } : {})
-        }
-      }
+  const salaryMin = input.salaryMin != null && String(input.salaryMin).trim() !== ""
+    ? Number(input.salaryMin)
     : undefined;
+  const salaryMax = input.salaryMax != null && String(input.salaryMax).trim() !== ""
+    ? Number(input.salaryMax)
+    : undefined;
+  const hasSalaryNumber =
+    Boolean(input.salaryVisible) &&
+    ((salaryMin !== undefined && Number.isFinite(salaryMin)) ||
+      (salaryMax !== undefined && Number.isFinite(salaryMax)));
+  const baseSalary = {
+    "@type": "MonetaryAmount",
+    currency: input.salaryCurrency || "BRL",
+    value: {
+      "@type": "QuantitativeValue",
+      ...(hasSalaryNumber
+        ? {
+            ...(salaryMin !== undefined && Number.isFinite(salaryMin) ? { minValue: salaryMin } : {}),
+            ...(salaryMax !== undefined && Number.isFinite(salaryMax) ? { maxValue: salaryMax } : {})
+          }
+        : { value: "0" }),
+      ...(hasSalaryNumber && input.salaryPeriod ? { unitText: input.salaryPeriod } : {})
+    }
+  };
   const brandLogos = DEFAULT_ORG_LOGOS.map((path) => ({
     "@type": "ImageObject" as const,
     url: absoluteAssetUrl(path)!
@@ -132,7 +134,7 @@ export function buildJobPosting(input: JobPostingInput) {
             }
           }
         }),
-    ...(baseSalary && (showSalary || input.salaryVisible) ? { baseSalary } : {}),
+    baseSalary,
     ...(input.directApply === true ? { directApply: true } : {})
   };
 }
