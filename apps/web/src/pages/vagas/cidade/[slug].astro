@@ -5,7 +5,7 @@ import { and, desc, eq, gt, sql } from "drizzle-orm";
 
 const slug = Astro.params.slug ?? "";
 let city: { id: string; name: string; state: string; seoTitle: string | null; metaDescription: string | null } | undefined;
-let rows: Array<{ title: string; slug: string; company: string; code: string }> = [];
+let rows: Array<{ title: string; slug: string; company: string }> = [];
 
 if (process.env.DATABASE_URL) {
   const connection = createDatabase(process.env.DATABASE_URL);
@@ -27,8 +27,7 @@ if (process.env.DATABASE_URL) {
         .select({
           title: jobs.normalizedTitle,
           slug: jobs.slug,
-          company: sql<string>`case when ${jobs.confidentialCompany} then 'Empresa confidencial' else coalesce(${companies.publicName}, ${companies.name}) end`,
-          code: jobs.publicCode
+          company: sql<string>`case when ${jobs.confidentialCompany} then 'Empresa confidencial' else coalesce(${companies.publicName}, ${companies.name}) end`
         })
         .from(jobs)
         .innerJoin(companies, eq(jobs.companyId, companies.id))
@@ -81,7 +80,7 @@ const noindex = rows.length === 0 || (!isSaoLuis && !city.seoTitle && !city.meta
         rows.map((job) => (
           <a class="rounded-xl border bg-white p-5" href={`/vagas/${job.slug}`}>
             <strong>{job.title}</strong>
-            <span class="mt-1 block text-sm text-slate-600">{job.company} · {job.code}</span>
+            <span class="mt-1 block text-sm text-slate-600">{job.company}</span>
           </a>
         ))
       ) : (

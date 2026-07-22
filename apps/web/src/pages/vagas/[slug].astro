@@ -17,7 +17,6 @@ import {
 } from "@es/shared";
 import { formatRelativeDate, formatSalary, formatWorkplace } from "../../lib/job-presenter";
 import { findPublishedJob, listRelatedJobs } from "../../lib/jobs";
-import { getVisualIdentity } from "../../lib/visual-identity";
 import { BRAND_ASSETS } from "../../lib/brand-assets";
 
 const slug = Astro.params.slug ?? "";
@@ -81,8 +80,7 @@ if (applicationEmail.normalized) {
   });
 }
 
-const identity = await getVisualIdentity();
-const siteLogo = identity.logoUrl || BRAND_ASSETS.logoHorizontalWebp;
+const orgLogo = job.companyLogoUrl?.trim() || BRAND_ASSETS.iconWebp;
 
 const jsonLd = buildJobPosting({
   title: record.normalizedTitle,
@@ -93,7 +91,6 @@ const jsonLd = buildJobPosting({
   workplaceType: record.workplaceType,
   companyName: job.companyName,
   companyWebsiteUrl: job.companyWebsiteUrl,
-  organizationLogoUrl: siteLogo,
   cityName: job.cityName,
   stateCode: job.stateCode,
   applicationUrl: record.applicationUrl,
@@ -137,18 +134,21 @@ const noindex = record.publicationStatus !== "PUBLISHED" || !acceptingApplicatio
       <div class="mt-6 grid gap-8 lg:grid-cols-[1fr_320px]">
         <article>
           <div class="flex flex-wrap items-start gap-4">
-            {job.companyLogoUrl ? (
-              <img src={job.companyLogoUrl} alt="" class="h-16 w-16 rounded-2xl border object-contain p-2" width="64" height="64" />
-            ) : (
-              <div class="flex h-16 w-16 items-center justify-center rounded-2xl bg-[var(--es-cream-dark)] text-xl font-black text-[var(--brand-primary)]">{job.companyName.slice(0, 1)}</div>
-            )}
+            <img
+              src={orgLogo}
+              alt=""
+              class="h-16 w-16 rounded-2xl border border-[var(--es-border)] bg-white object-contain p-2"
+              width="64"
+              height="64"
+            />
             <div class="min-w-0 flex-1">
-              <div class="flex flex-wrap gap-2">
-                <span class="chip chip-active">{record.publicCode}</span>
-                {record.featured && <span class="chip">Destaque</span>}
-                {record.sponsored && <span class="chip">Patrocinada</span>}
-              </div>
-              <h1 class="font-display mt-2 text-3xl font-black sm:text-4xl">{record.normalizedTitle}</h1>
+              {(record.featured || record.sponsored) && (
+                <div class="flex flex-wrap gap-2">
+                  {record.featured && <span class="chip">Destaque</span>}
+                  {record.sponsored && <span class="chip">Patrocinada</span>}
+                </div>
+              )}
+              <h1 class={`font-display text-3xl font-black sm:text-4xl ${record.featured || record.sponsored ? "mt-2" : ""}`}>{record.normalizedTitle}</h1>
               <p class="mt-2 text-lg font-semibold">
                 {record.confidentialCompany ? job.companyName : <a class="hover:text-[var(--brand-primary)]" href={`/empresas/${job.companySlug}`}>{job.companyName}</a>}
               </p>
@@ -175,26 +175,10 @@ const noindex = record.publicationStatus !== "PUBLISHED" || !acceptingApplicatio
             </p>
           )}
 
-          <ApplicationChannels
-            jobId={record.id}
-            accepting={acceptingApplications}
-            instructions={record.applicationInstructions}
-            channels={channels}
-            placement="summary"
-          />
-
           <section class="mt-8">
             <h2 class="font-display text-2xl font-black">Descrição da vaga</h2>
             <div class="es-prose mt-4 max-w-none" set:html={record.descriptionHtml} />
           </section>
-
-          <ApplicationChannels
-            jobId={record.id}
-            accepting={acceptingApplications}
-            instructions={record.applicationInstructions}
-            channels={channels}
-            placement="footer"
-          />
 
           <AdSlot slot="job-content-mid" pageType="job" citySlug={job.citySlug} companySlug={job.companySlug} workplaceType={record.workplaceType} />
 
@@ -211,6 +195,14 @@ const noindex = record.publicationStatus !== "PUBLISHED" || !acceptingApplicatio
             <p class="mt-2 text-sm text-amber-900">Nunca pague para conseguir emprego. Confirme se o canal de candidatura é oficial da empresa. <a class="underline" href="/seguranca-candidatos">Saiba mais</a>.</p>
           </section>
 
+          <ApplicationChannels
+            jobId={record.id}
+            accepting={acceptingApplications}
+            instructions={record.applicationInstructions}
+            channels={channels}
+            placement="footer"
+          />
+
           {related.length > 0 && (
             <section class="mt-10">
               <SectionHeading title="Vagas relacionadas" />
@@ -225,8 +217,8 @@ const noindex = record.publicationStatus !== "PUBLISHED" || !acceptingApplicatio
           {acceptingApplications && (
             <div class="es-card sticky top-24 space-y-4 p-6" id="candidatura">
               <h2 class="font-display text-xl font-black">Candidatura gratuita</h2>
-              <p class="text-sm text-[var(--es-muted)]">Os mesmos canais do resumo, sem cadastro obrigatório.</p>
-              <a class="es-btn es-btn-primary w-full py-3 text-center" href="#candidatura-summary">Ver canais de candidatura</a>
+              <p class="text-sm text-[var(--es-muted)]">Canais no final da página, sem cadastro obrigatório.</p>
+              <a class="es-btn es-btn-primary w-full py-3 text-center" href="#candidatura-footer">Ver canais de candidatura</a>
               <form method="post" action="/api/account/saved-jobs">
                 <input type="hidden" name="jobId" value={record.id} />
                 <input type="hidden" name="action" value="save" />

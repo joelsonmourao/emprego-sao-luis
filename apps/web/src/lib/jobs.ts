@@ -76,13 +76,13 @@ export async function listRelatedJobs(input: {
       id: jobs.id,
       title: jobs.normalizedTitle,
       slug: jobs.slug,
-      code: jobs.publicCode,
       company: sql<string>`case when ${jobs.confidentialCompany} then 'Empresa confidencial' else coalesce(${companies.publicName}, ${companies.name}) end`,
       city: cities.name,
       state: states.code,
       workplace: jobs.workplaceType,
       contract: jobs.employmentType,
-      publishedAt: jobs.publishedAt
+      publishedAt: jobs.publishedAt,
+      logoUrl: sql<string | null>`case when ${jobs.confidentialCompany} then null else ${companies.logoUrl} end`
     };
     const byCompany = await connection.db
       .select(fields)

@@ -29,6 +29,8 @@ export interface JobPostingInput {
   companyWebsiteUrl?: string | null;
   /** Logo do site (ou empresa) — vira hiringOrganization.logo */
   organizationLogoUrl?: string | null;
+  streetAddress?: string | null;
+  postalCode?: string | null;
   cityName: string;
   stateCode: string;
   applicationUrl?: string | null;
@@ -55,6 +57,8 @@ function absoluteAssetUrl(url: string | null | undefined): string | undefined {
   return value.startsWith("/") ? `${base}${value}` : `${base}/${value}`;
 }
 
+const DEFAULT_ORG_LOGOS = ["/brand/icon.webp", "/favicon.svg"] as const;
+
 export function buildJobPosting(input: JobPostingInput) {
   if (
     (input.publicationStatus && input.publicationStatus !== "PUBLISHED") ||
@@ -67,20 +71,35 @@ export function buildJobPosting(input: JobPostingInput) {
     !input.companyName.trim()
   )
     return null;
-  const showSalary = input.salaryVisible && (input.salaryMin || input.salaryMax);
-  const baseSalary = showSalary
+  const showSalary = Boolean(input.salaryVisible && (input.salaryMin || input.salaryMax));
+  const salaryMin = input.salaryMin ? Number(input.salaryMin) : undefined;
+  const salaryMax = input.salaryMax ? Number(input.salaryMax) : undefined;
+  const hasSalaryNumber =
+    (salaryMin !== undefined && Number.isFinite(salaryMin)) ||
+    (salaryMax !== undefined && Number.isFinite(salaryMax));
+  const baseSalary = input.salaryVisible
     ? {
         "@type": "MonetaryAmount",
-        currency: input.salaryCurrency,
+        currency: input.salaryCurrency || "BRL",
         value: {
           "@type": "QuantitativeValue",
-          ...(input.salaryMin ? { minValue: Number(input.salaryMin) } : {}),
-          ...(input.salaryMax ? { maxValue: Number(input.salaryMax) } : {}),
+          ...(hasSalaryNumber
+            ? {
+                ...(salaryMin !== undefined && Number.isFinite(salaryMin) ? { minValue: salaryMin } : {}),
+                ...(salaryMax !== undefined && Number.isFinite(salaryMax) ? { maxValue: salaryMax } : {})
+              }
+            : { value: 0 }),
           ...(input.salaryPeriod ? { unitText: input.salaryPeriod } : {})
         }
       }
     : undefined;
-  const logoUrl = absoluteAssetUrl(input.organizationLogoUrl);
+  const brandLogos = DEFAULT_ORG_LOGOS.map((path) => ({
+    "@type": "ImageObject" as const,
+    url: absoluteAssetUrl(path)!
+  }));
+  const identifierValue = input.publicCode?.trim() ? input.publicCode.trim() : 0;
+  const streetAddress = input.streetAddress?.trim() || "Não Informado";
+  const postalCode = input.postalCode?.trim() || "Não Informado";
   return {
     "@context": "https://schema.org",
     "@type": "JobPosting",
@@ -94,11 +113,9 @@ export function buildJobPosting(input: JobPostingInput) {
       "@type": "Organization",
       name: input.companyName,
       ...(input.companyWebsiteUrl ? { sameAs: input.companyWebsiteUrl } : {}),
-      ...(logoUrl ? { logo: { "@type": "ImageObject", url: logoUrl } } : {})
+      logo: brandLogos
     },
-    ...(input.publicCode
-      ? { identifier: { "@type": "PropertyValue", name: "Código ES", value: input.publicCode } }
-      : {}),
+    identifier: { "@type": "PropertyValue", name: "Código ES", value: identifierValue },
     ...(input.canonicalUrl ? { url: input.canonicalUrl } : {}),
     ...(input.workplaceType === "remoto"
       ? { jobLocationType: "TELECOMMUTE", applicantLocationRequirements: { "@type": "Country", name: "BR" } }
@@ -107,13 +124,15 @@ export function buildJobPosting(input: JobPostingInput) {
             "@type": "Place",
             address: {
               "@type": "PostalAddress",
-              addressLocality: input.cityName,
-              addressRegion: input.stateCode,
+              streetAddress,
+              postalCode,
+              addressLocality: input.cityName || "Não Informado",
+              addressRegion: input.stateCode || "Não Informado",
               addressCountry: "BR"
             }
           }
         }),
-    ...(baseSalary ? { baseSalary } : {}),
+    ...(baseSalary && (showSalary || input.salaryVisible) ? { baseSalary } : {}),
     ...(input.directApply === true ? { directApply: true } : {})
   };
 }
@@ -135,9 +154,7 @@ export function validateJobPosting(input: JobPostingInput) {
   if (input.publicationStatus && input.publicationStatus !== "PUBLISHED") missing.push("publicationStatus");
   if (input.workplaceType !== "remoto" && (!input.cityName.trim() || !input.stateCode.trim()))
     missing.push("jobLocation");
-  if (!input.publicCode?.trim()) missing.push("identifier");
   if (!input.canonicalUrl?.trim()) missing.push("canonicalUrl");
-  if (input.salaryVisible && !input.salaryMin && !input.salaryMax) missing.push("baseSalary");
   const schema = buildJobPosting(input);
   return { valid: missing.length === 0 && schema !== null, missing, schema };
 }

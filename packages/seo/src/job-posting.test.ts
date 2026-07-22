@@ -27,6 +27,13 @@ describe("JobPosting", () => {
     expect(result).not.toHaveProperty("directApply");
   });
 
+  it("fills address defaults and identifier value 0 when missing", () => {
+    const result = buildJobPosting({ ...input, publicCode: "" })!;
+    expect(result.identifier.value).toBe(0);
+    expect(result.jobLocation.address.streetAddress).toBe("Não Informado");
+    expect(result.jobLocation.address.postalCode).toBe("Não Informado");
+  });
+
   it("does not generate schema for expired jobs", () =>
     expect(buildJobPosting({ ...input, expiresAt: new Date(0) })).toBeNull());
 
@@ -48,18 +55,22 @@ describe("JobPosting", () => {
   it("reports missing fields in validation", () => {
     const result = validateJobPosting({ ...input, publicCode: "", canonicalUrl: "" });
     expect(result.valid).toBe(false);
-    expect(result.missing).toContain("identifier");
+    expect(result.missing).not.toContain("identifier");
     expect(result.missing).toContain("canonicalUrl");
   });
 
-  it("includes site logo on hiringOrganization", () => {
-    const result = buildJobPosting({
-      ...input,
-      organizationLogoUrl: "/brand/logo-horizontal.webp"
-    })!;
-    expect(result.hiringOrganization.logo).toEqual({
-      "@type": "ImageObject",
-      url: "https://empregossaoluis.com.br/brand/logo-horizontal.webp"
-    });
+  it("uses both brand logos on hiringOrganization", () => {
+    const result = buildJobPosting(input)!;
+    expect(result.hiringOrganization.logo).toEqual([
+      { "@type": "ImageObject", url: "https://empregossaoluis.com.br/brand/icon.webp" },
+      { "@type": "ImageObject", url: "https://empregossaoluis.com.br/favicon.svg" }
+    ]);
+  });
+
+  it("puts QuantitativeValue value 0 when salary visible but amounts missing", () => {
+    const result = buildJobPosting({ ...input, salaryVisible: true })!;
+    expect(result.baseSalary.value).toEqual(
+      expect.objectContaining({ "@type": "QuantitativeValue", value: 0 })
+    );
   });
 });
