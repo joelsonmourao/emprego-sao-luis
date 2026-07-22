@@ -22,8 +22,18 @@ export const POST: APIRoute = async ({ params, locals, clientAddress }) => {
       .from(importBatches)
       .where(eq(importBatches.id, params.id))
       .limit(1);
-    if (!failed || failed.status !== "FAILED") {
-      return adminJsonError("Somente lotes falhos podem ser reprocessados.", 409, {
+    const stage =
+      failed && typeof failed.settings === "object" && failed.settings && "stage" in failed.settings
+        ? String((failed.settings as { stage?: string }).stage ?? "")
+        : "";
+    const retryable =
+      failed &&
+      !failed.undoneAt &&
+      (failed.status === "FAILED" ||
+        (failed.status === "COMPLETED" && stage === "VALIDATED") ||
+        stage === "ARCHIVED_SUPERSEDED");
+    if (!retryable || !failed) {
+      return adminJsonError("Somente lotes falhos ou só validados podem ser reprocessados.", 409, {
         code: "IMPORT_NOT_RETRYABLE"
       });
     }

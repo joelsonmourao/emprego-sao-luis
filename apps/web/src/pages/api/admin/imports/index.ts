@@ -68,11 +68,40 @@ export const POST: APIRoute = async ({ request, locals }) => {
       .where(eq(importBatches.fileHash, fileHash))
       .orderBy(desc(importBatches.createdAt))
       .limit(1);
-    if (existing && !["FAILED", "CANCELLED"].includes(existing.status) && !existing.undoneAt) {
+    const existingStage =
+      existing && typeof existing.settings === "object" && existing.settings && "stage" in existing.settings
+        ? String((existing.settings as { stage?: string }).stage ?? "")
+        : "";
+    // Só reutiliza lote já importado com sucesso. Validação antiga (0 válidas) NÃO deve travar reenvio.
+    const canReuseImported =
+      Boolean(existing) &&
+      !existing!.undoneAt &&
+      existing!.status === "COMPLETED" &&
+      existingStage === "IMPORTED" &&
+      existing!.validRows > 0;
+    if (canReuseImported && existing) {
       return adminJsonRedirect(`/admin/vagas/importar?batch=${existing.id}&reused=1`, {
         batchId: existing.id,
         duplicateBy: "content-sha256"
       });
+    }
+    // Arquiva lotes antigos do mesmo arquivo (validação falha/zerada) para permitir nova análise.
+    if (existing && !existing.undoneAt && existingStage !== "IMPORTED" && existing.status !== "PROCESSING") {
+      const previousSettings =
+        typeof existing.settings === "object" && existing.settings ? existing.settings : {};
+      await connection.db
+        .update(importBatches)
+        .set({
+          status: "CANCELLED",
+          settings: {
+            ...previousSettings,
+            stage: "ARCHIVED_SUPERSEDED",
+            archivedAt: new Date().toISOString(),
+            archivedReason: "Novo envio do mesmo arquivo; revalidação solicitada."
+          },
+          updatedAt: new Date()
+        })
+        .where(eq(importBatches.id, existing.id));
     }
 
     let workbook: XLSX.WorkBook;
