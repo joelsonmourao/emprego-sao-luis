@@ -1,0 +1,65 @@
+---
+import AdminLayout from "../../layouts/AdminLayout.astro";
+import { getEditorialAuditReport, type EditorialClassification } from "../../lib/editorial-audit";
+import { can } from "../../lib/auth";
+
+const auth = Astro.locals.auth!;
+if (!can(auth, "content.manage") && !can(auth, "seo.manage")) return new Response("Proibido", { status: 403 });
+
+const report = await getEditorialAuditReport();
+const classification = Astro.url.searchParams.get("classificacao") as EditorialClassification | null;
+const type = Astro.url.searchParams.get("tipo");
+const filtered = report.assessments.filter((item) =>
+  (!classification || item.classification === classification) &&
+  (!type || item.article.type === type)
+);
+const counts = (value: EditorialClassification) => report.assessments.filter((item) => item.classification === value).length;
+const tone: Record<EditorialClassification, string> = { MANTER: "text-emerald-700", MELHORAR: "text-amber-700", NOINDEX: "text-rose-700", "REVISAR MANUALMENTE": "text-violet-700" };
+---
+<AdminLayout title="Qualidade editorial" description="Classificação interna de artigos e notícias por profundidade, confiança, similaridade, estrutura e utilidade local.">
+  <aside class="rounded-xl border border-sky-200 bg-sky-50 p-4 text-sm text-sky-950" role="note">
+    Este indicador é interno e não é uma pontuação do Google. Nenhum artigo é excluído ou alterado automaticamente.
+  </aside>
+  {can(auth, "content.manage") && <form class="mt-4" method="post" action="/api/admin/editorial-audit/persist" onsubmit="return confirm('Persistir a classificação interna atual em todos os conteúdos? Nenhum texto será reescrito ou excluído.')"><button class="es-btn es-btn-secondary" type="submit">Persistir classificação atual</button></form>}
+  <section class="mt-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+    {(["MANTER", "MELHORAR", "NOINDEX", "REVISAR MANUALMENTE"] as EditorialClassification[]).map((value) => <a class="rounded-2xl border bg-white p-5 shadow-sm" href={`?classificacao=${encodeURIComponent(value)}`}><p class="text-sm text-slate-600">{value}</p><strong class={`mt-2 block text-3xl ${tone[value]}`}>{counts(value)}</strong></a>)}
+  </section>
+  <div class="mt-6 flex flex-wrap gap-2">
+    <a class="chip" href="/admin/qualidade-editorial">Todos</a><a class="chip" href="?tipo=GUIDE">Blog</a><a class="chip" href="?tipo=DATA_REPORT">Relatórios</a><a class="chip" href="?tipo=NEWS">Notícias</a>
+  </div>
+
+  <section class="mt-6 overflow-hidden rounded-2xl border bg-white">
+    <div class="border-b p-5"><h2 class="text-xl font-black">Artigos e notícias</h2><p class="mt-1 text-sm text-slate-600">{filtered.length} conteúdo(s) no filtro atual.</p></div>
+    <div class="overflow-x-auto"><table class="min-w-full text-sm">
+      <thead class="bg-slate-50 text-left text-xs uppercase tracking-wide text-slate-600"><tr><th class="p-3">Título</th><th class="p-3">Autor</th><th class="p-3">Data</th><th class="p-3">Palavras</th><th class="p-3">Similaridade</th><th class="p-3">Qualidade</th><th class="p-3">Utilidade local</th><th class="p-3">Status</th><th class="p-3">Indexável?</th><th class="p-3">Ação</th></tr></thead>
+      <tbody>{filtered.map((item) => <tr class="border-t align-top">
+        <td class="max-w-sm p-3"><strong>{item.article.title}</strong>{item.issues.length > 0 && <details class="mt-1 text-xs text-slate-600"><summary class="cursor-pointer">{item.issues.length} observação(ões)</summary><ul class="mt-1 list-disc pl-4">{item.issues.map((issue) => <li>{issue}</li>)}</ul></details>}</td>
+        <td class="p-3">{item.article.authorName ?? "Não exibível"}</td>
+        <td class="p-3">{item.article.publishedAt?.toLocaleDateString("pt-BR") ?? "Rascunho"}<span class="block text-xs text-slate-500">Atualizado {item.article.updatedAt.toLocaleDateString("pt-BR")}</span></td>
+        <td class="p-3">{item.wordCount}<span class="block text-xs text-slate-500">{item.repeatedParagraphs + item.repeatedSentences + item.repeatedHeadings} repetição(ões)</span></td>
+        <td class="p-3">{(item.maxSimilarity * 100).toFixed(0)}%</td>
+        <td class="p-3"><span class="font-bold">{item.quality}</span><span class="block text-xs text-slate-500">Indicador interno {item.score}/100</span></td>
+        <td class="p-3">{item.localUtility}</td>
+        <td class={`p-3 font-bold ${tone[item.classification]}`}>{item.classification}</td>
+        <td class="p-3">{item.indexable ? "Sim" : "Não"}</td>
+        <td class="p-3"><a class="font-bold text-[var(--brand-primary)] underline" href={`/admin/conteudo/${item.article.id}/editar`}>Revisar</a></td>
+      </tr>)}</tbody>
+    </table></div>
+  </section>
+
+  <section id="clusters" class="mt-8 scroll-mt-24 overflow-hidden rounded-2xl border bg-white">
+    <div class="border-b p-5"><h2 class="text-xl font-black">Clusters de conteúdo semelhante</h2><p class="mt-1 text-sm text-slate-600">O primeiro item de cada grupo é apenas o melhor candidato interno pelo score e profundidade atuais; a decisão permanece humana.</p></div>
+    <div class="grid gap-4 p-5 lg:grid-cols-2">
+      {report.similarityClusters.map((cluster) => <article class="rounded-xl border p-4"><div class="flex items-center justify-between gap-3"><h3 class="font-black">Cluster {cluster.id}</h3><span class="text-sm font-bold">Pico {(cluster.strongestSimilarity * 100).toFixed(1)}%</span></div><ol class="mt-3 grid gap-2 text-sm">{cluster.members.map((member) => <li class="rounded-lg bg-slate-50 p-3"><a class="font-bold underline" href={`/admin/conteudo/${member.id}/editar`}>{member.title}</a><span class="mt-1 block text-xs text-slate-600">{member.id === cluster.bestCandidateId ? "Melhor candidato interno · " : ""}{member.classification} · score {member.score} · similaridade máxima {(member.maxSimilarity * 100).toFixed(1)}%</span></li>)}</ol></article>)}
+      {report.similarityClusters.length === 0 && <p class="text-sm text-slate-600">Nenhum cluster acima do limiar interno foi encontrado.</p>}
+    </div>
+  </section>
+
+  <section id="semelhantes" class="mt-8 scroll-mt-24 overflow-hidden rounded-2xl border bg-white">
+    <div class="border-b p-5"><h2 class="text-xl font-black">Conteúdos semelhantes</h2><p class="mt-1 text-sm text-slate-600">A comparação usa shingles de cinco termos e um índice invertido; não compara cegamente todos os pares.</p></div>
+    <div class="overflow-x-auto"><table class="min-w-full text-sm"><thead class="bg-slate-50 text-left text-xs uppercase tracking-wide text-slate-600"><tr><th class="p-3">Artigo A</th><th class="p-3">Artigo B</th><th class="p-3">Similaridade</th><th class="p-3">Trecho compartilhado</th><th class="p-3">Ação sugerida</th></tr></thead><tbody>
+      {report.similarities.map((pair) => <tr class="border-t align-top"><td class="p-3"><a class="underline" href={`/admin/conteudo/${pair.articleA.id}/editar`}>{pair.articleA.title}</a></td><td class="p-3"><a class="underline" href={`/admin/conteudo/${pair.articleB.id}/editar`}>{pair.articleB.title}</a></td><td class="p-3 font-bold">{(pair.similarity * 100).toFixed(1)}%</td><td class="max-w-md p-3 text-xs">{pair.sharedExcerpt}</td><td class="max-w-md p-3">{pair.suggestedAction}</td></tr>)}
+      {report.similarities.length === 0 && <tr><td class="p-8 text-center text-slate-600" colspan="5">Nenhum par acima do limiar interno foi encontrado.</td></tr>}
+    </tbody></table></div>
+  </section>
+</AdminLayout>

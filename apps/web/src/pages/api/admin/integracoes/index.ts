@@ -11,6 +11,7 @@ import {
 } from "../../../../lib/site-integrations";
 import { getAdSettings, saveAdSettings } from "../../../../lib/ads";
 import { getSeoSettings, saveSeoSettings } from "../../../../lib/seo-settings";
+import { validateAdsTxtContent } from "../../../../lib/ads-txt";
 
 function bool(form: FormData, name: string) {
   return form.get(name) === "on" || form.get(name) === "true" || form.get(name) === "1";
@@ -31,6 +32,7 @@ export const POST: APIRoute = async ({ request, locals, redirect, clientAddress 
   if (!process.env.DATABASE_URL) return new Response("Banco indisponível", { status: 503 });
 
   const form = await request.formData();
+  const rawAdsensePublisherId = String(form.get("adsensePublisherId") ?? "").trim();
   const before = await getSiteIntegrations();
   const next = mergeSiteIntegrations({
     consentModeEnabled: bool(form, "consentModeEnabled"),
@@ -42,7 +44,7 @@ export const POST: APIRoute = async ({ request, locals, redirect, clientAddress 
     searchConsoleReportsUrl: String(form.get("searchConsoleReportsUrl") ?? "").trim(),
     bingVerification: String(form.get("bingVerification") ?? "").trim(),
     adsenseEnabled: bool(form, "adsenseEnabled"),
-    adsensePublisherId: normalizeAdsenseClientId(String(form.get("adsensePublisherId") ?? "")),
+    adsensePublisherId: normalizeAdsenseClientId(rawAdsensePublisherId),
     adsenseAutoAds: bool(form, "adsenseAutoAds"),
     adsTxtContent: String(form.get("adsTxtContent") ?? "").trim(),
     metaPixelId: String(form.get("metaPixelId") ?? "").trim(),
@@ -52,6 +54,12 @@ export const POST: APIRoute = async ({ request, locals, redirect, clientAddress 
 
   const parsed = siteIntegrationsSchema.safeParse(next);
   if (!parsed.success) return new Response("Dados inválidos", { status: 400 });
+  if (rawAdsensePublisherId && !parsed.data.adsensePublisherId)
+    return new Response("Publisher ID do AdSense inválido. Use ca-pub- seguido apenas por números.", { status: 422 });
+  const adsTxt = validateAdsTxtContent(parsed.data.adsTxtContent);
+  if (parsed.data.adsTxtContent && !adsTxt.valid)
+    return new Response(`ads.txt inválido na linha ${adsTxt.errors[0]?.line ?? "desconhecida"}.`, { status: 422 });
+  parsed.data.adsTxtContent = adsTxt.content;
 
   await saveSiteIntegrations(parsed.data);
 

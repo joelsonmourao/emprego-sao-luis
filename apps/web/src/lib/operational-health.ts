@@ -2,6 +2,7 @@ import { createDatabase, indexingEvents } from "@es/db";
 import { count, eq, sql } from "drizzle-orm";
 import { indexingIntegrationStatus } from "./indexing";
 import { diagnoseStorage } from "@es/storage";
+import { getSiteIntegrations, normalizeAdsenseClientId } from "./site-integrations";
 
 export type IntegrationState = "healthy" | "degraded" | "not_configured" | "unavailable" | "unknown";
 
@@ -51,7 +52,13 @@ export async function getOperationalHealth() {
   const storage = await diagnoseStorage();
   checks.storage = storage.exists && storage.read && storage.write && storage.delete ? "healthy" : "unavailable";
   checks.sentry = stateFrom({ configured: Boolean(process.env.SENTRY_DSN), enabled: true });
-  checks.adsense = stateFrom({ configured: Boolean(process.env.PUBLIC_ADSENSE_CLIENT_ID), enabled: process.env.PUBLIC_ADSENSE_ENABLED === "true" });
+  const siteIntegrations = await getSiteIntegrations();
+  const adsenseClientId = normalizeAdsenseClientId(siteIntegrations.adsensePublisherId) ||
+    normalizeAdsenseClientId(String(process.env.PUBLIC_ADSENSE_CLIENT_ID ?? ""));
+  const adsenseEnabled = siteIntegrations.persisted
+    ? siteIntegrations.adsenseEnabled
+    : siteIntegrations.adsenseEnabled || process.env.PUBLIC_ADSENSE_ENABLED === "true";
+  checks.adsense = stateFrom({ configured: Boolean(adsenseClientId), enabled: adsenseEnabled });
 
   return checks;
 }

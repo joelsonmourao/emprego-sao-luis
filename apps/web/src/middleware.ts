@@ -139,6 +139,8 @@ export const onRequest = defineMiddleware(async (context, next) => {
     response.headers.set("X-Robots-Tag", "noindex, nofollow");
   } else if (isRouteWithin(path, "/empresa") || isRouteWithin(path, "/api/empresa")) {
     response.headers.set("X-Robots-Tag", "noindex, nofollow");
+  } else if (path.startsWith("/minha-conta") || path.startsWith("/entrar") || path.startsWith("/acesso")) {
+    response.headers.set("X-Robots-Tag", "noindex, nofollow");
   }
   const privateResponse =
     path.startsWith("/admin") ||

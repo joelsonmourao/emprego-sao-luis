@@ -68,7 +68,7 @@ const optionalDate = z.preprocess((value) => {
   if (value === "" || value == null) return undefined;
   const parsed = parseImportDate(value);
   return parsed ?? value;
-}, z.date({ errorMap: () => ({ message: "Data inválida. Use DD/MM/AAAA ou AAAA-MM-DD." }) }).optional());
+}, z.date({ error: "Data inválida. Use DD/MM/AAAA ou AAAA-MM-DD." }).optional());
 
 const workplaceType = z.preprocess((value) => {
   if (typeof value !== "string" || !value.trim()) return "presencial";

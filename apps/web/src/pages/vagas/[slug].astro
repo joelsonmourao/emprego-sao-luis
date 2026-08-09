@@ -21,13 +21,14 @@ import {
 import { formatRelativeDate, formatSalary, formatWorkplace } from "../../lib/job-presenter";
 import { findPublishedJob, listRelatedJobs } from "../../lib/jobs";
 import { BRAND_ASSETS } from "../../lib/brand-assets";
+import { getRuntimeSiteUrl, resolveCanonicalUrl } from "../../lib/canonical-url";
 
 const slug = Astro.params.slug ?? "";
 const job = await findPublishedJob(slug);
 if (!job) return Astro.redirect(`/vagas/indisponivel/${encodeURIComponent(slug)}`, 302);
 
 const record = job.job;
-const canonicalUrl = record.canonicalUrl || new URL(`/vagas/${record.slug}`, Astro.site).toString();
+const canonicalUrl = resolveCanonicalUrl(record.canonicalUrl ?? undefined, `/vagas/${record.slug}`, getRuntimeSiteUrl(Astro.site));
 const applicationUrl = normalizeApplicationUrl(record.applicationUrl);
 const applicationEmail = normalizeApplicationEmail(record.applicationEmail);
 const applicationWhatsapp = normalizeApplicationWhatsapp(record.applicationWhatsapp);
@@ -39,7 +40,7 @@ const emailUrl = applicationEmail.normalized ? buildMailtoUrl(applicationEmail.n
 const hasApplicationChannel = applicationUrl.valid || Boolean(whatsappUrl) || Boolean(emailUrl);
 const acceptingApplications =
   record.publicationStatus === "PUBLISHED" &&
-  record.applicationUrlStatus !== "CLOSED" &&
+  !["CLOSED", "INVALID"].includes(record.applicationUrlStatus) &&
   Boolean(record.expiresAt && record.expiresAt > new Date()) &&
   hasApplicationChannel;
 
@@ -84,6 +85,19 @@ if (applicationEmail.normalized) {
 }
 
 const orgLogo = job.companyLogoUrl?.trim() || BRAND_ASSETS.iconWebp;
+const sourceUrl = normalizeApplicationUrl(record.sourceUrl);
+const stringList = (value: unknown) => Array.isArray(value) ? value.map((item) => String(item ?? "").trim()).filter(Boolean) : [];
+const activities = stringList(record.activities);
+const requirements = stringList(record.requirements);
+const benefits = stringList(record.benefits);
+const verificationLabels: Record<string, string> = {
+  UNVERIFIED: "Ainda não verificada",
+  SOURCE_CONFIRMED: "Fonte confirmada",
+  COMPANY_VERIFIED: "Empresa verificada",
+  LINK_CONFIRMED: "Canal de candidatura confirmado",
+  NEEDS_REVIEW: "Revisão necessária",
+  FAILED: "Verificação sem confirmação"
+};
 
 const jsonLd = buildJobPosting({
   title: record.normalizedTitle,
@@ -94,6 +108,7 @@ const jsonLd = buildJobPosting({
   workplaceType: record.workplaceType,
   companyName: job.companyName,
   companyWebsiteUrl: job.companyWebsiteUrl,
+  organizationLogoUrl: job.companyLogoUrl,
   cityName: job.cityName,
   stateCode: job.stateCode,
   applicationUrl: record.applicationUrl,
@@ -168,13 +183,13 @@ const saveStatus = Astro.url.searchParams.get("salvar");
             </div>
           </div>
 
-          <dl class="mt-6 grid gap-3 rounded-2xl border border-[var(--es-border)] bg-[var(--es-cream)] p-5 sm:grid-cols-2">
+          <section class="mt-6" aria-labelledby="informacoes-vaga"><h2 id="informacoes-vaga" class="font-display text-2xl font-black">Informações da vaga</h2><dl class="mt-4 grid gap-3 rounded-2xl border border-[var(--es-border)] bg-[var(--es-cream)] p-5 sm:grid-cols-2">
             {salary && <div><dt class="text-xs font-bold uppercase text-[var(--es-muted)]">Salário</dt><dd class="font-bold text-[var(--es-green)]">{salary}</dd></div>}
             <div><dt class="text-xs font-bold uppercase text-[var(--es-muted)]">Publicada</dt><dd>{formatRelativeDate(record.publishedAt)}</dd></div>
             {record.expiresAt && <div><dt class="text-xs font-bold uppercase text-[var(--es-muted)]">Expira</dt><dd>{formatRelativeDate(record.expiresAt)}</dd></div>}
             {job.categoryName && <div><dt class="text-xs font-bold uppercase text-[var(--es-muted)]">Categoria</dt><dd><a class="underline" href={`/vagas/categoria/${job.categorySlug}`}>{job.categoryName}</a></dd></div>}
             {record.schedule && <div><dt class="text-xs font-bold uppercase text-[var(--es-muted)]">Jornada</dt><dd>{record.schedule}</dd></div>}
-          </dl>
+          </dl></section>
 
           {!acceptingApplications && (
             <p class="mt-6 rounded-xl border border-amber-200 bg-amber-50 p-4 font-semibold text-amber-950" role="status">
@@ -186,6 +201,8 @@ const saveStatus = Astro.url.searchParams.get("salvar");
             <h2 class="font-display text-2xl font-black">Descrição da vaga</h2>
             <div class="es-prose mt-4 max-w-none" set:html={descriptionHtml} />
           </section>
+
+          {(activities.length > 0 || requirements.length > 0 || benefits.length > 0 || record.education || record.experienceLevel || record.additionalInfo) && <section class="mt-8"><h2 class="font-display text-2xl font-black">Dados importantes</h2><div class="mt-4 grid gap-5 sm:grid-cols-2">{activities.length > 0 && <div><h3 class="font-bold">Atividades</h3><ul class="mt-2 list-disc pl-5">{activities.map((item) => <li>{item}</li>)}</ul></div>}{requirements.length > 0 && <div><h3 class="font-bold">Requisitos</h3><ul class="mt-2 list-disc pl-5">{requirements.map((item) => <li>{item}</li>)}</ul></div>}{benefits.length > 0 && <div><h3 class="font-bold">Benefícios informados</h3><ul class="mt-2 list-disc pl-5">{benefits.map((item) => <li>{item}</li>)}</ul></div>}{(record.education || record.experienceLevel || record.additionalInfo) && <div><h3 class="font-bold">Outras informações</h3>{record.education && <p class="mt-2"><strong>Escolaridade:</strong> {record.education}</p>}{record.experienceLevel && <p class="mt-2"><strong>Experiência:</strong> {record.experienceLevel}</p>}{record.additionalInfo && <p class="mt-2">{record.additionalInfo}</p>}</div>}</div></section>}
 
           <AdSlot slot="job-content-mid" pageType="job" citySlug={job.citySlug} companySlug={job.companySlug} workplaceType={record.workplaceType} />
 
@@ -202,9 +219,17 @@ const saveStatus = Astro.url.searchParams.get("salvar");
             placement="footer"
           />
 
+          <section class="mt-8 rounded-2xl border border-[var(--es-border)] bg-white p-5">
+            <h2 class="font-display text-lg font-black">Verificação da oportunidade</h2>
+            <p class="mt-2 text-sm"><strong>Status:</strong> {verificationLabels[record.verificationStatus] ?? record.verificationStatus}</p>
+            {record.applicationUrlCheckedAt && <p class="mt-1 text-sm text-[var(--es-muted)]">Última verificação do link: {record.applicationUrlCheckedAt.toLocaleString("pt-BR")} · resultado {record.applicationUrlStatus}</p>}
+            {!record.applicationUrlCheckedAt && <p class="mt-1 text-sm text-[var(--es-muted)]">O link externo ainda não possui verificação automática registrada.</p>}
+          </section>
+
           <section class="mt-8 rounded-2xl border border-[var(--es-border)] bg-[var(--es-cream)] p-5">
             <h2 class="font-display text-lg font-black">Fonte da oportunidade</h2>
             <p class="mt-2 text-sm font-semibold text-[var(--text-primary)]">{record.sourceName}</p>
+            {sourceUrl.valid && sourceUrl.normalized && <a class="mt-2 inline-flex break-all text-sm font-bold underline" href={sourceUrl.normalized} rel="nofollow noopener noreferrer" target="_blank">Consultar fonte original</a>}
             <p class="mt-2 text-xs text-[var(--es-muted)]">A fonte indica onde a oportunidade foi encontrada. Use os canais de candidatura exibidos acima.</p>
           </section>
 

@@ -84,7 +84,7 @@ describe("auditoria do painel administrativo", () => {
 
   it("todas as páginas do menu existem", () => {
     const missing = ADMIN_NAV_GROUPS.flatMap((g) => g.items)
-      .map((item) => item.href.replace(/^\//, ""))
+      .map((item) => item.href.split(/[?#]/)[0]!.replace(/^\//, ""))
       .filter((href) => {
         const candidates = [
           resolve(`apps/web/src/pages/${href}.astro`),

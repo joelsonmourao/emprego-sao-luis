@@ -49,17 +49,89 @@ export interface JobPostingInput {
   directApply?: boolean;
 }
 
-function absoluteAssetUrl(url: string | null | undefined): string | undefined {
-  const value = String(url ?? "").trim();
-  if (!value) return undefined;
-  if (/^https?:\/\//i.test(value)) return value;
-  const base = (process.env.SITE_URL || "https://empregossaoluis.com.br").replace(/\/$/, "");
-  return value.startsWith("/") ? `${base}${value}` : `${base}/${value}`;
+function isLocalOrPrivateHost(hostname: string): boolean {
+  const host = hostname.trim().toLowerCase();
+  if (!host) return true;
+  if (host === "localhost" || host === "127.0.0.1" || host === "::1" || host === "0.0.0.0") return true;
+  if (host.endsWith(".local") || host.endsWith(".localhost")) return true;
+  return false;
 }
 
-const DEFAULT_ORG_LOGOS = ["/brand/icon.webp", "/favicon.svg"] as const;
+function absoluteHttpUrl(url: string | null | undefined): string | undefined {
+  const value = String(url ?? "").trim();
+  if (!value) return undefined;
+  try {
+    const configured = process.env.SITE_URL?.trim();
+    let base = "https://empregossaoluis.com.br";
+    if (configured) {
+      try {
+        const parsed = new URL(configured);
+        if (
+          (parsed.protocol === "http:" || parsed.protocol === "https:") &&
+          !isLocalOrPrivateHost(parsed.hostname)
+        ) {
+          base = parsed.origin;
+        }
+      } catch {
+        // keep production base
+      }
+    }
+    const resolved = new URL(value, base);
+    if (!["http:", "https:"].includes(resolved.protocol)) return undefined;
+    if (isLocalOrPrivateHost(resolved.hostname)) return undefined;
+    return resolved.toString();
+  } catch {
+    return undefined;
+  }
+}
+
+const normalizeToken = (value: string) => value
+  .normalize("NFD")
+  .replace(/[\u0300-\u036f]/g, "")
+  .trim()
+  .toUpperCase()
+  .replace(/[\s-]+/g, "_");
+
+const EMPLOYMENT_TYPES = new Set([
+  "FULL_TIME", "PART_TIME", "CONTRACTOR", "TEMPORARY", "INTERN", "VOLUNTEER", "PER_DIEM", "OTHER"
+]);
+
+export function normalizeEmploymentType(value: string): string | undefined {
+  const normalized = normalizeToken(String(value ?? ""));
+  if (EMPLOYMENT_TYPES.has(normalized)) return normalized;
+  if (["CLT", "INTEGRAL", "TEMPO_INTEGRAL", "EFETIVO"].includes(normalized)) return "FULL_TIME";
+  if (["PARCIAL", "MEIO_PERIODO", "TEMPO_PARCIAL"].includes(normalized)) return "PART_TIME";
+  if (["TEMPORARIO", "SAFRISTA"].includes(normalized)) return "TEMPORARY";
+  if (["ESTAGIO", "APRENDIZ", "JOVEM_APRENDIZ"].includes(normalized)) return "INTERN";
+  if (["PJ", "AUTONOMO", "PRESTADOR_DE_SERVICOS", "CONTRATO"].includes(normalized)) return "CONTRACTOR";
+  if (["DIARISTA", "POR_DIA"].includes(normalized)) return "PER_DIEM";
+  if (["VOLUNTARIO"].includes(normalized)) return "VOLUNTEER";
+  if (["INTERMITENTE", "OUTRO"].includes(normalized)) return "OTHER";
+  return undefined;
+}
+
+function normalizeSalaryUnit(value: string | null | undefined): string | undefined {
+  const normalized = normalizeToken(String(value ?? ""));
+  const units: Record<string, string> = {
+    HOUR: "HOUR", HORA: "HOUR",
+    DAY: "DAY", DIA: "DAY",
+    WEEK: "WEEK", SEMANA: "WEEK",
+    MONTH: "MONTH", MES: "MONTH",
+    YEAR: "YEAR", ANO: "YEAR"
+  };
+  return units[normalized];
+}
 
 export function buildJobPosting(input: JobPostingInput) {
+  const title = String(input.title ?? "").trim();
+  const description = String(input.description ?? "").trim();
+  const companyName = String(input.companyName ?? "").trim();
+  const employmentType = normalizeEmploymentType(input.employmentType);
+  const remote = ["REMOTO", "REMOTE"].includes(normalizeToken(input.workplaceType));
+  const cityName = String(input.cityName ?? "").trim();
+  const stateCode = String(input.stateCode ?? "").trim().toUpperCase();
+  const invalidCity = /^(não informado|nao informado|a definir|desconhecida|cidade)$/i.test(cityName);
+  const canonicalUrl = absoluteHttpUrl(input.canonicalUrl);
   if (
     (input.publicationStatus && input.publicationStatus !== "PUBLISHED") ||
     !input.publishedAt ||
@@ -68,7 +140,12 @@ export function buildJobPosting(input: JobPostingInput) {
     input.confidentialCompany ||
     input.unidentifiedCompany ||
     input.organizationPubliclyIdentifiable === false ||
-    !input.companyName.trim()
+    !title ||
+    !description ||
+    !companyName ||
+    !employmentType ||
+    !canonicalUrl ||
+    (!remote && (!cityName || invalidCity || !/^[A-Z]{2}$/.test(stateCode)))
   )
     return null;
   const salaryMin =
@@ -82,82 +159,71 @@ export function buildJobPosting(input: JobPostingInput) {
   const validMin = salaryMin !== undefined && Number.isFinite(salaryMin) && salaryMin > 0 ? salaryMin : undefined;
   const validMax = salaryMax !== undefined && Number.isFinite(salaryMax) && salaryMax > 0 ? salaryMax : undefined;
   const hasSalaryNumber = Boolean(input.salaryVisible) && (validMin !== undefined || validMax !== undefined);
-  const unitText = input.salaryPeriod?.trim() || "MONTH";
-
-  // Google JobPosting: MonetaryAmount.value deve ser QuantitativeValue com value/min/max + unitText.
-  const baseSalary = {
+  const unitText = normalizeSalaryUnit(input.salaryPeriod);
+  const currency = String(input.salaryCurrency ?? "").trim().toUpperCase();
+  const baseSalary = hasSalaryNumber && unitText && /^[A-Z]{3}$/.test(currency) ? {
     "@type": "MonetaryAmount",
-    currency: input.salaryCurrency || "BRL",
-    value: hasSalaryNumber
-      ? {
-          "@type": "QuantitativeValue",
-          ...(validMin !== undefined ? { minValue: validMin } : {}),
-          ...(validMax !== undefined ? { maxValue: validMax } : {}),
-          ...(validMin !== undefined && validMax === undefined ? { value: validMin } : {}),
-          ...(validMax !== undefined && validMin === undefined ? { value: validMax } : {}),
-          ...(validMin !== undefined && validMax !== undefined && validMin === validMax
-            ? { value: validMin }
-            : {}),
-          unitText
-        }
-      : {
-          "@type": "QuantitativeValue",
-          value: 0,
-          unitText
-        }
-  };
-  const brandLogos = DEFAULT_ORG_LOGOS.map((path) => ({
-    "@type": "ImageObject" as const,
-    url: absoluteAssetUrl(path)!
-  }));
-  const identifierValue = input.publicCode?.trim() ? input.publicCode.trim() : 0;
-  const streetAddress = input.streetAddress?.trim() || "Não Informado";
-  const postalCode = input.postalCode?.trim() || "Não Informado";
+    currency,
+    value: {
+      "@type": "QuantitativeValue",
+      ...(validMin !== undefined ? { minValue: validMin } : {}),
+      ...(validMax !== undefined ? { maxValue: validMax } : {}),
+      ...(validMin !== undefined && validMax === undefined ? { value: validMin } : {}),
+      ...(validMax !== undefined && validMin === undefined ? { value: validMax } : {}),
+      ...(validMin !== undefined && validMax !== undefined && validMin === validMax ? { value: validMin } : {}),
+      unitText
+    }
+  } : null;
+  const organizationLogo = absoluteHttpUrl(input.organizationLogoUrl);
+  const companyWebsiteUrl = absoluteHttpUrl(input.companyWebsiteUrl);
+  const identifierValue = input.publicCode?.trim() || null;
+  const streetAddress = input.streetAddress?.trim() || null;
+  const postalCode = input.postalCode?.trim() || null;
   return {
     "@context": "https://schema.org",
     "@type": "JobPosting",
-    title: input.title,
+    title,
     // Google JobPosting: description em HTML (não Markdown).
-    description: input.description,
+    description,
     datePosted: input.publishedAt.toISOString(),
     validThrough: input.expiresAt.toISOString(),
-    employmentType: input.employmentType,
+    employmentType,
     hiringOrganization: {
       "@type": "Organization",
-      name: input.companyName,
-      ...(input.companyWebsiteUrl ? { sameAs: input.companyWebsiteUrl } : {}),
-      logo: brandLogos
+      name: companyName,
+      ...(companyWebsiteUrl ? { sameAs: companyWebsiteUrl } : {}),
+      ...(organizationLogo ? { logo: organizationLogo } : {})
     },
-    identifier: { "@type": "PropertyValue", name: "Código ES", value: identifierValue },
-    ...(input.canonicalUrl ? { url: input.canonicalUrl } : {}),
-    ...(input.workplaceType === "remoto"
-      ? { jobLocationType: "TELECOMMUTE", applicantLocationRequirements: { "@type": "Country", name: "BR" } }
+    ...(identifierValue ? { identifier: { "@type": "PropertyValue", name: "Código ES", value: identifierValue } } : {}),
+    url: canonicalUrl,
+    ...(remote
+      ? { jobLocationType: "TELECOMMUTE" }
       : {
           jobLocation: {
             "@type": "Place",
             address: {
-              "@type": "PostalAddress",
-              streetAddress,
-              postalCode,
-              addressLocality: input.cityName || "Não Informado",
-              addressRegion: input.stateCode || "Não Informado",
+            "@type": "PostalAddress",
+              ...(streetAddress ? { streetAddress } : {}),
+              ...(postalCode ? { postalCode } : {}),
+              addressLocality: cityName,
+              addressRegion: stateCode,
               addressCountry: "BR"
             }
           }
         }),
-    baseSalary,
+    ...(baseSalary ? { baseSalary } : {}),
     ...(input.directApply === true ? { directApply: true } : {})
   };
 }
 
 export function validateJobPosting(input: JobPostingInput) {
   const missing: string[] = [];
-  if (!input.title.trim()) missing.push("title");
-  if (!input.description.trim()) missing.push("description");
+  if (!String(input.title ?? "").trim()) missing.push("title");
+  if (!String(input.description ?? "").trim()) missing.push("description");
   if (!input.publishedAt) missing.push("datePosted");
   if (!input.expiresAt) missing.push("validThrough");
-  if (!input.employmentType.trim()) missing.push("employmentType");
-  if (!input.companyName.trim()) missing.push("hiringOrganization");
+  if (!normalizeEmploymentType(input.employmentType)) missing.push("employmentType");
+  if (!String(input.companyName ?? "").trim()) missing.push("hiringOrganization");
   if (
     input.confidentialCompany ||
     input.unidentifiedCompany ||
@@ -165,9 +231,12 @@ export function validateJobPosting(input: JobPostingInput) {
   )
     missing.push("publicHiringOrganization");
   if (input.publicationStatus && input.publicationStatus !== "PUBLISHED") missing.push("publicationStatus");
-  if (input.workplaceType !== "remoto" && (!input.cityName.trim() || !input.stateCode.trim()))
+  const remote = ["REMOTO", "REMOTE"].includes(normalizeToken(input.workplaceType));
+  const cityName = String(input.cityName ?? "").trim();
+  const stateCode = String(input.stateCode ?? "").trim().toUpperCase();
+  if (!remote && (!cityName || /^(não informado|nao informado|a definir|desconhecida|cidade)$/i.test(cityName) || !/^[A-Z]{2}$/.test(stateCode)))
     missing.push("jobLocation");
-  if (!input.canonicalUrl?.trim()) missing.push("canonicalUrl");
+  if (!absoluteHttpUrl(input.canonicalUrl)) missing.push("canonicalUrl");
   const schema = buildJobPosting(input);
   return { valid: missing.length === 0 && schema !== null, missing, schema };
 }

@@ -5,10 +5,14 @@ import EmptyState from "../../components/ui/EmptyState.astro";
 import PageHero from "../../components/ui/PageHero.astro";
 import Pagination from "../../components/ui/Pagination.astro";
 import { listPublishedArticlesPage } from "../../lib/articles";
+import { getRuntimeSiteUrl } from "../../lib/canonical-url";
 
 const pageSize = 12;
-const page = Math.max(1, Number(Astro.url.searchParams.get("pagina") ?? 1) || 1);
+const pageParam = Astro.url.searchParams.get("pagina") ?? "1";
+const pageNumber = Number(pageParam);
+const page = /^[1-9]\d*$/.test(pageParam) && Number.isSafeInteger(pageNumber) ? pageNumber : 1;
 const { items, total, page: current, pages } = await listPublishedArticlesPage(page, pageSize, ["GUIDE", "DATA_REPORT"]);
+if (page > pages) return new Response("Página não encontrada", { status: 404, headers: { "X-Robots-Tag": "noindex, follow" } });
 const pageUrl = (target: number) => {
   const params = new URLSearchParams(Astro.url.searchParams);
   if (target <= 1) params.delete("pagina");
@@ -16,7 +20,7 @@ const pageUrl = (target: number) => {
   const q = params.toString();
   return q ? `?${q}` : "/blog";
 };
-const canonical = new URL(current > 1 ? `/blog?pagina=${current}` : "/blog", Astro.site).toString();
+const canonical = new URL(current > 1 ? `/blog?pagina=${current}` : "/blog", getRuntimeSiteUrl(Astro.site)).toString();
 ---
 <BaseLayout
   title="Guias gratuitos de emprego — Empregos São Luís"

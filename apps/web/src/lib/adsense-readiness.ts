@@ -2,7 +2,9 @@ import { CANDIDATURE_BLOCKED_SLOT_KEYS } from "@es/ads";
 import { articles, categories, cities, companies, createDatabase, jobs, states, webStories } from "@es/db";
 import { evaluateJobPublication, isStagingLikeEnvironment } from "@es/shared";
 import { eq } from "drizzle-orm";
+import { validateAdsTxtContent } from "./ads-txt";
 import { getInstitutionalPages } from "./site-pages";
+import { getSiteIntegrations, normalizeAdsenseClientId, normalizePubIdForAdsTxt } from "./site-integrations";
 
 export type ReadinessKind = "OFFICIAL" | "INTERNAL" | "RECOMMENDATION";
 export type ReadinessStatus = "BLOQUEADOR" | "PENDENTE" | "EM_REVISÃO" | "APROVADO_INTERNAMENTE" | "NÃO_APLICÁVEL";
@@ -54,6 +56,7 @@ async function buildAdsenseReadiness(baseUrl: URL) {
   const institutional = await getInstitutionalPages();
   const institutionalRequired = [
     "quem-somos",
+    "sobre",
     "contato",
     "privacidade",
     "cookies",
@@ -61,6 +64,8 @@ async function buildAdsenseReadiness(baseUrl: URL) {
     "politica-editorial",
     "politica-fontes",
     "politica-correcoes",
+    "redacao",
+    "seguranca-candidatos",
     "lgpd"
   ] as const;
   const pendingInstitutional = institutionalRequired.filter(
@@ -93,8 +98,8 @@ async function buildAdsenseReadiness(baseUrl: URL) {
   if (process.env.DATABASE_URL) {
     const connection = createDatabase(process.env.DATABASE_URL);
     try {
-      articleRows = await connection.db.select().from(articles).limit(400);
-      storyRows = await connection.db.select().from(webStories).limit(100);
+      articleRows = await connection.db.select().from(articles);
+      storyRows = await connection.db.select().from(webStories);
       jobRows = await connection.db
         .select({
           job: jobs,
@@ -108,8 +113,7 @@ async function buildAdsenseReadiness(baseUrl: URL) {
         .innerJoin(cities, eq(jobs.cityId, cities.id))
         .innerJoin(states, eq(jobs.stateId, states.id))
         .leftJoin(categories, eq(jobs.categoryId, categories.id))
-        .where(eq(jobs.publicationStatus, "PUBLISHED"))
-        .limit(400);
+        .where(eq(jobs.publicationStatus, "PUBLISHED"));
     } finally {
       await connection.close();
     }
@@ -171,7 +175,7 @@ async function buildAdsenseReadiness(baseUrl: URL) {
       id: "content-volume",
       stage: "ETAPA_2",
       label: "Conteúdo original avaliável",
-      kind: "OFFICIAL",
+      kind: "INTERNAL",
       severity: "P0",
       status: publishedArticles.length ? "APROVADO_INTERNAMENTE" : "BLOQUEADOR",
       evidence: `${publishedArticles.length} real(is) publicado(s); ${scheduledArticles.length} agendado(s); ${templatePublished.length} template seed ignorado(s). O Google não publica quantidade mínima oficial.`,
@@ -390,10 +394,26 @@ async function buildAdsenseReadiness(baseUrl: URL) {
     })
   );
 
-  const publisherId = import.meta.env.PUBLIC_ADSENSE_PUBLISHER_ID as string | undefined;
-  const clientId = import.meta.env.PUBLIC_ADSENSE_CLIENT_ID as string | undefined;
-  const adsEnabled = import.meta.env.PUBLIC_ADSENSE_ENABLED === "true";
+  const integrations = await getSiteIntegrations();
+  const runtimeClientId = normalizeAdsenseClientId(
+    String(process.env.PUBLIC_ADSENSE_CLIENT_ID ?? import.meta.env.PUBLIC_ADSENSE_CLIENT_ID ?? "")
+  );
+  const clientId = normalizeAdsenseClientId(integrations.adsensePublisherId) || runtimeClientId;
+  const runtimePublisherId = String(
+    process.env.PUBLIC_ADSENSE_PUBLISHER_ID ?? import.meta.env.PUBLIC_ADSENSE_PUBLISHER_ID ?? ""
+  ).trim().toLowerCase();
+  const publisherId = /^pub-\d+$/.test(runtimePublisherId)
+    ? runtimePublisherId
+    : normalizePubIdForAdsTxt(clientId);
+  const adsEnabled = integrations.persisted
+    ? integrations.adsenseEnabled
+    : integrations.adsenseEnabled ||
+      String(process.env.PUBLIC_ADSENSE_ENABLED ?? import.meta.env.PUBLIC_ADSENSE_ENABLED ?? "").toLowerCase() === "true";
   const adsTxt = await fetchText(new URL("/ads.txt", baseUrl));
+  const adsTxtValidation = validateAdsTxtContent(adsTxt.body);
+  const adsTxtHasPublisher = Boolean(publisherId) && adsTxtValidation.valid && adsTxtValidation.content
+    .split(/\r?\n/)
+    .some((line) => line.split(",")[1]?.trim().toLowerCase() === publisherId);
   checks.push(
     pass({
       id: "publisher",
@@ -401,7 +421,7 @@ async function buildAdsenseReadiness(baseUrl: URL) {
       label: "Publisher ID",
       kind: "INTERNAL",
       severity: "P1",
-      status: publisherId && /^pub-\d+$/.test(publisherId) ? "APROVADO_INTERNAMENTE" : "PENDENTE",
+      status: publisherId ? "APROVADO_INTERNAMENTE" : "PENDENTE",
       evidence: publisherId ? "Formato configurado." : "Pendente de conta AdSense real; nenhum ID foi inventado."
     })
   );
@@ -412,8 +432,12 @@ async function buildAdsenseReadiness(baseUrl: URL) {
       label: "ads.txt",
       kind: "OFFICIAL",
       severity: "P1",
-      status: publisherId && adsTxt.body.includes(publisherId) ? "APROVADO_INTERNAMENTE" : "PENDENTE",
-      evidence: adsTxt.body.trim().slice(0, 180) || "ads.txt vazio ou indisponível."
+      status: adsTxt.status === 200 && adsTxtHasPublisher ? "APROVADO_INTERNAMENTE" : "PENDENTE",
+      evidence: adsTxt.status !== 200
+        ? `ads.txt indisponível (HTTP ${adsTxt.status || "erro de rede"}).`
+        : adsTxtHasPublisher
+          ? "Linha DIRECT do publisher configurado encontrada e validada."
+          : "Linha DIRECT do publisher configurado ausente ou inválida."
     })
   );
   checks.push(

@@ -7,6 +7,7 @@ import PageHero from "../../components/ui/PageHero.astro";
 import Pagination from "../../components/ui/Pagination.astro";
 import { categories, cities, companies, createDatabase, jobs, neighborhoods, states } from "@es/db";
 import { and, asc, count, desc, eq, gt, ilike, or, sql, type SQL } from "drizzle-orm";
+import { getRuntimeSiteUrl } from "../../lib/canonical-url";
 
 const q = Astro.url.searchParams.get("q")?.trim() ?? "";
 const city = Astro.url.searchParams.get("cidade")?.trim() ?? "";
@@ -15,7 +16,9 @@ const category = Astro.url.searchParams.get("categoria")?.trim() ?? "";
 const workplace = Astro.url.searchParams.get("modalidade") ?? "";
 const contract = Astro.url.searchParams.get("contrato")?.trim() ?? "";
 const order = Astro.url.searchParams.get("ordem") === "titulo" ? "titulo" : "recentes";
-const page = Math.max(1, Number(Astro.url.searchParams.get("pagina") ?? 1) || 1);
+const pageParam = Astro.url.searchParams.get("pagina") ?? "1";
+const pageNumber = Number(pageParam);
+const page = /^[1-9]\d*$/.test(pageParam) && Number.isSafeInteger(pageNumber) ? pageNumber : 1;
 const pageSize = 18;
 
 const conditions: SQL[] = [eq(jobs.publicationStatus, "PUBLISHED"), gt(jobs.expiresAt, new Date())];
@@ -74,6 +77,7 @@ if (process.env.DATABASE_URL) {
 }
 
 const pages = Math.max(1, Math.ceil(total / pageSize));
+if (page > pages) return new Response("Página não encontrada", { status: 404, headers: { "X-Robots-Tag": "noindex, follow" } });
 const pageUrl = (target: number) => {
   const params = new URLSearchParams(Astro.url.searchParams);
   if (target <= 1) params.delete("pagina");
@@ -90,15 +94,16 @@ const activeFilters = [
   workplace && ["Modalidade", workplace],
   contract && ["Contrato", contract]
 ].filter(Boolean) as Array<[string, string]>;
-const noindex = rows.length === 0 || activeFilters.length > 0 || order !== "recentes";
-const canonical = new URL(page > 1 ? `/vagas?pagina=${page}` : "/vagas", Astro.site).toString();
+const noindex = rows.length === 0 || activeFilters.length > 0 || order !== "recentes" || page > 1;
+const siteUrl = getRuntimeSiteUrl(Astro.site);
+const canonical = new URL(page > 1 ? `/vagas?pagina=${page}` : "/vagas", siteUrl).toString();
 const itemListSchema = {
   "@type": "ItemList",
   numberOfItems: rows.length,
   itemListElement: rows.map((row, index) => ({
     "@type": "ListItem",
     position: (page - 1) * pageSize + index + 1,
-    url: new URL(`/vagas/${row.slug}`, Astro.site).toString(),
+    url: new URL(`/vagas/${row.slug}`, siteUrl).toString(),
     name: row.title
   }))
 };

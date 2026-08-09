@@ -15,7 +15,7 @@ describe("brand constants", () => {
   it("define todas as chaves administráveis", () => {
     expect(Object.keys(BRAND_ASSET_LABELS).length).toBe(12);
     expect(BRAND_ASSET_KEYS.LOGO_MAIN).toBe("brand.logo.main");
-    expect(FALLBACK_PATHS[BRAND_ASSET_KEYS.FAVICON]).toBe("/favicon.ico");
+    expect(FALLBACK_PATHS[BRAND_ASSET_KEYS.FAVICON]).toBe("/favicon.svg");
   });
 
   it("limites de upload por tipo", () => {

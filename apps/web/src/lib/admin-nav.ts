@@ -1,142 +1,162 @@
-export type AdminNavItem = { label: string; href: string; permission?: string };
-export type AdminNavGroup = { title: string; items: AdminNavItem[] };
+export type AdminIcon =
+  | "home"
+  | "content"
+  | "publish"
+  | "quality"
+  | "search"
+  | "adsense"
+  | "operation"
+  | "business"
+  | "system";
+
+export type AdminNavItem = {
+  label: string;
+  href: string;
+  icon: AdminIcon;
+  description: string;
+  permission?: string;
+};
+export type AdminNavGroup = { title: string; icon: AdminIcon; items: AdminNavItem[] };
 
 /**
- * Menu administrativo: Operação do dia primeiro; demais ferramentas agrupadas.
- * Candidato sempre gratuito. AdSense só via Rota da Aprovação + flag explícita.
- *
- * Aliases: /admin/planos|pedidos|pagamentos|creditos → comercial/*;
- * /admin/filas|/admin/jobs → /admin/operacao; /admin/campanhas → publicidade.
+ * Arquitetura de informação do painel Astro ativo.
+ * As rotas existentes são preservadas; query strings e âncoras apenas abrem o recorte correto.
  */
 export const ADMIN_NAV_GROUPS: AdminNavGroup[] = [
   {
-    title: "Operação do dia",
+    title: "Visão geral",
+    icon: "home",
     items: [
-      { label: "Dashboard", href: "/admin" },
-      { label: "1. Importar vagas", href: "/admin/vagas/importar", permission: "imports.manage" },
-      { label: "2. Revisar e publicar", href: "/admin/vagas/revisao", permission: "jobs.publish" },
-      { label: "3. Monitor de candidaturas", href: "/admin/vagas/monitor-candidaturas", permission: "jobs.read" },
-      { label: "4. Post Magnético", href: "/admin/conteudo/post-magnetico", permission: "content.manage" },
-      { label: "5. Rota da Aprovação", href: "/admin/adsense-readiness", permission: "seo.manage" },
-      { label: "6. Planos e vagas patrocinadas", href: "/admin/comercial/planos", permission: "commercial.manage" }
+      { label: "Dashboard", href: "/admin", icon: "home", description: "Resumo operacional e prioridades do dia" }
     ]
   },
   {
-    title: "Vagas",
+    title: "Conteúdo",
+    icon: "content",
     items: [
-      { label: "Todas as vagas", href: "/admin/vagas", permission: "jobs.read" },
-      { label: "Cadastrar vaga", href: "/admin/vagas/nova", permission: "jobs.create" },
-      { label: "Importar por links ou contatos", href: "/admin/vagas/importar-contatos", permission: "imports.manage" },
-      { label: "Programação", href: "/admin/programacao", permission: "jobs.publish" }
+      { label: "Vagas", href: "/admin/vagas", icon: "content", description: "Cadastrar, revisar e administrar vagas", permission: "jobs.read" },
+      { label: "Blog", href: "/admin/conteudo?tipo=blog", icon: "content", description: "Guias e análises editoriais", permission: "content.manage" },
+      { label: "Notícias", href: "/admin/conteudo?tipo=noticias", icon: "content", description: "Conteúdo noticioso e atualizações", permission: "content.manage" },
+      { label: "Empresas", href: "/admin/empresas", icon: "business", description: "Empresas e perfis públicos", permission: "companies.manage" },
+      { label: "Categorias", href: "/admin/categorias", icon: "content", description: "Taxonomia das oportunidades", permission: "settings.manage" },
+      { label: "Cidades", href: "/admin/localidades", icon: "content", description: "Cidades e bairros cadastrados", permission: "settings.manage" },
+      { label: "Pilares e clusters", href: "/admin/conteudo/pilares", icon: "content", description: "Arquitetura editorial e links internos", permission: "content.manage" }
     ]
   },
   {
-    title: "Conteúdo (Blog Fantasma)",
+    title: "Publicação",
+    icon: "publish",
     items: [
-      { label: "Notícias e guias", href: "/admin/conteudo", permission: "content.manage" },
-      { label: "Pilares e clusters", href: "/admin/conteudo/pilares", permission: "content.manage" },
-      { label: "Redação assistida", href: "/admin/conteudo/estrategia", permission: "content.manage" },
-      { label: "Web Stories", href: "/admin/web-stories", permission: "content.manage" },
-      { label: "Calendário editorial", href: "/admin/calendario-editorial", permission: "content.manage" },
-      { label: "Autores e revisores", href: "/admin/autores", permission: "content.manage" },
-      { label: "Fontes", href: "/admin/fontes", permission: "content.manage" },
-      { label: "Regras de classificação", href: "/admin/classificacao", permission: "content.manage" }
+      { label: "Importações", href: "/admin/vagas/importar", icon: "publish", description: "Planilhas, links e pré-validação", permission: "imports.manage" },
+      { label: "Agendamentos", href: "/admin/programacao", icon: "publish", description: "Fila de publicação programada", permission: "jobs.publish" },
+      { label: "Histórico", href: "/admin/auditoria?entidade=JOB", icon: "publish", description: "Alterações e publicações registradas", permission: "audit.read" },
+      { label: "Filas", href: "/admin/operacao", icon: "operation", description: "Jobs assíncronos e reprocessamento", permission: "queues.manage" }
     ]
   },
   {
-    title: "Monetização B2B",
+    title: "Qualidade",
+    icon: "quality",
     items: [
-      { label: "Vagas patrocinadas", href: "/admin/vagas-patrocinadas", permission: "commercial.manage" },
-      { label: "Pedidos", href: "/admin/comercial/pedidos", permission: "commercial.manage" },
-      { label: "Pagamentos", href: "/admin/comercial/pagamentos", permission: "commercial.manage" },
-      { label: "Créditos", href: "/admin/comercial/creditos", permission: "commercial.manage" },
-      { label: "Reembolsos", href: "/admin/comercial/reembolsos", permission: "commercial.manage" },
-      { label: "Perfis empresariais", href: "/admin/perfis-empresariais", permission: "commercial.manage" },
-      { label: "Publicidade", href: "/admin/publicidade", permission: "commercial.manage" },
-      { label: "Campanhas", href: "/admin/campanhas", permission: "commercial.manage" },
-      { label: "Conteúdo patrocinado", href: "/admin/conteudo-patrocinado", permission: "content.manage" },
-      { label: "Config. pagamentos", href: "/admin/comercial/configuracao-pagamento", permission: "settings.manage" },
-      { label: "Contatos comerciais", href: "/admin/contatos", permission: "commercial.manage" }
+      { label: "Qualidade das vagas", href: "/admin/qualidade-vagas", icon: "quality", description: "Fontes, canais, salários e localização", permission: "jobs.read" },
+      { label: "Qualidade editorial", href: "/admin/qualidade-editorial", icon: "quality", description: "Profundidade, confiança e utilidade local", permission: "content.manage" },
+      { label: "Duplicidades", href: "/admin/qualidade-vagas#duplicidades", icon: "quality", description: "Vagas e conteúdo possivelmente repetidos", permission: "jobs.read" },
+      { label: "Vagas expiradas", href: "/admin/qualidade-vagas#expiradas", icon: "quality", description: "Validade e inconsistências de status", permission: "jobs.read" },
+      { label: "Links com problemas", href: "/admin/qualidade-vagas#links", icon: "quality", description: "Canais fechados, inválidos ou inconclusivos", permission: "jobs.read" },
+      { label: "Dados inconsistentes", href: "/admin/qualidade-vagas#inconsistencias", icon: "quality", description: "Campos críticos que exigem revisão", permission: "jobs.read" }
     ]
   },
   {
-    title: "Empresas e local",
+    title: "SEO & Google",
+    icon: "search",
     items: [
-      { label: "Todas as empresas", href: "/admin/empresas", permission: "companies.manage" },
-      { label: "Cidades e bairros", href: "/admin/localidades", permission: "companies.manage" }
+      { label: "Visão geral SEO", href: "/admin/seo", icon: "search", description: "Configurações e estado técnico", permission: "seo.manage" },
+      { label: "Google Jobs", href: "/admin/seo/auditoria#google-jobs", icon: "search", description: "Validade do schema JobPosting", permission: "seo.manage" },
+      { label: "Indexação Google", href: "/admin/integracoes#indexacao-google", icon: "search", description: "Eventos da API de indexação", permission: "seo.manage" },
+      { label: "Sitemaps", href: "/admin/seo/auditoria#sitemaps", icon: "search", description: "Índice e arquivos filhos", permission: "seo.manage" },
+      { label: "Dados estruturados", href: "/admin/seo/auditoria#dados-estruturados", icon: "search", description: "Schemas emitidos pelo portal", permission: "seo.manage" },
+      { label: "IndexNow", href: "/admin/integracoes#indexnow", icon: "search", description: "Envios e configuração IndexNow", permission: "seo.manage" }
     ]
   },
   {
-    title: "Mais ferramentas",
+    title: "AdSense",
+    icon: "adsense",
     items: [
-      { label: "Saúde", href: "/admin/saude" },
-      { label: "Páginas institucionais", href: "/admin/paginas", permission: "content.manage" },
-      { label: "Mídia", href: "/admin/midia", permission: "media.manage" },
-      { label: "Aparência", href: "/admin/aparencia", permission: "settings.manage" },
-      { label: "Alertas e inscrições", href: "/admin/audiencia", permission: "audience.manage" },
-      { label: "Social Studio", href: "/admin/social", permission: "social.manage" },
-      { label: "Instagram", href: "/admin/instagram", permission: "social.manage" },
-      { label: "Configurações SEO", href: "/admin/seo", permission: "seo.manage" },
-      { label: "Integrações", href: "/admin/integracoes", permission: "seo.manage" },
-      { label: "Auditoria SEO", href: "/admin/seo/auditoria", permission: "seo.manage" },
-      { label: "Links internos", href: "/admin/seo/links-internos", permission: "seo.manage" },
-      { label: "Conteúdo órfão e canibalização", href: "/admin/seo/canibalizacao", permission: "seo.manage" },
-      { label: "Filas e jobs", href: "/admin/operacao", permission: "queues.manage" },
-      { label: "Automações editoriais", href: "/admin/automacoes-editoriais", permission: "queues.manage" },
-      { label: "Auditoria", href: "/admin/auditoria", permission: "audit.read" },
-      { label: "Usuários", href: "/admin/usuarios", permission: "users.manage" },
-      { label: "Administradores", href: "/admin/administradores", permission: "users.manage" },
-      { label: "Permissões", href: "/admin/permissoes", permission: "users.manage" },
-      { label: "Segurança", href: "/admin/seguranca", permission: "settings.manage" },
-      { label: "Identidade visual", href: "/admin/configuracoes/identidade-visual", permission: "settings.brand.view" },
-      { label: "Categorias", href: "/admin/categorias", permission: "content.manage" }
+      { label: "Central AdSense", href: "/admin/adsense-readiness", icon: "adsense", description: "Indicador interno e bloqueadores", permission: "seo.manage" },
+      { label: "Auditoria de conteúdo", href: "/admin/adsense-readiness#conteudo", icon: "adsense", description: "Artigos, notícias e conteúdo fraco", permission: "seo.manage" },
+      { label: "Indexação para AdSense", href: "/admin/urls", icon: "adsense", description: "URLs, robots, canonical, qualidade e sitemap", permission: "seo.manage" },
+      { label: "Checklist de aprovação", href: "/admin/adsense-readiness#checklist", icon: "adsense", description: "Requisitos, metas internas e evidências", permission: "seo.manage" },
+      { label: "Configurações", href: "/admin/adsense-readiness#configuracoes", icon: "adsense", description: "Modo de revisão e controles", permission: "seo.manage" }
+    ]
+  },
+  {
+    title: "Operação",
+    icon: "operation",
+    items: [
+      { label: "Alertas", href: "/admin/audiencia", icon: "operation", description: "Inscrições e alertas de vagas", permission: "audience.manage" },
+      { label: "Notificações", href: "/admin/operacao#notificacoes", icon: "operation", description: "Entregas e falhas assíncronas", permission: "queues.manage" },
+      { label: "Publicações sociais", href: "/admin/social", icon: "operation", description: "Conteúdo e canais sociais", permission: "social.manage" },
+      { label: "Monitoramento", href: "/admin/vagas/monitor-candidaturas", icon: "operation", description: "Disponibilidade das candidaturas", permission: "jobs.read" }
+    ]
+  },
+  {
+    title: "Negócio",
+    icon: "business",
+    items: [
+      { label: "Monetização", href: "/admin/comercial/planos", icon: "business", description: "Planos, créditos e pedidos B2B", permission: "commercial.manage" },
+      { label: "Clientes / empresas", href: "/admin/perfis-empresariais", icon: "business", description: "Perfis e relacionamento comercial", permission: "commercial.manage" },
+      { label: "Publicidade", href: "/admin/publicidade", icon: "business", description: "Campanhas, anunciantes e slots", permission: "commercial.manage" },
+      { label: "Pagamentos", href: "/admin/comercial/pagamentos", icon: "business", description: "Pagamentos e revisões", permission: "commercial.manage" }
+    ]
+  },
+  {
+    title: "Sistema",
+    icon: "system",
+    items: [
+      { label: "Usuários", href: "/admin/usuarios", icon: "system", description: "Contas e privacidade", permission: "users.manage" },
+      { label: "Permissões", href: "/admin/permissoes", icon: "system", description: "Papéis e acessos RBAC", permission: "users.manage" },
+      { label: "Auditoria", href: "/admin/auditoria", icon: "system", description: "Trilha de ações administrativas", permission: "audit.read" },
+      { label: "Logs e diagnóstico", href: "/admin/saude", icon: "system", description: "Saúde dos serviços e armazenamento" },
+      { label: "Configurações", href: "/admin/integracoes", icon: "system", description: "Integrações e parâmetros do portal", permission: "settings.manage" },
+      { label: "Aparência", href: "/admin/aparencia", icon: "system", description: "Identidade e apresentação", permission: "settings.manage" },
+      { label: "Segurança", href: "/admin/seguranca", icon: "system", description: "MFA e sessões administrativas", permission: "settings.manage" }
     ]
   }
 ];
 
-/** Atalhos do dashboard — ordem fixa da operação diária. */
 export const ADMIN_DAY_OPS: AdminNavItem[] = [
-  {
-    label: "Importar vagas",
-    href: "/admin/vagas/importar",
-    permission: "imports.manage"
-  },
-  {
-    label: "Revisar e publicar",
-    href: "/admin/vagas/revisao",
-    permission: "jobs.publish"
-  },
-  {
-    label: "Monitor de candidaturas",
-    href: "/admin/vagas/monitor-candidaturas",
-    permission: "jobs.read"
-  },
-  {
-    label: "Post Magnético",
-    href: "/admin/conteudo/post-magnetico",
-    permission: "content.manage"
-  },
-  {
-    label: "Rota da Aprovação",
-    href: "/admin/adsense-readiness",
-    permission: "seo.manage"
-  },
-  {
-    label: "Planos e patrocínios",
-    href: "/admin/comercial/planos",
-    permission: "commercial.manage"
-  }
+  { label: "Importar vagas", href: "/admin/vagas/importar", icon: "publish", description: "Validar planilhas ou contatos", permission: "imports.manage" },
+  { label: "Revisar qualidade", href: "/admin/qualidade-vagas", icon: "quality", description: "Resolver bloqueadores antes de publicar", permission: "jobs.read" },
+  { label: "Publicar conteúdo", href: "/admin/conteudo", icon: "content", description: "Gerenciar notícias e guias", permission: "content.manage" },
+  { label: "Central AdSense", href: "/admin/adsense-readiness", icon: "adsense", description: "Ver preparação e modo de revisão", permission: "seo.manage" }
 ];
 
-export function filterAdminNav(permissions: string[]): AdminNavGroup[] {
-  const isSuper = permissions.includes("settings.manage") && permissions.length > 8;
+function hasPermission(permissions: string[], permission?: string, roles: string[] = []) {
+  if (!permission) return true;
+  return roles.includes("SUPER_ADMIN") || permissions.includes(permission);
+}
+
+export function filterAdminNav(permissions: string[], roles: string[] = []): AdminNavGroup[] {
   return ADMIN_NAV_GROUPS.map((group) => ({
     ...group,
-    items: group.items.filter((item) => !item.permission || permissions.includes(item.permission) || isSuper)
+    items: group.items.filter((item) => hasPermission(permissions, item.permission, roles))
   })).filter((group) => group.items.length > 0);
 }
 
-export function filterDayOps(permissions: string[]): AdminNavItem[] {
-  const isSuper = permissions.includes("settings.manage") && permissions.length > 8;
-  return ADMIN_DAY_OPS.filter((item) => !item.permission || permissions.includes(item.permission) || isSuper);
+export function filterDayOps(permissions: string[], roles: string[] = []) {
+  return ADMIN_DAY_OPS.filter((item) => hasPermission(permissions, item.permission, roles));
+}
+
+export function findAdminNavContext(pathname: string, search = "") {
+  const current = `${pathname}${search}`;
+  const matches = ADMIN_NAV_GROUPS.flatMap((group) =>
+    group.items.flatMap((item) => {
+      const candidate = item;
+      const href = candidate.href.split("#")[0]!;
+      const matched = href.includes("?")
+        ? current === href
+        : pathname === href || (href !== "/admin" && pathname.startsWith(`${href}/`));
+      return matched ? [{ group, item, score: href.length + (current === href ? 10_000 : 0) }] : [];
+    })
+  );
+  return matches.sort((left, right) => right.score - left.score)[0] ?? null;
 }

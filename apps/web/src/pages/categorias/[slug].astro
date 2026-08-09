@@ -5,6 +5,7 @@ import JobCard from "../../components/ui/JobCard.astro";
 import SectionHeading from "../../components/ui/SectionHeading.astro";
 import { categories, cities, companies, createDatabase, jobs, states } from "@es/db";
 import { and, desc, eq, gt, sql } from "drizzle-orm";
+import { classifyCategoryPage } from "../../lib/entity-page-quality";
 
 const slug = Astro.params.slug ?? "";
 let category;
@@ -44,8 +45,9 @@ if (!category) {
     headers: { "Content-Type": "text/plain; charset=utf-8", "X-Robots-Tag": "noindex, follow" }
   });
 }
+const pageQuality = classifyCategoryPage({ activeJobs: rows.length, description: category.description, seoTitle: category.seoTitle, metaDescription: category.metaDescription });
 ---
-<BaseLayout title={category.seoTitle ?? `${category.name} — vagas de emprego`} description={category.metaDescription ?? `Vagas na categoria ${category.name}.`} breadcrumbs={[{ name: "Categorias", url: "/categorias" }, { name: category.name, url: `/categorias/${category.slug}` }]} noindex={rows.length === 0 || !category.description?.trim()}>
+<BaseLayout title={category.seoTitle ?? `${category.name} — vagas de emprego`} description={category.metaDescription ?? `Vagas na categoria ${category.name}.`} canonical={`/categorias/${category.slug}`} breadcrumbs={[{ name: "Categorias", url: "/categorias" }, { name: category.name, url: `/categorias/${category.slug}` }]} noindex={pageQuality !== "FORTE"} adsenseReviewQualityOverride={pageQuality === "FORTE"}>
   <section class="es-section bg-white">
     <div class="es-container">
       <Breadcrumbs items={[{ name: "Início", url: "/" }, { name: "Categorias", url: "/categorias" }, { name: category.name }]} />

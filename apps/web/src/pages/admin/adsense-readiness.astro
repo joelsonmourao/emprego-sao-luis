@@ -1,126 +1,161 @@
 ---
 import AdminLayout from "../../layouts/AdminLayout.astro";
+import { getAdsenseIndexInventory } from "../../lib/adsense-index-inventory";
 import { getAdsenseReadiness } from "../../lib/adsense-readiness";
+import { getAdsenseReviewMode } from "../../lib/adsense-review-mode";
+import { getEditorialAuditReport } from "../../lib/editorial-audit";
+import { getJobAuditReport } from "../../lib/job-audit";
+import { getInstitutionalPages, getInstitutionalPagesUpdatedAt, type InstitutionalSlug } from "../../lib/site-pages";
+import { can } from "../../lib/auth";
+import { getRuntimeSiteUrl } from "../../lib/canonical-url";
 
-const baseUrl = new URL(process.env.SITE_URL ?? Astro.url.origin);
-const report = await getAdsenseReadiness(baseUrl);
-const tone =
-  report.classification === "PRONTO PARA SOLICITAR ANÁLISE"
-    ? "border-emerald-300 bg-emerald-50 text-emerald-950"
-    : report.classification === "QUASE PRONTO"
-      ? "border-amber-300 bg-amber-50 text-amber-950"
-      : "border-rose-300 bg-rose-50 text-rose-950";
+const auth = Astro.locals.auth!;
+if (!can(auth, "seo.manage")) return new Response("Proibido", { status: 403 });
+
+const baseUrl = getRuntimeSiteUrl(Astro.url);
+const [report, editorial, jobs, reviewMode, institutional, institutionalUpdatedAt] = await Promise.all([
+  getAdsenseReadiness(baseUrl),
+  getEditorialAuditReport(),
+  getJobAuditReport(),
+  getAdsenseReviewMode(),
+  getInstitutionalPages(),
+  getInstitutionalPagesUpdatedAt()
+]);
+const inventory = await getAdsenseIndexInventory(editorial);
+const tone = report.classification === "PRONTO PARA SOLICITAR ANÁLISE"
+  ? "border-emerald-300 bg-emerald-50 text-emerald-950"
+  : report.classification === "QUASE PRONTO"
+    ? "border-amber-300 bg-amber-50 text-amber-950"
+    : "border-rose-300 bg-rose-50 text-rose-950";
+const institutionalRequired: InstitutionalSlug[] = ["sobre", "quem-somos", "contato", "privacidade", "termos", "cookies", "lgpd", "politica-editorial", "politica-fontes", "politica-correcoes", "redacao", "seguranca-candidatos"];
+const plainLength = (html: string) => html.replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim().length;
+const institutionalRows = institutionalRequired.map((slug) => {
+  const page = institutional[slug];
+  const length = plainLength(page.contentHtml);
+  return {
+    ...page,
+    length,
+    sufficient: length >= 160 && page.metaDescription.trim().length >= 70,
+    problem: !page.published ? "Não publicada" : length < 160 ? "Conteúdo institucional muito curto" : page.metaDescription.trim().length < 70 ? "Meta description curta" : null
+  };
+});
+const publishedAssessments = editorial.assessments.filter((item) => item.article.status === "PUBLISHED");
+const classificationCounts = (name: "MANTER" | "MELHORAR" | "NOINDEX" | "REVISAR MANUALMENTE") => publishedAssessments.filter((item) => item.classification === name).length;
+const priorityChecks = report.checks.filter((item) => item.status === "BLOQUEADOR" || item.status === "PENDENTE");
+const articleAssessments = publishedAssessments.filter((item) => item.article.type !== "NEWS");
+const newsAssessments = publishedAssessments.filter((item) => item.article.type === "NEWS");
+const countClass = (rows: typeof editorial.assessments, name: "MANTER" | "MELHORAR" | "NOINDEX" | "REVISAR MANUALMENTE") => rows.filter((item) => item.classification === name).length;
+const readinessCheck = (label: string) => report.checks.find((check) => check.label.toLowerCase().includes(label.toLowerCase()));
+const finalChecklist = [
+  { label: "Conteúdo editorial revisado", ok: inventory.dataAvailable && publishedAssessments.length > 0 },
+  { label: "Páginas fracas noindex", ok: reviewMode.enabled && inventory.rows.filter((row) => row.status === "REVISAR").every((row) => !row.indexable) },
+  { label: "Sitemap limpo", ok: inventory.rows.every((row) => !row.sitemap || row.indexable) },
+  { label: "Páginas institucionais", ok: institutionalRows.every((page) => page.sufficient && page.published) },
+  { label: "Autores", ok: publishedAssessments.every((item) => Boolean(item.article.authorName)) },
+  { label: "Política editorial", ok: institutionalRows.find((page) => page.slug === "politica-editorial")?.sufficient === true },
+  { label: "Fontes", ok: institutionalRows.find((page) => page.slug === "politica-fontes")?.sufficient === true },
+  { label: "Correções", ok: institutionalRows.find((page) => page.slug === "politica-correcoes")?.sufficient === true },
+  { label: "Navegação", ok: ["/", "/blog", "/noticias", "/contato"].every((path) => inventory.rows.some((row) => row.path === path && row.statusHttp === 200)) },
+  { label: "Mobile", ok: readinessCheck("Experiência mobile")?.status === "APROVADO_INTERNAMENTE" },
+  { label: "Links", ok: editorial.brokenLinks.length === 0 && jobs.summary.brokenLinks === 0 },
+  { label: "Robots", ok: readinessCheck("robots.txt")?.status === "APROVADO_INTERNAMENTE" },
+  { label: "Canonical", ok: inventory.summary.canonicalProblems === 0 },
+  { label: "Anúncios fora de páginas inadequadas", ok: readinessCheck("Anúncios longe")?.status === "APROVADO_INTERNAMENTE" },
+  { label: "Conteúdo duplicado tratado", ok: editorial.similarities.length === 0 || reviewMode.enabled },
+  { label: "Modo Revisão ativo", ok: reviewMode.enabled && reviewMode.persisted }
+];
+const readyForReview = inventory.dataAvailable && report.blockers.length === 0 && finalChecklist.every((item) => item.ok);
 ---
-<AdminLayout title="Rota da Aprovação">
-  <h1 class="text-3xl font-black">Rota da Aprovação</h1>
-  <p class="mt-2 text-sm text-[var(--text-secondary)]">
-    Evidências técnicas e editoriais para decidir se o site está preparado para solicitar análise do Google AdSense.
-  </p>
-  <aside class="mt-4 rounded-xl border border-amber-300 bg-amber-50 p-4 text-sm text-amber-950" role="note">
-    <strong>AdSense no site público está desligado por padrão.</strong>
-    <p class="mt-1">
-      Esta página é o controle interno. Anúncios só aparecem no portal depois que você resolver os bloqueadores,
-      tiver conteúdo editorial suficiente e definir <code class="rounded bg-white px-1">PUBLIC_ADSENSE_ENABLED=true</code> no Coolify
-      com Publisher ID real. O candidato continua gratuito.
-    </p>
-    <p class="mt-2">
-      Fluxo recomendado:
-      <a class="font-bold underline" href="/admin/conteudo/pilares">Pilares</a> →
-      <a class="font-bold underline" href="/admin/conteudo/post-magnetico">Post Magnético</a> →
-      <a class="font-bold underline" href="/admin/web-stories">Web Stories</a> → checklist abaixo.
-    </p>
-  </aside>
+<AdminLayout title="Central AdSense" description="Diagnóstico interno, inventário de indexação e controles operacionais para preparar o portal sem prometer aprovação do Google.">
+  {reviewMode.enabled && (
+    <aside class="mb-6 rounded-2xl border-2 border-amber-400 bg-amber-50 p-5 text-amber-950" role="status">
+      <strong class="text-lg">Modo de revisão AdSense ativo.</strong>
+      <p class="mt-1 text-sm">Vagas, listagens, filtros e páginas de baixo valor estão temporariamente fora do índice. Home, conteúdo editorial útil e páginas institucionais permanecem indexáveis.</p>
+    </aside>
+  )}
 
-  <section class={`mt-6 rounded-2xl border p-6 ${tone}`}>
-    <p class="text-sm font-bold uppercase">Classificação interna</p>
+  <nav class="mb-6 flex flex-wrap gap-2 text-sm" aria-label="Seções da Central AdSense">
+    {[['visao-geral','Visão geral'],['conteudo','Conteúdo'],['indexacao','Indexação'],['institucionais','Institucionais'],['checklist','Checklist'],['auditoria','Auditoria'],['configuracoes','Configurações']].map(([id, label]) => <a class="rounded-full border bg-white px-3 py-2 font-bold hover:border-[var(--brand-primary)]" href={`#${id}`}>{label}</a>)}
+  </nav>
+
+  <section id="visao-geral" class={`scroll-mt-24 rounded-2xl border p-6 ${tone}`}>
+    <p class="text-sm font-bold uppercase tracking-wide">Classificação interna</p>
     <strong class="mt-2 block text-3xl">{report.classification}</strong>
     <p class="mt-3 text-sm font-semibold">{report.disclaimer}</p>
-    <p class="mt-2 text-xs">Gerado em {report.generatedAt.toLocaleString("pt-BR")}</p>
-    {report.readyForRequest ? (
-      <p class="mt-4 inline-flex rounded-lg bg-emerald-700 px-4 py-2 text-sm font-bold text-white">Pronto para solicitar análise (verificação interna)</p>
-    ) : (
-      <p class="mt-4 text-sm font-bold">Há bloqueadores ou pendências — não solicite revisão do AdSense ainda.</p>
-    )}
+    <p class="mt-2 text-xs">Diagnóstico gerado em {report.generatedAt.toLocaleString("pt-BR")}. O Google é o único responsável pela decisão de aprovação.</p>
   </section>
 
-  <section class="mt-6 rounded-2xl border border-slate-200 bg-white p-6">
-    <h2 class="text-xl font-black">Meta editorial interna</h2>
-    <p class="mt-2 text-sm text-[var(--text-secondary)]">
-      Quem aprova é o <strong>Google AdSense</strong>. Internamente exigimos
-      {report.editorialMeta.minPublished} posts <strong>reais</strong> com ≥{report.editorialMeta.minUsefulChars} caracteres,
-      capa exclusiva, autoria, fontes e pilar/cluster. Seed <code class="rounded bg-slate-100 px-1">adsense-editorial-*</code> não conta
-      {report.editorialMeta.templateIgnored ? ` (${report.editorialMeta.templateIgnored} ignorado(s) / devem ir para DRAFT)` : ""}.
-    </p>
-    <div class="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-      <article>
-        <p class="text-sm">Substanciais publicados</p>
-        <strong class="text-3xl">{report.editorialMeta.substantialPublished}/{report.editorialMeta.minPublished}</strong>
-      </article>
-      <article>
-        <p class="text-sm">Publicados (total)</p>
-        <strong class="text-3xl">{report.editorialMeta.published}</strong>
-      </article>
-      <article>
-        <p class="text-sm">Agendados</p>
-        <strong class="text-3xl">{report.editorialMeta.scheduled}</strong>
-      </article>
-      <article>
-        <p class="text-sm">Com capa completa</p>
-        <strong class="text-3xl">{report.editorialMeta.withCover}/{report.editorialMeta.published}</strong>
-      </article>
-      <article>
-        <p class="text-sm">Web Stories publicadas</p>
-        <strong class="text-3xl">{report.editorialMeta.publishedStories}</strong>
-      </article>
-    </div>
-    <p class="mt-4 text-sm">
-      Produza no admin (não use seed template). Se o seed ainda estiver publicado:
-      <code class="rounded bg-slate-100 px-1">npm run unpublish:adsense-editorial -- --write</code>
-      (produção: Coolify migrate com <code class="rounded bg-slate-100 px-1">RUN_UNPUBLISH_ADSENSE_EDITORIAL=true</code>).
-      Calendário: <a class="font-bold underline" href="/admin/calendario-editorial">/admin/calendario-editorial</a>.
-    </p>
+  <section class={`mt-6 rounded-2xl border-2 p-6 ${readyForReview ? "border-emerald-400 bg-emerald-50 text-emerald-950" : "border-rose-300 bg-rose-50 text-rose-950"}`}>
+    <p class="text-sm font-bold uppercase tracking-wide">Resultado do checklist final</p>
+    <strong class="mt-2 block text-2xl">{readyForReview ? "PRONTO PARA REVISÃO" : "AINDA NÃO PRONTO PARA REVISÃO"}</strong>
+    <p class="mt-2 text-sm">Essa avaliação é interna e não garante aprovação pelo Google AdSense.</p>
   </section>
 
-  <div class="mt-6 grid gap-4 md:grid-cols-3">
-    <article class="rounded-xl bg-white p-5"><p class="text-sm">Bloqueadores</p><strong class="text-3xl">{report.blockers.length}</strong></article>
-    <article class="rounded-xl bg-white p-5"><p class="text-sm">Verificações</p><strong class="text-3xl">{report.checks.length}</strong></article>
-    <article class="rounded-xl bg-white p-5"><p class="text-sm">Etapas</p><strong class="text-3xl">{report.stages.length}</strong></article>
+  <div class="mt-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+    <article class="rounded-2xl border bg-white p-5"><p class="text-sm text-slate-600">Bloqueadores</p><strong class="text-3xl text-rose-700">{report.blockers.length}</strong></article>
+    <article class="rounded-2xl border bg-white p-5"><p class="text-sm text-slate-600">Conteúdos publicados</p><strong class="text-3xl">{editorial.assessments.filter((item) => item.article.status === 'PUBLISHED').length}</strong></article>
+    <article class="rounded-2xl border bg-white p-5"><p class="text-sm text-slate-600">URLs indexáveis agora</p><strong class="text-3xl">{inventory.summary.indexable}</strong></article>
+    <article class="rounded-2xl border bg-white p-5"><p class="text-sm text-slate-600">Vagas com bloqueadores</p><strong class="text-3xl">{jobs.summary.incomplete}</strong></article>
   </div>
 
-  {report.stages.map((stage) => (
-    <section class="mt-8 overflow-x-auto rounded-2xl bg-white p-6">
-      <h2 class="text-xl font-black">{stage.title}</h2>
-      <table class="mt-4 min-w-full text-sm">
-        <thead>
-          <tr class="border-b text-left">
-            <th class="p-3">Item</th>
-            <th class="p-3">Severidade</th>
-            <th class="p-3">Status</th>
-            <th class="p-3">Evidência</th>
-            <th class="p-3">Correção</th>
-          </tr>
-        </thead>
-        <tbody>
-          {stage.checks.map((check) => (
-            <tr class="border-b align-top">
-              <td class="p-3 font-bold">{check.label}</td>
-              <td class="p-3">{check.severity}</td>
-              <td class="p-3 font-black">{check.status}</td>
-              <td class="max-w-xl p-3">{check.evidence}</td>
-              <td class="p-3">
-                {check.action ? <a class="font-bold text-red-700 underline" href={check.action}>Resolver</a> : "—"}
-                {check.autoFixAvailable ? <span class="mt-1 block text-xs">Correção automática disponível</span> : null}
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </section>
-  ))}
+  <section id="conteudo" class="mt-8 scroll-mt-24 rounded-2xl border bg-white p-6">
+    <div class="flex flex-wrap items-start justify-between gap-3">
+      <div><h2 class="text-xl font-black">Diagnóstico de conteúdo</h2><p class="mt-1 text-sm text-slate-600">Classificações editoriais internas; não são critérios oficiais nem garantias do Google.</p></div>
+      <a class="font-bold text-[var(--brand-primary)] underline" href="/admin/qualidade-editorial">Abrir auditoria editorial</a>
+    </div>
+    <div class="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+      <article class="rounded-xl bg-emerald-50 p-4"><span class="text-sm">Manter</span><strong class="block text-2xl">{classificationCounts('MANTER')}</strong></article>
+      <article class="rounded-xl bg-amber-50 p-4"><span class="text-sm">Melhorar</span><strong class="block text-2xl">{classificationCounts('MELHORAR')}</strong></article>
+      <article class="rounded-xl bg-rose-50 p-4"><span class="text-sm">Noindex</span><strong class="block text-2xl">{classificationCounts('NOINDEX')}</strong></article>
+      <article class="rounded-xl bg-sky-50 p-4"><span class="text-sm">Revisar manualmente</span><strong class="block text-2xl">{classificationCounts('REVISAR MANUALMENTE')}</strong></article>
+    </div>
+    <div class="mt-6 grid gap-4 lg:grid-cols-2">
+      {[{ title: "Artigos", rows: articleAssessments }, { title: "Notícias", rows: newsAssessments }].map((group) => <article class="rounded-xl border p-5"><h3 class="font-black">{group.title}</h3><dl class="mt-3 grid grid-cols-2 gap-3 text-sm sm:grid-cols-5"><div><dt>Total</dt><dd class="text-xl font-black">{group.rows.length}</dd></div><div><dt>Manter</dt><dd class="text-xl font-black">{countClass(group.rows, "MANTER")}</dd></div><div><dt>Melhorar</dt><dd class="text-xl font-black">{countClass(group.rows, "MELHORAR")}</dd></div><div><dt>Noindex</dt><dd class="text-xl font-black">{countClass(group.rows, "NOINDEX")}</dd></div><div><dt>Revisar</dt><dd class="text-xl font-black">{countClass(group.rows, "REVISAR MANUALMENTE")}</dd></div></dl></article>)}
+    </div>
+    <article class="mt-4 rounded-xl border p-5"><h3 class="font-black">Vagas</h3><dl class="mt-3 grid grid-cols-2 gap-3 text-sm sm:grid-cols-3 xl:grid-cols-6"><div><dt>Total</dt><dd class="text-xl font-black">{jobs.summary.total}</dd></div><div><dt>Ativas</dt><dd class="text-xl font-black">{jobs.assessments.filter((item) => item.row.job.publicationStatus === "PUBLISHED" && !item.expired).length}</dd></div><div><dt>Expiradas</dt><dd class="text-xl font-black">{jobs.summary.expired}</dd></div><div><dt>Duplicadas</dt><dd class="text-xl font-black">{jobs.summary.duplicates}</dd></div><div><dt>Suspeitas</dt><dd class="text-xl font-black">{jobs.summary.suspicious}</dd></div><div><dt>Incompletas</dt><dd class="text-xl font-black">{jobs.summary.incomplete}</dd></div></dl></article>
+    <p class="mt-4 text-sm">Meta conservadora interna atual: {report.editorialMeta.substantialPublished}/{report.editorialMeta.minPublished} conteúdos substanciais, com pelo menos {report.editorialMeta.minUsefulChars} caracteres e capa exclusiva. Essa quantidade não é uma exigência oficial do AdSense.</p>
+  </section>
 
-  <aside class="mt-6 rounded-xl border border-sky-200 bg-sky-50 p-5 text-sm text-sky-950">
-    <strong>Aviso obrigatório</strong>
-    <p class="mt-2">{report.disclaimer}</p>
-    <p class="mt-2">Publisher ID, dados jurídicos e responsável LGPD devem ser preenchidos com valores reais no painel — o sistema não inventa credenciais.</p>
-  </aside>
+  <section id="indexacao" class="mt-8 scroll-mt-24 overflow-hidden rounded-2xl border bg-white">
+    <div class="flex flex-wrap items-start justify-between gap-3 border-b p-6"><div><h2 class="text-xl font-black">Inventário de indexação</h2><p class="mt-1 text-sm text-slate-600">Estado calculado para cada rota pública conhecida, incluindo canonical e presença esperada no sitemap.</p></div><a class="font-bold underline" href="/admin/urls">Abrir visão completa de URLs</a></div>
+    <dl class="grid gap-3 border-b p-5 text-sm sm:grid-cols-2 xl:grid-cols-5"><div><dt>Indexáveis</dt><dd class="text-2xl font-black">{inventory.summary.indexable}</dd></div><div><dt>Noindex</dt><dd class="text-2xl font-black">{inventory.summary.noindex}</dd></div><div><dt>No sitemap</dt><dd class="text-2xl font-black">{inventory.summary.outsideSitemap}</dd></div><div><dt>No sitemap ativo</dt><dd class="text-2xl font-black">{inventory.summary.sitemap}</dd></div><div><dt>Canonical</dt><dd class="text-2xl font-black">{inventory.summary.canonicalProblems}</dd></div></dl>
+    <div class="overflow-x-auto"><table class="min-w-full text-sm"><thead class="bg-slate-50 text-left text-xs uppercase tracking-wide text-slate-600"><tr><th class="p-3">URL</th><th class="p-3">Tipo</th><th class="p-3">Indexável</th><th class="p-3">Sitemap</th><th class="p-3">Canonical</th><th class="p-3">Motivo</th><th class="p-3">Ação</th></tr></thead><tbody>
+      {inventory.rows.slice(0, 300).map((row) => <tr class="border-t align-top"><td class="max-w-xs break-all p-3 font-semibold">{row.path}</td><td class="p-3">{row.type}</td><td class="p-3">{row.indexable ? 'Sim' : 'Não'}</td><td class="p-3">{row.sitemap ? 'Sim' : 'Não'}</td><td class="max-w-xs break-all p-3 text-xs">{row.canonical}</td><td class="max-w-md p-3">{row.reason}</td><td class="p-3">{row.action ? <a class="font-bold underline" href={row.action}>Revisar</a> : '—'}</td></tr>)}
+    </tbody></table></div>
+    {inventory.rows.length > 300 && <p class="border-t p-4 text-sm text-slate-600">Exibindo 300 de {inventory.rows.length} URLs. Os totais acima consideram todo o inventário.</p>}
+  </section>
+
+  <section id="institucionais" class="mt-8 scroll-mt-24 overflow-hidden rounded-2xl border bg-white">
+    <div class="flex flex-wrap items-start justify-between gap-3 border-b p-6"><div><h2 class="text-xl font-black">Páginas institucionais</h2><p class="mt-1 text-sm text-slate-600">“Sobre” e “Quem somos” permanecem separadas e são sinalizadas para revisão se repetirem o mesmo papel.</p></div><a class="font-bold underline" href="/admin/paginas">Editar páginas</a></div>
+    <div class="overflow-x-auto"><table class="min-w-full text-sm"><thead class="bg-slate-50 text-left text-xs uppercase tracking-wide text-slate-600"><tr><th class="p-3">Página</th><th class="p-3">Publicada</th><th class="p-3">Indexável no modo</th><th class="p-3">Última atualização</th><th class="p-3">Tamanho</th><th class="p-3">Status</th></tr></thead><tbody>
+      {institutionalRows.map((page) => <tr class="border-t"><td class="p-3"><a class="font-bold underline" href={page.canonicalPath}>{page.title}</a><span class="block text-xs text-slate-500">{page.canonicalPath}</span></td><td class="p-3">{page.published ? 'Sim' : 'Não'}</td><td class="p-3">{page.published ? 'Sim' : 'Não'}</td><td class="p-3">{institutionalUpdatedAt ? institutionalUpdatedAt.toLocaleDateString('pt-BR') : 'Padrão do código'}</td><td class="p-3">{page.length} caracteres</td><td class={`p-3 font-bold ${page.sufficient ? 'text-emerald-700' : 'text-rose-700'}`}>{page.problem ?? 'Suficiente no teste estrutural'}</td></tr>)}
+    </tbody></table></div>
+  </section>
+
+  <section id="checklist" class="mt-8 scroll-mt-24 rounded-2xl border bg-white p-6">
+    <h2 class="text-xl font-black">Checklist antes de solicitar análise</h2>
+    <ol class="mt-4 grid gap-3 text-sm md:grid-cols-2">
+      {finalChecklist.map((check) => <li class={`rounded-xl border p-4 ${check.ok ? "border-emerald-200 bg-emerald-50" : "border-rose-200 bg-rose-50"}`}><span class="font-black">{check.ok ? '✓' : '!'}</span> <strong>{check.label}</strong></li>)}
+    </ol>
+    <p class="mt-4 text-sm font-semibold">Essa avaliação é interna e não garante aprovação pelo Google AdSense.</p>
+  </section>
+
+  <section id="auditoria" class="mt-8 scroll-mt-24 overflow-hidden rounded-2xl border bg-white">
+    <div class="border-b p-6"><h2 class="text-xl font-black">Pendências prioritárias</h2><p class="mt-1 text-sm text-slate-600">Evidências técnicas e editoriais que ainda pedem ação.</p></div>
+    <div class="overflow-x-auto"><table class="min-w-full text-sm"><thead class="bg-slate-50 text-left text-xs uppercase tracking-wide text-slate-600"><tr><th class="p-3">Etapa</th><th class="p-3">Item</th><th class="p-3">Natureza</th><th class="p-3">Status</th><th class="p-3">Evidência</th><th class="p-3">Ação</th></tr></thead><tbody>
+      {priorityChecks.map((check) => <tr class="border-t align-top"><td class="p-3">{check.stage}</td><td class="p-3 font-bold">{check.label}</td><td class="p-3">{check.kind}</td><td class="p-3 font-bold">{check.status}</td><td class="max-w-xl p-3">{check.evidence}</td><td class="p-3">{check.action ? <a class="font-bold underline" href={check.action}>Resolver</a> : '—'}</td></tr>)}
+      {priorityChecks.length === 0 && <tr><td class="p-8 text-center text-slate-600" colspan="6">Nenhuma pendência foi detectada pelos testes internos atuais.</td></tr>}
+    </tbody></table></div>
+  </section>
+
+  <section id="configuracoes" class="mt-8 scroll-mt-24 rounded-2xl border border-amber-300 bg-amber-50 p-6">
+    <h2 class="text-xl font-black">Modo de revisão AdSense</h2>
+    <p class="mt-2 max-w-3xl text-sm">Configuração persistida no banco e registrada na auditoria administrativa. Ela altera a indexação pública de forma igual para usuários e crawlers; não altera conteúdo por user-agent.</p>
+    <dl class="mt-4 grid gap-3 text-sm sm:grid-cols-3"><div><dt class="text-slate-600">Estado</dt><dd class="font-black">{reviewMode.enabled ? 'ATIVO' : 'INATIVO'}</dd></div><div><dt class="text-slate-600">Persistido</dt><dd class="font-black">{reviewMode.persisted ? 'Sim' : 'Ainda não'}</dd></div><div><dt class="text-slate-600">Última alteração</dt><dd class="font-black">{reviewMode.updatedAt ? new Date(reviewMode.updatedAt).toLocaleString('pt-BR') : 'Não registrada'}</dd></div></dl>
+    <form class="mt-5" method="post" action="/api/admin/adsense-review-mode" onsubmit={`return confirm('${reviewMode.enabled ? 'Desativar' : 'Ativar'} o modo de revisão AdSense? Esta ação altera robots meta e sitemaps públicos.')`}>
+      <input type="hidden" name="enabled" value={reviewMode.enabled ? 'false' : 'true'} />
+      <button class="rounded-xl bg-slate-950 px-5 py-3 font-black text-white" type="submit">{reviewMode.enabled ? 'Desativar modo de revisão' : 'Ativar modo de revisão'}</button>
+    </form>
+    <p class="mt-4 text-xs">A exibição de anúncios continua controlada separadamente. Nenhuma configuração desta tela garante aprovação, receita ou prazo de análise.</p>
+  </section>
 </AdminLayout>

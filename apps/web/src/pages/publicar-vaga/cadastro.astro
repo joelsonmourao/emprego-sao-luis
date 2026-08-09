@@ -8,7 +8,7 @@ if (!data || data.order.status !== "PAID" || data.remaining <= 0) {
   return Astro.redirect("/publicar-vaga", 302);
 }
 ---
-<BaseLayout title="Cadastrar vaga — Empregos São Luís" description="Cadastre sua vaga após confirmação do pagamento." canonical="/publicar-vaga/cadastro">
+<BaseLayout title="Cadastrar vaga — Empregos São Luís" description="Cadastre sua vaga após confirmação do pagamento." canonical="/publicar-vaga/cadastro" noindex>
   <section class="es-section">
     <div class="es-container max-w-2xl">
       <p class="es-kicker">Etapa 4 de 4</p>

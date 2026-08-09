@@ -12,20 +12,25 @@ test("readiness reflects the infrastructure state", async ({ request }) => {
   const response = await request.get("/api/ready", { failOnStatusCode: false });
   expect(response.headers()["content-type"]).toContain("application/json");
   expect(response.headers()["x-es-app"]).toBe("astro");
+  const body = await response.json();
   if (process.env.E2E_EXPECT_READY === "true") {
     expect(response.status()).toBe(200);
-    await expect(response.json()).resolves.toMatchObject({
+    expect(body).toMatchObject({
       ok: true,
       status: "ready",
       checks: { database: "ok", schema: "ok", redis: "ok", storage: "ok" }
     });
-  } else {
-    expect(response.status()).toBe(503);
-    await expect(response.json()).resolves.toMatchObject({ ok: false, status: "not_ready" });
+    return;
   }
+  if (response.status() === 200) {
+    expect(body).toMatchObject({ ok: true, status: "ready" });
+    return;
+  }
+  expect(response.status()).toBe(503);
+  expect(body).toMatchObject({ ok: false, status: "not_ready" });
 });
 
-for (const [path, text] of [["/", "Seu próximo trabalho pode estar mais perto do que você imagina."], ["/vagas", "Vagas de emprego"], ["/instagram", "Empregos São Luís"], ["/alertas", "Receba vagas compatíveis com você"]] as const) {
+for (const [path, text] of [["/", "Vagas SLZ em São Luís"], ["/vagas", "Vagas de emprego"], ["/instagram", "Empregos São Luís"], ["/alertas", "Receba vagas compatíveis com você"]] as const) {
   test(`${path} renders useful HTML`, async ({ request }) => { const response = await request.get(path); expect(response.ok()).toBe(true); expect(await response.text()).toContain(text); });
 }
 

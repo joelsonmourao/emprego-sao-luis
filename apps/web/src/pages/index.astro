@@ -10,6 +10,8 @@ import { categories, cities, companies, createDatabase, jobs, states } from "@es
 import { and, count, desc, eq, gt, sql } from "drizzle-orm";
 import { articlePublicPath, listPublishedArticles } from "../lib/articles";
 import { getVisualIdentity } from "../lib/visual-identity";
+import { getAdsenseReviewMode } from "../lib/adsense-review-mode";
+import { getEditorialAuditReport } from "../lib/editorial-audit";
 
 type JobRow = {
   id: string; title: string; slug: string; code: string; company: string; city: string; state: string;
@@ -26,8 +28,9 @@ let companyRows: Array<{ name: string; slug: string; total: number; logoUrl: str
 let categoryOptions: Array<{ name: string; slug: string }> = [];
 
 const identity = await getVisualIdentity();
+const reviewMode = await getAdsenseReviewMode();
 
-if (process.env.DATABASE_URL) {
+if (process.env.DATABASE_URL && !reviewMode.enabled) {
   const connection = createDatabase(process.env.DATABASE_URL);
   try {
     const active = and(eq(jobs.publicationStatus, "PUBLISHED"), gt(jobs.expiresAt, new Date()));
@@ -53,7 +56,11 @@ if (process.env.DATABASE_URL) {
   }
 }
 
-const articles = await listPublishedArticles(8);
+const allArticles = await listPublishedArticles(reviewMode.enabled ? 16 : 8);
+const reviewNoindexIds = reviewMode.enabled
+  ? new Set((await getEditorialAuditReport()).assessments.filter((item) => ["NOINDEX", "REVISAR MANUALMENTE"].includes(item.classification)).map((item) => item.article.id))
+  : new Set<string>();
+const articles = allArticles.filter((item) => !reviewNoindexIds.has(item.article.id));
 const newsArticles = articles.filter((item) => item.article.type === "NEWS").slice(0, 4);
 const blogArticles = articles.filter((item) => item.article.type !== "NEWS").slice(0, 4);
 const displayFeatured = featured.length ? featured : recent.slice(0, 3);
@@ -70,11 +77,78 @@ const steps = [
   ["Compare", "Veja empresa, local, contrato e fonte da vaga."],
   ["Candidate-se", "Acesse o link oficial sem cadastro obrigatório."]
 ];
-const homeTitle = "Empregos São Luís — Vagas SLZ e empregos em São Luís";
-const homeDescription =
-  "Vagas SLZ e empregos SLZ em São Luís e no Maranhão. Encontre oportunidades atualizadas na capital maranhense.";
+const editorialTopics = [
+  ["Mercado de Trabalho", "Mudanças, dados e movimentos que afetam quem trabalha em São Luís e no Maranhão."],
+  ["Currículo", "Orientações para apresentar experiência e competências com clareza, sem fórmulas enganosas."],
+  ["Entrevistas", "Preparação prática para processos seletivos presenciais e remotos."],
+  ["Primeiro Emprego", "Caminhos para quem busca a primeira oportunidade e ainda está construindo experiência."],
+  ["Direitos", "Explicações com referência a fontes oficiais quando o tema depende de regra ou legislação."],
+  ["Profissões", "Contexto sobre atividades, requisitos e possibilidades de carreira na região."],
+  ["Salários", "Leitura responsável de faixas e períodos, sem transformar estimativas em promessa."],
+  ["Empresas", "Informações para avaliar organizações, fontes e canais de candidatura."],
+  ["Segurança contra Golpes", "Sinais de cobrança indevida, perfis falsos e pedidos suspeitos de dados."]
+];
+const homeTitle = reviewMode.enabled ? "Emprego, carreira e mercado de trabalho em São Luís" : "Empregos São Luís — Vagas SLZ e empregos em São Luís";
+const homeDescription = reviewMode.enabled
+  ? "Notícias e guias gratuitos sobre emprego, carreira e mercado de trabalho em São Luís e no Maranhão."
+  : "Vagas SLZ e empregos SLZ em São Luís e no Maranhão. Encontre oportunidades atualizadas na capital maranhense.";
 ---
 <BaseLayout title={homeTitle} description={homeDescription}>
+  {reviewMode.enabled ? (
+    <>
+      <PageHero
+        kicker={identity.siteName}
+        title="Informação local para encontrar trabalho com segurança"
+        description="Notícias, guias práticos e orientações verificáveis sobre emprego em São Luís e no Maranhão. O acesso é gratuito para candidatos."
+      >
+        <div class="mt-7 flex flex-wrap gap-3">
+          <a class="es-btn bg-white text-[var(--brand-primary)]" href="/blog">Ler guias</a>
+          <a class="es-btn border border-white/60 text-white" href="/noticias">Ver notícias</a>
+          <a class="es-btn border border-white/60 text-white" href="/seguranca-candidatos">Candidatura segura</a>
+        </div>
+      </PageHero>
+
+      {newsArticles.length > 0 && (
+        <section class="es-section bg-white">
+          <div class="es-container">
+            <SectionHeading kicker="Notícias" title="Mercado de trabalho local" description="Atualizações publicadas com autoria, data e fontes para ajudar o leitor a entender o contexto local." actionHref="/noticias" actionLabel="Ver notícias" />
+            <div class="mt-8 grid gap-5 md:grid-cols-2 xl:grid-cols-4">
+              {newsArticles.map(({ article }) => <article class="es-card p-5"><p class="text-xs font-bold text-[var(--brand-primary)]">Notícia</p><h2 class="font-display mt-1 text-lg font-black"><a href={articlePublicPath(article.type, article.slug)}>{article.title}</a></h2>{article.excerpt && <p class="mt-2 line-clamp-3 text-sm text-[var(--es-muted)]">{article.excerpt}</p>}</article>)}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {blogArticles.length > 0 && (
+        <section class="es-section">
+          <div class="es-container">
+            <SectionHeading kicker="Orientação" title="Guias para a busca de emprego" description="Conteúdo prático para currículo, entrevista, direitos, carreira e candidatura sem cobrança do candidato." actionHref="/blog" actionLabel="Ver todos os guias" />
+            <div class="mt-8 grid gap-5 md:grid-cols-2 xl:grid-cols-4">
+              {blogArticles.map(({ article }) => <article class="es-card p-5"><p class="text-xs font-bold text-[var(--brand-primary)]">{article.type === 'DATA_REPORT' ? 'Relatório' : 'Guia'}</p><h2 class="font-display mt-1 text-lg font-black"><a href={articlePublicPath(article.type, article.slug)}>{article.title}</a></h2>{article.excerpt && <p class="mt-2 line-clamp-3 text-sm text-[var(--es-muted)]">{article.excerpt}</p>}</article>)}
+            </div>
+          </div>
+        </section>
+      )}
+
+      <section class="es-section bg-white">
+        <div class="es-container">
+          <SectionHeading kicker="Biblioteca editorial" title="Temas para procurar emprego e desenvolver a carreira" description="A redação organiza conteúdos por necessidades reais do candidato, com contexto local quando ele é relevante." actionHref="/blog" actionLabel="Explorar conteúdos" />
+          <div class="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {editorialTopics.map(([title, description]) => <article class="es-card p-5"><h2 class="font-display text-xl font-black">{title}</h2><p class="mt-2 text-sm text-[var(--es-muted)]">{description}</p></article>)}
+          </div>
+        </div>
+      </section>
+
+      <section class="es-section bg-[var(--es-cream-dark)]">
+        <div class="es-container grid gap-5 md:grid-cols-3">
+          <article class="es-card p-6"><p class="es-kicker">Transparência</p><h2 class="font-display mt-2 text-xl font-black">Como produzimos conteúdo</h2><p class="mt-2 text-sm text-[var(--es-muted)]">Conheça nossos critérios de seleção, fontes, revisão e correção.</p><a class="mt-4 inline-block font-bold underline" href="/politica-editorial">Política editorial</a></article>
+          <article class="es-card p-6"><p class="es-kicker">Segurança</p><h2 class="font-display mt-2 text-xl font-black">Evite golpes em vagas</h2><p class="mt-2 text-sm text-[var(--es-muted)]">Nunca pague para se candidatar e confira o canal oficial antes de enviar dados.</p><a class="mt-4 inline-block font-bold underline" href="/seguranca-candidatos">Ler orientações</a></article>
+          <article class="es-card p-6"><p class="es-kicker">Oportunidades</p><h2 class="font-display mt-2 text-xl font-black">Procurar vagas gratuitamente</h2><p class="mt-2 text-sm text-[var(--es-muted)]">A área de vagas continua acessível; durante a revisão ela fica temporariamente fora dos mecanismos de busca.</p><a class="mt-4 inline-block font-bold underline" href="/vagas">Explorar vagas</a></article>
+        </div>
+      </section>
+    </>
+  ) : (
+    <>
   <PageHero
     kicker={identity.siteName}
     title="Vagas SLZ em São Luís — seu próximo emprego na capital"
@@ -279,4 +353,6 @@ const homeDescription =
       </article>
     </div>
   </section>
+    </>
+  )}
 </BaseLayout>

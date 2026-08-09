@@ -11,7 +11,7 @@ const paid = order.status === "PAID";
 const manualReview = order.status === "MANUAL_REVIEW";
 const pending = order.status === "PENDING_PAYMENT";
 ---
-<BaseLayout title={`Confirmação ${order.orderCode}`} description="Status do pedido e próximos passos." canonical={`/publicar-vaga/confirmacao/${order.orderCode}`}>
+<BaseLayout title={`Confirmação ${order.orderCode}`} description="Status do pedido e próximos passos." canonical={`/publicar-vaga/confirmacao/${order.orderCode}`} noindex>
   <section class="es-section">
     <div class="es-container max-w-2xl">
       <p class="es-kicker">Pedido {order.orderCode}</p>

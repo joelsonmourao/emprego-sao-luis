@@ -1,7 +1,8 @@
 import type { APIRoute } from "astro";
 import { isStagingLikeEnvironment } from "../lib/runtime-env";
+import { getRuntimeSiteUrl } from "../lib/canonical-url";
 
-export const GET: APIRoute = ({ site }) => {
+export const GET: APIRoute = () => {
   if (isStagingLikeEnvironment()) {
     const lines = [
       "User-agent: *",
@@ -17,11 +18,17 @@ export const GET: APIRoute = ({ site }) => {
     });
   }
 
+  const site = getRuntimeSiteUrl();
   const lines = [
     "User-agent: *",
     "Allow: /",
+    "Allow: /api/uploads/",
+    "Allow: /api/brand-assets/",
+    "Allow: /api/brand-manifest.webmanifest",
+    "Disallow: /admin",
     "Disallow: /admin/",
     "Disallow: /api/",
+    "Disallow: /empresa",
     "Disallow: /empresa/",
     "Disallow: /minha-conta",
     "Disallow: /entrar",

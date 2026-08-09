@@ -92,13 +92,13 @@ test.describe("continuação — painel e candidatura multicanal", () => {
     test.use({ storageState: ADMIN_STORAGE_STATE });
   }
 
-  test("Rota da Aprovação mostra disclaimer e etapas", async ({ page }) => {
+  test("Central AdSense mostra disclaimer, inventário e checklist", async ({ page }) => {
     await login(page);
     await page.goto("/admin/adsense-readiness");
-    await expect(page.getByRole("heading", { name: /Rota da Aprovação/i })).toBeVisible();
+    await expect(page.getByRole("heading", { name: /Central AdSense/i }).first()).toBeVisible();
     await expect(page.getByText(/não garante aprovação pelo Google AdSense/i).first()).toBeVisible();
-    await expect(page.getByText(/Etapa 0/i).first()).toBeVisible();
-    await expect(page.getByText(/Etapa 5/i).first()).toBeVisible();
+    await expect(page.getByRole("heading", { name: /Inventário de indexação/i })).toBeVisible();
+    await expect(page.getByRole("heading", { name: /Checklist antes de solicitar análise/i })).toBeVisible();
   });
 
   test("cria vagas com combinações de canais e valida UX pública", async ({ page }) => {

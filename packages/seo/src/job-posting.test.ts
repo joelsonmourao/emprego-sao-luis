@@ -19,23 +19,19 @@ const input = {
 };
 
 describe("JobPosting", () => {
-  it("uses the hiring company and puts QuantitativeValue 0 with unitText when salary absent", () => {
+  it("uses the hiring company and omits salary when the source has no value", () => {
     const result = buildJobPosting(input)!;
     expect(result.hiringOrganization.name).toBe("Empresa Real");
-    expect(result.baseSalary).toEqual({
-      "@type": "MonetaryAmount",
-      currency: "BRL",
-      value: { "@type": "QuantitativeValue", value: 0, unitText: "MONTH" }
-    });
+    expect(result).not.toHaveProperty("baseSalary");
     expect(result.identifier).toEqual({ "@type": "PropertyValue", name: "Código ES", value: "ES-000123" });
     expect(result).not.toHaveProperty("directApply");
   });
 
-  it("fills address defaults and identifier value 0 when missing", () => {
+  it("omits unknown address and identifier fields instead of inventing placeholders", () => {
     const result = buildJobPosting({ ...input, publicCode: "" })!;
-    expect(result.identifier.value).toBe(0);
-    expect(result.jobLocation.address.streetAddress).toBe("Não Informado");
-    expect(result.jobLocation.address.postalCode).toBe("Não Informado");
+    expect(result).not.toHaveProperty("identifier");
+    expect(result).not.toHaveProperty("jobLocation.address.streetAddress");
+    expect(result).not.toHaveProperty("jobLocation.address.postalCode");
   });
 
   it("does not generate schema for expired jobs", () =>
@@ -51,10 +47,17 @@ describe("JobPosting", () => {
   });
 
   it("marks remote jobs correctly", () =>
-    expect(buildJobPosting({ ...input, workplaceType: "remoto" })).toHaveProperty(
-      "jobLocationType",
-      "TELECOMMUTE"
-    ));
+    {
+      const result = buildJobPosting({ ...input, workplaceType: "remoto" })!;
+      expect(result).toHaveProperty("jobLocationType", "TELECOMMUTE");
+      expect(result).not.toHaveProperty("applicantLocationRequirements");
+    });
+
+  it("maps Brazilian contract labels to the supported schema.org values", () => {
+    expect(buildJobPosting({ ...input, employmentType: "CLT" })).toHaveProperty("employmentType", "FULL_TIME");
+    expect(buildJobPosting({ ...input, employmentType: "estágio" })).toHaveProperty("employmentType", "INTERN");
+    expect(buildJobPosting({ ...input, employmentType: "modalidade desconhecida" })).toBeNull();
+  });
 
   it("reports missing fields in validation", () => {
     const result = validateJobPosting({ ...input, publicCode: "", canonicalUrl: "" });
@@ -63,21 +66,15 @@ describe("JobPosting", () => {
     expect(result.missing).toContain("canonicalUrl");
   });
 
-  it("uses both brand logos on hiringOrganization", () => {
-    const result = buildJobPosting(input)!;
-    expect(result.hiringOrganization.logo).toEqual([
-      { "@type": "ImageObject", url: "https://empregossaoluis.com.br/brand/icon.webp" },
-      { "@type": "ImageObject", url: "https://empregossaoluis.com.br/favicon.svg" }
-    ]);
+  it("only uses the real hiring organization logo when informed", () => {
+    const result = buildJobPosting({ ...input, organizationLogoUrl: "https://cdn.example.com/acme.png" })!;
+    expect(result.hiringOrganization.logo).toBe("https://cdn.example.com/acme.png");
+    expect(buildJobPosting(input)!.hiringOrganization).not.toHaveProperty("logo");
   });
 
-  it("puts QuantitativeValue value 0 with unitText when salary amounts are missing", () => {
+  it("does not emit baseSalary when visibility is true but values are missing", () => {
     const result = buildJobPosting({ ...input, salaryVisible: true })!;
-    expect(result.baseSalary).toEqual({
-      "@type": "MonetaryAmount",
-      currency: "BRL",
-      value: { "@type": "QuantitativeValue", value: 0, unitText: "MONTH" }
-    });
+    expect(result).not.toHaveProperty("baseSalary");
   });
 
   it("keeps min/max when salary is informed", () => {
@@ -88,11 +85,39 @@ describe("JobPosting", () => {
       salaryMax: "2000",
       salaryPeriod: "MONTH"
     })!;
-    expect(result.baseSalary.value).toEqual({
+    expect(result).toHaveProperty("baseSalary.value", {
       "@type": "QuantitativeValue",
       minValue: 1500,
       maxValue: 2000,
       unitText: "MONTH"
     });
+  });
+
+  it("omits salary when its period is not known", () => {
+    const result = buildJobPosting({
+      ...input,
+      salaryVisible: true,
+      salaryMin: "1500",
+      salaryPeriod: "a combinar"
+    })!;
+    expect(result).not.toHaveProperty("baseSalary");
+  });
+
+  it("does not emit baseSalary for zero or non-positive values", () => {
+    expect(
+      buildJobPosting({
+        ...input,
+        salaryVisible: true,
+        salaryMin: "0",
+        salaryMax: "0",
+        salaryPeriod: "MONTH"
+      })
+    ).not.toHaveProperty("baseSalary");
+  });
+
+  it("does not emit a JobPosting with a placeholder location or unsafe URL", () => {
+    expect(buildJobPosting({ ...input, cityName: "Não informado" })).toBeNull();
+    expect(buildJobPosting({ ...input, canonicalUrl: "javascript:alert(1)" })).toBeNull();
+    expect(buildJobPosting({ ...input, canonicalUrl: "http://localhost:4321/vagas/assistente" })).toBeNull();
   });
 });

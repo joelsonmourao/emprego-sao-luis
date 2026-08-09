@@ -4,7 +4,7 @@ import { join, resolve } from "node:path";
 import { ADMIN_STORAGE_STATE, ensureAdminSession, hasAdminStorageState } from "./helpers/admin-auth";
 
 const adminNavSource = readFileSync(resolve("apps/web/src/lib/admin-nav.ts"), "utf8");
-const menuRoutes = [...adminNavSource.matchAll(/href:\s*"(\/admin[^"]+)"/g)].map((match) => match[1]);
+const menuRoutes = [...new Set([...adminNavSource.matchAll(/href:\s*"(\/admin[^"]+)"/g)].map((match) => match[1]))];
 
 const adminEmail = process.env.E2E_ADMIN_EMAIL ?? process.env.ADMIN_INITIAL_EMAIL;
 const adminPassword = process.env.E2E_ADMIN_PASSWORD ?? process.env.ADMIN_INITIAL_PASSWORD;

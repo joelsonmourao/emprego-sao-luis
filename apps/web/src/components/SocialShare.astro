@@ -1,5 +1,6 @@
 ---
 import { BRAND_ASSETS } from "../lib/brand-assets";
+import { getRuntimeSiteUrl } from "../lib/canonical-url";
 
 interface Props {
   title: string;
@@ -8,7 +9,7 @@ interface Props {
 }
 
 const { title, url, summary } = Astro.props;
-const absoluteUrl = url.startsWith("http") ? url : new URL(url, Astro.site).toString();
+const absoluteUrl = url.startsWith("http") ? url : new URL(url, getRuntimeSiteUrl(Astro.site)).toString();
 const text = summary?.trim()
   ? `${title} — ${summary.trim().slice(0, 120)}`
   : `${title} — Vaga no Empregos São Luís`;

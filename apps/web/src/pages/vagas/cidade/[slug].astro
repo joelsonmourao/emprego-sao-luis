@@ -3,6 +3,8 @@ import BaseLayout from "../../../layouts/BaseLayout.astro";
 import JobCard from "../../../components/ui/JobCard.astro";
 import { cities, companies, createDatabase, jobs, states } from "@es/db";
 import { and, desc, eq, gt, sql } from "drizzle-orm";
+import { classifyCityPage } from "../../../lib/entity-page-quality";
+import { getRuntimeSiteUrl } from "../../../lib/canonical-url";
 
 const slug = Astro.params.slug ?? "";
 let city: { id: string; name: string; state: string; seoTitle: string | null; metaDescription: string | null } | undefined;
@@ -79,10 +81,11 @@ const description =
     ? "Vagas e empregos SLZ em São Luís/MA. Confira oportunidades atualizadas na capital maranhense."
     : `Oportunidades abertas em ${city.name}/${city.state}.`);
 const h1 = isSaoLuis ? "Vagas em São Luís (SLZ)" : `Vagas em ${city.name}/${city.state}`;
-const noindex = rows.length === 0 || (!isSaoLuis && !city.seoTitle && !city.metaDescription);
-const canonical = new URL(`/vagas/cidade/${slug}`, Astro.site).toString();
+const pageQuality = classifyCityPage({ activeJobs: rows.length, seoTitle: city.seoTitle, metaDescription: city.metaDescription });
+const noindex = pageQuality !== "FORTE";
+const canonical = new URL(`/vagas/cidade/${slug}`, getRuntimeSiteUrl(Astro.site)).toString();
 ---
-<BaseLayout title={title} description={description} canonical={canonical} noindex={noindex}>
+<BaseLayout title={title} description={description} canonical={canonical} noindex={noindex} adsenseReviewQualityOverride={pageQuality === "FORTE"}>
   <section class="es-section bg-white pt-8">
     <div class="es-container">
       <nav class="text-sm text-[var(--es-muted)]">

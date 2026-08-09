@@ -55,8 +55,8 @@ export async function listPublishedArticlesPage(
   pageSize = 12,
   type?: ArticleType | ArticleType[]
 ): Promise<{ items: Awaited<ReturnType<typeof listPublishedArticles>>; total: number; page: number; pages: number }> {
-  const safePage = Math.max(1, page);
-  const safeSize = Math.min(48, Math.max(1, pageSize));
+  const safePage = Math.max(1, Math.trunc(Number.isFinite(page) ? page : 1));
+  const safeSize = Math.min(48, Math.max(1, Math.trunc(Number.isFinite(pageSize) ? pageSize : 12)));
   if (!process.env.DATABASE_URL) return { items: [], total: 0, page: 1, pages: 1 };
   const connection = createDatabase(process.env.DATABASE_URL);
   const now = new Date();

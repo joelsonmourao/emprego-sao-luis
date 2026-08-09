@@ -7,6 +7,7 @@ import { listPublishedArticles } from "../lib/articles";
 import { getSeoSettings } from "../lib/seo-settings";
 import { desc, eq, and, gt } from "drizzle-orm";
 import { createDatabase, jobs } from "@es/db";
+import { getRuntimeSiteUrl } from "../lib/canonical-url";
 
 const seo = await getSeoSettings();
 const [latestJobs, featuredJobs, articles] = await Promise.all([
@@ -24,7 +25,7 @@ const [latestJobs, featuredJobs, articles] = await Promise.all([
   listPublishedArticles(4)
 ]);
 ---
-<BaseLayout title="Instagram — Empregos São Luís" description="Siga @empregosaoluis para vagas em stories e no feed. O portal complementa com busca e alertas." canonical={new URL("/instagram", Astro.site).toString()}>
+<BaseLayout title="Instagram — Empregos São Luís" description="Siga @empregosaoluis para vagas em stories e no feed. O portal complementa com busca e alertas." canonical={new URL("/instagram", getRuntimeSiteUrl(Astro.site)).toString()}>
   <section class="hero-pattern es-section text-white">
     <div class="es-container text-center">
       <img src={BRAND_ASSETS.iconWebp} alt="" class="mx-auto h-20 w-20 object-contain" width="80" height="80" />

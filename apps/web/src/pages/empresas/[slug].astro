@@ -5,6 +5,7 @@ import JobCard from "../../components/ui/JobCard.astro";
 import SectionHeading from "../../components/ui/SectionHeading.astro";
 import { cities, companies, createDatabase, jobs, states } from "@es/db";
 import { and, desc, eq, gt } from "drizzle-orm";
+import { classifyCompanyPage } from "../../lib/entity-page-quality";
 
 const slug = Astro.params.slug ?? "";
 let company;
@@ -42,8 +43,9 @@ if (!company) {
     headers: { "Content-Type": "text/plain; charset=utf-8", "X-Robots-Tag": "noindex, follow" }
   });
 }
+const pageQuality = classifyCompanyPage({ activeJobs: vacancies.length, descriptionHtml: company.descriptionHtml, seoTitle: company.seoTitle, metaDescription: company.metaDescription });
 ---
-<BaseLayout title={company.seoTitle ?? `${company.name} — vagas e informações`} description={company.metaDescription ?? `Consulte vagas abertas na ${company.name}.`} breadcrumbs={[{ name: "Empresas", url: "/empresas" }, { name: company.name, url: `/empresas/${company.slug}` }]}>
+<BaseLayout title={company.seoTitle ?? `${company.name} — vagas e informações`} description={company.metaDescription ?? `Consulte vagas abertas na ${company.name}.`} canonical={`/empresas/${company.slug}`} breadcrumbs={[{ name: "Empresas", url: "/empresas" }, { name: company.name, url: `/empresas/${company.slug}` }]} noindex={pageQuality !== "FORTE"} adsenseReviewQualityOverride={pageQuality === "FORTE"}>
   <section class="es-section bg-white">
     <div class="es-container">
       <Breadcrumbs items={[{ name: "Início", url: "/" }, { name: "Empresas", url: "/empresas" }, { name: company.name }]} />

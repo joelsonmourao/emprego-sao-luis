@@ -11,6 +11,8 @@ import { getSeoSettings } from "../lib/seo-settings";
 import { getSiteIntegrations, normalizeAdsenseClientId, normalizeSearchConsoleToken } from "../lib/site-integrations";
 import { getVisualIdentity } from "../lib/visual-identity";
 import { isStagingLikeEnvironment, stagingRobotsDirective } from "../lib/runtime-env";
+import { getAdsenseReviewDirective, getAdsenseReviewMode } from "../lib/adsense-review-mode";
+import { getRuntimeSiteUrl, resolveCanonicalUrl, resolvePublicHttpUrl } from "../lib/canonical-url";
 
 interface Props {
   title: string;
@@ -23,16 +25,20 @@ interface Props {
   pageSchemaType?: "WebPage" | "CollectionPage" | "SearchResultsPage" | "AboutPage" | "ContactPage";
   schemas?: Array<Record<string, unknown>>;
   disableSeoGraph?: boolean;
+  adsenseReviewQualityOverride?: boolean;
 }
 
 const identity = await getVisualIdentity();
 const brand = await getBrandIdentity();
 const seo = await getSeoSettings();
 const integrations = await getSiteIntegrations();
+const adsenseReviewMode = await getAdsenseReviewMode();
 const stagingLike = isStagingLikeEnvironment();
-const { title, description = seo.defaultDescription, robots = seo.robotsDefault, canonical, ogImage = identity.ogImageUrl ?? seo.og.image, breadcrumbs, noindex = false, pageSchemaType = "WebPage", schemas = [], disableSeoGraph = false } = Astro.props;
+const { title, description = seo.defaultDescription, robots = seo.robotsDefault, canonical, ogImage = identity.ogImageUrl ?? seo.og.image, breadcrumbs, noindex = false, pageSchemaType = "WebPage", schemas = [], disableSeoGraph = false, adsenseReviewQualityOverride = false } = Astro.props;
 const pageTitle = title.includes(seo.titleSuffix) ? title : `${title} — ${seo.titleSuffix}`;
-const canonicalUrl = canonical ? new URL(canonical, Astro.site).toString() : new URL(Astro.url.pathname, Astro.site).toString();
+const runtimeSite = getRuntimeSiteUrl(Astro.site);
+const canonicalUrl = resolveCanonicalUrl(canonical, Astro.url.pathname, runtimeSite);
+const publicOgImage = resolvePublicHttpUrl(ogImage, runtimeSite);
 const consentChoice = Astro.cookies.get("es_consent_ads")?.value;
 const consentOk = !integrations.consentModeEnabled || consentChoice === "yes";
 
@@ -43,10 +49,13 @@ const bingVerification = (integrations.bingVerification.trim() || seo.verificati
 
 const adsenseClientId =
   normalizeAdsenseClientId(integrations.adsensePublisherId) ||
-  String(import.meta.env.PUBLIC_ADSENSE_CLIENT_ID ?? "").trim();
+  normalizeAdsenseClientId(
+    String(process.env.PUBLIC_ADSENSE_CLIENT_ID ?? import.meta.env.PUBLIC_ADSENSE_CLIENT_ID ?? "")
+  );
 const adsWanted = integrations.persisted
   ? integrations.adsenseEnabled
-  : integrations.adsenseEnabled || import.meta.env.PUBLIC_ADSENSE_ENABLED === "true";
+  : integrations.adsenseEnabled ||
+    String(process.env.PUBLIC_ADSENSE_ENABLED ?? import.meta.env.PUBLIC_ADSENSE_ENABLED ?? "").toLowerCase() === "true";
 const adsEnabled = !stagingLike && adsWanted && Boolean(adsenseClientId) && consentOk;
 
 const ga4Id = integrations.ga4MeasurementId.trim();
@@ -60,9 +69,9 @@ const metaPixelId = integrations.metaPixelId.trim();
 const metaPixelOk = /^\d{5,20}$/.test(metaPixelId);
 const metaEnabled = !stagingLike && metaPixelOk && consentOk;
 
-const siteUrl = Astro.site?.toString() ?? process.env.SITE_URL ?? "https://empregossaoluis.com.br";
-const og = buildOpenGraphTags({ title: pageTitle, description, url: canonicalUrl, type: seo.og.type, siteName: seo.og.siteName, locale: seo.og.locale, ...(ogImage ? { image: ogImage } : {}) });
-const twitter = buildTwitterTags({ title: pageTitle, description, card: seo.twitter.card, ...(seo.twitter.site ? { site: seo.twitter.site } : {}), ...(seo.twitter.creator ? { creator: seo.twitter.creator } : {}), ...(ogImage ? { image: ogImage } : {}) });
+const siteUrl = runtimeSite.toString();
+const og = buildOpenGraphTags({ title: pageTitle, description, url: canonicalUrl, type: seo.og.type, siteName: seo.og.siteName, locale: seo.og.locale, ...(publicOgImage ? { image: publicOgImage } : {}) });
+const twitter = buildTwitterTags({ title: pageTitle, description, card: seo.twitter.card, ...(seo.twitter.site ? { site: seo.twitter.site } : {}), ...(seo.twitter.creator ? { creator: seo.twitter.creator } : {}), ...(publicOgImage ? { image: publicOgImage } : {}) });
 const organizationSchema = buildOrganizationSchema(seo, siteUrl);
 const websiteSchema = buildWebSiteSchema(seo, siteUrl);
 const breadcrumbSchema = breadcrumbs?.length ? buildBreadcrumbSchema(breadcrumbs.map((item) => ({ ...item, url: new URL(item.url, siteUrl).toString() }))) : null;
@@ -91,9 +100,11 @@ const seoGraph = disableSeoGraph || stagingLike ? null : {
   "@graph": [organizationNode, websiteNode, pageNode, ...(breadcrumbSchema ? [withoutContext(breadcrumbSchema)] : []), ...schemas.map(withoutContext)]
 };
 const currentPath = Astro.url.pathname;
+const reviewDirective = getAdsenseReviewDirective(Astro.url, adsenseReviewMode.enabled, adsenseReviewQualityOverride);
+const effectiveNoindex = noindex || reviewDirective.noindex;
 const robotsValue = stagingLike
   ? stagingRobotsDirective()
-  : noindex
+  : effectiveNoindex
     ? "noindex,follow"
     : robots.includes("max-image-preview")
       ? robots
@@ -131,7 +142,7 @@ const metaBootstrap = metaEnabled
     <title>{pageTitle}</title>
     <style is:inline set:html={cssVariablesFromIdentity(identity, brand.palette)} />
     {Object.entries(og).map(([key, value]) => <meta property={key} content={value} />)}
-    {ogImage && <meta property="og:image:alt" content={seo.defaultOgImageAlt} />}
+    {publicOgImage && <meta property="og:image:alt" content={seo.defaultOgImageAlt} />}
     {Object.entries(twitter).map(([key, value]) => <meta name={key} content={value} />)}
     {seoGraph && <script is:inline type="application/ld+json" set:html={JSON.stringify(seoGraph)} />}
     {analyticsEnabled && gtmOk && <script is:inline set:html={gtmBootstrap} />}
@@ -159,6 +170,6 @@ const metaBootstrap = metaEnabled
     <SiteHeader identity={identity} currentPath={currentPath} />
     <main id="conteudo"><slot /></main>
     <SiteFooter identity={identity} />
-    <CookieConsent initiallyHidden={Boolean(consentChoice)} />
+    <CookieConsent initiallyHidden={!integrations.consentModeEnabled || Boolean(consentChoice)} />
   </body>
 </html>

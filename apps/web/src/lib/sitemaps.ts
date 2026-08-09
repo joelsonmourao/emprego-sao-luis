@@ -1,27 +1,60 @@
-import { and, desc, eq, gt, inArray, isNull, or } from "drizzle-orm";
+import { and, count, desc, eq, gt, inArray, isNull, not, or } from "drizzle-orm";
 import { articles, categories, cities, companies, createDatabase, jobs, states, webStories } from "@es/db";
 import { dedupeEntries, normalizeLastmod, type SitemapEntry } from "@es/seo";
+import {
+  normalizeApplicationEmail,
+  normalizeApplicationUrl,
+  normalizeApplicationWhatsapp
+} from "@es/shared";
+import { getAdsenseReviewMode, sitemapCategoryAllowedInReview, staticPathAllowedInReview } from "./adsense-review-mode";
+import { getEditorialAuditReport } from "./editorial-audit";
+import { classifyCategoryPage, classifyCityPage, classifyCompanyPage } from "./entity-page-quality";
+import { getRuntimeSiteUrl } from "./canonical-url";
+import { getInstitutionalPages, type InstitutionalSlug } from "./site-pages";
+
+function jobHasIndexableApplicationChannel(row: {
+  applicationUrl: string | null;
+  applicationEmail: string | null;
+  applicationWhatsapp: string | null;
+  applicationWhatsappValid: boolean;
+  applicationEmailValid: boolean;
+}) {
+  return (
+    normalizeApplicationUrl(row.applicationUrl).valid ||
+    row.applicationWhatsappValid ||
+    normalizeApplicationWhatsapp(row.applicationWhatsapp).valid ||
+    row.applicationEmailValid ||
+    normalizeApplicationEmail(row.applicationEmail).valid
+  );
+}
 
 const INSTITUTIONAL_PATHS = [
   "/",
-  "/vagas-slz",
+  "/sobre",
   "/quem-somos",
   "/contato",
   "/privacidade",
   "/termos",
   "/cookies",
+  "/lgpd",
+  "/politica-editorial",
+  "/politica-fontes",
+  "/politica-correcoes",
+  "/redacao",
+  "/seguranca-candidatos",
   "/publicar-vaga",
-  "/cidades",
   "/area-empresas",
-  "/instagram"
+  "/trabalhe-conosco"
 ];
 
 export async function listSitemapEntries(
   category: "static" | "jobs" | "companies" | "cities" | "categories" | "blog" | "news" | "web-stories"
 ) {
   if (!process.env.DATABASE_URL) return [] as SitemapEntry[];
+  const reviewMode = await getAdsenseReviewMode();
+  if (reviewMode.enabled && !sitemapCategoryAllowedInReview(category)) return [] as SitemapEntry[];
   const connection = createDatabase(process.env.DATABASE_URL);
-  const siteUrl = process.env.SITE_URL ?? "http://localhost:4321";
+  const siteUrl = getRuntimeSiteUrl();
   const toEntry = (
     path: string,
     lastmod?: Date | null,
@@ -44,7 +77,13 @@ export async function listSitemapEntries(
         connection.db.select({ id: articles.id }).from(articles).where(and(eq(articles.status, "PUBLISHED"), eq(articles.type, "NEWS"))).limit(1),
         connection.db.select({ id: articles.id }).from(articles).where(and(eq(articles.status, "PUBLISHED"), inArray(articles.type, ["GUIDE", "DATA_REPORT"]))).limit(1)
       ]);
-      const paths = [...INSTITUTIONAL_PATHS, ...(activeJob ? ["/vagas", "/categorias"] : []), ...(activeCompany ? ["/empresas"] : []), ...(news ? ["/noticias"] : []), ...(guide ? ["/blog"] : [])];
+      const institutional = await getInstitutionalPages();
+      const publishedInstitutionalPaths = INSTITUTIONAL_PATHS.filter((path) => {
+        const slug = path.slice(1) as InstitutionalSlug;
+        return !(slug in institutional) || institutional[slug].published;
+      });
+      const normalPaths = [...publishedInstitutionalPaths, ...(activeJob ? ["/vagas", "/categorias", "/cidades"] : []), ...(activeCompany ? ["/empresas"] : []), ...(news ? ["/noticias"] : []), ...(guide ? ["/blog"] : [])];
+      const paths = reviewMode.enabled ? normalPaths.filter(staticPathAllowedInReview) : normalPaths;
       return dedupeEntries(
         paths.map((path) =>
           toEntry(
@@ -58,25 +97,43 @@ export async function listSitemapEntries(
     }
     if (category === "jobs") {
       const rows = await connection.db
-        .select({ slug: jobs.slug, updatedAt: jobs.updatedAt })
+        .select({
+          slug: jobs.slug,
+          updatedAt: jobs.updatedAt,
+          applicationUrl: jobs.applicationUrl,
+          applicationEmail: jobs.applicationEmail,
+          applicationWhatsapp: jobs.applicationWhatsapp,
+          applicationWhatsappValid: jobs.applicationWhatsappValid,
+          applicationEmailValid: jobs.applicationEmailValid
+        })
         .from(jobs)
-        .where(and(eq(jobs.publicationStatus, "PUBLISHED"), gt(jobs.expiresAt, new Date())))
+        .where(
+          and(
+            eq(jobs.publicationStatus, "PUBLISHED"),
+            gt(jobs.expiresAt, new Date()),
+            not(inArray(jobs.applicationUrlStatus, ["CLOSED", "INVALID"]))
+          )
+        )
         .orderBy(desc(jobs.updatedAt));
-      return dedupeEntries(rows.map((row) => toEntry(`/vagas/${row.slug}`, row.updatedAt, "daily", 0.8)));
+      return dedupeEntries(
+        rows
+          .filter(jobHasIndexableApplicationChannel)
+          .map((row) => toEntry(`/vagas/${row.slug}`, row.updatedAt, "daily", 0.8))
+      );
     }
     if (category === "companies") {
       const rows = await connection.db
-        .select({ slug: companies.slug, updatedAt: companies.updatedAt })
+        .select({ slug: companies.slug, updatedAt: companies.updatedAt, descriptionHtml: companies.descriptionHtml, seoTitle: companies.seoTitle, metaDescription: companies.metaDescription, activeJobs: count(jobs.id) })
         .from(companies)
         .innerJoin(jobs, eq(jobs.companyId, companies.id))
         .where(and(eq(companies.active, true), eq(jobs.publicationStatus, "PUBLISHED"), gt(jobs.expiresAt, new Date())))
         .groupBy(companies.id)
         .orderBy(desc(companies.updatedAt));
-      return dedupeEntries(rows.map((row) => toEntry(`/empresas/${row.slug}`, row.updatedAt, "weekly", 0.6)));
+      return dedupeEntries(rows.filter((row) => classifyCompanyPage(row) === "FORTE").map((row) => toEntry(`/empresas/${row.slug}`, row.updatedAt, "weekly", 0.6)));
     }
     if (category === "cities") {
       const rows = await connection.db
-        .select({ slug: cities.slug, updatedAt: cities.updatedAt })
+        .select({ slug: cities.slug, updatedAt: cities.updatedAt, seoTitle: cities.seoTitle, metaDescription: cities.metaDescription, activeJobs: count(jobs.id) })
         .from(cities)
         .innerJoin(states, eq(cities.stateId, states.id))
         .innerJoin(jobs, eq(jobs.cityId, cities.id))
@@ -84,19 +141,19 @@ export async function listSitemapEntries(
         .groupBy(cities.id)
         .orderBy(desc(cities.updatedAt));
       return dedupeEntries(
-        rows.map((row) => toEntry(`/vagas/cidade/${row.slug}`, row.updatedAt, "weekly", 0.7))
+        rows.filter((row) => classifyCityPage(row) === "FORTE").map((row) => toEntry(`/vagas/cidade/${row.slug}`, row.updatedAt, "weekly", 0.7))
       );
     }
     if (category === "categories") {
       const rows = await connection.db
-        .select({ slug: categories.slug, updatedAt: categories.updatedAt })
+        .select({ slug: categories.slug, updatedAt: categories.updatedAt, description: categories.description, seoTitle: categories.seoTitle, metaDescription: categories.metaDescription, activeJobs: count(jobs.id) })
         .from(categories)
         .innerJoin(jobs, eq(jobs.categoryId, categories.id))
         .where(and(eq(categories.active, true), eq(jobs.publicationStatus, "PUBLISHED"), gt(jobs.expiresAt, new Date())))
         .groupBy(categories.id)
         .orderBy(desc(categories.updatedAt));
       return dedupeEntries(
-        rows.map((row) => toEntry(`/categorias/${row.slug}`, row.updatedAt, "weekly", 0.6))
+        rows.filter((row) => classifyCategoryPage(row) === "FORTE").map((row) => toEntry(`/categorias/${row.slug}`, row.updatedAt, "weekly", 0.6))
       );
     }
     if (category === "web-stories") {
@@ -119,8 +176,11 @@ export async function listSitemapEntries(
       .from(articles)
       .where(and(eq(articles.status, "PUBLISHED"), inArray(articles.type, articleTypes)))
       .orderBy(desc(articles.updatedAt));
+    const noindexSlugs = reviewMode.enabled
+      ? new Set((await getEditorialAuditReport()).assessments.filter((item) => ["NOINDEX", "REVISAR MANUALMENTE"].includes(item.classification)).map((item) => item.article.slug))
+      : new Set<string>();
     return dedupeEntries(
-      rows.map((row) =>
+      rows.filter((row) => !noindexSlugs.has(row.slug)).map((row) =>
         toEntry(
           `/${category === "news" ? "noticias" : "blog"}/${row.slug}`,
           row.updatedAt,
@@ -136,7 +196,7 @@ export async function listSitemapEntries(
 
 export async function listSitemapManifest() {
   const categories = ["static", "jobs", "companies", "cities", "categories", "blog", "news", "web-stories"] as const;
-  const siteUrl = process.env.SITE_URL ?? "http://localhost:4321";
+  const siteUrl = getRuntimeSiteUrl();
   const files: Array<{ slug: string; loc: string; lastmod?: string; count: number }> = [];
   for (const category of categories) {
     const entries = await listSitemapEntries(category);
