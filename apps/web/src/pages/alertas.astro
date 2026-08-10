@@ -1,7 +1,11 @@
 ---
+import JobBoardPaused from "../components/JobBoardPaused.astro";
+import { jobBoardPublicGate } from "../lib/job-board-gate";
 import BaseLayout from "../layouts/BaseLayout.astro";
 import Breadcrumbs from "../components/ui/Breadcrumbs.astro";
 import PageHero from "../components/ui/PageHero.astro";
+
+const gate = await jobBoardPublicGate();
 
 const whatsapp = import.meta.env.PUBLIC_WHATSAPP_CHANNEL_URL as string | undefined;
 const status = Astro.url.searchParams.get("status");
@@ -11,6 +15,9 @@ const benefits = [
   "Cancele quando quiser, sem burocracia"
 ];
 ---
+{gate.paused ? (
+  <JobBoardPaused title="Alertas de vagas temporariamente pausados" />
+) : (
 <BaseLayout title="Alertas de vagas — Empregos São Luís" breadcrumbs={[{ name: "Alertas", url: "/alertas" }]}>
   <PageHero kicker="Alertas" title="Receba vagas compatíveis com você" description="A inscrição é opcional e não limita o acesso às vagas. Confirme seu e-mail para ativar os alertas." pattern={false} />
 
@@ -68,3 +75,4 @@ const benefits = [
     </div>
   </section>
 </BaseLayout>
+)}

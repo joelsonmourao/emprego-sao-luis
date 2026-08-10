@@ -1,4 +1,6 @@
 ---
+import JobBoardPaused from "../../components/JobBoardPaused.astro";
+import { jobBoardPublicGate } from "../../lib/job-board-gate";
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import Breadcrumbs from "../../components/ui/Breadcrumbs.astro";
 import EmptyState from "../../components/ui/EmptyState.astro";
@@ -6,8 +8,10 @@ import PageHero from "../../components/ui/PageHero.astro";
 import { companies, createDatabase, jobs } from "@es/db";
 import { and, asc, count, eq, gt } from "drizzle-orm";
 
+const gate = await jobBoardPublicGate();
+
 let rows: Array<{ name: string; slug: string; logo: string | null; total: number }> = [];
-if (process.env.DATABASE_URL) {
+if (!gate.paused && process.env.DATABASE_URL) {
   const connection = createDatabase(process.env.DATABASE_URL);
   try {
     const listed = await connection.db
@@ -23,6 +27,9 @@ if (process.env.DATABASE_URL) {
   }
 }
 ---
+{gate.paused ? (
+  <JobBoardPaused title="Empresas temporariamente indisponíveis" />
+) : (
 <BaseLayout title="Empresas com vagas — Empregos São Luís" description="Conheça empresas e consulte oportunidades abertas em São Luís e no Maranhão." breadcrumbs={[{ name: "Empresas", url: "/empresas" }]} pageSchemaType="CollectionPage" noindex={rows.length === 0}>
   <PageHero kicker="Empresas" title="Empresas que contratam na região" description="Consulte perfis e vagas abertas com fonte identificada." pattern={false} />
   <section class="es-section pt-0">
@@ -49,3 +56,4 @@ if (process.env.DATABASE_URL) {
     </div>
   </section>
 </BaseLayout>
+)}

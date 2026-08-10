@@ -4,8 +4,9 @@ import BrandLogo from "../components/BrandLogo.astro";
 import { cssVariablesFromIdentity } from "../lib/design-tokens";
 import { BRAND_ASSET_KEYS } from "../lib/brand/constants";
 import { getBrandIdentity } from "../lib/brand/identity-service";
-import { filterAdminNav, findAdminNavContext, type AdminIcon } from "../lib/admin-nav";
+import { filterAdminNav } from "../lib/admin-nav";
 import { ADMIN_FORM_BRIDGE_SCRIPT } from "../lib/admin-form-bridge";
+import { getEditorialPortalMode, getAdsenseReviewMode } from "../lib/portal-modes";
 import { getVisualIdentity } from "../lib/visual-identity";
 
 const auth = Astro.locals.auth;
@@ -14,30 +15,9 @@ const { title, description = "Gerencie esta área com dados verificáveis e tril
 const identity = await getVisualIdentity();
 const brand = await getBrandIdentity();
 const permissions = auth?.permissions ?? [];
-const navGroups = filterAdminNav(permissions, auth?.roles ?? []);
-const currentPath = Astro.url.pathname;
-const currentSearch = Astro.url.search;
-const context = findAdminNavContext(currentPath, currentSearch);
-const feedback = Astro.url.searchParams.get("message") ?? Astro.url.searchParams.get("success") ?? Astro.url.searchParams.get("saved");
-const errorFeedback = Astro.url.searchParams.get("error");
-
-const iconPaths: Record<AdminIcon, string> = {
-  home: "M3 10.5 12 3l9 7.5M5 9.5V21h14V9.5M9 21v-7h6v7",
-  content: "M5 3h11l3 3v15H5V3Zm3 5h8M8 12h8M8 16h6",
-  publish: "M12 16V3m0 0L7 8m5-5 5 5M5 14v7h14v-7",
-  quality: "m12 3 2.2 4.5 5 .7-3.6 3.5.9 5-4.5-2.4L8 16.7l.9-5L5.3 8.2l5-.7L12 3Z",
-  search: "m21 21-4.35-4.35M19 11a8 8 0 1 1-16 0 8 8 0 0 1 16 0Z",
-  adsense: "M12 2v20M17 6.5c0-2-2-3.5-5-3.5S7 4.2 7 6.5 9 10 12 10s5 1.2 5 3.5S15 17 12 17s-5-1.5-5-3.5",
-  operation: "M4 7h16M4 17h16M8 3v8M16 13v8",
-  business: "M4 8h16v12H4V8Zm4 0V4h8v4M4 13h16M10 13v2h4v-2",
-  system: "M12 15.5A3.5 3.5 0 1 0 12 8a3.5 3.5 0 0 0 0 7.5Zm0-12 1 2.1 2.3.5 1.8-1.5 2.3 2.3-1.5 1.8.5 2.3 2.1 1v3.2l-2.1 1-.5 2.3 1.5 1.8-2.3 2.3-1.8-1.5-2.3.5-1 2.1H9.8l-1-2.1-2.3-.5-1.8 1.5-2.3-2.3 1.5-1.8-.5-2.3-2.1-1V10l2.1-1 .5-2.3-1.5-1.8 2.3-2.3 1.8 1.5 2.3-.5 1-2.1H12Z"
-};
-
-const itemIsActive = (href: string) => {
-  if (context?.item.href === href) return true;
-  const base = href.split(/[?#]/)[0]!;
-  return !context && (currentPath === base || (base !== "/admin" && currentPath.startsWith(`${base}/`)));
-};
+const navGroups = filterAdminNav(permissions);
+const current = Astro.url.pathname;
+const [portalMode, reviewMode] = await Promise.all([getEditorialPortalMode(), getAdsenseReviewMode()]);
 ---
 <!doctype html>
 <html lang="pt-BR">
@@ -51,167 +31,109 @@ const itemIsActive = (href: string) => {
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;600;700&family=Fraunces:wght@700;800&display=swap" rel="stylesheet" />
     <style is:inline set:html={cssVariablesFromIdentity(identity, brand.palette)} />
-    <style is:inline>
-      #admin-shell { --admin-sidebar-width: 18rem; }
-      #admin-shell[data-collapsed="true"] { --admin-sidebar-width: 5.5rem; }
-      #admin-sidebar { width: var(--admin-sidebar-width); }
-      #admin-shell[data-collapsed="true"] .admin-nav-copy,
-      #admin-shell[data-collapsed="true"] .admin-group-title,
-      #admin-shell[data-collapsed="true"] .admin-brand-copy { display: none; }
-      #admin-shell[data-collapsed="true"] .admin-nav-link { justify-content: center; padding-inline: .75rem; }
-      #admin-shell[data-collapsed="true"] .admin-group { border-bottom: 1px solid rgba(255,255,255,.1); padding-bottom: .5rem; }
-      @media (max-width: 1023px) {
-        #admin-sidebar { width: min(88vw, 20rem); transform: translateX(-105%); }
-        #admin-shell[data-mobile-open="true"] #admin-sidebar { transform: translateX(0); }
-        #admin-shell[data-mobile-open="true"] #admin-backdrop { display: block; }
-      }
-    </style>
   </head>
   <body class="bg-[var(--brand-background)] text-[var(--text-primary)]">
-    <div id="admin-shell" class="min-h-screen lg:grid lg:grid-cols-[var(--admin-sidebar-width)_minmax(0,1fr)]" data-collapsed="false" data-mobile-open="false">
-      <button id="admin-backdrop" class="fixed inset-0 z-30 hidden bg-black/55 lg:hidden" aria-label="Fechar menu"></button>
-      <aside id="admin-sidebar" class="fixed inset-y-0 left-0 z-40 flex flex-col border-r border-white/10 bg-[var(--brand-secondary)] text-white shadow-xl transition-[width,transform] duration-200 lg:sticky lg:top-0 lg:h-screen lg:translate-x-0">
-        <div class="flex items-center justify-between gap-3 border-b border-white/10 p-4">
-          <a class="flex min-w-0 items-center gap-3" href="/admin" aria-label={identity.siteName}>
-            <BrandLogo assetKey={BRAND_ASSET_KEYS.ADMIN_LOGO} class="h-9 w-auto max-w-[9rem] object-contain brightness-0 invert" width={144} height={36} />
-            <span class="admin-brand-copy sr-only">Painel administrativo</span>
-          </a>
-          <button id="admin-sidebar-collapse" class="hidden rounded-lg p-2 text-white/75 hover:bg-white/10 hover:text-white lg:inline-flex" type="button" aria-label="Recolher menu" aria-expanded="true">
-            <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m15 18-6-6 6-6" /></svg>
-          </button>
-          <button id="admin-sidebar-close" class="rounded-lg p-2 text-white/75 hover:bg-white/10 lg:hidden" type="button" aria-label="Fechar menu">
-            <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 6 12 12M18 6 6 18" /></svg>
-          </button>
-        </div>
-        <nav class="grid flex-1 content-start gap-2 overflow-y-auto p-3 text-sm" aria-label="Painel administrativo">
-          {navGroups.map((group) => {
-            const groupActive = context?.group.title === group.title;
-            return (
-              <details class="admin-group rounded-xl" open={groupActive || group.title === "Visão geral"}>
-                <summary class="admin-group-title flex cursor-pointer list-none items-center gap-2 rounded-lg px-3 py-2 text-[0.68rem] font-bold uppercase tracking-wider text-white/55 hover:bg-white/5 hover:text-white/80">
-                  <svg class="h-4 w-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d={iconPaths[group.icon]} /></svg>
-                  <span>{group.title}</span>
-                </summary>
-                <div class="mt-1 grid gap-1">
-                  {group.items.map((item) => {
-                    const active = itemIsActive(item.href);
-                    return (
-                      <a
-                        class={`admin-nav-link flex items-center gap-3 rounded-xl px-3 py-2.5 transition-colors ${active ? "bg-white text-[var(--brand-secondary)] shadow-sm" : "text-white/80 hover:bg-white/10 hover:text-white"}`}
-                        href={item.href}
-                        aria-current={active ? "page" : undefined}
-                        title={item.description}
-                      >
-                        <svg class="h-[1.15rem] w-[1.15rem] shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d={iconPaths[item.icon]} /></svg>
-                        <span class="admin-nav-copy min-w-0">
-                          <span class="block truncate font-semibold">{item.label}</span>
-                          {active && <span class="mt-0.5 block text-[0.68rem] font-normal text-slate-600">{item.description}</span>}
-                        </span>
-                      </a>
-                    );
-                  })}
-                </div>
-              </details>
-            );
-          })}
+    <div class="min-h-screen lg:grid lg:grid-cols-[280px_1fr]">
+      <aside class="border-r border-[var(--brand-border)] bg-[var(--brand-secondary)] p-5 text-white">
+        <a class="block" href="/admin" aria-label={identity.siteName}>
+          <BrandLogo assetKey={BRAND_ASSET_KEYS.ADMIN_LOGO} class="h-10 w-auto max-w-[10rem] object-contain brightness-0 invert" width={160} height={40} />
+        </a>
+        <p class="mt-2 text-xs text-white/60">Painel administrativo</p>
+        <nav class="mt-6 grid max-h-[calc(100vh-9rem)] gap-4 overflow-auto pr-1 text-sm" aria-label="Painel">
+          {navGroups.map((group) => (
+            <div>
+              <p class="px-2 text-[0.65rem] font-bold uppercase tracking-wider text-white/45">{group.title}</p>
+              <div class="mt-1 grid gap-0.5">
+                {group.items.map((item) => (
+                  <a
+                    class={`rounded-xl px-3 py-2 transition-colors ${current === item.href || current.startsWith(`${item.href}/`) ? "bg-white/15 font-bold" : "hover:bg-white/10"}`}
+                    href={item.href}
+                  >
+                    {item.label}
+                  </a>
+                ))}
+              </div>
+            </div>
+          ))}
         </nav>
-        <div class="admin-brand-copy border-t border-white/10 p-4 text-xs text-white/60">
-          <p class="truncate font-semibold text-white/85">{auth?.name}</p>
-          <p class="truncate">{auth?.email}</p>
-        </div>
       </aside>
-
-      <div class="min-w-0">
-        <header class="sticky top-0 z-20 border-b border-[var(--brand-border)] bg-white/95 px-4 py-3 backdrop-blur sm:px-6">
-          <div class="flex items-center gap-3">
-            <button id="admin-sidebar-open" class="rounded-lg border border-[var(--brand-border)] p-2 lg:hidden" type="button" aria-label="Abrir menu" aria-controls="admin-sidebar" aria-expanded="false">
-              <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h16" /></svg>
-            </button>
-            <div class="min-w-0 flex-1">
-              <nav class="flex flex-wrap items-center gap-1 text-xs text-[var(--text-secondary)]" aria-label="Breadcrumb">
-                <a class="font-semibold hover:text-[var(--brand-primary)]" href="/admin">Admin</a>
-                {context && <><span aria-hidden="true">/</span><span>{context.group.title}</span></>}
-                {context && context.item.href !== "/admin" && <><span aria-hidden="true">/</span><span aria-current="page" class="font-semibold text-[var(--text-primary)]">{context.item.label}</span></>}
-              </nav>
-              <h1 class="font-display mt-0.5 truncate text-xl font-black sm:text-2xl">{title}</h1>
-              <p class="mt-0.5 hidden max-w-3xl text-xs text-[var(--text-secondary)] sm:block">{description}</p>
+      <div>
+        <header class="flex flex-wrap items-center justify-between gap-4 border-b border-[var(--brand-border)] bg-[var(--brand-surface)] px-6 py-4">
+          <div>
+            <p class="text-xs font-bold uppercase tracking-wide text-[var(--text-secondary)]">Painel</p>
+            <strong class="font-display text-lg">{title}</strong>
+            <p class="mt-0.5 max-w-3xl text-xs text-[var(--text-secondary)]">{description}</p>
+            <p class="text-sm text-[var(--text-secondary)]">{auth?.email}</p>
+          </div>
+          <div class="flex flex-1 flex-wrap items-center justify-end gap-4">
+            <div class="relative w-full max-w-xs">
+              <input
+                id="admin-search"
+                type="search"
+                placeholder="Busca global…"
+                autocomplete="off"
+                class="es-input w-full max-w-xs"
+                aria-label="Busca global no painel"
+              />
+              <div id="search-results" class="absolute right-0 top-full z-50 mt-1 hidden w-full min-w-[18rem] rounded-xl border border-[var(--brand-border)] bg-white py-2 shadow-lg"></div>
             </div>
-            <div class="relative hidden w-full max-w-xs md:block">
-              <label class="sr-only" for="admin-search">Busca global no painel</label>
-              <input id="admin-search" type="search" placeholder="Buscar vagas, conteúdo ou empresa…" autocomplete="off" class="es-input !mt-0" />
-              <div id="search-results" class="absolute right-0 top-full z-50 mt-1 hidden w-full min-w-[20rem] rounded-xl border border-[var(--brand-border)] bg-white py-2 shadow-xl"></div>
-            </div>
-            <form method="post" action="/api/admin/logout"><button class="es-btn es-btn-secondary !px-3 !py-2">Sair</button></form>
+            <form method="post" action="/api/admin/logout"><button class="es-btn es-btn-secondary">Sair</button></form>
           </div>
         </header>
-        <main id="admin-content" class="p-4 sm:p-6 lg:p-8" tabindex="-1">
-          {feedback && <div class="mb-5 rounded-xl border border-emerald-200 bg-emerald-50 p-4 text-sm font-semibold text-emerald-950" role="status">Operação concluída com sucesso.</div>}
-          {errorFeedback && <div class="mb-5 rounded-xl border border-rose-200 bg-rose-50 p-4 text-sm font-semibold text-rose-950" role="alert">Não foi possível concluir a operação. Revise os dados e tente novamente.</div>}
+        <main class="p-6">
+          {portalMode.enabled && (
+            <aside class="mb-4 rounded-xl border border-amber-300 bg-amber-50 p-4 text-sm text-amber-950" role="status">
+              <strong>MODO PORTAL EDITORIAL ATIVO</strong>
+              <p class="mt-1">A área pública de vagas está temporariamente oculta. Importações e o admin continuam normais.</p>
+            </aside>
+          )}
+          {reviewMode.enabled && (
+            <aside class="mb-4 rounded-xl border border-sky-300 bg-sky-50 p-4 text-sm text-sky-950" role="status">
+              <strong>MODO DE REVISÃO ADSENSE ATIVO</strong>
+              <p class="mt-1">Prioriza superfície editorial e restringe indexação de páginas de baixo valor. Não é cloaking.</p>
+            </aside>
+          )}
           <slot />
         </main>
       </div>
     </div>
     <script is:inline>
       (function () {
-        const shell = document.getElementById("admin-shell");
-        const collapse = document.getElementById("admin-sidebar-collapse");
-        const open = document.getElementById("admin-sidebar-open");
-        const close = document.getElementById("admin-sidebar-close");
-        const backdrop = document.getElementById("admin-backdrop");
-        if (!shell) return;
-        const setCollapsed = function (value) {
-          shell.dataset.collapsed = String(value);
-          collapse?.setAttribute("aria-expanded", String(!value));
-          collapse?.setAttribute("aria-label", value ? "Expandir menu" : "Recolher menu");
-          try { localStorage.setItem("es_admin_sidebar_collapsed", value ? "1" : "0"); } catch {}
-        };
-        try { setCollapsed(localStorage.getItem("es_admin_sidebar_collapsed") === "1"); } catch {}
-        collapse?.addEventListener("click", function () { setCollapsed(shell.dataset.collapsed !== "true"); });
-        const setMobile = function (value) {
-          shell.dataset.mobileOpen = String(value);
-          open?.setAttribute("aria-expanded", String(value));
-        };
-        open?.addEventListener("click", function () { setMobile(true); });
-        close?.addEventListener("click", function () { setMobile(false); open?.focus(); });
-        backdrop?.addEventListener("click", function () { setMobile(false); });
-        document.addEventListener("keydown", function (event) { if (event.key === "Escape") setMobile(false); });
-
         const searchInput = document.getElementById("admin-search");
         const searchResults = document.getElementById("search-results");
         if (!searchInput || !searchResults) return;
         let searchTimer;
-        const renderResults = function (results) {
-          searchResults.replaceChildren();
+
+        async function runSearch(q) {
+          if (!q.trim()) {
+            searchResults.classList.add("hidden");
+            searchResults.innerHTML = "";
+            return;
+          }
+          const res = await fetch("/api/admin/search?q=" + encodeURIComponent(q.trim()));
+          const data = await res.json();
+          const results = data.results || [];
           if (!results.length) {
-            const empty = document.createElement("p");
-            empty.className = "px-4 py-2 text-sm text-[var(--text-secondary)]";
-            empty.textContent = "Nenhum resultado.";
-            searchResults.append(empty);
+            searchResults.innerHTML = '<p class="px-4 py-2 text-sm text-[var(--text-secondary)]">Nenhum resultado.</p>';
           } else {
-            results.forEach(function (result) {
-              const link = document.createElement("a");
-              link.className = "block px-4 py-2 text-sm hover:bg-[var(--brand-background)]";
-              link.href = String(result.href || "/admin");
-              const type = document.createElement("span");
-              type.className = "text-xs font-bold uppercase text-[var(--text-secondary)]";
-              type.textContent = String(result.type || "Resultado");
-              link.append(type, document.createElement("br"), document.createTextNode(String(result.label || "Abrir")));
-              searchResults.append(link);
-            });
+            searchResults.innerHTML = results.map(function (r) {
+              return '<a class="block px-4 py-2 text-sm hover:bg-[var(--brand-background)]" href="' + r.href + '"><span class="text-xs font-bold uppercase text-[var(--text-secondary)]">' + r.type + '</span><br/>' + r.label + '</a>';
+            }).join("");
           }
           searchResults.classList.remove("hidden");
-        };
-        async function runSearch(query) {
-          if (!query.trim()) { searchResults.classList.add("hidden"); searchResults.replaceChildren(); return; }
-          try {
-            const response = await fetch("/api/admin/search?q=" + encodeURIComponent(query.trim()), { credentials: "same-origin" });
-            const data = await response.json();
-            renderResults(Array.isArray(data.results) ? data.results : []);
-          } catch { renderResults([]); }
         }
-        searchInput.addEventListener("input", function () { clearTimeout(searchTimer); searchTimer = setTimeout(function () { runSearch(searchInput.value); }, 250); });
-        searchInput.addEventListener("keydown", function (event) { if (event.key === "Enter") { event.preventDefault(); clearTimeout(searchTimer); runSearch(searchInput.value); } if (event.key === "Escape") { searchResults.classList.add("hidden"); searchInput.blur(); } });
-        document.addEventListener("click", function (event) { if (!searchResults.contains(event.target) && event.target !== searchInput) searchResults.classList.add("hidden"); });
+
+        searchInput.addEventListener("input", function () {
+          clearTimeout(searchTimer);
+          searchTimer = setTimeout(function () { runSearch(searchInput.value); }, 250);
+        });
+        searchInput.addEventListener("keydown", function (e) {
+          if (e.key === "Enter") { clearTimeout(searchTimer); runSearch(searchInput.value); }
+          if (e.key === "Escape") { searchResults.classList.add("hidden"); searchInput.blur(); }
+        });
+        document.addEventListener("click", function (e) {
+          if (!searchResults.contains(e.target) && e.target !== searchInput) searchResults.classList.add("hidden");
+        });
       })();
     </script>
     <script is:inline set:html={ADMIN_FORM_BRIDGE_SCRIPT} />

@@ -6,6 +6,7 @@ import { INSTITUTIONAL_DEFAULTS_HTML } from "./institutional-defaults";
 export const INSTITUTIONAL_SLUGS = [
   "quem-somos",
   "sobre",
+  "redacao",
   "contato",
   "privacidade",
   "cookies",
@@ -14,7 +15,6 @@ export const INSTITUTIONAL_SLUGS = [
   "politica-editorial",
   "politica-correcoes",
   "politica-fontes",
-  "redacao",
   "seguranca-candidatos",
   "anunciar-vaga",
   "area-empresas",
@@ -61,6 +61,15 @@ const defaults: Record<InstitutionalSlug, InstitutionalPage> = {
     canonicalPath: "/sobre",
     published: true,
     contentHtml: INSTITUTIONAL_DEFAULTS_HTML.sobre
+  },
+  redacao: {
+    slug: "redacao",
+    title: "Redação",
+    seoTitle: "Redação — Empregos São Luís",
+    metaDescription: "Como a redação do Empregos São Luís organiza notícias, guias e conteúdos institucionais.",
+    canonicalPath: "/redacao",
+    published: true,
+    contentHtml: INSTITUTIONAL_DEFAULTS_HTML.redacao
   },
   contato: {
     slug: "contato",
@@ -134,15 +143,6 @@ const defaults: Record<InstitutionalSlug, InstitutionalPage> = {
     published: true,
     contentHtml: INSTITUTIONAL_DEFAULTS_HTML["politica-fontes"]
   },
-  redacao: {
-    slug: "redacao",
-    title: "Redação Empregos São Luís",
-    seoTitle: "Redação — Empregos São Luís",
-    metaDescription: "Conheça os critérios de pauta, revisão, fontes, atualização e correção da Redação Empregos São Luís.",
-    canonicalPath: "/redacao",
-    published: true,
-    contentHtml: INSTITUTIONAL_DEFAULTS_HTML.redacao
-  },
   "seguranca-candidatos": {
     slug: "seguranca-candidatos",
     title: "Segurança para candidatos",
@@ -204,19 +204,6 @@ export async function getInstitutionalPages(): Promise<Record<InstitutionalSlug,
 export async function getInstitutionalPage(slug: InstitutionalSlug): Promise<InstitutionalPage> {
   const pages = await getInstitutionalPages();
   return pages[slug];
-}
-
-export async function getInstitutionalPagesUpdatedAt(): Promise<Date | null> {
-  if (!process.env.DATABASE_URL) return null;
-  const connection = createDatabase(process.env.DATABASE_URL);
-  try {
-    const [row] = await connection.db.select({ updatedAt: settings.updatedAt }).from(settings).where(eq(settings.key, "institutional_pages")).limit(1);
-    return row?.updatedAt ?? null;
-  } catch {
-    return null;
-  } finally {
-    await connection.close();
-  }
 }
 
 export async function saveInstitutionalPages(pages: Partial<Record<InstitutionalSlug, InstitutionalPage>>) {

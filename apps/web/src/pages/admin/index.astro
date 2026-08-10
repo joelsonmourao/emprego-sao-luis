@@ -2,85 +2,90 @@
 import AdminLayout from "../../layouts/AdminLayout.astro";
 import { getAdminDashboardMetrics } from "../../lib/admin-dashboard";
 import { filterDayOps } from "../../lib/admin-nav";
+import { countOpenSeoIssues } from "../../lib/seo-audit";
 
 const metrics = await getAdminDashboardMetrics();
+const seoIssues = await countOpenSeoIssues();
+metrics.seoIssues = seoIssues;
+
 const permissions = Astro.locals.auth?.permissions ?? [];
-const dayOps = filterDayOps(permissions, Astro.locals.auth?.roles ?? []);
+const dayOps = filterDayOps(permissions);
+
+const fmtCurrency = (v: number) => v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+
 const jobCards = [
-  ["Ativas", metrics.jobs.active, "/admin/vagas"],
-  ["Publicadas hoje", metrics.jobs.publishedToday, "/admin/vagas"],
-  ["Últimos 7 dias", metrics.jobs.publishedSevenDays, "/admin/vagas"],
-  ["Aguardando publicação", metrics.jobs.awaiting, "/admin/vagas/revisao"],
-  ["Expiradas", metrics.jobs.expired, "/admin/qualidade-vagas#expiradas"],
-  ["Rascunhos", metrics.jobs.drafts, "/admin/vagas?status=DRAFT"]
-] as const;
-const editorialCards = [
-  ["Artigos publicados", metrics.jobs.editorialPublished, "/admin/conteudo?tipo=blog"],
-  ["Notícias publicadas", metrics.jobs.newsPublished, "/admin/conteudo?tipo=noticias"],
-  ["Rascunhos", metrics.jobs.editorialDrafts, "/admin/conteudo?status=DRAFT"],
-  ["Aguardando revisão", metrics.jobs.editorialReview, "/admin/qualidade-editorial"]
-] as const;
-const alerts = [
-  ["Vagas sem fonte completa", metrics.quality.missingSource, "/admin/qualidade-vagas?problema=SOURCE_MISSING"],
-  ["Vagas sem empresa confiável", metrics.quality.unknownCompany, "/admin/qualidade-vagas?problema=COMPANY_UNKNOWN"],
-  ["Localizações inválidas", metrics.quality.invalidLocation, "/admin/qualidade-vagas?problema=CITY_INVALID"],
-  ["Sem URL de candidatura", metrics.quality.missingApplicationUrl, "/admin/qualidade-vagas?problema=APPLICATION_LINK_MISSING"],
-  ["Salários suspeitos", metrics.quality.suspiciousSalary, "/admin/qualidade-vagas?problema=SALARY_SUSPICIOUS"],
-  ["Possíveis duplicidades", metrics.quality.duplicates, "/admin/qualidade-vagas#duplicidades"],
-  ["Expiradas ainda inconsistentes", metrics.quality.expired, "/admin/qualidade-vagas#expiradas"],
-  ["Links de candidatura com problema", metrics.quality.brokenLinks, "/admin/qualidade-vagas#links"],
-  ["Conteúdos editoriais fracos", metrics.quality.weakArticles, "/admin/qualidade-editorial?classificacao=NOINDEX"],
-  ["Conteúdos semelhantes", metrics.quality.similarArticles, "/admin/qualidade-editorial#semelhantes"],
-  ["Links editoriais quebrados", metrics.quality.brokenEditorialLinks, "/admin/qualidade-editorial"]
-] as const;
+  ["Vagas publicadas", metrics.published],
+  ["Aguardando revisão", metrics.review],
+  ["Vagas agendadas", metrics.scheduled],
+  ["Vagas expiradas", metrics.expired]
+];
+
+const commercialCards = [
+  ["Pedidos pendentes", metrics.pendingOrders],
+  ["Pagamentos em revisão", metrics.manualReviewPayments],
+  ["Receita confirmada", fmtCurrency(metrics.paidRevenue)],
+  ["Planos ativos", metrics.activePlans]
+];
+
+const dayHints: Record<string, string> = {
+  "/admin/vagas/importar": "Excel/CSV ou links — bairro opcional; WhatsApp e e-mail são canais válidos",
+  "/admin/vagas/revisao": "Aprove só o que estiver completo e seguro",
+  "/admin/vagas/monitor-candidaturas": "Acompanhe canais site, WhatsApp e e-mail",
+  "/admin/conteudo/post-magnetico": "Pilares → Post Magnético → Web Story",
+  "/admin/adsense-readiness": "Checklist interno — AdSense no site só depois do OK",
+  "/admin/comercial/planos": "Receita B2B; candidato permanece gratuito"
+};
 ---
-<AdminLayout title="Dashboard" description="Prioridades operacionais de conteúdo, qualidade, SEO e preparação para AdSense.">
-  <section aria-labelledby="acoes-do-dia">
-    <div class="flex items-center justify-between gap-4"><div><h2 id="acoes-do-dia" class="text-xl font-black">Ações prioritárias</h2><p class="mt-1 text-sm text-slate-600">Atalhos para o trabalho que exige atenção humana.</p></div><a class="es-btn es-btn-secondary" href="/admin/saude">Diagnóstico</a></div>
-    <ol class="mt-4 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-      {dayOps.map((item, index) => <li><a class="block h-full rounded-2xl border bg-white p-5 shadow-sm transition hover:border-[var(--brand-primary)] hover:shadow-md" href={item.href}><span class="text-xs font-bold uppercase tracking-wide text-[var(--brand-primary)]">Prioridade {index + 1}</span><strong class="mt-2 block text-lg">{item.label}</strong><span class="mt-1 block text-sm text-slate-600">{item.description}</span></a></li>)}
-    </ol>
-  </section>
-
-  <section class="mt-9" aria-labelledby="conteudo-dashboard">
-    <h2 id="conteudo-dashboard" class="text-xl font-black">Conteúdo</h2>
-    <div class="mt-4 grid gap-6 xl:grid-cols-2">
-      <div class="rounded-2xl border bg-white p-5"><h3 class="font-black">Vagas</h3><div class="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3">{jobCards.map(([label, value, href]) => <a class="rounded-xl bg-slate-50 p-4 hover:bg-slate-100" href={href}><span class="text-xs text-slate-600">{label}</span><strong class="mt-1 block text-2xl">{value}</strong></a>)}</div></div>
-      <div class="rounded-2xl border bg-white p-5"><h3 class="font-black">Editorial</h3><div class="mt-4 grid grid-cols-2 gap-3">{editorialCards.map(([label, value, href]) => <a class="rounded-xl bg-slate-50 p-4 hover:bg-slate-100" href={href}><span class="text-xs text-slate-600">{label}</span><strong class="mt-1 block text-2xl">{value}</strong></a>)}</div></div>
+<AdminLayout title="Visão geral">
+  <div class="flex flex-wrap items-end justify-between gap-4">
+    <div>
+      <h1 class="font-display text-3xl font-black">Operação do dia</h1>
+      <p class="mt-3 max-w-2xl text-[var(--text-secondary)]">
+        Seis ações com controle total. O restante do painel fica em “Mais ferramentas” no menu.
+      </p>
     </div>
-  </section>
+    <a class="es-btn es-btn-secondary" href="/admin/saude">Saúde da infraestrutura</a>
+  </div>
 
-  <section class="mt-9" aria-labelledby="qualidade-dashboard">
-    <div class="flex flex-wrap items-end justify-between gap-3"><div><h2 id="qualidade-dashboard" class="text-xl font-black">Qualidade</h2><p class="mt-1 text-sm text-slate-600">Alertas gerados por regras internas; nenhuma correção é automática.</p></div><a class="font-bold text-[var(--brand-primary)] underline" href="/admin/qualidade-vagas">Abrir auditoria completa</a></div>
-    <div class="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
-      {alerts.map(([label, value, href]) => <a class={`flex items-center justify-between gap-3 rounded-xl border bg-white p-4 ${value ? "border-amber-200" : "border-emerald-200"}`} href={href}><span class="text-sm font-semibold">{label}</span><strong class={value ? "text-amber-800" : "text-emerald-700"}>{value}</strong></a>)}
-    </div>
-  </section>
+  <ol class="mt-8 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+    {dayOps.map((item, index) => (
+      <li>
+        <a
+          class="flex h-full flex-col rounded-2xl border border-[var(--brand-border)] bg-white p-5 shadow-sm transition hover:border-[var(--brand-primary)]"
+          href={item.href}
+        >
+          <span class="text-xs font-bold uppercase tracking-wide text-[var(--brand-primary)]">Passo {index + 1}</span>
+          <strong class="mt-2 font-display text-xl font-black">{item.label}</strong>
+          <p class="mt-2 text-sm text-[var(--text-secondary)]">{dayHints[item.href] ?? "Abrir área"}</p>
+        </a>
+      </li>
+    ))}
+  </ol>
 
-  <section class="mt-9 grid gap-6 xl:grid-cols-2">
-    <article class="rounded-2xl border bg-white p-6" aria-labelledby="seo-dashboard">
-      <h2 id="seo-dashboard" class="text-xl font-black">SEO</h2>
-      <dl class="mt-4 grid grid-cols-2 gap-4 text-sm">
-        <div><dt class="text-slate-600">URLs indexáveis</dt><dd class="text-2xl font-black">{metrics.seo.indexable}</dd></div>
-        <div><dt class="text-slate-600">URLs noindex</dt><dd class="text-2xl font-black">{metrics.seo.noindex}</dd></div>
-        <div><dt class="text-slate-600">URLs em sitemap</dt><dd class="text-2xl font-black">{metrics.seo.sitemap}</dd></div>
-        <div><dt class="text-slate-600">Pendências SEO abertas</dt><dd class="text-2xl font-black text-amber-700">{metrics.seo.seoIssues}</dd></div>
-        <div><dt class="text-slate-600">Erros estruturados detectáveis</dt><dd class="text-2xl font-black text-rose-700">{metrics.seo.structuredErrors}</dd></div>
-        <div><dt class="text-slate-600">JobPosting compatíveis</dt><dd class="text-2xl font-black text-emerald-700">{metrics.seo.jobPostingValid}</dd></div>
-        <div><dt class="text-slate-600">JobPosting incompatíveis</dt><dd class="text-2xl font-black text-rose-700">{metrics.seo.jobPostingInvalid}</dd></div>
-      </dl>
-      <a class="mt-5 inline-flex font-bold text-[var(--brand-primary)] underline" href="/admin/seo/auditoria">Abrir auditoria SEO</a>
-    </article>
+  <h2 class="mt-10 text-sm font-bold uppercase tracking-wide text-[var(--text-secondary)]">Vagas</h2>
+  <div class="mt-3 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+    {jobCards.map(([label, value]) => (
+      <section class="rounded-2xl border border-[var(--brand-border)] bg-white p-5">
+        <p class="text-sm text-[var(--text-secondary)]">{label}</p>
+        <strong class="mt-2 block font-display text-3xl">{value}</strong>
+      </section>
+    ))}
+  </div>
 
-    <article class="rounded-2xl border bg-white p-6" aria-labelledby="adsense-dashboard">
-      <div class="flex flex-wrap items-start justify-between gap-3"><div><h2 id="adsense-dashboard" class="text-xl font-black">Status interno de preparação para AdSense</h2><p class="mt-1 text-xs text-slate-600">Indicador interno — não fornecido pelo Google.</p></div><span class={`rounded-full px-3 py-1 text-xs font-black ${metrics.adsense.reviewMode ? "bg-amber-100 text-amber-900" : "bg-slate-100 text-slate-700"}`}>Modo de revisão {metrics.adsense.reviewMode ? "ATIVO" : "DESATIVADO"}</span></div>
-      <ul class="mt-4 grid gap-3 text-sm">
-        <li class="flex justify-between gap-3"><span>Páginas institucionais</span><strong class={metrics.adsense.institutionalOk ? "text-emerald-700" : "text-rose-700"}>{metrics.adsense.institutionalOk ? "OK" : "ATENÇÃO"}</strong></li>
-        <li class="flex justify-between gap-3"><span>Conteúdo editorial útil</span><strong class={metrics.adsense.editorialOk ? "text-emerald-700" : "text-amber-700"}>{metrics.adsense.editorialOk ? "OK" : "ATENÇÃO"}</strong></li>
-        <li class="flex justify-between gap-3"><span>Conteúdo semelhante</span><strong class={metrics.adsense.duplicateContent ? "text-amber-700" : "text-emerald-700"}>{metrics.adsense.duplicateContent ? `${metrics.adsense.duplicateContent} PARA REVISAR` : "OK"}</strong></li>
-        <li class="flex justify-between gap-3"><span>Páginas de baixo valor</span><strong class={metrics.adsense.lowValuePages ? "text-amber-700" : "text-emerald-700"}>{metrics.adsense.lowValuePages ? `${metrics.adsense.lowValuePages} PARA REVISAR` : "OK"}</strong></li>
-      </ul>
-      <a class="es-btn es-btn-primary mt-5" href="/admin/adsense-readiness">Abrir Central AdSense</a>
-    </article>
-  </section>
+  <h2 class="mt-8 text-sm font-bold uppercase tracking-wide text-[var(--text-secondary)]">Comercial B2B</h2>
+  <div class="mt-3 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+    {commercialCards.map(([label, value]) => (
+      <section class="rounded-2xl border border-[var(--brand-border)] bg-white p-5">
+        <p class="text-sm text-[var(--text-secondary)]">{label}</p>
+        <strong class="mt-2 block font-display text-3xl">{value}</strong>
+      </section>
+    ))}
+  </div>
+
+  <p class="mt-6 text-sm text-[var(--text-secondary)]">
+    Problemas SEO abertos: <strong>{seoIssues}</strong>
+    · <a class="font-bold text-[var(--brand-primary)]" href="/admin/seo/auditoria">Auditoria SEO</a>
+    · <a class="font-bold text-[var(--brand-primary)]" href="/admin/conteudo/pilares">Pilares e clusters</a>
+    · <a class="font-bold text-[var(--brand-primary)]" href="/admin/web-stories">Web Stories</a>
+  </p>
 </AdminLayout>

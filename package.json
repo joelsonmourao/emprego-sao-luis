@@ -58,6 +58,7 @@
     "generate:sl-local-covers": "node scripts/generate-sl-local-covers.mjs",
     "fetch:sl-local-covers": "node scripts/fetch-sl-local-photo-covers.mjs",
     "seed:local-editorial": "node scripts/seed-local-editorial-schedule.mjs",
+    "persist:adsense-quality-guides": "node scripts/persist-adsense-quality-guides.mjs",
     "activate:local-editorial": "node scripts/activate-sl-local-editorial.mjs",
     "audit:performance": "node scripts/audit-performance.mjs",
     "audit:admin": "node scripts/audit-admin.mjs",

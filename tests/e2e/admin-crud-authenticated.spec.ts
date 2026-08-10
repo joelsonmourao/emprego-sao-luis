@@ -77,7 +77,7 @@ test.describe("CRUD autenticado — persistência admin", () => {
     await page.screenshot({ path: resolve(shotDir, "crud-import.png"), fullPage: true });
   });
 
-  test("Central AdSense e Web Stories autenticados", async ({ page }) => {
+  test("Rota da Aprovação e Web Stories autenticados", async ({ page }) => {
     await page.goto("/admin/adsense-readiness");
     expect(page.url()).not.toContain("/admin/login");
     await expect(page.getByText(/não garante aprovação pelo Google AdSense/i).first()).toBeVisible();

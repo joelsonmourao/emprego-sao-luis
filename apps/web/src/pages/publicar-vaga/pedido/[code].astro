@@ -1,29 +1,29 @@
 ---
+import { jobBoardPublicGate } from "../../../lib/job-board-gate";
 import BaseLayout from "../../../layouts/BaseLayout.astro";
 import { getOrderByCode, getPaymentSettings } from "../../../lib/commercial";
 import { getConfiguredGateway, isPaymentAvailable } from "../../../lib/payments/gateway";
 
+const gate = await jobBoardPublicGate();
+if (gate.paused) return Astro.rewrite("/quadro-pausado");
 const { code } = Astro.params;
 const data = code ? await getOrderByCode(code) : null;
 if (!data) return Astro.redirect("/publicar-vaga", 302);
-
 const { order, plan, remaining } = data;
 const paymentAvailable = await isPaymentAvailable();
 const paymentSettings = await getPaymentSettings();
 const gateway = getConfiguredGateway();
 const manualPix = paymentSettings.manualPixEnabled && paymentSettings.manualPixKey.trim();
 const gatewayReady = gateway?.provider === "mercadopago";
-
 if (order.status === "PAID" && remaining > 0) {
   return Astro.redirect(`/publicar-vaga/cadastro?pedido=${order.orderCode}`, 302);
 }
 if (order.status === "MANUAL_REVIEW" || order.status === "PAID") {
   return Astro.redirect(`/publicar-vaga/confirmacao/${order.orderCode}`, 302);
 }
-
 const proofError = Astro.url.searchParams.get("proof");
 ---
-<BaseLayout title={`Pedido ${order.orderCode}`} description="Acompanhe pagamento e liberação de crédito." canonical={`/publicar-vaga/pedido/${order.orderCode}`} noindex>
+<BaseLayout title={`Pedido ${order.orderCode}`} description="Acompanhe pagamento e liberação de crédito." canonical={`/publicar-vaga/pedido/${order.orderCode}`}>
   <section class="es-section">
     <div class="es-container max-w-2xl">
       <p class="es-kicker">Etapa 4 de 4</p>

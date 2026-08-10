@@ -167,6 +167,7 @@ describe("spreadsheet import", () => {
   });
 
   it("rejects invalid dates with a clear message", () => {
+    // field comes through normalize as expiresAt; direct schema uses expiresAt
     const direct = importJobRowSchema.safeParse({
       title: "Analista",
       company: "Empresa",

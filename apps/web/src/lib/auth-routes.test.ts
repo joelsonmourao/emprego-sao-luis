@@ -22,8 +22,10 @@ describe("rotas de autenticação separadas", () => {
   });
 
   it("navegação pública aponta corretamente", () => {
-    expect(read("apps/web/src/components/SiteHeader.astro")).toContain("/cidades");
-    expect(read("apps/web/src/components/SiteHeader.astro")).toContain("Cidades");
+    expect(read("apps/web/src/components/SiteHeader.astro")).toContain("getPublicNav");
+    expect(read("apps/web/src/components/SiteHeader.astro")).toContain("getEditorialPortalMode");
+    expect(read("apps/web/src/lib/portal-modes.ts")).toContain('["Vagas", "/vagas"]');
+    expect(read("apps/web/src/lib/portal-modes.ts")).toContain('["Cidades", "/cidades"]');
     expect(read("apps/web/src/components/SiteHeader.astro")).not.toContain("Área da empresa");
     expect(read("apps/web/src/components/SiteFooter.astro")).toContain('href="/admin/login"');
     expect(read("apps/web/src/components/SiteFooter.astro")).toContain("Administração");

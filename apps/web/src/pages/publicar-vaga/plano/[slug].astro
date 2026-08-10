@@ -1,4 +1,5 @@
 ---
+import { jobBoardPublicGate } from "../../../lib/job-board-gate";
 import BaseLayout from "../../../layouts/BaseLayout.astro";
 import Breadcrumbs from "../../../components/ui/Breadcrumbs.astro";
 import { getPlanBySlug } from "../../../lib/commercial";
@@ -6,6 +7,8 @@ import { isPurchasablePlan } from "../../../lib/commercial/publication-page-stat
 import { getCommercialContactUrl } from "../../../lib/commercial/payment-settings";
 import { logServerError } from "../../../lib/server-error";
 
+const gate = await jobBoardPublicGate();
+if (gate.paused) return Astro.rewrite("/quadro-pausado");
 const { slug } = Astro.params;
 let plan = null;
 try {

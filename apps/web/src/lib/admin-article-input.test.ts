@@ -49,16 +49,14 @@ describe("article form", () => {
     }
   });
 
-  it("converte Markdown em HTML ao salvar", () => {
+  it("bloqueia APPROVED sem revisor", () => {
     const form = validForm();
-    form.set("contentHtml", "## Abertura\n\nTexto com **destaque**.\n\n- item um\n- item dois");
+    form.set("editorialStage", "APPROVED");
     const parsed = parseArticleForm(form);
-    expect(parsed.ok).toBe(true);
-    if (parsed.ok) {
-      expect(parsed.data.contentHtml).toContain("<h");
-      expect(parsed.data.contentHtml).toContain("<strong>");
-      expect(parsed.data.contentHtml).toContain("<ul>");
-      expect(parsed.data.contentHtml).toContain("<li>");
+    expect(parsed.ok).toBe(false);
+    if (!parsed.ok) {
+      expect(parsed.error).toMatch(/revisor/i);
+      expect(parsed.details).toContain("APPROVED_WITHOUT_REVIEWER");
     }
   });
 });

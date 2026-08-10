@@ -28,14 +28,22 @@ export const INSTITUTIONAL_DEFAULTS_HTML: Record<InstitutionalSlug, string> = {
 <p>O Empregos São Luís é um portal independente de divulgação de vagas, com transparência sobre fontes e compromisso com a experiência do candidato na região de São Luís e Maranhão.</p>
 <h2>Missão</h2>
 <p>Facilitar o acesso a oportunidades de trabalho locais, com informação organizada e canais oficiais de candidatura.</p>
-<h2>O que o portal entrega</h2>
-<p>Reunimos vagas, notícias e guias de carreira em uma navegação comum. As páginas de oportunidade mostram os dados recebidos da fonte, o prazo informado e os canais disponíveis; conteúdos editoriais passam por cadastro de autoria, fontes e revisão antes da publicação.</p>
-<h2>Para candidatos</h2>
-<p>Pesquisar, filtrar, visualizar e acessar canais de candidatura é gratuito. Alertas, conteúdos e recursos destinados à procura de emprego também não exigem pagamento. O portal não vende destaque de currículo nem cobra para liberar contato de vaga.</p>
-<h2>Para empresas</h2>
-<p>A operação é financiada por publicidade e serviços destinados a empregadores, como publicação e destaque de vagas, perfis empresariais e campanhas patrocinadas claramente identificadas. A relação comercial não transforma publicidade em recomendação editorial.</p>
-<h2>Limites e transparência</h2>
-<p>Não somos a empresa contratante e não conduzimos processos seletivos. Informações podem mudar na fonte original; por isso mantemos canais para correções, denúncias e dúvidas em <a href="/contato">Contato</a>.</p>
+`,
+  redacao: `
+<p>A <strong>Redação Empregos São Luís</strong> é a equipe responsável por organizar, revisar e publicar conteúdos editoriais do portal — notícias sobre mercado de trabalho, guias práticos para candidatos e páginas institucionais.</p>
+<h2>O que publicamos</h2>
+<ul>
+<li>Notícias e atualizações relevantes para quem busca emprego em São Luís e no Maranhão</li>
+<li>Guias e materiais educativos no blog</li>
+<li>Orientações de segurança para candidatos</li>
+<li>Políticas editoriais, de fontes e de correções</li>
+</ul>
+<h2>Como trabalhamos</h2>
+<p>Priorizamos clareza, fonte identificada e utilidade prática. Textos passam por revisão interna antes da publicação. Erros materiais podem ser corrigidos conforme a <a href="/politica-correcoes">política de correções</a>.</p>
+<h2>Independência</h2>
+<p>Conteúdos editoriais seguem critérios próprios, descritos na <a href="/politica-editorial">política editorial</a> e na <a href="/politica-fontes">política de fontes</a>. Anúncios e publicações pagas de empresas, quando houver, são tratados em fluxos comerciais distintos.</p>
+<h2>Contato com a redação</h2>
+<p>Sugestões, correções e denúncias podem ser enviadas pela página de <a href="/contato">contato</a>. Não publicamos nomes fictícios de jornalistas nesta página; a comunicação oficial do portal é institucional.</p>
 `,
   contato: `
 <p>Use o formulário abaixo para falar com a equipe do Empregos São Luís. Cada mensagem recebe um protocolo e é registrada no painel administrativo.</p>
@@ -89,8 +97,8 @@ export const INSTITUTIONAL_DEFAULTS_HTML: Record<InstitutionalSlug, string> = {
 <h2>Publicidade</h2>
 <p>Com consentimento, cookies de publicidade podem apoiar exibição e medição de anúncios, incluindo Google AdSense quando ativo.</p>
 <h2>Gerenciamento</h2>
-<p>Quando a gestão de consentimento está ativa, o banner permite aceitar ou recusar cookies não essenciais. A escolha fica registrada no navegador e pode ser redefinida pelo link de cookies no rodapé.</p>
-<p><em>Última atualização: agosto de 2026.</em></p>
+<p>No primeiro acesso, o banner permite aceitar todos, recusar não essenciais ou personalizar categorias. Você pode alterar depois pelo link de cookies no rodapé.</p>
+<p><em>Última atualização: junho de 2026.</em></p>
 `,
   termos: `
 <p>Estes Termos de Uso regulam o acesso ao portal Empregos São Luís. Ao utilizar o site, você concorda com estas condições.</p>
@@ -131,57 +139,15 @@ export const INSTITUTIONAL_DEFAULTS_HTML: Record<InstitutionalSlug, string> = {
 <p>Quando houver encarregado nomeado, o nome e o canal oficial constarão nesta página. Enquanto isso, o atendimento LGPD é feito pelo formulário de contato.</p>
 `,
   "politica-editorial": `
-<p>Esta página explica como produzimos notícias, guias e análises sobre trabalho em São Luís e no Maranhão. Nosso objetivo é oferecer informação local útil, verificável e gratuita para quem procura emprego.</p>
-<h2>Seleção de temas</h2>
-<p>Priorizamos dúvidas práticas de candidatos, mudanças relevantes no mercado de trabalho local, dados públicos e assuntos que ajudem o leitor a avaliar oportunidades com mais segurança. Não publicamos um texto apenas para repetir uma palavra-chave ou aumentar artificialmente o número de páginas.</p>
-<h2>Apuração e fontes</h2>
-<p>Cada conteúdo deve registrar a origem das informações utilizadas. Notícias exigem referência verificável; guias distinguem orientação editorial de regras oficiais. Quando uma afirmação depende de órgão público, empresa ou pesquisa, procuramos indicar a fonte correspondente.</p>
-<h2>Autoria e revisão</h2>
-<p>Os artigos exibem a autoria cadastrada e as datas de publicação e atualização. O painel interno verifica estrutura, fontes, utilidade local, links, repetição e possível semelhança com outros textos. Alertas automáticos apoiam a revisão humana e não substituem a decisão editorial.</p>
-<h2>Atualizações, correções e conteúdo patrocinado</h2>
-<p>Alterações relevantes podem ser identificadas pela data de atualização. Erros podem ser reportados pelo <a href="/contato">contato</a> e seguem nossa <a href="/politica-correcoes">política de correções</a>. Conteúdo patrocinado, quando existir, deve ser claramente identificado e não pode condicionar o acesso de candidatos a vagas.</p>
+<p>Conteúdos de notícias e blog seguem critérios de clareza, fonte identificada e relevância para o mercado de trabalho em São Luís e Maranhão.</p>
+<h2>Correções</h2>
+<p>Erros podem ser reportados pelo contato. Alterações relevantes são datadas quando necessário.</p>
 `,
   "politica-correcoes": `
-<p>Reporte erros em vagas, links ou textos pelo formulário de contato. Indique URL, código da vaga (ES-000000), descrição do problema e, quando possível, uma fonte que permita conferir a informação.</p>
-<h2>Como o relato é avaliado</h2>
-<p>A equipe compara o apontamento com a fonte registrada, o conteúdo publicado e o histórico disponível no painel. Um alerta automático pode indicar o problema, mas não substitui a conferência humana quando a correção altera fatos, datas, valores ou canais de candidatura.</p>
-<h2>O que acontece depois</h2>
-<p>Quando a correção é confirmada, a equipe atualiza o registro e mantém a alteração na trilha administrativa. Conteúdos editoriais exibem a data de atualização quando a mudança é relevante para a compreensão do leitor. Uma vaga sem confirmação suficiente pode ser pausada, encerrada ou encaminhada para revisão, sem inventar dados ausentes.</p>
-<h2>Correções que dependem da fonte</h2>
-<p>Se uma empresa ou órgão não oferece evidência verificável, o portal pode sinalizar a informação como inconclusiva. Respostas HTTP 403, 429 e falhas temporárias de rede não são tratadas isoladamente como prova de encerramento de uma vaga.</p>
-<h2>Como acompanhar</h2>
-<p>Use o protocolo gerado no <a href="/contato">formulário de contato</a>. Dados pessoais enviados para a apuração seguem a <a href="/privacidade">Política de Privacidade</a>.</p>
+<p>Reporte erros em vagas, links ou textos pelo formulário de contato. Indique URL, código da vaga (ES-000000) e descrição do problema.</p>
 `,
   "politica-fontes": `
-<p>Priorizamos fontes oficiais, empresas identificadas, órgãos públicos e evidências verificáveis. Vagas sem fonte clara podem ser retidas para revisão e não devem ser apresentadas como confirmadas.</p>
-<h2>Hierarquia de fontes</h2>
-<ul>
-<li>Páginas oficiais de carreiras, concursos, seleções e comunicados de órgãos públicos</li>
-<li>Sites, perfis e documentos publicados pela própria empresa responsável pela oportunidade</li>
-<li>Plataformas de recrutamento quando identificam empresa, prazo e canal de candidatura</li>
-<li>Fontes secundárias confiáveis, usadas como apoio e não como substituição de uma origem disponível</li>
-</ul>
-<h2>Como a informação é conferida</h2>
-<p>O endereço de origem, o canal de candidatura, a identidade da empresa, a cidade e a validade são campos independentes. A presença de um link não confirma automaticamente todo o restante. O painel sinaliza ausência de fonte, dados inconsistentes e links inconclusivos para revisão.</p>
-<h2>Notícias e guias</h2>
-<p>Notícias devem registrar referência externa verificável e contexto local. Guias podem explicar práticas e dúvidas recorrentes, mas precisam separar orientação editorial de regras oficiais e indicar a fonte quando citam legislação, dados ou declarações.</p>
-<h2>Fontes patrocinadas e conflitos</h2>
-<p>Uma relação comercial não torna uma informação verdadeira nem garante publicação editorial. Conteúdo patrocinado é identificado, e a candidatura continua gratuita para o candidato.</p>
-<h2>Correções</h2>
-<p>Quando uma fonte muda ou um erro é confirmado, aplicamos a <a href="/politica-correcoes">Política de Correções</a>. Bloqueios temporários, como 403, 429 ou timeout, exigem cautela e não encerram uma vaga por si só.</p>
-`,
-  redacao: `
-<p><strong>Redação Empregos São Luís</strong> é a assinatura institucional usada em conteúdos produzidos e revisados pela equipe do portal. Ela não representa um jornalista fictício e não substitui a identificação de um autor individual quando houver.</p>
-<h2>Como as pautas são selecionadas</h2>
-<p>Priorizamos dúvidas práticas de candidatos, fatos com impacto no mercado de trabalho local, informações públicas sobre São Luís e Maranhão e orientações que ajudem o leitor a avaliar oportunidades com segurança. Não criamos páginas apenas para repetir palavras-chave ou aumentar artificialmente o volume do site.</p>
-<h2>Como a publicação é revisada</h2>
-<p>O fluxo editorial registra tipo, autoria, fontes, datas, metadados, pilar e cluster. O painel sinaliza texto curto, repetição, similaridade, falta de contexto local, links ausentes e outros riscos. A classificação automática é um indicador interno; a decisão de manter, melhorar ou retirar temporariamente do índice exige revisão responsável.</p>
-<h2>Fontes e apuração</h2>
-<p>Notícias precisam de fonte verificável. Guias que citam dados, leis ou regras oficiais devem apontar a origem correspondente. Consulte a <a href="/politica-fontes">Política de Fontes</a> para entender a hierarquia e os limites dessa verificação.</p>
-<h2>Atualizações e correções</h2>
-<p>Os conteúdos exibem data de publicação e, quando aplicável, data de atualização. Relatos enviados pelo <a href="/contato">Contato</a> são comparados com as fontes e o histórico disponível. O procedimento completo está na <a href="/politica-correcoes">Política de Correções</a>.</p>
-<h2>Independência e gratuidade</h2>
-<p>Publicidade e conteúdo patrocinado são identificados. Nenhum pagamento de empresa condiciona o acesso de candidatos às vagas, aos links de candidatura ou aos conteúdos do portal.</p>
+<p>Priorizamos fontes oficiais, empresas identificadas e evidências verificáveis. Vagas sem fonte clara podem ser retidas para revisão.</p>
 `,
   "seguranca-candidatos": `
 <p><strong>Nunca pague para participar de processo seletivo.</strong> O Empregos São Luís não cobra candidatos. Desconfie de qualquer pedido de Pix, taxa de cadastro ou compra de uniforme antes da contratação formal.</p>
@@ -228,12 +194,6 @@ export const INSTITUTIONAL_DEFAULTS_HTML: Record<InstitutionalSlug, string> = {
 <p>Para pacotes maiores ou condições especiais, use “Falar com o comercial” no fluxo de publicação.</p>
 `,
   "trabalhe-conosco": `
-<p>Esta é a página oficial para oportunidades de trabalho na operação do Empregos São Luís.</p>
-<h2>Vagas abertas</h2>
-<p>No momento, não há processo seletivo próprio anunciado nesta página. Quando houver, cada oportunidade será publicada com atividade, requisitos, prazo e canal oficial de candidatura.</p>
-<h2>Envio espontâneo</h2>
-<p>Não solicitamos pagamento, compra de curso ou taxa para participar de seleção. Se desejar apresentar seu perfil para oportunidades futuras, use o <a href="/contato">formulário de contato</a> com o assunto “Trabalhe conosco”. O envio não garante abertura de vaga ou contratação.</p>
-<h2>Segurança</h2>
-<p>Confirme sempre se a comunicação aponta para este domínio ou para um canal publicado oficialmente pelo portal. Denuncie cobranças e mensagens suspeitas pela página de <a href="/seguranca-candidatos">Segurança para candidatos</a>.</p>
+<p>Quando houver vagas na operação do portal, divulgaremos nesta página e no Instagram. Envie perfil pelo contato com assunto “Trabalhe conosco”.</p>
 `
 };

@@ -12,7 +12,7 @@ const motivo = Astro.url.searchParams.get("motivo");
 const next = Astro.url.searchParams.get("next");
 const safeNext = next && next.startsWith("/") && !next.startsWith("//") ? next : "";
 ---
-<BaseLayout title="Entrar — Empregos São Luís" noindex>
+<BaseLayout title="Entrar — Empregos São Luís">
   <section class="mx-auto max-w-lg px-4 py-16">
     <h1 class="text-4xl font-black">Entrar na sua conta</h1>
     <p class="mt-4 text-[var(--es-muted)]">Enviaremos um link seguro para seu e-mail. Não é necessário criar senha.</p>

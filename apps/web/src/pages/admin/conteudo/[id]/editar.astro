@@ -3,6 +3,7 @@ import { eq } from "drizzle-orm";
 import { articles, authors, contentClusters, contentPillars, createDatabase, users } from "@es/db";
 import { toDatetimeLocalValue } from "@es/shared";
 import AdminLayout from "../../../../layouts/AdminLayout.astro";
+import { assessEditorialArticle, getEditorialAuditReport, type EditorialArticleInput } from "../../../../lib/editorial-audit";
 
 if (!process.env.DATABASE_URL) return Astro.redirect("/admin/conteudo");
 const connection = createDatabase(process.env.DATABASE_URL);
@@ -17,6 +18,42 @@ await connection.close();
 const article = articleRows[0];
 if (!article) Astro.response.status = 404;
 const localDate = (value: Date | null) => toDatetimeLocalValue(value);
+
+let assessment = null;
+if (article) {
+  const corpus = (await getEditorialAuditReport()).assessments.map((item) => item.article);
+  const input: EditorialArticleInput = {
+    id: article.id,
+    title: article.title,
+    slug: article.slug,
+    type: article.type,
+    excerpt: article.excerpt,
+    contentHtml: article.contentHtml,
+    status: article.status,
+    editorialStage: article.editorialStage,
+    authorId: article.authorId,
+    reviewerId: article.reviewerId,
+    reviewedAt: article.reviewedAt,
+    factCheckedAt: article.factCheckedAt,
+    pillarId: article.pillarId,
+    clusterId: article.clusterId,
+    primaryKeyword: article.primaryKeyword,
+    sourceName: article.sourceName,
+    sourceUrl: article.sourceUrl,
+    sources: article.sources,
+    seoTitle: article.seoTitle,
+    metaDescription: article.metaDescription,
+    canonicalUrl: article.canonicalUrl,
+    coverImageUrl: article.coverImageUrl,
+    coverImageAlt: article.coverImageAlt,
+    coverImageCaption: article.coverImageCaption,
+    coverImageCredit: article.coverImageCredit,
+    localHook: article.localHook,
+    updatedAt: article.updatedAt,
+    publishedAt: article.publishedAt
+  };
+  assessment = assessEditorialArticle(input, corpus);
+}
 ---
 <AdminLayout title="Editar conteúdo">
   {article ? <>
@@ -24,6 +61,7 @@ const localDate = (value: Date | null) => toDatetimeLocalValue(value);
       <h1 class="text-3xl font-black">Editar conteúdo</h1>
       <div class="flex flex-wrap gap-2">
         <a class="rounded-lg border px-4 py-2 font-bold" href="/admin/conteudo">Voltar à lista</a>
+        <a class="rounded-lg border px-4 py-2 font-bold" href="/admin/qualidade-editorial">Qualidade editorial</a>
         <form method="post" action={`/api/admin/articles/${article.id}`}>
           <input type="hidden" name="action" value="DUPLICATE" />
           <button class="rounded-lg border px-4 py-2">Duplicar como rascunho</button>
@@ -40,6 +78,33 @@ const localDate = (value: Date | null) => toDatetimeLocalValue(value);
         </form>
       </div>
     </div>
+
+    {assessment && (
+      <section class="mt-6 rounded-2xl border bg-white p-6" id="auditoria">
+        <h2 class="text-xl font-black">Auditoria de qualidade</h2>
+        <p class="mt-2 text-sm">Classificação: <strong>{assessment.classification}</strong> · Pontuação interna: <strong>{assessment.score}/100</strong> · Fonte: <strong>{assessment.sourceKind}</strong></p>
+        <p class="mt-1 text-sm text-slate-600">{assessment.issues.length} problema(s) encontrado(s) · {assessment.wordCount} palavras · {assessment.charCount} caracteres</p>
+        {article.editorialStage === "APPROVED" && !article.reviewerId && (
+          <p class="mt-3 rounded-lg border border-amber-300 bg-amber-50 p-3 text-sm text-amber-950">
+            Etapa APPROVED com revisor pendente: inconsistência. Atribua um revisor real ou volte a EDITORIAL_REVIEW. Não invente revisor.
+          </p>
+        )}
+        <div class="mt-4 grid gap-3">
+          {assessment.issues.map((issue) => (
+            <article class="rounded-xl border p-4">
+              <p class="text-xs font-bold uppercase tracking-wide">{issue.severity} · {issue.category} · {issue.code}</p>
+              <h3 class="mt-1 font-black">{issue.title}</h3>
+              <p class="mt-2 text-sm"><strong>Problema:</strong> {issue.description}</p>
+              <p class="mt-1 text-sm"><strong>Por que foi identificado:</strong> {issue.impact}{issue.currentValue != null && issue.currentValue !== "" ? ` Valor atual: ${issue.currentValue}.` : ""}{issue.expectedValue != null && issue.expectedValue !== "" ? ` Esperado: ${issue.expectedValue}.` : ""}</p>
+              <p class="mt-1 text-sm"><strong>Como corrigir:</strong> {issue.recommendation}</p>
+              <p class="mt-1 text-sm"><strong>Status:</strong> {issue.autoFixable ? "PENDENTE (autocorrigível)" : "REQUER REVISÃO HUMANA"} · {issue.status}</p>
+            </article>
+          ))}
+          {!assessment.issues.length && <p class="text-sm text-emerald-800">Nenhuma observação automática neste conteúdo.</p>}
+        </div>
+      </section>
+    )}
+
     <form class="mt-6 grid gap-4 rounded-2xl bg-white p-6" method="post" action={`/api/admin/articles/${article.id}`}>
       <div class="grid gap-4 md:grid-cols-3">
         <label>Tipo<select class="mt-1 w-full rounded-lg border p-3" name="type">{["NEWS","GUIDE","DATA_REPORT"].map((value)=><option value={value} selected={article.type===value}>{value}</option>)}</select></label>

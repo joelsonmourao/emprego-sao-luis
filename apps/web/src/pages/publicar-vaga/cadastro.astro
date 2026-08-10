@@ -1,14 +1,23 @@
 ---
+import JobBoardPaused from "../../components/JobBoardPaused.astro";
+import { jobBoardPublicGate } from "../../lib/job-board-gate";
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import { getOrderByCode } from "../../lib/commercial";
 
-const orderCode = Astro.url.searchParams.get("pedido");
-const data = orderCode ? await getOrderByCode(orderCode) : null;
-if (!data || data.order.status !== "PAID" || data.remaining <= 0) {
-  return Astro.redirect("/publicar-vaga", 302);
+const gate = await jobBoardPublicGate();
+let data: Awaited<ReturnType<typeof getOrderByCode>> | null = null;
+if (!gate.paused) {
+  const orderCode = Astro.url.searchParams.get("pedido");
+  data = orderCode ? await getOrderByCode(orderCode) : null;
+  if (!data || data.order.status !== "PAID" || data.remaining <= 0) {
+    return Astro.redirect("/publicar-vaga", 302);
+  }
 }
 ---
-<BaseLayout title="Cadastrar vaga — Empregos São Luís" description="Cadastre sua vaga após confirmação do pagamento." canonical="/publicar-vaga/cadastro" noindex>
+{gate.paused || !data ? (
+  <JobBoardPaused title="Publicação de vagas temporariamente pausada" />
+) : (
+<BaseLayout title="Cadastrar vaga — Empregos São Luís" description="Cadastre sua vaga após confirmação do pagamento." canonical="/publicar-vaga/cadastro">
   <section class="es-section">
     <div class="es-container max-w-2xl">
       <p class="es-kicker">Etapa 4 de 4</p>
@@ -28,3 +37,4 @@ if (!data || data.order.status !== "PAID" || data.remaining <= 0) {
     </div>
   </section>
 </BaseLayout>
+)}

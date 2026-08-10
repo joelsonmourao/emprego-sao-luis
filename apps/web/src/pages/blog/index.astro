@@ -5,14 +5,23 @@ import EmptyState from "../../components/ui/EmptyState.astro";
 import PageHero from "../../components/ui/PageHero.astro";
 import Pagination from "../../components/ui/Pagination.astro";
 import { listPublishedArticlesPage } from "../../lib/articles";
-import { getRuntimeSiteUrl } from "../../lib/canonical-url";
+import {
+  EDITORIAL_BLOG_THEMES,
+  getEditorialPortalMode,
+  type EditorialBlogTheme
+} from "../../lib/portal-modes";
 
 const pageSize = 12;
-const pageParam = Astro.url.searchParams.get("pagina") ?? "1";
-const pageNumber = Number(pageParam);
-const page = /^[1-9]\d*$/.test(pageParam) && Number.isSafeInteger(pageNumber) ? pageNumber : 1;
-const { items, total, page: current, pages } = await listPublishedArticlesPage(page, pageSize, ["GUIDE", "DATA_REPORT"]);
-if (page > pages) return new Response("Página não encontrada", { status: 404, headers: { "X-Robots-Tag": "noindex, follow" } });
+const page = Math.max(1, Number(Astro.url.searchParams.get("pagina") ?? 1) || 1);
+const themeParam = Astro.url.searchParams.get("tema");
+const { items, total, page: current, pages, theme } = await listPublishedArticlesPage(
+  page,
+  pageSize,
+  ["GUIDE", "DATA_REPORT"],
+  themeParam
+);
+const portal = await getEditorialPortalMode();
+const themeMeta = theme ? EDITORIAL_BLOG_THEMES[theme as EditorialBlogTheme] : null;
 const pageUrl = (target: number) => {
   const params = new URLSearchParams(Astro.url.searchParams);
   if (target <= 1) params.delete("pagina");
@@ -20,27 +29,49 @@ const pageUrl = (target: number) => {
   const q = params.toString();
   return q ? `?${q}` : "/blog";
 };
-const canonical = new URL(current > 1 ? `/blog?pagina=${current}` : "/blog", getRuntimeSiteUrl(Astro.site)).toString();
+const canonicalPath =
+  current > 1 || theme
+    ? `/blog?${new URLSearchParams({
+        ...(theme ? { tema: theme } : {}),
+        ...(current > 1 ? { pagina: String(current) } : {})
+      }).toString()}`
+    : "/blog";
+const canonical = new URL(canonicalPath, Astro.site).toString();
+const heroTitle = themeMeta ? `${themeMeta.label} — guias` : "Guias e mercado de trabalho";
+const heroDescription = themeMeta
+  ? `Conteúdos do blog sobre ${themeMeta.label.toLowerCase()} para candidatos em São Luís e no Maranhão.`
+  : "Orientação gratuita, análises locais e informações úteis para candidatos e empresas.";
 ---
 <BaseLayout
-  title="Guias gratuitos de emprego — Empregos São Luís"
-  description="Guias gratuitos para candidatos e análises do mercado de trabalho local."
-  breadcrumbs={[{ name: "Guias", url: "/blog" }]}
+  title={themeMeta ? `${themeMeta.label} — Empregos São Luís` : "Guias gratuitos de emprego — Empregos São Luís"}
+  description={heroDescription}
+  breadcrumbs={[{ name: "Guias", url: "/blog" }, ...(themeMeta ? [{ name: themeMeta.label, url: `/blog?tema=${theme}` }] : [])]}
   pageSchemaType="CollectionPage"
   canonical={canonical}
-  noindex={items.length === 0 || current > 1}
+  noindex={items.length === 0 || current > 1 || Boolean(theme)}
 >
-  <PageHero kicker="Conteúdo gratuito" title="Guias e mercado de trabalho" description="Orientação gratuita, análises locais e informações úteis para candidatos e empresas." pattern={false} />
+  <PageHero kicker="Conteúdo gratuito" title={heroTitle} description={heroDescription} pattern={false} />
   <section class="es-section pt-0">
     <div class="es-container">
-      <Breadcrumbs items={[{ name: "Início", url: "/" }, { name: "Guias" }]} />
+      <Breadcrumbs items={[{ name: "Início", url: "/" }, { name: "Guias", url: "/blog" }, ...(themeMeta ? [{ name: themeMeta.label }] : [])]} />
+      <nav class="mt-6 flex flex-wrap gap-2" aria-label="Temas do blog">
+        <a class={`rounded-full border px-3 py-1 text-sm ${!theme ? "bg-slate-900 text-white" : "bg-white"}`} href="/blog">Todos</a>
+        {(Object.keys(EDITORIAL_BLOG_THEMES) as EditorialBlogTheme[]).map((key) => (
+          <a
+            class={`rounded-full border px-3 py-1 text-sm ${theme === key ? "bg-slate-900 text-white" : "bg-white"}`}
+            href={`/blog?tema=${key}`}
+          >
+            {EDITORIAL_BLOG_THEMES[key].label}
+          </a>
+        ))}
+      </nav>
       {items.length === 0 ? (
         <div class="mt-8">
           <EmptyState
-            title="Nenhum guia publicado"
-            description="Esta página permanecerá fora do índice até receber conteúdo editorial revisado."
-            actionHref="/vagas"
-            actionLabel="Ver vagas"
+            title={themeMeta ? `Nenhum guia sobre ${themeMeta.label.toLowerCase()}` : "Nenhum guia publicado"}
+            description="Esta página permanece fora do índice até haver conteúdo editorial revisado neste recorte."
+            actionHref={portal.enabled ? "/noticias" : "/vagas"}
+            actionLabel={portal.enabled ? "Ver notícias" : "Ver vagas"}
           />
         </div>
       ) : (

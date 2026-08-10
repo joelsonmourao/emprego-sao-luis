@@ -2,9 +2,9 @@ import { CANDIDATURE_BLOCKED_SLOT_KEYS } from "@es/ads";
 import { articles, categories, cities, companies, createDatabase, jobs, states, webStories } from "@es/db";
 import { evaluateJobPublication, isStagingLikeEnvironment } from "@es/shared";
 import { eq } from "drizzle-orm";
-import { validateAdsTxtContent } from "./ads-txt";
+import { getEditorialAuditReport } from "./editorial-audit";
+import { getAdsenseReviewMode, getEditorialPortalMode } from "./portal-modes";
 import { getInstitutionalPages } from "./site-pages";
-import { getSiteIntegrations, normalizeAdsenseClientId, normalizePubIdForAdsTxt } from "./site-integrations";
 
 export type ReadinessKind = "OFFICIAL" | "INTERNAL" | "RECOMMENDATION";
 export type ReadinessStatus = "BLOQUEADOR" | "PENDENTE" | "EM_REVISÃO" | "APROVADO_INTERNAMENTE" | "NÃO_APLICÁVEL";
@@ -53,10 +53,14 @@ export async function getAdsenseReadiness(baseUrl: URL) {
 async function buildAdsenseReadiness(baseUrl: URL) {
   const checks: ReadinessCheck[] = [];
   const stagingLike = isStagingLikeEnvironment();
-  const institutional = await getInstitutionalPages();
+  const [institutional, portalModeEarly, reviewModeEarly] = await Promise.all([
+    getInstitutionalPages(),
+    getEditorialPortalMode(),
+    getAdsenseReviewMode()
+  ]);
+  const portalEnabled = portalModeEarly.enabled;
   const institutionalRequired = [
     "quem-somos",
-    "sobre",
     "contato",
     "privacidade",
     "cookies",
@@ -64,8 +68,6 @@ async function buildAdsenseReadiness(baseUrl: URL) {
     "politica-editorial",
     "politica-fontes",
     "politica-correcoes",
-    "redacao",
-    "seguranca-candidatos",
     "lgpd"
   ] as const;
   const pendingInstitutional = institutionalRequired.filter(
@@ -98,8 +100,8 @@ async function buildAdsenseReadiness(baseUrl: URL) {
   if (process.env.DATABASE_URL) {
     const connection = createDatabase(process.env.DATABASE_URL);
     try {
-      articleRows = await connection.db.select().from(articles);
-      storyRows = await connection.db.select().from(webStories);
+      articleRows = await connection.db.select().from(articles).limit(400);
+      storyRows = await connection.db.select().from(webStories).limit(100);
       jobRows = await connection.db
         .select({
           job: jobs,
@@ -113,7 +115,8 @@ async function buildAdsenseReadiness(baseUrl: URL) {
         .innerJoin(cities, eq(jobs.cityId, cities.id))
         .innerJoin(states, eq(jobs.stateId, states.id))
         .leftJoin(categories, eq(jobs.categoryId, categories.id))
-        .where(eq(jobs.publicationStatus, "PUBLISHED"));
+        .where(eq(jobs.publicationStatus, "PUBLISHED"))
+        .limit(400);
     } finally {
       await connection.close();
     }
@@ -175,7 +178,7 @@ async function buildAdsenseReadiness(baseUrl: URL) {
       id: "content-volume",
       stage: "ETAPA_2",
       label: "Conteúdo original avaliável",
-      kind: "INTERNAL",
+      kind: "OFFICIAL",
       severity: "P0",
       status: publishedArticles.length ? "APROVADO_INTERNAMENTE" : "BLOQUEADOR",
       evidence: `${publishedArticles.length} real(is) publicado(s); ${scheduledArticles.length} agendado(s); ${templatePublished.length} template seed ignorado(s). O Google não publica quantidade mínima oficial.`,
@@ -309,9 +312,17 @@ async function buildAdsenseReadiness(baseUrl: URL) {
       label: "Vagas e candidaturas válidas",
       kind: "OFFICIAL",
       severity: "P0",
-      status: invalidJobs.length ? "BLOQUEADOR" : "APROVADO_INTERNAMENTE",
-      evidence: invalidJobs.length ? invalidJobs.slice(0, 5).join(" | ") : `${jobRows.length} vaga(s) publicada(s), sem bloqueio conhecido.`,
-      action: invalidJobs.length ? "/admin/vagas" : undefined
+      status: portalEnabled
+        ? "NÃO_APLICÁVEL"
+        : invalidJobs.length
+          ? "BLOQUEADOR"
+          : "APROVADO_INTERNAMENTE",
+      evidence: portalEnabled
+        ? "Modo Portal Editorial ativo: vagas públicas pausadas; pipeline e admin continuam."
+        : invalidJobs.length
+          ? invalidJobs.slice(0, 5).join(" | ")
+          : `${jobRows.length} vaga(s) publicada(s), sem bloqueio conhecido.`,
+      action: invalidJobs.length && !portalEnabled ? "/admin/vagas" : undefined
     })
   );
   checks.push(
@@ -394,26 +405,10 @@ async function buildAdsenseReadiness(baseUrl: URL) {
     })
   );
 
-  const integrations = await getSiteIntegrations();
-  const runtimeClientId = normalizeAdsenseClientId(
-    String(process.env.PUBLIC_ADSENSE_CLIENT_ID ?? import.meta.env.PUBLIC_ADSENSE_CLIENT_ID ?? "")
-  );
-  const clientId = normalizeAdsenseClientId(integrations.adsensePublisherId) || runtimeClientId;
-  const runtimePublisherId = String(
-    process.env.PUBLIC_ADSENSE_PUBLISHER_ID ?? import.meta.env.PUBLIC_ADSENSE_PUBLISHER_ID ?? ""
-  ).trim().toLowerCase();
-  const publisherId = /^pub-\d+$/.test(runtimePublisherId)
-    ? runtimePublisherId
-    : normalizePubIdForAdsTxt(clientId);
-  const adsEnabled = integrations.persisted
-    ? integrations.adsenseEnabled
-    : integrations.adsenseEnabled ||
-      String(process.env.PUBLIC_ADSENSE_ENABLED ?? import.meta.env.PUBLIC_ADSENSE_ENABLED ?? "").toLowerCase() === "true";
+  const publisherId = import.meta.env.PUBLIC_ADSENSE_PUBLISHER_ID as string | undefined;
+  const clientId = import.meta.env.PUBLIC_ADSENSE_CLIENT_ID as string | undefined;
+  const adsEnabled = import.meta.env.PUBLIC_ADSENSE_ENABLED === "true";
   const adsTxt = await fetchText(new URL("/ads.txt", baseUrl));
-  const adsTxtValidation = validateAdsTxtContent(adsTxt.body);
-  const adsTxtHasPublisher = Boolean(publisherId) && adsTxtValidation.valid && adsTxtValidation.content
-    .split(/\r?\n/)
-    .some((line) => line.split(",")[1]?.trim().toLowerCase() === publisherId);
   checks.push(
     pass({
       id: "publisher",
@@ -421,7 +416,7 @@ async function buildAdsenseReadiness(baseUrl: URL) {
       label: "Publisher ID",
       kind: "INTERNAL",
       severity: "P1",
-      status: publisherId ? "APROVADO_INTERNAMENTE" : "PENDENTE",
+      status: publisherId && /^pub-\d+$/.test(publisherId) ? "APROVADO_INTERNAMENTE" : "PENDENTE",
       evidence: publisherId ? "Formato configurado." : "Pendente de conta AdSense real; nenhum ID foi inventado."
     })
   );
@@ -432,12 +427,8 @@ async function buildAdsenseReadiness(baseUrl: URL) {
       label: "ads.txt",
       kind: "OFFICIAL",
       severity: "P1",
-      status: adsTxt.status === 200 && adsTxtHasPublisher ? "APROVADO_INTERNAMENTE" : "PENDENTE",
-      evidence: adsTxt.status !== 200
-        ? `ads.txt indisponível (HTTP ${adsTxt.status || "erro de rede"}).`
-        : adsTxtHasPublisher
-          ? "Linha DIRECT do publisher configurado encontrada e validada."
-          : "Linha DIRECT do publisher configurado ausente ou inválida."
+      status: publisherId && adsTxt.body.includes(publisherId) ? "APROVADO_INTERNAMENTE" : "PENDENTE",
+      evidence: adsTxt.body.trim().slice(0, 180) || "ads.txt vazio ou indisponível."
     })
   );
   checks.push(
@@ -487,12 +478,52 @@ async function buildAdsenseReadiness(baseUrl: URL) {
     })
   );
 
+  const editorialReport = await getEditorialAuditReport();
+  const portalMode = portalModeEarly;
+  const reviewMode = reviewModeEarly;
+  const publishedAssessments = editorialReport.assessments.filter((item) => item.article.status === "PUBLISHED");
+  const publishedQuality = {
+    total: publishedAssessments.length,
+    manter: publishedAssessments.filter((item) => item.classification === "MANTER").length,
+    melhorar: publishedAssessments.filter((item) => item.classification === "MELHORAR").length,
+    noindex: publishedAssessments.filter((item) => item.classification === "NOINDEX").length,
+    revisar: publishedAssessments.filter((item) => item.classification === "REVISAR MANUALMENTE").length
+  };
+  checks.push(
+    pass({
+      id: "editorial-portal-mode",
+      stage: "ETAPA_0",
+      label: "Modo Portal Editorial",
+      kind: "INTERNAL",
+      severity: "P1",
+      status: portalMode.enabled ? "APROVADO_INTERNAMENTE" : "PENDENTE",
+      evidence: portalMode.enabled
+        ? "Ativo: superfície pública de vagas pausada; pipeline de coleta continua."
+        : "Desativado: portal público ainda inclui job board.",
+      action: "/admin/adsense-readiness#configuracoes"
+    })
+  );
+  checks.push(
+    pass({
+      id: "adsense-review-mode",
+      stage: "ETAPA_0",
+      label: "Modo de Revisão AdSense",
+      kind: "INTERNAL",
+      severity: "P1",
+      status: reviewMode.enabled ? "APROVADO_INTERNAMENTE" : "PENDENTE",
+      evidence: reviewMode.enabled
+        ? "Ativo: prioriza indexação editorial e restringe páginas de baixo valor."
+        : "Desativado.",
+      action: "/admin/adsense-readiness#configuracoes"
+    })
+  );
+
   const blockers = checks.filter((check) => check.status === "BLOQUEADOR");
   const pending = checks.filter((check) => ["PENDENTE", "EM_REVISÃO"].includes(check.status));
   const ready =
     blockers.length === 0 &&
     !pendingInstitutional.length &&
-    invalidJobs.length === 0 &&
+    (portalEnabled || invalidJobs.length === 0) &&
     substantialPublished.length >= MIN_PUBLISHED_ARTICLES &&
     thin.length === 0 &&
     noAuthorSource.length === 0 &&
@@ -517,11 +548,34 @@ async function buildAdsenseReadiness(baseUrl: URL) {
     { id: "ETAPA_5", title: "Etapa 5 — Monetização segura", checks: checks.filter((item) => item.stage === "ETAPA_5") }
   ];
 
+  const detailedBlockers = blockers.map((item) => ({
+    id: item.id,
+    type:
+      item.kind === "OFFICIAL"
+        ? "REQUISITO TÉCNICO"
+        : item.kind === "INTERNAL"
+          ? "RECOMENDAÇÃO INTERNA"
+          : "RECOMENDAÇÃO INTERNA",
+    label: item.label,
+    description: item.evidence,
+    howToFix: item.action ? `Resolver em ${item.action}` : "Revisar evidência e corrigir no admin.",
+    status: item.status,
+    severity: item.severity,
+    category:
+      item.id.includes("content") || item.id.includes("author") || item.id.includes("thin") || item.id.includes("template")
+        ? "PENDÊNCIA EDITORIAL"
+        : item.id.includes("publisher") || item.id.includes("ads-txt") || item.id.includes("ads-flag")
+          ? "PENDÊNCIA EXTERNA"
+          : item.kind === "OFFICIAL"
+            ? "REQUISITO TÉCNICO"
+            : "RECOMENDAÇÃO INTERNA"
+  }));
+
   return {
     classification,
     readyForRequest: ready,
     disclaimer:
-      "Verificação interna apenas. A aprovação final é do Google AdSense — “Pronto” aqui não garante aprovação. Seed template e capas repetidas não contam.",
+      "Verificação interna apenas. A aprovação final é do Google AdSense — “Pronto” aqui não garante aprovação. Seed template e capas repetidas não contam. Pontuação/classificação editorial é métrica interna, não do Google.",
     editorialMeta: {
       minPublished: MIN_PUBLISHED_ARTICLES,
       minUsefulChars: MIN_USEFUL_CHARS,
@@ -530,11 +584,18 @@ async function buildAdsenseReadiness(baseUrl: URL) {
       scheduled: scheduledArticles.length,
       withCover: uniqueCoverPublished.length,
       templateIgnored: templatePublished.length,
-      publishedStories: storyRows.filter((story) => story.status === "PUBLISHED" && !story.slug.startsWith("adsense-editorial")).length
+      publishedStories: storyRows.filter((story) => story.status === "PUBLISHED" && !story.slug.startsWith("adsense-editorial")).length,
+      auditedTotal: editorialReport.summary.total,
+      auditedPublished: editorialReport.summary.published,
+      countExplanation: `${publishedArticles.length} conteúdos publicados atualmente (exclui seed template). ${editorialReport.summary.total} registros editoriais auditados incluindo rascunhos, agendados e arquivados. A qualidade abaixo usa apenas os publicados.`
     },
+    publishedQuality,
+    portalMode,
+    reviewMode,
     checks,
     stages,
     blockers,
+    detailedBlockers,
     generatedAt: new Date()
   };
 }

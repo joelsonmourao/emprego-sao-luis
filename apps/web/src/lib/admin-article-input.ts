@@ -107,6 +107,13 @@ export function parseArticleForm(form: FormData, now = new Date()) {
   if (parsed.data.status === "SCHEDULED" && (!scheduledAt || scheduledAt <= now)) {
     return { ok: false as const, error: "O agendamento deve estar no futuro.", details: [] };
   }
+  if (parsed.data.editorialStage === "APPROVED" && !parsed.data.reviewerId) {
+    return {
+      ok: false as const,
+      error: "Etapa APPROVED exige revisor humano real. Selecione um revisor ou volte a EDITORIAL_REVIEW — não invente revisor.",
+      details: ["APPROVED_WITHOUT_REVIEWER"]
+    };
+  }
   if (expiresAt && expiresAt <= now) {
     return { ok: false as const, error: "A validade deve estar no futuro.", details: [] };
   }

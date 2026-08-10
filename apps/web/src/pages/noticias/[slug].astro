@@ -8,10 +8,6 @@ import {
   resolveSlLocalSeoSlug
 } from "../../lib/articles";
 import { normalizeEditorialHtml } from "@es/shared";
-import { getAdsenseReviewMode } from "../../lib/adsense-review-mode";
-import { getEditorialAssessment } from "../../lib/editorial-audit";
-import { buildEditorialSchema } from "../../lib/editorial-schema";
-import { getRuntimeSiteUrl, resolveCanonicalUrl, resolvePublicHttpUrl } from "../../lib/canonical-url";
 
 const slug = Astro.params.slug!;
 const seoFromLegacy = resolveSlLocalSeoSlug(slug);
@@ -34,37 +30,42 @@ if (!result) {
   });
 }
 const { article, authorName } = result;
-const [reviewMode, editorialAssessment] = await Promise.all([getAdsenseReviewMode(), getEditorialAssessment(article.id)]);
-const reviewNoindex = reviewMode.enabled && ["NOINDEX", "REVISAR MANUALMENTE"].includes(editorialAssessment?.classification ?? "");
 const contentHtml = normalizeEditorialHtml(article.contentHtml, { baseHeadingLevel: 2 });
-const siteUrl = getRuntimeSiteUrl(Astro.site);
-const canonical = resolveCanonicalUrl(article.canonicalUrl ?? undefined, `/noticias/${article.slug}`, siteUrl);
+const canonical = article.canonicalUrl ?? new URL(`/noticias/${article.slug}`, Astro.site).toString();
 const variants = article.coverImageVariants && typeof article.coverImageVariants === "object"
   ? article.coverImageVariants as Record<string, { url?: string; width?: number; height?: number }>
   : {};
 const structuredImages = [variants.hero, variants.landscape43, variants.square]
   .filter((image): image is { url: string; width?: number; height?: number } => Boolean(image?.url))
-  .flatMap((image) => {
-    const url = resolvePublicHttpUrl(image.url, siteUrl);
-    return url ? [{
-      "@type": "ImageObject",
-      url,
-      ...(image.width ? { width: image.width } : {}),
-      ...(image.height ? { height: image.height } : {}),
-      ...(article.coverImageCaption ? { caption: article.coverImageCaption } : {}),
-      ...(article.coverImageCredit ? { creditText: article.coverImageCredit } : {})
-    }] : [];
-  });
-const jsonLd = buildEditorialSchema({ type: "NewsArticle", title: article.title, description: article.metaDescription ?? article.excerpt, canonical, authorName, publishedAt: article.publishedAt, updatedAt: article.updatedAt, siteUrl: siteUrl.toString(), ...(structuredImages.length ? { image: structuredImages } : {}) });
+  .map((image) => ({
+    "@type": "ImageObject",
+    url: image.url,
+    ...(image.width ? { width: image.width } : {}),
+    ...(image.height ? { height: image.height } : {}),
+    ...(article.coverImageCaption ? { caption: article.coverImageCaption } : {}),
+    ...(article.coverImageCredit ? { creditText: article.coverImageCredit } : {})
+  }));
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "NewsArticle",
+  headline: article.title,
+  description: article.metaDescription ?? article.excerpt,
+  datePublished: article.publishedAt?.toISOString(),
+  dateModified: article.updatedAt.toISOString(),
+  mainEntityOfPage: canonical,
+  author: { "@type": "Person", name: authorName },
+  publisher: { "@type": "Organization", name: "Empregos São Luís" },
+  ...(structuredImages.length ? { image: structuredImages } : {})
+};
 ---
-<BaseLayout title={`${article.seoTitle ?? article.title} — Empregos São Luís`} description={article.metaDescription ?? article.excerpt} canonical={canonical} ogImage={article.ogImageUrl ?? article.coverImageUrl ?? undefined} noindex={reviewNoindex} breadcrumbs={[{ name: "Notícias", url: "/noticias" }, { name: article.title, url: `/noticias/${article.slug}` }]} schemas={[jsonLd]}>
+<BaseLayout title={`${article.seoTitle ?? article.title} — Empregos São Luís`} description={article.metaDescription ?? article.excerpt} canonical={canonical} ogImage={article.ogImageUrl ?? article.coverImageUrl ?? undefined} breadcrumbs={[{ name: "Notícias", url: "/noticias" }, { name: article.title, url: `/noticias/${article.slug}` }]} schemas={[jsonLd]}>
   <article class="es-section">
     <div class="es-container max-w-4xl">
       <Breadcrumbs items={[{ name: "Início", url: "/" }, { name: "Notícias", url: "/noticias" }, { name: article.title }]} />
       <p class="es-kicker mt-6">{article.section ?? "Notícia"}</p>
       <h1 class="font-display mt-2 text-4xl font-black sm:text-5xl">{article.title}</h1>
       {article.subtitle && <p class="mt-4 text-xl text-[var(--es-muted)]">{article.subtitle}</p>}
-      <p class="mt-4 text-sm text-[var(--es-muted)]">Por {authorName} · publicado em {article.publishedAt?.toLocaleDateString("pt-BR")}{article.publishedAt && article.updatedAt.getTime() > article.publishedAt.getTime() + 86_400_000 ? ` · atualizado em ${article.updatedAt.toLocaleDateString("pt-BR")}` : ""}</p>
+      <p class="mt-4 text-sm text-[var(--es-muted)]">Por {authorName} · {article.publishedAt?.toLocaleDateString("pt-BR")}</p>
       {article.coverImageUrl && (
         <figure class="mt-8 overflow-hidden rounded-3xl">
           <img class="w-full" src={variants.hero?.url ?? article.coverImageUrl} srcset={variants.card?.url && variants.hero?.url ? `${variants.card.url} 640w, ${variants.hero.url} 1600w` : undefined} sizes="(max-width: 768px) 100vw, 896px" alt={article.coverImageAlt ?? article.title} width={article.coverImageWidth ?? 1600} height={article.coverImageHeight ?? 900} loading="eager" fetchpriority="high" />

@@ -1,81 +1,86 @@
-import { articles, createDatabase, jobs } from "@es/db";
-import { and, count, eq, gte, inArray, lt } from "drizzle-orm";
-import { getAdsenseIndexInventory } from "./adsense-index-inventory";
-import { getAdsenseReviewMode } from "./adsense-review-mode";
-import { getEditorialAuditReport } from "./editorial-audit";
-import { getJobAuditReport } from "./job-audit";
+import {
+  commercialOrders,
+  commercialPayments,
+  commercialPlans,
+  companyCredits,
+  contactSubmissions,
+  createDatabase,
+  jobs
+} from "@es/db";
+import { and, count, eq, gt, sql } from "drizzle-orm";
+import { countPaymentsByStatus } from "./commercial/payments-service";
+import { countOrdersByStatus } from "./commercial/orders-service";
+import { sumCreditsIssued, sumCreditsUsed } from "./commercial/credits-service";
 import { countOpenSeoIssues } from "./seo-audit";
-import { getInstitutionalPages } from "./site-pages";
 
 export async function getAdminDashboardMetrics() {
-  const [jobAudit, editorialAudit, reviewMode, institutional, seoIssues] = await Promise.all([
-    getJobAuditReport(),
-    getEditorialAuditReport(),
-    getAdsenseReviewMode(),
-    getInstitutionalPages(),
-    countOpenSeoIssues()
-  ]);
-  const indexInventory = await getAdsenseIndexInventory(editorialAudit);
-  const counts = {
-    active: 0, publishedToday: 0, publishedSevenDays: 0, awaiting: 0, expired: 0, drafts: 0,
-    editorialPublished: 0, newsPublished: 0, editorialDrafts: 0, editorialReview: 0
+  const empty = {
+    published: 0,
+    review: 0,
+    scheduled: 0,
+    expired: 0,
+    companies: 0,
+    pendingOrders: 0,
+    manualReviewPayments: 0,
+    paidRevenue: 0,
+    creditsIssued: 0,
+    creditsUsed: 0,
+    activePlans: 0,
+    companiesWithCredit: 0,
+    openContacts: 0,
+    webhookFailures: 0,
+    seoIssues: 0
   };
-  if (process.env.DATABASE_URL) {
-    const connection = createDatabase(process.env.DATABASE_URL);
-    const now = new Date();
-    const startToday = new Date(now); startToday.setHours(0, 0, 0, 0);
-    const sevenDays = new Date(now.getTime() - 7 * 86_400_000);
-    try {
-      const results = await Promise.all([
-        connection.db.select({ value: count() }).from(jobs).where(and(eq(jobs.publicationStatus, "PUBLISHED"), gte(jobs.expiresAt, now))),
-        connection.db.select({ value: count() }).from(jobs).where(and(eq(jobs.publicationStatus, "PUBLISHED"), gte(jobs.publishedAt, startToday))),
-        connection.db.select({ value: count() }).from(jobs).where(and(eq(jobs.publicationStatus, "PUBLISHED"), gte(jobs.publishedAt, sevenDays))),
-        connection.db.select({ value: count() }).from(jobs).where(inArray(jobs.publicationStatus, ["PENDING_REVIEW", "APPROVED", "SCHEDULED"])),
-        connection.db.select({ value: count() }).from(jobs).where(lt(jobs.expiresAt, now)),
-        connection.db.select({ value: count() }).from(jobs).where(eq(jobs.publicationStatus, "DRAFT")),
-        connection.db.select({ value: count() }).from(articles).where(and(eq(articles.status, "PUBLISHED"), inArray(articles.type, ["GUIDE", "DATA_REPORT"]))),
-        connection.db.select({ value: count() }).from(articles).where(and(eq(articles.status, "PUBLISHED"), eq(articles.type, "NEWS"))),
-        connection.db.select({ value: count() }).from(articles).where(eq(articles.status, "DRAFT")),
-        connection.db.select({ value: count() }).from(articles).where(eq(articles.status, "PENDING_REVIEW"))
-      ]);
-      const values = results.map((result) => Number(result[0]?.value ?? 0));
-      counts.active = values[0] ?? 0;
-      counts.publishedToday = values[1] ?? 0;
-      counts.publishedSevenDays = values[2] ?? 0;
-      counts.awaiting = values[3] ?? 0;
-      counts.expired = values[4] ?? 0;
-      counts.drafts = values[5] ?? 0;
-      counts.editorialPublished = values[6] ?? 0;
-      counts.newsPublished = values[7] ?? 0;
-      counts.editorialDrafts = values[8] ?? 0;
-      counts.editorialReview = values[9] ?? 0;
-    } finally { await connection.close(); }
+  if (!process.env.DATABASE_URL) return empty;
+  const connection = createDatabase(process.env.DATABASE_URL);
+  try {
+    const [
+      published,
+      review,
+      scheduled,
+      expired,
+      pendingOrders,
+      manualReview,
+      paidRevenue,
+      activePlans,
+      companiesWithCredit,
+      openContacts,
+      webhookFailures,
+      seoIssues
+    ] = await Promise.all([
+      connection.db.select({ value: count() }).from(jobs).where(eq(jobs.publicationStatus, "PUBLISHED")),
+      connection.db.select({ value: count() }).from(jobs).where(eq(jobs.publicationStatus, "PENDING_REVIEW")),
+      connection.db.select({ value: count() }).from(jobs).where(eq(jobs.publicationStatus, "SCHEDULED")),
+      connection.db.select({ value: count() }).from(jobs).where(eq(jobs.publicationStatus, "EXPIRED")),
+      countOrdersByStatus("PENDING_PAYMENT"),
+      countPaymentsByStatus("MANUAL_REVIEW"),
+      connection.db.select({ value: sql<number>`coalesce(sum(${commercialOrders.amount}), 0)::float` }).from(commercialOrders).where(eq(commercialOrders.status, "PAID")),
+      connection.db.select({ value: count() }).from(commercialPlans).where(and(eq(commercialPlans.active, true), eq(commercialPlans.archived, false))),
+      connection.db.select({ value: sql<number>`count(distinct ${companyCredits.email})::int` }).from(companyCredits).where(gt(companyCredits.expiresAt, new Date())),
+      connection.db.select({ value: count() }).from(contactSubmissions).where(eq(contactSubmissions.status, "OPEN")),
+      connection.db.select({ value: count() }).from(commercialPayments).where(eq(commercialPayments.status, "FAILED")),
+      countOpenSeoIssues()
+    ]);
+    const creditsIssued = await sumCreditsIssued();
+    const creditsUsed = await sumCreditsUsed();
+    return {
+      published: published[0]?.value ?? 0,
+      review: review[0]?.value ?? 0,
+      scheduled: scheduled[0]?.value ?? 0,
+      expired: expired[0]?.value ?? 0,
+      companies: 0,
+      pendingOrders: pendingOrders,
+      manualReviewPayments: manualReview,
+      paidRevenue: paidRevenue[0]?.value ?? 0,
+      creditsIssued,
+      creditsUsed,
+      activePlans: activePlans[0]?.value ?? 0,
+      companiesWithCredit: companiesWithCredit[0]?.value ?? 0,
+      openContacts: openContacts[0]?.value ?? 0,
+      webhookFailures: webhookFailures[0]?.value ?? 0,
+      seoIssues
+    };
+  } finally {
+    await connection.close();
   }
-  const requiredInstitutional = ["sobre", "quem-somos", "contato", "privacidade", "termos", "cookies", "lgpd", "politica-editorial", "politica-fontes", "politica-correcoes", "redacao", "seguranca-candidatos"] as const;
-  const institutionalOk = requiredInstitutional.every((slug) => institutional[slug]?.published && institutional[slug].contentHtml.replace(/<[^>]*>/g, " ").trim().length >= 160);
-  const publishedEditorial = editorialAudit.assessments.filter((item) => item.article.status === "PUBLISHED");
-  return {
-    jobs: counts,
-    quality: {
-      ...jobAudit.summary,
-      weakArticles: publishedEditorial.filter((item) => item.quality === "FRACA").length,
-      similarArticles: editorialAudit.similarities.length,
-      brokenEditorialLinks: editorialAudit.brokenLinks.length
-    },
-    seo: {
-      ...indexInventory.summary,
-      seoIssues,
-      structuredErrors: jobAudit.summary.jobPostingInvalid,
-      jobPostingValid: jobAudit.summary.jobPostingValid,
-      jobPostingInvalid: jobAudit.summary.jobPostingInvalid
-    },
-    adsense: {
-      reviewMode: reviewMode.enabled,
-      institutionalOk,
-      editorialOk: publishedEditorial.some((item) => item.classification === "MANTER") &&
-        publishedEditorial.every((item) => !["NOINDEX", "REVISAR MANUALMENTE"].includes(item.classification)),
-      duplicateContent: editorialAudit.similarities.length,
-      lowValuePages: publishedEditorial.filter((item) => item.classification === "NOINDEX").length + indexInventory.summary.review
-    }
-  };
 }

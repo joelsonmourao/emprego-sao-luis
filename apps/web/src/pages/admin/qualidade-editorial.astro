@@ -1,65 +1,171 @@
 ---
 import AdminLayout from "../../layouts/AdminLayout.astro";
-import { getEditorialAuditReport, type EditorialClassification } from "../../lib/editorial-audit";
-import { can } from "../../lib/auth";
-
-const auth = Astro.locals.auth!;
-if (!can(auth, "content.manage") && !can(auth, "seo.manage")) return new Response("Proibido", { status: 403 });
+import { getEditorialAuditReport, type EditorialClassification, type IssueSeverity } from "../../lib/editorial-audit";
 
 const report = await getEditorialAuditReport();
-const classification = Astro.url.searchParams.get("classificacao") as EditorialClassification | null;
-const type = Astro.url.searchParams.get("tipo");
-const filtered = report.assessments.filter((item) =>
-  (!classification || item.classification === classification) &&
-  (!type || item.article.type === type)
-);
-const counts = (value: EditorialClassification) => report.assessments.filter((item) => item.classification === value).length;
-const tone: Record<EditorialClassification, string> = { MANTER: "text-emerald-700", MELHORAR: "text-amber-700", NOINDEX: "text-rose-700", "REVISAR MANUALMENTE": "text-violet-700" };
+const filter = Astro.url.searchParams.get("filtro") ?? "todos";
+const success = Astro.url.searchParams.get("success");
+const applied = Astro.url.searchParams.get("applied");
+
+const severityRank: Record<IssueSeverity, number> = {
+  CRÍTICA: 0,
+  ALTA: 1,
+  MÉDIA: 2,
+  BAIXA: 3
+};
+
+function worstSeverity(assessment: (typeof report.assessments)[number]): IssueSeverity {
+  let best: IssueSeverity = "BAIXA";
+  for (const item of assessment.issues) {
+    if (severityRank[item.severity] < severityRank[best]) best = item.severity;
+  }
+  return assessment.issues.length ? best : "BAIXA";
+}
+
+function matches(filterKey: string, assessment: (typeof report.assessments)[number]) {
+  if (filterKey === "todos") return true;
+  if (filterKey === "manter") return assessment.classification === "MANTER";
+  if (filterKey === "melhorar") return assessment.classification === "MELHORAR";
+  if (filterKey === "noindex") return assessment.classification === "NOINDEX";
+  if (filterKey === "revisar") return assessment.classification === "REVISAR MANUALMENTE";
+  if (filterKey === "artigos") return assessment.article.type !== "NEWS";
+  if (filterKey === "noticias") return assessment.article.type === "NEWS";
+  if (filterKey === "fontes") return assessment.issues.some((item) => item.category === "FONTES");
+  if (filterKey === "revisao") return assessment.issues.some((item) => item.code === "APPROVED_WITHOUT_REVIEWER");
+  if (filterKey === "duplicidade") return assessment.issues.some((item) => item.category === "DUPLICIDADE");
+  if (filterKey === "seo") return assessment.issues.some((item) => item.category === "SEO");
+  if (filterKey === "tecnico") return assessment.issues.some((item) => item.category === "TÉCNICO");
+  if (filterKey === "imagem") return assessment.issues.some((item) => item.category === "IMAGEM");
+  if (filterKey === "autocorrigivel") return assessment.autoFixableCount > 0;
+  if (filterKey === "critico") return assessment.issues.some((item) => item.severity === "CRÍTICA");
+  if (filterKey === "alta") return assessment.issues.some((item) => item.severity === "ALTA" || item.severity === "CRÍTICA");
+  return true;
+}
+
+const rows = report.assessments
+  .filter((item) => matches(filter, item))
+  .sort((a, b) => {
+    const sev = severityRank[worstSeverity(a)] - severityRank[worstSeverity(b)];
+    if (sev !== 0) return sev;
+    return b.issues.length - a.issues.length;
+  });
+
+const autoFixableIssues = report.summary.autoFixableIssues;
+const autoFixCodes = new Map<string, number>();
+for (const assessment of report.assessments) {
+  for (const item of assessment.issues) {
+    if (!item.autoFixable) continue;
+    autoFixCodes.set(item.code, (autoFixCodes.get(item.code) ?? 0) + 1);
+  }
+}
+const autoFixBreakdown = [...autoFixCodes.entries()].sort((a, b) => b[1] - a[1]);
+
+const filters: Array<[string, string]> = [
+  ["todos", "Todos"],
+  ["manter", "Manter"],
+  ["melhorar", "Melhorar"],
+  ["noindex", "Noindex"],
+  ["revisar", "Revisar manualmente"],
+  ["artigos", "Artigos"],
+  ["noticias", "Notícias"],
+  ["fontes", "Problemas de fontes"],
+  ["revisao", "Revisão pendente"],
+  ["duplicidade", "Duplicidade"],
+  ["seo", "SEO"],
+  ["tecnico", "Técnico"],
+  ["imagem", "Imagem"],
+  ["autocorrigivel", "Autocorrigível"],
+  ["critico", "Crítico"],
+  ["alta", "Alta prioridade"]
+];
+const tone = (value: EditorialClassification) =>
+  value === "MANTER" ? "bg-emerald-50 text-emerald-900" : value === "MELHORAR" ? "bg-amber-50 text-amber-950" : value === "NOINDEX" ? "bg-slate-100 text-slate-800" : "bg-rose-50 text-rose-950";
 ---
-<AdminLayout title="Qualidade editorial" description="Classificação interna de artigos e notícias por profundidade, confiança, similaridade, estrutura e utilidade local.">
-  <aside class="rounded-xl border border-sky-200 bg-sky-50 p-4 text-sm text-sky-950" role="note">
-    Este indicador é interno e não é uma pontuação do Google. Nenhum artigo é excluído ou alterado automaticamente.
-  </aside>
-  {can(auth, "content.manage") && <form class="mt-4" method="post" action="/api/admin/editorial-audit/persist" onsubmit="return confirm('Persistir a classificação interna atual em todos os conteúdos? Nenhum texto será reescrito ou excluído.')"><button class="es-btn es-btn-secondary" type="submit">Persistir classificação atual</button></form>}
-  <section class="mt-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-    {(["MANTER", "MELHORAR", "NOINDEX", "REVISAR MANUALMENTE"] as EditorialClassification[]).map((value) => <a class="rounded-2xl border bg-white p-5 shadow-sm" href={`?classificacao=${encodeURIComponent(value)}`}><p class="text-sm text-slate-600">{value}</p><strong class={`mt-2 block text-3xl ${tone[value]}`}>{counts(value)}</strong></a>)}
+<AdminLayout title="Qualidade editorial">
+  <h1 class="text-3xl font-black">Qualidade editorial</h1>
+  <p class="mt-2 max-w-3xl text-sm text-[var(--text-secondary)]">
+    Classificação interna (não é nota do Google). Noindex nunca é aplicado em massa automaticamente.
+    Fontes institucionais do próprio portal não comprovam fatos trabalhistas.
+    Lista ordenada por severidade (CRÍTICA → BAIXA).
+  </p>
+  <p class="mt-2 text-sm text-slate-600">
+    {report.summary.published} conteúdos publicados · {report.summary.total} registros editoriais auditados (inclui rascunhos/agendados/arquivados quando presentes).
+  </p>
+
+  {success === "autofix" && (
+    <p class="mt-4 rounded-xl border border-emerald-300 bg-emerald-50 p-4 text-sm text-emerald-950">
+      Correções seguras aplicadas: {applied ?? "0"} campos atualizados. Reauditoria já disponível abaixo (compare com os totais anteriores na sua própria anotações, se necessário).
+    </p>
+  )}
+
+  <section class="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
+    <article class="rounded-xl border bg-white p-4"><p class="text-sm">Auditados</p><strong class="text-3xl">{report.summary.total}</strong><p class="mt-1 text-xs text-slate-500">{report.summary.published} publicados</p></article>
+    <article class="rounded-xl border bg-white p-4"><p class="text-sm">Manter</p><strong class="text-3xl">{report.summary.manter}</strong></article>
+    <article class="rounded-xl border bg-white p-4"><p class="text-sm">Melhorar</p><strong class="text-3xl">{report.summary.melhorar}</strong></article>
+    <article class="rounded-xl border bg-white p-4"><p class="text-sm">Noindex</p><strong class="text-3xl">{report.summary.noindex}</strong></article>
+    <article class="rounded-xl border bg-white p-4"><p class="text-sm">Revisar</p><strong class="text-3xl">{report.summary.revisar}</strong></article>
   </section>
-  <div class="mt-6 flex flex-wrap gap-2">
-    <a class="chip" href="/admin/qualidade-editorial">Todos</a><a class="chip" href="?tipo=GUIDE">Blog</a><a class="chip" href="?tipo=DATA_REPORT">Relatórios</a><a class="chip" href="?tipo=NEWS">Notícias</a>
+
+  <section class="mt-8 rounded-2xl border bg-white p-6" id="correcoes">
+    <h2 class="text-xl font-black">Correções automáticas seguras</h2>
+    <p class="mt-2 text-sm text-[var(--text-secondary)]">
+      {autoFixableIssues} problema(s) técnicos detectados que podem ser corrigidos sem inventar fatos, autores, fontes ou leis.
+    </p>
+    {autoFixBreakdown.length > 0 && (
+      <ul class="mt-3 grid gap-1 text-sm text-slate-700 sm:grid-cols-2">
+        {autoFixBreakdown.map(([code, count]) => (
+          <li><strong>{count}</strong> × {code}</li>
+        ))}
+      </ul>
+    )}
+    <p class="mt-3 text-xs text-slate-500">Impacto: metadados SEO, canonical técnico e ALT derivável. Não altera texto factual.</p>
+    <form class="mt-4" method="post" action="/api/admin/editorial-audit/safe-fix" onsubmit="return confirm('Aplicar correções seguras (SEO title, meta, canonical técnico, ALT derivável)?')">
+      <input type="hidden" name="confirm" value="APPLY_SAFE_FIXES" />
+      <button class="es-btn es-btn-primary" type="submit" disabled={autoFixableIssues === 0}>Aplicar correções seguras</button>
+    </form>
+  </section>
+
+  <nav class="mt-8 flex flex-wrap gap-2" aria-label="Filtros">
+    {filters.map(([key, label]) => (
+      <a class={`rounded-full border px-3 py-1 text-sm ${filter === key ? "bg-slate-900 text-white" : "bg-white"}`} href={`?filtro=${key}`}>{label}</a>
+    ))}
+  </nav>
+
+  <div class="mt-6 overflow-x-auto rounded-2xl border bg-white">
+    <table class="min-w-full text-sm">
+      <thead>
+        <tr class="border-b text-left">
+          <th class="p-3">Conteúdo</th>
+          <th class="p-3">Status</th>
+          <th class="p-3">Classificação</th>
+          <th class="p-3">Severidade</th>
+          <th class="p-3">Score</th>
+          <th class="p-3">Problemas</th>
+          <th class="p-3">Ação</th>
+        </tr>
+      </thead>
+      <tbody>
+        {rows.slice(0, 300).map((item) => (
+          <tr class="border-b align-top">
+            <td class="p-3">
+              <strong>{item.article.title}</strong>
+              <p class="text-xs text-slate-500">{item.article.type} · /{item.article.type === "NEWS" ? "noticias" : "blog"}/{item.article.slug}</p>
+            </td>
+            <td class="p-3">{item.article.status}<br/><span class="text-xs">{item.article.editorialStage}</span></td>
+            <td class="p-3"><span class={`rounded px-2 py-1 text-xs font-bold ${tone(item.classification)}`}>{item.classification}</span></td>
+            <td class="p-3 text-xs font-bold">{item.issues.length ? worstSeverity(item) : "—"}</td>
+            <td class="p-3">{item.score}/100</td>
+            <td class="p-3">
+              <p class="font-semibold">{item.issues.length} observação(ões)</p>
+              <ul class="mt-1 list-disc pl-4 text-xs text-slate-600">
+                {item.issues.slice(0, 3).map((issue) => <li>{issue.severity} — {issue.title}</li>)}
+              </ul>
+            </td>
+            <td class="p-3"><a class="font-bold text-[var(--brand-primary)]" href={`/admin/conteudo/${item.article.id}/editar#auditoria`}>Revisar</a></td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+    {!rows.length && <p class="p-6 text-sm text-slate-600">Nenhum item neste filtro.</p>}
   </div>
-
-  <section class="mt-6 overflow-hidden rounded-2xl border bg-white">
-    <div class="border-b p-5"><h2 class="text-xl font-black">Artigos e notícias</h2><p class="mt-1 text-sm text-slate-600">{filtered.length} conteúdo(s) no filtro atual.</p></div>
-    <div class="overflow-x-auto"><table class="min-w-full text-sm">
-      <thead class="bg-slate-50 text-left text-xs uppercase tracking-wide text-slate-600"><tr><th class="p-3">Título</th><th class="p-3">Autor</th><th class="p-3">Data</th><th class="p-3">Palavras</th><th class="p-3">Similaridade</th><th class="p-3">Qualidade</th><th class="p-3">Utilidade local</th><th class="p-3">Status</th><th class="p-3">Indexável?</th><th class="p-3">Ação</th></tr></thead>
-      <tbody>{filtered.map((item) => <tr class="border-t align-top">
-        <td class="max-w-sm p-3"><strong>{item.article.title}</strong>{item.issues.length > 0 && <details class="mt-1 text-xs text-slate-600"><summary class="cursor-pointer">{item.issues.length} observação(ões)</summary><ul class="mt-1 list-disc pl-4">{item.issues.map((issue) => <li>{issue}</li>)}</ul></details>}</td>
-        <td class="p-3">{item.article.authorName ?? "Não exibível"}</td>
-        <td class="p-3">{item.article.publishedAt?.toLocaleDateString("pt-BR") ?? "Rascunho"}<span class="block text-xs text-slate-500">Atualizado {item.article.updatedAt.toLocaleDateString("pt-BR")}</span></td>
-        <td class="p-3">{item.wordCount}<span class="block text-xs text-slate-500">{item.repeatedParagraphs + item.repeatedSentences + item.repeatedHeadings} repetição(ões)</span></td>
-        <td class="p-3">{(item.maxSimilarity * 100).toFixed(0)}%</td>
-        <td class="p-3"><span class="font-bold">{item.quality}</span><span class="block text-xs text-slate-500">Indicador interno {item.score}/100</span></td>
-        <td class="p-3">{item.localUtility}</td>
-        <td class={`p-3 font-bold ${tone[item.classification]}`}>{item.classification}</td>
-        <td class="p-3">{item.indexable ? "Sim" : "Não"}</td>
-        <td class="p-3"><a class="font-bold text-[var(--brand-primary)] underline" href={`/admin/conteudo/${item.article.id}/editar`}>Revisar</a></td>
-      </tr>)}</tbody>
-    </table></div>
-  </section>
-
-  <section id="clusters" class="mt-8 scroll-mt-24 overflow-hidden rounded-2xl border bg-white">
-    <div class="border-b p-5"><h2 class="text-xl font-black">Clusters de conteúdo semelhante</h2><p class="mt-1 text-sm text-slate-600">O primeiro item de cada grupo é apenas o melhor candidato interno pelo score e profundidade atuais; a decisão permanece humana.</p></div>
-    <div class="grid gap-4 p-5 lg:grid-cols-2">
-      {report.similarityClusters.map((cluster) => <article class="rounded-xl border p-4"><div class="flex items-center justify-between gap-3"><h3 class="font-black">Cluster {cluster.id}</h3><span class="text-sm font-bold">Pico {(cluster.strongestSimilarity * 100).toFixed(1)}%</span></div><ol class="mt-3 grid gap-2 text-sm">{cluster.members.map((member) => <li class="rounded-lg bg-slate-50 p-3"><a class="font-bold underline" href={`/admin/conteudo/${member.id}/editar`}>{member.title}</a><span class="mt-1 block text-xs text-slate-600">{member.id === cluster.bestCandidateId ? "Melhor candidato interno · " : ""}{member.classification} · score {member.score} · similaridade máxima {(member.maxSimilarity * 100).toFixed(1)}%</span></li>)}</ol></article>)}
-      {report.similarityClusters.length === 0 && <p class="text-sm text-slate-600">Nenhum cluster acima do limiar interno foi encontrado.</p>}
-    </div>
-  </section>
-
-  <section id="semelhantes" class="mt-8 scroll-mt-24 overflow-hidden rounded-2xl border bg-white">
-    <div class="border-b p-5"><h2 class="text-xl font-black">Conteúdos semelhantes</h2><p class="mt-1 text-sm text-slate-600">A comparação usa shingles de cinco termos e um índice invertido; não compara cegamente todos os pares.</p></div>
-    <div class="overflow-x-auto"><table class="min-w-full text-sm"><thead class="bg-slate-50 text-left text-xs uppercase tracking-wide text-slate-600"><tr><th class="p-3">Artigo A</th><th class="p-3">Artigo B</th><th class="p-3">Similaridade</th><th class="p-3">Trecho compartilhado</th><th class="p-3">Ação sugerida</th></tr></thead><tbody>
-      {report.similarities.map((pair) => <tr class="border-t align-top"><td class="p-3"><a class="underline" href={`/admin/conteudo/${pair.articleA.id}/editar`}>{pair.articleA.title}</a></td><td class="p-3"><a class="underline" href={`/admin/conteudo/${pair.articleB.id}/editar`}>{pair.articleB.title}</a></td><td class="p-3 font-bold">{(pair.similarity * 100).toFixed(1)}%</td><td class="max-w-md p-3 text-xs">{pair.sharedExcerpt}</td><td class="max-w-md p-3">{pair.suggestedAction}</td></tr>)}
-      {report.similarities.length === 0 && <tr><td class="p-8 text-center text-slate-600" colspan="5">Nenhum par acima do limiar interno foi encontrado.</td></tr>}
-    </tbody></table></div>
-  </section>
 </AdminLayout>

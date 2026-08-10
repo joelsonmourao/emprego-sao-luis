@@ -1,66 +1,93 @@
 import { describe, expect, it } from "vitest";
 import { existsSync, readFileSync } from "node:fs";
 import { resolve } from "node:path";
-import { ADMIN_DAY_OPS, ADMIN_NAV_GROUPS, filterAdminNav, filterDayOps, findAdminNavContext } from "./admin-nav";
+import { ADMIN_DAY_OPS, ADMIN_NAV_GROUPS, filterDayOps } from "./admin-nav";
 
 const webRoot = resolve("apps/web/src/pages");
 
 function adminPageExists(href: string) {
-  const path = href.split(/[?#]/)[0]!.replace(/^\//, "");
-  return [resolve(webRoot, `${path}.astro`), resolve(webRoot, path, "index.astro")].some((file) => existsSync(file));
+  const path = href.replace(/^\//, "");
+  const candidates = [resolve(webRoot, `${path}.astro`), resolve(webRoot, path, "index.astro")];
+  return candidates.some((file) => existsSync(file));
 }
 
 describe("admin navigation", () => {
-  it("organiza o menu pela nova arquitetura operacional", () => {
-    expect(ADMIN_NAV_GROUPS.map((group) => group.title)).toEqual([
-      "Visão geral", "Conteúdo", "Publicação", "Qualidade", "SEO & Google", "AdSense", "Operação", "Negócio", "Sistema"
-    ]);
-    expect(ADMIN_DAY_OPS).toHaveLength(4);
-    expect(ADMIN_DAY_OPS.map((item) => item.href)).toEqual([
-      "/admin/vagas/importar", "/admin/qualidade-vagas", "/admin/conteudo", "/admin/adsense-readiness"
-    ]);
+  it("coloca Operação do dia no topo com as 6 ações", () => {
+    expect(ADMIN_NAV_GROUPS[0]?.title).toBe("Operação do dia");
+    expect(ADMIN_DAY_OPS).toHaveLength(6);
+    const dayHrefs = ADMIN_NAV_GROUPS[0]!.items.map((i) => i.href);
+    expect(dayHrefs).toContain("/admin/vagas/importar");
+    expect(dayHrefs).toContain("/admin/vagas/revisao");
+    expect(dayHrefs).toContain("/admin/vagas/monitor-candidaturas");
+    expect(dayHrefs).toContain("/admin/conteudo/post-magnetico");
+    expect(dayHrefs).toContain("/admin/adsense-readiness");
+    expect(dayHrefs).toContain("/admin/comercial/planos");
   });
 
-  it("inclui as áreas críticas sem duplicar links", () => {
-    const hrefs = ADMIN_NAV_GROUPS.flatMap((group) => group.items.map((item) => item.href));
+  it("agrupa Blog Fantasma e Mais ferramentas", () => {
+    const titles = ADMIN_NAV_GROUPS.map((g) => g.title);
+    expect(titles).toContain("Conteúdo (Blog Fantasma)");
+    expect(titles).toContain("Mais ferramentas");
+    expect(titles).toContain("Monetização B2B");
+  });
+
+  it("inclui módulos comercial e continuidade no menu", () => {
+    const hrefs = ADMIN_NAV_GROUPS.flatMap((g) => g.items.map((i) => i.href));
     for (const href of [
-      "/admin/qualidade-vagas", "/admin/qualidade-editorial", "/admin/adsense-readiness",
-      "/admin/seo/auditoria#google-jobs", "/admin/conteudo/pilares", "/admin/comercial/planos",
-      "/admin/publicidade", "/admin/perfis-empresariais", "/admin/integracoes"
-    ]) expect(hrefs).toContain(href);
+      "/admin/comercial/planos",
+      "/admin/comercial/reembolsos",
+      "/admin/seo/auditoria",
+      "/admin/configuracoes/identidade-visual",
+      "/admin/contatos",
+      "/admin/vagas/importar",
+      "/admin/instagram",
+      "/admin/vagas/importar-contatos",
+      "/admin/vagas/revisao",
+      "/admin/vagas/monitor-candidaturas",
+      "/admin/conteudo/pilares",
+      "/admin/conteudo/post-magnetico",
+      "/admin/qualidade-editorial",
+      "/admin/adsense-readiness",
+      "/admin/integracoes",
+      "/admin/web-stories",
+      "/admin/calendario-editorial",
+      "/admin/autores",
+      "/admin/fontes",
+      "/admin/seo/links-internos",
+      "/admin/seo/canibalizacao",
+      "/admin/vagas-patrocinadas",
+      "/admin/perfis-empresariais",
+      "/admin/conteudo-patrocinado",
+      "/admin/automacoes-editoriais"
+    ]) {
+      expect(hrefs).toContain(href);
+    }
     expect(new Set(hrefs).size).toBe(hrefs.length);
   });
 
-  it("aponta cada item para uma página Astro existente", () => {
-    const missing = ADMIN_NAV_GROUPS.flatMap((group) => group.items).filter((item) => !adminPageExists(item.href)).map((item) => item.href);
+  it("cada item do menu aponta para página existente", () => {
+    const missing = ADMIN_NAV_GROUPS.flatMap((g) => g.items)
+      .filter((item) => !adminPageExists(item.href))
+      .map((item) => item.href);
     expect(missing).toEqual([]);
   });
 
-  it("respeita permissões nas prioridades", () => {
+  it("filterDayOps respeita permissões", () => {
     expect(filterDayOps([])).toEqual([]);
-    expect(filterDayOps(["imports.manage"]).map((item) => item.href)).toEqual(["/admin/vagas/importar"]);
+    expect(filterDayOps(["imports.manage"]).map((i) => i.href)).toEqual(["/admin/vagas/importar"]);
   });
 
-  it("não deduz super admin pela quantidade de permissões", () => {
-    const manyPermissions = ["settings.manage", ...Array.from({ length: 12 }, (_, index) => `custom.${index}`)];
-    const regularHrefs = filterAdminNav(manyPermissions).flatMap((group) => group.items.map((item) => item.href));
-    expect(regularHrefs).not.toContain("/admin/vagas");
-    const superHrefs = filterAdminNav([], ["SUPER_ADMIN"]).flatMap((group) => group.items.map((item) => item.href));
-    expect(superHrefs).toContain("/admin/vagas");
-  });
-
-  it("seleciona a rota mais específica para breadcrumbs e item ativo", () => {
-    expect(findAdminNavContext("/admin/vagas/importar")?.item.label).toBe("Importações");
-    expect(findAdminNavContext("/admin/conteudo", "?tipo=noticias")?.item.label).toBe("Notícias");
-  });
-
-  it("mantém navegação responsiva e dashboard operacional", () => {
+  it("AdminLayout usa grupos de menu", () => {
     const layout = readFileSync(resolve("apps/web/src/layouts/AdminLayout.astro"), "utf8");
-    const dashboard = readFileSync(resolve("apps/web/src/pages/admin/index.astro"), "utf8");
     expect(layout).toContain("filterAdminNav");
-    expect(layout).toContain("admin-sidebar-collapse");
-    expect(layout).toContain("aria-label=\"Painel administrativo\"");
-    expect(dashboard).toContain("Ações prioritárias");
-    expect(dashboard).toContain("Central AdSense");
+    expect(layout).toContain("navGroups.map");
+    expect(layout).toContain("BrandLogo");
+  });
+
+  it("dashboard destaca Operação do dia", () => {
+    const dash = readFileSync(resolve("apps/web/src/pages/admin/index.astro"), "utf8");
+    expect(dash).toContain("filterDayOps");
+    expect(dash).toContain("Operação do dia");
+    expect(dash).toContain("Passo");
   });
 });

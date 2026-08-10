@@ -1,15 +1,17 @@
 ---
+import JobBoardPaused from "../components/JobBoardPaused.astro";
+import { jobBoardPublicGate } from "../lib/job-board-gate";
 import BaseLayout from "../layouts/BaseLayout.astro";
 import Breadcrumbs from "../components/ui/Breadcrumbs.astro";
 import PageHero from "../components/ui/PageHero.astro";
 import { cities, createDatabase, jobs, states } from "@es/db";
 import { and, asc, count, eq, gt } from "drizzle-orm";
-import { getRuntimeSiteUrl } from "../lib/canonical-url";
+
+const gate = await jobBoardPublicGate();
 
 type CityRow = { name: string; slug: string; state: string; total: number };
 let rows: CityRow[] = [];
-
-if (process.env.DATABASE_URL) {
+if (!gate.paused && process.env.DATABASE_URL) {
   const connection = createDatabase(process.env.DATABASE_URL);
   try {
     const active = and(eq(jobs.publicationStatus, "PUBLISHED"), gt(jobs.expiresAt, new Date()));
@@ -30,11 +32,9 @@ if (process.env.DATABASE_URL) {
     await connection.close();
   }
 }
-
 const title = "Cidades com vagas — Empregos São Luís";
 const description =
-  "Explore gratuitamente vagas por cidade no Maranhão e encontre oportunidades abertas em São Luís e outras localidades.";
-const siteUrl = getRuntimeSiteUrl(Astro.site);
+  "Explore vagas por cidade no Maranhão e região. Encontre oportunidades em São Luís e outras localidades com páginas otimizadas para busca.";
 const itemList = {
   "@context": "https://schema.org",
   "@type": "ItemList",
@@ -44,15 +44,18 @@ const itemList = {
     "@type": "ListItem",
     position: index + 1,
     name: `${city.name}/${city.state}`,
-    url: new URL(`/vagas/cidade/${city.slug}`, siteUrl).toString()
+    url: new URL(`/vagas/cidade/${city.slug}`, Astro.site).toString()
   }))
 };
 ---
-<BaseLayout title={title} description={description} canonical={new URL("/cidades", siteUrl).toString()} noindex={rows.length === 0} schemas={[itemList]}>
+{gate.paused ? (
+  <JobBoardPaused title="Cidades com vagas temporariamente pausadas" />
+) : (
+<BaseLayout title={title} description={description} canonical={new URL("/cidades", Astro.site).toString()} schemas={[itemList]}>
   <PageHero
     kicker="Localidades"
     title="Vagas por cidade"
-    description="Escolha uma cidade para ver as oportunidades abertas no momento."
+    description="Escolha a cidade e veja oportunidades abertas com página dedicada para ranquear melhor no Google."
     pattern={false}
   />
   <section class="es-section pt-0">
@@ -73,3 +76,4 @@ const itemList = {
     </div>
   </section>
 </BaseLayout>
+)}

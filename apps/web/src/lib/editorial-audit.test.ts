@@ -1,47 +1,118 @@
 import { describe, expect, it } from "vitest";
-import { assessEditorialArticle, auditEditorialContent, type EditorialArticle } from "./editorial-audit";
+import { assessEditorialArticle, classifySourceUrl, type EditorialArticleInput } from "./editorial-audit";
 
-const usefulText = Array.from({ length: 90 }, (_, index) => `${index === 0 ? "Em São Luís," : "Neste guia,"} etapa${index} orientação${index} candidatura${index} conferência${index} contexto${index} documento${index} prazo${index} canal${index} empresa${index} decisão${index} segurança${index} resultado${index}.`).join(" ");
-
-function article(overrides: Partial<EditorialArticle> = {}): EditorialArticle {
+function article(partial: Partial<EditorialArticleInput> = {}): EditorialArticleInput {
   return {
-    id: "a-1", title: "Guia local de candidatura", slug: "guia-local", type: "GUIDE", excerpt: "Orientação local",
-    contentHtml: `<p>${usefulText}</p><p><a href="/blog/outro-guia">Leia outro guia</a> e consulte <a href="https://www.gov.br/trabalho">a fonte oficial</a>.</p>`,
-    primaryKeyword: "candidatura em são luís", pillarId: "p-1", clusterId: "c-1", sourceUrl: "https://www.gov.br/trabalho",
-    sources: [{ url: "https://www.gov.br/trabalho" }], authorId: "u-1", authorName: "Redação local", reviewerId: "u-2",
-    factCheckedAt: new Date(), publishedAt: new Date("2026-01-01"), updatedAt: new Date("2026-01-02"), status: "PUBLISHED",
-    relatedArticleIds: [], relatedJobIds: [], seoTitle: "Guia local", metaDescription: "Guia local e verificável para candidaturas em São Luís.",
-    canonicalUrl: null, section: "Carreira", localHook: "Aplicação prática em São Luís", ...overrides
+    id: "11111111-1111-1111-1111-111111111111",
+    title: "Como montar currículo em São Luís",
+    slug: "curriculo-sao-luis",
+    type: "GUIDE",
+    excerpt: "Guia prático",
+    contentHtml: "<p>" + "texto útil local ".repeat(40) + "</p>",
+    status: "PUBLISHED",
+    editorialStage: "EDITORIAL_REVIEW",
+    authorId: "22222222-2222-2222-2222-222222222222",
+    reviewerId: "33333333-3333-3333-3333-333333333333",
+    reviewedAt: new Date(),
+    factCheckedAt: new Date(),
+    pillarId: "44444444-4444-4444-4444-444444444444",
+    clusterId: "55555555-5555-5555-5555-555555555555",
+    primaryKeyword: "curriculo sao luis",
+    sourceName: "Governo",
+    sourceUrl: "https://www.gov.br/trabalho",
+    sources: [],
+    seoTitle: "Currículo em São Luís",
+    metaDescription: "Orientação prática",
+    canonicalUrl: "/blog/curriculo-sao-luis",
+    coverImageUrl: "https://cdn.example.com/a.jpg",
+    coverImageAlt: "Pessoa com currículo",
+    coverImageCaption: "Ilustração",
+    coverImageCredit: "Arquivo",
+    localHook: "São Luís",
+    updatedAt: new Date(),
+    publishedAt: new Date(),
+    ...partial
   };
 }
 
 describe("editorial audit", () => {
-  it("mantém conteúdo substancial e recomenda noindex para página muito fraca", () => {
-    expect(assessEditorialArticle(article()).classification).toBe("MANTER");
-    const weak = assessEditorialArticle(article({ id: "a-2", contentHtml: "<p>Texto curto.</p>", sourceUrl: null, sources: [], pillarId: null, clusterId: null, metaDescription: null, localHook: null }));
-    expect(weak.classification).toBe("NOINDEX");
-    expect(weak.indexable).toBe(false);
+  it("does not treat institutional policy pages as factual proof", () => {
+    expect(classifySourceUrl("https://empregossaoluis.com.br/politica-editorial")).toBe("INSTITUCIONAL");
+    const result = assessEditorialArticle(
+      article({
+        title: "Regras do 13º salário",
+        contentHtml: "<p>O décimo terceiro salário e a CLT exigem atenção.</p>" + "<p>mais texto </p>".repeat(20),
+        sourceUrl: "https://empregossaoluis.com.br/politica-editorial",
+        sourceName: "Empregos São Luís"
+      })
+    );
+    expect(result.issues.some((item) => item.code === "SOURCE_INTERNAL_AS_FACTUAL")).toBe(true);
+    expect(result.classification).not.toBe("MANTER");
   });
 
-  it("detecta pares candidatos com shingles e índice invertido", () => {
-    const report = auditEditorialContent([article(), article({ id: "a-2", slug: "guia-local-copia", title: "Guia local de candidatura — cópia" })]);
-    expect(report.similarities).toHaveLength(1);
-    expect(report.similarities[0]!.similarity).toBeGreaterThan(0.7);
-    expect(report.assessments.every((item) => item.classification === "REVISAR MANUALMENTE")).toBe(true);
+  it("flags APPROVED without reviewer as human review", () => {
+    const result = assessEditorialArticle(
+      article({
+        editorialStage: "APPROVED",
+        reviewerId: null,
+        reviewedAt: null
+      })
+    );
+    expect(result.issues.some((item) => item.code === "APPROVED_WITHOUT_REVIEWER")).toBe(true);
+    expect(result.classification).toBe("REVISAR MANUALMENTE");
   });
 
-  it("não deixa rascunhos alterarem a classificação ou os links do conteúdo público", () => {
-    const published = article();
-    const draft = article({
-      id: "a-draft",
-      slug: "rascunho-copia",
-      status: "DRAFT",
-      contentHtml: `${published.contentHtml}<p><a href="/blog/inexistente">Link de rascunho</a></p>`
-    });
-    const report = auditEditorialContent([published, draft]);
-    expect(report.assessments.find((item) => item.article.id === published.id)?.classification).toBe("MANTER");
-    expect(report.similarities).toHaveLength(0);
-    expect(report.brokenLinks).toHaveLength(1);
-    expect(report.brokenLinks[0]?.href).toBe("/blog/outro-guia");
+  it("treats short length as auxiliary, not automatic NOINDEX", () => {
+    const result = assessEditorialArticle(
+      article({
+        contentHtml: "<p>" + "palavra ".repeat(60) + "</p>",
+        sourceUrl: "https://www.gov.br/trabalho"
+      })
+    );
+    expect(result.charCount).toBeLessThan(800);
+    expect(result.issues.some((item) => item.code === "CONTENT_SHORT_AUX")).toBe(true);
+    expect(result.classification).not.toBe("NOINDEX");
+  });
+
+  it("marks technical SEO gaps as auto-fixable", () => {
+    const result = assessEditorialArticle(
+      article({
+        seoTitle: null,
+        metaDescription: null,
+        coverImageAlt: null
+      })
+    );
+    expect(result.autoFixableCount).toBeGreaterThan(0);
+    expect(result.issues.some((item) => item.code === "SEO_TITLE_MISSING" && item.autoFixable)).toBe(true);
+  });
+
+  it("returns structured issue fields for editor UI", () => {
+    const result = assessEditorialArticle(
+      article({
+        sourceUrl: "https://empregossaoluis.com.br/politica-editorial",
+        seoTitle: null
+      })
+    );
+    for (const issue of result.issues) {
+      expect(issue).toEqual(
+        expect.objectContaining({
+          code: expect.any(String),
+          category: expect.any(String),
+          title: expect.any(String),
+          description: expect.any(String),
+          severity: expect.any(String),
+          recommendation: expect.any(String),
+          autoFixable: expect.any(Boolean),
+          impact: expect.any(String),
+          status: "PENDENTE"
+        })
+      );
+    }
+  });
+
+  it("flags missing cover as IMAGEM issue without mass noindex", () => {
+    const result = assessEditorialArticle(article({ coverImageUrl: null, coverImageAlt: null }));
+    expect(result.issues.some((item) => item.code === "COVER_MISSING" && item.category === "IMAGEM")).toBe(true);
+    expect(result.classification).not.toBe("NOINDEX");
   });
 });

@@ -1,6 +1,11 @@
-import { and, count, desc, eq, gt, inArray, isNull, like, lte, or, type SQL } from "drizzle-orm";
+import { and, count, desc, eq, gt, ilike, inArray, isNull, like, lte, or, type SQL } from "drizzle-orm";
 import { articles, authors, createDatabase } from "@es/db";
 import { slLocalSlugMap } from "../data/sl-local-slug-map";
+import {
+  EDITORIAL_BLOG_THEMES,
+  resolveEditorialBlogTheme,
+  type EditorialBlogTheme
+} from "./portal-modes";
 
 type ArticleType = "NEWS" | "GUIDE" | "DATA_REPORT";
 
@@ -20,13 +25,22 @@ export function resolveSlLocalSeoSlug(slug: string): string | null {
   return byNumber[num] || byNumber[padded] || null;
 }
 
-function publishedWhere(now: Date, since?: Date, type?: ArticleType | ArticleType[]) {
+function publishedWhere(now: Date, since?: Date, type?: ArticleType | ArticleType[], theme?: EditorialBlogTheme | null) {
+  const themeFilter = theme
+    ? or(
+        ilike(articles.title, `%${EDITORIAL_BLOG_THEMES[theme].query}%`),
+        ilike(articles.slug, `%${theme.replace(/-/g, "%")}%`),
+        ilike(articles.primaryKeyword, `%${EDITORIAL_BLOG_THEMES[theme].query}%`),
+        ilike(articles.excerpt, `%${EDITORIAL_BLOG_THEMES[theme].query}%`)
+      )
+    : undefined;
   return and(
     eq(articles.status, "PUBLISHED"),
     lte(articles.publishedAt, now),
     or(isNull(articles.expiresAt), gt(articles.expiresAt, now)),
     since ? gt(articles.publishedAt, since) : undefined,
-    Array.isArray(type) ? inArray(articles.type, type) : type ? eq(articles.type, type) : undefined
+    Array.isArray(type) ? inArray(articles.type, type) : type ? eq(articles.type, type) : undefined,
+    themeFilter
   );
 }
 
@@ -53,15 +67,23 @@ export async function listPublishedArticles(limit = 50, since?: Date, type?: Art
 export async function listPublishedArticlesPage(
   page = 1,
   pageSize = 12,
-  type?: ArticleType | ArticleType[]
-): Promise<{ items: Awaited<ReturnType<typeof listPublishedArticles>>; total: number; page: number; pages: number }> {
-  const safePage = Math.max(1, Math.trunc(Number.isFinite(page) ? page : 1));
-  const safeSize = Math.min(48, Math.max(1, Math.trunc(Number.isFinite(pageSize) ? pageSize : 12)));
-  if (!process.env.DATABASE_URL) return { items: [], total: 0, page: 1, pages: 1 };
+  type?: ArticleType | ArticleType[],
+  themeRaw?: string | null
+): Promise<{
+  items: Awaited<ReturnType<typeof listPublishedArticles>>;
+  total: number;
+  page: number;
+  pages: number;
+  theme: EditorialBlogTheme | null;
+}> {
+  const safePage = Math.max(1, page);
+  const safeSize = Math.min(48, Math.max(1, pageSize));
+  const theme = resolveEditorialBlogTheme(themeRaw);
+  if (!process.env.DATABASE_URL) return { items: [], total: 0, page: 1, pages: 1, theme };
   const connection = createDatabase(process.env.DATABASE_URL);
   const now = new Date();
   try {
-    const where = publishedWhere(now, undefined, type) as SQL;
+    const where = publishedWhere(now, undefined, type, theme) as SQL;
     const [totalRow] = await connection.db.select({ value: count() }).from(articles).where(where);
     const total = Number(totalRow?.value ?? 0);
     const pages = Math.max(1, Math.ceil(total / safeSize));
@@ -74,10 +96,10 @@ export async function listPublishedArticlesPage(
       .orderBy(desc(articles.publishedAt))
       .limit(safeSize)
       .offset((current - 1) * safeSize);
-    return { items, total, page: current, pages };
+    return { items, total, page: current, pages, theme };
   } catch (error) {
     console.error("[articles.listPublishedArticlesPage]", error instanceof Error ? error.message : error);
-    return { items: [], total: 0, page: 1, pages: 1 };
+    return { items: [], total: 0, page: 1, pages: 1, theme };
   } finally {
     await connection.close();
   }

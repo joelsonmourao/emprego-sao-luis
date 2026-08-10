@@ -7,6 +7,15 @@ API de apoio: `/api/admin/adsense-readiness`
 
 **Esta verificação é interna e não garante aprovação pelo Google AdSense.**
 
+## Modos temporários (AdSense)
+
+Durante a preparação para nova análise, use no painel:
+
+- **Modo Portal Editorial** — pausa a superfície pública de vagas (reversível; workers intactos)
+- **Modo de Revisão AdSense** — controle separado de indexação/editorial
+
+Detalhes: [PORTAL_EDITORIAL_MODE.md](./PORTAL_EDITORIAL_MODE.md).
+
 ## Etapas
 
 | Etapa | Foco |

@@ -163,7 +163,7 @@ export async function getAdsenseIndexInventory(editorialReport?: Awaited<ReturnT
       reason: auditNoindex ? "Conteúdo classificado como NOINDEX ou REVISAR MANUALMENTE durante a revisão." : undefined,
       problem: canonicalMismatch
         ? "Canonical cadastrado não corresponde à URL pública; o layout ignora o valor inválido e usa o path da página."
-        : assessment.issues[0] ?? null
+        : assessment.issues[0]?.title ?? null
     }));
   }
 

@@ -2,7 +2,6 @@
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import { createDatabase, webStories } from "@es/db";
 import { and, eq, gt, or, isNull } from "drizzle-orm";
-import { getRuntimeSiteUrl, resolveCanonicalUrl } from "../../lib/canonical-url";
 
 const slug = Astro.params.slug ?? "";
 let story: typeof webStories.$inferSelect | null = null;
@@ -33,11 +32,7 @@ if (!story) {
   });
 }
 const pages = Array.isArray(story.pages) ? story.pages : [];
-const canonical = resolveCanonicalUrl(
-  story.canonicalUrl ?? undefined,
-  `/web-stories/${story.slug}`,
-  getRuntimeSiteUrl(Astro.site)
-);
+const canonical = story.canonicalUrl || new URL(`/web-stories/${story.slug}`, Astro.site).toString();
 ---
 <BaseLayout
   title={story.seoTitle || `${story.title} — Web Story`}

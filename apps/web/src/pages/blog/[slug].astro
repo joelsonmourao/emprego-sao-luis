@@ -8,10 +8,6 @@ import {
   resolveSlLocalSeoSlug
 } from "../../lib/articles";
 import { normalizeEditorialHtml } from "@es/shared";
-import { getAdsenseReviewMode } from "../../lib/adsense-review-mode";
-import { getEditorialAssessment } from "../../lib/editorial-audit";
-import { buildEditorialSchema } from "../../lib/editorial-schema";
-import { getRuntimeSiteUrl, resolveCanonicalUrl, resolvePublicHttpUrl } from "../../lib/canonical-url";
 const slug = Astro.params.slug ?? "";
 const seoFromLegacy = resolveSlLocalSeoSlug(slug);
 if (seoFromLegacy && seoFromLegacy !== slug) {
@@ -27,20 +23,16 @@ if (!result) {
   return new Response("Conteúdo não encontrado", { status: 404, headers: { "X-Robots-Tag": "noindex, follow" } });
 }
 const { article, authorName } = result;
-const [reviewMode, editorialAssessment] = await Promise.all([getAdsenseReviewMode(), getEditorialAssessment(article.id)]);
-const reviewNoindex = reviewMode.enabled && ["NOINDEX", "REVISAR MANUALMENTE"].includes(editorialAssessment?.classification ?? "");
-const siteUrl = getRuntimeSiteUrl(Astro.site);
-const canonical = resolveCanonicalUrl(article.canonicalUrl ?? undefined, `/blog/${article.slug}`, siteUrl);
-const structuredImage = resolvePublicHttpUrl(article.coverImageUrl ?? undefined, siteUrl);
+const canonical = article.canonicalUrl || new URL(`/blog/${article.slug}`, Astro.site).toString();
 const contentHtml = normalizeEditorialHtml(article.contentHtml, { baseHeadingLevel: 2 });
-const schema = buildEditorialSchema({ type: "Article", title: article.title, description: article.metaDescription ?? article.excerpt, canonical, authorName, publishedAt: article.publishedAt, updatedAt: article.updatedAt, siteUrl: siteUrl.toString(), ...(structuredImage ? { image: [structuredImage] } : {}) });
+const schema = { "@type": "Article", headline: article.title, description: article.excerpt, datePublished: article.publishedAt?.toISOString(), dateModified: article.updatedAt.toISOString(), author: { "@type": "Person", name: authorName }, mainEntityOfPage: canonical, ...(article.coverImageUrl ? { image: [article.coverImageUrl] } : {}), ...(article.sponsoredContent ? { isAccessibleForFree: true } : {}) };
 ---
-<BaseLayout title={article.seoTitle || article.title} description={article.metaDescription || article.excerpt} canonical={canonical} ogImage={article.ogImageUrl ?? article.coverImageUrl ?? undefined} noindex={reviewNoindex} breadcrumbs={[{ name: "Guias", url: "/blog" }, { name: article.title, url: `/blog/${article.slug}` }]} schemas={[schema]}>
+<BaseLayout title={article.seoTitle || article.title} description={article.metaDescription || article.excerpt} canonical={canonical} ogImage={article.ogImageUrl ?? article.coverImageUrl ?? undefined} breadcrumbs={[{ name: "Guias", url: "/blog" }, { name: article.title, url: `/blog/${article.slug}` }]} schemas={[schema]}>
   <article class="es-section bg-white"><div class="mx-auto max-w-3xl px-4">
     <Breadcrumbs items={[{ name: "Início", url: "/" }, { name: "Guias", url: "/blog" }, { name: article.title }]} />
     {article.sponsoredContent && <p class="mt-6 rounded-lg bg-amber-50 p-3 text-sm font-bold text-amber-950">Conteúdo patrocinado{article.sponsorshipDisclosure ? ` — ${article.sponsorshipDisclosure}` : ""}</p>}
     <p class="es-kicker mt-6">{article.type === "DATA_REPORT" ? "Relatório" : "Guia gratuito"}</p><h1 class="font-display mt-3 text-4xl font-black sm:text-5xl">{article.title}</h1>
-    {article.subtitle && <p class="mt-4 text-xl text-[var(--es-muted)]">{article.subtitle}</p>}<p class="mt-4 text-sm text-[var(--es-muted)]">Por {authorName} · publicado em {article.publishedAt?.toLocaleDateString("pt-BR")}{article.publishedAt && article.updatedAt.getTime() > article.publishedAt.getTime() + 86_400_000 ? ` · atualizado em ${article.updatedAt.toLocaleDateString("pt-BR")}` : ""}</p>
+    {article.subtitle && <p class="mt-4 text-xl text-[var(--es-muted)]">{article.subtitle}</p>}<p class="mt-4 text-sm text-[var(--es-muted)]">Por {authorName} · {article.publishedAt?.toLocaleDateString("pt-BR")}</p>
     {article.coverImageUrl && <figure class="mt-8"><img src={article.coverImageUrl} alt={article.coverImageAlt ?? article.title} class="w-full rounded-2xl" width={article.coverImageWidth ?? undefined} height={article.coverImageHeight ?? undefined} /><figcaption class="mt-2 text-xs text-[var(--es-muted)]">{article.coverImageCaption}{article.coverImageCredit ? ` · ${article.coverImageCredit}` : ""}</figcaption></figure>}
     <div class="es-prose mt-8 max-w-none" set:html={contentHtml} />
     {article.sourceUrl && <p class="mt-8 text-sm">Fonte: <a class="underline" href={article.sourceUrl} rel="nofollow noopener">{article.sourceName ?? "fonte original"}</a></p>}

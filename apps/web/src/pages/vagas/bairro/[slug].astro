@@ -1,57 +1,19 @@
 ---
+import JobBoardPaused from "../../../components/JobBoardPaused.astro";
+import { jobBoardPublicGate } from "../../../lib/job-board-gate";
 import BaseLayout from "../../../layouts/BaseLayout.astro";
 import { cities, companies, createDatabase, jobs, neighborhoods, states } from "@es/db";
 import { and, desc, eq, gt, sql } from "drizzle-orm";
 
+const gate = await jobBoardPublicGate();
 const slug = Astro.params.slug ?? "";
 let area: { id: string; name: string; city: string; state: string } | undefined;
 let rows: Array<{ title: string; slug: string; company: string }> = [];
-
-if (process.env.DATABASE_URL) {
-  const connection = createDatabase(process.env.DATABASE_URL);
-  try {
-    [area] = await connection.db
-      .select({ id: neighborhoods.id, name: neighborhoods.name, city: cities.name, state: states.code })
-      .from(neighborhoods)
-      .innerJoin(cities, eq(neighborhoods.cityId, cities.id))
-      .innerJoin(states, eq(cities.stateId, states.id))
-      .where(and(eq(neighborhoods.slug, slug), eq(neighborhoods.active, true)))
-      .limit(1);
-    if (area) {
-      rows = await connection.db
-        .select({
-          title: jobs.normalizedTitle,
-          slug: jobs.slug,
-          company: sql<string>`case when ${jobs.confidentialCompany} then 'Empresa confidencial' else coalesce(${companies.publicName}, ${companies.name}) end`
-        })
-        .from(jobs)
-        .innerJoin(companies, eq(jobs.companyId, companies.id))
-        .where(and(eq(jobs.neighborhoodId, area.id), eq(jobs.publicationStatus, "PUBLISHED"), gt(jobs.expiresAt, new Date())))
-        .orderBy(desc(jobs.publishedAt))
-        .limit(50);
-    }
-  } finally {
-    await connection.close();
-  }
-}
-
-if (!area) {
-  return new Response("Bairro não encontrado", {
-    status: 404,
-    headers: { "Content-Type": "text/plain; charset=utf-8", "X-Robots-Tag": "noindex, follow" }
-  });
-}
+if (!gate.paused && process.env.DATABASE_URL) { const connection = createDatabase(process.env.DATABASE_URL); try { [area] = await connection.db.select({ id: neighborhoods.id, name: neighborhoods.name, city: cities.name, state: states.code }).from(neighborhoods).innerJoin(cities, eq(neighborhoods.cityId, cities.id)).innerJoin(states, eq(cities.stateId, states.id)).where(and(eq(neighborhoods.slug, slug), eq(neighborhoods.active, true))).limit(1); if (area) rows = await connection.db.select({ title: jobs.normalizedTitle, slug: jobs.slug, company: sql<string>`case when ${jobs.confidentialCompany} then 'Empresa confidencial' else coalesce(${companies.publicName}, ${companies.name}) end` }).from(jobs).innerJoin(companies, eq(jobs.companyId, companies.id)).where(and(eq(jobs.neighborhoodId, area.id), eq(jobs.publicationStatus, "PUBLISHED"), gt(jobs.expiresAt, new Date()))).orderBy(desc(jobs.publishedAt)).limit(50); } finally { await connection.close(); } }
+if (!gate.paused && !area) return new Response("Bairro não encontrado", { status: 404, headers: { "Content-Type": "text/plain; charset=utf-8", "X-Robots-Tag": "noindex, follow" } });
 ---
-<BaseLayout title={`Vagas no bairro ${area.name} — ${area.city}`} noindex>
-  <section class="mx-auto max-w-5xl px-4 py-12">
-    <nav class="text-sm text-slate-600"><a href="/">Início</a> / <a href="/vagas">Vagas</a> / {area.name}</nav>
-    <h1 class="mt-4 text-4xl font-black">Vagas no {area.name}, {area.city}/{area.state}</h1>
-    <div class="mt-8 grid gap-3">
-      {rows.length ? rows.map((job) => (
-        <a class="rounded-xl border bg-white p-5" href={`/vagas/${job.slug}`}>
-          <strong>{job.title}</strong><span class="mt-1 block text-sm text-slate-600">{job.company}</span>
-        </a>
-      )) : <p class="rounded-xl border bg-white p-5">Nenhuma vaga ativa neste bairro.</p>}
-    </div>
-  </section>
-</BaseLayout>
+{gate.paused || !area ? (
+  <JobBoardPaused title="Vagas por bairro temporariamente pausadas" />
+) : (
+<BaseLayout title={`Vagas no bairro ${area.name} — ${area.city}`} noindex={rows.length === 0}><section class="mx-auto max-w-5xl px-4 py-12"><nav class="text-sm text-slate-600"><a href="/">Início</a> / <a href="/vagas">Vagas</a> / {area.name}</nav><h1 class="mt-4 text-4xl font-black">Vagas no {area.name}, {area.city}/{area.state}</h1><div class="mt-8 grid gap-3">{rows.length ? rows.map((job) => <a class="rounded-xl border bg-white p-5" href={`/vagas/${job.slug}`}><strong>{job.title}</strong><span class="mt-1 block text-sm text-slate-600">{job.company}</span></a>) : <p class="rounded-xl border bg-white p-5">Nenhuma vaga ativa neste bairro.</p>}</div></section></BaseLayout>
+)}

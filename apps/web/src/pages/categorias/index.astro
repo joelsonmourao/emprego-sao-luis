@@ -1,12 +1,16 @@
 ---
+import JobBoardPaused from "../../components/JobBoardPaused.astro";
+import { jobBoardPublicGate } from "../../lib/job-board-gate";
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import Breadcrumbs from "../../components/ui/Breadcrumbs.astro";
 import PageHero from "../../components/ui/PageHero.astro";
 import { categories, createDatabase, jobs } from "@es/db";
 import { and, asc, count, eq, gt } from "drizzle-orm";
 
+const gate = await jobBoardPublicGate();
+
 let rows: Array<{ name: string; slug: string; description: string | null; total: number }> = [];
-if (process.env.DATABASE_URL) {
+if (!gate.paused && process.env.DATABASE_URL) {
   const connection = createDatabase(process.env.DATABASE_URL);
   try {
     rows = await connection.db
@@ -16,18 +20,20 @@ if (process.env.DATABASE_URL) {
       .where(eq(categories.active, true))
       .groupBy(categories.id)
       .orderBy(asc(categories.sortOrder), asc(categories.name));
-    rows = rows.filter((row) => row.total > 0);
   } finally {
     await connection.close();
   }
 }
 ---
-<BaseLayout title="Categorias profissionais — Empregos São Luís" noindex={rows.length === 0} breadcrumbs={[{ name: "Categorias", url: "/categorias" }]} pageSchemaType="CollectionPage">
+{gate.paused ? (
+  <JobBoardPaused title="Categorias de vagas temporariamente pausadas" />
+) : (
+<BaseLayout title="Categorias profissionais — Empregos São Luís" breadcrumbs={[{ name: "Categorias", url: "/categorias" }]} pageSchemaType="CollectionPage">
   <PageHero kicker="Áreas" title="Categorias profissionais" description="Explore vagas por área de atuação." pattern={false} />
   <section class="es-section pt-0">
     <div class="es-container">
       <Breadcrumbs items={[{ name: "Início", url: "/" }, { name: "Categorias" }]} />
-      {rows.length ? <div class="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      <div class="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {rows.map((item) => (
           <a class="es-card block p-6 hover:border-[var(--brand-primary)]" href={`/categorias/${item.slug}`}>
             <h2 class="font-display text-xl font-black">{item.name}</h2>
@@ -35,7 +41,8 @@ if (process.env.DATABASE_URL) {
             <p class="mt-3 text-sm font-bold text-[var(--brand-primary)]">{item.total} vaga(s)</p>
           </a>
         ))}
-      </div> : <p class="mt-8 rounded-2xl border bg-white p-6">Nenhuma categoria com vagas ativas no momento.</p>}
+      </div>
     </div>
   </section>
 </BaseLayout>
+)}

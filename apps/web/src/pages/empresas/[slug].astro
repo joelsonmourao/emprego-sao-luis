@@ -1,11 +1,14 @@
 ---
+import JobBoardPaused from "../../components/JobBoardPaused.astro";
+import { jobBoardPublicGate } from "../../lib/job-board-gate";
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import Breadcrumbs from "../../components/ui/Breadcrumbs.astro";
 import JobCard from "../../components/ui/JobCard.astro";
 import SectionHeading from "../../components/ui/SectionHeading.astro";
 import { cities, companies, createDatabase, jobs, states } from "@es/db";
 import { and, desc, eq, gt } from "drizzle-orm";
-import { classifyCompanyPage } from "../../lib/entity-page-quality";
+
+const gate = await jobBoardPublicGate();
 
 const slug = Astro.params.slug ?? "";
 let company;
@@ -14,7 +17,7 @@ let vacancies: Array<{
   contract: string; publishedAt: Date | null; logoUrl: string | null;
 }> = [];
 
-if (process.env.DATABASE_URL) {
+if (!gate.paused && process.env.DATABASE_URL) {
   const connection = createDatabase(process.env.DATABASE_URL);
   try {
     [company] = await connection.db.select().from(companies).where(and(eq(companies.slug, slug), eq(companies.active, true))).limit(1);
@@ -37,15 +40,17 @@ if (process.env.DATABASE_URL) {
     await connection.close();
   }
 }
-if (!company) {
+if (!gate.paused && !company) {
   return new Response("Empresa não encontrada", {
     status: 404,
     headers: { "Content-Type": "text/plain; charset=utf-8", "X-Robots-Tag": "noindex, follow" }
   });
 }
-const pageQuality = classifyCompanyPage({ activeJobs: vacancies.length, descriptionHtml: company.descriptionHtml, seoTitle: company.seoTitle, metaDescription: company.metaDescription });
 ---
-<BaseLayout title={company.seoTitle ?? `${company.name} — vagas e informações`} description={company.metaDescription ?? `Consulte vagas abertas na ${company.name}.`} canonical={`/empresas/${company.slug}`} breadcrumbs={[{ name: "Empresas", url: "/empresas" }, { name: company.name, url: `/empresas/${company.slug}` }]} noindex={pageQuality !== "FORTE"} adsenseReviewQualityOverride={pageQuality === "FORTE"}>
+{gate.paused || !company ? (
+  <JobBoardPaused title="Empresas temporariamente indisponíveis" />
+) : (
+<BaseLayout title={company.seoTitle ?? `${company.name} — vagas e informações`} description={company.metaDescription ?? `Consulte vagas abertas na ${company.name}.`} breadcrumbs={[{ name: "Empresas", url: "/empresas" }, { name: company.name, url: `/empresas/${company.slug}` }]}>
   <section class="es-section bg-white">
     <div class="es-container">
       <Breadcrumbs items={[{ name: "Início", url: "/" }, { name: "Empresas", url: "/empresas" }, { name: company.name }]} />
@@ -70,3 +75,4 @@ const pageQuality = classifyCompanyPage({ activeJobs: vacancies.length, descript
     </div>
   </section>
 </BaseLayout>
+)}

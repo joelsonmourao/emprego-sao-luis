@@ -4,7 +4,6 @@ import { can } from "../../lib/auth";
 import { ensureDefaultAdSlots, getAdReportSummary, getAdSettings } from "../../lib/ads";
 import { adCreatives, adSlots, advertisers, campaigns, createDatabase } from "@es/db";
 import { asc, desc, eq } from "drizzle-orm";
-import { normalizeAdsenseClientId } from "../../lib/site-integrations";
 
 const auth = Astro.locals.auth!;
 if (!can(auth, "commercial.manage")) return new Response("Proibido", { status: 403 });
@@ -36,9 +35,7 @@ if (process.env.DATABASE_URL) {
   }
 }
 
-const envAdsense = normalizeAdsenseClientId(
-  String(process.env.PUBLIC_ADSENSE_CLIENT_ID ?? import.meta.env.PUBLIC_ADSENSE_CLIENT_ID ?? "")
-);
+const envAdsense = import.meta.env.PUBLIC_ADSENSE_CLIENT_ID ?? "";
 ---
 <AdminLayout title="Publicidade">
   <h1 class="text-3xl font-black">Publicidade e monetização</h1>

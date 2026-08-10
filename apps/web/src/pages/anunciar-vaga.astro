@@ -1,4 +1,12 @@
 ---
+import JobBoardPaused from "../components/JobBoardPaused.astro";
+import { jobBoardPublicGate } from "../lib/job-board-gate";
 import InstitutionalPage from "../components/InstitutionalPage.astro";
+
+const gate = await jobBoardPublicGate();
 ---
+{gate.paused ? (
+  <JobBoardPaused title="Publicação de vagas temporariamente pausada" />
+) : (
 <InstitutionalPage slug="anunciar-vaga" />
+)}

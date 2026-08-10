@@ -15,7 +15,9 @@ describe("site-pages", () => {
       "politica-fontes",
       "seguranca-candidatos",
       "anunciar-vaga",
-      "area-empresas"
+      "area-empresas",
+      "redacao",
+      "sobre"
     ];
     for (const slug of required) expect(INSTITUTIONAL_SLUGS).toContain(slug);
   });

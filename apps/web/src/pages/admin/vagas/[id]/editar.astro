@@ -6,7 +6,6 @@ import { getJobFormOptions, EMPLOYMENT_TYPES, WORKPLACE_TYPES } from "../../../.
 import { can } from "../../../../lib/auth";
 import { toDatetimeLocalValue, UNIDENTIFIED_COMPANY_ID } from "@es/shared";
 import { validateJobPosting } from "@es/seo";
-import { getRuntimeSiteUrl, resolveCanonicalUrl } from "../../../../lib/canonical-url";
 
 const auth = Astro.locals.auth!;
 if (!can(auth, "jobs.create")) return new Response("Proibido", { status: 403 });
@@ -38,7 +37,7 @@ const schemaDiagnosis = validateJobPosting({
   salaryPeriod: job.salaryPeriod,
   salaryVisible: job.salaryVisible,
   publicCode: job.publicCode,
-  canonicalUrl: resolveCanonicalUrl(job.canonicalUrl ?? undefined, `/vagas/${job.slug}`, getRuntimeSiteUrl(Astro.site)),
+  canonicalUrl: job.canonicalUrl || new URL(`/vagas/${job.slug}`, Astro.site).toString(),
   publicationStatus: job.publicationStatus,
   confidentialCompany: job.confidentialCompany,
   unidentifiedCompany: job.unidentifiedCompany,

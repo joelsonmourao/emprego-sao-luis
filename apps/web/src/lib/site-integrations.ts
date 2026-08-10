@@ -54,7 +54,7 @@ export function normalizeAdsenseClientId(raw: string): string {
   if (!value) return "";
   if (/^ca-pub-\d+$/i.test(value)) return value.toLowerCase();
   if (/^pub-\d+$/i.test(value)) return `ca-${value.toLowerCase()}`;
-  return "";
+  return value;
 }
 
 export function normalizePubIdForAdsTxt(clientId: string): string {

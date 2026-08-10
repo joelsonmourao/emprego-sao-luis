@@ -10,6 +10,11 @@ import { getAdsenseReviewMode, sitemapCategoryAllowedInReview, staticPathAllowed
 import { getEditorialAuditReport } from "./editorial-audit";
 import { classifyCategoryPage, classifyCityPage, classifyCompanyPage } from "./entity-page-quality";
 import { getRuntimeSiteUrl } from "./canonical-url";
+import {
+  getEditorialPortalMode,
+  sitemapCategoryAllowedWhenPortalEditorial,
+  staticPathAllowedWhenPortalEditorial
+} from "./portal-modes";
 import { getInstitutionalPages, type InstitutionalSlug } from "./site-pages";
 
 function jobHasIndexableApplicationChannel(row: {
@@ -52,7 +57,13 @@ export async function listSitemapEntries(
 ) {
   if (!process.env.DATABASE_URL) return [] as SitemapEntry[];
   const reviewMode = await getAdsenseReviewMode();
-  if (reviewMode.enabled && !sitemapCategoryAllowedInReview(category)) return [] as SitemapEntry[];
+  const portalMode = await getEditorialPortalMode();
+  const portalOn = portalMode.enabled;
+  if (portalOn) {
+    if (!sitemapCategoryAllowedWhenPortalEditorial(category)) return [] as SitemapEntry[];
+  } else if (reviewMode.enabled && !sitemapCategoryAllowedInReview(category)) {
+    return [] as SitemapEntry[];
+  }
   const connection = createDatabase(process.env.DATABASE_URL);
   const siteUrl = getRuntimeSiteUrl();
   const toEntry = (
@@ -83,7 +94,9 @@ export async function listSitemapEntries(
         return !(slug in institutional) || institutional[slug].published;
       });
       const normalPaths = [...publishedInstitutionalPaths, ...(activeJob ? ["/vagas", "/categorias", "/cidades"] : []), ...(activeCompany ? ["/empresas"] : []), ...(news ? ["/noticias"] : []), ...(guide ? ["/blog"] : [])];
-      const paths = reviewMode.enabled ? normalPaths.filter(staticPathAllowedInReview) : normalPaths;
+      let paths = normalPaths;
+      if (portalOn) paths = paths.filter(staticPathAllowedWhenPortalEditorial);
+      else if (reviewMode.enabled) paths = paths.filter(staticPathAllowedInReview);
       return dedupeEntries(
         paths.map((path) =>
           toEntry(

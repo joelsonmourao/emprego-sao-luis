@@ -1,11 +1,13 @@
 ---
+import { jobBoardPublicGate } from "../../../lib/job-board-gate";
 import BaseLayout from "../../../layouts/BaseLayout.astro";
 import { getOrderByCode } from "../../../lib/commercial";
 
+const gate = await jobBoardPublicGate();
+if (gate.paused) return Astro.rewrite("/quadro-pausado");
 const { code } = Astro.params;
 const data = code ? await getOrderByCode(code) : null;
 if (!data) return Astro.redirect("/publicar-vaga", 302);
-
 const { order, plan } = data;
 if (order.status === "PAID") {
   return Astro.redirect(`/publicar-vaga/confirmacao/${order.orderCode}`, 302);
@@ -14,7 +16,7 @@ if (order.status !== "PENDING_PAYMENT") {
   return Astro.redirect(`/publicar-vaga/confirmacao/${order.orderCode}`, 302);
 }
 ---
-<BaseLayout title={`Resumo do pedido ${order.orderCode}`} description="Revise os dados antes do pagamento." canonical={`/publicar-vaga/resumo/${order.orderCode}`} noindex>
+<BaseLayout title={`Resumo do pedido ${order.orderCode}`} description="Revise os dados antes do pagamento." canonical={`/publicar-vaga/resumo/${order.orderCode}`}>
   <section class="es-section">
     <div class="es-container max-w-2xl">
       <p class="es-kicker">Etapa 3 de 4</p>

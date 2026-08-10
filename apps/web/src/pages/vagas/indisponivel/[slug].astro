@@ -1,6 +1,16 @@
 ---
+import JobBoardPaused from "../../../components/JobBoardPaused.astro";
+import { jobBoardPublicGate } from "../../../lib/job-board-gate";
 import BaseLayout from "../../../layouts/BaseLayout.astro";
-Astro.response.status = 410;
-Astro.response.headers.set("X-Robots-Tag", "noindex, nofollow");
+
+const gate = await jobBoardPublicGate();
+if (!gate.paused) {
+  Astro.response.status = 410;
+  Astro.response.headers.set("X-Robots-Tag", "noindex, nofollow");
+}
 ---
+{gate.paused ? (
+  <JobBoardPaused title="Quadro de vagas temporariamente pausado" />
+) : (
 <BaseLayout title="Vaga indisponível" noindex disableSeoGraph><section class="mx-auto max-w-3xl px-4 py-20"><h1 class="text-4xl font-black">Esta vaga não está mais disponível</h1><p class="mt-4">Consulte as oportunidades abertas e atuais.</p><a class="mt-8 inline-flex font-bold text-red-700" href="/vagas">Ver vagas abertas</a></section></BaseLayout>
+)}

@@ -11,12 +11,11 @@ interface Props {
 
 const { slug, showContactForm = slug === "contato" } = Astro.props;
 const page = await getInstitutionalPage(slug);
-if (!page.published) return new Response("Página não encontrada", { status: 404, headers: { "X-Robots-Tag": "noindex, follow" } });
 const contentHtml = normalizeEditorialHtml(page.contentHtml, { baseHeadingLevel: 2 });
 const sent = Astro.url.searchParams.get("sent") === "1";
 const protocol = Astro.url.searchParams.get("protocolo");
 const error = Astro.url.searchParams.get("error");
-const pageSchemaType = slug === "contato" ? "ContactPage" : ["sobre", "quem-somos"].includes(slug) ? "AboutPage" : "WebPage";
+const pageSchemaType = slug === "contato" ? "ContactPage" : ["sobre", "quem-somos", "redacao"].includes(slug) ? "AboutPage" : "WebPage";
 const categories = [
   ["suporte_candidato", "Suporte ao candidato"],
   ["correcao_vaga", "Correção de vaga"],

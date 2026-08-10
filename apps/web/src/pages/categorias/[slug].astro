@@ -1,11 +1,14 @@
 ---
+import JobBoardPaused from "../../components/JobBoardPaused.astro";
+import { jobBoardPublicGate } from "../../lib/job-board-gate";
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import Breadcrumbs from "../../components/ui/Breadcrumbs.astro";
 import JobCard from "../../components/ui/JobCard.astro";
 import SectionHeading from "../../components/ui/SectionHeading.astro";
 import { categories, cities, companies, createDatabase, jobs, states } from "@es/db";
 import { and, desc, eq, gt, sql } from "drizzle-orm";
-import { classifyCategoryPage } from "../../lib/entity-page-quality";
+
+const gate = await jobBoardPublicGate();
 
 const slug = Astro.params.slug ?? "";
 let category;
@@ -14,7 +17,7 @@ let rows: Array<{
   workplace: string; contract: string; publishedAt: Date | null; logoUrl: string | null;
 }> = [];
 
-if (process.env.DATABASE_URL) {
+if (!gate.paused && process.env.DATABASE_URL) {
   const connection = createDatabase(process.env.DATABASE_URL);
   try {
     [category] = await connection.db.select().from(categories).where(and(eq(categories.slug, slug), eq(categories.active, true))).limit(1);
@@ -39,15 +42,17 @@ if (process.env.DATABASE_URL) {
     await connection.close();
   }
 }
-if (!category) {
+if (!gate.paused && !category) {
   return new Response("Categoria não encontrada", {
     status: 404,
     headers: { "Content-Type": "text/plain; charset=utf-8", "X-Robots-Tag": "noindex, follow" }
   });
 }
-const pageQuality = classifyCategoryPage({ activeJobs: rows.length, description: category.description, seoTitle: category.seoTitle, metaDescription: category.metaDescription });
 ---
-<BaseLayout title={category.seoTitle ?? `${category.name} — vagas de emprego`} description={category.metaDescription ?? `Vagas na categoria ${category.name}.`} canonical={`/categorias/${category.slug}`} breadcrumbs={[{ name: "Categorias", url: "/categorias" }, { name: category.name, url: `/categorias/${category.slug}` }]} noindex={pageQuality !== "FORTE"} adsenseReviewQualityOverride={pageQuality === "FORTE"}>
+{gate.paused || !category ? (
+  <JobBoardPaused title="Categorias de vagas temporariamente pausadas" />
+) : (
+<BaseLayout title={category.seoTitle ?? `${category.name} — vagas de emprego`} description={category.metaDescription ?? `Vagas na categoria ${category.name}.`} breadcrumbs={[{ name: "Categorias", url: "/categorias" }, { name: category.name, url: `/categorias/${category.slug}` }]} noindex={rows.length === 0 || !category.description?.trim()}>
   <section class="es-section bg-white">
     <div class="es-container">
       <Breadcrumbs items={[{ name: "Início", url: "/" }, { name: "Categorias", url: "/categorias" }, { name: category.name }]} />
@@ -66,3 +71,4 @@ const pageQuality = classifyCategoryPage({ activeJobs: rows.length, description:
     </div>
   </section>
 </BaseLayout>
+)}

@@ -1,3 +1,12 @@
 ---
-return Astro.redirect(`/categorias/${encodeURIComponent(Astro.params.slug ?? "")}`, 301);
+import JobBoardPaused from "../../../components/JobBoardPaused.astro";
+import { jobBoardPublicGate } from "../../../lib/job-board-gate";
+
+const gate = await jobBoardPublicGate();
+if (gate.paused) {
+  // show soft landing below
+} else {
+  return Astro.redirect(`/categorias/${encodeURIComponent(Astro.params.slug ?? "")}`, 301);
+}
 ---
+<JobBoardPaused title="Categorias de vagas temporariamente pausadas" />

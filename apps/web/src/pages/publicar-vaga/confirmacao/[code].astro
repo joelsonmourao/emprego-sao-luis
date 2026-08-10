@@ -1,17 +1,19 @@
 ---
+import { jobBoardPublicGate } from "../../../lib/job-board-gate";
 import BaseLayout from "../../../layouts/BaseLayout.astro";
 import { getOrderByCode } from "../../../lib/commercial";
 
+const gate = await jobBoardPublicGate();
+if (gate.paused) return Astro.rewrite("/quadro-pausado");
 const { code } = Astro.params;
 const data = code ? await getOrderByCode(code) : null;
 if (!data) return Astro.redirect("/publicar-vaga", 302);
-
 const { order, plan, remaining } = data;
 const paid = order.status === "PAID";
 const manualReview = order.status === "MANUAL_REVIEW";
 const pending = order.status === "PENDING_PAYMENT";
 ---
-<BaseLayout title={`Confirmação ${order.orderCode}`} description="Status do pedido e próximos passos." canonical={`/publicar-vaga/confirmacao/${order.orderCode}`} noindex>
+<BaseLayout title={`Confirmação ${order.orderCode}`} description="Status do pedido e próximos passos." canonical={`/publicar-vaga/confirmacao/${order.orderCode}`}>
   <section class="es-section">
     <div class="es-container max-w-2xl">
       <p class="es-kicker">Pedido {order.orderCode}</p>

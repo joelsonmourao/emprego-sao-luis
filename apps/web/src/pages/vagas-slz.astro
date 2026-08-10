@@ -1,4 +1,6 @@
 ---
+import JobBoardPaused from "../components/JobBoardPaused.astro";
+import { jobBoardPublicGate } from "../lib/job-board-gate";
 import BaseLayout from "../layouts/BaseLayout.astro";
 import JobCard from "../components/ui/JobCard.astro";
 import EmptyState from "../components/ui/EmptyState.astro";
@@ -6,6 +8,8 @@ import PageHero from "../components/ui/PageHero.astro";
 import SectionHeading from "../components/ui/SectionHeading.astro";
 import { categories, cities, companies, createDatabase, jobs, states } from "@es/db";
 import { and, count, desc, eq, gt, sql } from "drizzle-orm";
+
+const gate = await jobBoardPublicGate();
 
 type JobRow = {
   id: string;
@@ -27,12 +31,10 @@ type JobRow = {
   salaryCurrency: string;
   salaryPeriod: string | null;
 };
-
 let rows: JobRow[] = [];
 let total = 0;
 let categoryRows: Array<{ name: string; slug: string; total: number }> = [];
-
-if (process.env.DATABASE_URL) {
+if (!gate.paused && process.env.DATABASE_URL) {
   const connection = createDatabase(process.env.DATABASE_URL);
   try {
     const [city] = await connection.db
@@ -41,7 +43,6 @@ if (process.env.DATABASE_URL) {
       .innerJoin(states, eq(cities.stateId, states.id))
       .where(and(eq(cities.slug, "sao-luis"), eq(cities.active, true)))
       .limit(1);
-
     if (city) {
       const active = and(
         eq(jobs.publicationStatus, "PUBLISHED"),
@@ -96,12 +97,13 @@ if (process.env.DATABASE_URL) {
     await connection.close();
   }
 }
-
 const title = "Vagas SLZ e Empregos SLZ em São Luís — Empregos São Luís";
 const description =
   "Vagas SLZ e empregos SLZ atualizados em São Luís (MA). Portal local com oportunidades verificadas para quem busca emprego na capital maranhense.";
 ---
-
+{gate.paused ? (
+  <JobBoardPaused title="Vagas SLZ temporariamente pausadas" />
+) : (
 <BaseLayout
   title={title}
   description={description}
@@ -186,3 +188,4 @@ const description =
     </div>
   </section>
 </BaseLayout>
+)}
