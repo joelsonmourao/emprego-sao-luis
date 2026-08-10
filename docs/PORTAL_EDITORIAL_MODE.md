@@ -48,11 +48,19 @@ API: `POST /api/admin/adsense-review-mode`.
 
 Arquivo CMS-ready: `scripts/data/adsense-quality-guides.mjs`
 Capas estáticas: `apps/web/public/covers/adsense-quality/` (servidas em `/covers/adsense-quality/...`)
-Persistência (requer `DATABASE_URL` no ambiente correto):
+Persistência (requer `DATABASE_URL` no ambiente correto).
+
+A imagem `Dockerfile.web` inclui **somente** o necessário para este comando administrativo:
+`package.json` (scripts), `scripts/persist-adsense-quality-guides.mjs`,
+`scripts/data/adsense-quality-guides.mjs` e `apps/web/public/covers/adsense-quality/*`.
+Não copia o monorepo inteiro.
 
 ```sh
 # dry-run (agenda + validação de capas)
 npm run persist:adsense-quality-guides
+
+# equivalente direto
+node scripts/persist-adsense-quality-guides.mjs
 
 # escrita idempotente (slug existente = skip)
 npm run persist:adsense-quality-guides -- --write
@@ -61,9 +69,13 @@ npm run persist:adsense-quality-guides -- --write
 npm run persist:adsense-quality-guides -- --write --force
 ```
 
-Produção/Coolify (após backup):
+Produção / Coolify Terminal do serviço **web** (após backup; usa a `DATABASE_URL` já injetada no runtime):
 
 ```sh
+cd /app
+ls package.json scripts/persist-adsense-quality-guides.mjs scripts/data/adsense-quality-guides.mjs
+ls apps/web/public/covers/adsense-quality/*.webp | wc -l
+npm run | grep persist:adsense-quality-guides
 export ADSENSE_EDITORIAL_ALLOW_PRODUCTION=1
 npm run persist:adsense-quality-guides -- --write --i-understand-production
 ```

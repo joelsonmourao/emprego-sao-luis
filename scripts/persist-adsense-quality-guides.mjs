@@ -10,9 +10,11 @@
  *   npm run persist:adsense-quality-guides -- --write
  *   npm run persist:adsense-quality-guides -- --write --force
  *
- * Produção (fail-closed):
+ * Produção (fail-closed) — no Terminal Coolify do serviço web (/app):
  *   ADSENSE_EDITORIAL_ALLOW_PRODUCTION=1 npm run persist:adsense-quality-guides -- --write --i-understand-production
  *
+ * A imagem Dockerfile.web inclui package.json + este script + data + capas WebP
+ * (sem copiar o monorepo inteiro).
  * Regras:
  * - FACT_REVIEW / HOLD_REVIEW → DRAFT (nunca PUBLISHED/SCHEDULED automático)
  * - Agenda recalculada em America/Sao_Paulo a partir de "agora" (sem scheduledAt no passado)
