@@ -19,10 +19,6 @@ COPY apps/web apps/web
 COPY packages packages
 RUN npm run build --workspace=@es/web
 
-# Runtime deps only — shrinks the exported image vs full install+dev tree.
-FROM deps AS prod-deps
-RUN npm prune --omit=dev --legacy-peer-deps
-
 FROM node:22-alpine AS runtime
 ENV NODE_ENV=production HOST=0.0.0.0 PORT=4321 UPLOADS_DIR=/app/data TZ=America/Sao_Paulo APP_TIME_ZONE=America/Sao_Paulo
 WORKDIR /app
@@ -31,11 +27,11 @@ RUN apk add --no-cache tzdata \
 RUN mkdir -p /app/data/imports /app/data/media /app/data/brand /app/data/reports /app/data/temp /app/data/receipts \
  && chown -R app:app /app/data
 
-# CRITICAL: do NOT COPY --chown on node_modules/packages/dist.
-# Coolify often fails at "exporting layers" (exit 255) when BuildKit rewrites
-# ownership across ~1–2GB of node_modules during image export.
+# Do NOT COPY --chown on node_modules/packages/dist (Coolify export failures).
+# Do NOT npm prune --omit=dev: Astro SSR entry imports runtime packages such as
+# es-module-lexer (dependency of astro) that prune incorrectly drops in this monorepo.
 COPY --from=build /app/apps/web/dist ./dist
-COPY --from=prod-deps /app/node_modules ./node_modules
+COPY --from=deps /app/node_modules ./node_modules
 COPY --from=build /app/packages ./packages
 COPY package.json package.json
 
@@ -54,7 +50,6 @@ COPY --chown=app:app scripts/data/sl-local-editorial-catalog.mjs \
 COPY --chown=app:app apps/web/public/covers/sl-local/credits.json apps/web/public/covers/sl-local/credits.json
 COPY --chown=app:app apps/web/public/covers/adsense-quality apps/web/public/covers/adsense-quality
 
-# Readable by non-root; writable only where the app needs it.
 RUN chmod -R a+rX /app/dist /app/node_modules /app/packages /app/scripts \
  && chown -R app:app /app/dist
 

@@ -11,7 +11,9 @@ const packageJson = JSON.parse(readFileSync(resolve(root, "package.json"), "utf8
 describe("Dockerfile.web AdSense quality persist surface", () => {
   it("keeps a minimal production runtime and does not copy the full source tree", () => {
     expect(dockerfile).toContain("COPY --from=build /app/apps/web/dist ./dist");
-    expect(dockerfile).toContain("COPY --from=prod-deps /app/node_modules ./node_modules");
+    expect(dockerfile).toContain("COPY --from=deps /app/node_modules ./node_modules");
+    expect(dockerfile).not.toMatch(/^RUN npm prune/m);
+    expect(dockerfile).not.toContain("AS prod-deps");
     expect(dockerfile).not.toMatch(/COPY --from=deps --chown=app:app \/app\/node_modules/);
     expect(dockerfile).not.toMatch(/COPY --chown=app:app apps\/web apps\/web\s*$/m);
     expect(dockerfile).not.toContain("COPY . .");
