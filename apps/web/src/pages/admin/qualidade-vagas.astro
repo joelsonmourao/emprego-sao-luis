@@ -1,0 +1,85 @@
+---
+import AdminLayout from "../../layouts/AdminLayout.astro";
+import { getJobAuditReport, type JobAuditIssueCode } from "../../lib/job-audit";
+import { can } from "../../lib/auth";
+
+const auth = Astro.locals.auth!;
+if (!can(auth, "jobs.read") && !can(auth, "seo.manage")) return new Response("Proibido", { status: 403 });
+
+const report = await getJobAuditReport();
+const issueFilter = Astro.url.searchParams.get("problema") as JobAuditIssueCode | null;
+const page = Math.max(1, Number(Astro.url.searchParams.get("pagina") ?? 1) || 1);
+const pageSize = 100;
+const filtered = issueFilter
+  ? report.assessments.filter((item) => item.issues.some((issue) => issue.code === issueFilter))
+  : report.assessments;
+const pages = Math.max(1, Math.ceil(filtered.length / pageSize));
+const current = Math.min(page, pages);
+const rows = filtered.slice((current - 1) * pageSize, current * pageSize);
+const label: Record<JobAuditIssueCode, string> = {
+  SOURCE_MISSING: "Fonte ausente",
+  APPLICATION_LINK_MISSING: "URL de candidatura ausente",
+  APPLICATION_CHANNEL_MISSING: "Canal de candidatura ausente",
+  COMPANY_UNKNOWN: "Empresa desconhecida",
+  CITY_INVALID: "Cidade inválida",
+  SALARY_SUSPICIOUS: "Salário suspeito",
+  EXPIRED: "Vaga expirada",
+  POSSIBLE_DUPLICATE: "Possível duplicidade",
+  DESCRIPTION_INSUFFICIENT: "Descrição insuficiente",
+  STATUS_INCONSISTENT: "Status inconsistente",
+  CONTRACT_MISSING: "Contrato ausente",
+  REQUIREMENTS_MISSING: "Requisitos ausentes",
+  BENEFITS_MISSING: "Benefícios ausentes"
+};
+const duplicateRows = report.assessments.filter((item) => item.duplicate);
+const expiredRows = report.assessments.filter((item) => item.expired);
+const brokenRows = report.assessments.filter((item) => ["CLOSED", "INVALID", "INCONCLUSIVE"].includes(item.row.job.applicationUrlStatus));
+const inconsistentRows = report.assessments.filter((item) => !item.complete);
+---
+<AdminLayout title="Qualidade das vagas" description="Auditoria interna de fonte, candidatura, validade, salário, localização e compatibilidade com JobPosting.">
+  <aside class="rounded-xl border border-sky-200 bg-sky-50 p-4 text-sm text-sky-950" role="note">
+    Nenhum dado é corrigido automaticamente nesta tela. Os alertas indicam onde revisar a fonte real antes de alterar ou publicar uma vaga.
+  </aside>
+
+  <section class="mt-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4" aria-label="Resumo da qualidade das vagas">
+    <a class="rounded-2xl border bg-white p-5 shadow-sm" href="/admin/qualidade-vagas"><p class="text-sm text-slate-600">Vagas avaliadas</p><strong class="mt-2 block text-3xl">{report.summary.total}</strong></a>
+    <a class="rounded-2xl border bg-white p-5 shadow-sm" href="?problema=SOURCE_MISSING"><p class="text-sm text-slate-600">Sem fonte completa</p><strong class="mt-2 block text-3xl text-amber-700">{report.summary.missingSource}</strong></a>
+    <a class="rounded-2xl border bg-white p-5 shadow-sm" href="?problema=SALARY_SUSPICIOUS"><p class="text-sm text-slate-600">Salários suspeitos</p><strong class="mt-2 block text-3xl text-amber-700">{report.summary.suspiciousSalary}</strong></a>
+    <a class="rounded-2xl border bg-white p-5 shadow-sm" href="#inconsistencias"><p class="text-sm text-slate-600">Com bloqueadores</p><strong class="mt-2 block text-3xl text-rose-700">{report.summary.incomplete}</strong></a>
+    <a class="rounded-2xl border bg-white p-5 shadow-sm" href="#expiradas"><p class="text-sm text-slate-600">Expiradas</p><strong class="mt-2 block text-3xl">{report.summary.expired}</strong></a>
+    <a class="rounded-2xl border bg-white p-5 shadow-sm" href="#duplicidades"><p class="text-sm text-slate-600">Possíveis duplicidades</p><strong class="mt-2 block text-3xl">{report.summary.duplicates}</strong></a>
+    <a class="rounded-2xl border bg-white p-5 shadow-sm" href="#links"><p class="text-sm text-slate-600">Links com problema</p><strong class="mt-2 block text-3xl">{report.summary.brokenLinks}</strong></a>
+    <article class="rounded-2xl border bg-white p-5 shadow-sm"><p class="text-sm text-slate-600">JobPosting válido/inválido</p><strong class="mt-2 block text-3xl"><span class="text-emerald-700">{report.summary.jobPostingValid}</span> / <span class="text-rose-700">{report.summary.jobPostingInvalid}</span></strong></article>
+  </section>
+
+  <section class="mt-8 overflow-hidden rounded-2xl border bg-white">
+    <div class="flex flex-wrap items-center justify-between gap-3 border-b p-5">
+      <div><h2 class="text-xl font-black">Auditoria detalhada</h2><p class="mt-1 text-sm text-slate-600">{filtered.length} resultado(s){issueFilter ? ` para ${label[issueFilter]}` : ""}.</p></div>
+      {issueFilter && <a class="es-btn es-btn-secondary" href="/admin/qualidade-vagas">Limpar filtro</a>}
+    </div>
+    <div class="overflow-x-auto">
+      <table class="min-w-full text-sm">
+        <thead class="bg-slate-50 text-left text-xs uppercase tracking-wide text-slate-600"><tr><th class="p-3">Vaga</th><th class="p-3">Classificação</th><th class="p-3">Fonte/canal</th><th class="p-3">Localização</th><th class="p-3">Salário</th><th class="p-3">Validade</th><th class="p-3">Problemas</th><th class="p-3">Ação</th></tr></thead>
+        <tbody>
+          {rows.map((item) => <tr class="border-t align-top">
+            <td class="p-3"><strong>{item.row.job.normalizedTitle}</strong><span class="mt-1 block font-mono text-xs text-slate-500">{item.row.job.publicCode}</span></td>
+            <td class="p-3 font-bold">{item.classification}</td>
+            <td class="p-3"><span class="block">{item.row.job.sourceName || "—"}</span><span class="text-xs text-slate-500">{item.row.job.applicationUrl ? `URL · ${item.linkStatus}` : item.row.job.applicationEmail ? "E-mail" : item.row.job.applicationWhatsapp ? "WhatsApp" : "Sem canal"}</span>{item.row.job.applicationUrlCheckedAt && <span class="block text-xs text-slate-500">Verificado {item.row.job.applicationUrlCheckedAt.toLocaleDateString("pt-BR")}</span>}</td>
+            <td class="p-3"><span class={`font-bold ${item.locationStatus === "VALIDADA" ? "text-emerald-700" : "text-rose-700"}`}>{item.locationStatus}</span><span class="block text-xs">{item.row.cityName}/{item.row.stateCode}</span></td>
+            <td class="p-3"><span class={`font-bold ${item.salaryStatus === "SUSPEITO" ? "text-amber-700" : "text-slate-700"}`}>{item.salaryStatus}</span></td>
+            <td class="p-3">{item.row.job.expiresAt?.toLocaleDateString("pt-BR") ?? "Não informada"}{item.expired && <span class="block font-bold text-rose-700">EXPIRADA</span>}</td>
+            <td class="max-w-md p-3"><ul class="grid gap-1">{item.issues.map((issue) => <li class={issue.severity === "BLOCKER" ? "text-rose-800" : issue.severity === "WARNING" ? "text-amber-800" : "text-slate-600"}><strong>{label[issue.code]}:</strong> {issue.message}</li>)}</ul></td>
+            <td class="p-3"><a class="font-bold text-[var(--brand-primary)] underline" href={`/admin/vagas/${item.row.job.id}/editar`}>Revisar</a></td>
+          </tr>)}
+          {rows.length === 0 && <tr><td class="p-8 text-center text-slate-600" colspan="8">Nenhuma vaga corresponde a este filtro.</td></tr>}
+        </tbody>
+      </table>
+    </div>
+    {pages > 1 && <nav class="flex items-center justify-between border-t p-4 text-sm" aria-label="Paginação"><a class={`font-bold ${current <= 1 ? "pointer-events-none opacity-40" : ""}`} href={`?${issueFilter ? `problema=${issueFilter}&` : ""}pagina=${Math.max(1, current - 1)}`}>Anterior</a><span>Página {current} de {pages}</span><a class={`font-bold ${current >= pages ? "pointer-events-none opacity-40" : ""}`} href={`?${issueFilter ? `problema=${issueFilter}&` : ""}pagina=${Math.min(pages, current + 1)}`}>Próxima</a></nav>}
+  </section>
+
+  <section id="duplicidades" class="mt-8 scroll-mt-28 rounded-2xl border bg-white p-6"><h2 class="text-xl font-black">Duplicidades</h2><p class="mt-2 text-sm text-slate-600">{duplicateRows.length} vaga(s) sinalizada(s) por hash, URLs, empresa/cargo/cidade ou similaridade da descrição. Compare a fonte antes de decidir.</p><div class="mt-4 grid gap-3 md:grid-cols-2">{report.duplicateGroups.slice(0, 100).map((group) => <article class="rounded-xl border p-4"><h3 class="font-black">Grupo {group.id}</h3><p class="mt-1 text-xs text-slate-600">{group.reason}</p><ul class="mt-2 grid gap-1 text-sm">{group.jobs.map((job) => <li><a class="font-semibold underline" href={`/admin/vagas/${job.id}/editar`}>{job.code} · {job.title}</a></li>)}</ul></article>)}</div>{report.duplicateGroups.length > 100 && <p class="mt-4 text-sm text-slate-600">Exibindo 100 de {report.duplicateGroups.length} grupos; use a tabela filtrada para consultar os demais registros.</p>}</section>
+  <section id="expiradas" class="mt-6 scroll-mt-28 rounded-2xl border bg-white p-6"><h2 class="text-xl font-black">Vagas expiradas</h2><p class="mt-2 text-sm text-slate-600">{expiredRows.length} vaga(s) com validade encerrada; {expiredRows.filter((item) => item.row.job.publicationStatus === "PUBLISHED").length} ainda marcada(s) como publicada(s).</p></section>
+  <section id="links" class="mt-6 scroll-mt-28 rounded-2xl border bg-white p-6"><h2 class="text-xl font-black">Links com problemas</h2><p class="mt-2 text-sm text-slate-600">{brokenRows.length} candidatura(s) com estado fechado, inválido ou inconclusivo. HTTP 403, 429 e timeout não são tratados como encerramento automático.</p></section>
+  <section id="inconsistencias" class="mt-6 scroll-mt-28 rounded-2xl border bg-white p-6"><h2 class="text-xl font-black">Dados inconsistentes</h2><p class="mt-2 text-sm text-slate-600">{inconsistentRows.length} vaga(s) possuem ao menos um bloqueador. A correção deve usar a fonte real; nenhuma informação foi inventada.</p></section>
+</AdminLayout>

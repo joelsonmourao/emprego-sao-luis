@@ -1,0 +1,100 @@
+---
+import JobBoardPaused from "../../components/JobBoardPaused.astro";
+import { jobBoardPublicGate } from "../../lib/job-board-gate";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import PageHero from "../../components/ui/PageHero.astro";
+import { loadPublicationPageState } from "../../lib/commercial/publication-page-state";
+
+const gate = await jobBoardPublicGate();
+
+const { plans, paymentAvailable } = gate.paused
+  ? { plans: [], paymentAvailable: false }
+  : await loadPublicationPageState();
+const faqs = [
+  ["Como funciona?", "Escolha um plano, informe os dados da empresa, conclua o pagamento e cadastre a vaga após liberação do crédito."],
+  ["Quando a vaga é publicada?", "Por padrão, após revisão da equipe. Planos podem incluir destaque no site e no Instagram."],
+  ["Posso publicar sem pagar online?", "A contratação é um serviço destinado à empresa. O pedido segue pelo plano e pela etapa de pagamento; quando o pagamento estiver indisponível, novas compras ficam pausadas."],
+  ["O portal garante contratação?", "Não. Divulgamos a oportunidade e direcionamos ao canal oficial da empresa."]
+];
+---
+{gate.paused ? (
+  <JobBoardPaused title="Publicação de vagas temporariamente pausada" />
+) : (
+<BaseLayout
+  title="Publicar vaga — Empregos São Luís"
+  description="Divulgue vagas para candidatos em São Luís e Maranhão. Planos no site e Instagram @empregosaoluis."
+  canonical="/publicar-vaga"
+  breadcrumbs={[{ name: "Publicar vaga", url: "/publicar-vaga" }]}
+>
+  <PageHero
+    kicker="Para empresas"
+    title="Alcance candidatos em São Luís e no Maranhão"
+    description="Publique vagas no portal e, conforme o plano, amplie a divulgação no Instagram @empregosaoluis."
+  />
+
+  <section class="es-section !pt-0">
+    <div class="es-container grid gap-10 lg:grid-cols-[1.2fr_1fr]">
+      <div>
+        <p class="mb-6 rounded-xl border border-emerald-200 bg-emerald-50 p-4 text-sm font-semibold text-emerald-950">Empresas pagam para divulgar e destacar oportunidades. Candidatos acessam vagas e canais de candidatura gratuitamente.</p>
+        <h2 class="font-display text-3xl font-black">Benefícios</h2>
+        <ul class="mt-4 grid gap-3 text-[var(--text-secondary)]">
+          <li>• Página da vaga com código ES rastreável e SEO local</li>
+          <li>• Listagem por cidade, categoria e empresa</li>
+          <li>• Destaque no site e no Instagram (conforme plano)</li>
+          <li>• Acompanhamento de pedido, pagamento e créditos</li>
+        </ul>
+
+        <h2 class="font-display mt-10 text-2xl font-black">Perguntas frequentes</h2>
+        <div class="mt-4 grid gap-4">
+          {faqs.map(([q, a]) => (
+            <details class="es-card rounded-2xl p-4">
+              <summary class="cursor-pointer font-bold">{q}</summary>
+              <p class="mt-2 text-sm text-[var(--text-secondary)]">{a}</p>
+            </details>
+          ))}
+        </div>
+      </div>
+
+      <div>
+        <h2 class="font-display text-2xl font-black">Planos disponíveis</h2>
+        {!paymentAvailable && (
+          <p class="mt-3 rounded-xl border border-[var(--warning)] bg-yellow-50 p-3 text-sm text-yellow-900">
+            Pagamento temporariamente indisponível. Novos pedidos permanecem pausados até a configuração empresarial ser concluída.
+          </p>
+        )}
+        <div class="mt-4 grid gap-4">
+          {plans.length ? plans.map((plan) => {
+            const price = plan.promoPrice ?? plan.price;
+            return (
+              <article class={`es-card rounded-2xl p-5 ${plan.recommended ? "ring-2 ring-[var(--brand-primary)]" : ""}`}>
+                {plan.recommended && <p class="es-kicker">Recomendado</p>}
+                <h3 class="font-display text-xl font-black">{plan.name}</h3>
+                <p class="mt-2 text-sm text-[var(--text-secondary)]">{plan.description}</p>
+                <p class="mt-4 text-2xl font-black text-[var(--brand-primary)]">
+                  R$ {Number(price).toFixed(2).replace(".", ",")}
+                </p>
+                <ul class="mt-3 grid gap-1 text-sm text-[var(--text-secondary)]">
+                  <li>{plan.jobCredits} vaga(s) · {plan.durationDays} dias no site</li>
+                  {plan.highlightDays > 0 && <li>{plan.highlightDays} dias em destaque</li>}
+                  {plan.publishStories && <li>Stories no Instagram</li>}
+                  {plan.publishFeed && <li>Post no feed do Instagram</li>}
+                </ul>
+                {paymentAvailable
+                  ? <a class="es-btn es-btn-primary mt-4 w-full" href={`/publicar-vaga/plano/${plan.slug}`}>Escolher plano</a>
+                  : <span class="mt-4 block rounded-xl bg-slate-100 p-3 text-center text-sm font-bold text-slate-600">Compra temporariamente indisponível</span>}
+              </article>
+            );
+          }) : (
+            <div class="es-card rounded-2xl p-5" role="status">
+              <h3 class="font-display text-xl font-black">Publicação de vagas em configuração</h3>
+              <p class="mt-2 text-[var(--text-secondary)]">Os planos para publicação ainda estão sendo preparados.</p>
+              <a class="es-btn es-btn-secondary mt-4" href="/empresa/login">Acompanhar pedidos da empresa</a>
+            </div>
+          )}
+        </div>
+        <a class="mt-6 block text-sm font-semibold text-[var(--brand-primary)] underline" href="/area-empresas">Saiba mais na área para empresas</a>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+)}

@@ -1,0 +1,148 @@
+---
+import { BRAND_ASSETS } from "../lib/brand-assets";
+
+interface Props {
+  title: string;
+  url: string;
+  summary?: string | null;
+}
+
+const { title, url, summary } = Astro.props;
+const absoluteUrl = url.startsWith("http") ? url : new URL(url, Astro.site).toString();
+const text = summary?.trim()
+  ? `${title} — ${summary.trim().slice(0, 120)}`
+  : `${title} — Vaga no Empregos São Luís`;
+const shareBody = `${text}\n${absoluteUrl}`;
+const encodedUrl = encodeURIComponent(absoluteUrl);
+const encodedText = encodeURIComponent(shareBody);
+const encodedTitle = encodeURIComponent(title);
+const instagramUrl = BRAND_ASSETS.instagramUrl;
+
+const networks = [
+  {
+    label: "WhatsApp",
+    href: `https://api.whatsapp.com/send?text=${encodedText}`,
+    className: "bg-emerald-700 text-white hover:bg-emerald-800"
+  },
+  {
+    label: "LinkedIn",
+    href: `https://www.linkedin.com/shareArticle?mini=true&url=${encodedUrl}&title=${encodedTitle}`,
+    className: "bg-[#0A66C2] text-white hover:bg-[#084e96]"
+  },
+  {
+    label: "Facebook",
+    href: `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}&quote=${encodedTitle}`,
+    className: "bg-[#1877F2] text-white hover:bg-[#0f5fcc]"
+  },
+  {
+    label: "X",
+    href: `https://twitter.com/intent/tweet?url=${encodedUrl}&text=${encodedTitle}`,
+    className: "bg-[#111111] text-white hover:bg-black"
+  },
+  {
+    label: "Telegram",
+    href: `https://t.me/share/url?url=${encodedUrl}&text=${encodedTitle}`,
+    className: "bg-[#229ED9] text-white hover:bg-[#1b86b8]"
+  }
+] as const;
+---
+<div
+  class="space-y-3"
+  data-social-share
+  data-share-title={title}
+  data-share-text={text}
+  data-share-url={absoluteUrl}
+>
+  <p class="text-xs font-bold uppercase tracking-wide text-[var(--es-muted)]">Compartilhar vaga</p>
+  <button
+    class="es-btn es-btn-primary inline-flex w-full items-center justify-center py-2.5 text-sm"
+    type="button"
+    data-share-native
+  >
+    Compartilhar
+  </button>
+  <div class="grid grid-cols-2 gap-2">
+    {networks.map((network) => (
+      <a
+        class={`inline-flex items-center justify-center rounded-xl px-3 py-2.5 text-sm font-bold transition ${network.className}`}
+        href={network.href}
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        {network.label}
+      </a>
+    ))}
+    <button
+      class="inline-flex items-center justify-center rounded-xl border border-[var(--es-border)] bg-white px-3 py-2.5 text-sm font-bold text-[#111827] transition hover:border-[var(--brand-primary)] hover:text-[var(--brand-primary)]"
+      type="button"
+      data-share-copy
+      data-share-url={absoluteUrl}
+    >
+      Copiar link
+    </button>
+    <a
+      class="inline-flex items-center justify-center rounded-xl border border-pink-200 bg-pink-50 px-3 py-2.5 text-sm font-bold text-pink-800 transition hover:border-pink-400"
+      href={instagramUrl}
+      target="_blank"
+      rel="noopener noreferrer"
+      data-track="instagram_share_follow_click"
+    >
+      Seguir Instagram
+    </a>
+  </div>
+  <p class="text-xs text-[var(--es-muted)]" data-share-status role="status" aria-live="polite"></p>
+</div>
+<script is:inline>
+  document.querySelectorAll("[data-social-share]").forEach((root) => {
+    if (root.dataset.bound === "1") return;
+    root.dataset.bound = "1";
+    const status = root.querySelector("[data-share-status]");
+    const setStatus = (message) => {
+      if (status) status.textContent = message;
+    };
+    const copy = async (value) => {
+      try {
+        await navigator.clipboard.writeText(value);
+        return true;
+      } catch {
+        try {
+          const input = document.createElement("textarea");
+          input.value = value;
+          input.setAttribute("readonly", "");
+          input.style.position = "fixed";
+          input.style.left = "-9999px";
+          document.body.appendChild(input);
+          input.select();
+          const ok = document.execCommand("copy");
+          document.body.removeChild(input);
+          return ok;
+        } catch {
+          return false;
+        }
+      }
+    };
+    root.querySelector("[data-share-native]")?.addEventListener("click", async () => {
+      const shareUrl = root.getAttribute("data-share-url") || "";
+      const shareTitle = root.getAttribute("data-share-title") || "";
+      const shareText = root.getAttribute("data-share-text") || "";
+      if (navigator.share) {
+        try {
+          await navigator.share({ title: shareTitle, text: shareText, url: shareUrl });
+          setStatus("Compartilhamento aberto.");
+          return;
+        } catch (error) {
+          if (error && error.name === "AbortError") {
+            setStatus("Compartilhamento cancelado.");
+            return;
+          }
+        }
+      }
+      setStatus((await copy(shareUrl)) ? "Link copiado para compartilhar." : "Copie o link manualmente.");
+    });
+    root.querySelector("[data-share-copy]")?.addEventListener("click", async (event) => {
+      const button = event.currentTarget;
+      const shareUrl = button.getAttribute("data-share-url") || "";
+      setStatus((await copy(shareUrl)) ? "Link copiado." : "Não foi possível copiar.");
+    });
+  });
+</script>

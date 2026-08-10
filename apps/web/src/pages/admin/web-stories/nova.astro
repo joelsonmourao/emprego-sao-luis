@@ -1,0 +1,48 @@
+---
+import AdminLayout from "../../../layouts/AdminLayout.astro";
+import { articles, authors, createDatabase } from "@es/db";
+import { and, eq } from "drizzle-orm";
+
+let eligibleArticles: Array<{ id: string; title: string }> = [];
+let authorRows: Array<{ id: string; name: string }> = [];
+if (process.env.DATABASE_URL) {
+  const connection = createDatabase(process.env.DATABASE_URL);
+  try {
+    eligibleArticles = await connection.db
+      .select({ id: articles.id, title: articles.title })
+      .from(articles)
+      .where(and(eq(articles.webStoryEligible, true), eq(articles.status, "PUBLISHED")));
+    authorRows = await connection.db.select({ id: authors.id, name: authors.name }).from(authors);
+  } finally {
+    await connection.close();
+  }
+}
+---
+<AdminLayout title="Nova Web Story">
+  <h1 class="text-3xl font-black">Nova Web Story</h1>
+  <p class="mt-2 text-sm text-[var(--text-secondary)]">Geração assistida apenas para artigos elegíveis. Publicação exige revisão humana.</p>
+  {eligibleArticles.length === 0 ? (
+    <p class="mt-6 rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm">Nenhum artigo elegível. Marque `webStoryEligible` em conteúdos fortes já publicados.</p>
+  ) : (
+    <form class="mt-6 grid max-w-3xl gap-4 rounded-2xl bg-white p-6" method="post" action="/api/admin/web-stories">
+      <label class="grid gap-1 text-sm font-bold">Título<input class="rounded-lg border p-3" name="title" required minlength="8" /></label>
+      <label class="grid gap-1 text-sm font-bold">Slug<input class="rounded-lg border p-3" name="slug" required pattern="^[a-z0-9]+(?:-[a-z0-9]+)*$" /></label>
+      <label class="grid gap-1 text-sm font-bold">Artigo de origem
+        <select class="rounded-lg border p-3" name="articleId" required>
+          {eligibleArticles.map((article) => <option value={article.id}>{article.title}</option>)}
+        </select>
+      </label>
+      <label class="grid gap-1 text-sm font-bold">Autor
+        <select class="rounded-lg border p-3" name="authorId" required>
+          {authorRows.map((author) => <option value={author.id}>{author.name}</option>)}
+        </select>
+      </label>
+      <label class="grid gap-1 text-sm font-bold">Poster URL<input class="rounded-lg border p-3" name="posterUrl" required /></label>
+      <label class="grid gap-1 text-sm font-bold">Poster alt<input class="rounded-lg border p-3" name="posterAlt" required /></label>
+      <label class="grid gap-1 text-sm font-bold">Páginas (JSON)
+        <textarea class="min-h-40 rounded-lg border p-3 font-mono text-xs" name="pagesJson" required set:html={JSON.stringify([{ order: 1, headline: "Abertura", body: "..." }, { order: 2, headline: "Desenvolvimento", body: "..." }, { order: 3, headline: "Próximo passo", body: "..." }], null, 2)}></textarea>
+      </label>
+      <button class="rounded-lg bg-red-700 px-4 py-3 font-bold text-white" type="submit">Salvar como rascunho</button>
+    </form>
+  )}
+</AdminLayout>

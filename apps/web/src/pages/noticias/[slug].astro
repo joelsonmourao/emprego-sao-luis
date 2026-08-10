@@ -1,0 +1,87 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import Breadcrumbs from "../../components/ui/Breadcrumbs.astro";
+import {
+  articlePublicPath,
+  findPublishedArticle,
+  findPublishedSlLocalByNumber,
+  resolveSlLocalSeoSlug
+} from "../../lib/articles";
+import { getEditorialPortalMode } from "../../lib/portal-modes";
+import { rewriteJobBoardLinksForPortal } from "../../lib/portal-content-rewrite";
+import { normalizeEditorialHtml } from "@es/shared";
+
+const slug = Astro.params.slug!;
+const portal = await getEditorialPortalMode();
+const seoFromLegacy = resolveSlLocalSeoSlug(slug);
+if (seoFromLegacy && seoFromLegacy !== slug) {
+  const moved = await findPublishedArticle(seoFromLegacy, ["GUIDE", "DATA_REPORT", "NEWS"]);
+  if (moved) return Astro.redirect(articlePublicPath(moved.article.type, moved.article.slug), 301);
+}
+const result = await findPublishedArticle(slug, "NEWS");
+if (!result) {
+  // SEO: posts reclassificados (NEWS → GUIDE/DATA) mantêm 301 a partir da URL antiga.
+  const retyped = await findPublishedArticle(slug, ["GUIDE", "DATA_REPORT"]);
+  if (retyped) {
+    return Astro.redirect(`/blog/${slug}`, 301);
+  }
+  const renamed = await findPublishedSlLocalByNumber(slug, ["GUIDE", "DATA_REPORT", "NEWS"]);
+  if (renamed) return Astro.redirect(articlePublicPath(renamed.article.type, renamed.article.slug), 301);
+  return new Response("Notícia não encontrada", {
+    status: 404,
+    headers: { "Content-Type": "text/plain; charset=utf-8", "X-Robots-Tag": "noindex, follow" }
+  });
+}
+const { article, authorName } = result;
+const normalizedHtml = normalizeEditorialHtml(article.contentHtml, { baseHeadingLevel: 2 });
+const contentHtml = portal.enabled ? rewriteJobBoardLinksForPortal(normalizedHtml) : normalizedHtml;
+const canonical = article.canonicalUrl ?? new URL(`/noticias/${article.slug}`, Astro.site).toString();
+const variants = article.coverImageVariants && typeof article.coverImageVariants === "object"
+  ? article.coverImageVariants as Record<string, { url?: string; width?: number; height?: number }>
+  : {};
+const structuredImages = [variants.hero, variants.landscape43, variants.square]
+  .filter((image): image is { url: string; width?: number; height?: number } => Boolean(image?.url))
+  .map((image) => ({
+    "@type": "ImageObject",
+    url: image.url,
+    ...(image.width ? { width: image.width } : {}),
+    ...(image.height ? { height: image.height } : {}),
+    ...(article.coverImageCaption ? { caption: article.coverImageCaption } : {}),
+    ...(article.coverImageCredit ? { creditText: article.coverImageCredit } : {})
+  }));
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "NewsArticle",
+  headline: article.title,
+  description: article.metaDescription ?? article.excerpt,
+  datePublished: article.publishedAt?.toISOString(),
+  dateModified: article.updatedAt.toISOString(),
+  mainEntityOfPage: canonical,
+  author: { "@type": "Person", name: authorName },
+  publisher: { "@type": "Organization", name: "Empregos São Luís" },
+  ...(structuredImages.length ? { image: structuredImages } : {})
+};
+---
+<BaseLayout title={`${article.seoTitle ?? article.title} — Empregos São Luís`} description={article.metaDescription ?? article.excerpt} canonical={canonical} ogImage={article.ogImageUrl ?? article.coverImageUrl ?? undefined} breadcrumbs={[{ name: "Notícias", url: "/noticias" }, { name: article.title, url: `/noticias/${article.slug}` }]} schemas={[jsonLd]}>
+  <article class="es-section">
+    <div class="es-container max-w-4xl">
+      <Breadcrumbs items={[{ name: "Início", url: "/" }, { name: "Notícias", url: "/noticias" }, { name: article.title }]} />
+      <p class="es-kicker mt-6">{article.section ?? "Notícia"}</p>
+      <h1 class="font-display mt-2 text-4xl font-black sm:text-5xl">{article.title}</h1>
+      {article.subtitle && <p class="mt-4 text-xl text-[var(--es-muted)]">{article.subtitle}</p>}
+      <p class="mt-4 text-sm text-[var(--es-muted)]">Por {authorName} · {article.publishedAt?.toLocaleDateString("pt-BR")}</p>
+      {article.coverImageUrl && (
+        <figure class="mt-8 overflow-hidden rounded-3xl">
+          <img class="w-full" src={variants.hero?.url ?? article.coverImageUrl} srcset={variants.card?.url && variants.hero?.url ? `${variants.card.url} 640w, ${variants.hero.url} 1600w` : undefined} sizes="(max-width: 768px) 100vw, 896px" alt={article.coverImageAlt ?? article.title} width={article.coverImageWidth ?? 1600} height={article.coverImageHeight ?? 900} loading="eager" fetchpriority="high" />
+          {(article.coverImageCaption || article.coverImageCredit) && <figcaption class="mt-2 text-sm text-[var(--es-muted)]">{article.coverImageCaption}{article.coverImageCaption && article.coverImageCredit ? " · " : ""}{article.coverImageCredit ? `Crédito: ${article.coverImageCredit}` : ""}</figcaption>}
+        </figure>
+      )}
+      <div class="es-prose mt-8 max-w-none text-[1.05rem] leading-8" set:html={contentHtml} />
+      {article.sourceUrl && <p class="mt-8 text-sm">Fonte: <a class="underline" href={article.sourceUrl} rel="nofollow noopener">{article.sourceName ?? "fonte original"}</a></p>}
+      <div class="mt-8 flex flex-wrap gap-3">
+        <a class="es-btn es-btn-secondary" href={`https://wa.me/?text=${encodeURIComponent(`${article.title} - ${canonical}`)}`} rel="noopener noreferrer">Compartilhar</a>
+        <a class="es-btn es-btn-secondary" href="/noticias">Voltar às notícias</a>
+      </div>
+    </div>
+  </article>
+</BaseLayout>

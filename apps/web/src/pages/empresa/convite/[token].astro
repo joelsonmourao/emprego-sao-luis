@@ -1,0 +1,79 @@
+---
+import "../../../styles/global.css";
+import { BRAND_ASSETS, brandCssVariables } from "../../../lib/brand-assets";
+import { companyAccounts, createDatabase } from "@es/db";
+import { and, eq, gt, isNull } from "drizzle-orm";
+import { createHash } from "node:crypto";
+
+const { token } = Astro.params;
+const hash = (value: string) => createHash("sha256").update(value).digest("hex");
+
+let valid = false;
+let email = "";
+
+if (token && process.env.DATABASE_URL) {
+  const connection = createDatabase(process.env.DATABASE_URL);
+  try {
+    const [account] = await connection.db
+      .select({ email: companyAccounts.email, hasPassword: companyAccounts.passwordHash })
+      .from(companyAccounts)
+      .where(
+        and(
+          eq(companyAccounts.inviteTokenHash, hash(token)),
+          gt(companyAccounts.inviteExpiresAt, new Date()),
+          eq(companyAccounts.active, true),
+          isNull(companyAccounts.passwordHash)
+        )
+      )
+      .limit(1);
+    if (account) {
+      valid = true;
+      email = account.email;
+    }
+  } finally {
+    await connection.close();
+  }
+}
+---
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width" />
+    <meta name="robots" content="noindex,nofollow" />
+    <title>Ativar conta — Área da empresa</title>
+    <link rel="icon" href={BRAND_ASSETS.faviconIco} />
+    <style is:inline set:html={brandCssVariables()} />
+  </head>
+  <body class="grid min-h-screen place-items-center bg-[var(--brand-background)] p-4">
+    <main class="es-card w-full max-w-md p-8">
+      <a href="/" aria-label={BRAND_ASSETS.logoAlt}>
+        <img src={BRAND_ASSETS.logoHorizontalWebp} alt="" class="h-10 w-auto" width="160" height="40" />
+      </a>
+      {valid ? (
+        <>
+          <h1 class="mt-6 font-display text-2xl font-black">Definir senha</h1>
+          <p class="mt-2 text-sm text-[var(--text-secondary)]">Ative sua conta comercial para <strong>{email}</strong>.</p>
+          <form class="mt-8 grid gap-5" method="post" action="/api/empresa/convite">
+            <input type="hidden" name="token" value={token} />
+            <label class="grid gap-1 text-sm font-semibold">
+              Nova senha
+              <input class="rounded-xl border border-[var(--brand-border)] px-3 py-2.5" type="password" name="password" autocomplete="new-password" minlength="8" required />
+            </label>
+            <label class="grid gap-1 text-sm font-semibold">
+              Confirmar senha
+              <input class="rounded-xl border border-[var(--brand-border)] px-3 py-2.5" type="password" name="confirm" autocomplete="new-password" minlength="8" required />
+            </label>
+            <button class="es-btn es-btn-primary w-full" type="submit">Ativar conta</button>
+          </form>
+        </>
+      ) : (
+        <>
+          <h1 class="mt-6 font-display text-2xl font-black">Convite inválido</h1>
+          <p class="mt-2 text-sm text-[var(--text-secondary)]">Este link expirou ou já foi utilizado.</p>
+          <a class="es-btn es-btn-secondary mt-6" href="/empresa/login">Ir para o login</a>
+        </>
+      )}
+    </main>
+  </body>
+</html>

@@ -1,0 +1,62 @@
+---
+import EmpresaLayout from "../../layouts/EmpresaLayout.astro";
+import { listCompanyJobDrafts } from "../../lib/company-dashboard";
+import { companyCanManageJobs } from "../../lib/company-auth";
+
+const company = Astro.locals.company!;
+const drafts = await listCompanyJobDrafts(company.id);
+const canManage = companyCanManageJobs(company.role);
+
+const statusLabels: Record<string, string> = {
+  DRAFT: "Rascunho",
+  PENDING_REVIEW: "Em revisão",
+  APPROVED: "Aprovada",
+  REJECTED: "Rejeitada",
+  PUBLISHED: "Publicada"
+};
+---
+<EmpresaLayout title="Vagas">
+  <div class="flex flex-wrap items-end justify-between gap-4">
+    <div>
+      <h1 class="font-display text-3xl font-black">Vagas</h1>
+      <p class="mt-2 text-[var(--text-secondary)]">Rascunhos e solicitações de publicação vinculados à sua conta.</p>
+    </div>
+    {canManage && <a class="es-btn es-btn-primary" href="/publicar-vaga">Nova vaga</a>}
+  </div>
+  <div class="mt-8 overflow-x-auto es-card">
+    <table class="min-w-full text-sm">
+      <thead class="border-b border-[var(--brand-border)] bg-[var(--brand-background)] text-left">
+        <tr>
+          <th class="p-3">Cargo</th>
+          <th class="p-3">Status</th>
+          <th class="p-3">Candidatura</th>
+          <th class="p-3">Atualizado</th>
+        </tr>
+      </thead>
+      <tbody>
+        {drafts.length ? drafts.map((draft) => (
+          <tr class="border-b border-[var(--brand-border)]">
+            <td class="p-3 font-semibold">{draft.jobTitle}</td>
+            <td class="p-3">{statusLabels[draft.status] ?? draft.status}</td>
+            <td class="p-3">
+              <a class="text-[var(--brand-primary)] underline" href={draft.applyUrl} target="_blank" rel="noopener">Link</a>
+            </td>
+            <td class="p-3">{new Date(draft.updatedAt).toLocaleDateString("pt-BR")}</td>
+          </tr>
+        )) : (
+          <tr><td class="p-6 text-[var(--text-secondary)]" colspan="4">Nenhum rascunho de vaga.</td></tr>
+        )}
+      </tbody>
+    </table>
+  </div>
+  {drafts.some((d) => d.adminFeedback) && (
+    <div class="mt-6 es-card p-5">
+      <h2 class="font-display font-bold">Retorno da equipe</h2>
+      <ul class="mt-3 grid gap-2 text-sm">
+        {drafts.filter((d) => d.adminFeedback).map((d) => (
+          <li><strong>{d.jobTitle}:</strong> {d.adminFeedback}</li>
+        ))}
+      </ul>
+    </div>
+  )}
+</EmpresaLayout>

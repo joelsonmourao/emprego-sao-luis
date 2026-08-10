@@ -1,0 +1,42 @@
+{
+  "name": "@es/web",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "astro dev",
+    "preview": "astro preview",
+    "build": "astro check && astro build",
+    "typecheck": "astro check"
+  },
+  "dependencies": {
+    "@astrojs/node": "^11.0.2",
+    "@astrojs/react": "^6.0.1",
+    "@aws-sdk/client-s3": "^3.850.0",
+    "@es/ads": "*",
+    "@es/db": "*",
+    "@es/seo": "*",
+    "@es/shared": "*",
+    "@es/social": "*",
+    "@es/storage": "*",
+    "@sentry/astro": "^10.65.0",
+    "@tailwindcss/vite": "^4.1.11",
+    "astro": "^7.0.7",
+    "bcryptjs": "^3.0.3",
+    "bullmq": "^5.80.2",
+    "drizzle-orm": "^0.45.2",
+    "jose": "^6.1.0",
+    "otplib": "^13.4.1",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
+    "sharp": "^0.34.5",
+    "tailwindcss": "^4.1.11",
+    "xlsx": "^0.18.5",
+    "zod": "3.25.76"
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.9.4",
+    "@types/react": "^19.1.9",
+    "@types/react-dom": "^19.1.7"
+  }
+}
