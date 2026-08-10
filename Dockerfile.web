@@ -19,6 +19,10 @@ COPY apps/web apps/web
 COPY packages packages
 RUN npm run build --workspace=@es/web
 
+# Runtime deps only — shrinks the exported image vs full install+dev tree.
+FROM deps AS prod-deps
+RUN npm prune --omit=dev --legacy-peer-deps
+
 FROM node:22-alpine AS runtime
 ENV NODE_ENV=production HOST=0.0.0.0 PORT=4321 UPLOADS_DIR=/app/data TZ=America/Sao_Paulo APP_TIME_ZONE=America/Sao_Paulo
 WORKDIR /app
@@ -26,23 +30,34 @@ RUN apk add --no-cache tzdata \
  && addgroup -S app -g 1001 && adduser -S app -u 1001 -G app
 RUN mkdir -p /app/data/imports /app/data/media /app/data/brand /app/data/reports /app/data/temp /app/data/receipts \
  && chown -R app:app /app/data
-COPY --from=build --chown=app:app /app/apps/web/dist ./dist
-COPY --from=deps --chown=app:app /app/node_modules ./node_modules
-COPY --from=build --chown=app:app /app/packages ./packages
-# Minimal package.json so Coolify Terminal can run named npm scripts (not a full monorepo install).
-COPY --chown=app:app package.json package.json
-# One-shot editorial activate (Coolify Terminal do web)
-COPY --chown=app:app scripts/activate-sl-local-editorial.mjs scripts/activate-sl-local-editorial.mjs
-COPY --chown=app:app scripts/rewrite-sl-local-editorial-bodies.mjs scripts/rewrite-sl-local-editorial-bodies.mjs
-COPY --chown=app:app scripts/rewrite-job-board-links-in-articles.mjs scripts/rewrite-job-board-links-in-articles.mjs
-COPY --chown=app:app scripts/persist-adsense-quality-guides.mjs scripts/persist-adsense-quality-guides.mjs
-COPY --chown=app:app scripts/data/sl-local-editorial-catalog.mjs scripts/data/sl-local-editorial-catalog.mjs
-COPY --chown=app:app scripts/data/sl-local-article-html.mjs scripts/data/sl-local-article-html.mjs
-COPY --chown=app:app scripts/data/sl-local-tip-followups-46-105.mjs scripts/data/sl-local-tip-followups-46-105.mjs
-COPY --chown=app:app scripts/data/adsense-quality-guides.mjs scripts/data/adsense-quality-guides.mjs
-COPY --chown=app:app scripts/data/adsense-quality-bodies.mjs scripts/data/adsense-quality-bodies.mjs
+
+# CRITICAL: do NOT COPY --chown on node_modules/packages/dist.
+# Coolify often fails at "exporting layers" (exit 255) when BuildKit rewrites
+# ownership across ~1–2GB of node_modules during image export.
+COPY --from=build /app/apps/web/dist ./dist
+COPY --from=prod-deps /app/node_modules ./node_modules
+COPY --from=build /app/packages ./packages
+COPY package.json package.json
+
+# Coolify Terminal editorial scripts (small; chown OK)
+COPY --chown=app:app scripts/activate-sl-local-editorial.mjs \
+  scripts/rewrite-sl-local-editorial-bodies.mjs \
+  scripts/rewrite-job-board-links-in-articles.mjs \
+  scripts/persist-adsense-quality-guides.mjs \
+  scripts/
+COPY --chown=app:app scripts/data/sl-local-editorial-catalog.mjs \
+  scripts/data/sl-local-article-html.mjs \
+  scripts/data/sl-local-tip-followups-46-105.mjs \
+  scripts/data/adsense-quality-guides.mjs \
+  scripts/data/adsense-quality-bodies.mjs \
+  scripts/data/
 COPY --chown=app:app apps/web/public/covers/sl-local/credits.json apps/web/public/covers/sl-local/credits.json
 COPY --chown=app:app apps/web/public/covers/adsense-quality apps/web/public/covers/adsense-quality
+
+# Readable by non-root; writable only where the app needs it.
+RUN chmod -R a+rX /app/dist /app/node_modules /app/packages /app/scripts \
+ && chown -R app:app /app/dist
+
 USER app
 EXPOSE 4321
 HEALTHCHECK --interval=30s --timeout=5s --start-period=15s --retries=3 CMD wget -qO- http://127.0.0.1:4321/api/health || exit 1

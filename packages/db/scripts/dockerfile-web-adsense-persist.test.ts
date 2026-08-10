@@ -10,30 +10,29 @@ const packageJson = JSON.parse(readFileSync(resolve(root, "package.json"), "utf8
 
 describe("Dockerfile.web AdSense quality persist surface", () => {
   it("keeps a minimal production runtime and does not copy the full source tree", () => {
-    expect(dockerfile).toContain("COPY --from=build --chown=app:app /app/apps/web/dist ./dist");
+    expect(dockerfile).toContain("COPY --from=build /app/apps/web/dist ./dist");
+    expect(dockerfile).toContain("COPY --from=prod-deps /app/node_modules ./node_modules");
+    expect(dockerfile).not.toMatch(/COPY --from=deps --chown=app:app \/app\/node_modules/);
     expect(dockerfile).not.toMatch(/COPY --chown=app:app apps\/web apps\/web\s*$/m);
     expect(dockerfile).not.toContain("COPY . .");
   });
 
-  it("ships package.json so npm run persist:adsense-quality-guides works in Coolify", () => {
+  it("ships Coolify editorial scripts including rewrite + persist + covers", () => {
     expect(packageJson.scripts?.["persist:adsense-quality-guides"]).toBe(
       "node scripts/persist-adsense-quality-guides.mjs"
     );
-    expect(dockerfile).toContain("COPY --chown=app:app package.json package.json");
-    expect(dockerfile).toContain(
-      "COPY --chown=app:app scripts/persist-adsense-quality-guides.mjs scripts/persist-adsense-quality-guides.mjs"
+    expect(packageJson.scripts?.["rewrite:sl-local-bodies"]).toBe(
+      "node scripts/rewrite-sl-local-editorial-bodies.mjs"
     );
-    expect(dockerfile).toContain(
-      "COPY --chown=app:app scripts/data/adsense-quality-guides.mjs scripts/data/adsense-quality-guides.mjs"
+    expect(packageJson.scripts?.["rewrite:job-board-links"]).toBe(
+      "node scripts/rewrite-job-board-links-in-articles.mjs"
     );
-    expect(dockerfile).toContain(
-      "COPY --chown=app:app scripts/data/adsense-quality-bodies.mjs scripts/data/adsense-quality-bodies.mjs"
-    );
-    expect(dockerfile).toContain(
-      "COPY --chown=app:app scripts/rewrite-sl-local-editorial-bodies.mjs scripts/rewrite-sl-local-editorial-bodies.mjs"
-    );
-    expect(dockerfile).toContain(
-      "COPY --chown=app:app apps/web/public/covers/adsense-quality apps/web/public/covers/adsense-quality"
-    );
+    expect(dockerfile).toContain("COPY package.json package.json");
+    expect(dockerfile).toContain("persist-adsense-quality-guides.mjs");
+    expect(dockerfile).toContain("rewrite-sl-local-editorial-bodies.mjs");
+    expect(dockerfile).toContain("rewrite-job-board-links-in-articles.mjs");
+    expect(dockerfile).toContain("adsense-quality-guides.mjs");
+    expect(dockerfile).toContain("adsense-quality-bodies.mjs");
+    expect(dockerfile).toContain("apps/web/public/covers/adsense-quality");
   });
 });
