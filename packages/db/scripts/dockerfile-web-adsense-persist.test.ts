@@ -27,6 +27,12 @@ describe("Dockerfile.web AdSense quality persist surface", () => {
       "COPY --chown=app:app scripts/data/adsense-quality-guides.mjs scripts/data/adsense-quality-guides.mjs"
     );
     expect(dockerfile).toContain(
+      "COPY --chown=app:app scripts/data/adsense-quality-bodies.mjs scripts/data/adsense-quality-bodies.mjs"
+    );
+    expect(dockerfile).toContain(
+      "COPY --chown=app:app scripts/rewrite-sl-local-editorial-bodies.mjs scripts/rewrite-sl-local-editorial-bodies.mjs"
+    );
+    expect(dockerfile).toContain(
       "COPY --chown=app:app apps/web/public/covers/adsense-quality apps/web/public/covers/adsense-quality"
     );
   });

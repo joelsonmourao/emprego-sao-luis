@@ -59,6 +59,8 @@
     "fetch:sl-local-covers": "node scripts/fetch-sl-local-photo-covers.mjs",
     "seed:local-editorial": "node scripts/seed-local-editorial-schedule.mjs",
     "persist:adsense-quality-guides": "node scripts/persist-adsense-quality-guides.mjs",
+    "rewrite:sl-local-bodies": "node scripts/rewrite-sl-local-editorial-bodies.mjs",
+    "rewrite:job-board-links": "node scripts/rewrite-job-board-links-in-articles.mjs",
     "activate:local-editorial": "node scripts/activate-sl-local-editorial.mjs",
     "audit:performance": "node scripts/audit-performance.mjs",
     "audit:admin": "node scripts/audit-admin.mjs",

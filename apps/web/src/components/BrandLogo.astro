@@ -2,6 +2,8 @@
 import type { BrandAssetKey } from "../lib/brand/constants";
 import { FALLBACK_PATHS } from "../lib/brand/constants";
 import { getBrandIdentity } from "../lib/brand/identity-service";
+import { getEditorialPortalMode } from "../lib/portal-modes";
+import { resolveLogoAltForPortal } from "../lib/portal-content-rewrite";
 
 interface Props {
   assetKey: BrandAssetKey;
@@ -26,8 +28,9 @@ const {
 } = Astro.props;
 
 const identity = await getBrandIdentity();
+const portal = await getEditorialPortalMode();
 const asset = identity.assets[assetKey];
-const resolvedAlt = alt ?? asset?.altText ?? identity.logoAlt;
+const resolvedAlt = resolveLogoAltForPortal(alt ?? asset?.altText ?? identity.logoAlt, portal.enabled);
 const url = asset?.url ?? FALLBACK_PATHS[assetKey];
 const webp = variant && asset?.variants[variant] ? asset.variants[variant] : (asset?.variants.medium ?? url);
 const png = asset?.variants["medium-png"] ?? asset?.originalUrl ?? url;

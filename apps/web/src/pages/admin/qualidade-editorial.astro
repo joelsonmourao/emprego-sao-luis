@@ -83,6 +83,7 @@ const tone = (value: EditorialClassification) =>
 ---
 <AdminLayout title="Qualidade editorial">
   <h1 class="text-3xl font-black">Qualidade editorial</h1>
+  <p class="mt-2 text-sm text-slate-600">*Faixas internas de qualidade (não são pontuação oficial do Google). Score deixa de premiar texto curto só por passar de um mínimo de caracteres.</p>
   <p class="mt-2 max-w-3xl text-sm text-[var(--text-secondary)]">
     Classificação interna (não é nota do Google). Noindex nunca é aplicado em massa automaticamente.
     Fontes institucionais do próprio portal não comprovam fatos trabalhistas.
@@ -105,6 +106,15 @@ const tone = (value: EditorialClassification) =>
     <article class="rounded-xl border bg-white p-4"><p class="text-sm">Noindex</p><strong class="text-3xl">{report.summary.noindex}</strong></article>
     <article class="rounded-xl border bg-white p-4"><p class="text-sm">Revisar</p><strong class="text-3xl">{report.summary.revisar}</strong></article>
   </section>
+
+  <section class="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
+    <article class="rounded-xl border bg-white p-4"><p class="text-sm">Excelente*</p><strong class="text-3xl">{report.summary.excelente}</strong></article>
+    <article class="rounded-xl border bg-white p-4"><p class="text-sm">Bom*</p><strong class="text-3xl">{report.summary.bom}</strong></article>
+    <article class="rounded-xl border bg-white p-4"><p class="text-sm">Precisa melhorar*</p><strong class="text-3xl">{report.summary.precisaMelhorar}</strong></article>
+    <article class="rounded-xl border bg-white p-4"><p class="text-sm">Revisão humana*</p><strong class="text-3xl">{report.summary.revisaoHumana}</strong></article>
+    <article class="rounded-xl border bg-white p-4"><p class="text-sm">Baixo valor*</p><strong class="text-3xl">{report.summary.baixoValor}</strong></article>
+  </section>
+  <p class="mt-2 text-xs text-slate-500">*Faixas internas de qualidade editorial — não são pontuação oficial do Google. Texto curto/template não recebe 100/100 só por passar de um mínimo de caracteres.</p>
 
   <section class="mt-8 rounded-2xl border bg-white p-6" id="correcoes">
     <h2 class="text-xl font-black">Correções automáticas seguras</h2>
@@ -152,7 +162,7 @@ const tone = (value: EditorialClassification) =>
               <p class="text-xs text-slate-500">{item.article.type} · /{item.article.type === "NEWS" ? "noticias" : "blog"}/{item.article.slug}</p>
             </td>
             <td class="p-3">{item.article.status}<br/><span class="text-xs">{item.article.editorialStage}</span></td>
-            <td class="p-3"><span class={`rounded px-2 py-1 text-xs font-bold ${tone(item.classification)}`}>{item.classification}</span></td>
+            <td class="p-3"><span class={`rounded px-2 py-1 text-xs font-bold ${tone(item.classification)}`}>{item.classification}</span><p class="mt-1 text-[11px] text-slate-500">{item.qualityBand}</p></td>
             <td class="p-3 text-xs font-bold">{item.issues.length ? worstSeverity(item) : "—"}</td>
             <td class="p-3">{item.score}/100</td>
             <td class="p-3">

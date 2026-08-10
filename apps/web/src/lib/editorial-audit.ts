@@ -2,6 +2,13 @@ import { articles, auditLogs, createDatabase } from "@es/db";
 import { desc, eq } from "drizzle-orm";
 
 export type EditorialClassification = "MANTER" | "MELHORAR" | "NOINDEX" | "REVISAR MANUALMENTE";
+/** Faixas internas de qualidade editorial (não são score oficial do Google). */
+export type EditorialQualityBand =
+  | "EXCELENTE"
+  | "BOM"
+  | "PRECISA MELHORAR"
+  | "REVISÃO HUMANA"
+  | "BAIXO VALOR";
 export type IssueCategory =
   | "TÉCNICO"
   | "SEO"
@@ -72,6 +79,8 @@ export type EditorialArticleInput = {
 export type EditorialAssessment = {
   article: EditorialArticleInput;
   classification: EditorialClassification;
+  /** Faixa honesta de qualidade — independente do checklist técnico. */
+  qualityBand: EditorialQualityBand;
   score: number;
   issues: EditorialIssue[];
   sourceKind: SourceKind;
@@ -167,9 +176,157 @@ function bestSourceKind(article: EditorialArticleInput): SourceKind {
 
 function factualTopic(title: string, html: string) {
   const blob = normalize(`${title} ${plainText(html)}`);
-  return /\b(13o|decimo terceiro|salario minimo|clt|fgts|seguro desemprego|direito trabalh|hora extra|aviso previo|rescisao|inss|lei |artigo \d+)\b/.test(
+  return /\b(13o|decimo terceiro|salario minimo|clt|fgts|seguro desemprego|direito trabalh|hora extra|aviso previo|rescisao|inss|lei |artigo \d+|jovem aprendiz|aprendizagem|estagio|holerite|abono pecuniario|banco de horas|ctps|carteira de trabalho|terceiriz|demissao|ferias|salario)\b/.test(
     blob
   );
+}
+
+const TEMPLATE_H2_PATTERNS = [
+  /uma situacao comum na pratica/,
+  /roteiro aplicavel passo a passo/,
+  /feche o ciclo com uma acao/,
+  /leitura util do cenario/,
+  /como usar esses sinais na busca/,
+  /como decidir o proximo passo/,
+  /o que esta em jogo agora/,
+  /o que fazer nesta semana/,
+  /para nao perder o fio/
+];
+
+const BOILERPLATE_PHRASES = [
+  /guarde este conteudo como referencia e volte a ele quando for candidatar/,
+  /continue navegando pelos guias relacionados no blog e pelas paginas institucionais/,
+  /transparencia protege candidato e empresa/
+];
+
+function extractHeadings(html: string): string[] {
+  return [...html.matchAll(/<h[2-3][^>]*>([\s\S]*?)<\/h[2-3]>/gi)].map((match) =>
+    normalize(plainText(match[1] ?? ""))
+  );
+}
+
+function countInternalEditorialLinks(html: string): number {
+  const matches = html.match(/href=["']\/(blog|noticias|seguranca-candidatos|redacao|sobre)[^"']*["']/gi) ?? [];
+  return matches.length;
+}
+
+function hasPracticalExamples(html: string): boolean {
+  const text = normalize(plainText(html));
+  return /\b(exemplo|por exemplo|modelo|checklist|passo a passo|situacao|acao|resultado)\b/.test(text);
+}
+
+function hasUsefulConclusion(html: string): boolean {
+  const headings = extractHeadings(html);
+  if (headings.some((h) => /resumo|conclus|proximos passos|checklist final|o que fazer agora/.test(h))) {
+    return true;
+  }
+  const text = normalize(plainText(html));
+  const tail = text.slice(Math.max(0, text.length - 420));
+  return /\b(resumo|em sintese|proximo passo|antes de aceitar|confira|registre|ensai)\b/.test(tail);
+}
+
+function detectTemplateStructure(html: string): { template: boolean; boilerplateHits: number } {
+  const headings = extractHeadings(html);
+  const templateHits = headings.filter((h) => TEMPLATE_H2_PATTERNS.some((re) => re.test(h))).length;
+  const text = normalize(plainText(html));
+  const boilerplateHits = BOILERPLATE_PHRASES.filter((re) => re.test(text)).length;
+  return {
+    template: templateHits >= 2 || (templateHits >= 1 && headings.length <= 3),
+    boilerplateHits
+  };
+}
+
+function scoreQualitySignals(input: {
+  wordCount: number;
+  charCount: number;
+  template: boolean;
+  boilerplateHits: number;
+  internalLinks: number;
+  examples: boolean;
+  conclusion: boolean;
+  factualNeedsSource: boolean;
+  sourceKind: SourceKind;
+  issues: EditorialIssue[];
+}): { score: number; qualityBand: EditorialQualityBand } {
+  let score = 58;
+
+  // Profundidade / completude (intenção de busca) — tamanho é auxiliar, não meta.
+  if (input.wordCount >= 900 && input.examples && input.conclusion && !input.template) score += 22;
+  else if (input.wordCount >= 700 && input.examples && !input.template) score += 16;
+  else if (input.wordCount >= 550 && input.examples) score += 10;
+  else if (input.wordCount >= 400) score += 4;
+  else if (input.wordCount > 0 && input.wordCount < 320) score -= 18;
+  else if (input.wordCount > 0 && input.wordCount < 400) score -= 8;
+
+  if (input.examples) score += 6;
+  else score -= 8;
+  if (input.conclusion) score += 5;
+  else score -= 6;
+  if (input.internalLinks >= 2) score += 6;
+  else if (input.internalLinks === 1) score += 2;
+  else score -= 6;
+
+  if (input.template) score -= 22;
+  if (input.boilerplateHits >= 2) score -= 12;
+  else if (input.boilerplateHits === 1) score -= 5;
+
+  if (input.factualNeedsSource) {
+    if (input.sourceKind === "OFICIAL" || input.sourceKind === "PRIMÁRIA") score += 4;
+    else if (input.sourceKind === "SECUNDÁRIA CONFIÁVEL") score += 1;
+    else score -= 18;
+  }
+
+  for (const item of input.issues) {
+    if (item.code.startsWith("CONTENT_") || item.code.startsWith("SOURCE_") || item.code === "TITLE_DUPLICATE") {
+      continue; // já refletidos acima / abaixo via classification
+    }
+    if (item.severity === "CRÍTICA") score -= 12;
+    else if (item.severity === "ALTA") score -= 7;
+    else if (item.severity === "MÉDIA") score -= 3;
+  }
+
+  score = Math.max(0, Math.min(100, score));
+
+  // Teto honesto: template + texto curto não pode virar “excelente/manter”.
+  if (input.template && input.wordCount < 750) score = Math.min(score, 68);
+  if (!input.template && input.wordCount < 550 && !input.factualNeedsSource) score = Math.min(score, 78);
+  if (input.wordCount > 0 && input.wordCount < 280) score = Math.min(score, 35);
+
+  const needsHuman =
+    input.issues.some((item) =>
+      ["SOURCE_INTERNAL_AS_FACTUAL", "SOURCE_MISSING", "TITLE_DUPLICATE"].includes(item.code)
+    ) ||
+    input.issues.some((item) => item.severity === "CRÍTICA") ||
+    (input.factualNeedsSource &&
+      (input.sourceKind === "INSTITUCIONAL" ||
+        input.sourceKind === "INTERNA" ||
+        input.sourceKind === "AUSENTE" ||
+        input.sourceKind === "NÃO VERIFICÁVEL"));
+
+  let qualityBand: EditorialQualityBand;
+  if (needsHuman) qualityBand = "REVISÃO HUMANA";
+  else if (input.charCount > 0 && input.charCount < 280) qualityBand = "BAIXO VALOR";
+  else if (
+    score >= 90 &&
+    input.wordCount >= 850 &&
+    !input.template &&
+    input.examples &&
+    input.conclusion &&
+    input.internalLinks >= 2
+  ) {
+    qualityBand = "EXCELENTE";
+  } else if (score >= 78 && input.wordCount >= 650 && !input.template && input.examples) {
+    qualityBand = "BOM";
+  } else if (
+    score < 45 ||
+    (input.template && input.wordCount < 420 && input.internalLinks === 0 && !input.conclusion)
+  ) {
+    qualityBand = "BAIXO VALOR";
+  } else {
+    qualityBand = "PRECISA MELHORAR";
+  }
+
+  return { score, qualityBand };
 }
 
 export function assessEditorialArticle(
@@ -377,7 +534,7 @@ export function assessEditorialArticle(
         code: "CONTENT_EXTREMELY_SHORT",
         category: "CONTEÚDO",
         title: "Texto extremamente curto",
-        description: `Apenas ${charCount} caracteres úteis.`,
+        description: `Apenas ${charCount} caracteres úteis / ${wordCount} palavras.`,
         severity: "ALTA",
         currentValue: String(charCount),
         expectedValue: "Conteúdo com utilidade mínima clara",
@@ -386,19 +543,102 @@ export function assessEditorialArticle(
         impact: "Alto risco de página de baixo valor."
       })
     );
-  } else if (charCount > 0 && charCount < 800) {
+  } else if (wordCount > 0 && wordCount < 550) {
     issues.push(
       issue({
-        code: "CONTENT_SHORT_AUX",
+        code: "CONTENT_DEPTH_WEAK",
         category: "CONTEÚDO",
-        title: "Texto curto (indicador auxiliar)",
-        description: `${charCount} caracteres / ${wordCount} palavras. Tamanho sozinho não define qualidade.`,
-        severity: "BAIXA",
-        currentValue: String(charCount),
-        expectedValue: "Avaliar utilidade, fontes e originalidade",
-        recommendation: "Revisar se o texto resolve a intenção do leitor; não inflar artificialmente.",
+        title: "Profundidade insuficiente para a intenção",
+        description: `${wordCount} palavras / ${charCount} caracteres. Ultrapassar um mínimo de caracteres não garante qualidade.`,
+        severity: wordCount < 400 ? "ALTA" : "MÉDIA",
+        currentValue: String(wordCount),
+        expectedValue: "Desenvolvimento com exemplos, estrutura própria e conclusão útil (sem padding)",
+        recommendation:
+          "Aprofundar utilidade real do tema. Não inflar com parágrafos repetidos de template.",
         autoFixable: false,
-        impact: "Pode precisar aprofundamento, dependendo do tema."
+        impact: "Conteúdo superficial tende a ser classificado como PRECISA MELHORAR / BAIXO VALOR."
+      })
+    );
+  }
+
+  const { template, boilerplateHits } = detectTemplateStructure(article.contentHtml);
+  if (template) {
+    issues.push(
+      issue({
+        code: "CONTENT_TEMPLATE_STRUCTURE",
+        category: "CONTEÚDO",
+        title: "Estrutura/template repetitivo",
+        description:
+          "Os subtítulos ou blocos coincidem com o template editorial genérico usado em massa no corpus.",
+        severity: "ALTA",
+        currentValue: extractHeadings(article.contentHtml).slice(0, 5).join(" | "),
+        expectedValue: "H2/H3 específicos do assunto e desenvolvimento original",
+        recommendation:
+          "Reescrever subtítulos e corpo com estrutura própria do tema; eliminar seções genéricas idênticas a dezenas de outros artigos.",
+        autoFixable: false,
+        impact: "Sinal forte de conteúdo em série de baixo valor editorial."
+      })
+    );
+  }
+  if (boilerplateHits >= 2) {
+    issues.push(
+      issue({
+        code: "CONTENT_BOILERPLATE_PADDING",
+        category: "CONTEÚDO",
+        title: "Padding/boilerplate repetido",
+        description: "Há parágrafos de fechamento genéricos repetidos entre conteúdos.",
+        severity: "MÉDIA",
+        recommendation: "Remover blocos genéricos e escrever conclusão específica do artigo.",
+        autoFixable: true,
+        impact: "Infla contagem de palavras sem utilidade."
+      })
+    );
+  }
+
+  const internalLinks = countInternalEditorialLinks(article.contentHtml);
+  if (internalLinks === 0 && article.status === "PUBLISHED") {
+    issues.push(
+      issue({
+        code: "CONTENT_NO_INTERNAL_LINKS",
+        category: "ESTRUTURA",
+        title: "Sem links internos editoriais",
+        description: "O corpo não aponta para outros guias/notícias/segurança do portal.",
+        severity: "MÉDIA",
+        recommendation: "Incluir 1–3 links internos realmente relacionados.",
+        autoFixable: false,
+        impact: "Navegação e utilidade editorial mais fracas."
+      })
+    );
+  }
+
+  const examples = hasPracticalExamples(article.contentHtml);
+  if (!examples) {
+    issues.push(
+      issue({
+        code: "CONTENT_NO_EXAMPLES",
+        category: "CONTEÚDO",
+        title: "Poucos exemplos práticos",
+        description: "Não há indícios claros de exemplos, modelos ou checklist aplicável.",
+        severity: "MÉDIA",
+        recommendation: "Incluir exemplos concretos (sem inventar leis/estatísticas).",
+        autoFixable: false,
+        impact: "Menor utilidade para a intenção de busca."
+      })
+    );
+  }
+
+  const conclusion = hasUsefulConclusion(article.contentHtml);
+  if (!conclusion) {
+    issues.push(
+      issue({
+        code: "CONTENT_WEAK_CONCLUSION",
+        category: "CONTEÚDO",
+        title: "Conclusão fraca ou ausente",
+        description: "O fechamento não resume próximos passos úteis ao leitor.",
+        severity: "BAIXA",
+        recommendation: "Encerrar com ação clara e específica do tema.",
+        autoFixable: false,
+        impact: "Texto parece incompleto."
       })
     );
   }
@@ -451,38 +691,46 @@ export function assessEditorialArticle(
     }
   }
 
-  let score = 100;
-  for (const item of issues) {
-    if (item.severity === "CRÍTICA") score -= 25;
-    else if (item.severity === "ALTA") score -= 15;
-    else if (item.severity === "MÉDIA") score -= 8;
-    else score -= 3;
-  }
-  score = Math.max(0, Math.min(100, score));
+  const needsFact = factualTopic(article.title, article.contentHtml);
+  const { score, qualityBand } = scoreQualitySignals({
+    wordCount,
+    charCount,
+    template,
+    boilerplateHits,
+    internalLinks,
+    examples,
+    conclusion,
+    factualNeedsSource: needsFact,
+    sourceKind,
+    issues
+  });
 
   const critical = issues.some((item) => item.severity === "CRÍTICA");
   const factReviewCodes = ["SOURCE_INTERNAL_AS_FACTUAL", "TITLE_DUPLICATE", "SOURCE_MISSING"];
   const needsFactReview = issues.some((item) => factReviewCodes.includes(item.code)) || critical;
   const approvedWithoutReviewer = issues.some((item) => item.code === "APPROVED_WITHOUT_REVIEWER");
 
-  let classification: EditorialClassification = "MANTER";
+  // Mapeamento painel (MANTER/MELHORAR/…) a partir da faixa honesta — sem greenwash.
+  let classification: EditorialClassification = "MELHORAR";
   if (charCount > 0 && charCount < 200 && article.status === "PUBLISHED") {
     classification = "NOINDEX";
-  } else if (needsFactReview) {
-    // Reserva REVISAR MANUALMENTE para risco factual/crítico — não para governança leve.
+  } else if (qualityBand === "REVISÃO HUMANA" || needsFactReview) {
     classification = "REVISAR MANUALMENTE";
-  } else if (
-    approvedWithoutReviewer ||
-    issues.some((item) => item.severity === "ALTA" || item.severity === "MÉDIA" || item.severity === "CRÍTICA")
-  ) {
+  } else if (qualityBand === "BAIXO VALOR") {
     classification = "MELHORAR";
-  } else if (issues.length) {
-    classification = score >= 85 ? "MANTER" : "MELHORAR";
+  } else if (qualityBand === "EXCELENTE" || qualityBand === "BOM") {
+    classification =
+      approvedWithoutReviewer || issues.some((item) => item.severity === "ALTA" || item.severity === "CRÍTICA")
+        ? "MELHORAR"
+        : "MANTER";
+  } else {
+    classification = "MELHORAR";
   }
 
   return {
     article,
     classification,
+    qualityBand,
     score,
     issues,
     sourceKind,
@@ -520,6 +768,11 @@ export type EditorialAuditReport = {
     melhorar: number;
     noindex: number;
     revisar: number;
+    excelente: number;
+    bom: number;
+    precisaMelhorar: number;
+    revisaoHumana: number;
+    baixoValor: number;
     autoFixableIssues: number;
     sourceProblems: number;
     reviewPending: number;
@@ -535,6 +788,11 @@ function summarize(assessments: EditorialAssessment[]): EditorialAuditReport["su
     melhorar: assessments.filter((item) => item.classification === "MELHORAR").length,
     noindex: assessments.filter((item) => item.classification === "NOINDEX").length,
     revisar: assessments.filter((item) => item.classification === "REVISAR MANUALMENTE").length,
+    excelente: assessments.filter((item) => item.qualityBand === "EXCELENTE").length,
+    bom: assessments.filter((item) => item.qualityBand === "BOM").length,
+    precisaMelhorar: assessments.filter((item) => item.qualityBand === "PRECISA MELHORAR").length,
+    revisaoHumana: assessments.filter((item) => item.qualityBand === "REVISÃO HUMANA").length,
+    baixoValor: assessments.filter((item) => item.qualityBand === "BAIXO VALOR").length,
     autoFixableIssues: assessments.reduce((sum, item) => sum + item.autoFixableCount, 0),
     sourceProblems: assessments.filter((item) =>
       item.issues.some((issueItem) => issueItem.category === "FONTES")

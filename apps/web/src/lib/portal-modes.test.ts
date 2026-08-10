@@ -102,4 +102,30 @@ describe("portal modes", () => {
     expect(workerSrc).not.toContain("getEditorialPortalMode");
     expect(workerSrc).not.toContain("editorial_portal_mode");
   });
+
+  it("workers skip job alerts/social/indexing leaks when portal mode flag is on", () => {
+    expect(read("apps/worker/src/alert-dispatch.ts")).toContain("editorial_portal_mode");
+    expect(read("apps/worker/src/social-processor.ts")).toContain("editorial_portal_mode");
+    expect(read("apps/worker/src/maintenance.ts")).toContain("portalMode");
+  });
+
+  it("rewrites job-board links in article pages when portal is on", () => {
+    expect(read("apps/web/src/pages/blog/[slug].astro")).toContain("rewriteJobBoardLinksForPortal");
+    expect(read("apps/web/src/pages/noticias/[slug].astro")).toContain("rewriteJobBoardLinksForPortal");
+  });
+
+  it("omits SearchAction to /busca in BaseLayout when portal mode is considered", () => {
+    const layout = read("apps/web/src/layouts/BaseLayout.astro");
+    expect(layout).toContain("getEditorialPortalMode");
+    expect(layout).toContain("portal.enabled");
+    expect(layout).toContain("potentialAction");
+  });
+
+  it("FACT_REVIEW quality guides remain hold in package data", () => {
+    const pkg = read("scripts/data/adsense-quality-guides.mjs");
+    expect(pkg).toContain("jovem-aprendiz-como-funciona");
+    expect(pkg).toContain("estagio-x-jovem-aprendiz");
+    expect(pkg).toContain("HOLD_REVIEW");
+    expect(pkg).toContain("FACT_REVIEW");
+  });
 });

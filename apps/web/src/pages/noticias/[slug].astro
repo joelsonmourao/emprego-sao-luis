@@ -7,9 +7,12 @@ import {
   findPublishedSlLocalByNumber,
   resolveSlLocalSeoSlug
 } from "../../lib/articles";
+import { getEditorialPortalMode } from "../../lib/portal-modes";
+import { rewriteJobBoardLinksForPortal } from "../../lib/portal-content-rewrite";
 import { normalizeEditorialHtml } from "@es/shared";
 
 const slug = Astro.params.slug!;
+const portal = await getEditorialPortalMode();
 const seoFromLegacy = resolveSlLocalSeoSlug(slug);
 if (seoFromLegacy && seoFromLegacy !== slug) {
   const moved = await findPublishedArticle(seoFromLegacy, ["GUIDE", "DATA_REPORT", "NEWS"]);
@@ -30,7 +33,8 @@ if (!result) {
   });
 }
 const { article, authorName } = result;
-const contentHtml = normalizeEditorialHtml(article.contentHtml, { baseHeadingLevel: 2 });
+const normalizedHtml = normalizeEditorialHtml(article.contentHtml, { baseHeadingLevel: 2 });
+const contentHtml = portal.enabled ? rewriteJobBoardLinksForPortal(normalizedHtml) : normalizedHtml;
 const canonical = article.canonicalUrl ?? new URL(`/noticias/${article.slug}`, Astro.site).toString();
 const variants = article.coverImageVariants && typeof article.coverImageVariants === "object"
   ? article.coverImageVariants as Record<string, { url?: string; width?: number; height?: number }>

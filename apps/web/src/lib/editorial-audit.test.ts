@@ -47,7 +47,8 @@ describe("editorial audit", () => {
       })
     );
     expect(result.issues.some((item) => item.code === "SOURCE_INTERNAL_AS_FACTUAL")).toBe(true);
-    expect(result.classification).not.toBe("MANTER");
+    expect(result.classification).toBe("REVISAR MANUALMENTE");
+    expect(result.qualityBand).toBe("REVISÃO HUMANA");
   });
 
   it("flags APPROVED without reviewer as improve (not automatic FACT_REVIEW)", () => {
@@ -55,23 +56,38 @@ describe("editorial audit", () => {
       article({
         editorialStage: "APPROVED",
         reviewerId: null,
-        reviewedAt: null
+        reviewedAt: null,
+        contentHtml:
+          "<h2>Como adaptar o PDF</h2><p>Exemplo: liste tarefas reais do comércio.</p>".repeat(30) +
+          "<h2>Resumo</h2><p>Próximo passo: revise o objetivo e envie.</p><p><a href=\"/blog/x\">guia</a> <a href=\"/seguranca-candidatos\">segurança</a></p>"
       })
     );
     expect(result.issues.some((item) => item.code === "APPROVED_WITHOUT_REVIEWER")).toBe(true);
-    expect(result.classification).toBe("MELHORAR");
+    expect(result.classification).not.toBe("REVISAR MANUALMENTE");
   });
 
-  it("treats short length as auxiliary, not automatic NOINDEX", () => {
+  it("does not give 100/MANTER to short template content just above a character floor", () => {
     const result = assessEditorialArticle(
       article({
-        contentHtml: "<p>" + "palavra ".repeat(60) + "</p>",
-        sourceUrl: "https://www.gov.br/trabalho"
+        contentHtml: `
+          <p>${"orientação prática para candidatos locais em São Luís ".repeat(12)}</p>
+          <h2>Uma situação comum na prática</h2>
+          <p>${"texto auxiliar com utilidade mínima para o leitor ".repeat(10)}</p>
+          <h2>Roteiro aplicável passo a passo</h2>
+          <p>${"passo útil de candidatura sem inventar estatística ".repeat(10)}</p>
+          <h2>Feche o ciclo com uma ação</h2>
+          <p>${"ação final objetiva para a semana de busca ".repeat(8)}</p>
+        `,
+        sourceUrl: "https://empregossaoluis.com.br/politica-editorial",
+        sourceName: "Orientação editorial"
       })
     );
-    expect(result.charCount).toBeLessThan(800);
-    expect(result.issues.some((item) => item.code === "CONTENT_SHORT_AUX")).toBe(true);
-    expect(result.classification).not.toBe("NOINDEX");
+    expect(result.wordCount).toBeGreaterThan(300);
+    expect(result.wordCount).toBeLessThan(550);
+    expect(result.issues.some((item) => item.code === "CONTENT_TEMPLATE_STRUCTURE")).toBe(true);
+    expect(result.score).toBeLessThan(70);
+    expect(result.classification).not.toBe("MANTER");
+    expect(["PRECISA MELHORAR", "BAIXO VALOR"]).toContain(result.qualityBand);
   });
 
   it("marks technical SEO gaps as auto-fixable", () => {
@@ -114,5 +130,33 @@ describe("editorial audit", () => {
     const result = assessEditorialArticle(article({ coverImageUrl: null, coverImageAlt: null }));
     expect(result.issues.some((item) => item.code === "COVER_MISSING" && item.category === "IMAGEM")).toBe(true);
     expect(result.classification).not.toBe("NOINDEX");
+  });
+
+  it("can classify deep original practical guide as BOM/EXCELENTE", () => {
+    const body = [
+      "<p>Introdução útil sobre objetivo profissional no currículo para quem busca emprego em São Luís.</p>",
+      "<h2>O que escrever em duas linhas</h2>",
+      "<p>Exemplo sólido: auxiliar administrativo com atendimento em comércio.</p>",
+      "<p>Exemplo fraco: profissional dinâmico em busca de desafios.</p>",
+      "<h2>Passo a passo</h2>",
+      "<ol><li>Leia a vaga</li><li>Corte clichês</li><li>Inclua prova concreta</li></ol>",
+      "<h2>Erros comuns</h2>",
+      "<p>Objetivo genérico demais reduz confiança do recrutador.</p>",
+      "<h2>Resumo</h2>",
+      "<p>Próximo passo: adapte a frase à vaga desta semana e revise o PDF.</p>",
+      '<p>Veja também <a href="/blog/curriculo-ats-palavras-chave-sao-luis">currículo ATS</a> e <a href="/seguranca-candidatos">segurança</a>.</p>'
+    ].join("") + `<p>${"detalhe prático aplicável ao perfil iniciante e à transição de área na capital maranhense. ".repeat(55)}</p>`;
+    const result = assessEditorialArticle(
+      article({
+        title: "Como escrever o objetivo profissional no currículo",
+        contentHtml: body,
+        sourceUrl: "https://empregossaoluis.com.br/politica-editorial",
+        sourceName: "Orientação editorial"
+      })
+    );
+    expect(result.issues.some((item) => item.code === "CONTENT_TEMPLATE_STRUCTURE")).toBe(false);
+    expect(result.wordCount).toBeGreaterThan(650);
+    expect(["BOM", "EXCELENTE"]).toContain(result.qualityBand);
+    expect(result.score).toBeGreaterThanOrEqual(78);
   });
 });

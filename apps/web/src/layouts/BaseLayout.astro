@@ -11,6 +11,7 @@ import { getSeoSettings } from "../lib/seo-settings";
 import { getSiteIntegrations, normalizeAdsenseClientId, normalizeSearchConsoleToken } from "../lib/site-integrations";
 import { getVisualIdentity } from "../lib/visual-identity";
 import { isStagingLikeEnvironment, stagingRobotsDirective } from "../lib/runtime-env";
+import { getEditorialPortalMode } from "../lib/portal-modes";
 
 interface Props {
   title: string;
@@ -63,6 +64,7 @@ const metaEnabled = !stagingLike && metaPixelOk && consentOk;
 const siteUrl = Astro.site?.toString() ?? process.env.SITE_URL ?? "https://empregossaoluis.com.br";
 const og = buildOpenGraphTags({ title: pageTitle, description, url: canonicalUrl, type: seo.og.type, siteName: seo.og.siteName, locale: seo.og.locale, ...(ogImage ? { image: ogImage } : {}) });
 const twitter = buildTwitterTags({ title: pageTitle, description, card: seo.twitter.card, ...(seo.twitter.site ? { site: seo.twitter.site } : {}), ...(seo.twitter.creator ? { creator: seo.twitter.creator } : {}), ...(ogImage ? { image: ogImage } : {}) });
+const portal = await getEditorialPortalMode();
 const organizationSchema = buildOrganizationSchema(seo, siteUrl);
 const websiteSchema = buildWebSiteSchema(seo, siteUrl);
 const breadcrumbSchema = breadcrumbs?.length ? buildBreadcrumbSchema(breadcrumbs.map((item) => ({ ...item, url: new URL(item.url, siteUrl).toString() }))) : null;
@@ -72,11 +74,16 @@ const websiteNode = {
   ...withoutContext(websiteSchema),
   "@id": `${siteUrl.replace(/\/$/, "")}#website`,
   publisher: { "@id": `${siteUrl.replace(/\/$/, "")}#organization` },
-  potentialAction: {
-    "@type": "SearchAction",
-    target: `${siteUrl.replace(/\/$/, "")}/busca?q={search_term_string}`,
-    "query-input": "required name=search_term_string"
-  }
+  // Com portal editorial ON, /busca é área pausada — não anunciar SearchAction de vagas.
+  ...(portal.enabled
+    ? {}
+    : {
+        potentialAction: {
+          "@type": "SearchAction",
+          target: `${siteUrl.replace(/\/$/, "")}/busca?q={search_term_string}`,
+          "query-input": "required name=search_term_string"
+        }
+      })
 };
 const pageNode = {
   "@type": pageSchemaType,

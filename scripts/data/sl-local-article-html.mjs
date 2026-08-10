@@ -602,29 +602,114 @@ function expandTip(tip, index, item) {
     index === 0
       ? ` No tema em pauta — ${item.title} — o detalhe abaixo costuma separar candidatura fraca de candidatura cuidadosa.`
       : "";
-  return `<p><strong>${index + 1}.</strong> ${tip}${titleOnce} ${follow}</p>`;
+  return `<h3>${tip}</h3>\n<p>${follow}${titleOnce}</p>`;
 }
 
+/** H2 próprios do tema — nunca o trio genérico repetido em massa. */
 function headingSet(item) {
+  const topic = String(item.keyword || item.title)
+    .replace(/\s+/g, " ")
+    .trim();
+  const short = topic.length > 52 ? `${topic.slice(0, 49)}…` : topic;
+  const n = Number(String(item.key).match(/^(\d+)/)?.[1] || 0);
   if (item.type === "NEWS") {
-    return {
-      scene: "O que está em jogo agora",
-      practice: "O que fazer nesta semana",
-      close: "Para não perder o fio"
-    };
+    const variants = [
+      {
+        scene: `O que mudou sobre ${short}`,
+        practice: `Como reagir com segurança`,
+        close: `Checklist antes de compartilhar`
+      },
+      {
+        scene: `Leitura do fato: ${short}`,
+        practice: `Passos desta semana`,
+        close: `Sinais para pausar`
+      },
+      {
+        scene: `Contexto local de ${short}`,
+        practice: `O que conferir agora`,
+        close: `Próximo passo responsável`
+      }
+    ];
+    return variants[n % variants.length];
   }
   if (item.type === "DATA_REPORT") {
-    return {
-      scene: "Leitura útil do cenário",
-      practice: "Como usar esses sinais na busca",
-      close: "Como decidir o próximo passo"
-    };
+    const variants = [
+      {
+        scene: `O que os sinais de ${short} mostram`,
+        practice: `Como usar na sua busca`,
+        close: `Decisão com critério`
+      },
+      {
+        scene: `Leitura útil: ${short}`,
+        practice: `Traduzir dado em prioridade`,
+        close: `O que ajustar na semana`
+      }
+    ];
+    return variants[n % variants.length];
   }
-  return {
-    scene: "Uma situação comum na prática",
-    practice: "Roteiro aplicável passo a passo",
-    close: "Feche o ciclo com uma ação"
-  };
+  const variants = [
+    {
+      scene: `Por que ${short} trava candidaturas`,
+      practice: `Roteiro específico para ${short}`,
+      close: `Erros que mais custam tempo`
+    },
+    {
+      scene: `O problema real em ${short}`,
+      practice: `Passo a passo aplicável`,
+      close: `Como fechar o ciclo hoje`
+    },
+    {
+      scene: `Situação típica: ${short}`,
+      practice: `Checklist de execução`,
+      close: `Quando pedir ajuda ou pausar`
+    },
+    {
+      scene: `Antes de improvisar em ${short}`,
+      practice: `Ordem prática que funciona`,
+      close: `Resumo acionável`
+    },
+    {
+      scene: `O que costuma dar errado em ${short}`,
+      practice: `Como fazer direito, em etapas`,
+      close: `Próxima ação concreta`
+    }
+  ];
+  return variants[n % variants.length];
+}
+
+function relatedLinksHtml(item, index) {
+  const sameSection = catalog.filter((entry) => entry.section === item.section && entry.key !== item.key);
+  const pool = sameSection.length >= 2 ? sameSection : catalog.filter((entry) => entry.key !== item.key);
+  if (pool.length < 2) return "";
+  const a = pool[index % pool.length];
+  const b = pool[(index + 3) % pool.length];
+  if (!a || !b || a.key === b.key) return "";
+  const path = (entry) => (entry.type === "NEWS" ? `/noticias/${slugForSafe(entry)}` : `/blog/${slugForSafe(entry)}`);
+  return `<h2>Leia também</h2>
+<ul>
+<li><a href="${path(a)}">${a.title}</a></li>
+<li><a href="${path(b)}">${b.title}</a></li>
+<li><a href="/seguranca-candidatos">Segurança do candidato</a></li>
+</ul>`;
+}
+
+function slugForSafe(item) {
+  const fromKeyword = String(item.keyword || "")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .replace(/-+/g, "-")
+    .slice(0, 72);
+  if (fromKeyword.length >= 8) return fromKeyword;
+  return String(item.title || "guia")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .slice(0, 72);
 }
 
 function deepParagraph(item) {
@@ -639,6 +724,15 @@ function deepParagraph(item) {
   return byType[item.type] || byType.GUIDE;
 }
 
+function topicPadParagraphs(item, index) {
+  const topic = item.keyword || item.title;
+  return [
+    `Volte a este guia de ${topic} quando a busca emperrar: releia só a seção de roteiro e marque um item para executar amanhã. Progresso costuma ser acumulativo — um ajuste de mensagem, um trajeto testado, um documento organizado.`,
+    `Antes do próximo envio ligado a ${topic}, confira telefone com DDD, e-mail sem erro e se o canal é o mesmo do anúncio. Detalhe pequeno evita silêncio que parece rejeição, mas era só contato errado.`,
+    `Se ${topic} envolve comparar propostas, anote bruto, benefícios, escala e tempo de deslocamento na mesma folha. Decisão no feeling puro costuma ignorar o custo real da semana em São Luís e no Maranhão.`
+  ].map((text, i) => (i === index % 3 ? text : null)).filter(Boolean);
+}
+
 /** @param {import("./sl-local-editorial-catalog.mjs").CatalogItem} item */
 export function buildArticleHtml(item) {
   const index = catalog.findIndex((entry) => entry.key === item.key);
@@ -649,14 +743,16 @@ export function buildArticleHtml(item) {
   const deep = deepParagraph(item);
   const bridge = `No contexto de São Luís e do Maranhão, ${item.localAngle.charAt(0).toLowerCase()}${item.localAngle.slice(1)} Vale cruzar isso com a sua disponibilidade real de horário e com o custo de deslocamento até o posto.`;
 
-  const hubPath = item.type === "NEWS" ? "/noticias" : item.type === "DATA_REPORT" ? "/blog" : "/blog";
+  const hubPath = item.type === "NEWS" ? "/noticias" : "/blog";
   const ctaVariants = [
-    `Quando for candidatar-se, use a <a href="/vagas">busca de vagas em São Luís</a> e o canal oficial do anúncio. Em dúvida de golpe, veja <a href="/seguranca-candidatos">segurança do candidato</a>.`,
-    `Compare vagas abertas na <a href="/vagas">página de vagas</a> e leia mais orientações no <a href="${hubPath}">hub editorial</a>. Pedido de pagamento antecipado? Vá para <a href="/seguranca-candidatos">segurança do candidato</a>.`,
-    `Próximo passo: uma candidatura pelo canal do anúncio, via <a href="/vagas">Empregos São Luís</a>. Para checagem de risco, use <a href="/seguranca-candidatos">segurança do candidato</a>.`
+    `Quando for candidatar-se, use o canal oficial do anúncio e leia mais no <a href="${hubPath}">hub editorial</a>. Em dúvida de golpe, veja <a href="/seguranca-candidatos">segurança do candidato</a>.`,
+    `Compare orientações no <a href="${hubPath}">hub editorial</a> antes de enviar documentos. Pedido de pagamento antecipado? Vá para <a href="/seguranca-candidatos">segurança do candidato</a>.`,
+    `Próximo passo: uma candidatura pelo canal do anúncio, com apoio dos <a href="/blog">guias do Empregos São Luís</a>. Para checagem de risco, use <a href="/seguranca-candidatos">segurança do candidato</a>.`
   ];
   const cta = ctaVariants[(index < 0 ? 0 : index) % ctaVariants.length];
-  const legalBlock = item.legalDisclaimer ? `<p><em>Aviso:</em> este texto é orientação geral para candidatos em São Luís e no Maranhão. Não substitui advogado, contador, sindicato ou orientação oficial do empregador/governo. Regras e valores mudam — confira sempre a fonte oficial e o seu contrato.</p>` : "";
+  const legalBlock = item.legalDisclaimer
+    ? `<p><em>Aviso:</em> este texto é orientação geral para candidatos em São Luís e no Maranhão. Não substitui advogado, contador, sindicato ou orientação oficial do empregador/governo. Regras e valores mudam — confira sempre a fonte oficial e o seu contrato.</p>`
+    : "";
 
   const parts = [
     `<p>${item.lead}</p>`,
@@ -670,11 +766,11 @@ export function buildArticleHtml(item) {
     `<h2>${heads.close}</h2>`,
     legalBlock,
     `<p>${closing} ${cta}</p>`,
-    `<p>A candidatura do trabalhador no Empregos São Luís continua gratuita e sem cadastro obrigatório. Avance com um envio bem feito hoje, em vez de guardar a vaga “para depois”.</p>`
+    relatedLinksHtml(item, index < 0 ? 0 : index),
+    `<p>A orientação ao trabalhador no Empregos São Luís continua gratuita. Avance com um envio bem feito hoje, em vez de guardar a oportunidade “para depois”.</p>`
   ].filter(Boolean);
 
   let html = parts.join("\n");
-  // No máximo uma menção a “Grande Ilha” no corpo público
   if ((html.match(/Grande Ilha/gi) || []).length > 1) {
     let seen = 0;
     html = html.replace(/Grande Ilha/gi, () => {
@@ -684,14 +780,16 @@ export function buildArticleHtml(item) {
   }
   let plain = html.replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim();
   let pad = 0;
-  while (plain.length < MIN_USEFUL_CHARS && pad < 3) {
+  const topicPads = topicPadParagraphs(item, index < 0 ? 0 : index);
+  while (plain.length < MIN_USEFUL_CHARS && pad < topicPads.length) {
+    html += `\n<p>${topicPads[pad]}</p>`;
     pad += 1;
-    const pads = [
-      `Se sobrar energia no fim do dia, releia só a seção de roteiro e marque um item para executar amanhã. Progresso em busca de emprego costuma ser acumulativo: um ajuste de mensagem, um trajeto testado, um documento organizado.`,
-      `Antes do próximo envio, confira telefone com DDD, e-mail sem erro e se o canal é o mesmo do anúncio publicado. Detalhe pequeno evita silêncio que parece rejeição, mas era só contato errado.`,
-      `Quando comparar duas propostas, anote bruto, benefícios, escala e tempo de deslocamento na mesma folha. Decisão no feeling puro costuma ignorar o custo real da semana na capital maranhense.`
-    ];
-    html += `\n<p>${pads[(index + pad) % pads.length]}</p>`;
+    plain = html.replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim();
+  }
+  // Se ainda curto, acrescenta mais tips contextuais sem boilerplate genérico de fechamento.
+  while (plain.length < MIN_USEFUL_CHARS && pad < 5) {
+    html += `\n<p>No tema “${item.title}”, revise se o que você vai enviar (PDF, mensagem ou documento) realmente responde ao anúncio — e se o canal é oficial. Isso vale para quem busca oportunidade em São Luís e no interior do Maranhão.</p>`;
+    pad += 1;
     plain = html.replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim();
   }
   if (plain.length < MIN_USEFUL_CHARS) {

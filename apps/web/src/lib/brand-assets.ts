@@ -15,7 +15,7 @@ export const BRAND_ASSETS = {
   instagramUrl: "https://www.instagram.com/empregosaoluis/",
   instagramHandle: "@empregosaoluis",
   siteName: "Empregos São Luís",
-  logoAlt: "Empregos São Luís — vagas em São Luís e Maranhão"
+  logoAlt: "Empregos São Luís — emprego, carreira e notícias em São Luís"
 } as const;
 
 export const BRAND_COLORS = {

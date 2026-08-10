@@ -8,6 +8,7 @@ import {
   resolveSlLocalSeoSlug
 } from "../../lib/articles";
 import { getEditorialPortalMode } from "../../lib/portal-modes";
+import { rewriteJobBoardLinksForPortal } from "../../lib/portal-content-rewrite";
 import { normalizeEditorialHtml } from "@es/shared";
 const slug = Astro.params.slug ?? "";
 const portal = await getEditorialPortalMode();
@@ -26,7 +27,8 @@ if (!result) {
 }
 const { article, authorName } = result;
 const canonical = article.canonicalUrl || new URL(`/blog/${article.slug}`, Astro.site).toString();
-const contentHtml = normalizeEditorialHtml(article.contentHtml, { baseHeadingLevel: 2 });
+const normalizedHtml = normalizeEditorialHtml(article.contentHtml, { baseHeadingLevel: 2 });
+const contentHtml = portal.enabled ? rewriteJobBoardLinksForPortal(normalizedHtml) : normalizedHtml;
 const schema = { "@type": "Article", headline: article.title, description: article.excerpt, datePublished: article.publishedAt?.toISOString(), dateModified: article.updatedAt.toISOString(), author: { "@type": "Person", name: authorName }, mainEntityOfPage: canonical, ...(article.coverImageUrl ? { image: [article.coverImageUrl] } : {}), ...(article.sponsoredContent ? { isAccessibleForFree: true } : {}) };
 ---
 <BaseLayout title={article.seoTitle || article.title} description={article.metaDescription || article.excerpt} canonical={canonical} ogImage={article.ogImageUrl ?? article.coverImageUrl ?? undefined} breadcrumbs={[{ name: "Guias", url: "/blog" }, { name: article.title, url: `/blog/${article.slug}` }]} schemas={[schema]}>

@@ -33,13 +33,15 @@ COPY --from=build --chown=app:app /app/packages ./packages
 COPY --chown=app:app package.json package.json
 # One-shot editorial activate (Coolify Terminal do web)
 COPY --chown=app:app scripts/activate-sl-local-editorial.mjs scripts/activate-sl-local-editorial.mjs
+COPY --chown=app:app scripts/rewrite-sl-local-editorial-bodies.mjs scripts/rewrite-sl-local-editorial-bodies.mjs
+COPY --chown=app:app scripts/rewrite-job-board-links-in-articles.mjs scripts/rewrite-job-board-links-in-articles.mjs
+COPY --chown=app:app scripts/persist-adsense-quality-guides.mjs scripts/persist-adsense-quality-guides.mjs
 COPY --chown=app:app scripts/data/sl-local-editorial-catalog.mjs scripts/data/sl-local-editorial-catalog.mjs
 COPY --chown=app:app scripts/data/sl-local-article-html.mjs scripts/data/sl-local-article-html.mjs
 COPY --chown=app:app scripts/data/sl-local-tip-followups-46-105.mjs scripts/data/sl-local-tip-followups-46-105.mjs
-COPY --chown=app:app apps/web/public/covers/sl-local/credits.json apps/web/public/covers/sl-local/credits.json
-# AdSense quality guides package (persist via Coolify Terminal; uses runtime DATABASE_URL)
-COPY --chown=app:app scripts/persist-adsense-quality-guides.mjs scripts/persist-adsense-quality-guides.mjs
 COPY --chown=app:app scripts/data/adsense-quality-guides.mjs scripts/data/adsense-quality-guides.mjs
+COPY --chown=app:app scripts/data/adsense-quality-bodies.mjs scripts/data/adsense-quality-bodies.mjs
+COPY --chown=app:app apps/web/public/covers/sl-local/credits.json apps/web/public/covers/sl-local/credits.json
 COPY --chown=app:app apps/web/public/covers/adsense-quality apps/web/public/covers/adsense-quality
 USER app
 EXPOSE 4321
