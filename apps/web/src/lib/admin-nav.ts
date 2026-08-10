@@ -3,7 +3,7 @@ export type AdminNavGroup = { title: string; items: AdminNavItem[] };
 
 /**
  * Menu administrativo: Operação do dia primeiro; demais ferramentas agrupadas.
- * Candidato sempre gratuito. AdSense só via Rota da Aprovação + flag explícita.
+ * Candidato sempre gratuito. AdSense só via Preparação AdSense + flag explícita.
  *
  * Aliases: /admin/planos|pedidos|pagamentos|creditos → comercial/*;
  * /admin/filas|/admin/jobs → /admin/operacao; /admin/campanhas → publicidade.
@@ -17,7 +17,7 @@ export const ADMIN_NAV_GROUPS: AdminNavGroup[] = [
       { label: "2. Revisar e publicar", href: "/admin/vagas/revisao", permission: "jobs.publish" },
       { label: "3. Monitor de candidaturas", href: "/admin/vagas/monitor-candidaturas", permission: "jobs.read" },
       { label: "4. Post Magnético", href: "/admin/conteudo/post-magnetico", permission: "content.manage" },
-      { label: "5. Rota da Aprovação", href: "/admin/adsense-readiness", permission: "seo.manage" },
+      { label: "5. Preparação AdSense", href: "/admin/adsense-readiness", permission: "seo.manage" },
       { label: "6. Planos e vagas patrocinadas", href: "/admin/comercial/planos", permission: "commercial.manage" }
     ]
   },
@@ -118,7 +118,7 @@ export const ADMIN_DAY_OPS: AdminNavItem[] = [
     permission: "content.manage"
   },
   {
-    label: "Rota da Aprovação",
+    label: "Preparação AdSense",
     href: "/admin/adsense-readiness",
     permission: "seo.manage"
   },

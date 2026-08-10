@@ -5,7 +5,9 @@ import EmptyState from "../../components/ui/EmptyState.astro";
 import PageHero from "../../components/ui/PageHero.astro";
 import Pagination from "../../components/ui/Pagination.astro";
 import { listPublishedArticlesPage } from "../../lib/articles";
+import { getEditorialPortalMode } from "../../lib/portal-modes";
 
+const portal = await getEditorialPortalMode();
 const pageSize = 12;
 const page = Math.max(1, Number(Astro.url.searchParams.get("pagina") ?? 1) || 1);
 const { items, total, page: current, pages } = await listPublishedArticlesPage(page, pageSize, "NEWS");
@@ -39,8 +41,8 @@ const canonical = new URL(current > 1 ? `/noticias?pagina=${current}` : "/notici
           <EmptyState
             title="Nenhuma notícia publicada"
             description="Volte em breve para conteúdos sobre carreira e mercado de trabalho."
-            actionHref="/vagas"
-            actionLabel="Ver vagas"
+            actionHref={portal.enabled ? "/blog" : "/vagas"}
+            actionLabel={portal.enabled ? "Ver guias" : "Ver vagas"}
           />
         </div>
       ) : (

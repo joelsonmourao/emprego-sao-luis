@@ -21,6 +21,14 @@ const schema = z.object({
 const hash = (value: string) => createHash("sha256").update(value).digest("hex");
 
 export const POST: APIRoute = async ({ request, clientAddress, url, redirect }) => {
+  const { getEditorialPortalMode } = await import("../../../lib/portal-modes");
+  const portal = await getEditorialPortalMode();
+  if (portal.enabled) {
+    return Response.json(
+      { ok: false, error: "Cadastro de alertas de vagas temporariamente pausado." },
+      { status: 503 }
+    );
+  }
   const parsed = schema.safeParse(Object.fromEntries(await request.formData()));
   if (!parsed.success) return Response.json({ ok: false, error: "Dados inválidos." }, { status: 400 });
   if (!process.env.DATABASE_URL) return Response.json({ ok: false, error: "Serviço indisponível." }, { status: 503 });

@@ -50,7 +50,7 @@ describe("editorial audit", () => {
     expect(result.classification).not.toBe("MANTER");
   });
 
-  it("flags APPROVED without reviewer as human review", () => {
+  it("flags APPROVED without reviewer as improve (not automatic FACT_REVIEW)", () => {
     const result = assessEditorialArticle(
       article({
         editorialStage: "APPROVED",
@@ -59,7 +59,7 @@ describe("editorial audit", () => {
       })
     );
     expect(result.issues.some((item) => item.code === "APPROVED_WITHOUT_REVIEWER")).toBe(true);
-    expect(result.classification).toBe("REVISAR MANUALMENTE");
+    expect(result.classification).toBe("MELHORAR");
   });
 
   it("treats short length as auxiliary, not automatic NOINDEX", () => {

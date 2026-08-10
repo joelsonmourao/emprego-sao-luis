@@ -461,19 +461,20 @@ export function assessEditorialArticle(
   score = Math.max(0, Math.min(100, score));
 
   const critical = issues.some((item) => item.severity === "CRÍTICA");
-  const needsHuman =
-    issues.some((item) =>
-      ["SOURCE_INTERNAL_AS_FACTUAL", "APPROVED_WITHOUT_REVIEWER", "TITLE_DUPLICATE", "SOURCE_MISSING"].includes(
-        item.code
-      )
-    ) || critical;
+  const factReviewCodes = ["SOURCE_INTERNAL_AS_FACTUAL", "TITLE_DUPLICATE", "SOURCE_MISSING"];
+  const needsFactReview = issues.some((item) => factReviewCodes.includes(item.code)) || critical;
+  const approvedWithoutReviewer = issues.some((item) => item.code === "APPROVED_WITHOUT_REVIEWER");
 
   let classification: EditorialClassification = "MANTER";
   if (charCount > 0 && charCount < 200 && article.status === "PUBLISHED") {
     classification = "NOINDEX";
-  } else if (needsHuman && (critical || article.editorialStage === "APPROVED")) {
+  } else if (needsFactReview) {
+    // Reserva REVISAR MANUALMENTE para risco factual/crítico — não para governança leve.
     classification = "REVISAR MANUALMENTE";
-  } else if (issues.some((item) => item.severity === "ALTA" || item.severity === "MÉDIA" || item.severity === "CRÍTICA")) {
+  } else if (
+    approvedWithoutReviewer ||
+    issues.some((item) => item.severity === "ALTA" || item.severity === "MÉDIA" || item.severity === "CRÍTICA")
+  ) {
     classification = "MELHORAR";
   } else if (issues.length) {
     classification = score >= 85 ? "MANTER" : "MELHORAR";

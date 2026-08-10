@@ -7,8 +7,10 @@ import {
   findPublishedSlLocalByNumber,
   resolveSlLocalSeoSlug
 } from "../../lib/articles";
+import { getEditorialPortalMode } from "../../lib/portal-modes";
 import { normalizeEditorialHtml } from "@es/shared";
 const slug = Astro.params.slug ?? "";
+const portal = await getEditorialPortalMode();
 const seoFromLegacy = resolveSlLocalSeoSlug(slug);
 if (seoFromLegacy && seoFromLegacy !== slug) {
   const moved = await findPublishedArticle(seoFromLegacy, ["GUIDE", "DATA_REPORT", "NEWS"]);
@@ -36,6 +38,22 @@ const schema = { "@type": "Article", headline: article.title, description: artic
     {article.coverImageUrl && <figure class="mt-8"><img src={article.coverImageUrl} alt={article.coverImageAlt ?? article.title} class="w-full rounded-2xl" width={article.coverImageWidth ?? undefined} height={article.coverImageHeight ?? undefined} /><figcaption class="mt-2 text-xs text-[var(--es-muted)]">{article.coverImageCaption}{article.coverImageCredit ? ` · ${article.coverImageCredit}` : ""}</figcaption></figure>}
     <div class="es-prose mt-8 max-w-none" set:html={contentHtml} />
     {article.sourceUrl && <p class="mt-8 text-sm">Fonte: <a class="underline" href={article.sourceUrl} rel="nofollow noopener">{article.sourceName ?? "fonte original"}</a></p>}
-    <aside class="mt-10 rounded-2xl bg-[var(--es-cream)] p-5"><p class="font-bold">Continue gratuitamente</p><div class="mt-3 flex flex-wrap gap-3"><a class="es-btn es-btn-primary" href="/vagas">Ver vagas</a><a class="es-btn es-btn-secondary" href="/alertas">Criar alerta gratuito</a></div></aside>
+    <aside class="mt-10 rounded-2xl bg-[var(--es-cream)] p-5">
+      <p class="font-bold">Continue gratuitamente</p>
+      <div class="mt-3 flex flex-wrap gap-3">
+        {portal.enabled ? (
+          <>
+            <a class="es-btn es-btn-primary" href="/blog">Mais guias</a>
+            <a class="es-btn es-btn-secondary" href="/noticias">Ver notícias</a>
+            <a class="es-btn es-btn-secondary" href="/contato">Falar com a redação</a>
+          </>
+        ) : (
+          <>
+            <a class="es-btn es-btn-primary" href="/vagas">Ver vagas</a>
+            <a class="es-btn es-btn-secondary" href="/alertas">Criar alerta gratuito</a>
+          </>
+        )}
+      </div>
+    </aside>
   </div></article>
 </BaseLayout>

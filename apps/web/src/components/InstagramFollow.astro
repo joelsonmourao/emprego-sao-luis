@@ -1,6 +1,7 @@
 ---
 import { BRAND_ASSETS } from "../lib/brand-assets";
 import { getInstagramCtaSettings } from "../lib/instagram-cta";
+import { getEditorialPortalMode } from "../lib/portal-modes";
 
 interface Props {
   variant?: "home" | "compact" | "alert" | "empty";
@@ -9,8 +10,15 @@ interface Props {
 
 const { variant = "home", trackEvent = "instagram_follow_click" } = Astro.props;
 const settings = await getInstagramCtaSettings();
-const title = settings.title || "Acompanhe as vagas também no Instagram";
-const description = settings.description || "No @empregosaoluis divulgamos oportunidades em stories e no feed, sempre com link para o portal. Siga para não perder vagas da sua região.";
+const portal = await getEditorialPortalMode();
+const title = portal.enabled
+  ? (settings.title?.includes("vaga") ? "Acompanhe a redação no Instagram" : settings.title) ||
+    "Acompanhe a redação no Instagram"
+  : settings.title || "Acompanhe as vagas também no Instagram";
+const description = portal.enabled
+  ? "No @empregosaoluis compartilhamos guias, notícias e orientação profissional para quem busca se posicionar melhor no mercado de São Luís."
+  : settings.description ||
+    "No @empregosaoluis divulgamos oportunidades em stories e no feed, sempre com link para o portal. Siga para não perder vagas da sua região.";
 const showQr = settings.showQrCode && settings.qrCodeUrl;
 ---
 <section class={`es-section ${variant === "compact" ? "!py-10" : ""}`} aria-labelledby="instagram-cta-title">

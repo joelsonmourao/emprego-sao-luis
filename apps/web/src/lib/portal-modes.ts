@@ -116,7 +116,8 @@ const JOB_BOARD_PATH_PREFIXES = [
   "/alertas",
   "/publicar-vaga",
   "/anunciar-vaga",
-  "/area-empresas"
+  "/area-empresas",
+  "/i"
 ] as const;
 
 export function isJobBoardPublicPath(pathname: string) {

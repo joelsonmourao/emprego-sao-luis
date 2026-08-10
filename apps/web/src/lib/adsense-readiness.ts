@@ -385,7 +385,7 @@ async function buildAdsenseReadiness(baseUrl: URL) {
     })
   );
 
-  const hubPaths = ["/blog", "/noticias", "/empresas"] as const;
+  const hubPaths = (portalEnabled ? (["/blog", "/noticias"] as const) : (["/blog", "/noticias", "/empresas"] as const));
   const hubPages = await Promise.all(hubPaths.map((path) => fetchText(new URL(path, baseUrl))));
   const emptyHubs: string[] = [];
   hubPaths.forEach((path, index) => {
@@ -489,6 +489,49 @@ async function buildAdsenseReadiness(baseUrl: URL) {
     noindex: publishedAssessments.filter((item) => item.classification === "NOINDEX").length,
     revisar: publishedAssessments.filter((item) => item.classification === "REVISAR MANUALMENTE").length
   };
+  const issueCodeBreakdown = Object.entries(
+    editorialReport.assessments.reduce<Record<string, number>>((acc, item) => {
+      for (const issue of item.issues) {
+        acc[issue.code] = (acc[issue.code] ?? 0) + 1;
+      }
+      return acc;
+    }, {})
+  )
+    .map(([code, count]) => ({ code, count }))
+    .sort((a, b) => b.count - a.count)
+    .slice(0, 20);
+
+  const publishedIssueBreakdown = Object.entries(
+    publishedAssessments.reduce<Record<string, number>>((acc, item) => {
+      for (const issue of item.issues) {
+        acc[issue.code] = (acc[issue.code] ?? 0) + 1;
+      }
+      return acc;
+    }, {})
+  )
+    .map(([code, count]) => ({ code, count }))
+    .sort((a, b) => b.count - a.count)
+    .slice(0, 20);
+
+  const coverUrls = publishedArticles
+    .map((item) => item.coverImageUrl?.trim())
+    .filter((value): value is string => Boolean(value));
+  const coverCounts = coverUrls.reduce<Record<string, number>>((acc, url) => {
+    acc[url] = (acc[url] ?? 0) + 1;
+    return acc;
+  }, {});
+  const imageInventory = {
+    publishedWithCover: uniqueCoverPublished.length,
+    publishedMissingCover: missingCover.length,
+    repeatedCovers: Object.values(coverCounts).filter((count) => count > 1).length,
+    totalPublished: publishedArticles.length
+  };
+
+  const jobInventory = {
+    publishedSample: jobRows.length,
+    invalidPublished: invalidJobs.length,
+    note: "Amostra limitada aos PUBLISHED carregados na Central (até 400). Use Qualidade das Vagas para inventário completo."
+  };
   checks.push(
     pass({
       id: "editorial-portal-mode",
@@ -590,6 +633,10 @@ async function buildAdsenseReadiness(baseUrl: URL) {
       countExplanation: `${publishedArticles.length} conteúdos publicados atualmente (exclui seed template). ${editorialReport.summary.total} registros editoriais auditados incluindo rascunhos, agendados e arquivados. A qualidade abaixo usa apenas os publicados.`
     },
     publishedQuality,
+    issueCodeBreakdown,
+    publishedIssueBreakdown,
+    imageInventory,
+    jobInventory,
     portalMode,
     reviewMode,
     checks,

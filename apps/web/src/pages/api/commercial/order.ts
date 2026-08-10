@@ -14,6 +14,9 @@ const schema = z.object({
 });
 
 export const POST: APIRoute = async ({ request, redirect }) => {
+  const { getEditorialPortalMode } = await import("../../../lib/portal-modes");
+  const portal = await getEditorialPortalMode();
+  if (portal.enabled) return redirect("/quadro-pausado", 303);
   const form = Object.fromEntries(await request.formData());
   const parsed = schema.safeParse(form);
   if (!parsed.success) return redirect("/publicar-vaga?error=invalido", 303);

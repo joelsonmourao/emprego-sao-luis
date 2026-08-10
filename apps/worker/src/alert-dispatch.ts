@@ -1,6 +1,6 @@
 import { and, desc, eq, gt, gte } from "drizzle-orm";
 import { Queue, type ConnectionOptions } from "bullmq";
-import { alerts, categories, cities, companies, createDatabase, jobs, notificationDeliveries, subscriptions } from "@es/db";
+import { alerts, categories, cities, companies, createDatabase, jobs, notificationDeliveries, settings, subscriptions } from "@es/db";
 
 function redisOptions(value: string): ConnectionOptions {
   const url = new URL(value);
@@ -36,6 +36,17 @@ export async function dispatchJobAlerts() {
   const queue = new Queue("notifications", { connection: redisOptions(process.env.REDIS_URL) });
   let sent = 0;
   try {
+    const [portalRow] = await connection.db
+      .select({ value: settings.value })
+      .from(settings)
+      .where(eq(settings.key, "editorial_portal_mode"))
+      .limit(1);
+    const portalValue =
+      portalRow?.value && typeof portalRow.value === "object" ? (portalRow.value as Record<string, unknown>) : {};
+    if (portalValue.enabled === true) {
+      return { sent: 0, skipped: "editorial_portal_mode" };
+    }
+
     const activeAlerts = await connection.db
       .select({ alert: alerts, subscription: subscriptions })
       .from(alerts)

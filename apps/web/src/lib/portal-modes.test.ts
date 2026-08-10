@@ -25,6 +25,8 @@ describe("portal modes", () => {
     expect(isJobBoardPublicPath("/empresas/acme")).toBe(true);
     expect(isJobBoardPublicPath("/categorias")).toBe(true);
     expect(isJobBoardPublicPath("/publicar-vaga")).toBe(true);
+    expect(isJobBoardPublicPath("/i")).toBe(true);
+    expect(isJobBoardPublicPath("/i/ES-000001")).toBe(true);
     expect(isJobBoardPublicPath("/blog/guia")).toBe(false);
     expect(isJobBoardPublicPath("/noticias/x")).toBe(false);
     expect(isJobBoardPublicPath("/redacao")).toBe(false);

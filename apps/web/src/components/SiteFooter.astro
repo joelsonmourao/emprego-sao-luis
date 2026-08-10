@@ -14,7 +14,7 @@ const portalEditorial = portal.enabled;
   <div class="es-container grid gap-8 py-12 md:grid-cols-4">
     <div>
       <BrandLogo assetKey={BRAND_ASSET_KEYS.LOGO_DARK} class="h-11 w-auto max-w-[13rem] rounded-xl bg-white object-contain px-3 py-2 sm:h-12 sm:max-w-[15rem]" width={240} height={80} loading="lazy" />
-      <p class="mt-4 text-sm text-white/70">{identity.tagline}</p>
+      <p class="mt-4 text-sm text-white/70">{portalEditorial ? "Portal editorial de carreira, guias e notícias em São Luís e no Maranhão." : identity.tagline}</p>
     </div>
     <div>
       <p class="text-xs font-bold uppercase tracking-wider text-white/50">Conteúdo gratuito</p>

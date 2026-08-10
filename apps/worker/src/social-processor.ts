@@ -1,3 +1,105 @@
-import { eq } from "drizzle-orm"; import { cities, companies, createDatabase, jobs, socialPosts, socialPublications, states } from "@es/db"; import { buildJobCardSvg } from "@es/social"; import sharp from "sharp"; import { publishInstagramImage } from "./meta.js"; import { putObject } from "./storage.js";
+import { eq } from "drizzle-orm";
+import { cities, companies, createDatabase, jobs, settings, socialPosts, socialPublications, states } from "@es/db";
+import { buildJobCardSvg } from "@es/social";
+import sharp from "sharp";
+import { publishInstagramImage } from "./meta.js";
+import { putObject } from "./storage.js";
+
 const dimensions = { feed: [1080, 1350], story: [1080, 1920], square: [1080, 1080], carousel: [1080, 1350] } as const;
-export async function processSocialPost(payload: { postId: string }) { if (!process.env.DATABASE_URL) throw new Error("DATABASE_URL não configurada."); const connection = createDatabase(process.env.DATABASE_URL); try { const [record] = await connection.db.select({ post: socialPosts, job: jobs, company: companies.name, city: cities.name, state: states.code }).from(socialPosts).innerJoin(jobs, eq(socialPosts.entityId, jobs.id)).innerJoin(companies, eq(jobs.companyId, companies.id)).innerJoin(cities, eq(jobs.cityId, cities.id)).innerJoin(states, eq(jobs.stateId, states.id)).where(eq(socialPosts.id, payload.postId)).limit(1); if (!record) throw new Error("Publicação social não encontrada."); const size = dimensions[record.post.format as keyof typeof dimensions]; if (!size) throw new Error("Formato social inválido."); await connection.db.update(socialPosts).set({ status: "PROCESSING", updatedAt: new Date() }).where(eq(socialPosts.id, record.post.id)); const svg = buildJobCardSvg({ title: record.job.normalizedTitle, company: record.company, location: `${record.city}/${record.state}`, publicCode: record.job.publicCode, width: size[0], height: size[1] }); const png = await sharp(Buffer.from(svg)).png({ compressionLevel: 9 }).toBuffer(); const key = `social/${record.job.publicCode}/${record.post.id}-${record.post.format}.png`; const imageUrl = await putObject(key, png, "image/png"); await connection.db.update(socialPosts).set({ imageKey: key, status: "COMPLETED", updatedAt: new Date() }).where(eq(socialPosts.id, record.post.id)); if (record.post.autoPublish) { const [publication] = await connection.db.insert(socialPublications).values({ postId: record.post.id, status: "PROCESSING", attempts: 1 }).returning(); try { const result = await publishInstagramImage({ imageUrl, caption: record.post.caption }); await connection.db.update(socialPublications).set({ status: "COMPLETED", externalContainerId: result.containerId, externalMediaId: result.mediaId, publishedAt: new Date(), updatedAt: new Date() }).where(eq(socialPublications.id, publication!.id)); } catch (error) { await connection.db.update(socialPublications).set({ status: "FAILED", error: error instanceof Error ? error.message : "Erro desconhecido", updatedAt: new Date() }).where(eq(socialPublications.id, publication!.id)); throw error; } } return { imageUrl }; } catch (error) { await connection.db.update(socialPosts).set({ status: "FAILED", updatedAt: new Date() }).where(eq(socialPosts.id, payload.postId)); throw error; } finally { await connection.close(); } }
+
+export async function processSocialPost(payload: { postId: string }) {
+  if (!process.env.DATABASE_URL) throw new Error("DATABASE_URL não configurada.");
+  const connection = createDatabase(process.env.DATABASE_URL);
+  try {
+    const [portalRow] = await connection.db
+      .select({ value: settings.value })
+      .from(settings)
+      .where(eq(settings.key, "editorial_portal_mode"))
+      .limit(1);
+    const portalValue =
+      portalRow?.value && typeof portalRow.value === "object" ? (portalRow.value as Record<string, unknown>) : {};
+    if (portalValue.enabled === true) {
+      await connection.db
+        .update(socialPosts)
+        .set({ status: "FAILED", updatedAt: new Date() })
+        .where(eq(socialPosts.id, payload.postId));
+      throw new Error("Modo Portal Editorial ativo: publicação social de vagas pausada.");
+    }
+
+    const [record] = await connection.db
+      .select({
+        post: socialPosts,
+        job: jobs,
+        company: companies.name,
+        city: cities.name,
+        state: states.code
+      })
+      .from(socialPosts)
+      .innerJoin(jobs, eq(socialPosts.entityId, jobs.id))
+      .innerJoin(companies, eq(jobs.companyId, companies.id))
+      .innerJoin(cities, eq(jobs.cityId, cities.id))
+      .innerJoin(states, eq(jobs.stateId, states.id))
+      .where(eq(socialPosts.id, payload.postId))
+      .limit(1);
+    if (!record) throw new Error("Publicação social não encontrada.");
+    const size = dimensions[record.post.format as keyof typeof dimensions];
+    if (!size) throw new Error("Formato social inválido.");
+    await connection.db
+      .update(socialPosts)
+      .set({ status: "PROCESSING", updatedAt: new Date() })
+      .where(eq(socialPosts.id, record.post.id));
+    const svg = buildJobCardSvg({
+      title: record.job.normalizedTitle,
+      company: record.company,
+      location: `${record.city}/${record.state}`,
+      publicCode: record.job.publicCode,
+      width: size[0],
+      height: size[1]
+    });
+    const png = await sharp(Buffer.from(svg)).png({ compressionLevel: 9 }).toBuffer();
+    const key = `social/${record.job.publicCode}/${record.post.id}-${record.post.format}.png`;
+    const imageUrl = await putObject(key, png, "image/png");
+    await connection.db
+      .update(socialPosts)
+      .set({ imageKey: key, status: "COMPLETED", updatedAt: new Date() })
+      .where(eq(socialPosts.id, record.post.id));
+    if (record.post.autoPublish) {
+      const [publication] = await connection.db
+        .insert(socialPublications)
+        .values({ postId: record.post.id, status: "PROCESSING", attempts: 1 })
+        .returning();
+      try {
+        const result = await publishInstagramImage({ imageUrl, caption: record.post.caption });
+        await connection.db
+          .update(socialPublications)
+          .set({
+            status: "COMPLETED",
+            externalContainerId: result.containerId,
+            externalMediaId: result.mediaId,
+            publishedAt: new Date(),
+            updatedAt: new Date()
+          })
+          .where(eq(socialPublications.id, publication!.id));
+      } catch (error) {
+        await connection.db
+          .update(socialPublications)
+          .set({
+            status: "FAILED",
+            error: error instanceof Error ? error.message : "Erro desconhecido",
+            updatedAt: new Date()
+          })
+          .where(eq(socialPublications.id, publication!.id));
+        throw error;
+      }
+    }
+    return { imageUrl };
+  } catch (error) {
+    await connection.db
+      .update(socialPosts)
+      .set({ status: "FAILED", updatedAt: new Date() })
+      .where(eq(socialPosts.id, payload.postId));
+    throw error;
+  } finally {
+    await connection.close();
+  }
+}

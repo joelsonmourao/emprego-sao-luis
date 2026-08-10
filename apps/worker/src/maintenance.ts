@@ -2,16 +2,168 @@ import { and, asc, eq, lte } from "drizzle-orm";
 import { createDatabase, indexingEvents, jobs, settings } from "@es/db";
 import { submitGoogleIndexing, submitIndexNow } from "./indexing.js";
 
-const publicUrl = (slug: string) => new URL(`/vagas/${slug}`, process.env.SITE_URL ?? "https://empregossaoluis.com.br").toString();
-export function shouldSuppressIndexingInReview(url: string, notificationType: string, reviewMode: boolean) {
-  if (!reviewMode || notificationType !== "URL_UPDATED") return false;
+const publicUrl = (slug: string) =>
+  new URL(`/vagas/${slug}`, process.env.SITE_URL ?? "https://empregossaoluis.com.br").toString();
+
+export function shouldSuppressIndexingInReview(
+  url: string,
+  notificationType: string,
+  reviewMode: boolean,
+  portalMode = false
+) {
+  if ((!reviewMode && !portalMode) || notificationType !== "URL_UPDATED") return false;
   try {
     const path = new URL(url).pathname;
-    return path === "/vagas" || path.startsWith("/vagas/") || path === "/web-stories" || path.startsWith("/web-stories/");
+    if (portalMode) {
+      return (
+        path === "/vagas" ||
+        path.startsWith("/vagas/") ||
+        path === "/empresas" ||
+        path.startsWith("/empresas/") ||
+        path === "/categorias" ||
+        path.startsWith("/categorias/") ||
+        path === "/cidades" ||
+        path.startsWith("/cidades/") ||
+        path === "/i" ||
+        path.startsWith("/i/") ||
+        path === "/web-stories" ||
+        path.startsWith("/web-stories/")
+      );
+    }
+    return (
+      path === "/vagas" ||
+      path.startsWith("/vagas/") ||
+      path === "/web-stories" ||
+      path.startsWith("/web-stories/")
+    );
   } catch {
     return false;
   }
 }
-export async function expireJobs() { if (!process.env.DATABASE_URL) throw new Error("DATABASE_URL não configurada."); const connection = createDatabase(process.env.DATABASE_URL); try { return await connection.db.transaction(async (tx) => { const expired = await tx.update(jobs).set({ publicationStatus: "EXPIRED", closedAt: new Date(), closureReason: "Validade encerrada automaticamente", updatedAt: new Date() }).where(and(eq(jobs.publicationStatus, "PUBLISHED"), lte(jobs.expiresAt, new Date()))).returning({ id: jobs.id, slug: jobs.slug }); for (const job of expired) { const url = publicUrl(job.slug); await tx.insert(indexingEvents).values([{ dedupeKey: `expiry:${job.id}:google`, jobId: job.id, provider: "GOOGLE", url, notificationType: "URL_DELETED" }, { dedupeKey: `expiry:${job.id}:indexnow`, jobId: job.id, provider: "INDEXNOW", url, notificationType: "URL_UPDATED" }]).onConflictDoNothing(); } return { expired: expired.length }; }); } finally { await connection.close(); } }
 
-export async function processIndexingEvents() { if (!process.env.DATABASE_URL) throw new Error("DATABASE_URL não configurada."); const connection = createDatabase(process.env.DATABASE_URL); let processed = 0; let suppressed = 0; try { const [modeRow] = await connection.db.select({ value: settings.value }).from(settings).where(eq(settings.key, "adsense_review_mode")).limit(1); const modeValue = modeRow?.value && typeof modeRow.value === "object" ? modeRow.value as Record<string, unknown> : {}; const reviewMode = modeValue.enabled === true; const events = await connection.db.select().from(indexingEvents).where(eq(indexingEvents.status, "PENDING")).orderBy(asc(indexingEvents.createdAt)).limit(20); for (const event of events) { if (shouldSuppressIndexingInReview(event.url, event.notificationType, reviewMode)) { await connection.db.update(indexingEvents).set({ status: "CANCELLED", response: { reason: "Modo de Revisão AdSense ativo; URL fora da superfície indexável." }, processedAt: new Date(), updatedAt: new Date() }).where(and(eq(indexingEvents.id, event.id), eq(indexingEvents.status, "PENDING"))); suppressed++; continue; } await connection.db.update(indexingEvents).set({ status: "PROCESSING", attempts: event.attempts + 1, updatedAt: new Date() }).where(and(eq(indexingEvents.id, event.id), eq(indexingEvents.status, "PENDING"))); try { const response = event.provider === "GOOGLE" ? await submitGoogleIndexing(event.url, event.notificationType as "URL_UPDATED" | "URL_DELETED") : await submitIndexNow(event.url); await connection.db.update(indexingEvents).set({ status: "COMPLETED", response, processedAt: new Date(), updatedAt: new Date() }).where(eq(indexingEvents.id, event.id)); processed++; } catch (error) { await connection.db.update(indexingEvents).set({ status: event.attempts + 1 >= 5 ? "FAILED" : "PENDING", error: error instanceof Error ? error.message : "Erro desconhecido", updatedAt: new Date() }).where(eq(indexingEvents.id, event.id)); } } return { processed, suppressed, examined: events.length }; } finally { await connection.close(); } }
+async function readModeFlags(connection: ReturnType<typeof createDatabase>) {
+  const rows = await connection.db
+    .select({ key: settings.key, value: settings.value })
+    .from(settings)
+    .where(eq(settings.key, "adsense_review_mode"));
+  const portalRows = await connection.db
+    .select({ key: settings.key, value: settings.value })
+    .from(settings)
+    .where(eq(settings.key, "editorial_portal_mode"));
+  const reviewValue =
+    rows[0]?.value && typeof rows[0].value === "object" ? (rows[0].value as Record<string, unknown>) : {};
+  const portalValue =
+    portalRows[0]?.value && typeof portalRows[0].value === "object"
+      ? (portalRows[0].value as Record<string, unknown>)
+      : {};
+  return {
+    reviewMode: reviewValue.enabled === true,
+    portalMode: portalValue.enabled === true
+  };
+}
+
+export async function expireJobs() {
+  if (!process.env.DATABASE_URL) throw new Error("DATABASE_URL não configurada.");
+  const connection = createDatabase(process.env.DATABASE_URL);
+  try {
+    return await connection.db.transaction(async (tx) => {
+      const expired = await tx
+        .update(jobs)
+        .set({
+          publicationStatus: "EXPIRED",
+          closedAt: new Date(),
+          closureReason: "Validade encerrada automaticamente",
+          updatedAt: new Date()
+        })
+        .where(and(eq(jobs.publicationStatus, "PUBLISHED"), lte(jobs.expiresAt, new Date())))
+        .returning({ id: jobs.id, slug: jobs.slug });
+      for (const job of expired) {
+        const url = publicUrl(job.slug);
+        await tx
+          .insert(indexingEvents)
+          .values([
+            {
+              dedupeKey: `expiry:${job.id}:google`,
+              jobId: job.id,
+              provider: "GOOGLE",
+              url,
+              notificationType: "URL_DELETED"
+            },
+            {
+              dedupeKey: `expiry:${job.id}:indexnow`,
+              jobId: job.id,
+              provider: "INDEXNOW",
+              url,
+              notificationType: "URL_UPDATED"
+            }
+          ])
+          .onConflictDoNothing();
+      }
+      return { expired: expired.length };
+    });
+  } finally {
+    await connection.close();
+  }
+}
+
+export async function processIndexingEvents() {
+  if (!process.env.DATABASE_URL) throw new Error("DATABASE_URL não configurada.");
+  const connection = createDatabase(process.env.DATABASE_URL);
+  let processed = 0;
+  let suppressed = 0;
+  try {
+    const { reviewMode, portalMode } = await readModeFlags(connection);
+    const events = await connection.db
+      .select()
+      .from(indexingEvents)
+      .where(eq(indexingEvents.status, "PENDING"))
+      .orderBy(asc(indexingEvents.createdAt))
+      .limit(20);
+    for (const event of events) {
+      if (shouldSuppressIndexingInReview(event.url, event.notificationType, reviewMode, portalMode)) {
+        await connection.db
+          .update(indexingEvents)
+          .set({
+            status: "CANCELLED",
+            response: {
+              reason: portalMode
+                ? "Modo Portal Editorial ativo; URL de vagas fora da superfície pública."
+                : "Modo de Revisão AdSense ativo; URL fora da superfície indexável."
+            },
+            processedAt: new Date(),
+            updatedAt: new Date()
+          })
+          .where(and(eq(indexingEvents.id, event.id), eq(indexingEvents.status, "PENDING")));
+        suppressed++;
+        continue;
+      }
+      await connection.db
+        .update(indexingEvents)
+        .set({ status: "PROCESSING", attempts: event.attempts + 1, updatedAt: new Date() })
+        .where(and(eq(indexingEvents.id, event.id), eq(indexingEvents.status, "PENDING")));
+      try {
+        const response =
+          event.provider === "GOOGLE"
+            ? await submitGoogleIndexing(event.url, event.notificationType as "URL_UPDATED" | "URL_DELETED")
+            : await submitIndexNow(event.url);
+        await connection.db
+          .update(indexingEvents)
+          .set({ status: "COMPLETED", response, processedAt: new Date(), updatedAt: new Date() })
+          .where(eq(indexingEvents.id, event.id));
+        processed++;
+      } catch (error) {
+        await connection.db
+          .update(indexingEvents)
+          .set({
+            status: event.attempts + 1 >= 5 ? "FAILED" : "PENDING",
+            error: error instanceof Error ? error.message : "Erro desconhecido",
+            updatedAt: new Date()
+          })
+          .where(eq(indexingEvents.id, event.id));
+      }
+    }
+    return { processed, suppressed, examined: events.length };
+  } finally {
+    await connection.close();
+  }
+}

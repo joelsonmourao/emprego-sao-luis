@@ -8,4 +8,16 @@ describe("indexing events during AdSense review mode", () => {
     expect(shouldSuppressIndexingInReview("https://empregossaoluis.com.br/vagas/auxiliar", "URL_DELETED", true)).toBe(false);
     expect(shouldSuppressIndexingInReview("https://empregossaoluis.com.br/blog/curriculo", "URL_UPDATED", true)).toBe(false);
   });
+
+  it("suppresses job board URL updates when Portal Editorial is on", () => {
+    expect(
+      shouldSuppressIndexingInReview("https://empregossaoluis.com.br/vagas/auxiliar", "URL_UPDATED", false, true)
+    ).toBe(true);
+    expect(
+      shouldSuppressIndexingInReview("https://empregossaoluis.com.br/empresas/acme", "URL_UPDATED", false, true)
+    ).toBe(true);
+    expect(
+      shouldSuppressIndexingInReview("https://empregossaoluis.com.br/blog/curriculo", "URL_UPDATED", false, true)
+    ).toBe(false);
+  });
 });

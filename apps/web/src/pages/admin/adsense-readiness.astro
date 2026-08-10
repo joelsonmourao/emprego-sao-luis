@@ -12,8 +12,8 @@ const tone =
       : "border-rose-300 bg-rose-50 text-rose-950";
 const message = Astro.url.searchParams.get("message");
 ---
-<AdminLayout title="Central AdSense">
-  <h1 class="text-3xl font-black">Central AdSense</h1>
+<AdminLayout title="Preparação AdSense" description="Controles e diagnóstico interno para a fase de revisão AdSense.">
+  <h1 class="text-3xl font-black">Preparação AdSense</h1>
   <p class="mt-2 text-sm text-[var(--text-secondary)]">
     Controles internos para preparação AdSense. Classificações e pontuações são métricas internas — não são do Google.
   </p>
@@ -23,10 +23,9 @@ const message = Astro.url.searchParams.get("message");
     <article class="rounded-2xl border bg-white p-6">
       <h2 class="text-xl font-black">Modo Portal Editorial</h2>
       <p class="mt-2 text-sm text-[var(--text-secondary)]">
-        Oculta temporariamente a área pública de vagas e prioriza Blog, Notícias e conteúdo institucional.
-        As vagas continuam sendo coletadas, armazenadas e administradas normalmente.
+        Oculta temporariamente a experiência pública de vagas enquanto mantém coleta, banco, importações, workers e administração funcionando.
       </p>
-      <p class="mt-3 text-sm font-bold">Estado: {report.portalMode.enabled ? "ATIVO" : "DESATIVADO"}</p>
+      <p class="mt-3 text-sm font-bold">PORTAL EDITORIAL: {report.portalMode.enabled ? "ATIVO" : "DESATIVADO"}</p>
       <form class="mt-4" method="post" action="/api/admin/editorial-portal-mode" onsubmit={`return confirm('${report.portalMode.enabled ? "Desativar" : "Ativar"} o Modo Portal Editorial?')`}>
         <input type="hidden" name="enabled" value={report.portalMode.enabled ? "false" : "true"} />
         <button class="es-btn es-btn-primary" type="submit">{report.portalMode.enabled ? "Desativar" : "Ativar"} Modo Portal Editorial</button>
@@ -35,10 +34,9 @@ const message = Astro.url.searchParams.get("message");
     <article class="rounded-2xl border bg-white p-6">
       <h2 class="text-xl font-black">Modo de Revisão AdSense</h2>
       <p class="mt-2 text-sm text-[var(--text-secondary)]">
-        Controle separado: prioriza indexação editorial e reduz páginas de baixo valor no índice/sitemap.
-        Não substitui o Modo Portal Editorial e não faz cloaking.
+        Aplica as regras de indexação e exposição definidas para a fase de preparação/revisão. Não substitui o Modo Portal Editorial e não faz cloaking.
       </p>
-      <p class="mt-3 text-sm font-bold">Estado: {report.reviewMode.enabled ? "ATIVO" : "DESATIVADO"}</p>
+      <p class="mt-3 text-sm font-bold">REVISÃO ADSENSE: {report.reviewMode.enabled ? "ATIVA" : "DESATIVADA"}</p>
       <form class="mt-4" method="post" action="/api/admin/adsense-review-mode" onsubmit={`return confirm('${report.reviewMode.enabled ? "Desativar" : "Ativar"} o Modo de Revisão AdSense?')`}>
         <input type="hidden" name="enabled" value={report.reviewMode.enabled ? "false" : "true"} />
         <button class="es-btn es-btn-secondary" type="submit">{report.reviewMode.enabled ? "Desativar" : "Ativar"} Modo de Revisão</button>
@@ -69,6 +67,43 @@ const message = Astro.url.searchParams.get("message");
     <p class="mt-4 text-sm">
       <a class="font-bold underline" href="/admin/qualidade-editorial">Abrir Qualidade Editorial</a>
     </p>
+  </section>
+
+  <section class="mt-6 rounded-2xl border bg-white p-6" id="motivos">
+    <h2 class="text-xl font-black">Motivos de auditoria (publicados)</h2>
+    <p class="mt-2 text-sm text-[var(--text-secondary)]">
+      Contagem por código de issue nos conteúdos publicados. Use para separar revisão factual de governança leve.
+    </p>
+    {report.publishedIssueBreakdown.length === 0 ? (
+      <p class="mt-3 text-sm">Sem issues nos publicados ou sem DATABASE_URL neste ambiente.</p>
+    ) : (
+      <ul class="mt-4 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+        {report.publishedIssueBreakdown.map((item) => (
+          <li class="rounded-xl border px-3 py-2 text-sm"><strong>{item.code}</strong>: {item.count}</li>
+        ))}
+      </ul>
+    )}
+  </section>
+
+  <section class="mt-6 grid gap-4 lg:grid-cols-2" id="inventarios">
+    <article class="rounded-2xl border bg-white p-6">
+      <h2 class="text-xl font-black">Imagens (publicados)</h2>
+      <ul class="mt-3 grid gap-2 text-sm">
+        <li>Com capa completa: <strong>{report.imageInventory.publishedWithCover}</strong></li>
+        <li>Sem capa completa: <strong>{report.imageInventory.publishedMissingCover}</strong></li>
+        <li>URLs de capa repetidas: <strong>{report.imageInventory.repeatedCovers}</strong></li>
+        <li>Total publicados amostrados: <strong>{report.imageInventory.totalPublished}</strong></li>
+      </ul>
+    </article>
+    <article class="rounded-2xl border bg-white p-6">
+      <h2 class="text-xl font-black">Vagas (amostra)</h2>
+      <ul class="mt-3 grid gap-2 text-sm">
+        <li>Publicadas na amostra: <strong>{report.jobInventory.publishedSample}</strong></li>
+        <li>Inválidas na amostra: <strong>{report.jobInventory.invalidPublished}</strong></li>
+      </ul>
+      <p class="mt-3 text-xs text-[var(--text-secondary)]">{report.jobInventory.note}</p>
+      <p class="mt-2 text-sm"><a class="font-bold underline" href="/admin/qualidade-vagas">Abrir Qualidade das Vagas</a></p>
+    </article>
   </section>
 
   <section class="mt-6 rounded-2xl border bg-white p-6" id="bloqueadores">
