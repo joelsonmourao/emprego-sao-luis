@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Check, Copy, ExternalLink, Mail, MessageCircle } from "lucide-react";
 
 import { TrackedExternalLink } from "@/components/analytics/tracked-external-link";
@@ -10,6 +10,8 @@ import { parseApplyDestination, type ApplyDestination } from "@/lib/apply-destin
 type JobApplyPanelProps = {
   applyUrl: string;
   jobSlug: string;
+  jobTitle: string;
+  autoOpen?: boolean;
 };
 
 type JobApplyMobileBarProps = {
@@ -25,6 +27,29 @@ async function copyText(text: string) {
   } catch {
     return false;
   }
+}
+
+function applicationHref(destination: ApplyDestination, jobTitle: string) {
+  if (!destination.href) return null;
+
+  const title = jobTitle.trim();
+  if (destination.type === "email") {
+    const subject = title ? `Candidatura - ${title}` : "Candidatura";
+    const body = title
+      ? `Olá!\n\nGostaria de me candidatar à vaga de ${title}.\n\nSegue meu currículo em anexo.\n\nAtenciosamente,`
+      : "Olá!\n\nGostaria de me candidatar à vaga.\n\nSegue meu currículo em anexo.\n\nAtenciosamente,";
+    return `mailto:${destination.value}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+  }
+
+  if (destination.type === "whatsapp") {
+    const message = title
+      ? `Olá! Gostaria de me candidatar à vaga de ${title}.`
+      : "Olá! Gostaria de me candidatar à vaga.";
+    const separator = destination.href.includes("?") ? "&" : "?";
+    return `${destination.href}${separator}text=${encodeURIComponent(message)}`;
+  }
+
+  return destination.href;
 }
 
 function CopyButton({ label, value }: { label: string; value: string }) {
@@ -50,8 +75,9 @@ function CopyButton({ label, value }: { label: string; value: string }) {
   );
 }
 
-function EmailApplyActions({ destination, jobSlug }: { destination: ApplyDestination; jobSlug: string }) {
+function EmailApplyActions({ destination, jobSlug, jobTitle }: { destination: ApplyDestination; jobSlug: string; jobTitle: string }) {
   const [revealed, setRevealed] = useState(false);
+  const href = applicationHref(destination, jobTitle);
 
   if (!revealed) {
     return (
@@ -75,10 +101,10 @@ function EmailApplyActions({ destination, jobSlug }: { destination: ApplyDestina
       </div>
       <div className="flex flex-wrap gap-2">
         <CopyButton label="Copiar e-mail" value={destination.value} />
-        {destination.href ? (
+        {href ? (
           <Button asChild size="sm" variant="secondary" className="gap-2">
             <TrackedExternalLink
-              href={destination.href}
+              href={href}
               eventName="apply_click"
               entityType="job"
               entitySlug={jobSlug}
@@ -94,15 +120,16 @@ function EmailApplyActions({ destination, jobSlug }: { destination: ApplyDestina
   );
 }
 
-function WhatsAppApplyActions({ destination, jobSlug }: { destination: ApplyDestination; jobSlug: string }) {
+function WhatsAppApplyActions({ destination, jobSlug, jobTitle }: { destination: ApplyDestination; jobSlug: string; jobTitle: string }) {
+  const href = applicationHref(destination, jobTitle);
   return (
     <div className="space-y-3">
       <p className="text-sm font-semibold text-[var(--brand-charcoal)]">{destination.display}</p>
       <div className="flex flex-col gap-2">
-        {destination.href ? (
+        {href ? (
           <Button asChild size="lg" className="w-full gap-2 rounded-2xl">
             <TrackedExternalLink
-              href={destination.href}
+              href={href}
               target="_blank"
               rel="noopener noreferrer"
               eventName="apply_click"
@@ -147,14 +174,25 @@ function UrlApplyActions({ destination, jobSlug }: { destination: ApplyDestinati
   );
 }
 
-export function JobApplyPanel({ applyUrl, jobSlug }: JobApplyPanelProps) {
+export function JobApplyPanel({ applyUrl, jobSlug, jobTitle, autoOpen = false }: JobApplyPanelProps) {
   const destination = parseApplyDestination(applyUrl);
+  const href = applicationHref(destination, jobTitle);
+
+  useEffect(() => {
+    if (!autoOpen || !href) return;
+
+    const timer = window.setTimeout(() => {
+      window.location.assign(href);
+    }, 700);
+
+    return () => window.clearTimeout(timer);
+  }, [autoOpen, href]);
 
   switch (destination.type) {
     case "email":
-      return <EmailApplyActions destination={destination} jobSlug={jobSlug} />;
+      return <EmailApplyActions destination={destination} jobSlug={jobSlug} jobTitle={jobTitle} />;
     case "whatsapp":
-      return <WhatsAppApplyActions destination={destination} jobSlug={jobSlug} />;
+      return <WhatsAppApplyActions destination={destination} jobSlug={jobSlug} jobTitle={jobTitle} />;
     case "url":
       return <UrlApplyActions destination={destination} jobSlug={jobSlug} />;
     default:
@@ -168,6 +206,7 @@ export function JobApplyPanel({ applyUrl, jobSlug }: JobApplyPanelProps) {
 
 export function JobApplyMobileBar({ applyUrl, jobSlug, jobTitle }: JobApplyMobileBarProps) {
   const destination = parseApplyDestination(applyUrl);
+  const href = applicationHref(destination, jobTitle);
   const [emailOpen, setEmailOpen] = useState(false);
 
   return (
@@ -198,10 +237,10 @@ export function JobApplyMobileBar({ applyUrl, jobSlug, jobTitle }: JobApplyMobil
                 <Mail className="h-4 w-4" />
                 Ver e-mail
               </Button>
-            ) : destination.type === "whatsapp" && destination.href ? (
+            ) : destination.type === "whatsapp" && href ? (
               <Button asChild size="sm" className="gap-1.5 rounded-xl px-4">
                 <TrackedExternalLink
-                  href={destination.href}
+                  href={href}
                   target="_blank"
                   rel="noopener noreferrer"
                   eventName="apply_click"

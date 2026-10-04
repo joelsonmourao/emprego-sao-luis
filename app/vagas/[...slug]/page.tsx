@@ -152,6 +152,7 @@ export default async function VagasCatchAllPage({
     const stateCode = safeString(job.state?.code, "BR");
     const stateName = safeString(job.state?.name, "Brasil");
     const pageTitle = job.title.trim();
+    const autoOpenApplication = rawSearch.candidatar === "1";
 
     const locationEnrichment = await getTrustedLocationEnrichmentForJob({
       companyName: job.companyName,
@@ -194,7 +195,7 @@ export default async function VagasCatchAllPage({
       <>
         <JobPostingJsonLd input={jobPostingInput} />
         <JobBreadcrumbJsonLd items={breadcrumbItems} />
-        <JobDetailView job={job} displayTitle={pageTitle} />
+        <JobDetailView job={job} displayTitle={pageTitle} autoOpenApplication={autoOpenApplication} />
       </>
     );
   }

@@ -39,7 +39,15 @@ function jobEmploymentLabel(job: JobWithRelations) {
   }
 }
 
-export async function JobDetailView({ job, displayTitle }: { job: JobWithRelations; displayTitle?: string | null }) {
+export async function JobDetailView({
+  job,
+  displayTitle,
+  autoOpenApplication = false
+}: {
+  job: JobWithRelations;
+  displayTitle?: string | null;
+  autoOpenApplication?: boolean;
+}) {
   const headingTitle = (displayTitle?.trim() || job.title).trim();
   const settings = await getSiteSettings();
   const sourceSiteLabel = settings.siteName.trim();
@@ -184,7 +192,12 @@ export async function JobDetailView({ job, displayTitle }: { job: JobWithRelatio
               A candidatura é feita pelo canal oficial da empresa. O Emprego São Luís apenas divulga a oportunidade.
             </p>
             <div className="mt-5">
-              <JobApplyPanel applyUrl={job.applyUrl} jobSlug={job.slug} />
+              <JobApplyPanel
+                applyUrl={job.applyUrl}
+                jobSlug={job.slug}
+                jobTitle={headingTitle}
+                autoOpen={autoOpenApplication}
+              />
             </div>
             <p className="mt-4 text-xs text-[var(--brand-text-secondary)]">Fonte: {sourceSiteLabel}</p>
           </section>
