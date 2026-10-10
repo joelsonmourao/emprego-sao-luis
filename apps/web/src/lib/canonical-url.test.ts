@@ -1,3 +1,5 @@
+import { readFileSync } from "node:fs";
+import { resolve } from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
 import { getRuntimeSiteUrl, resolveCanonicalUrl, resolvePublicHttpUrl } from "./canonical-url";
 
@@ -10,6 +12,13 @@ afterEach(() => {
 });
 
 describe("resolveCanonicalUrl", () => {
+  it("aplica a resolução segura de canonical no layout público", () => {
+    const layout = readFileSync(resolve("apps/web/src/layouts/BaseLayout.astro"), "utf8");
+    expect(layout).toContain("getRuntimeSiteUrl(Astro.site)");
+    expect(layout).toContain("resolveCanonicalUrl(canonical, Astro.url.pathname, runtimeSite)");
+    expect(layout).not.toContain("canonical ? new URL(canonical");
+  });
+
   it("removes tracking parameters and trailing slash", () => {
     expect(resolveCanonicalUrl("/blog/guia/?utm_source=teste#topo", "/blog/guia", site))
       .toBe("https://empregossaoluis.com.br/blog/guia");
