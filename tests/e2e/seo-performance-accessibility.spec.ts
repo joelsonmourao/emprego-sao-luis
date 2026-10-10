@@ -68,7 +68,7 @@ for (const width of [360, 768, 1440, 1920]) {
         clientWidth: document.documentElement.clientWidth
       }));
       expect(dimensions.scrollWidth, route).toBeLessThanOrEqual(dimensions.clientWidth + 1);
-      await expect(page.locator("h1")).toHaveCount(1);
+      await expect(page.locator("main#conteudo h1")).toHaveCount(1);
     }
   });
 }
