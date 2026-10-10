@@ -1,5 +1,5 @@
 name: CI
-on: { push: { branches: [main, codex/reconstrucao-astro] }, pull_request: {} }
+on: { push: { branches: [main, codex/reconstrucao-astro, codex/admin-negocio-completo] }, pull_request: {} }
 jobs:
   quality:
     runs-on: ubuntu-latest

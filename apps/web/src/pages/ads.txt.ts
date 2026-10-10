@@ -1,27 +1,48 @@
 import type { APIRoute } from "astro";
-import { getSiteIntegrations, normalizePubIdForAdsTxt } from "../lib/site-integrations";
+import { normalizeGooglePublisherId, prepareAdsTxtContent } from "../lib/ads-txt";
+import { getSiteIntegrations } from "../lib/site-integrations";
+
+const textHeaders = { "content-type": "text/plain; charset=utf-8" };
 
 export const GET: APIRoute = async () => {
   const integrations = await getSiteIntegrations();
-  const custom = integrations.adsTxtContent.trim();
+  const custom = prepareAdsTxtContent(integrations.adsTxtContent);
   if (custom) {
-    const body = custom.endsWith("\n") ? custom : `${custom}\n`;
-    return new Response(body, { headers: { "content-type": "text/plain; charset=utf-8" } });
+    return new Response(custom, {
+      status: 200,
+      headers: {
+        ...textHeaders,
+        "cache-control": "public, max-age=300"
+      }
+    });
   }
 
-  const fromDb = normalizePubIdForAdsTxt(integrations.adsensePublisherId);
-  const fromEnv = String(import.meta.env.PUBLIC_ADSENSE_PUBLISHER_ID ?? "").trim();
-  const publisher =
-    fromDb && /^pub-\d+$/i.test(fromDb)
-      ? fromDb
-      : fromEnv && /^pub-\d+$/i.test(fromEnv)
-        ? fromEnv
-        : normalizePubIdForAdsTxt(String(import.meta.env.PUBLIC_ADSENSE_CLIENT_ID ?? ""));
+  const publisher = [
+    integrations.adsensePublisherId,
+    String(import.meta.env.PUBLIC_ADSENSE_PUBLISHER_ID ?? ""),
+    String(import.meta.env.PUBLIC_ADSENSE_CLIENT_ID ?? "")
+  ]
+    .map(normalizeGooglePublisherId)
+    .find(Boolean);
 
-  const body =
-    publisher && /^pub-\d+$/i.test(publisher)
-      ? `google.com, ${publisher}, DIRECT, f08c47fec0942fa0\n`
-      : "# AdSense ainda não ativado. Configure em /admin/integracoes\n";
+  if (!publisher) {
+    return new Response("", {
+      status: 404,
+      headers: {
+        ...textHeaders,
+        "cache-control": "no-store"
+      }
+    });
+  }
 
-  return new Response(body, { headers: { "content-type": "text/plain; charset=utf-8" } });
+  return new Response(
+    `google.com, ${publisher}, DIRECT, f08c47fec0942fa0\n`,
+    {
+      status: 200,
+      headers: {
+        ...textHeaders,
+        "cache-control": "public, max-age=300"
+      }
+    }
+  );
 };
