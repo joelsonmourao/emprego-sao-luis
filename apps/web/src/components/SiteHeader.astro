@@ -30,7 +30,7 @@ const mobileItems = nav.map(([label, href]) => ({ label, href, current: isCurren
       <BrandLogo assetKey={BRAND_ASSET_KEYS.LOGO_MAIN} picture class="h-11 w-auto max-w-[13rem] object-contain sm:h-12 sm:max-w-[15rem]" width={240} height={80} loading="eager" />
     </a>
 
-    <nav class="hidden items-center gap-1 md:flex" aria-label="Principal">
+    <nav class="hidden items-center gap-1 xl:flex" aria-label="Principal">
       {nav.map(([label, href]) => (
         <a
           class={`rounded-xl px-3 py-2 text-sm font-semibold transition-colors ${isCurrent(href) ? "bg-[color-mix(in_srgb,var(--brand-primary)_10%,white)] text-[var(--brand-primary)]" : "text-[var(--text-secondary)] hover:text-[var(--brand-primary)]"}`}
