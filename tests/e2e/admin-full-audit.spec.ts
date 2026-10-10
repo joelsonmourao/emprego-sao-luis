@@ -6,7 +6,7 @@ import { ADMIN_STORAGE_STATE, ensureAdminSession, hasAdminStorageState } from ".
 const adminNavSource = readFileSync(resolve("apps/web/src/lib/admin-nav.ts"), "utf8");
 const menuRoutes = [
   ...new Set(
-    [...adminNavSource.matchAll(/href:\\s*"(\\/admin[^"]+)"/g)].map((match) => match[1])
+    [...adminNavSource.matchAll(/href:\s*"(\/admin[^"]+)"/g)].map((match) => match[1])
   )
 ];
 
