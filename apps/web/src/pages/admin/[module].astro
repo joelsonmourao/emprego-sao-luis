@@ -1,0 +1,7 @@
+---
+import AdminLayout from "../../layouts/AdminLayout.astro";
+const labels: Record<string, string> = { vagas: "Vagas", importacao: "Importação", empresas: "Empresas", conteudo: "Conteúdo", midia: "Mídia", social: "Social e Instagram", audiencia: "Audiência e alertas", publicidade: "Publicidade", seo: "SEO e indexação", usuarios: "Usuários e permissões", filas: "Filas", saude: "Saúde do sistema" };
+const moduleName = Astro.params.module ?? ""; const label = labels[moduleName];
+if (!label) { Astro.response.status = 404; }
+---
+<AdminLayout title={label ?? "Não encontrado"}><h1 class="text-3xl font-black">{label ?? "Módulo não encontrado"}</h1><p class="mt-3 text-slate-700">Módulo protegido por autenticação e autorização no servidor.</p></AdminLayout>

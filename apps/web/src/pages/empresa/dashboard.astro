@@ -1,0 +1,35 @@
+---
+import EmpresaLayout from "../../layouts/EmpresaLayout.astro";
+import { getCompanyDashboardMetrics } from "../../lib/company-dashboard";
+
+const company = Astro.locals.company!;
+const metrics = await getCompanyDashboardMetrics(company);
+
+const cards = [
+  ["Créditos disponíveis", metrics.creditsBalance],
+  ["Pedidos", metrics.ordersCount],
+  ["Pedidos pagos", metrics.paidOrders],
+  ["Pagamentos", metrics.paymentsCount],
+  ["Rascunhos de vaga", metrics.jobDraftsCount],
+  ["Chamados abertos", metrics.openTickets]
+];
+---
+<EmpresaLayout title="Visão geral">
+  <div>
+    <h1 class="font-display text-3xl font-black">Visão geral</h1>
+    <p class="mt-2 text-[var(--text-secondary)]">Resumo da sua conta comercial no portal.</p>
+  </div>
+  <div class="mt-8 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+    {cards.map(([label, value]) => (
+      <section class="es-card p-5">
+        <p class="text-sm text-[var(--text-secondary)]">{label}</p>
+        <strong class="mt-2 block font-display text-3xl">{value}</strong>
+      </section>
+    ))}
+  </div>
+  <div class="mt-8 flex flex-wrap gap-3">
+    <a class="es-btn es-btn-primary" href="/empresa/creditos">Ver créditos</a>
+    <a class="es-btn es-btn-secondary" href="/empresa/vagas">Minhas vagas</a>
+    <a class="es-btn es-btn-secondary" href="/publicar-vaga">Comprar plano</a>
+  </div>
+</EmpresaLayout>

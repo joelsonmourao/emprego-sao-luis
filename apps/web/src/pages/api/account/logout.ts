@@ -1,0 +1,1 @@
+import type { APIRoute } from "astro"; import { CANDIDATE_COOKIE, revokeCandidateSession } from "../../../lib/candidate-auth"; export const POST: APIRoute = async ({ cookies, redirect }) => { const token = cookies.get(CANDIDATE_COOKIE)?.value; if (token) await revokeCandidateSession(token); cookies.delete(CANDIDATE_COOKIE, { path: "/" }); return redirect("/", 303); };

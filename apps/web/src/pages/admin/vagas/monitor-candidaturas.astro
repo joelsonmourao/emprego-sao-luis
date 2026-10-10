@@ -1,0 +1,85 @@
+---
+import AdminLayout from "../../../layouts/AdminLayout.astro";
+import { can } from "../../../lib/auth";
+import { createDatabase, jobApplicationEvents, jobs } from "@es/db";
+import { desc, eq } from "drizzle-orm";
+
+const auth = Astro.locals.auth!;
+if (!can(auth, "jobs.read")) return Astro.redirect("/admin?error=sem-permissao");
+
+type EventRow = {
+  id: string;
+  jobId: string;
+  jobTitle: string | null;
+  channel: string;
+  action: string;
+  placement: string | null;
+  createdAt: Date;
+};
+
+let rows: EventRow[] = [];
+let loadError: string | null = null;
+if (process.env.DATABASE_URL) {
+  const connection = createDatabase(process.env.DATABASE_URL);
+  try {
+    rows = await connection.db
+      .select({
+        id: jobApplicationEvents.id,
+        jobId: jobApplicationEvents.jobId,
+        jobTitle: jobs.normalizedTitle,
+        channel: jobApplicationEvents.channel,
+        action: jobApplicationEvents.action,
+        placement: jobApplicationEvents.placement,
+        createdAt: jobApplicationEvents.createdAt
+      })
+      .from(jobApplicationEvents)
+      .leftJoin(jobs, eq(jobs.id, jobApplicationEvents.jobId))
+      .orderBy(desc(jobApplicationEvents.createdAt))
+      .limit(200);
+  } catch (error) {
+    loadError = "Tabela de eventos indisponível. Aplique as migrations 0024/0025 no banco E2E.";
+    console.error("[monitor-candidaturas]", error);
+  } finally {
+    await connection.close();
+  }
+}
+---
+<AdminLayout title="Monitor de candidaturas">
+  <div>
+    <p class="text-sm font-bold uppercase tracking-wide text-red-700">Vagas</p>
+    <h1 class="mt-2 text-3xl font-black">Monitor de candidaturas</h1>
+    <p class="mt-2 text-sm text-[var(--text-secondary)]">
+      Cliques e revelações de canais (site, WhatsApp, e-mail). Não contém dados pagos do candidato.
+      Candidatura no portal permanece gratuita.
+    </p>
+  </div>
+  {loadError && <p class="mt-4 rounded-lg border border-amber-200 bg-amber-50 p-3 text-sm" role="alert">{loadError}</p>}
+  <section class="mt-8 overflow-x-auto rounded-2xl bg-white p-6">
+    {rows.length === 0 && !loadError ? (
+      <p class="text-sm text-slate-600">Nenhum evento registrado ainda. Interações públicas aparecem aqui.</p>
+    ) : (
+      <table class="min-w-full text-sm">
+        <thead>
+          <tr class="border-b text-left">
+            <th class="p-3">Quando</th>
+            <th class="p-3">Vaga</th>
+            <th class="p-3">Canal</th>
+            <th class="p-3">Ação</th>
+            <th class="p-3">Posição</th>
+          </tr>
+        </thead>
+        <tbody>
+          {rows.map((row) => (
+            <tr class="border-b">
+              <td class="p-3 whitespace-nowrap">{row.createdAt.toLocaleString("pt-BR")}</td>
+              <td class="p-3"><a class="font-bold underline" href={`/admin/vagas/${row.jobId}/editar`}>{row.jobTitle ?? row.jobId}</a></td>
+              <td class="p-3">{row.channel}</td>
+              <td class="p-3">{row.action}</td>
+              <td class="p-3">{row.placement ?? "—"}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    )}
+  </section>
+</AdminLayout>

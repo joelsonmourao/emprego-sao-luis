@@ -1,0 +1,45 @@
+---
+import AdminLayout from "../../layouts/AdminLayout.astro";
+import { classificationRules, createDatabase } from "@es/db";
+import { asc } from "drizzle-orm";
+
+let rules: typeof classificationRules.$inferSelect[] = [];
+if (process.env.DATABASE_URL) {
+  const connection = createDatabase(process.env.DATABASE_URL);
+  try {
+    rules = await connection.db.select().from(classificationRules).orderBy(asc(classificationRules.priority));
+  } finally {
+    await connection.close();
+  }
+}
+---
+<AdminLayout title="Regras de classificação">
+  <h1 class="text-3xl font-black">Regras de classificação automática</h1>
+  <p class="mt-2 text-sm text-[var(--text-secondary)]">
+    Categorização determinística por palavras-chave e sinônimos administráveis. Não há aprendizado obscuro.
+  </p>
+  <form class="mt-6 grid max-w-3xl gap-3 rounded-2xl bg-white p-6" method="post" action="/api/admin/classification-rules">
+    <label class="grid gap-1 text-sm font-bold">Slug da categoria<input class="rounded-lg border p-3" name="categorySlug" required /></label>
+    <label class="grid gap-1 text-sm font-bold">Nome<input class="rounded-lg border p-3" name="categoryName" required /></label>
+    <label class="grid gap-1 text-sm font-bold">Palavras-chave (vírgula)<input class="rounded-lg border p-3" name="keywords" required /></label>
+    <label class="grid gap-1 text-sm font-bold">Sinônimos (vírgula)<input class="rounded-lg border p-3" name="synonyms" /></label>
+    <label class="grid gap-1 text-sm font-bold">Prioridade<input class="rounded-lg border p-3" name="priority" type="number" value="100" /></label>
+    <button class="rounded-lg bg-red-700 px-4 py-3 font-bold text-white" type="submit">Salvar regra</button>
+  </form>
+  <section class="mt-8 overflow-x-auto rounded-2xl bg-white p-6">
+    <table class="min-w-full text-sm">
+      <thead><tr class="border-b text-left"><th class="p-3">Categoria</th><th class="p-3">Keywords</th><th class="p-3">Sinônimos</th><th class="p-3">Prioridade</th><th class="p-3">Ativa</th></tr></thead>
+      <tbody>
+        {rules.map((rule) => (
+          <tr class="border-b align-top">
+            <td class="p-3 font-bold">{rule.categoryName}<span class="mt-1 block text-xs text-slate-500">{rule.categorySlug}</span></td>
+            <td class="p-3">{Array.isArray(rule.keywords) ? rule.keywords.join(", ") : ""}</td>
+            <td class="p-3">{Array.isArray(rule.synonyms) ? rule.synonyms.join(", ") : ""}</td>
+            <td class="p-3">{rule.priority}</td>
+            <td class="p-3">{rule.active ? "Sim" : "Não"}</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </section>
+</AdminLayout>

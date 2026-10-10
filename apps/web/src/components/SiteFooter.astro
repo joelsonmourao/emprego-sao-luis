@@ -1,0 +1,78 @@
+---
+import BrandLogo from "./BrandLogo.astro";
+import { BRAND_ASSETS } from "../lib/brand-assets";
+import { BRAND_ASSET_KEYS } from "../lib/brand/constants";
+import { getEditorialPortalMode } from "../lib/portal-modes";
+import type { VisualIdentity } from "../lib/visual-identity";
+
+interface Props { identity: VisualIdentity }
+const { identity } = Astro.props;
+const portal = await getEditorialPortalMode();
+const portalEditorial = portal.enabled;
+---
+<footer class="border-t border-[var(--brand-border)] bg-[var(--brand-secondary)] text-white">
+  <div class="es-container grid gap-8 py-12 md:grid-cols-4">
+    <div>
+      <BrandLogo assetKey={BRAND_ASSET_KEYS.LOGO_DARK} class="h-11 w-auto max-w-[13rem] rounded-xl bg-white object-contain px-3 py-2 sm:h-12 sm:max-w-[15rem]" width={240} height={80} loading="lazy" />
+      <p class="mt-4 text-sm text-white/70">{portalEditorial ? "Portal editorial de carreira, guias e notícias em São Luís e no Maranhão." : identity.tagline}</p>
+    </div>
+    <div>
+      <p class="text-xs font-bold uppercase tracking-wider text-white/50">Conteúdo gratuito</p>
+      <ul class="mt-3 grid gap-2 text-sm">
+        <li><a class="hover:text-[var(--brand-accent-warm)]" href="/noticias">Notícias</a></li>
+        <li><a class="hover:text-[var(--brand-accent-warm)]" href="/blog">Blog</a></li>
+        <li><a class="hover:text-[var(--brand-accent-warm)]" href="/web-stories">Web Stories</a></li>
+        {!portalEditorial && <li><a class="hover:text-[var(--brand-accent-warm)]" href="/alertas">Alertas de vagas</a></li>}
+        <li><a class="hover:text-[var(--brand-accent-warm)]" href="/seguranca-candidatos">Segurança do candidato</a></li>
+      </ul>
+    </div>
+    <div>
+      <p class="text-xs font-bold uppercase tracking-wider text-white/50">{portalEditorial ? "Editorial" : "Portal"}</p>
+      <ul class="mt-3 grid gap-2 text-sm">
+        {portalEditorial ? (
+          <>
+            <li><a class="hover:text-[var(--brand-accent-warm)]" href="/blog">Blog</a></li>
+            <li><a class="hover:text-[var(--brand-accent-warm)]" href="/noticias">Notícias</a></li>
+            <li><a class="hover:text-[var(--brand-accent-warm)]" href="/redacao">Redação</a></li>
+            <li><a class="hover:text-[var(--brand-accent-warm)]" href="/sobre">Sobre</a></li>
+            <li><a class="hover:text-[var(--brand-accent-warm)]" href="/contato">Contato</a></li>
+            <li><a class="hover:text-[var(--brand-accent-warm)]" href="/instagram" data-track="instagram_footer_click">Instagram</a></li>
+          </>
+        ) : (
+          <>
+            <li><a class="hover:text-[var(--brand-accent-warm)]" href="/vagas">Vagas</a></li>
+            <li><a class="hover:text-[var(--brand-accent-warm)]" href="/cidades">Cidades</a></li>
+            <li><a class="hover:text-[var(--brand-accent-warm)]" href="/vagas-slz">Vagas SLZ</a></li>
+            <li><a class="hover:text-[var(--brand-accent-warm)]" href="/empresas">Empresas</a></li>
+            <li><a class="hover:text-[var(--brand-accent-warm)]" href="/publicar-vaga">Publicar vaga</a></li>
+            <li><a class="hover:text-[var(--brand-accent-warm)]" href="/instagram" data-track="instagram_footer_click">Instagram</a></li>
+          </>
+        )}
+      </ul>
+    </div>
+    <div>
+      <p class="text-xs font-bold uppercase tracking-wider text-white/50">Institucional</p>
+      <ul class="mt-3 grid gap-2 text-sm">
+        <li><a class="hover:text-[var(--brand-accent-warm)]" href="/sobre">Sobre</a></li>
+        <li><a class="hover:text-[var(--brand-accent-warm)]" href="/redacao">Redação</a></li>
+        <li><a class="hover:text-[var(--brand-accent-warm)]" href="/contato">Contato</a></li>
+        <li><a class="hover:text-[var(--brand-accent-warm)]" href="/privacidade">Privacidade</a></li>
+        <li><a class="hover:text-[var(--brand-accent-warm)]" href="/termos">Termos de uso</a></li>
+        <li><a class="hover:text-[var(--brand-accent-warm)]" href="/cookies">Política de cookies</a></li>
+        <li><a class="hover:text-[var(--brand-accent-warm)]" href="/lgpd">LGPD</a></li>
+        <li><a class="hover:text-[var(--brand-accent-warm)]" href="/quem-somos">Quem somos</a></li>
+        <li><a class="hover:text-[var(--brand-accent-warm)]" href="/politica-editorial">Política editorial</a></li>
+        <li><a class="hover:text-[var(--brand-accent-warm)]" href="/politica-fontes">Política de fontes</a></li>
+        <li><a class="hover:text-[var(--brand-accent-warm)]" href="/politica-correcoes">Política de correções</a></li>
+        <li><button class="text-left hover:text-[var(--brand-accent-warm)]" type="button" data-open-cookie-preferences>Preferências de cookies</button></li>
+        <li><a class="hover:text-[var(--brand-accent-warm)] text-white/60" href="/admin/login">Administração</a></li>
+      </ul>
+      <p class="mt-6 text-xs text-white/50">© {new Date().getFullYear()} {identity.siteName || BRAND_ASSETS.siteName}</p>
+    </div>
+  </div>
+</footer>
+<script is:inline>
+  document.querySelector("[data-open-cookie-preferences]")?.addEventListener("click", () => {
+    document.dispatchEvent(new CustomEvent("cookie-consent:open"));
+  });
+</script>

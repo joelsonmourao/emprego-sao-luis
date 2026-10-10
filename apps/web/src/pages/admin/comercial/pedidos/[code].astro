@@ -1,0 +1,155 @@
+---
+import AdminLayout from "../../../../layouts/AdminLayout.astro";
+import { can } from "../../../../lib/auth";
+
+const auth = Astro.locals.auth!;
+if (!can(auth, "commercial.manage")) return new Response("Proibido", { status: 403 });
+
+const { code } = Astro.params;
+---
+<AdminLayout title={`Pedido ${code}`}>
+  <div class="flex flex-wrap items-center gap-4">
+    <a href="/admin/comercial/pedidos" class="text-sm text-[var(--brand-primary)] hover:underline">← Voltar aos pedidos</a>
+  </div>
+  <h1 class="mt-4 font-display text-3xl font-black">Pedido <span id="order-code" class="font-mono text-xl">{code}</span></h1>
+  <p id="order-status" class="mt-2 text-[var(--text-secondary)]">Carregando…</p>
+
+  <div class="mt-8 grid gap-6 lg:grid-cols-2">
+    <section class="rounded-2xl border border-[var(--brand-border)] bg-white p-6">
+      <h2 class="font-display text-lg font-bold">Dados do pedido</h2>
+      <dl id="order-details" class="mt-4 grid gap-2 text-sm"></dl>
+    </section>
+    <section class="rounded-2xl border border-[var(--brand-border)] bg-white p-6">
+      <h2 class="font-display text-lg font-bold">Plano contratado</h2>
+      <div id="plan-details" class="mt-4 text-sm"></div>
+    </section>
+  </div>
+
+  <section class="mt-6 rounded-2xl border border-[var(--brand-border)] bg-white p-6">
+    <h2 class="font-display text-lg font-bold">Linha do tempo</h2>
+    <ol id="timeline" class="mt-4 grid gap-3 text-sm"></ol>
+  </section>
+
+  <section id="notes-section" class="mt-6 rounded-2xl border border-[var(--brand-border)] bg-white p-6 hidden">
+    <h2 class="font-display text-lg font-bold">Notas internas</h2>
+    <pre id="internal-notes" class="mt-3 whitespace-pre-wrap rounded-lg bg-[var(--brand-background)] p-4 text-xs"></pre>
+  </section>
+
+  <div id="actions" class="mt-6 flex flex-wrap gap-4 hidden">
+    <button type="button" id="btn-cancel" class="es-btn es-btn-secondary text-red-700">Cancelar pedido</button>
+  </div>
+
+  <dialog id="cancel-modal" class="w-full max-w-md rounded-2xl border border-[var(--brand-border)] p-6 shadow-xl backdrop:bg-black/40">
+    <h2 class="font-display text-lg font-bold">Cancelar pedido</h2>
+    <label class="mt-4 block text-sm">Motivo<textarea id="cancel-reason" class="mt-1 w-full rounded-lg border border-[var(--brand-border)] p-2" rows="3" required></textarea></label>
+    <div class="mt-4 flex gap-3">
+      <button type="button" id="confirm-cancel" class="es-btn es-btn-primary bg-red-700">Confirmar cancelamento</button>
+      <button type="button" id="close-cancel" class="es-btn es-btn-secondary">Voltar</button>
+    </div>
+  </dialog>
+
+  <section class="mt-6 rounded-2xl border border-[var(--brand-border)] bg-white p-6">
+    <h2 class="font-display text-lg font-bold">Adicionar nota interna</h2>
+    <form id="note-form" class="mt-4 flex flex-col gap-3 sm:flex-row">
+      <input id="note-text" class="flex-1 rounded-lg border border-[var(--brand-border)] p-2 text-sm" placeholder="Observação visível apenas no admin…" required />
+      <button type="submit" class="es-btn es-btn-secondary">Salvar nota</button>
+    </form>
+  </section>
+
+  <script define:vars={{ code }}>
+    const STATUS_LABELS = {
+      PENDING_PAYMENT: "Aguardando pagamento",
+      MANUAL_REVIEW: "Revisão manual",
+      PAID: "Pago",
+      CANCELLED: "Cancelado",
+      EXPIRED: "Expirado"
+    };
+    const TIMELINE_LABELS = {
+      ORDER_CREATED: "Pedido criado",
+      ORDER_PAID: "Pedido pago",
+      ORDER_CANCELLED: "Pedido cancelado",
+      PAYMENT_PAID: "Pagamento confirmado",
+      PAYMENT_FAILED: "Pagamento falhou",
+      MANUAL_REVIEW: "Enviado para revisão manual",
+      MANUAL_PROOF_SUBMITTED: "Comprovante manual enviado",
+      NOTE: "Nota interna"
+    };
+    const fmt = (v) => Number(v ?? 0).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+
+    let orderData = null;
+
+    async function loadOrder() {
+      const res = await fetch(`/api/admin/commercial/orders/${code}`);
+      if (!res.ok) {
+        document.getElementById("order-status").textContent = "Pedido não encontrado.";
+        return;
+      }
+      const data = await res.json();
+      orderData = data;
+      const { order, plan } = data;
+      document.getElementById("order-status").textContent = STATUS_LABELS[order.status] ?? order.status;
+      document.getElementById("order-details").innerHTML = `
+        <div class="grid grid-cols-[8rem_1fr] gap-1"><dt class="text-[var(--text-secondary)]">Empresa</dt><dd>${order.companyName}</dd></div>
+        <div class="grid grid-cols-[8rem_1fr] gap-1"><dt class="text-[var(--text-secondary)]">Contato</dt><dd>${order.contactName}</dd></div>
+        <div class="grid grid-cols-[8rem_1fr] gap-1"><dt class="text-[var(--text-secondary)]">E-mail</dt><dd>${order.email}</dd></div>
+        <div class="grid grid-cols-[8rem_1fr] gap-1"><dt class="text-[var(--text-secondary)]">WhatsApp</dt><dd>${order.whatsapp ?? "—"}</dd></div>
+        <div class="grid grid-cols-[8rem_1fr] gap-1"><dt class="text-[var(--text-secondary)]">Cidade</dt><dd>${order.city}</dd></div>
+        <div class="grid grid-cols-[8rem_1fr] gap-1"><dt class="text-[var(--text-secondary)]">Valor</dt><dd class="font-bold">${fmt(order.amount)}</dd></div>
+        <div class="grid grid-cols-[8rem_1fr] gap-1"><dt class="text-[var(--text-secondary)]">Criado em</dt><dd>${new Date(order.createdAt).toLocaleString("pt-BR")}</dd></div>
+        ${order.paidAt ? `<div class="grid grid-cols-[8rem_1fr] gap-1"><dt class="text-[var(--text-secondary)]">Pago em</dt><dd>${new Date(order.paidAt).toLocaleString("pt-BR")}</dd></div>` : ""}
+        ${order.cancelReason ? `<div class="grid grid-cols-[8rem_1fr] gap-1"><dt class="text-[var(--text-secondary)]">Motivo cancel.</dt><dd>${order.cancelReason}</dd></div>` : ""}`;
+      document.getElementById("plan-details").innerHTML = plan
+        ? `<p class="font-bold">${plan.name}</p><p class="mt-1">${plan.jobCredits} crédito(s) · ${plan.durationDays} dias</p><p class="mt-2 text-[var(--text-secondary)]">${plan.shortDescription || plan.description?.slice(0, 160) || ""}</p>`
+        : "<p class='text-[var(--text-secondary)]'>Plano não encontrado.</p>";
+      const timeline = Array.isArray(order.timeline) ? order.timeline : [];
+      document.getElementById("timeline").innerHTML = timeline.length
+        ? timeline.slice().reverse().map((e) => `
+          <li class="rounded-lg border border-[var(--brand-border)] p-3">
+            <strong>${TIMELINE_LABELS[e.type] ?? e.type}</strong>
+            <span class="ml-2 text-xs text-[var(--text-secondary)]">${e.at ? new Date(e.at).toLocaleString("pt-BR") : ""}</span>
+            ${e.reason ? `<p class="mt-1 text-[var(--text-secondary)]">${e.reason}</p>` : ""}
+            ${e.note ? `<p class="mt-1">${e.note}</p>` : ""}
+          </li>`).join("")
+        : "<li class='text-[var(--text-secondary)]'>Sem eventos registrados.</li>";
+      if (order.internalNotes) {
+        document.getElementById("notes-section").classList.remove("hidden");
+        document.getElementById("internal-notes").textContent = order.internalNotes;
+      }
+      if (order.status !== "PAID" && order.status !== "CANCELLED") {
+        document.getElementById("actions").classList.remove("hidden");
+      }
+    }
+
+    const cancelModal = document.getElementById("cancel-modal");
+    document.getElementById("btn-cancel").addEventListener("click", () => cancelModal.showModal());
+    document.getElementById("close-cancel").addEventListener("click", () => cancelModal.close());
+    document.getElementById("confirm-cancel").addEventListener("click", async () => {
+      const reason = document.getElementById("cancel-reason").value.trim();
+      if (!reason) return;
+      const res = await fetch(`/api/admin/commercial/orders/${code}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "cancel", reason })
+      });
+      if (!res.ok) { const d = await res.json(); alert(d.error ?? "Erro ao cancelar."); return; }
+      cancelModal.close();
+      await loadOrder();
+    });
+
+    document.getElementById("note-form").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const note = document.getElementById("note-text").value.trim();
+      if (!note) return;
+      const res = await fetch(`/api/admin/commercial/orders/${code}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "note", note })
+      });
+      if (!res.ok) { alert("Erro ao salvar nota."); return; }
+      document.getElementById("note-text").value = "";
+      await loadOrder();
+    });
+
+    loadOrder();
+  </script>
+</AdminLayout>

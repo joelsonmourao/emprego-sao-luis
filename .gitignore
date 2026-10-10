@@ -2,9 +2,20 @@ node_modules
 .next
 .env
 .env.local
+.env.staging
 .vercel
 .env*.local
 
 # Cache incremental do TypeScript (evita merge conflicts e commits gigantes)
 tsconfig.tsbuildinfo
 *.tsbuildinfo
+dist
+.astro
+playwright-report
+test-results
+coverage
+.lighthouseci
+
+tmp/
+tmp-lighthouse/
+backups/

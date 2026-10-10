@@ -1,0 +1,51 @@
+---
+import BrandLogo from "./BrandLogo.astro";
+import MobileNav from "./MobileNav.astro";
+import { BRAND_ASSETS } from "../lib/brand-assets";
+import { BRAND_ASSET_KEYS } from "../lib/brand/constants";
+import { getEditorialPortalMode, getPublicNav } from "../lib/portal-modes";
+import type { VisualIdentity } from "../lib/visual-identity";
+
+interface Props {
+  identity: VisualIdentity;
+  currentPath?: string;
+}
+
+const { identity, currentPath = "" } = Astro.props;
+const portal = await getEditorialPortalMode();
+const nav = getPublicNav(portal.enabled);
+const ctaHref = portal.enabled ? "/contato" : "/publicar-vaga";
+const ctaLabel = portal.enabled ? "Contato" : "Publicar vaga";
+
+const pathOnly = (href: string) => href.split("?")[0] || href;
+const isCurrent = (href: string) => {
+  const path = pathOnly(href);
+  return currentPath === path || (path !== "/" && currentPath.startsWith(path));
+};
+const mobileItems = nav.map(([label, href]) => ({ label, href, current: isCurrent(href) }));
+---
+<header class="sticky top-0 z-40 border-b border-[var(--brand-border)] bg-[var(--brand-surface)]/95 backdrop-blur">
+  <div class="es-container relative flex items-center justify-between gap-4 py-3">
+    <a class="flex min-w-0 items-center gap-3" href="/" aria-label={identity.siteName || BRAND_ASSETS.logoAlt}>
+      <BrandLogo assetKey={BRAND_ASSET_KEYS.LOGO_MAIN} picture class="h-11 w-auto max-w-[13rem] object-contain sm:h-12 sm:max-w-[15rem]" width={240} height={80} loading="eager" />
+    </a>
+
+    <nav class="hidden items-center gap-1 md:flex" aria-label="Principal">
+      {nav.map(([label, href]) => (
+        <a
+          class={`rounded-xl px-3 py-2 text-sm font-semibold transition-colors ${isCurrent(href) ? "bg-[color-mix(in_srgb,var(--brand-primary)_10%,white)] text-[var(--brand-primary)]" : "text-[var(--text-secondary)] hover:text-[var(--brand-primary)]"}`}
+          href={href}
+          aria-current={isCurrent(href) ? "page" : undefined}
+          {...(href === "/instagram" ? { "data-track": "instagram_header_click" } : {})}
+        >
+          {label}
+        </a>
+      ))}
+    </nav>
+
+    <div class="flex items-center gap-2">
+      <a class="es-btn es-btn-primary hidden text-sm sm:inline-flex" href={ctaHref}>{ctaLabel}</a>
+      <MobileNav items={mobileItems} ctaHref={ctaHref} ctaLabel={ctaLabel} />
+    </div>
+  </div>
+</header>

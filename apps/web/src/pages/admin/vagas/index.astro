@@ -1,0 +1,37 @@
+---
+import AdminLayout from "../../../layouts/AdminLayout.astro";
+import { companies, createDatabase, jobs } from "@es/db";
+import { and, asc, count, desc, eq, ilike, type SQL } from "drizzle-orm";
+import { can } from "../../../lib/auth";
+
+const auth = Astro.locals.auth!;
+if (!can(auth, "jobs.read")) return new Response("Proibido", { status: 403 });
+const query = Astro.url.searchParams.get("q")?.trim() ?? "";
+const status = Astro.url.searchParams.get("status") ?? "";
+const page = Math.max(1, Number(Astro.url.searchParams.get("page") ?? 1) || 1);
+const pageSize = 25;
+const conditions: SQL[] = [];
+if (query) conditions.push(ilike(jobs.normalizedTitle, `%${query}%`));
+if (status && ["DRAFT", "PENDING_REVIEW", "APPROVED", "SCHEDULED", "PUBLISHED", "PAUSED", "EXPIRED", "CLOSED", "ARCHIVED"].includes(status)) conditions.push(eq(jobs.publicationStatus, status as typeof jobs.publicationStatus.enumValues[number]));
+let rows: Array<{ id: string; code: string; title: string; slug: string; company: string; status: string; publishedAt: Date | null; expiresAt: Date | null }> = [];
+let total = 0;
+if (process.env.DATABASE_URL) {
+  const connection = createDatabase(process.env.DATABASE_URL);
+  try {
+    const where = conditions.length ? and(...conditions) : undefined;
+    const [[summary], result] = await Promise.all([
+      connection.db.select({ value: count() }).from(jobs).where(where),
+      connection.db.select({ id: jobs.id, code: jobs.publicCode, title: jobs.normalizedTitle, slug: jobs.slug, company: companies.name, status: jobs.publicationStatus, publishedAt: jobs.publishedAt, expiresAt: jobs.expiresAt }).from(jobs).innerJoin(companies, eq(jobs.companyId, companies.id)).where(where).orderBy(desc(jobs.createdAt), asc(jobs.normalizedTitle)).limit(pageSize).offset((page - 1) * pageSize)
+    ]);
+    total = summary?.value ?? 0;
+    rows = result;
+  } finally { await connection.close(); }
+}
+const pages = Math.max(1, Math.ceil(total / pageSize));
+const labels: Record<string, string> = { DRAFT: "Rascunho", PENDING_REVIEW: "Em revisão", APPROVED: "Aprovada", SCHEDULED: "Agendada", PUBLISHED: "Publicada", PAUSED: "Pausada", EXPIRED: "Expirada", CLOSED: "Encerrada", ARCHIVED: "Arquivada" };
+---
+<AdminLayout title="Vagas"><div class="flex flex-wrap items-center justify-between gap-4"><div><h1 class="text-3xl font-black">Vagas</h1><p class="mt-2 text-slate-600">{total} registro(s) encontrado(s).</p></div>{can(auth, "jobs.create") && <a class="rounded-xl bg-red-700 px-5 py-3 font-bold text-white" href="/admin/vagas/nova">Nova vaga</a>}</div>
+<form class="mt-6 grid gap-3 rounded-2xl bg-white p-4 md:grid-cols-[1fr_220px_auto]" method="get"><label><span class="sr-only">Buscar</span><input class="w-full rounded-lg border p-3" name="q" value={query} placeholder="Buscar por título"/></label><label><span class="sr-only">Status</span><select class="w-full rounded-lg border p-3" name="status"><option value="">Todos os status</option>{Object.entries(labels).map(([value, label]) => <option value={value} selected={status === value}>{label}</option>)}</select></label><button class="rounded-lg bg-slate-900 px-5 font-bold text-white">Filtrar</button></form>
+<form id="bulk-jobs" class="mt-4 rounded-2xl border bg-white p-4" method="post" action="/api/admin/jobs/bulk"><div class="flex flex-wrap gap-3">{rows.map((job) => <label class="rounded-lg border px-3 py-2 text-sm"><input class="mr-2" type="checkbox" name="jobId" value={job.id}/>{job.code}</label>)}</div><div class="mt-4 flex flex-wrap items-end gap-3"><label>Status em lote<select class="ml-2 rounded-lg border p-2" name="status" required><option value="">Selecione</option>{Object.entries(labels).filter(([value]) => !["EXPIRED","CLOSED"].includes(value)).map(([value,label]) => <option value={value}>{label}</option>)}</select></label><button class="rounded-lg bg-slate-900 px-4 py-2 font-bold text-white">Aplicar às selecionadas</button></div></form>
+<div class="mt-6 overflow-x-auto rounded-2xl bg-white"><table class="w-full min-w-[900px] text-left"><thead class="border-b bg-slate-50 text-sm"><tr><th class="p-4">Código</th><th class="p-4">Vaga</th><th class="p-4">Empresa</th><th class="p-4">Status</th><th class="p-4">Validade</th><th class="p-4">Ações</th></tr></thead><tbody>{rows.length === 0 ? <tr><td class="p-8 text-center text-slate-600" colspan="6">Nenhuma vaga encontrada.</td></tr> : rows.map((job) => <tr class="border-b align-top"><td class="p-4 font-mono text-sm">{job.code}</td><td class="p-4"><strong>{job.title}</strong><div class="mt-1 flex gap-3 text-sm"><a class="text-red-700" href={`/vagas/${job.slug}`} target="_blank">Visualizar</a><a class="text-red-700" href={`/admin/vagas/${job.id}/editar`}>Editar</a><a class="text-red-700" href={`/admin/vagas/${job.id}/historico`}>Histórico</a></div></td><td class="p-4">{job.company}</td><td class="p-4">{labels[job.status] ?? job.status}</td><td class="p-4 text-sm">{job.expiresAt?.toLocaleString("pt-BR") ?? "Sem data"}</td><td class="p-4"><div class="flex flex-wrap gap-2"><form method="post" action={`/api/admin/jobs/${job.id}/duplicate`}><button class="rounded border px-3 py-1 text-sm">Duplicar</button></form>{can(auth, "jobs.publish") && job.status !== "PUBLISHED" && <form method="post" action={`/api/admin/jobs/${job.id}/status`}><input type="hidden" name="status" value="PUBLISHED"/><button class="rounded border px-3 py-1 text-sm">Publicar</button></form>}{can(auth, "jobs.publish") && job.status === "PUBLISHED" && <form method="post" action={`/api/admin/jobs/${job.id}/status`}><input type="hidden" name="status" value="PAUSED"/><button class="rounded border px-3 py-1 text-sm">Pausar</button></form>}{can(auth, "jobs.publish") && job.status !== "ARCHIVED" && <form method="post" action={`/api/admin/jobs/${job.id}/status`}><input type="hidden" name="status" value="ARCHIVED"/><button class="rounded border border-red-300 px-3 py-1 text-sm text-red-700">Arquivar</button></form>}</div></td></tr>)}</tbody></table></div>
+<nav class="mt-6 flex items-center justify-between" aria-label="Paginação"><span>Página {page} de {pages}</span><div class="flex gap-2">{page > 1 && <a class="rounded border bg-white px-4 py-2" href={`?q=${encodeURIComponent(query)}&status=${status}&page=${page - 1}`}>Anterior</a>}{page < pages && <a class="rounded border bg-white px-4 py-2" href={`?q=${encodeURIComponent(query)}&status=${status}&page=${page + 1}`}>Próxima</a>}</div></nav></AdminLayout>

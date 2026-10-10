@@ -1,0 +1,12 @@
+---
+import JobBoardPaused from "../components/JobBoardPaused.astro";
+import { jobBoardPublicGate } from "../lib/job-board-gate";
+import InstitutionalPage from "../components/InstitutionalPage.astro";
+
+const gate = await jobBoardPublicGate();
+---
+{gate.paused ? (
+  <JobBoardPaused title="Área para empresas temporariamente pausada" />
+) : (
+<InstitutionalPage slug="area-empresas" />
+)}

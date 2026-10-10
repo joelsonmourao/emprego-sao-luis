@@ -1,0 +1,80 @@
+---
+import { BRAND_ASSETS } from "../lib/brand-assets";
+import { getInstagramCtaSettings } from "../lib/instagram-cta";
+import { getEditorialPortalMode } from "../lib/portal-modes";
+
+interface Props {
+  variant?: "home" | "compact" | "alert" | "empty";
+  trackEvent?: string;
+}
+
+const { variant = "home", trackEvent = "instagram_follow_click" } = Astro.props;
+const settings = await getInstagramCtaSettings();
+const portal = await getEditorialPortalMode();
+const title = portal.enabled
+  ? (settings.title?.includes("vaga") ? "Acompanhe a redação no Instagram" : settings.title) ||
+    "Acompanhe a redação no Instagram"
+  : settings.title || "Acompanhe as vagas também no Instagram";
+const description = portal.enabled
+  ? "No @empregosaoluis compartilhamos guias, notícias e orientação profissional para quem busca se posicionar melhor no mercado de São Luís."
+  : settings.description ||
+    "No @empregosaoluis divulgamos oportunidades em stories e no feed, sempre com link para o portal. Siga para não perder vagas da sua região.";
+const showQr = settings.showQrCode && settings.qrCodeUrl;
+---
+<section class={`es-section ${variant === "compact" ? "!py-10" : ""}`} aria-labelledby="instagram-cta-title">
+  <div class="es-container">
+    <div class="overflow-hidden rounded-3xl border border-[var(--brand-border)] bg-[var(--brand-surface)] shadow-[var(--es-shadow)]">
+      <div class="grid gap-0 lg:grid-cols-[1.2fr_1fr]">
+        <div class="p-6 sm:p-10">
+          <p class="es-kicker">Instagram oficial</p>
+          <h2 id="instagram-cta-title" class="font-display mt-2 text-3xl font-black sm:text-4xl">{title}</h2>
+          <p class="mt-4 max-w-xl text-[var(--text-secondary)] leading-7">{description}</p>
+          {settings.storiesNote && <p class="mt-3 text-sm text-[var(--text-secondary)]">{settings.storiesNote}</p>}
+          <div class="mt-6 flex flex-wrap gap-3">
+            <a
+              class="es-btn es-btn-primary"
+              href={settings.profileUrl || BRAND_ASSETS.instagramUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              data-track={trackEvent}
+            >
+              Seguir {BRAND_ASSETS.instagramHandle}
+            </a>
+            <a class="es-btn es-btn-secondary" href="/instagram">Ver página do Instagram</a>
+          </div>
+          {settings.followerCount && settings.followerCountUpdatedAt && (
+            <p class="mt-4 text-xs text-[var(--text-secondary)]">
+              {settings.followerCount} seguidores · atualizado em {new Date(settings.followerCountUpdatedAt).toLocaleDateString("pt-BR")}
+            </p>
+          )}
+        </div>
+        <div class="flex items-center justify-center bg-[var(--brand-secondary)] p-6 sm:p-10">
+          <div class="text-center">
+            <img
+              src="/brand/icon-instagram.webp"
+              alt={BRAND_ASSETS.logoAlt}
+              class="mx-auto h-36 w-36 rounded-2xl bg-white object-contain p-2 shadow-sm sm:h-44 sm:w-44 sm:p-2.5 lg:h-48 lg:w-48"
+              width="192"
+              height="192"
+              loading="lazy"
+              decoding="async"
+            />
+            <p class="mt-4 font-display text-xl font-black text-white">{BRAND_ASSETS.instagramHandle}</p>
+            <p class="mt-2 text-sm text-white/70">Vagas · Stories · Dicas</p>
+            {showQr && <img src={settings.qrCodeUrl!} alt="QR Code do Instagram" class="mx-auto mt-6 h-28 w-28 rounded-xl bg-white p-2" width="112" height="112" loading="lazy" decoding="async" />}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+<script is:inline>
+  document.querySelectorAll("[data-track]").forEach((el) => {
+    if (el.closest("footer")) return;
+    el.addEventListener("click", () => {
+      const event = el.getAttribute("data-track");
+      if (!event) return;
+      navigator.sendBeacon?.("/api/events/instagram", JSON.stringify({ event, path: location.pathname }));
+    });
+  });
+</script>

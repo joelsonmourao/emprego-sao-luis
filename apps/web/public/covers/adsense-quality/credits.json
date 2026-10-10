@@ -1,0 +1,77 @@
+{
+  "packageId": "adsense-quality-guides-v1",
+  "covers": [
+    {
+      "slug": "objetivo-profissional-curriculo",
+      "file": "objetivo-profissional-curriculo.webp",
+      "width": 1280,
+      "height": 720,
+      "alt": "Pessoa jovem organizando anotações ao lado de um notebook para montar o currículo",
+      "credit": "Ilustração editorial Empregos São Luís",
+      "status": "GERADA_E_OTIMIZADA"
+    },
+    {
+      "slug": "perguntas-comuns-entrevista-emprego",
+      "file": "perguntas-comuns-entrevista-emprego.webp",
+      "width": 1280,
+      "height": 720,
+      "alt": "Candidato e recrutador conversando em entrevista profissional em escritório",
+      "credit": "Ilustração editorial Empregos São Luís",
+      "status": "GERADA_E_OTIMIZADA"
+    },
+    {
+      "slug": "pesquisar-empresa-antes-entrevista",
+      "file": "pesquisar-empresa-antes-entrevista.webp",
+      "width": 1280,
+      "height": 720,
+      "alt": "Pessoa pesquisando informações de uma empresa no notebook antes de uma entrevista",
+      "credit": "Ilustração editorial Empregos São Luís",
+      "status": "GERADA_E_OTIMIZADA"
+    },
+    {
+      "slug": "acompanhar-candidatura-emprego",
+      "file": "acompanhar-candidatura-emprego.webp",
+      "width": 1280,
+      "height": 720,
+      "alt": "Pessoa organizando agenda e anotações para acompanhar candidaturas de emprego",
+      "credit": "Ilustração editorial Empregos São Luís",
+      "status": "GERADA_E_OTIMIZADA"
+    },
+    {
+      "slug": "linkedin-primeiro-emprego",
+      "file": "linkedin-primeiro-emprego.webp",
+      "width": 1280,
+      "height": 720,
+      "alt": "Jovem adulto montando perfil profissional em notebook para busca do primeiro emprego",
+      "credit": "Ilustração editorial Empregos São Luís",
+      "status": "GERADA_E_OTIMIZADA"
+    },
+    {
+      "slug": "jovem-aprendiz-como-funciona",
+      "file": "jovem-aprendiz-como-funciona.webp",
+      "width": 1280,
+      "height": 720,
+      "alt": "Jovem em ambiente de trabalho aprendendo com supervisão em atividade profissional",
+      "credit": "Ilustração editorial Empregos São Luís",
+      "status": "GERADA_E_OTIMIZADA"
+    },
+    {
+      "slug": "estagio-x-jovem-aprendiz",
+      "file": "estagio-x-jovem-aprendiz.webp",
+      "width": 1280,
+      "height": 720,
+      "alt": "Dois jovens em contextos profissionais distintos, sugerindo caminhos de estágio e aprendizagem",
+      "credit": "Ilustração editorial Empregos São Luís",
+      "status": "GERADA_E_OTIMIZADA"
+    },
+    {
+      "slug": "organizar-busca-emprego",
+      "file": "organizar-busca-emprego.webp",
+      "width": 1280,
+      "height": 720,
+      "alt": "Pessoa planejando a semana de busca de emprego com anotações em mesa organizada",
+      "credit": "Ilustração editorial Empregos São Luís",
+      "status": "GERADA_E_OTIMIZADA"
+    }
+  ]
+}

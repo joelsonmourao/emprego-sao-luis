@@ -1,0 +1,21 @@
+---
+import JobBoardPaused from "../components/JobBoardPaused.astro";
+import { jobBoardPublicGate } from "../lib/job-board-gate";
+import BaseLayout from "../layouts/BaseLayout.astro";
+
+const gate = await jobBoardPublicGate();
+---
+{gate.paused ? (
+  <JobBoardPaused title="Busca de vagas temporariamente pausada" />
+) : (
+<BaseLayout title="Buscar vagas — Empregos São Luís" pageSchemaType="SearchResultsPage" noindex>
+  <section class="mx-auto max-w-4xl px-4 py-12">
+    <h1 class="text-4xl font-black">Buscar vagas</h1>
+    <form class="mt-8 flex gap-3" action="/vagas" method="get">
+      <label class="sr-only" for="q">Cargo, empresa ou palavra-chave</label>
+      <input class="min-w-0 flex-1 rounded-xl border p-3" id="q" name="q" required />
+      <button class="rounded-xl bg-red-700 px-5 font-bold text-white">Buscar</button>
+    </form>
+  </section>
+</BaseLayout>
+)}

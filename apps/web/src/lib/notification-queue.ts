@@ -1,0 +1,3 @@
+import { Queue, type ConnectionOptions } from "bullmq";
+function options(value: string): ConnectionOptions { const url = new URL(value); return { host: url.hostname, port: Number(url.port || 6379), ...(url.username ? { username: decodeURIComponent(url.username) } : {}), ...(url.password ? { password: decodeURIComponent(url.password) } : {}), ...(url.protocol === "rediss:" ? { tls: {} } : {}) }; }
+export function createNotificationQueue() { if (!process.env.REDIS_URL) throw new Error("REDIS_URL não configurada."); return new Queue("notifications", { connection: options(process.env.REDIS_URL) }); }
