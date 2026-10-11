@@ -18,7 +18,7 @@ describe("ads.txt validation", () => {
     expect(route).toContain("normalizeGooglePublisherId");
     expect(route).toContain("prepareAdsTxtContent");
     expect(route).toContain("status: 404");
-    expect(route).toContain('\"cache-control\": \"no-store\"');
+    expect(route).toContain('"cache-control": "no-store"');
     expect(route).not.toContain("pub-XXXXXXXXXXXXXXXX");
   });
 
