@@ -236,3 +236,15 @@ Política inicial sugerida, sujeita à aprovação operacional:
 Por execução, registre ID, horário UTC, operador, commit, versão PostgreSQL, provider de storage, tamanhos, checksums/versões, destino independente, resultado do restore, verificações e rollback.
 
 Nunca anexe dumps, arquivos do volume, segredos, URLs de banco ou dados pessoais a issues, PRs ou logs de CI.
+
+## 12. Manifesto verificável antes de abrir o gate
+
+O arquivo `scripts/validate-recovery-evidence.mjs` valida apenas metadados. Ele não abre conexão PostgreSQL, não lê volumes, não chama Coolify e não acessa o webhook. O contrato exige identidade exata do aplicativo público, hashes e tamanhos do dump e do armazenamento, destino independente, pausa de web e worker, restauração isolada, health/readiness, amostra de mídia, rollback de código/banco/arquivos, retenção e confirmação de que os aplicativos fora do escopo permaneceram intactos.
+
+Crie o manifesto real fora do repositório e sem credenciais. Valide-o com:
+
+    node scripts/validate-recovery-evidence.mjs /caminho/restrito/recovery-evidence.json
+
+A mensagem `Recovery evidence: VALID` confirma somente que o manifesto está completo e coerente. Ela não prova que backup, restauração ou rollback foram executados. Logs originais, checksums recalculados no destino independente e evidências do ambiente isolado devem permanecer vinculados ao registro operacional restrito.
+
+O gate só pode mudar para `open` após revisão humana dessas evidências. Não versione o manifesto real, dumps, arquivos, caminhos internos, credenciais, URLs assinadas nem dados pessoais.
