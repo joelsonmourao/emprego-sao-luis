@@ -7,7 +7,7 @@ import PageHero from "../components/ui/PageHero.astro";
 import SectionHeading from "../components/ui/SectionHeading.astro";
 import InstagramFollow from "../components/InstagramFollow.astro";
 import { categories, cities, companies, createDatabase, jobs, states } from "@es/db";
-import { and, count, desc, eq, gt, sql } from "drizzle-orm";
+import { and, count, desc, eq, gt, gte, lt, sql } from "drizzle-orm";
 import { articlePublicPath, listPublishedArticles } from "../lib/articles";
 import { getEditorialPortalMode } from "../lib/portal-modes";
 import { getVisualIdentity } from "../lib/visual-identity";
@@ -28,6 +28,7 @@ let categoryRows: Array<{ name: string; slug: string; total: number }> = [];
 let cityRows: Array<{ name: string; slug: string; state: string; total: number }> = [];
 let companyRows: Array<{ name: string; slug: string; total: number; logoUrl: string | null }> = [];
 let categoryOptions: Array<{ name: string; slug: string }> = [];
+let publishedToday = 0;
 
 const identity = await getVisualIdentity();
 
@@ -44,6 +45,14 @@ if (!portalEditorial && process.env.DATABASE_URL) {
       salaryVisible: jobs.salaryVisible, salaryMin: jobs.salaryMin, salaryMax: jobs.salaryMax,
       salaryCurrency: jobs.salaryCurrency, salaryPeriod: jobs.salaryPeriod
     };
+    const todayStart = sql<Date>`date_trunc('day', now() at time zone 'America/Sao_Paulo') at time zone 'America/Sao_Paulo'`;
+    const todayEnd = sql<Date>`${todayStart} + interval '1 day'`;
+    const [todayRow] = await connection.db
+      .select({ total: count(jobs.id) })
+      .from(jobs)
+      .where(and(active, gte(jobs.publishedAt, todayStart), lt(jobs.publishedAt, todayEnd)));
+    publishedToday = Number(todayRow?.total ?? 0);
+
     [recent, featured, categoryRows, cityRows, companyRows, categoryOptions] = await Promise.all([
       connection.db.select(fields).from(jobs).innerJoin(companies, eq(jobs.companyId, companies.id)).innerJoin(cities, eq(jobs.cityId, cities.id)).innerJoin(states, eq(jobs.stateId, states.id)).where(active).orderBy(desc(jobs.publishedAt)).limit(9),
       connection.db.select(fields).from(jobs).innerJoin(companies, eq(jobs.companyId, companies.id)).innerJoin(cities, eq(jobs.cityId, cities.id)).innerJoin(states, eq(jobs.stateId, states.id)).where(and(active, eq(jobs.featured, true))).orderBy(desc(jobs.publishedAt)).limit(6),
@@ -231,6 +240,11 @@ const homeDescription = portalEditorial
         {quickFilters.map(([label, href]) => <a class="chip hover:border-[var(--brand-primary)] hover:text-[var(--brand-primary)]" href={href}>{label}</a>)}
       </div>
     </form>
+    {publishedToday > 0 && (
+      <p class="mt-4 text-sm font-semibold text-white/90" aria-live="polite">
+        <strong>{publishedToday}</strong> {publishedToday === 1 ? "vaga publicada hoje" : "vagas publicadas hoje"}
+      </p>
+    )}
   </PageHero>
 
   <div class="es-container py-6"><AdSlot slot="home-top" pageType="home" /></div>
