@@ -1,3 +1,5 @@
+import { existsSync, readFileSync } from "node:fs";
+import { resolve } from "node:path";
 import { describe, expect, it } from "vitest";
 import {
   normalizeGooglePublisherId,
@@ -8,6 +10,17 @@ import {
 describe("ads.txt validation", () => {
   const publisher = "pub-1234567890123456";
   const validLine = `google.com, ${publisher}, DIRECT, f08c47fec0942fa0`;
+
+  it("mantém a rota pública fail-closed e remove o placeholder estático legado", () => {
+    expect(existsSync(resolve("public/ads.txt"))).toBe(false);
+
+    const route = readFileSync(resolve("apps/web/src/pages/ads.txt.ts"), "utf8");
+    expect(route).toContain("normalizeGooglePublisherId");
+    expect(route).toContain("prepareAdsTxtContent");
+    expect(route).toContain("status: 404");
+    expect(route).toContain('\"cache-control\": \"no-store\"');
+    expect(route).not.toContain("pub-XXXXXXXXXXXXXXXX");
+  });
 
   it("normalizes and deduplicates valid records", () => {
     const result = validateAdsTxtContent(
