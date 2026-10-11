@@ -172,6 +172,26 @@ export function validateRecoveryEvidence(data) {
     /^[a-f0-9]{40}$/.test(get(data, "rollback.previous_commit") ?? ""),
     "rollback.previous_commit deve ser SHA completo",
   );
+  if (
+    isDate(get(data, "backup.captured_at")) &&
+    isDate(get(data, "restore.completed_at"))
+  ) {
+    require(
+      Date.parse(get(data, "restore.completed_at")) >
+        Date.parse(get(data, "backup.captured_at")),
+      "restore.completed_at deve ser posterior ao backup",
+    );
+  }
+  if (
+    isDate(get(data, "restore.completed_at")) &&
+    isDate(get(data, "rollback.completed_at"))
+  ) {
+    require(
+      Date.parse(get(data, "rollback.completed_at")) >
+        Date.parse(get(data, "restore.completed_at")),
+      "rollback.completed_at deve ser posterior ao restore",
+    );
+  }
 
   require(
     isDate(get(data, "retention.expires_at")),
@@ -202,6 +222,16 @@ export function validateRecoveryEvidence(data) {
       isDate(get(data, "gate.approved_at")),
       "gate.approved_at obrigatório para open",
     );
+    if (
+      isDate(get(data, "rollback.completed_at")) &&
+      isDate(get(data, "gate.approved_at"))
+    ) {
+      require(
+        Date.parse(get(data, "gate.approved_at")) >
+          Date.parse(get(data, "rollback.completed_at")),
+        "gate.approved_at deve ser posterior ao rollback",
+      );
+    }
   }
 
   return [...new Set(errors)];
@@ -267,6 +297,30 @@ function runSelfTest() {
   invalid.identity.application_uuid = FORBIDDEN_APP_UUID;
   invalid.database_url = "postgresql://user:password@example.invalid/db";
   const invalidErrors = validateRecoveryEvidence(invalid);
+
+  const invalidChronology = validFixture();
+  invalidChronology.restore.completed_at = "2026-10-11T18:59:59Z";
+  invalidChronology.rollback.completed_at = "2026-10-11T18:59:58Z";
+  invalidChronology.gate = {
+    decision: "open",
+    approved_by: "responsavel-operacional",
+    approved_at: "2026-10-11T18:59:57Z",
+  };
+  const chronologyErrors = validateRecoveryEvidence(invalidChronology);
+  const expectedChronologyErrors = [
+    "restore.completed_at deve ser posterior ao backup",
+    "rollback.completed_at deve ser posterior ao restore",
+    "gate.approved_at deve ser posterior ao rollback",
+  ];
+  if (
+    !expectedChronologyErrors.every((error) =>
+      chronologyErrors.includes(error),
+    )
+  ) {
+    console.error("Chronology self-test failed", { chronologyErrors });
+    process.exit(1);
+  }
+
   if (validErrors.length > 0 || invalidErrors.length < 3) {
     console.error("Self-test failed", { validErrors, invalidErrors });
     process.exit(1);
