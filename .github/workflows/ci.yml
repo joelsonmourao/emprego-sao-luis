@@ -8,6 +8,7 @@ jobs:
       REDIS_URL: redis://127.0.0.1:6379
       UPLOADS_DIR: ${{ github.workspace }}/tmp/e2e-uploads
       APP_ENV: e2e
+      E2E_EXPECT_READY: "true"
       COOKIE_SECURE: "false"
       AUTH_SECRET: ci-only-auth-secret-with-32-characters
       SITE_URL: http://127.0.0.1:4321

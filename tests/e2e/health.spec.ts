@@ -25,7 +25,7 @@ test("readiness reflects the infrastructure state", async ({ request }) => {
   }
 });
 
-for (const [path, text] of [["/", "Seu próximo trabalho pode estar mais perto do que você imagina."], ["/vagas", "Vagas de emprego"], ["/instagram", "Empregos São Luís"], ["/alertas", "Receba vagas compatíveis com você"]] as const) {
+for (const [path, text] of [["/", "Vagas SLZ em São Luís — seu próximo emprego na capital"], ["/vagas", "Vagas de emprego"], ["/instagram", "Empregos São Luís"], ["/alertas", "Receba vagas compatíveis com você"]] as const) {
   test(`${path} renders useful HTML`, async ({ request }) => { const response = await request.get(path); expect(response.ok()).toBe(true); expect(await response.text()).toContain(text); });
 }
 

@@ -11,6 +11,7 @@ import { getSeoSettings } from "../lib/seo-settings";
 import { getSiteIntegrations, normalizeAdsenseClientId, normalizeSearchConsoleToken } from "../lib/site-integrations";
 import { getVisualIdentity } from "../lib/visual-identity";
 import { isStagingLikeEnvironment, stagingRobotsDirective } from "../lib/runtime-env";
+import { getRuntimeSiteUrl, resolveCanonicalUrl } from "../lib/canonical-url";
 import { getEditorialPortalMode } from "../lib/portal-modes";
 
 interface Props {
@@ -33,7 +34,9 @@ const integrations = await getSiteIntegrations();
 const stagingLike = isStagingLikeEnvironment();
 const { title, description = seo.defaultDescription, robots = seo.robotsDefault, canonical, ogImage = identity.ogImageUrl ?? seo.og.image, breadcrumbs, noindex = false, pageSchemaType = "WebPage", schemas = [], disableSeoGraph = false } = Astro.props;
 const pageTitle = title.includes(seo.titleSuffix) ? title : `${title} — ${seo.titleSuffix}`;
-const canonicalUrl = canonical ? new URL(canonical, Astro.site).toString() : new URL(Astro.url.pathname, Astro.site).toString();
+const runtimeSite = getRuntimeSiteUrl(Astro.site);
+const siteUrl = runtimeSite.toString();
+const canonicalUrl = resolveCanonicalUrl(canonical, Astro.url.pathname, runtimeSite);
 const consentChoice = Astro.cookies.get("es_consent_ads")?.value;
 const consentOk = !integrations.consentModeEnabled || consentChoice === "yes";
 
@@ -61,7 +64,6 @@ const metaPixelId = integrations.metaPixelId.trim();
 const metaPixelOk = /^\d{5,20}$/.test(metaPixelId);
 const metaEnabled = !stagingLike && metaPixelOk && consentOk;
 
-const siteUrl = Astro.site?.toString() ?? process.env.SITE_URL ?? "https://empregossaoluis.com.br";
 const og = buildOpenGraphTags({ title: pageTitle, description, url: canonicalUrl, type: seo.og.type, siteName: seo.og.siteName, locale: seo.og.locale, ...(ogImage ? { image: ogImage } : {}) });
 const twitter = buildTwitterTags({ title: pageTitle, description, card: seo.twitter.card, ...(seo.twitter.site ? { site: seo.twitter.site } : {}), ...(seo.twitter.creator ? { creator: seo.twitter.creator } : {}), ...(ogImage ? { image: ogImage } : {}) });
 const portal = await getEditorialPortalMode();
