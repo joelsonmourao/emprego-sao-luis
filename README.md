@@ -108,6 +108,7 @@ Procedimento completo: [docs/PRODUCTION_STABILIZATION.md](docs/PRODUCTION_STABIL
 ## Documentação principal
 
 - [Estabilização de produção](docs/PRODUCTION_STABILIZATION.md)
+- [Backup, restauração isolada e rollback](docs/RECOVERY_RUNBOOK.md)
 - [Auditoria das operações administrativas](docs/ADMIN_OPERATIONS_AUDIT.md)
 - [Volume persistente no Coolify](docs/COOLIFY_STORAGE.md)
 - [Deploy no Coolify](docs/COOLIFY_DEPLOY.md)
