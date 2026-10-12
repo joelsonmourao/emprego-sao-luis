@@ -522,3 +522,31 @@ textarea:focus-visible {
     margin-top: 1.5rem;
   }
 }
+
+
+/* Homepage de vagas: a mesma assinatura visual do portal editorial. */
+.es-home-hero {
+  background:
+    radial-gradient(circle at 85% 0%, rgba(245, 130, 32, 0.2), transparent 28%),
+    linear-gradient(115deg, #171717 0%, #292020 46%, var(--brand-primary) 100%);
+}
+
+.es-home-hero h1 {
+  max-width: 18ch;
+  font-size: clamp(2.5rem, 5.3vw, 4.9rem);
+  line-height: 1.08;
+  text-wrap: balance;
+}
+
+.es-home-hero .hero-search-panel {
+  max-width: 68rem;
+  margin-top: clamp(2rem, 4vw, 3rem);
+  border: 1px solid rgba(255,255,255,0.35);
+  border-top: 5px solid var(--brand-accent);
+  box-shadow: 0 22px 68px rgba(0,0,0,0.22);
+}
+
+@media (max-width: 639px) {
+  .es-home-hero h1 { max-width: none; }
+  .es-home-hero .hero-search-panel { border-radius: 1rem; }
+}
