@@ -1,5 +1,9 @@
 name: Auditoria pública completa - AdSense
 on:
+  push:
+    branches: [codex/admin-negocio-completo]
+    paths:
+      - ".github/workflows/auditoria-adsense-publico.yml"
   pull_request:
     branches: [codex/admin-negocio-completo]
     paths:
