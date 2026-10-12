@@ -1,4 +1,4 @@
-import { createDatabase, settings } from "@es/db";
+import { createDatabase, createPublicDatabase, settings } from "@es/db";
 import { eq } from "drizzle-orm";
 import { BRAND_ASSETS, BRAND_COLORS } from "./brand-assets";
 import { getBrandIdentity, brandIdentityToVisualIdentity, invalidateBrandCache } from "./brand/identity-service";
@@ -43,7 +43,7 @@ export async function getVisualIdentity(): Promise<VisualIdentity> {
     };
   } catch {
     if (!process.env.DATABASE_URL) return defaults;
-    const connection = createDatabase(process.env.DATABASE_URL);
+    const connection = createPublicDatabase(process.env.DATABASE_URL);
     try {
       const [row] = await connection.db.select().from(settings).where(eq(settings.key, "visual_identity")).limit(1);
       if (!row?.value || typeof row.value !== "object") return defaults;
