@@ -66,9 +66,12 @@ if (!portalEditorial && process.env.DATABASE_URL) {
   }
 }
 
-const articles = await listPublishedArticles(8);
-const newsArticles = articles.filter((item) => item.article.type === "NEWS").slice(0, 4);
-const blogArticles = articles.filter((item) => item.article.type !== "NEWS").slice(0, 4);
+// Não esconder notícias só porque os últimos artigos publicados são guias.
+// Consultas independentes, em paralelo, trazem até quatro itens reais de cada tipo.
+const [newsArticles, blogArticles] = await Promise.all([
+  listPublishedArticles(4, undefined, "NEWS"),
+  listPublishedArticles(4, undefined, ["GUIDE", "DATA_REPORT"])
+]);
 const displayFeatured = featured.length ? featured : recent.slice(0, 3);
 const quickFilters = [
   ["Vagas SLZ", "/vagas-slz"],
