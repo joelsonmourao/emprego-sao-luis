@@ -123,6 +123,9 @@ repository=joelsonmourao/emprego-sao-luis
 branch=codex/admin-negocio-completo
 deployed_commit=<sha>
 postgres_version=<major.minor>
+dump_command_exit_code=0
+dump_contents_verified=true
+restore_postgres_version=<major.minor>
 storage_provider=<volume|s3|r2>
 database_sha256=<sha256>
 storage_sha256_or_version=<valor>
@@ -138,7 +141,7 @@ Copie dump, armazenamento e manifesto para destino criptografado e independente 
 
 Crie ambiente descartável com:
 
-- PostgreSQL da mesma versão principal;
+- PostgreSQL da mesma versão principal; registre a versão efetivamente usada em `restore.postgres_version`;
 - volume ou bucket novo e vazio;
 - rede privada, sem domínio público;
 - credenciais exclusivas;
@@ -233,13 +236,13 @@ Política inicial sugerida, sujeita à aprovação operacional:
 - semanal: 8 cópias;
 - mensal: 6 cópias.
 
-Por execução, registre ID, horário UTC, operador, commit, versão PostgreSQL, provider de storage, tamanhos, checksums/versões, destino independente, resultado do restore, verificações e rollback.
+Por execução, registre ID, horário UTC, operador, commit, versões PostgreSQL da origem e da restauração, conclusão do `pg_dump`, inspeção do conteúdo com `pg_restore --list`, provider de storage, tamanhos, checksums/versões, destino independente, resultado do restore, verificações e rollback.
 
 Nunca anexe dumps, arquivos do volume, segredos, URLs de banco ou dados pessoais a issues, PRs ou logs de CI.
 
 ## 12. Manifesto verificável antes de abrir o gate
 
-O arquivo `scripts/validate-recovery-evidence.mjs` valida apenas metadados. Ele não abre conexão PostgreSQL, não lê volumes, não chama Coolify e não acessa o webhook. O contrato exige identidade exata do aplicativo público, hashes e tamanhos do dump e do armazenamento, destino independente, pausa de web e worker, restauração isolada, health/readiness, amostra de mídia, rollback de código/banco/arquivos, retenção e confirmação de que os aplicativos fora do escopo permaneceram intactos.
+O arquivo `scripts/validate-recovery-evidence.mjs` valida apenas metadados. Ele não abre conexão PostgreSQL, não lê volumes, não chama Coolify e não acessa o webhook. O contrato exige identidade exata do aplicativo público, conclusão do `pg_dump`, inspeção do conteúdo com `pg_restore --list`, compatibilidade da versão principal do PostgreSQL na restauração, hashes e tamanhos do dump e do armazenamento, destino independente, pausa de web e worker, restauração isolada, health/readiness, amostra de mídia, rollback de código/banco/arquivos, retenção e confirmação de que os aplicativos fora do escopo permaneceram intactos.
 
 Crie o manifesto real fora do repositório e sem credenciais. Valide-o com:
 
