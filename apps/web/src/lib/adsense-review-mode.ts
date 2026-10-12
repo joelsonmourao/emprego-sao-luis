@@ -70,6 +70,7 @@ const REVIEW_INDEXABLE_EXACT = new Set([
   "/blog",
   "/noticias",
   "/ferramentas/controle-candidaturas",
+  "/guias/emprego-sine-maranhao",
   "/sobre",
   "/quem-somos",
   "/contato",
