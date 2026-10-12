@@ -1,5 +1,5 @@
 import { and, count, desc, eq, gt, ilike, inArray, isNull, like, lte, or, type SQL } from "drizzle-orm";
-import { articles, authors, createDatabase, createPublicDatabase } from "@es/db";
+import { articles, authors, createPublicDatabase } from "@es/db";
 import { slLocalSlugMap } from "../data/sl-local-slug-map";
 import {
   EDITORIAL_BLOG_THEMES,
