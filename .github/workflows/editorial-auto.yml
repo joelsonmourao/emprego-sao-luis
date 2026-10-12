@@ -1,0 +1,57 @@
+name: Empregos Sao Luis - Publicacao automatica
+on:
+  push:
+    branches: [codex/admin-negocio-completo]
+    paths:
+      - "editorial/**"
+      - "scripts/build-auto-editorial.mjs"
+      - ".github/workflows/editorial-auto.yml"
+  pull_request:
+    branches: [codex/admin-negocio-completo]
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: es-editorial-automatico
+  cancel-in-progress: false
+jobs:
+  preparar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: codex/admin-negocio-completo
+          persist-credentials: true
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+      - run: npm ci --legacy-peer-deps
+      - name: Converter rascunhos qualificados em manifesto e capas proprias
+        run: node scripts/build-auto-editorial.mjs
+      - name: Validar integridade antes de qualquer publicacao
+        run: |
+          npm run typecheck
+          npm run test
+          npm run build
+      - name: Guardar relatorio de conteudos aprovados e bloqueados
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: es-editorial-qa
+          path: editorial/automation-report.json
+          if-no-files-found: warn
+          retention-days: 30
+      - name: Persistir manifesto e WebP apenas apos QA e compilacao
+        if: github.event_name != 'pull_request'
+        run: |
+          git config user.name "es-editorial-bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add apps/web/src/data/auto-editorial-manifest.json apps/web/public/covers/auto-editorial/ editorial/automation-report.json
+          if git diff --cached --quiet; then
+            echo "Sem novos artigos aprovados — nenhum commit."
+          else
+            git commit -m "editorial(auto): posts e imagens validados"
+            git push origin HEAD:codex/admin-negocio-completo
+          fi
