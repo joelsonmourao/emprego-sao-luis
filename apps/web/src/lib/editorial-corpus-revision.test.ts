@@ -21,13 +21,19 @@ describe("Auditoria editorial real do corpus de 12/10/2026", () => {
   it("registra exatamente os 98 guias com conteúdo repetitivo ou curto", () => {
     const flagged = all.filter((x) => x.flags.includes("TEMPLATE_REPEATED") || x.flags.includes("SHORT"));
     expect(flagged).toHaveLength(98);
-    expect(guidesPendingReview.size).toBe(flagged.length);
-    for (const item of flagged) expect(guidesPendingReview.has(item.slug)).toBe(true);
+    const reviewed = flagged.filter((item) => getEditorialContentOverride(item.slug));
+    const pending = flagged.filter((item) => !getEditorialContentOverride(item.slug));
+    expect(reviewed).toHaveLength(20);
+    expect(pending).toHaveLength(78);
+    expect(guidesPendingReview.size).toBe(pending.length);
+    for (const item of pending) expect(guidesPendingReview.has(item.slug)).toBe(true);
+    for (const item of reviewed) expect(guidesPendingReview.has(item.slug)).toBe(false);
   });
 
   it("não usa um único noindex genérico: cada slug possui evidência registrada", () => {
     for (const item of all) {
-      const expected = item.flags.includes("TEMPLATE_REPEATED") || item.flags.includes("SHORT");
+      const flagged = item.flags.includes("TEMPLATE_REPEATED") || item.flags.includes("SHORT");
+      const expected = flagged && !getEditorialContentOverride(item.slug);
       expect(isEditorialReviewPending("GUIDE", item.slug)).toBe(expected);
     }
     expect(newsPendingFactCheck.size).toBe(5);
@@ -39,7 +45,11 @@ describe("Auditoria editorial real do corpus de 12/10/2026", () => {
       "pesquisar-empresa-antes-entrevista", "seguro-desemprego-checklist-documentos",
       "ctps-digital-carteira-trabalho-consultar", "fgts-consultar-trabalhador-clt",
       "ler-contrato-trabalho-clt", "curriculo-pdf-erros-triagem",
-      "entrevista-comportamental-exemplos", "primeiro-emprego-sao-luis-checklist"
+      "entrevista-comportamental-exemplos", "primeiro-emprego-sao-luis-checklist",
+      "acidente-de-trabalho-o-que-fazer", "assedio-no-trabalho-o-que-fazer",
+      "atestado-medico-trabalho-como-entregar", "banco-de-horas-direitos-trabalhador",
+      "convencao-coletiva-holerite-trabalhador", "escala-6x1-o-que-perguntar",
+      "hora-extra-holerite-como-conferir", "pedido-demissao-aviso-previo-acerto"
     ];
     for (const slug of edited) {
       const override = getEditorialContentOverride(slug);
@@ -48,6 +58,16 @@ describe("Auditoria editorial real do corpus de 12/10/2026", () => {
       expect(override!.contentHtml).not.toContain("Uma situação comum na prática");
       expect(override!.contentHtml).not.toContain("No tema em pauta");
       expect(override!.contentHtml).toContain("<h2>");
+    }
+
+    const sourceBacked = [
+      "acidente-de-trabalho-o-que-fazer", "assedio-no-trabalho-o-que-fazer",
+      "atestado-medico-trabalho-como-entregar", "banco-de-horas-direitos-trabalhador",
+      "convencao-coletiva-holerite-trabalhador", "escala-6x1-o-que-perguntar",
+      "hora-extra-holerite-como-conferir", "pedido-demissao-aviso-previo-acerto"
+    ];
+    for (const slug of sourceBacked) {
+      expect(getEditorialContentOverride(slug)!.contentHtml).toMatch(/<a href="https:\/\//);
     }
   });
 
