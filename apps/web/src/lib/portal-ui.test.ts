@@ -50,6 +50,14 @@ describe("portal UI redesign", () => {
     expect(css).toContain("@media (max-width: 639px)");
   });
 
+  it("homepage editorial mostra notícias e guias reais em consultas independentes", () => {
+    const home = readFileSync(resolve("apps/web/src/pages/index.astro"), "utf8");
+    expect(home).toContain('listPublishedArticles(4, undefined, "NEWS")');
+    expect(home).toContain('listPublishedArticles(4, undefined, ["GUIDE", "DATA_REPORT"])');
+    expect(home).toContain("Promise.all");
+    expect(home).toContain('href="/redacao"');
+  });
+
   it("home inclui seção Instagram e busca", () => {
     const source = readFileSync(resolve("apps/web/src/pages/index.astro"), "utf8");
     expect(source).toContain("InstagramFollow");
