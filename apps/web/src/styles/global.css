@@ -997,3 +997,20 @@ main article .es-prose a { text-decoration-thickness: 1px; text-underline-offset
     box-shadow: var(--es-premium-shadow-strong);
   }
 }
+
+
+/* Consistent section mastheads across all editorial and institutional pages. */
+.es-premium-page-hero:not(.hero-pattern):not(.es-home-hero) {
+  border-bottom: 1px solid var(--es-premium-stroke);
+  background:
+    radial-gradient(ellipse at 94% 10%, rgba(157, 62, 74, .07), transparent 40%),
+    linear-gradient(125deg, #faf7f5, #f4eeee);
+}
+.es-premium-page-hero:not(.hero-pattern) h1 {
+  max-width: 19ch;
+  color: var(--es-premium-ink);
+  text-wrap: balance;
+}
+.es-premium-page-hero:not(.hero-pattern) p:last-child {
+  line-height: 1.8;
+}
