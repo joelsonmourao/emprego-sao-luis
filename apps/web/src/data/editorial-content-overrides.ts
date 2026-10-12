@@ -340,6 +340,171 @@ const overrides: Record<string, EditorialContentOverride> = {
 <p>Registre cargo, empresa, data e resposta recebida no <a href="/ferramentas/controle-candidaturas">controle gratuito</a>. Uma candidatura sem retorno não significa que seu esforço foi inútil; observe quais formatos de currículo e funções geram respostas reais antes de alterar tudo.</p>
 <p><strong>Exemplo ilustrativo:</strong> alguém que mora no Cohatrac encontra vaga no outro lado da cidade com jornada cedo. Antes de enviar, precisa calcular tempo de viagem, custo e condições de transporte no horário. O salário do anúncio não revela sozinho se a oportunidade é viável.</p>
 <p>Para documentação profissional, o serviço <a href="https://www.gov.br/pt-br/servicos/obter-a-carteira-de-trabalho" target="_blank" rel="noopener noreferrer">Carteira de Trabalho Digital</a> orienta o acesso ao documento. Nunca forneça senha da sua conta gov.br a recrutadores.</p>`.trim()
+  },
+  "acidente-de-trabalho-o-que-fazer": {
+    reviewedAt: "2026-10-12",
+    contentHtml: `
+<p><strong>Revisão editorial: 12 de outubro de 2026.</strong> Um acidente durante o trabalho ou no trajeto precisa ser tratado primeiro como questão de saúde e segurança. Este guia organiza ações práticas, mas não determina se um caso específico gera benefício, estabilidade ou indenização. Essas conclusões dependem dos fatos, dos documentos e da análise do órgão ou profissional competente.</p>
+<h2>Primeiro: interrompa o risco e procure atendimento</h2>
+<p>Se houver perigo ativo, afaste-se quando isso puder ser feito com segurança e peça ajuda. Em situação urgente, priorize o serviço de emergência e as orientações da equipe de saúde. Não continue uma tarefa apenas para “terminar o turno” quando houver dor, sangramento, tontura, queda, queimadura, choque ou outra alteração relevante.</p>
+<p>Informe ao atendimento como o evento aconteceu, quais partes do corpo foram afetadas e quais equipamentos estavam envolvidos. Não acrescente detalhes que não presenciou. Guarde receitas, relatórios, exames e orientações de retorno; esses documentos ajudam a acompanhar a saúde e a reconstruir a sequência do ocorrido.</p>
+<h2>Registre o que você sabe, sem virar investigador</h2>
+<ol><li>Anote data, horário, setor e atividade realizada.</li><li>Registre quem presenciou o fato, sem pressionar colegas a produzir uma versão.</li><li>Guarde comunicações enviadas à liderança, ao RH ou à área de segurança.</li><li>Fotografe o local ou equipamento apenas se isso for permitido e não criar novo risco.</li><li>Peça cópia de documentos que assinou e não confirme uma narrativa que não compreendeu.</li></ol>
+<p><strong>Exemplo ilustrativo:</strong> uma auxiliar de cozinha sofre queimadura ao movimentar uma panela. O registro útil descreve tarefa, horário, atendimento e comunicação. Ele não precisa atribuir culpa antes de uma apuração técnica.</p>
+<h2>Entenda a Comunicação de Acidente de Trabalho</h2>
+<p>O serviço federal <a href="https://www.gov.br/pt-br/servicos/registrar-comunicacao-de-acidente-de-trabalho-cat?id=9402&amp;origem=servico" target="_blank" rel="noopener noreferrer">Cadastrar Comunicação de Acidente de Trabalho (CAT)</a> explica quem pode registrar, os dados solicitados e o procedimento digital. A CAT é uma comunicação administrativa: emitir o documento não substitui atendimento médico nem decide sozinho todos os efeitos trabalhistas ou previdenciários.</p>
+<p>Se a empresa informou que registrou a CAT, solicite o número ou uma cópia. O serviço <a href="https://www.gov.br/pt-br/servicos/consultar-comunicacao-de-acidente-de-trabalho-cat?id=9331&amp;origem=servico" target="_blank" rel="noopener noreferrer">Consultar CAT</a> orienta a consulta pelo canal oficial. Se houver recusa, atraso ou dúvida sobre quem pode registrar, use as instruções do serviço e procure orientação qualificada; não pague intermediário para “liberar” protocolo.</p>
+<h2>Afastamento e retorno exigem documentos claros</h2>
+<p>Siga as recomendações da equipe de saúde e entregue documentos pelo canal formal informado pela empresa. Antes de retornar, confirme se existe avaliação ocupacional, restrição ou adaptação indicada. Não prometa desempenhar atividade incompatível com a orientação médica apenas por medo de perder o posto.</p>
+<p>Em São Luís, funções de limpeza, carga, cozinha, construção e atendimento externo podem envolver riscos muito diferentes. O nome do cargo não basta para avaliar o caso: importam a tarefa concreta, o ambiente, os equipamentos, o treinamento e o que ocorreu naquele dia.</p>
+<h2>Checklist para as próximas 24 horas</h2>
+<ul><li>Saúde atendida e orientações guardadas.</li><li>Liderança ou canal responsável avisado por meio rastreável.</li><li>Data, local, tarefa e testemunhas anotados.</li><li>CAT verificada no serviço oficial, quando aplicável.</li><li>Cópias de documentos preservadas fora do telefone corporativo.</li><li>Dúvidas individuais encaminhadas a órgão, sindicato ou profissional competente.</li></ul>
+<p>Não publique prontuário, CPF ou fotos de lesão em redes abertas. Para reconhecer contatos falsos que tentam cobrar por benefício ou vaga, consulte também a página de <a href="/seguranca-candidatos">segurança do candidato</a>.</p>
+`.trim()
+  },
+  "assedio-no-trabalho-o-que-fazer": {
+    reviewedAt: "2026-10-12",
+    contentHtml: `
+<p><strong>Revisão editorial: 12 de outubro de 2026.</strong> Violência e assédio no trabalho podem envolver humilhação, isolamento, ameaça, constrangimento sexual, perseguição ou outras condutas que afetam dignidade e segurança. Nem todo conflito ou cobrança profissional é assédio; por isso, é importante registrar fatos concretos e buscar orientação sem tentar fechar um diagnóstico jurídico sozinho.</p>
+<h2>Descreva condutas, não rótulos</h2>
+<p>Em vez de anotar apenas “meu chefe me assedia”, registre o que foi dito ou feito, em que dia, onde e diante de quem. Uma cobrança de prazo pode ser legítima; xingamentos, ameaças, exposição vexatória ou comentários sexualizados são fatos diferentes e precisam ser descritos com precisão.</p>
+<p>O Ministério Público do Trabalho mantém as cartilhas oficiais <a href="https://mpt.mp.br/pgt/publicacoes?td=cartilhas" target="_blank" rel="noopener noreferrer">Violência e Assédio Moral no Trabalho</a> e <a href="https://mpt.mp.br/pgt/publicacoes?td=cartilhas" target="_blank" rel="noopener noreferrer">Violência e Assédio Sexual no Trabalho</a>. Consulte a edição e a data do material, porque conceitos e canais podem ser atualizados.</p>
+<h2>Monte uma linha do tempo segura</h2>
+<ol><li>Anote data, horário, local, participantes e palavras ou ações observáveis.</li><li>Preserve e-mails, mensagens, escalas ou documentos aos quais você tem acesso legítimo.</li><li>Não edite arquivos para “deixar mais claro”; mantenha o original e uma cópia.</li><li>Liste testemunhas sem combinar versões.</li><li>Guarde o material em conta pessoal protegida, respeitando sigilo de clientes e terceiros.</li></ol>
+<p><strong>Exemplo ilustrativo:</strong> uma atendente recebe comentários sobre o corpo em reuniões e mensagens privadas fora do expediente. A linha do tempo deve separar cada episódio e preservar o conteúdo original. Ela não deve expor colegas ou dados de clientes em uma postagem pública.</p>
+<h2>Escolha o canal considerando sua segurança</h2>
+<p>Se houver risco imediato, priorize sair do local e buscar apoio. Quando for seguro, verifique se a organização tem RH, ouvidoria, canal de ética, CIPA ou outro procedimento formal. Faça uma comunicação objetiva e guarde o protocolo. Um canal interno pode ajudar, mas não é a única alternativa e não deve ser usado de modo que aumente o risco para a pessoa afetada.</p>
+<p>O <a href="https://mpt.mp.br/pgt/servicos/servico-denuncie" target="_blank" rel="noopener noreferrer">Serviço Denuncie do MPT</a> apresenta o encaminhamento por estado. A página pede informações para compreender a irregularidade; leia as orientações antes de enviar. Dependendo do caso, também podem ser relevantes sindicato, assistência jurídica, polícia, serviço de saúde ou outro órgão. Este guia não escolhe o canal por você.</p>
+<h2>Cuide da saúde sem transformar sofrimento em prova pública</h2>
+<p>Ansiedade, medo, insônia e queda de rendimento merecem atendimento. Procure suporte de saúde e alguém de confiança. Um relato público feito no momento de crise pode revelar dados pessoais, dificultar a proteção de provas e expor outras pessoas. Buscar ajuda não exige narrar tudo em uma rede social.</p>
+<h2>Perguntas para organizar a decisão</h2>
+<ul><li>Existe risco de ficar sozinho com a pessoa envolvida?</li><li>Quais fatos consigo datar e comprovar sem acessar conteúdo proibido?</li><li>Há um canal formal seguro e como obtenho protocolo?</li><li>Preciso de acompanhamento de saúde ou apoio emocional agora?</li><li>Qual órgão ou profissional pode analisar o meu caso individual?</li></ul>
+<p>Não assine retratação, pedido de demissão ou declaração que não compreendeu. Peça cópia e tempo para orientação. Se o problema começou ainda no recrutamento, interrompa pedidos impróprios e consulte a página de <a href="/seguranca-candidatos">segurança para candidatos</a>.</p>
+`.trim()
+  },
+  "atestado-medico-trabalho-como-entregar": {
+    reviewedAt: "2026-10-12",
+    contentHtml: `
+<p><strong>Revisão editorial: 12 de outubro de 2026.</strong> Um documento médico deve ser entregue de forma íntegra, legível e pelo canal correto. Não existe um único procedimento interno para todas as empresas. O trabalhador precisa separar o que consta da lei e das normas profissionais do que é prazo, sistema ou rotina administrativa do empregador.</p>
+<h2>Antes de sair do atendimento</h2>
+<p>Confira se o documento identifica o profissional e informa o período recomendado de afastamento ou comparecimento conforme o atendimento realizado. Não acrescente, apague ou corrija conteúdo por conta própria. Se houver erro, solicite correção ao profissional ou estabelecimento responsável.</p>
+<p>A norma do Conselho Federal de Medicina sobre documentos médicos pode ser consultada no sistema oficial em <a href="https://sistemas.cfm.org.br/normas/visualizar/resolucoes/BR/2024/2381" target="_blank" rel="noopener noreferrer">Resolução CFM nº 2.381/2024</a>. Ela trata da emissão de documentos por médicos; o trabalhador não deve usar um resumo de internet como substituto da norma ou da orientação recebida.</p>
+<h2>Descubra o canal sem expor sua saúde</h2>
+<ol><li>Consulte regulamento, manual do empregado ou orientação do RH.</li><li>Confirme se o envio ocorre por sistema, e-mail corporativo ou entrega presencial.</li><li>Pergunte quem pode acessar o documento e como receberá confirmação.</li><li>Envie dentro do prazo informado quando isso for possível.</li><li>Se estiver hospitalizado ou impossibilitado, comunique a situação por canal disponível e regularize assim que puder.</li></ol>
+<p><strong>Exemplo ilustrativo:</strong> uma trabalhadora recebe alta à noite e o aplicativo interno não aceita o arquivo. Ela registra a tentativa, avisa o RH pelo e-mail oficial e pede orientação para reenviar no formato correto. Não manda o documento em grupo de mensagens com colegas.</p>
+<h2>CID e dados de saúde exigem cuidado</h2>
+<p>Diagnóstico, exame e histórico clínico são dados sensíveis. Não presuma que todo destinatário pode exigir ou compartilhar essas informações. Questões sobre CID, consentimento, validação e medicina ocupacional dependem da norma aplicável e do contexto. Se houver dúvida, pergunte ao profissional que emitiu o documento e ao canal formal da empresa, sem publicar o arquivo.</p>
+<p>A <a href="https://www.planalto.gov.br/ccivil_03/_ato2015-2018/2018/lei/l13709.htm" target="_blank" rel="noopener noreferrer">Lei Geral de Proteção de Dados Pessoais</a> classifica dados de saúde como sensíveis. Isso não elimina obrigações legítimas, mas reforça que coleta, uso e armazenamento precisam de finalidade e proteção adequadas.</p>
+<h2>Guarde prova da entrega e acompanhe</h2>
+<p>Mantenha uma cópia legível e o comprovante do envio. Se entregar em papel, peça protocolo ou recibo. Se enviar pelo sistema, salve a tela de confirmação. Se o documento for recusado, peça o motivo por escrito e não tente resolver alterando o arquivo.</p>
+<p>Atestado, declaração de comparecimento e relatório médico não são documentos idênticos. Leia o título e o conteúdo que recebeu. A página oficial da <a href="https://www.planalto.gov.br/ccivil_03/leis/l0605.htm" target="_blank" rel="noopener noreferrer">Lei nº 605/1949</a> é uma das referências legais relacionadas à justificativa de ausências; regras complementares, instrumentos coletivos e situações particulares podem exigir análise própria.</p>
+<h2>Checklist de entrega responsável</h2>
+<ul><li>Documento original conferido, sem alteração.</li><li>Canal e prazo confirmados no regulamento aplicável.</li><li>Somente destinatários necessários receberam o arquivo.</li><li>Comprovante de entrega guardado.</li><li>Rejeição ou falha de sistema registrada e comunicada.</li><li>Dúvida individual levada à medicina do trabalho, sindicato ou orientação competente.</li></ul>
+<p>Não compre atestado e não compartilhe senha, CPF ou documento médico com perfis que prometem “abonar falta”. Suspeitas de fraude também podem colocar a própria pessoa em risco disciplinar e criminal.</p>
+`.trim()
+  },
+  "banco-de-horas-direitos-trabalhador": {
+    reviewedAt: "2026-10-12",
+    contentHtml: `
+<p><strong>Revisão editorial: 12 de outubro de 2026.</strong> Banco de horas é uma forma de compensar variações de jornada; não é um saldo informal controlado apenas pela memória do supervisor. A validade, o prazo de compensação e a forma do acordo dependem da legislação e do instrumento aplicável ao vínculo.</p>
+<h2>Comece identificando qual regra existe</h2>
+<p>Pergunte ao RH se o regime decorre do contrato, de acordo individual, de acordo coletivo ou de convenção coletiva. Peça acesso ao texto e verifique a vigência. A <a href="https://www.planalto.gov.br/ccivil_03/decreto-lei/del5452.htm" target="_blank" rel="noopener noreferrer">Consolidação das Leis do Trabalho (CLT)</a> trata da jornada e das formas de compensação; leia a versão atualizada e não confie em tabela sem data.</p>
+<p>Quando houver instrumento coletivo, consulte o serviço oficial <a href="https://www.gov.br/pt-br/servicos/consultar-instrumento-coletivo-de-trabalho" target="_blank" rel="noopener noreferrer">Consultar Instrumento Coletivo de Trabalho</a>. Categoria, sindicato, empresa, território e período de vigência importam. Um acordo de outra empresa ou de outro estado pode não responder ao seu caso em São Luís.</p>
+<h2>Leia o espelho de ponto junto com o saldo</h2>
+<ol><li>Confira horários de entrada, saída e intervalos.</li><li>Compare alterações de escala com o que aparece no registro.</li><li>Identifique separadamente horas creditadas, compensadas e eventual saldo negativo.</li><li>Veja qual período de fechamento a empresa utiliza.</li><li>Peça correção de divergência por canal rastreável.</li></ol>
+<p><strong>Exemplo ilustrativo:</strong> um vendedor fica quarenta minutos além do horário em três dias de evento. O controle útil não é apenas somar os minutos: é verificar se foram registrados, em qual regime entraram e qual regra informa a compensação.</p>
+<h2>Faça perguntas antes da data de pico</h2>
+<p>Em comércio, hotelaria, alimentação e serviços, datas de maior movimento podem alterar escalas. Isso não prova que toda empresa usa banco de horas nem que qualquer compensação é válida. Antes do período, pergunte como a convocação será registrada, com que antecedência aparece a folga e onde consultar o saldo.</p>
+<p>Evite combinar folga somente por mensagem informal. Se o sistema não refletir o acordo, peça regularização. Também não registre ponto por outra pessoa nem permita que façam isso em seu nome.</p>
+<h2>Se o saldo não fecha</h2>
+<p>Separe documentos do mesmo período: espelho de ponto, holerite, escala e extrato do banco. Faça uma pergunta objetiva, por exemplo: “No dia 8, o ponto registrou saída às 19h20, mas o extrato não mostra crédito. Qual regra foi aplicada?” Isso ajuda o RH a localizar a divergência sem transformar a conversa em cálculo improvisado.</p>
+<p>Na saída do emprego, o tratamento do saldo depende da situação e da regra válida. Não presuma que todo saldo positivo ou negativo terá o mesmo resultado. Peça memória de cálculo e procure orientação individual se os documentos não coincidirem.</p>
+<h2>Checklist mensal</h2>
+<ul><li>Regra aplicável e vigência identificadas.</li><li>Espelho de ponto conferido antes do fechamento.</li><li>Saldo positivo e negativo compreendidos.</li><li>Compensações registradas com data.</li><li>Divergências comunicadas por escrito.</li><li>Documentos guardados fora do dispositivo corporativo.</li></ul>
+<p>Este guia não calcula horas nem declara que um banco específico é válido ou inválido. Para entender também os lançamentos pagos, leia o guia de <a href="/blog/hora-extra-holerite-como-conferir">conferência de horas extras no holerite</a>.</p>
+`.trim()
+  },
+  "convencao-coletiva-holerite-trabalhador": {
+    reviewedAt: "2026-10-12",
+    contentHtml: `
+<p><strong>Revisão editorial: 12 de outubro de 2026.</strong> Convenção coletiva e acordo coletivo podem estabelecer regras relevantes para remuneração, jornada, benefícios e procedimentos. O nome da empresa ou do cargo, sozinho, não identifica qual instrumento se aplica. É preciso conferir categoria, partes, abrangência territorial e período de vigência.</p>
+<h2>Entenda a diferença prática</h2>
+<p>De forma geral, a convenção é negociada entre entidades sindicais e o acordo envolve sindicato de trabalhadores e uma ou mais empresas. Essa distinção não resolve automaticamente qual texto vale para você. A fonte correta é o instrumento registrado e vigente, combinado com o vínculo concreto.</p>
+<p>O Ministério do Trabalho e Emprego explica o registro de <a href="https://www.gov.br/trabalho-e-emprego/pt-br/servicos/empregador/mediacao/registro-de-convencoes-e-acordo-coletivo-de-trabalho" target="_blank" rel="noopener noreferrer">convenções e acordos coletivos</a> e informa que os documentos ficam disponíveis para consulta. Use também o serviço <a href="https://www.gov.br/pt-br/servicos/consultar-instrumento-coletivo-de-trabalho" target="_blank" rel="noopener noreferrer">Consultar Instrumento Coletivo de Trabalho</a>.</p>
+<h2>Como localizar o documento certo</h2>
+<ol><li>Identifique o CNPJ e a atividade principal do empregador.</li><li>Confirme sua função e a categoria informada nos documentos de admissão.</li><li>Pesquise estado, município, sindicatos e partes envolvidas.</li><li>Confira datas de início e fim da vigência.</li><li>Leia termos aditivos e instrumentos posteriores.</li></ol>
+<p><strong>Exemplo ilustrativo:</strong> duas recepcionistas trabalham em empresas diferentes em São Luís. O título do cargo é igual, mas uma atua em clínica e a outra em hotel. Não é seguro copiar o piso ou benefício encontrado para a primeira sem confirmar a categoria e o instrumento da segunda.</p>
+<h2>Compare o texto com o holerite</h2>
+<p>Separe salário-base, adicionais, descontos e benefícios. Procure no instrumento a cláusula correspondente e leia definições, datas e condições, não apenas o valor destacado. Uma cláusula pode ter exceções, faixas ou requisitos que mudam a comparação.</p>
+<p>Se houver divergência, leve ao RH o holerite, a competência e a cláusula completa. Pergunte qual enquadramento foi usado. Se a resposta não esclarecer, procure o sindicato da categoria ou orientação profissional. Este portal não substitui essa análise.</p>
+<h2>Evite cinco erros comuns</h2>
+<ul><li>Usar instrumento vencido porque o PDF aparece primeiro na busca.</li><li>Confundir proposta interna com direito coletivo registrado.</li><li>Aplicar convenção de outra categoria por semelhança de cargo.</li><li>Ignorar termo aditivo ou data-base.</li><li>Compartilhar recorte sem cabeçalho, vigência e partes.</li></ul>
+<h2>Organize uma pasta mínima</h2>
+<p>Guarde contrato, holerites, espelhos de ponto e o PDF do instrumento com o endereço e a data de consulta. Nomeie o arquivo com categoria e vigência. Assim, uma dúvida sobre piso, adicional ou benefício pode ser discutida com documento completo.</p>
+<p>A <a href="https://www.planalto.gov.br/ccivil_03/decreto-lei/del5452.htm" target="_blank" rel="noopener noreferrer">CLT atualizada</a> reúne normas gerais sobre negociação coletiva. A lei e o instrumento precisam ser lidos de forma coordenada; um resumo editorial não determina o resultado de um caso individual.</p>
+`.trim()
+  },
+  "escala-6x1-o-que-perguntar": {
+    reviewedAt: "2026-10-12",
+    contentHtml: `
+<p><strong>Revisão editorial: 12 de outubro de 2026.</strong> “6x1” descreve uma sequência de seis dias de trabalho e um de descanso, mas não informa sozinho a duração diária, os intervalos, a folga dominical, o trabalho em feriados ou o modo de compensação. Antes de aceitar uma vaga, transforme o nome da escala em horários concretos.</p>
+<h2>Peça uma semana de exemplo</h2>
+<p>Solicite ao recrutador ou RH um exemplo de segunda a domingo: hora de entrada, saída, intervalo e dia de descanso. Pergunte se a folga é fixa ou rotativa e com que antecedência a escala é divulgada. Uma resposta como “horário comercial, depois vemos a folga” não permite calcular deslocamento nem organizar cuidados familiares.</p>
+<p>A <a href="https://www.planalto.gov.br/ccivil_03/decreto-lei/del5452.htm" target="_blank" rel="noopener noreferrer">CLT</a> reúne regras gerais sobre jornada e intervalos, e a <a href="https://www.planalto.gov.br/ccivil_03/leis/l0605.htm" target="_blank" rel="noopener noreferrer">Lei nº 605/1949</a> trata do repouso semanal e de feriados. Normas coletivas podem trazer condições específicas; verifique o instrumento aplicável.</p>
+<h2>Sete perguntas antes do aceite</h2>
+<ol><li>Qual é a carga horária diária e semanal prevista?</li><li>Quanto dura o intervalo e ele entra ou não na jornada?</li><li>Em qual dia costuma ocorrer o descanso e como funciona a rotação?</li><li>Como domingos e feriados são programados?</li><li>Existe banco de horas ou pagamento de horas extras?</li><li>Qual unidade é o local habitual e pode haver transferência entre lojas?</li><li>Quando a escala do mês ou da semana é entregue?</li></ol>
+<h2>Teste o deslocamento no horário real</h2>
+<p>Uma entrada às 6h ou saída após 22h pode exigir rota diferente daquela mostrada no meio da tarde. Use a <a href="/ferramentas/custo-deslocamento">calculadora de deslocamento</a> com tarifas e viagens informadas por você. Considere também tempo de espera, iluminação do ponto e alternativas quando houver chuva ou atraso.</p>
+<p><strong>Exemplo ilustrativo:</strong> a vaga fica em um shopping, mas o fechamento do setor acontece depois do último ônibus direto para o bairro do candidato. A pergunta correta não é apenas “aceita 6x1?”, e sim se o horário de saída e o transporte são viáveis em todos os dias da escala.</p>
+<h2>Compare anúncio, proposta e contrato</h2>
+<p>Guarde o anúncio e anote o que foi explicado na entrevista. Antes de assinar, confira se cargo, unidade, jornada, salário e benefícios correspondem à proposta. Se houver acordo ou convenção coletiva, consulte o documento no serviço oficial <a href="https://www.gov.br/pt-br/servicos/consultar-instrumento-coletivo-de-trabalho" target="_blank" rel="noopener noreferrer">Consultar Instrumento Coletivo de Trabalho</a>.</p>
+<h2>Sinais de que ainda faltam informações</h2>
+<ul><li>A empresa não informa horário de entrada ou saída.</li><li>A folga depende apenas de aviso verbal no dia anterior.</li><li>O intervalo é descrito de forma contraditória.</li><li>Horas além da escala são tratadas como “ajuda” sem registro.</li><li>Unidade e deslocamentos entre locais não estão claros.</li></ul>
+<p>Esses sinais não provam irregularidade, mas justificam pedir esclarecimento antes do aceite. Nenhum guia substitui a leitura do contrato ou a orientação sobre uma escala concreta. Registre a oportunidade no <a href="/ferramentas/controle-candidaturas">controle de candidaturas</a> e compare alternativas com os mesmos critérios.</p>
+`.trim()
+  },
+  "hora-extra-holerite-como-conferir": {
+    reviewedAt: "2026-10-12",
+    contentHtml: `
+<p><strong>Revisão editorial: 12 de outubro de 2026.</strong> Conferir hora extra exige comparar jornada registrada, regra aplicável e lançamentos do holerite. Um valor isolado não permite concluir se o pagamento está correto, porque podem existir banco de horas, períodos de fechamento, adicionais previstos em norma coletiva e outros componentes.</p>
+<h2>Reúna documentos do mesmo período</h2>
+<ol><li>Espelho de ponto ou registro de jornada.</li><li>Escala e alterações comunicadas.</li><li>Holerite da competência correspondente.</li><li>Contrato e política de banco de horas, se houver.</li><li>Acordo ou convenção coletiva vigente.</li></ol>
+<p>A <a href="https://www.planalto.gov.br/ccivil_03/decreto-lei/del5452.htm" target="_blank" rel="noopener noreferrer">CLT</a> reúne regras gerais sobre duração do trabalho, horas suplementares e compensação. A Constituição também prevê remuneração do serviço extraordinário; consulte o texto oficial e o instrumento da categoria em vez de usar calculadora sem contexto.</p>
+<h2>Leia o espelho antes do holerite</h2>
+<p>Marque os dias em que a saída, a entrada ou o intervalo diferem da escala. Verifique se houve correção manual e se você reconhece o motivo. Não some apenas “tempo dentro da empresa”: deslocamento, espera, intervalo e atividade efetiva podem ter tratamentos distintos conforme os fatos e a regra aplicável.</p>
+<p><strong>Exemplo ilustrativo:</strong> o ponto de uma auxiliar mostra saída posterior em dois dias, mas o holerite fecha antes do fim do mês. Antes de afirmar que faltou pagamento, ela confirma o período de apuração e se as horas foram para banco. Se a explicação não aparecer nos documentos, pergunta ao RH por escrito.</p>
+<h2>Localize as rubricas no demonstrativo</h2>
+<p>Procure descrição, quantidade, referência e valor. Algumas folhas separam hora extra e reflexos; outras usam nomes internos. Não presuma o significado de uma sigla. Peça a legenda ou memória de cálculo e compare com o salário-base, a jornada contratual e o percentual previsto para o caso.</p>
+<p>O serviço <a href="https://www.gov.br/pt-br/servicos/consultar-instrumento-coletivo-de-trabalho" target="_blank" rel="noopener noreferrer">Consultar Instrumento Coletivo de Trabalho</a> ajuda a localizar convenções e acordos registrados. Confirme partes e vigência antes de usar uma cláusula.</p>
+<h2>Como perguntar sem fazer acusação precipitada</h2>
+<blockquote><p>Olá. No espelho de ponto da competência [mês], identifiquei os registros dos dias [datas]. Não localizei no holerite a rubrica correspondente nem a movimentação no banco de horas. Poderiam informar o período de fechamento e a regra aplicada?</p></blockquote>
+<p>Anexe somente documentos necessários e use o canal oficial. Guarde protocolo e resposta. Se houver erro reconhecido, peça a previsão e a forma de correção.</p>
+<h2>Não comprometa o próprio registro</h2>
+<ul><li>Não bata ponto por colega.</li><li>Não altere captura de tela.</li><li>Não deixe de registrar saída por ordem apenas verbal sem pedir orientação formal.</li><li>Não publique holerite completo com CPF, matrícula ou dados bancários.</li><li>Não aceite cálculo de perfil desconhecido como decisão final.</li></ul>
+<p>Se a divergência persistir, leve o conjunto de documentos ao sindicato, à inspeção do trabalho ou a profissional competente. Este guia ensina a conferir e formular perguntas; ele não calcula crédito trabalhista nem substitui perícia contábil.</p>
+`.trim()
+  },
+  "pedido-demissao-aviso-previo-acerto": {
+    reviewedAt: "2026-10-12",
+    contentHtml: `
+<p><strong>Revisão editorial: 12 de outubro de 2026.</strong> Pedir demissão é encerrar o contrato por iniciativa do trabalhador. A decisão pode afetar aviso prévio, datas, descontos e verbas do acerto. Antes de entregar a carta, organize documentos e confirme as consequências para a sua situação; não use um modelo genérico como cálculo definitivo.</p>
+<h2>Registre a decisão com clareza</h2>
+<p>Faça uma comunicação datada, identificando a empresa e seu pedido. Guarde uma via com recebimento. Se quiser solicitar dispensa do cumprimento do aviso, escreva isso como pedido; não trate a dispensa como garantida. A resposta e o tratamento financeiro dependem do caso e da regra aplicável.</p>
+<p>A <a href="https://www.planalto.gov.br/ccivil_03/decreto-lei/del5452.htm" target="_blank" rel="noopener noreferrer">CLT atualizada</a> reúne as normas sobre aviso prévio e término do contrato. Leia o texto oficial e busque orientação antes de assinar acordo, quitação ou declaração que não compreendeu.</p>
+<h2>Antes da carta, confira cinco pontos</h2>
+<ol><li>Data em que pretende encerrar as atividades.</li><li>Se existe novo emprego confirmado ou apenas expectativa.</li><li>Saldo de férias, adiantamentos, banco de horas e benefícios.</li><li>Equipamentos, chaves, uniforme e documentos sob sua responsabilidade.</li><li>Endereço, telefone e conta informados para comunicações do acerto.</li></ol>
+<p><strong>Exemplo ilustrativo:</strong> um trabalhador recebe convite verbal para começar em outra empresa na semana seguinte. Antes de pedir demissão, confirma a proposta por escrito e pergunta ao empregador atual como será o aviso. Isso não elimina riscos, mas evita decidir com base apenas em promessa informal.</p>
+<h2>Peça uma memória do acerto</h2>
+<p>Confira período trabalhado, férias vencidas ou proporcionais quando aplicáveis, décimo terceiro proporcional, descontos e outros lançamentos. Não presuma que pedido de demissão tem os mesmos efeitos de dispensa sem justa causa. Se houver desconto de aviso, adiantamento ou equipamento, peça a base e o documento correspondente.</p>
+<p>Use a <a href="https://www.gov.br/pt-br/servicos/obter-a-carteira-de-trabalho" target="_blank" rel="noopener noreferrer">Carteira de Trabalho Digital</a> para acompanhar dados do vínculo, lembrando que atualizações podem depender dos registros enviados. Guarde termo de rescisão, comprovantes e holerites.</p>
+<h2>Devolução e transição</h2>
+<p>Liste bens da empresa e peça recibo de devolução com data e estado aparente. Transfira tarefas sem copiar base de clientes, documentos sigilosos ou arquivos que não lhe pertencem. Uma transição organizada protege ambas as partes e não exige abrir mão de questionar valores.</p>
+<h2>Evite decisões sob pressão</h2>
+<ul><li>Não assine pedido de demissão escrito por outra pessoa sem conferir se representa sua vontade.</li><li>Não entregue carta em branco ou sem data.</li><li>Não apague mensagens ou comprovantes necessários para entender o acerto.</li><li>Não publique acusações ou dados internos durante a negociação.</li><li>Não pague intermediário que promete “aumentar a rescisão”.</li></ul>
+<h2>Quando buscar ajuda</h2>
+<p>Se houver coação, doença, acidente, estabilidade, gravidez, afastamento, acordo especial ou divergência relevante, procure o sindicato, assistência jurídica ou profissional habilitado antes de concluir. Esses elementos podem mudar a análise.</p>
+<p>Para organizar a mudança sem interromper sua busca, registre propostas reais no <a href="/ferramentas/controle-candidaturas">controle de candidaturas</a>. O Empregos São Luís não recebe cartas de demissão nem calcula verbas rescisórias.</p>
+`.trim()
   }
 };
 
