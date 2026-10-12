@@ -489,6 +489,42 @@ async function buildAdsenseReadiness(baseUrl: URL) {
     noindex: publishedAssessments.filter((item) => item.classification === "NOINDEX").length,
     revisar: publishedAssessments.filter((item) => item.classification === "REVISAR MANUALMENTE").length
   };
+  // Avaliação editorial NÃO equivale à aprovação do Google. Bloqueia recomendação interna
+  // enquanto houver conteúdo publicado com qualidade insuficiente ou fatos sem revisão.
+  const qualityRequiresReview = publishedAssessments.filter((item) =>
+    item.classification === "NOINDEX" || item.classification === "REVISAR MANUALMENTE"
+  );
+  const templatedPublished = publishedAssessments.filter((item) =>
+    item.issues.some((issue) => issue.code === "CONTENT_TEMPLATE_STRUCTURE")
+  );
+  const needsImprovement = publishedAssessments.filter((item) =>
+    item.classification === "MELHORAR"
+  );
+  checks.push(
+    pass({
+      id: "editorial-quality-human",
+      stage: "ETAPA_2",
+      label: "Revisão de artigos publicados de baixo valor",
+      kind: "INTERNAL",
+      severity: "P0",
+      status: qualityRequiresReview.length || templatedPublished.length ? "BLOQUEADOR" : "APROVADO_INTERNAMENTE",
+      evidence: `${qualityRequiresReview.length} artigo(s) para revisão humana/noindex; ${templatedPublished.length} com estrutura de template repetitivo. Nenhuma destas avaliações é um parecer oficial do Google.`,
+      action: qualityRequiresReview.length || templatedPublished.length ? "/admin/qualidade-editorial" : undefined
+    })
+  );
+  checks.push(
+    pass({
+      id: "editorial-quality-depth",
+      stage: "ETAPA_3",
+      label: "Artigos publicados que precisam ser aprofundados",
+      kind: "INTERNAL",
+      severity: "P1",
+      status: needsImprovement.length ? "PENDENTE" : "APROVADO_INTERNAMENTE",
+      evidence: `${needsImprovement.length} artigo(s) classificados MELHORAR pela auditoria interna. Revisar exemplos, especificidade do tema e fontes reais, sem repetir parágrafos para aumentar contagem.`,
+      action: needsImprovement.length ? "/admin/qualidade-editorial" : undefined
+    })
+  );
+
   const issueCodeBreakdown = Object.entries(
     editorialReport.assessments.reduce<Record<string, number>>((acc, item) => {
       for (const issue of item.issues) {
@@ -573,7 +609,10 @@ async function buildAdsenseReadiness(baseUrl: URL) {
     missingPillar.length === 0 &&
     missingCover.length === 0 &&
     duplicateCoverUrls.length === 0 &&
-    templatePublished.length === 0;
+    templatePublished.length === 0 &&
+    qualityRequiresReview.length === 0 &&
+    templatedPublished.length === 0 &&
+    needsImprovement.length === 0;
   const classification = ready
     ? "PRONTO PARA SOLICITAR ANÁLISE"
     : blockers.some((item) => item.severity === "P0")
