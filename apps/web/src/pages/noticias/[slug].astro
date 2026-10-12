@@ -82,7 +82,7 @@ const jsonLd = {
         </figure>
       )}
       <div class="es-prose mt-8 max-w-none text-[1.05rem] leading-8" set:html={contentHtml} />
-      {article.sourceUrl && <p class="mt-8 text-sm">Fonte: <a class="underline" href={article.sourceUrl} rel="nofollow noopener">{article.sourceName ?? "fonte original"}</a></p>}
+      {!editorialOverride && article.sourceUrl && <p class="mt-8 text-sm">Fonte: <a class="underline" href={article.sourceUrl} rel="nofollow noopener">{article.sourceName ?? "fonte original"}</a></p>}
       <div class="mt-8 flex flex-wrap gap-3">
         <a class="es-btn es-btn-secondary" href={`https://wa.me/?text=${encodeURIComponent(`${article.title} - ${canonical}`)}`} rel="noopener noreferrer">Compartilhar</a>
         <a class="es-btn es-btn-secondary" href="/noticias">Voltar às notícias</a>
