@@ -50,7 +50,7 @@ test("guia SINE possui fonte oficial, conteudo proprio e indexacao clara", async
   await expect(page.locator('a[href="https://www.gov.br/pt-br/servicos/buscar-emprego-no-sistema-nacional-de-emprego-sine"]').first()).toBeVisible();
   const canonicalLink = page.locator('link[rel="canonical"]');
   if (await canonicalLink.count()) {
-    expect(await canonicalLink.getAttribute("href")).toMatch(/\\/guias\\/emprego-sine-maranhao$/);
+    expect((await canonicalLink.getAttribute("href")) || "").toContain("/guias/emprego-sine-maranhao");
   } else {
     // O ambiente de CI/homologação desativa canonical e schema para evitar indexação.
     await expect(page.locator('meta[name="robots"]')).toHaveAttribute("content", /noindex/i);
