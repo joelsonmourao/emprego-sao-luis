@@ -93,7 +93,7 @@ export async function listSitemapEntries(
         const slug = path.slice(1) as InstitutionalSlug;
         return !(slug in institutional) || institutional[slug].published;
       });
-      const normalPaths = [...publishedInstitutionalPaths, "/ferramentas/controle-candidaturas", ...(activeJob ? ["/vagas", "/categorias", "/cidades"] : []), ...(activeCompany ? ["/empresas"] : []), ...(news ? ["/noticias"] : []), ...(guide ? ["/blog"] : [])];
+      const normalPaths = [...publishedInstitutionalPaths, "/ferramentas/controle-candidaturas", "/guias/emprego-sine-maranhao", ...(activeJob ? ["/vagas", "/categorias", "/cidades"] : []), ...(activeCompany ? ["/empresas"] : []), ...(news ? ["/noticias"] : []), ...(guide ? ["/blog"] : [])];
       let paths = normalPaths;
       if (portalOn) paths = paths.filter(staticPathAllowedWhenPortalEditorial);
       else if (reviewMode.enabled) paths = paths.filter(staticPathAllowedInReview);
