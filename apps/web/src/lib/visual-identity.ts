@@ -1,4 +1,4 @@
-import { createDatabase, createPublicDatabase, settings } from "@es/db";
+import { createPublicDatabase, settings } from "@es/db";
 import { eq } from "drizzle-orm";
 import { BRAND_ASSETS, BRAND_COLORS } from "./brand-assets";
 import { getBrandIdentity, brandIdentityToVisualIdentity, invalidateBrandCache } from "./brand/identity-service";
