@@ -106,7 +106,10 @@ test.describe("imagens públicas — marca", () => {
       const icon = page.locator('img[src="/brand/icon-instagram.webp"]');
       await expect(icon).toHaveCount(1);
       const box = await icon.boundingBox();
-      expect(box?.width ?? 0).toBeGreaterThanOrEqual(width < 640 ? 120 : 140);
+      // O avatar premium deve ser legível, mas não dominar metade da seção.
+      expect(box?.width ?? 0).toBeGreaterThanOrEqual(60);
+      expect(box?.width ?? 0).toBeLessThanOrEqual(96);
+      await expect(page.locator(".es-instagram-feature")).toBeVisible();
       const dims = await page.evaluate(() => ({
         scrollWidth: document.documentElement.scrollWidth,
         clientWidth: document.documentElement.clientWidth
