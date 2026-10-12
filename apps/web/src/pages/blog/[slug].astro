@@ -10,6 +10,7 @@ import {
 import { getEditorialPortalMode } from "../../lib/portal-modes";
 import { rewriteJobBoardLinksForPortal } from "../../lib/portal-content-rewrite";
 import { normalizeEditorialHtml } from "@es/shared";
+import { getReviewedEditorialOverride } from "../../lib/editorial-reviewed-overrides";
 const slug = Astro.params.slug ?? "";
 const portal = await getEditorialPortalMode();
 const seoFromLegacy = resolveSlLocalSeoSlug(slug);
@@ -26,20 +27,36 @@ if (!result) {
   return new Response("Conteúdo não encontrado", { status: 404, headers: { "X-Robots-Tag": "noindex, follow" } });
 }
 const { article, authorName } = result;
+const reviewed = getReviewedEditorialOverride(slug);
 const canonical = article.canonicalUrl || new URL(`/blog/${article.slug}`, Astro.site).toString();
-const normalizedHtml = normalizeEditorialHtml(article.contentHtml, { baseHeadingLevel: 2 });
+const normalizedHtml = normalizeEditorialHtml(reviewed?.html ?? article.contentHtml, { baseHeadingLevel: 2 });
 const contentHtml = portal.enabled ? rewriteJobBoardLinksForPortal(normalizedHtml) : normalizedHtml;
-const schema = { "@type": "Article", headline: article.title, description: article.excerpt, datePublished: article.publishedAt?.toISOString(), dateModified: article.updatedAt.toISOString(), author: { "@type": "Person", name: authorName }, mainEntityOfPage: canonical, ...(article.coverImageUrl ? { image: [article.coverImageUrl] } : {}), ...(article.sponsoredContent ? { isAccessibleForFree: true } : {}) };
+const schema = { "@type": "Article", headline: article.title, description: article.excerpt, datePublished: article.publishedAt?.toISOString(), dateModified: reviewed ? `${reviewed.revisedAt}T12:00:00Z` : article.updatedAt.toISOString(), author: { "@type": "Person", name: authorName }, mainEntityOfPage: canonical, ...(article.coverImageUrl ? { image: [article.coverImageUrl] } : {}), ...(article.sponsoredContent ? { isAccessibleForFree: true } : {}) };
 ---
-<BaseLayout title={article.seoTitle || article.title} description={article.metaDescription || article.excerpt} canonical={canonical} ogImage={article.ogImageUrl ?? article.coverImageUrl ?? undefined} breadcrumbs={[{ name: "Guias", url: "/blog" }, { name: article.title, url: `/blog/${article.slug}` }]} schemas={[schema]}>
+<BaseLayout title={article.seoTitle || article.title} description={reviewed?.description ?? article.metaDescription ?? article.excerpt} canonical={canonical} ogImage={article.ogImageUrl ?? article.coverImageUrl ?? undefined} breadcrumbs={[{ name: "Guias", url: "/blog" }, { name: article.title, url: `/blog/${article.slug}` }]} schemas={[schema]}>
   <article class="es-section bg-white"><div class="mx-auto max-w-3xl px-4">
     <Breadcrumbs items={[{ name: "Início", url: "/" }, { name: "Guias", url: "/blog" }, { name: article.title }]} />
     {article.sponsoredContent && <p class="mt-6 rounded-lg bg-amber-50 p-3 text-sm font-bold text-amber-950">Conteúdo patrocinado{article.sponsorshipDisclosure ? ` — ${article.sponsorshipDisclosure}` : ""}</p>}
     <p class="es-kicker mt-6">{article.type === "DATA_REPORT" ? "Relatório" : "Guia gratuito"}</p><h1 class="font-display mt-3 text-4xl font-black sm:text-5xl">{article.title}</h1>
     {article.subtitle && <p class="mt-4 text-xl text-[var(--es-muted)]">{article.subtitle}</p>}<p class="mt-4 text-sm text-[var(--es-muted)]">Por {authorName} · {article.publishedAt?.toLocaleDateString("pt-BR")}</p>
+    {reviewed && <p class="mt-3 text-sm font-semibold text-[var(--text-secondary)]">Texto revisado pela redação em 12/10/2026, com referências externas verificáveis. Exemplos identificados como fictícios não são ofertas de emprego.</p>}
     {article.coverImageUrl && <figure class="mt-8"><img src={article.coverImageUrl} alt={article.coverImageAlt ?? article.title} class="w-full rounded-2xl" width={article.coverImageWidth ?? undefined} height={article.coverImageHeight ?? undefined} /><figcaption class="mt-2 text-xs text-[var(--es-muted)]">{article.coverImageCaption}{article.coverImageCredit ? ` · ${article.coverImageCredit}` : ""}</figcaption></figure>}
     <div class="es-prose mt-8 max-w-none" set:html={contentHtml} />
-    {article.sourceUrl && <p class="mt-8 text-sm">Fonte: <a class="underline" href={article.sourceUrl} rel="nofollow noopener">{article.sourceName ?? "fonte original"}</a></p>}
+    {reviewed ? (
+      <section class="mt-9 rounded-2xl border border-[var(--brand-border)] bg-[var(--brand-surface)] p-5" aria-label="Fontes consultadas">
+        <h2 class="font-display text-xl font-black">Fontes e critérios de verificação</h2>
+        <ul class="mt-4 grid gap-3 text-sm">
+          {reviewed.sources.map((source) => (
+            <li>
+              <a class="font-bold underline underline-offset-2" href={source.url} target="_blank" rel="noopener noreferrer">{source.label}</a>
+              <p class="mt-1 text-[var(--text-secondary)]">{source.reason}</p>
+            </li>
+          ))}
+        </ul>
+      </section>
+    ) : article.sourceUrl ? (
+      <p class="mt-8 text-sm">Fonte: <a class="underline" href={article.sourceUrl} rel="nofollow noopener">{article.sourceName ?? "fonte original"}</a></p>
+    ) : null}
     <aside class="mt-10 rounded-2xl bg-[var(--es-cream)] p-5">
       <p class="font-bold">Continue gratuitamente</p>
       <div class="mt-3 flex flex-wrap gap-3">
