@@ -58,7 +58,8 @@ describe("ativos de marca públicos", () => {
     expect(layout).toContain("BRAND_ASSETS.favicon16");
     expect(layout).toContain('sizes="48x48"');
     expect(instagram).toContain("/brand/icon-instagram.webp");
-    expect(instagram).toContain('width="192"');
+    expect(instagram).toContain('width="66"');
+    expect(instagram).toContain('class="es-instagram-avatar"');
     expect(instagram).toMatch(/rounded-2xl|object-contain/);
     expect(footer).toContain("LOGO_DARK");
     expect(footer).toMatch(/bg-white/);
