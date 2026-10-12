@@ -89,6 +89,8 @@ const verifiedNewsArticles = newsArticles.filter((item) =>
   !isEditorialReviewPending("NEWS", item.article.slug) ||
   Boolean(getNewsEditorialOverride(item.article.slug))
 ).slice(0,4);
+const featuredNews = verifiedNewsArticles[0];
+const featuredGuide = blogArticles[0];
 const displayFeatured = featured.length ? featured : recent.slice(0, 3);
 const quickFilters = [
   ["Vagas SLZ", "/vagas-slz"],
@@ -139,12 +141,12 @@ const homeDescription = portalEditorial
               </div>
             </div>
             <div class="es-magazine-cover-art">
-              {blogArticles[0]?.article.coverImageUrl ? (
-                <a class="es-magazine-cover-image" href={articlePublicPath(blogArticles[0].article.type, blogArticles[0].article.slug)}>
-                  <img src={blogArticles[0].article.coverImageUrl} alt={blogArticles[0].article.coverImageAlt ?? blogArticles[0].article.title} width="880" height="660" loading="eager" decoding="async" fetchpriority="high" />
+              {featuredGuide?.article.coverImageUrl ? (
+                <a class="es-magazine-cover-image" href={articlePublicPath(featuredGuide.article.type, featuredGuide.article.slug)}>
+                  <img src={featuredGuide.article.coverImageUrl} alt={featuredGuide.article.coverImageAlt ?? featuredGuide.article.title} width="880" height="660" loading="eager" decoding="async" fetchpriority="high" />
                   <span class="es-magazine-image-caption">
                     <span class="es-magazine-image-eyebrow">LEITURA EM DESTAQUE</span>
-                    <strong class="font-display">{blogArticles[0].article.title}</strong>
+                    <strong class="font-display">{featuredGuide.article.title}</strong>
                     <span>Explorar conteúdo <span aria-hidden="true">↗</span></span>
                   </span>
                 </a>
@@ -169,7 +171,7 @@ const homeDescription = portalEditorial
         </div>
       </section>
 
-      {verifiedNewsArticles.length > 0 && (
+      {featuredNews && (
         <section class="es-magazine-news es-section" aria-labelledby="magazine-news-heading">
           <div class="es-container">
             <div class="es-magazine-section-header">
@@ -182,14 +184,14 @@ const homeDescription = portalEditorial
             </div>
             <div class="es-magazine-news-grid">
               <article class="es-magazine-news-feature">
-                <a href={articlePublicPath(verifiedNewsArticles[0].article.type, verifiedNewsArticles[0].article.slug)}>
-                  {verifiedNewsArticles[0].article.coverImageUrl ? (
-                    <img src={verifiedNewsArticles[0].article.coverImageUrl} alt={verifiedNewsArticles[0].article.coverImageAlt ?? verifiedNewsArticles[0].article.title} width="850" height="510" loading="lazy" decoding="async" />
+                <a href={articlePublicPath(featuredNews.article.type, featuredNews.article.slug)}>
+                  {featuredNews.article.coverImageUrl ? (
+                    <img src={featuredNews.article.coverImageUrl} alt={featuredNews.article.coverImageAlt ?? featuredNews.article.title} width="850" height="510" loading="lazy" decoding="async" />
                   ) : <div class="es-magazine-news-placeholder" aria-hidden="true">ES / NOTÍCIAS</div>}
                   <div class="es-magazine-news-feature-content">
                     <p>NOTÍCIA EM DESTAQUE</p>
-                    <h3 class="font-display">{verifiedNewsArticles[0].article.title}</h3>
-                    {verifiedNewsArticles[0].article.excerpt && <span>{verifiedNewsArticles[0].article.excerpt}</span>}
+                    <h3 class="font-display">{featuredNews.article.title}</h3>
+                    {featuredNews.article.excerpt && <span>{featuredNews.article.excerpt}</span>}
                     <strong>Leia a matéria <span aria-hidden="true">↗</span></strong>
                   </div>
                 </a>
@@ -233,7 +235,7 @@ const homeDescription = portalEditorial
 
       <div class="es-container py-5"><AdSlot slot="home-top" pageType="home" /></div>
 
-      {blogArticles.length > 0 && (
+      {featuredGuide && (
         <section class="es-magazine-guides es-section" aria-labelledby="magazine-guides-heading">
           <div class="es-container">
             <div class="es-magazine-section-header">
@@ -246,12 +248,12 @@ const homeDescription = portalEditorial
             </div>
             <div class="es-magazine-guides-grid">
               <article class="es-magazine-guide-lead">
-                <a href={articlePublicPath(blogArticles[0].article.type, blogArticles[0].article.slug)}>
-                  {blogArticles[0].article.coverImageUrl && <img src={blogArticles[0].article.coverImageUrl} alt={blogArticles[0].article.coverImageAlt ?? blogArticles[0].article.title} width="800" height="500" loading="lazy" decoding="async" />}
+                <a href={articlePublicPath(featuredGuide.article.type, featuredGuide.article.slug)}>
+                  {featuredGuide.article.coverImageUrl && <img src={featuredGuide.article.coverImageUrl} alt={featuredGuide.article.coverImageAlt ?? featuredGuide.article.title} width="800" height="500" loading="lazy" decoding="async" />}
                   <div>
                     <span class="es-magazine-guide-type">GUIA EM DESTAQUE</span>
-                    <h3 class="font-display">{blogArticles[0].article.title}</h3>
-                    {blogArticles[0].article.excerpt && <p>{blogArticles[0].article.excerpt}</p>}
+                    <h3 class="font-display">{featuredGuide.article.title}</h3>
+                    {featuredGuide.article.excerpt && <p>{featuredGuide.article.excerpt}</p>}
                     <strong>Ler o guia <span aria-hidden="true">↗</span></strong>
                   </div>
                 </a>
