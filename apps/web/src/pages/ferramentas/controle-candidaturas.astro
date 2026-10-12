@@ -1,0 +1,171 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import Breadcrumbs from "../../components/ui/Breadcrumbs.astro";
+---
+
+<BaseLayout
+  title="Controle gratuito de candidaturas — Empregos São Luís"
+  description="Ferramenta gratuita para acompanhar vagas, datas e retornos. Organize candidaturas e baixe sua planilha CSV sem cadastro e sem enviar dados ao servidor."
+  canonical="/ferramentas/controle-candidaturas"
+  breadcrumbs={[{ name: "Ferramentas", url: "/ferramentas/controle-candidaturas" }, { name: "Controle de candidaturas", url: "/ferramentas/controle-candidaturas" }]}
+>
+  <section class="es-section">
+    <div class="es-container max-w-5xl">
+      <Breadcrumbs items={[{ name: "Início", url: "/" }, { name: "Controle de candidaturas" }]} />
+      <p class="es-kicker mt-7">Ferramenta gratuita • Uso no navegador</p>
+      <h1 class="mt-3 max-w-3xl font-display text-4xl font-black leading-tight sm:text-5xl">Controle suas candidaturas sem perder prazos</h1>
+      <p class="mt-5 max-w-3xl text-lg leading-8 text-[var(--text-secondary)]">
+        Registre cada vaga que encontrou, acompanhe em que etapa está e prepare o próximo contato.
+        Funciona sem login. Os dados ficam apenas nesta página enquanto ela está aberta:
+        <strong>nada é enviado ao Empregos São Luís</strong>. Baixe o CSV para guardar o histórico.
+      </p>
+
+      <form id="controle-form" class="es-card mt-8 grid gap-5 p-5 sm:grid-cols-2 sm:p-8" autocomplete="off">
+        <label class="grid gap-2 text-sm font-bold">Cargo desejado
+          <input required name="cargo" maxlength="100" placeholder="Ex.: Auxiliar administrativo" class="rounded-lg border border-[var(--brand-border)] bg-white px-3 py-3" />
+        </label>
+        <label class="grid gap-2 text-sm font-bold">Empresa ou origem da vaga
+          <input required name="empresa" maxlength="100" placeholder="Ex.: Empresa / site oficial" class="rounded-lg border border-[var(--brand-border)] bg-white px-3 py-3" />
+        </label>
+        <label class="grid gap-2 text-sm font-bold">Data da candidatura
+          <input required name="data" type="date" class="rounded-lg border border-[var(--brand-border)] bg-white px-3 py-3" />
+        </label>
+        <label class="grid gap-2 text-sm font-bold">Situação atual
+          <select name="situacao" class="rounded-lg border border-[var(--brand-border)] bg-white px-3 py-3">
+            <option value="Enviei o currículo">Enviei o currículo</option>
+            <option value="Aguardando resposta">Aguardando resposta</option>
+            <option value="Entrevista marcada">Entrevista marcada</option>
+            <option value="Em avaliação">Em avaliação</option>
+            <option value="Processo encerrado">Processo encerrado</option>
+            <option value="Contratado(a)">Contratado(a)</option>
+          </select>
+        </label>
+        <label class="grid gap-2 text-sm font-bold sm:col-span-2">Próximo passo (opcional)
+          <input name="proximo" maxlength="180" placeholder="Ex.: Conferir e-mail e consultar o prazo informado no anúncio" class="rounded-lg border border-[var(--brand-border)] bg-white px-3 py-3" />
+        </label>
+        <div class="flex flex-wrap items-center gap-3 sm:col-span-2">
+          <button type="submit" class="es-btn es-btn-primary">Adicionar candidatura</button>
+          <span class="text-sm text-[var(--text-secondary)]">Nenhum dado precisa ser enviado para nosso servidor.</span>
+        </div>
+      </form>
+
+      <div class="mt-7 flex flex-wrap items-center justify-between gap-4">
+        <div>
+          <h2 class="font-display text-2xl font-black">Seu acompanhamento</h2>
+          <p id="controle-contagem" class="mt-1 text-sm text-[var(--text-secondary)]" role="status" aria-live="polite">0 candidaturas registradas nesta página.</p>
+        </div>
+        <div class="flex flex-wrap gap-2">
+          <button id="controle-exportar" type="button" class="es-btn es-btn-secondary" disabled>Baixar CSV</button>
+          <button id="controle-limpar" type="button" class="es-btn es-btn-secondary" disabled>Limpar a lista</button>
+        </div>
+      </div>
+      <div class="mt-4 overflow-x-auto rounded-xl border border-[var(--brand-border)]">
+        <table class="w-full min-w-[720px] text-left text-sm">
+          <thead class="bg-[var(--brand-surface)]">
+            <tr>
+              <th class="p-3">Data</th><th class="p-3">Cargo</th><th class="p-3">Empresa / origem</th>
+              <th class="p-3">Situação</th><th class="p-3">Próximo passo</th><th class="p-3">Ação</th>
+            </tr>
+          </thead>
+          <tbody id="controle-linhas"><tr id="controle-vazio"><td colspan="6" class="p-6 text-center text-[var(--text-secondary)]">Adicione a primeira candidatura pelo formulário acima.</td></tr></tbody>
+        </table>
+      </div>
+      <p class="mt-3 text-sm text-[var(--text-secondary)]"><strong>Atenção à privacidade:</strong> ao fechar ou atualizar esta página, a lista é descartada. Use <strong>Baixar CSV</strong> antes de sair. Evite registrar CPF, RG ou senhas. Em computador compartilhado, feche a página ao terminar.</p>
+
+      <section class="mt-12 max-w-3xl">
+        <h2 class="font-display text-2xl font-black">Como usar esse controle para melhorar sua busca</h2>
+        <ol class="mt-4 list-decimal space-y-4 pl-5 leading-7 text-[var(--text-secondary)]">
+          <li><strong>Registre somente vagas reais:</strong> anote o cargo, a empresa ou o canal que publicou a oportunidade e a data em que enviou sua candidatura.</li>
+          <li><strong>Separe envio de entrevista:</strong> a inscrição feita não é confirmação de seleção. Altere o status ao receber uma comunicação oficial.</li>
+          <li><strong>Respeite os prazos:</strong> acompanhe o processo pelo canal informado no anúncio. Se a empresa indicar uma data de retorno, espere até ela chegar antes de perguntar novamente.</li>
+          <li><strong>Revise o histórico:</strong> compare os tipos de vaga e os canais em que teve retorno, sem presumir que ausência de resposta significa reprovação.</li>
+          <li><strong>Exporte e arquive:</strong> o CSV pode ser aberto em um editor de planilhas. Guarde o arquivo em um local privado.</li>
+        </ol>
+        <h2 class="mt-9 font-display text-2xl font-black">Segurança antes da candidatura</h2>
+        <p class="mt-3 leading-7 text-[var(--text-secondary)]">Não envie documentos sensíveis a desconhecidos e não pague para participar de seleções. Confirme o domínio da empresa, o canal de candidatura e a descrição do cargo. Consulte também o guia de <a class="font-semibold underline" href="/seguranca-candidatos">segurança para candidatos</a> e os <a class="font-semibold underline" href="/blog">guias de carreira</a> do portal.</p>
+      </section>
+    </div>
+  </section>
+</BaseLayout>
+
+<script is:inline>
+  (() => {
+    const form = document.getElementById("controle-form");
+    const tbody = document.getElementById("controle-linhas");
+    const status = document.getElementById("controle-contagem");
+    const exportBtn = document.getElementById("controle-exportar");
+    const clearBtn = document.getElementById("controle-limpar");
+    if (!(form && tbody && status && exportBtn && clearBtn)) return;
+    let rows = [];
+    const makeCell = (text) => {
+      const cell = document.createElement("td");
+      cell.className = "p-3 align-top break-words";
+      cell.textContent = text;
+      return cell;
+    };
+    const safeCsv = (value) => {
+      const raw = String(value || "").replace(/[\r\n\t]/g, " ").slice(0, 200);
+      const safe = /^\s*[=+@-]/.test(raw) ? "'" + raw : raw;
+      return '"' + safe.replace(/"/g, '""') + '"';
+    };
+    const render = () => {
+      tbody.replaceChildren();
+      rows.forEach((item, index) => {
+        const tr = document.createElement("tr");
+        tr.className = "border-t border-[var(--brand-border)]";
+        [item.data, item.cargo, item.empresa, item.situacao, item.proximo].forEach((value) => tr.appendChild(makeCell(value)));
+        const cell = makeCell("");
+        const remove = document.createElement("button");
+        remove.type = "button";
+        remove.className = "font-semibold text-[var(--brand-primary)] underline";
+        remove.textContent = "Remover";
+        remove.setAttribute("aria-label", "Remover candidatura de " + item.cargo);
+        remove.addEventListener("click", () => { rows.splice(index, 1); render(); });
+        cell.appendChild(remove);
+        tr.appendChild(cell);
+        tbody.appendChild(tr);
+      });
+      if (!rows.length) {
+        const tr = document.createElement("tr");
+        const td = makeCell("Nenhuma candidatura registrada. Use o formulário para começar.");
+        td.colSpan = 6; td.className = "p-6 text-center text-[var(--text-secondary)]";
+        tr.appendChild(td); tbody.appendChild(tr);
+      }
+      status.textContent = rows.length + (rows.length === 1 ? " candidatura registrada nesta página." : " candidaturas registradas nesta página.");
+      exportBtn.disabled = rows.length === 0;
+      clearBtn.disabled = rows.length === 0;
+    };
+    form.addEventListener("submit", (event) => {
+      event.preventDefault();
+      if (!form.reportValidity()) return;
+      const data = new FormData(form);
+      rows.push({
+        cargo: String(data.get("cargo") || "").trim().slice(0, 100),
+        empresa: String(data.get("empresa") || "").trim().slice(0, 100),
+        data: String(data.get("data") || ""),
+        situacao: String(data.get("situacao") || ""),
+        proximo: String(data.get("proximo") || "").trim().slice(0, 180)
+      });
+      render();
+      form.reset();
+      form.querySelector('[name="cargo"]')?.focus();
+    });
+    exportBtn.addEventListener("click", () => {
+      if (!rows.length) return;
+      const columns = ["Data", "Cargo", "Empresa ou origem", "Situacao", "Proximo passo"];
+      const lines = [columns, ...rows.map(item => [item.data, item.cargo, item.empresa, item.situacao, item.proximo])];
+      const csv = "\uFEFF" + lines.map((line) => line.map(safeCsv).join(";")).join("\r\n");
+      const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url; a.download = "controle-candidaturas.csv";
+      document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+    });
+    clearBtn.addEventListener("click", () => {
+      if (rows.length && confirm("Limpar todas as candidaturas desta página? Exporte o CSV antes, se quiser guardar.")) {
+        rows = []; render();
+      }
+    });
+  })();
+</script>

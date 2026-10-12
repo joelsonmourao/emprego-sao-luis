@@ -35,6 +35,48 @@ const categories = [
       <p class="es-kicker mt-6">Institucional</p>
       <h1 class="font-display mt-2 text-4xl font-black sm:text-5xl">{page.title}</h1>
       <div class="es-prose mt-8 rounded-3xl border border-[var(--brand-border)] bg-[var(--brand-surface)] p-6 sm:p-8" set:html={contentHtml} />
+      {slug === "politica-editorial" && (
+        <section class="es-prose mt-8 max-w-none" aria-label="Critérios para artigos do portal">
+          <h2>O que torna um artigo útil neste portal</h2>
+          <p>Buscamos distinguir orientação prática, análise e notícia factual. Um guia deve ajudar o leitor a realizar uma tarefa: por exemplo, preparar uma entrevista, conferir uma candidatura ou identificar sinais de golpe. Texto longo por si só não comprova utilidade. Conteúdos repetitivos ou sem informações verificáveis devem ser revistos.</p>
+          <h2>Critérios de publicação e revisão</h2>
+          <ul>
+            <li><strong>Fatos e atualidade:</strong> notícias devem informar de onde veio a informação e a que data ela se refere. Uma orientação antiga não deve se apresentar como anúncio de vaga aberto hoje.</li>
+            <li><strong>Autoria responsável:</strong> a assinatura institucional identifica o portal, mas não substitui fontes externas quando um texto afirma fatos sobre leis, salários, empresas ou oportunidades.</li>
+            <li><strong>Valor para o candidato:</strong> exemplos, comparações, listas de verificação e ferramentas devem ser específicos do tema, não blocos idênticos reproduzidos em massa.</li>
+            <li><strong>Publicidade identificada:</strong> conteúdos comerciais, quando existentes, devem ser separados claramente dos editoriais.</li>
+          </ul>
+          <h2>Como o leitor pode avaliar um conteúdo</h2>
+          <p>Confira a data de publicação, a origem de números e regras citadas e se o artigo oferece uma ação concreta. Se notar trecho desatualizado, fonte ausente ou afirmação incorreta, envie a URL e a observação pelo <a href="/contato">formulário de contato</a>.</p>
+        </section>
+      )}
+      {slug === "politica-fontes" && (
+        <section class="es-prose mt-8 max-w-none" aria-label="Como verificar fontes">
+          <h2>Fontes adequadas para cada tipo de informação</h2>
+          <ul>
+            <li><strong>Vagas:</strong> anúncio original, página oficial de carreiras da empresa ou canal de inscrição confirmado. Uma publicação antiga de rede social não comprova que a vaga continua aberta.</li>
+            <li><strong>Direitos e obrigações trabalhistas:</strong> legislação e órgãos públicos competentes. Textos internos deste portal não são prova de um direito.</li>
+            <li><strong>Dados locais:</strong> pesquisas identificadas por instituição, data, método e recorte geográfico. Números sem referência devem ser tratados com cautela.</li>
+            <li><strong>Guias de orientação:</strong> indicar quando o conteúdo é uma recomendação editorial, um exemplo fictício para treino ou uma informação factual comprovável.</li>
+          </ul>
+          <h2>Fonte ausente ou quebrada</h2>
+          <p>Não presuma que a informação é verdadeira só por estar publicada aqui. Verifique o canal original antes de enviar documentos ou dinheiro. Se encontrar um endereço indisponível, comunique pelo <a href="/contato">formulário de contato</a> informando o link e o trecho que precisa de checagem.</p>
+        </section>
+      )}
+      {slug === "politica-correcoes" && (
+        <section class="es-prose mt-8 max-w-none" aria-label="Como solicitar uma correção">
+          <h2>Como pedir revisão de uma informação</h2>
+          <ol>
+            <li>Copie o endereço completo da página ou informe o título do artigo.</li>
+            <li>Indique o parágrafo, link, data ou informação que acredita estar incorreto.</li>
+            <li>Quando possível, envie a fonte verificável que mostra a divergência, sem encaminhar dados sensíveis.</li>
+            <li>Use o <a href="/contato">formulário de contato</a> e selecione a categoria adequada.</li>
+          </ol>
+          <h2>O que pode precisar ser corrigido</h2>
+          <p>Links de candidatura vencidos, títulos de vagas que não correspondem ao anúncio original, informações legais desatualizadas, fontes sem comprovação e uso inadequado de imagens. Correção factual não deve ser tratada apenas como alteração estética ou atualização artificial da data.</p>
+          <p>Para sua segurança, não envie senha, CPF completo ou documentos pessoais pelo pedido de correção.</p>
+        </section>
+      )}
       {showContactForm && (
         <section class="es-card mt-8 p-6 sm:p-8">
           <h2 class="font-display text-2xl font-black">Envie sua mensagem</h2>
