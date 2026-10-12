@@ -62,6 +62,16 @@ async function crawlSitemap(){
       else pages.add(loc.split("#")[0]);
     }
   }
+  // O sitemap pode omitir artigos em revisão que ainda são acessíveis ao usuário.
+  // Também inventariar o índice editorial paginado sem presumir que o sitemap é exaustivo.
+  const collectionPages=[...Array.from({length:12},(_,n)=>ORIGIN+"/blog"+(n?"?pagina="+(n+1):"")),
+    ...Array.from({length:3},(_,n)=>ORIGIN+"/noticias"+(n?"?pagina="+(n+1):""))];
+  for(const indexUrl of collectionPages){
+    const res=await fetchPage(indexUrl);
+    if(res.status!==200)continue;
+    const matches=[...(res.body||"").matchAll(/href="(\\/(?:blog|noticias)\\/[a-z0-9-_]+)(?:[?#][^"]*)?"/gi)];
+    for(const m of matches)pages.add(ORIGIN+m[1]);
+  }
   return {pages:[...pages].slice(0,MAX_PAGES),sitemaps:sitemapResults};
 }
 function auditHtml(page){
