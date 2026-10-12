@@ -1,7 +1,7 @@
 /**
  * Triagem DOCUMENTADA em 12/10/2026: 106 artigos públicos examinados.
  * 98 guias tinham múltiplos trechos repetitivos ou menos de 350 palavras.
- * 36 já receberam revisão substantiva; 62 permanecem acessíveis, mas fora do índice.
+ * 44 já receberam revisão substantiva; 54 permanecem acessíveis, mas fora do índice.
  * 5 notícias de julho/2026 ainda precisam de fontes factuais externas.
  * Não inventar data ou prova e não confundir este controle com aprovação Google.
  * Relatórios: reports/adsense-revisao-integral-parte-{1,2}.json
@@ -11,7 +11,6 @@ export const EDITORIAL_REVIEW_DATE = "2026-10-12";
 export const guidesPendingReview = new Set<string>([
   "agradecimento-pos-entrevista-mensagem",
   "alfabetizacao-digital-emprego-basico",
-  "auxiliar-administrativo-vagas-sao-luis",
   "avaliacao-de-desempenho-preparacao",
   "candidatura-whatsapp-emprego-mensagem",
   "carta-apresentacao-emprego-curta",
@@ -62,14 +61,7 @@ export const guidesPendingReview = new Set<string>([
   "teste-online-processo-seletivo-dicas",
   "trabalho-hibrido-sao-luis-checklist",
   "transporte-entrevista-emprego-sao-luis",
-  "vaga-recepcionista-clinica-sao-luis",
-  "vaga-sazonal-comercio-sao-luis",
   "vagas-afirmativas-como-candidatar",
-  "vagas-call-center-sao-luis",
-  "vagas-estoque-logistica-sao-luis",
-  "vagas-motorista-entregador-sao-luis",
-  "vagas-pcd-inclusao-emprego",
-  "vagas-restaurante-sao-luis-dicas",
   "vagas-vendedor-loja-comissao-dicas",
 ]);
 
