@@ -12,6 +12,7 @@ import { rewriteJobBoardLinksForPortal } from "../../lib/portal-content-rewrite"
 import { normalizeEditorialHtml } from "@es/shared";
 import { getEditorialContentOverride } from "../../data/editorial-content-overrides";
 import { isEditorialReviewPending } from "../../data/editorial-review-pending";
+import { findAutoEditorialArticle } from "../../lib/auto-editorial";
 const slug = Astro.params.slug ?? "";
 const portal = await getEditorialPortalMode();
 const seoFromLegacy = resolveSlLocalSeoSlug(slug);
@@ -19,7 +20,7 @@ if (seoFromLegacy && seoFromLegacy !== slug) {
   const moved = await findPublishedArticle(seoFromLegacy, ["GUIDE", "DATA_REPORT", "NEWS"]);
   if (moved) return Astro.redirect(articlePublicPath(moved.article.type, moved.article.slug), 301);
 }
-const result = await findPublishedArticle(slug, ["GUIDE", "DATA_REPORT"]);
+const result = (await findPublishedArticle(slug, ["GUIDE", "DATA_REPORT"])) ?? findAutoEditorialArticle(slug);
 if (!result) {
   const news = await findPublishedArticle(slug, "NEWS");
   if (news) return Astro.redirect(`/noticias/${slug}`, 301);
