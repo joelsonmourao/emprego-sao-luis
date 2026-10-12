@@ -41,6 +41,27 @@ describe("revisões editoriais substanciais para AdSense", () => {
     expect(html).not.toMatch(/salário médio|vagas abertas hoje|empresas contratando agora/i);
   });
 
+  it("revisa o terceiro artigo prioritário com uso responsável do LinkedIn", () => {
+    const override = getEditorialContentOverride("linkedin-primeiro-emprego");
+    expect(override).not.toBeNull();
+    const html = override?.contentHtml ?? "";
+    const words = textOnly(html).split(/\s+/).filter(Boolean).length;
+    const outbound = [...html.matchAll(/href="(https:\/\/[^"]+)"/g)].map((match) => match[1]);
+
+    expect(override?.reviewedAt).toBe("2026-10-12");
+    expect(words).toBeGreaterThanOrEqual(1200);
+    expect(new Set(outbound).size).toBeGreaterThanOrEqual(5);
+    expect(html).toContain("linkedin.com/help/linkedin/answer/a554351");
+    expect(html).toContain("linkedin.com/help/linkedin/answer/a1420165");
+    expect(html).toContain("linkedin.com/help/linkedin/answer/a518980");
+    expect(html).toContain("linkedin.com/help/linkedin/answer/a1338436");
+    expect(html).toContain("buscar-emprego-no-sistema-nacional-de-emprego-sine");
+    expect(html).toContain('href="/ferramentas/controle-candidaturas"');
+    expect(html).toContain('href="/guias/emprego-sine-maranhao"');
+    expect(html).not.toMatch(/uma situação comum na prática|roteiro aplicável passo a passo|feche o ciclo com uma ação/i);
+    expect(html).not.toMatch(/salário médio|vagas abertas hoje|empresas contratando agora|contratação garantida/i);
+  });
+
   it("não altera artigos ainda não revisados", () => {
     expect(getEditorialContentOverride("salario-custo-de-vida-sao-luis")).toBeNull();
   });
