@@ -17,16 +17,16 @@ const { items, ctaHref, ctaLabel, companyHref } = Astro.props;
 <div class="xl:hidden" data-mobile-nav>
   <button
     type="button"
-    class="es-btn es-btn-secondary px-3 py-2 text-sm"
+    class="es-btn es-btn-secondary gap-2 px-3 py-2 text-sm"
     aria-expanded="false"
     aria-controls="mobile-nav-panel"
     data-mobile-nav-toggle
   >
-    Menu
+    <span aria-hidden="true">☰</span> Menu
   </button>
   <nav
     id="mobile-nav-panel"
-    class="absolute right-4 top-full z-50 mt-2 hidden min-w-52 gap-1 rounded-2xl border border-[var(--es-border)] bg-white p-3 shadow-[var(--es-shadow)]"
+    class="es-premium-mobile-panel absolute right-0 top-full z-50 mt-2 hidden w-[min(23rem,calc(100vw-2rem))] gap-1 rounded-2xl border border-[var(--es-premium-stroke)] bg-white p-4 shadow-[var(--es-premium-shadow-strong)]"
     aria-label="Menu mobile"
     data-mobile-nav-panel
   >
