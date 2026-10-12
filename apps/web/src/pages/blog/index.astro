@@ -5,6 +5,7 @@ import EmptyState from "../../components/ui/EmptyState.astro";
 import PageHero from "../../components/ui/PageHero.astro";
 import Pagination from "../../components/ui/Pagination.astro";
 import { listPublishedArticlesPage } from "../../lib/articles";
+import { listAutoEditorialArticles } from "../../lib/auto-editorial";
 import {
   EDITORIAL_BLOG_THEMES,
   getEditorialPortalMode,
@@ -21,6 +22,7 @@ const { items, total, page: current, pages, theme } = await listPublishedArticle
   themeParam
 );
 const portal = await getEditorialPortalMode();
+const automatic = listAutoEditorialArticles(9);
 const themeMeta = theme ? EDITORIAL_BLOG_THEMES[theme as EditorialBlogTheme] : null;
 const pageUrl = (target: number) => {
   const params = new URLSearchParams(Astro.url.searchParams);
@@ -54,6 +56,22 @@ const heroDescription = themeMeta
   <section class="es-section pt-0">
     <div class="es-container">
       <Breadcrumbs items={[{ name: "Início", url: "/" }, { name: "Guias", url: "/blog" }, ...(themeMeta ? [{ name: themeMeta.label }] : [])]} />
+      {current === 1 && !theme && automatic.length > 0 && (
+        <section class="mt-8" aria-label="Novos guias com revisão automatizada">
+          <h2 class="font-display text-2xl font-black">Novos guias gratuitos</h2>
+          <p class="mt-2 text-sm text-[var(--text-secondary)]">Publicações programadas e verificadas por critérios automáticos de estrutura, fontes e conteúdo. A verificação automática não substitui a checagem humana de fatos.</p>
+          <ul class="mt-5 grid gap-4 md:grid-cols-2">
+            {automatic.map(item => (
+              <li class="es-card overflow-hidden">
+                <a href={`/blog/${item.slug}`} class="block">
+                  <img src={item.coverImageUrl} alt={item.coverImageAlt} width="600" height="338" loading="lazy" decoding="async" class="h-44 w-full object-cover" />
+                  <span class="block p-4 font-display text-xl font-black">{item.title}</span>
+                </a>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
       <nav class="mt-6 flex flex-wrap gap-2" aria-label="Temas do blog">
         <a class={`rounded-full border px-3 py-1 text-sm ${!theme ? "bg-slate-900 text-white" : "bg-white"}`} href="/blog">Todos</a>
         {(Object.keys(EDITORIAL_BLOG_THEMES) as EditorialBlogTheme[]).map((key) => (
