@@ -10,6 +10,7 @@ import {
 import { getEditorialPortalMode } from "../../lib/portal-modes";
 import { rewriteJobBoardLinksForPortal } from "../../lib/portal-content-rewrite";
 import { normalizeEditorialHtml } from "@es/shared";
+import { isEditorialReviewPending } from "../../data/editorial-review-pending";
 
 const slug = Astro.params.slug!;
 const portal = await getEditorialPortalMode();
@@ -33,6 +34,7 @@ if (!result) {
   });
 }
 const { article, authorName } = result;
+const editorialNoindex = isEditorialReviewPending("NEWS", article.slug);
 const normalizedHtml = normalizeEditorialHtml(article.contentHtml, { baseHeadingLevel: 2 });
 const contentHtml = portal.enabled ? rewriteJobBoardLinksForPortal(normalizedHtml) : normalizedHtml;
 const canonical = article.canonicalUrl ?? new URL(`/noticias/${article.slug}`, Astro.site).toString();
@@ -62,7 +64,7 @@ const jsonLd = {
   ...(structuredImages.length ? { image: structuredImages } : {})
 };
 ---
-<BaseLayout title={`${article.seoTitle ?? article.title} — Empregos São Luís`} description={article.metaDescription ?? article.excerpt} canonical={canonical} ogImage={article.ogImageUrl ?? article.coverImageUrl ?? undefined} breadcrumbs={[{ name: "Notícias", url: "/noticias" }, { name: article.title, url: `/noticias/${article.slug}` }]} schemas={[jsonLd]}>
+<BaseLayout title={`${article.seoTitle ?? article.title} — Empregos São Luís`} description={article.metaDescription ?? article.excerpt} canonical={canonical} ogImage={article.ogImageUrl ?? article.coverImageUrl ?? undefined} breadcrumbs={[{ name: "Notícias", url: "/noticias" }, { name: article.title, url: `/noticias/${article.slug}` }]} schemas={[jsonLd]} noindex={editorialNoindex}>
   <article class="es-section">
     <div class="es-container max-w-4xl">
       <Breadcrumbs items={[{ name: "Início", url: "/" }, { name: "Notícias", url: "/noticias" }, { name: article.title }]} />
