@@ -1,5 +1,5 @@
 import { and, eq } from "drizzle-orm";
-import { createDatabase, createPublicDatabase, redirects } from "@es/db";
+import { createPublicDatabase, redirects } from "@es/db";
 import { defineMiddleware } from "astro:middleware";
 import { storageStartup } from "./instrumentation";
 import { adminJsonError, createRequestId, normalizeAdminApiResponse } from "./lib/admin-api-response";
