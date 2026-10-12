@@ -1,5 +1,5 @@
 import { createHash } from "node:crypto";
-import { auditLogs, brandAssetHistory, brandAssets, createDatabase, mediaAssets, settings } from "@es/db";
+import { auditLogs, brandAssetHistory, brandAssets, createDatabase, createPublicDatabase, mediaAssets, settings } from "@es/db";
 import { eq, desc } from "drizzle-orm";
 import { BRAND_ASSETS, BRAND_COLORS } from "../brand-assets";
 import {
@@ -103,7 +103,7 @@ export async function getBrandIdentity(force = false): Promise<BrandIdentityConf
   };
 
   if (process.env.DATABASE_URL) {
-    const connection = createDatabase(process.env.DATABASE_URL);
+    const connection = createPublicDatabase(process.env.DATABASE_URL);
     try {
       const [settingsRow] = await connection.db.select().from(settings).where(eq(settings.key, SETTINGS_KEY)).limit(1);
       if (settingsRow?.value && typeof settingsRow.value === "object") {
