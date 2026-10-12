@@ -59,7 +59,7 @@ const adsenseClientId =
 const adsWanted = integrations.persisted
   ? integrations.adsenseEnabled
   : integrations.adsenseEnabled || import.meta.env.PUBLIC_ADSENSE_ENABLED === "true";
-const adsEnabled = !stagingLike && adsWanted && Boolean(adsenseClientId) && consentOk;
+const adsEnabled = !stagingLike && !noindex && !/\bnoindex\b/i.test(robots) && adsWanted && Boolean(adsenseClientId) && consentOk;
 
 const ga4Id = integrations.ga4MeasurementId.trim();
 const gtmId = integrations.gtmContainerId.trim().toUpperCase();

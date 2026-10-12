@@ -8,6 +8,9 @@ import {
 } from "@es/shared";
 import { getAdsenseReviewMode, sitemapCategoryAllowedInReview, staticPathAllowedInReview } from "./adsense-review-mode";
 import { getEditorialAuditReport } from "./editorial-audit";
+import { isEditorialReviewPending } from "../data/editorial-review-pending";
+import { getEditorialContentOverride } from "../data/editorial-content-overrides";
+import { getNewsEditorialOverride } from "../data/news-editorial-content-overrides";
 import { classifyCategoryPage, classifyCityPage, classifyCompanyPage } from "./entity-page-quality";
 import { getRuntimeSiteUrl } from "./canonical-url";
 import {
@@ -193,7 +196,16 @@ export async function listSitemapEntries(
       ? new Set((await getEditorialAuditReport()).assessments.filter((item) => ["NOINDEX", "REVISAR MANUALMENTE"].includes(item.classification)).map((item) => item.article.slug))
       : new Set<string>();
     return dedupeEntries(
-      rows.filter((row) => !noindexSlugs.has(row.slug)).map((row) =>
+      rows.filter((row) => {
+        const editorialRevision = row.type === "NEWS"
+          ? getNewsEditorialOverride(row.slug)
+          : getEditorialContentOverride(row.slug);
+        // Auditoria do banco avalia o texto antigo. Conteúdo novo e revisado em código
+        // pode voltar ao sitemap, desde que o HTML entregue também permita indexação.
+        if (noindexSlugs.has(row.slug) && !editorialRevision) return false;
+        if (isEditorialReviewPending(row.type, row.slug)) return Boolean(editorialRevision);
+        return true;
+      }).map((row) =>
         toEntry(
           `/${category === "news" ? "noticias" : "blog"}/${row.slug}`,
           row.updatedAt,

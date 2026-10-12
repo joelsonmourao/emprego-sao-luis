@@ -10,6 +10,8 @@ import {
 import { getEditorialPortalMode } from "../../lib/portal-modes";
 import { rewriteJobBoardLinksForPortal } from "../../lib/portal-content-rewrite";
 import { normalizeEditorialHtml } from "@es/shared";
+import { isEditorialReviewPending } from "../../data/editorial-review-pending";
+import { getNewsEditorialOverride } from "../../data/news-editorial-content-overrides";
 
 const slug = Astro.params.slug!;
 const portal = await getEditorialPortalMode();
@@ -33,9 +35,12 @@ if (!result) {
   });
 }
 const { article, authorName } = result;
-const normalizedHtml = normalizeEditorialHtml(article.contentHtml, { baseHeadingLevel: 2 });
+const editorialOverride = getNewsEditorialOverride(article.slug);
+const editorialNoindex = isEditorialReviewPending("NEWS", article.slug) && !editorialOverride;
+const normalizedHtml = normalizeEditorialHtml(editorialOverride?.contentHtml ?? article.contentHtml, { baseHeadingLevel: 2 });
 const contentHtml = portal.enabled ? rewriteJobBoardLinksForPortal(normalizedHtml) : normalizedHtml;
 const canonical = article.canonicalUrl ?? new URL(`/noticias/${article.slug}`, Astro.site).toString();
+const dateModified = editorialOverride ? new Date(`${editorialOverride.reviewedAt}T12:00:00-03:00`).toISOString() : article.updatedAt.toISOString();
 const variants = article.coverImageVariants && typeof article.coverImageVariants === "object"
   ? article.coverImageVariants as Record<string, { url?: string; width?: number; height?: number }>
   : {};
@@ -55,14 +60,14 @@ const jsonLd = {
   headline: article.title,
   description: article.metaDescription ?? article.excerpt,
   datePublished: article.publishedAt?.toISOString(),
-  dateModified: article.updatedAt.toISOString(),
+  dateModified,
   mainEntityOfPage: canonical,
   author: { "@type": "Person", name: authorName },
   publisher: { "@type": "Organization", name: "Empregos São Luís" },
   ...(structuredImages.length ? { image: structuredImages } : {})
 };
 ---
-<BaseLayout title={`${article.seoTitle ?? article.title} — Empregos São Luís`} description={article.metaDescription ?? article.excerpt} canonical={canonical} ogImage={article.ogImageUrl ?? article.coverImageUrl ?? undefined} breadcrumbs={[{ name: "Notícias", url: "/noticias" }, { name: article.title, url: `/noticias/${article.slug}` }]} schemas={[jsonLd]}>
+<BaseLayout title={`${article.seoTitle ?? article.title} — Empregos São Luís`} description={article.metaDescription ?? article.excerpt} canonical={canonical} ogImage={article.ogImageUrl ?? article.coverImageUrl ?? undefined} breadcrumbs={[{ name: "Notícias", url: "/noticias" }, { name: article.title, url: `/noticias/${article.slug}` }]} schemas={[jsonLd]} noindex={editorialNoindex}>
   <article class="es-section">
     <div class="es-container max-w-4xl">
       <Breadcrumbs items={[{ name: "Início", url: "/" }, { name: "Notícias", url: "/noticias" }, { name: article.title }]} />
@@ -72,12 +77,12 @@ const jsonLd = {
       <p class="mt-4 text-sm text-[var(--es-muted)]">Por {authorName} · {article.publishedAt?.toLocaleDateString("pt-BR")}</p>
       {article.coverImageUrl && (
         <figure class="mt-8 overflow-hidden rounded-3xl">
-          <img class="w-full" src={variants.hero?.url ?? article.coverImageUrl} srcset={variants.card?.url && variants.hero?.url ? `${variants.card.url} 640w, ${variants.hero.url} 1600w` : undefined} sizes="(max-width: 768px) 100vw, 896px" alt={article.coverImageAlt ?? article.title} width={article.coverImageWidth ?? 1600} height={article.coverImageHeight ?? 900} loading="eager" fetchpriority="high" />
+          <img class="w-full max-h-[34rem] bg-[var(--es-cream)] object-contain" decoding="async" src={variants.hero?.url ?? article.coverImageUrl} srcset={variants.card?.url && variants.hero?.url ? `${variants.card.url} 640w, ${variants.hero.url} 1600w` : undefined} sizes="(max-width: 768px) 100vw, 896px" alt={article.coverImageAlt ?? article.title} width={article.coverImageWidth ?? 1600} height={article.coverImageHeight ?? 900} loading="eager" fetchpriority="high" />
           {(article.coverImageCaption || article.coverImageCredit) && <figcaption class="mt-2 text-sm text-[var(--es-muted)]">{article.coverImageCaption}{article.coverImageCaption && article.coverImageCredit ? " · " : ""}{article.coverImageCredit ? `Crédito: ${article.coverImageCredit}` : ""}</figcaption>}
         </figure>
       )}
       <div class="es-prose mt-8 max-w-none text-[1.05rem] leading-8" set:html={contentHtml} />
-      {article.sourceUrl && <p class="mt-8 text-sm">Fonte: <a class="underline" href={article.sourceUrl} rel="nofollow noopener">{article.sourceName ?? "fonte original"}</a></p>}
+      {!editorialOverride && article.sourceUrl && <p class="mt-8 text-sm">Fonte: <a class="underline" href={article.sourceUrl} rel="nofollow noopener">{article.sourceName ?? "fonte original"}</a></p>}
       <div class="mt-8 flex flex-wrap gap-3">
         <a class="es-btn es-btn-secondary" href={`https://wa.me/?text=${encodeURIComponent(`${article.title} - ${canonical}`)}`} rel="noopener noreferrer">Compartilhar</a>
         <a class="es-btn es-btn-secondary" href="/noticias">Voltar às notícias</a>

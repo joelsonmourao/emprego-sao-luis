@@ -11,6 +11,7 @@ import { getEditorialPortalMode } from "../../lib/portal-modes";
 import { rewriteJobBoardLinksForPortal } from "../../lib/portal-content-rewrite";
 import { normalizeEditorialHtml } from "@es/shared";
 import { getEditorialContentOverride } from "../../data/editorial-content-overrides";
+import { isEditorialReviewPending } from "../../data/editorial-review-pending";
 const slug = Astro.params.slug ?? "";
 const portal = await getEditorialPortalMode();
 const seoFromLegacy = resolveSlLocalSeoSlug(slug);
@@ -29,20 +30,21 @@ if (!result) {
 const { article, authorName } = result;
 const canonical = article.canonicalUrl || new URL(`/blog/${article.slug}`, Astro.site).toString();
 const editorialOverride = getEditorialContentOverride(article.slug);
+const editorialNoindex = isEditorialReviewPending(article.type, article.slug) && !editorialOverride;
 const normalizedHtml = normalizeEditorialHtml(editorialOverride?.contentHtml ?? article.contentHtml, { baseHeadingLevel: 2 });
 const contentHtml = portal.enabled ? rewriteJobBoardLinksForPortal(normalizedHtml) : normalizedHtml;
 const dateModified = editorialOverride ? new Date(`${editorialOverride.reviewedAt}T12:00:00-03:00`).toISOString() : article.updatedAt.toISOString();
 const schema = { "@type": "Article", headline: article.title, description: article.excerpt, datePublished: article.publishedAt?.toISOString(), dateModified, author: { "@type": "Person", name: authorName }, mainEntityOfPage: canonical, ...(article.coverImageUrl ? { image: [article.coverImageUrl] } : {}), ...(article.sponsoredContent ? { isAccessibleForFree: true } : {}) };
 ---
-<BaseLayout title={article.seoTitle || article.title} description={article.metaDescription || article.excerpt} canonical={canonical} ogImage={article.ogImageUrl ?? article.coverImageUrl ?? undefined} breadcrumbs={[{ name: "Guias", url: "/blog" }, { name: article.title, url: `/blog/${article.slug}` }]} schemas={[schema]}>
+<BaseLayout title={article.seoTitle || article.title} description={article.metaDescription || article.excerpt} canonical={canonical} ogImage={article.ogImageUrl ?? article.coverImageUrl ?? undefined} breadcrumbs={[{ name: "Guias", url: "/blog" }, { name: article.title, url: `/blog/${article.slug}` }]} schemas={[schema]} noindex={editorialNoindex}>
   <article class="es-section bg-white"><div class="mx-auto max-w-3xl px-4">
     <Breadcrumbs items={[{ name: "Início", url: "/" }, { name: "Guias", url: "/blog" }, { name: article.title }]} />
     {article.sponsoredContent && <p class="mt-6 rounded-lg bg-amber-50 p-3 text-sm font-bold text-amber-950">Conteúdo patrocinado{article.sponsorshipDisclosure ? ` — ${article.sponsorshipDisclosure}` : ""}</p>}
     <p class="es-kicker mt-6">{article.type === "DATA_REPORT" ? "Relatório" : "Guia gratuito"}</p><h1 class="font-display mt-3 text-4xl font-black sm:text-5xl">{article.title}</h1>
     {article.subtitle && <p class="mt-4 text-xl text-[var(--es-muted)]">{article.subtitle}</p>}<p class="mt-4 text-sm text-[var(--es-muted)]">Por {authorName} · {article.publishedAt?.toLocaleDateString("pt-BR")}{editorialOverride ? ` · Revisado em ${new Date(`${editorialOverride.reviewedAt}T12:00:00-03:00`).toLocaleDateString("pt-BR")}` : ""}</p>
-    {article.coverImageUrl && <figure class="mt-8"><img src={article.coverImageUrl} alt={article.coverImageAlt ?? article.title} class="w-full rounded-2xl" width={article.coverImageWidth ?? undefined} height={article.coverImageHeight ?? undefined} /><figcaption class="mt-2 text-xs text-[var(--es-muted)]">{article.coverImageCaption}{article.coverImageCredit ? ` · ${article.coverImageCredit}` : ""}</figcaption></figure>}
-    <div class="es-prose mt-8 max-w-none" set:html={contentHtml} />
-    {article.sourceUrl && <p class="mt-8 text-sm">Fonte: <a class="underline" href={article.sourceUrl} rel="nofollow noopener">{article.sourceName ?? "fonte original"}</a></p>}
+    {article.coverImageUrl && <figure class="mt-8"><img src={article.coverImageUrl} alt={article.coverImageAlt ?? article.title} class="w-full max-h-[34rem] rounded-2xl bg-[var(--es-cream)] object-contain" width={article.coverImageWidth ?? 1200} height={article.coverImageHeight ?? 675} loading="eager" decoding="async" fetchpriority="high" />{(article.coverImageCaption || article.coverImageCredit) && <figcaption class="mt-2 text-xs text-[var(--es-muted)]">{article.coverImageCaption}{article.coverImageCaption && article.coverImageCredit ? " · " : ""}{article.coverImageCredit ? `Crédito: ${article.coverImageCredit}` : ""}</figcaption>}</figure>}
+    <div class="es-prose mt-8 max-w-none break-words" set:html={contentHtml} />
+    {!editorialOverride && article.sourceUrl && <p class="mt-8 text-sm">Fonte: <a class="underline" href={article.sourceUrl} rel="nofollow noopener">{article.sourceName ?? "fonte original"}</a></p>}
     <aside class="mt-10 rounded-2xl bg-[var(--es-cream)] p-5">
       <p class="font-bold">Continue gratuitamente</p>
       <div class="mt-3 flex flex-wrap gap-3">
