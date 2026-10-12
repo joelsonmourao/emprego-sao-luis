@@ -10,7 +10,7 @@ import { getEditorialPortalMode } from "../../lib/portal-modes";
 const portal = await getEditorialPortalMode();
 const pageSize = 12;
 const page = Math.max(1, Number(Astro.url.searchParams.get("pagina") ?? 1) || 1);
-const { items, total, page: current, pages } = await listPublishedArticlesPage(page, pageSize, "NEWS");
+const { items, total, page: current, pages } = await listPublishedArticlesPage(page, pageSize, "NEWS", null, true);
 const featured = current === 1 ? items[0] : undefined;
 const rest = current === 1 ? items.slice(1) : items;
 const pageUrl = (target: number) => {
