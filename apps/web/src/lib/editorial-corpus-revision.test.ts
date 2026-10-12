@@ -61,6 +61,12 @@ describe("Auditoria editorial real do corpus de 12/10/2026", () => {
     }
   });
 
+  it("não monetiza artigos pendentes marcados noindex", () => {
+    const layout = load("apps/web/src/layouts/BaseLayout.astro");
+    expect(layout).toContain("!noindex && !/");
+    expect(layout).toContain("adsWanted");
+  });
+
   it("noindex individual e sitemap utilizam a mesma classificação e exceção revisada", () => {
     const blog = load("apps/web/src/pages/blog/[slug].astro");
     const news = load("apps/web/src/pages/noticias/[slug].astro");
