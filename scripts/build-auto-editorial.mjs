@@ -83,7 +83,7 @@ async function cover(post,dest){
   const svg='<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="675"><defs><linearGradient id="g" x2="1" y2="1"><stop stop-color="'+a+'"/><stop offset="1" stop-color="'+b+'"/></linearGradient></defs><rect width="1200" height="675" fill="url(#g)"/><circle cx="1110" cy="310" r="'+(250+k)+'" stroke="'+c+'" stroke-width="17" stroke-opacity=".20" fill="none"/><rect x="906" y="164" width="215" height="304" rx="23" fill="'+c+'" fill-opacity=".12" stroke="'+c+'" stroke-width="3"/><path d="M950 270h120m-120 60h120m-120 60h90" stroke="'+c+'" stroke-width="12" stroke-linecap="round"/><text x="80" y="100" font-size="22" font-weight="bold" fill="'+c+'" font-family="DejaVu Sans,Arial,sans-serif">EMPREGOS SÃO LUÍS • GUIA</text>'+lines+'<text x="78" y="631" font-size="19" fill="#fff" font-family="DejaVu Sans,Arial,sans-serif">ILUSTRAÇÃO EDITORIAL ORIGINAL</text></svg>';
   await sharp(Buffer.from(svg)).webp({quality:84,effort:4}).toFile(dest);
 }
-const accepted=[],blocked=[],seen=new Set();
+const accepted=[],blocked=[],seen=new Set(),verifiedParagraphs=new Set();
 for(const day of plan.days){
   for(const post of day.posts){
     const fail=[];
@@ -103,11 +103,15 @@ for(const day of plan.days){
       if(sources.length<1||sources.some(s=>!/^https:\/\/[a-z0-9.-]+(?:\/|$)/i.test(s)))fail.push("fontes ausentes ou inseguras");
       const paragraphs=body.split(/\r?\n\s*\r?\n/).filter(s=>s.length>100).map(s=>slugify(s.slice(0,200)));
       if(new Set(paragraphs).size!==paragraphs.length)fail.push("parágrafos repetidos");
+      const shared=paragraphs.filter(x=>x.length>75&&verifiedParagraphs.has(x));
+      if(shared.length>=2)fail.push("trechos longos repetidos de artigos anteriores");
+      if(sources.some(s=>!body.includes(s)))fail.push("fonte citada apenas nos metadados, sem referência no texto");
       if(/Uma situação comum na prática|Roteiro aplicável passo a passo|No tema em pauta/i.test(body))fail.push("template repetido");
       if(/vaga garantida|contratação confirmada|está contratando hoje/i.test(body))fail.push("alegação de vaga atual sem evidência");
       if(fail.length){blocked.push({slug:post.slug,reason:fail.join("; ")});continue;}
       const [y,m,d]=day.date.split("-").map(Number);
       const hour=Number(post.time.slice(0,2));
+      paragraphs.filter(x=>x.length>75).forEach(x=>verifiedParagraphs.add(x));
       accepted.push({
         slug:post.slug,type:"GUIDE",title:meta.title,excerpt:meta.excerpt,primaryKeyword:meta.primary_keyword||"",
         contentHtml:markdownToHtml(body),sources,
@@ -126,6 +130,9 @@ if(!checkOnly){
   for(const entry of accepted){
     const post=plan.days.flatMap(d=>d.posts).find(p=>p.slug===entry.slug);
     await cover(post,path.join(coverDir,entry.slug+".webp"));
+    const imageFile=path.join(coverDir,entry.slug+".webp");
+    const meta=await sharp(imageFile).metadata();
+    if(meta.width!==1200||meta.height!==675||meta.format!=="webp"||fs.statSync(imageFile).size>450000)throw new Error("Capa invalida/pesada: "+entry.slug);
   }
   fs.mkdirSync(path.dirname(output),{recursive:true});
   fs.writeFileSync(output,JSON.stringify(accepted,null,2)+"\n");
