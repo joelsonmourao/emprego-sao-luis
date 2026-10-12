@@ -10,6 +10,7 @@ import { getAdsenseReviewMode, sitemapCategoryAllowedInReview, staticPathAllowed
 import { getEditorialAuditReport } from "./editorial-audit";
 import { isEditorialReviewPending } from "../data/editorial-review-pending";
 import { getEditorialContentOverride } from "../data/editorial-content-overrides";
+import { getNewsEditorialOverride } from "../data/news-editorial-content-overrides";
 import { classifyCategoryPage, classifyCityPage, classifyCompanyPage } from "./entity-page-quality";
 import { getRuntimeSiteUrl } from "./canonical-url";
 import {
@@ -197,7 +198,7 @@ export async function listSitemapEntries(
     return dedupeEntries(
       rows.filter((row) => {
         if (noindexSlugs.has(row.slug)) return false;
-        if (isEditorialReviewPending(row.type, row.slug)) return row.type !== "NEWS" && Boolean(getEditorialContentOverride(row.slug));
+        if (isEditorialReviewPending(row.type, row.slug)) return row.type === "NEWS" ? Boolean(getNewsEditorialOverride(row.slug)) : Boolean(getEditorialContentOverride(row.slug));
         return true;
       }).map((row) =>
         toEntry(
