@@ -49,3 +49,45 @@ jobs:
       - run: npm run build
       - run: npx playwright install --with-deps chromium
       - run: npm run test:e2e
+
+  editorial-auto:
+    name: Gerar e registrar artigos/capas apos QA geral
+    needs: quality
+    if: github.event_name == 'push' && github.ref == 'refs/heads/codex/admin-negocio-completo'
+    permissions:
+      contents: write
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: codex/admin-negocio-completo
+          persist-credentials: true
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci --legacy-peer-deps
+      - name: Produzir manifestos e capas sem publicar texto fraco
+        run: node scripts/build-auto-editorial.mjs
+      - name: Conferir build com manifesto efetivo
+        run: npm run typecheck
+      - name: Persistir somente material aprovado e validado
+        run: |
+          git config user.name "es-editorial-bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add apps/web/src/data/auto-editorial-manifest.json apps/web/public/covers/auto-editorial/ editorial/automation-report.json
+          if git diff --cached --quiet; then
+            echo "Nenhuma publicacao adicional validada."
+          else
+            git commit -m "editorial(auto): capas e manifestos verificados"
+            git push origin HEAD:codex/admin-negocio-completo
+          fi
+      - name: Guardar contagem de aprovados/bloqueados
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: es-editorial-qa-relatorio
+          path: editorial/automation-report.json
+          if-no-files-found: warn
+          retention-days: 30
