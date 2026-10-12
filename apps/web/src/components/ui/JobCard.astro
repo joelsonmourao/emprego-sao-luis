@@ -55,13 +55,13 @@ const location = [city, state].filter(Boolean).join(" - ");
 const avatar = logoUrl?.trim() || BRAND_ASSETS.iconWebp;
 ---
 <article
-  class={`group flex h-full flex-col rounded-2xl border border-[#E6E6E6] bg-white p-5 shadow-[0_1px_2px_rgba(16,24,40,0.04)] transition hover:border-[#CFCFCF] hover:shadow-[0_8px_24px_rgba(16,24,40,0.08)] ${compact ? "" : "sm:p-6"}`}
+  class={`es-premium-job-card group flex h-full flex-col rounded-[1.4rem] border border-[var(--es-premium-stroke)] bg-white p-5 transition ${compact ? "" : "sm:p-6"}`}
 >
   <div class="flex items-start gap-4">
     <img
       src={avatar}
       alt=""
-      class="h-12 w-12 shrink-0 rounded-xl border border-[#EEE] bg-white object-contain p-1.5"
+      class="h-12 w-12 shrink-0 rounded-xl border border-[var(--es-premium-stroke)] bg-white object-contain p-1.5"
       width="48"
       height="48"
       loading="lazy"
@@ -71,7 +71,7 @@ const avatar = logoUrl?.trim() || BRAND_ASSETS.iconWebp;
         {featured && <span class="rounded-full bg-[#F3F4F6] px-2.5 py-0.5 text-[11px] font-bold uppercase tracking-wide text-[#374151]">Destaque</span>}
         {sponsored && <span class="rounded-full bg-[#FEF3C7] px-2.5 py-0.5 text-[11px] font-bold uppercase tracking-wide text-[#92400E]">Patrocinada</span>}
       </div>
-      <h3 class="mt-1 text-lg font-bold leading-snug text-[#111827] sm:text-[1.15rem]">
+      <h3 class="mt-2 text-lg font-extrabold leading-snug text-[var(--text-primary)] sm:text-[1.15rem]">
         <a class="hover:text-[var(--brand-primary)]" href={`/vagas/${slug}`}>{title}</a>
       </h3>
       <p class="mt-1 text-sm font-medium text-[#4B5563]">{company}</p>
@@ -92,7 +92,7 @@ const avatar = logoUrl?.trim() || BRAND_ASSETS.iconWebp;
 
   <div class="mt-auto pt-5">
     <a
-      class="inline-flex w-full items-center justify-center rounded-xl border border-[#D1D5DB] bg-white px-4 py-2.5 text-sm font-bold text-[#111827] transition group-hover:border-[var(--brand-primary)] group-hover:text-[var(--brand-primary)]"
+      class="inline-flex w-full items-center justify-center rounded-xl border border-[var(--es-premium-stroke)] bg-[var(--es-premium-paper)] px-4 py-3 text-sm font-extrabold text-[var(--brand-primary)] transition group-hover:border-[var(--brand-primary)] group-hover:bg-[var(--es-premium-blush)]"
       href={`/vagas/${slug}`}
     >
       Ver vaga
