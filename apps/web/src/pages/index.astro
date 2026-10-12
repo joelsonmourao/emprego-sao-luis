@@ -103,170 +103,212 @@ const homeDescription = portalEditorial
 <BaseLayout title={homeTitle} description={homeDescription}>
   {portalEditorial ? (
     <>
-      <section class="es-editorial-hero es-section" aria-labelledby="editorial-hero-title">
-        <div class="es-container es-editorial-hero-grid">
-          <div class="es-editorial-hero-main">
-            <p class="es-editorial-eyebrow">São Luís • Maranhão • Portal editorial</p>
-            <h1 id="editorial-hero-title" class="font-display es-editorial-hero-title">{identity.siteName}</h1>
-            <p class="es-editorial-hero-lead">
-              Informação que ajuda a avançar: notícias do mercado de trabalho,
-              orientações para o currículo e caminhos para se preparar melhor para uma entrevista.
-            </p>
-            <div class="es-editorial-hero-actions">
-              <a class="es-btn es-editorial-button-primary" href="/noticias">Últimas notícias <span aria-hidden="true">↗</span></a>
-              <a class="es-btn es-editorial-button-secondary" href="/blog">Guias de carreira</a>
-            </div>
-            <ul class="es-editorial-topics" aria-label="Assuntos do portal">
-              <li>Mercado de trabalho</li>
-              <li>Currículo</li>
-              <li>Entrevistas</li>
-            </ul>
+      <section class="es-magazine-cover" aria-labelledby="editorial-hero-title">
+        <div class="es-container">
+          <div class="es-magazine-edition">
+            <span class="es-magazine-edition-tag"><span aria-hidden="true">●</span> EMPREGOS SÃO LUÍS</span>
+            <span>Carreira • Informação • Maranhão</span>
+            <a href="/redacao">Compromisso editorial <span aria-hidden="true">↗</span></a>
           </div>
-          <aside class="es-editorial-digest" aria-label="Leituras em destaque">
-            <p class="es-editorial-digest-kicker">Explore o portal</p>
-            <h2 class="font-display es-editorial-digest-title">Leituras para começar</h2>
-            {newsArticles[0] ? (
-              <article class="es-editorial-digest-item">
-                <p class="es-editorial-digest-label">Notícia</p>
-                <h3><a href={articlePublicPath(newsArticles[0].article.type, newsArticles[0].article.slug)}>{newsArticles[0].article.title}</a></h3>
+          <div class="es-magazine-cover-grid">
+            <div class="es-magazine-intro">
+              <p class="es-magazine-overline">UM PORTAL PARA IR MAIS LONGE</p>
+              <h1 id="editorial-hero-title" class="font-display es-magazine-headline">
+                Sua carreira merece <em>boas histórias.</em> E boas decisões.
+              </h1>
+              <p class="es-magazine-standfirst">Notícias, orientações práticas e ferramentas para quem busca oportunidades e quer se preparar melhor em São Luís e no Maranhão.</p>
+              <div class="es-magazine-actions">
+                <a class="es-magazine-action-main" href="/blog">Explorar guias <span aria-hidden="true">↗</span></a>
+                <a class="es-magazine-action-text" href="/noticias">Ler notícias <span aria-hidden="true">→</span></a>
+              </div>
+              <div class="es-magazine-quicklinks" aria-label="Assuntos em destaque">
+                <span>Comece por:</span>
+                <a href="/blog?tema=curriculo">Currículo</a>
+                <a href="/blog?tema=entrevista">Entrevistas</a>
+                <a href="/blog?tema=primeiro-emprego">Primeiro emprego</a>
+              </div>
+            </div>
+            <div class="es-magazine-cover-art">
+              {blogArticles[0]?.article.coverImageUrl ? (
+                <a class="es-magazine-cover-image" href={articlePublicPath(blogArticles[0].article.type, blogArticles[0].article.slug)}>
+                  <img src={blogArticles[0].article.coverImageUrl} alt={blogArticles[0].article.coverImageAlt ?? blogArticles[0].article.title} width="880" height="660" loading="eager" decoding="async" fetchpriority="high" />
+                  <span class="es-magazine-image-caption">
+                    <span class="es-magazine-image-eyebrow">LEITURA EM DESTAQUE</span>
+                    <strong class="font-display">{blogArticles[0].article.title}</strong>
+                    <span>Explorar conteúdo <span aria-hidden="true">↗</span></span>
+                  </span>
+                </a>
+              ) : (
+                <div class="es-magazine-cover-fallback">
+                  <span>ES / Editorial</span>
+                  <strong class="font-display">Informação que abre caminhos.</strong>
+                  <a href="/blog">Descubra nossos guias <span aria-hidden="true">↗</span></a>
+                </div>
+              )}
+              <div class="es-magazine-cover-counter">
+                <span class="es-magazine-counter-mark">ES.</span>
+                <span>Informação local.<strong>Decisões melhores.</strong></span>
+              </div>
+            </div>
+          </div>
+          <div class="es-magazine-bottom-line">
+            <span>CONTEÚDO DE CARREIRA, SEM PROMESSAS FÁCEIS</span>
+            <span class="es-magazine-bottom-rule"></span>
+            <a href="/sobre">Conheça o portal <span aria-hidden="true">↗</span></a>
+          </div>
+        </div>
+      </section>
+
+      {newsArticles.length > 0 && (
+        <section class="es-magazine-news es-section" aria-labelledby="magazine-news-heading">
+          <div class="es-container">
+            <div class="es-magazine-section-header">
+              <div>
+                <p class="es-magazine-section-kicker">01 / REDAÇÃO</p>
+                <h2 id="magazine-news-heading" class="font-display">No radar <em>do trabalho.</em></h2>
+                <p>Notícias e explicações sobre o mercado e o dia a dia profissional.</p>
+              </div>
+              <a class="es-magazine-all-link" href="/noticias">Todas as notícias <span aria-hidden="true">↗</span></a>
+            </div>
+            <div class="es-magazine-news-grid">
+              <article class="es-magazine-news-feature">
+                <a href={articlePublicPath(newsArticles[0].article.type, newsArticles[0].article.slug)}>
+                  {newsArticles[0].article.coverImageUrl ? (
+                    <img src={newsArticles[0].article.coverImageUrl} alt={newsArticles[0].article.coverImageAlt ?? newsArticles[0].article.title} width="850" height="510" loading="lazy" decoding="async" />
+                  ) : <div class="es-magazine-news-placeholder" aria-hidden="true">ES / NOTÍCIAS</div>}
+                  <div class="es-magazine-news-feature-content">
+                    <p>NOTÍCIA EM DESTAQUE</p>
+                    <h3 class="font-display">{newsArticles[0].article.title}</h3>
+                    {newsArticles[0].article.excerpt && <span>{newsArticles[0].article.excerpt}</span>}
+                    <strong>Leia a matéria <span aria-hidden="true">↗</span></strong>
+                  </div>
+                </a>
               </article>
-            ) : (
-              <article class="es-editorial-digest-item">
-                <p class="es-editorial-digest-label">Nosso compromisso</p>
-                <h3><a href="/redacao">Conheça os critérios editoriais e as fontes do portal</a></h3>
+              <div class="es-magazine-news-list">
+                {newsArticles.slice(1).map(({ article }, index) => (
+                  <article class="es-magazine-news-row">
+                    <a href={articlePublicPath(article.type, article.slug)}>
+                      <span class="es-magazine-news-order">0{index + 2}</span>
+                      <span class="es-magazine-news-row-copy">
+                        <span>REDAÇÃO / NOTÍCIAS</span>
+                        <strong class="font-display">{article.title}</strong>
+                        {article.excerpt && <small>{article.excerpt}</small>}
+                      </span>
+                      <span class="es-magazine-row-arrow" aria-hidden="true">↗</span>
+                    </a>
+                  </article>
+                ))}
+                <a class="es-magazine-news-extra" href="/redacao">
+                  <span>Como verificamos as informações</span>
+                  <span aria-hidden="true">↗</span>
+                </a>
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
+
+      <section class="es-magazine-toolband" aria-labelledby="magazine-tool-heading">
+        <div class="es-container es-magazine-toolband-grid">
+          <div class="es-magazine-toolband-intro">
+            <p>02 / FERRAMENTA GRATUITA</p>
+            <h2 id="magazine-tool-heading" class="font-display">A próxima candidatura começa com <em>organização.</em></h2>
+          </div>
+          <div class="es-magazine-toolband-action">
+            <p>Registre vagas, datas e etapas do processo seletivo. Baixe uma planilha CSV sem cadastro e sem enviar seus dados ao portal.</p>
+            <a href="/ferramentas/controle-candidaturas">Organizar candidaturas <span aria-hidden="true">↗</span></a>
+          </div>
+        </div>
+      </section>
+
+      <div class="es-container py-5"><AdSlot slot="home-top" pageType="home" /></div>
+
+      {blogArticles.length > 0 && (
+        <section class="es-magazine-guides es-section" aria-labelledby="magazine-guides-heading">
+          <div class="es-container">
+            <div class="es-magazine-section-header">
+              <div>
+                <p class="es-magazine-section-kicker">03 / CONHECIMENTO PRÁTICO</p>
+                <h2 id="magazine-guides-heading" class="font-display">Leituras para <em>avançar.</em></h2>
+                <p>Escolha um tema e coloque as orientações em prática.</p>
+              </div>
+              <a class="es-magazine-all-link" href="/blog">Biblioteca de guias <span aria-hidden="true">↗</span></a>
+            </div>
+            <div class="es-magazine-guides-grid">
+              <article class="es-magazine-guide-lead">
+                <a href={articlePublicPath(blogArticles[0].article.type, blogArticles[0].article.slug)}>
+                  {blogArticles[0].article.coverImageUrl && <img src={blogArticles[0].article.coverImageUrl} alt={blogArticles[0].article.coverImageAlt ?? blogArticles[0].article.title} width="800" height="500" loading="lazy" decoding="async" />}
+                  <div>
+                    <span class="es-magazine-guide-type">GUIA EM DESTAQUE</span>
+                    <h3 class="font-display">{blogArticles[0].article.title}</h3>
+                    {blogArticles[0].article.excerpt && <p>{blogArticles[0].article.excerpt}</p>}
+                    <strong>Ler o guia <span aria-hidden="true">↗</span></strong>
+                  </div>
+                </a>
               </article>
-            )}
-            {blogArticles[0] ? (
-              <article class="es-editorial-digest-item">
-                <p class="es-editorial-digest-label">Guia</p>
-                <h3><a href={articlePublicPath(blogArticles[0].article.type, blogArticles[0].article.slug)}>{blogArticles[0].article.title}</a></h3>
-              </article>
-            ) : (
-              <article class="es-editorial-digest-item">
-                <p class="es-editorial-digest-label">Proteção ao candidato</p>
-                <h3><a href="/seguranca-candidatos">Saiba como reconhecer anúncios suspeitos</a></h3>
-              </article>
-            )}
-            <a class="es-editorial-digest-more" href="/sobre">Conheça o Empregos São Luís <span aria-hidden="true">→</span></a>
+              <div class="es-magazine-guides-side">
+                {blogArticles.slice(1).map(({ article }, index) => (
+                  <article class="es-magazine-guide-small">
+                    <a href={articlePublicPath(article.type, article.slug)}>
+                      {article.coverImageUrl ? <img src={article.coverImageUrl} alt={article.coverImageAlt ?? article.title} width="168" height="138" loading="lazy" decoding="async" /> : <div class="es-magazine-guide-placeholder" aria-hidden="true">ES</div>}
+                      <div>
+                        <span>LEITURA 0{index + 2}</span>
+                        <h3 class="font-display">{article.title}</h3>
+                        <strong>Ver conteúdo <span aria-hidden="true">↗</span></strong>
+                      </div>
+                    </a>
+                  </article>
+                ))}
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
+
+      <section class="es-magazine-categories es-section" aria-labelledby="magazine-categories-heading">
+        <div class="es-container">
+          <div class="es-magazine-section-header">
+            <div>
+              <p class="es-magazine-section-kicker">04 / ASSUNTOS</p>
+              <h2 id="magazine-categories-heading" class="font-display">Seu caminho, <em>seu assunto.</em></h2>
+              <p>Acesse diretamente os temas que fazem sentido para o seu momento.</p>
+            </div>
+          </div>
+          <div class="es-magazine-topic-grid">
+            <a href="/blog?tema=mercado"><span>01</span><strong class="font-display">Mercado de trabalho</strong><small>Entenda o cenário profissional</small><span aria-hidden="true">↗</span></a>
+            <a href="/blog?tema=curriculo"><span>02</span><strong class="font-display">Currículo</strong><small>Organize suas experiências</small><span aria-hidden="true">↗</span></a>
+            <a href="/blog?tema=entrevista"><span>03</span><strong class="font-display">Entrevistas</strong><small>Prepare seus exemplos</small><span aria-hidden="true">↗</span></a>
+            <a href="/blog?tema=primeiro-emprego"><span>04</span><strong class="font-display">Primeiro emprego</strong><small>Comece com segurança</small><span aria-hidden="true">↗</span></a>
+          </div>
+        </div>
+      </section>
+
+      <section class="es-magazine-resource es-section" aria-labelledby="magazine-resource-heading">
+        <div class="es-container es-magazine-resource-grid">
+          <div>
+            <p class="es-magazine-section-kicker">05 / SERVIÇO PÚBLICO</p>
+            <h2 id="magazine-resource-heading" class="font-display">Buscando vagas pelo SINE no Maranhão?</h2>
+            <p>Veja como consultar os canais oficiais, conferir o atendimento e organizar sua documentação antes da candidatura.</p>
+            <a href="/guias/emprego-sine-maranhao">Acessar guia completo <span aria-hidden="true">↗</span></a>
+          </div>
+          <aside class="es-magazine-resource-aside">
+            <span>CONFIANÇA IMPORTA</span>
+            <strong class="font-display">Informação útil. Fonte identificada. Sem promessas de contratação.</strong>
+            <a href="/seguranca-candidatos">Segurança do candidato <span aria-hidden="true">↗</span></a>
           </aside>
         </div>
       </section>
 
-      <section class="es-section pt-0" aria-labelledby="ferramenta-candidaturas">
-        <div class="es-container">
-          <div class="es-card grid items-center gap-5 border-l-4 border-[var(--brand-primary)] p-6 sm:p-8 lg:grid-cols-[1fr_auto]">
-            <div>
-              <p class="es-kicker">Ferramenta gratuita para candidatos</p>
-              <h2 id="ferramenta-candidaturas" class="mt-2 font-display text-2xl font-black sm:text-3xl">Organize suas candidaturas em uma planilha</h2>
-              <p class="mt-3 max-w-2xl leading-7 text-[var(--text-secondary)]">Registre as vagas às quais se candidatou, acompanhe entrevistas e baixe um CSV. Sem cadastro, sem pagar e sem enviar seus dados ao portal.</p>
-            </div>
-            <a class="es-btn es-btn-primary" href="/ferramentas/controle-candidaturas">Abrir controle gratuito <span aria-hidden="true">→</span></a>
-          </div>
+      <section class="es-magazine-about" aria-label="Conheça o portal">
+        <div class="es-container es-magazine-about-inner">
+          <p><strong>Mais do que manchetes.</strong> Uma redação comprometida com orientação clara e verificável.</p>
+          <nav aria-label="Informações sobre o portal">
+            <a href="/sobre">Quem somos</a>
+            <a href="/redacao">Nossa redação</a>
+            <a href="/politica-fontes">Nossas fontes</a>
+          </nav>
         </div>
       </section>
-
-      <section class="es-section pt-0" aria-labelledby="sine-ma-guia">
-        <div class="es-container">
-          <div class="rounded-2xl border border-[var(--brand-border)] bg-[var(--brand-surface)] p-5 sm:p-7">
-            <p class="es-kicker">Guia com fontes públicas verificáveis</p>
-            <h2 id="sine-ma-guia" class="mt-2 font-display text-2xl font-black">Como buscar emprego pelo SINE no Maranhão</h2>
-            <p class="mt-3 max-w-3xl leading-7 text-[var(--text-secondary)]">Passo a passo para consultar oportunidades pelos serviços oficiais, preparar o perfil profissional e conferir informações de atendimento em São Luís. Inclui checklist de segurança e links do governo.</p>
-            <a class="mt-5 inline-flex font-bold text-[var(--brand-primary)] underline underline-offset-4" href="/guias/emprego-sine-maranhao">Ler guia completo <span aria-hidden="true">→</span></a>
-          </div>
-        </div>
-      </section>
-
-      <div class="es-container py-6"><AdSlot slot="home-top" pageType="home" /></div>
-
-      {newsArticles.length > 0 && (
-        <section class="es-section pt-0">
-          <div class="es-container">
-            <SectionHeading kicker="Notícias" title="Atualizações do mercado de trabalho" actionHref="/noticias" actionLabel="Ver notícias" />
-            <div class="mt-8 grid gap-5 md:grid-cols-2 xl:grid-cols-4">
-              {newsArticles.map(({ article }) => (
-                <article class="es-card p-5">
-                  <p class="text-xs font-bold text-[var(--brand-primary)]">Notícia</p>
-                  <h3 class="font-display mt-1 text-lg font-black">
-                    <a href={articlePublicPath(article.type, article.slug)}>{article.title}</a>
-                  </h3>
-                  {article.excerpt && <p class="mt-2 text-sm text-[var(--es-muted)] line-clamp-3">{article.excerpt}</p>}
-                </article>
-              ))}
-            </div>
-          </div>
-        </section>
-      )}
-
-      {blogArticles.length > 0 && (
-        <section class="es-section bg-white">
-          <div class="es-container">
-            <SectionHeading kicker="Blog" title="Guias e conteúdos para se posicionar melhor" actionHref="/blog" actionLabel="Ver blog" />
-            <div class="mt-8 grid gap-5 md:grid-cols-2 xl:grid-cols-4">
-              {blogArticles.map(({ article }) => (
-                <article class="es-card p-5">
-                  <p class="text-xs font-bold text-[var(--brand-primary)]">{article.type === "DATA_REPORT" ? "Relatório" : "Guia"}</p>
-                  <h3 class="font-display mt-1 text-lg font-black">
-                    <a href={articlePublicPath(article.type, article.slug)}>{article.title}</a>
-                  </h3>
-                  {article.excerpt && <p class="mt-2 text-sm text-[var(--es-muted)] line-clamp-3">{article.excerpt}</p>}
-                </article>
-              ))}
-            </div>
-          </div>
-        </section>
-      )}
-
-      <section class="es-section">
-        <div class="es-container">
-          <SectionHeading kicker="Temas" title="Orientação por assunto" actionHref="/blog" actionLabel="Ver todos os guias" />
-          <div class="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            <a class="es-card block p-5 hover:border-[var(--brand-primary)]" href="/blog?tema=mercado">
-              <p class="text-xs font-bold text-[var(--brand-primary)]">Mercado</p>
-              <h3 class="font-display mt-1 text-lg font-black">Mercado de trabalho</h3>
-              <p class="mt-2 text-sm text-[var(--es-muted)]">Contexto local, salários e cenários em São Luís e no Maranhão.</p>
-            </a>
-            <a class="es-card block p-5 hover:border-[var(--brand-primary)]" href="/blog?tema=curriculo">
-              <p class="text-xs font-bold text-[var(--brand-primary)]">Carreira</p>
-              <h3 class="font-display mt-1 text-lg font-black">Currículo</h3>
-              <p class="mt-2 text-sm text-[var(--es-muted)]">Guias práticos para montar e ajustar o currículo.</p>
-            </a>
-            <a class="es-card block p-5 hover:border-[var(--brand-primary)]" href="/blog?tema=entrevista">
-              <p class="text-xs font-bold text-[var(--brand-primary)]">Seleção</p>
-              <h3 class="font-display mt-1 text-lg font-black">Entrevistas</h3>
-              <p class="mt-2 text-sm text-[var(--es-muted)]">Preparação para entrevistas presenciais e remotas.</p>
-            </a>
-            <a class="es-card block p-5 hover:border-[var(--brand-primary)]" href="/blog?tema=primeiro-emprego">
-              <p class="text-xs font-bold text-[var(--brand-primary)]">Início</p>
-              <h3 class="font-display mt-1 text-lg font-black">Primeiro emprego</h3>
-              <p class="mt-2 text-sm text-[var(--es-muted)]">Checklist e orientação para quem está começando.</p>
-            </a>
-          </div>
-        </div>
-      </section>
-
-      <section class="es-section bg-white">
-        <div class="es-container grid gap-5 lg:grid-cols-3">
-          <article class="es-card p-6 sm:p-8">
-            <p class="es-kicker">Institucional</p>
-            <h2 class="font-display mt-2 text-2xl font-black">Sobre o portal</h2>
-            <p class="mt-3 text-[var(--text-secondary)]">Conheça a missão e o propósito do Empregos São Luís.</p>
-            <a class="es-btn es-btn-secondary mt-5" href="/sobre">Ler sobre</a>
-          </article>
-          <article class="es-card p-6 sm:p-8">
-            <p class="es-kicker">Redação</p>
-            <h2 class="font-display mt-2 text-2xl font-black">Como publicamos</h2>
-            <p class="mt-3 text-[var(--text-secondary)]">Critérios editoriais, fontes e correções do conteúdo do portal.</p>
-            <a class="es-btn es-btn-secondary mt-5" href="/redacao">Ver redação</a>
-          </article>
-          <article class="es-card p-6 sm:p-8">
-            <p class="es-kicker">Segurança</p>
-            <h2 class="font-display mt-2 text-2xl font-black">Evite golpes</h2>
-            <p class="mt-3 text-[var(--text-secondary)]">Orientações para candidatos e denúncias de ofertas suspeitas.</p>
-            <a class="es-btn es-btn-primary mt-5" href="/seguranca-candidatos">Ver segurança</a>
-          </article>
-        </div>
-      </section>
-
       <InstagramFollow />
     </>
   ) : (
