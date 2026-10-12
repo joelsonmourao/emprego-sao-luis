@@ -658,7 +658,286 @@ const overrides: Record<string, EditorialContentOverride> = {
 <ol><li>Teste o trajeto no horário efetivo.</li><li>Defina contatos de emergência e limites de compartilhamento.</li><li>Revise documentos e acessos necessários ao trabalho.</li><li>Reserve margem para adaptação da rotina.</li><li>Registre qualquer combinação relevante com o RH.</li></ol>
 <p>Se houver pressão para pedir demissão, discriminação, recusa de direito, risco à saúde ou divergência sobre estabilidade, preserve mensagens e documentos e procure sindicato, inspeção do trabalho, assistência jurídica ou profissional habilitado. Este guia oferece organização prática; não substitui avaliação jurídica ou médica.</p>
 `.trim()
-  }
+  },
+
+  "como-ler-holerite-descontos": {
+    reviewedAt: "2026-10-12",
+    contentHtml: `
+<p><strong>Revisão editorial: 12 de outubro de 2026.</strong> O holerite é um registro para conferir, não uma conta que o trabalhador precisa aceitar sem entender. Compare o documento com o contrato, o controle de jornada e o valor que entrou na conta. Não use uma tabela antiga da internet para concluir que há erro: alíquotas, bases e regras podem mudar.</p>
+<h2>Leia em quatro blocos</h2>
+<ol>
+<li><strong>Identificação e competência:</strong> confirme nome, empregador, cargo e o mês a que o pagamento se refere.</li>
+<li><strong>Proventos:</strong> salário-base, horas, adicionais, comissões ou outras parcelas devem corresponder ao que ocorreu no período.</li>
+<li><strong>Descontos:</strong> observe a descrição, a base e o valor de cada item; descontos sem explicação merecem pergunta formal.</li>
+<li><strong>Líquido:</strong> confira se o total depositado corresponde ao líquido indicado e guarde o comprovante.</li>
+</ol>
+<p>A <a href="https://www.planalto.gov.br/ccivil_03/decreto-lei/del5452.htm" target="_blank" rel="noopener noreferrer">CLT</a>, especialmente nos artigos 462 e 464, disciplina descontos e a comprovação do pagamento. Isso não transforma todo desconto divergente em ilegal: adiantamentos, previsão legal e instrumentos coletivos podem alterar a leitura do caso.</p>
+<h2>Um exemplo sem adivinhar alíquotas</h2>
+<p>Imagine que o ponto mostra duas horas extras, mas o holerite não traz rubrica correspondente. Primeiro confirme se houve compensação válida, fechamento do ponto em data diferente ou banco de horas. Depois envie ao RH uma pergunta objetiva: “No demonstrativo de julho não localizei as horas de 8 e 9 de julho. Elas foram compensadas ou entrarão na próxima competência?” Anexe apenas o trecho necessário do espelho de ponto.</p>
+<h2>Checklist para conversar com o RH</h2>
+<ul>
+<li>Qual período de ponto entrou nesta folha?</li>
+<li>Que documento explica esta rubrica?</li>
+<li>O desconto decorre de lei, contrato, adiantamento ou instrumento coletivo?</li>
+<li>Existe folha complementar ou ajuste previsto?</li>
+<li>Como recebo a resposta e o demonstrativo corrigido por escrito?</li>
+</ul>
+<h2>Faça uma conferência mensal simples</h2>
+<p>Crie uma linha por competência com salário-base, dias trabalhados, horas registradas, faltas justificadas, férias, benefícios e líquido recebido. Quando houver variável, anote a origem: venda, plantão, comissão ou ajuste. Essa planilha não substitui a folha; ela ajuda a localizar em que mês surgiu a diferença.</p>
+<p>Não compare apenas dois líquidos: férias, afastamento, adiantamento, início ou término no meio do mês e fechamento de ponto podem alterar o resultado. Compare primeiro as rubricas e bases. Se receber folha retificadora, preserve também a versão anterior e a resposta que explica o motivo.</p>
+<h2>Dúvidas que o valor líquido não responde</h2>
+<p><strong>O salário-base está certo, então a folha está certa?</strong> Não necessariamente. Jornada, adicionais, faltas, benefícios e descontos também precisam corresponder aos registros do período.</p>
+<p><strong>Posso enviar o holerite inteiro por WhatsApp?</strong> Prefira o canal oficial e compartilhe só o necessário. O documento contém remuneração e outros dados pessoais.</p>
+<p><strong>Uma diferença pequena pode ser ignorada?</strong> Registre e pergunte. Valores pequenos repetidos se acumulam e podem indicar uma rubrica interpretada de forma diferente pelo RH.</p>
+<p>Quando a folha usa códigos internos, peça o glossário de rubricas em vez de adivinhar pelo nome abreviado. Na rescisão ou troca de sistema, exporte seus demonstrativos antes de perder o acesso ao portal corporativo. Arquivo pessoal não deve depender apenas do e-mail ou aplicativo da empresa.</p>
+<p>Guarde holerites, espelhos de ponto, contrato e comprovantes em local pessoal seguro. Se a diferença persistir, peça memória de cálculo ao empregador e consulte o sindicato da categoria ou profissional habilitado. Este guia ajuda a organizar a conferência; não calcula tributos nem substitui análise contábil ou jurídica.</p>
+`.trim()
+  },
+  "freelancer-ou-clt-vantagens": {
+    reviewedAt: "2026-10-12",
+    contentHtml: `
+<p><strong>Revisão editorial: 12 de outubro de 2026.</strong> “Freelancer” descreve uma forma comum de prestar serviços, mas não resolve sozinho se existe ou não vínculo de emprego. A escolha prática deve considerar autonomia real, previsibilidade de renda, custos, proteção previdenciária e o contrato proposto — não apenas o valor anunciado.</p>
+<h2>Compare o trabalho concreto</h2>
+<table>
+<thead><tr><th>Ponto</th><th>Emprego formal</th><th>Prestação por conta própria</th></tr></thead>
+<tbody>
+<tr><td>Rotina</td><td>Jornada, direção e regras do empregador</td><td>Escopo, entrega e autonomia precisam estar claros</td></tr>
+<tr><td>Pagamento</td><td>Salário e parcelas conforme contrato e legislação</td><td>Preço, prazo, aceite e multa devem constar do acordo</td></tr>
+<tr><td>Custos</td><td>Verifique transporte, alimentação e equipamentos</td><td>Inclua tempo sem projeto, tributos, contribuição e ferramentas no preço</td></tr>
+<tr><td>Risco</td><td>Renda tende a ser mais previsível, conforme o vínculo</td><td>Atraso do cliente e intervalos sem demanda precisam de reserva</td></tr>
+</tbody>
+</table>
+<p>A <a href="https://www.planalto.gov.br/ccivil_03/decreto-lei/del5452.htm" target="_blank" rel="noopener noreferrer">CLT</a> reúne as regras gerais do emprego. Para quem trabalha por conta própria, o <a href="https://www.gov.br/inss/pt-br/direitos-e-deveres/inscricao-e-contribuicao/tipos-de-filiacao" target="_blank" rel="noopener noreferrer">INSS explica os tipos de filiação</a> e mantém orientações sobre <a href="https://www.gov.br/inss/pt-br/direitos-e-deveres/inscricao-e-contribuicao/contribuicao-previdenciaria-e-salario-de-contribuicao" target="_blank" rel="noopener noreferrer">contribuição previdenciária</a>. Consulte as páginas atuais antes de escolher categoria ou valor; uma tabela antiga pode induzir erro.</p>
+<h2>Faça uma conta mensal, não por diária</h2>
+<p><strong>Exemplo ilustrativo:</strong> uma pessoa recebe proposta de quatro entregas por mês. Ela soma horas de execução, reuniões, transporte, internet, equipamento, eventual emissão de documento fiscal e semanas sem demanda. Só então compara com uma proposta empregatícia, considerando jornada, benefícios confirmados e custo do trajeto em São Luís.</p>
+<h2>Perguntas antes de aceitar</h2>
+<ul>
+<li>Quem define horário, local, método e prioridade?</li>
+<li>Qual é o escopo e quantas revisões estão incluídas?</li>
+<li>Quando a entrega é considerada aceita e quando vence o pagamento?</li>
+<li>Quem fornece equipamento, acesso e material?</li>
+<li>Há exclusividade, confidencialidade ou cessão de direitos?</li>
+<li>Como encerrar o acordo e receber o que já foi entregue?</li>
+</ul>
+<h2>Coloque o acordo de serviço no papel</h2>
+<p>Uma proposta de prestação deve identificar as partes, o resultado esperado, os arquivos ou serviços incluídos, a data de entrega, a forma de aceite, o preço, o vencimento e o que acontece se o escopo mudar. Defina também quem fornece acesso, material e autorização para usar marcas ou dados. “Fazer as redes” ou “dar apoio” é amplo demais para cobrar e entregar com segurança.</p>
+<p>Para comparar renda, simule um mês fraco, um mês normal e um mês cheio. Reserve tempo não faturado para prospectar, organizar documentos e corrigir entregas. Se o contrato exige disponibilidade permanente, exclusividade ou controle diário, considere esse impacto antes de aceitar e procure orientação se a prática parecer diferente do rótulo usado.</p>
+<h2>Três decisões antes de trocar de modelo</h2>
+<p><strong>Reserva:</strong> quantos meses você consegue cobrir despesas se um cliente atrasar ou cancelar? <strong>Dependência:</strong> qual percentual da renda viria de um único contratante? <strong>Capacidade:</strong> quantas horas cabem sem reduzir qualidade ou descanso?</p>
+<p>Se você já tem emprego, revise cláusulas de confidencialidade, conflito de interesse e horário antes de aceitar projeto paralelo. Nunca use lista de clientes, equipamento ou arquivo do empregador sem autorização. Se está desempregado, trate promessa de volume futuro como possibilidade, não como receita confirmada.</p>
+<p>Peça uma proposta-piloto paga quando ainda não houver histórico com o cliente; ela reduz incerteza sem transformar trabalho completo em “teste grátis”.</p>
+<p>Não abra CNPJ, pague taxa ou entregue senha gov.br só porque um anúncio exige urgência. Se a rotina real divergir do contrato ou houver dúvida sobre vínculo, tributação ou contribuição, leve os documentos a profissional habilitado. Este conteúdo é um roteiro de decisão, não enquadramento jurídico automático.</p>
+`.trim()
+  },
+  "mitos-direitos-trabalhistas-whatsapp": {
+    reviewedAt: "2026-10-12",
+    contentHtml: `
+<p><strong>Revisão editorial: 12 de outubro de 2026.</strong> Mensagens virais misturam regra geral, exceção, decisão sobre um caso específico e informação já superada. Em vez de responder “verdadeiro” ou “falso” sem contexto, verifique a fonte, a data, a categoria profissional e o documento aplicável.</p>
+<h2>Um método de verificação em cinco passos</h2>
+<ol>
+<li><strong>Capture a afirmação exata.</strong> Salve texto, data e link; áudio sem origem é difícil de auditar.</li>
+<li><strong>Identifique o tipo de regra.</strong> Pode vir de lei, contrato, política interna, convenção ou acordo coletivo.</li>
+<li><strong>Confirme a abrangência.</strong> Categoria, município, empresa, vigência e situação contratual podem mudar a resposta.</li>
+<li><strong>Abra a fonte primária.</strong> Use portais oficiais, não uma imagem cortada.</li>
+<li><strong>Registre a dúvida restante.</strong> Pergunte ao RH, sindicato ou profissional habilitado com os documentos do caso.</li>
+</ol>
+<p>Para legislação geral, consulte a <a href="https://www.planalto.gov.br/ccivil_03/decreto-lei/del5452.htm" target="_blank" rel="noopener noreferrer">CLT no Planalto</a>. O Ministério do Trabalho permite <a href="https://www.gov.br/pt-br/servicos/consultar-instrumento-coletivo-de-trabalho" target="_blank" rel="noopener noreferrer">consultar instrumentos coletivos registrados</a> e mantém o <a href="https://cnes.trabalho.gov.br/app/publico/consultas/cadastro-entidade" target="_blank" rel="noopener noreferrer">CNES</a> para verificar entidades sindicais.</p>
+<h2>Exemplo: “todo trabalhador recebe o mesmo adicional”</h2>
+<p>A frase é incompleta. O nome da parcela, a atividade, o horário, a base de cálculo e a norma aplicável precisam ser identificados. A verificação correta começa pelo contrato e holerite, passa pelo instrumento coletivo vigente e termina na regra oficial pertinente. Um print sem empresa, período e categoria não sustenta conclusão.</p>
+<h2>Sinais de mensagem insegura</h2>
+<ul>
+<li>não informa número, órgão, data ou link da norma;</li>
+<li>promete dinheiro automático ou indenização garantida;</li>
+<li>pede CPF, senha, código ou pagamento para “liberar direito”;</li>
+<li>usa “vale para todo mundo” sem explicar categoria e vigência;</li>
+<li>manda encaminhar antes que a mensagem seja “apagada”.</li>
+</ul>
+<h2>Como registrar a resposta sem criar outro boato</h2>
+<p>Copie o título da fonte, o órgão responsável, a data de consulta e a passagem relevante em suas próprias palavras. Se a regra vier de convenção coletiva, registre número, vigência, categoria e município. Se depender do contrato, diga explicitamente que a fonte geral não resolve o caso sozinha.</p>
+<p><strong>Exemplo de resposta responsável:</strong> “A CLT contém a regra geral, mas o instrumento coletivo e os documentos do vínculo precisam ser conferidos. O serviço oficial para pesquisar acordos está neste link. Consultei em 12/10/2026.” Esse formato permite que outra pessoa refaça a verificação.</p>
+<h2>Quando não responder em grupo</h2>
+<p>Atestado, acidente, assédio, dispensa e desconto podem expor dados pessoais ou exigir prazo. Nesses casos, preserve a mensagem, saia da discussão pública e use um canal individual com a entidade ou profissional adequado. Não publique nome da empresa ou colega como acusação sem apuração.</p>
+<h2>Perguntas para desmontar uma corrente</h2>
+<ul><li>Qual é o número da lei, cláusula ou decisão?</li><li>Qual órgão publicou e em que data?</li><li>A informação vale para empregado, servidor, autônomo ou uma categoria específica?</li><li>A regra está vigente na data do fato?</li><li>Há condição ou exceção que foi cortada da mensagem?</li></ul>
+<p>Se ninguém consegue responder, rotule a informação como não verificada. Não complete a lacuna com memória ou com outro post que cita a mesma corrente. Uma busca pode encontrar muitas repetições sem encontrar a fonte original.</p>
+<p>Ao compartilhar uma correção, envie o link oficial e uma frase limitada: “esta fonte diz X; é preciso confirmar se se aplica ao seu contrato”. Não exponha holerite, atestado ou dados de colegas em grupo. Se houver prazo, desconto, dispensa ou risco à saúde, preserve os documentos e procure orientação individual. Este guia combate desinformação; não oferece parecer jurídico.</p>
+`.trim()
+  },
+  "servicos-gerais-epi-vaga": {
+    reviewedAt: "2026-10-12",
+    contentHtml: `
+<p><strong>Revisão editorial: 12 de outubro de 2026.</strong> Em uma vaga de serviços gerais, perguntar sobre risco e proteção é parte da avaliação profissional. “Usa luva” não basta: o equipamento precisa corresponder ao risco da tarefa, ter orientação de uso e estar integrado às medidas de prevenção do local.</p>
+<h2>O que a vaga deve esclarecer</h2>
+<ul>
+<li>ambientes e tarefas: limpeza comum, resíduos, produtos químicos, altura ou área de saúde;</li>
+<li>produtos utilizados e onde ficam as fichas e instruções;</li>
+<li>equipamentos de trabalho e manutenção;</li>
+<li>treinamento antes de tarefas de maior risco;</li>
+<li>responsável por reposição, higienização e comunicação de defeitos.</li>
+</ul>
+<p>A <a href="https://www.gov.br/trabalho-e-emprego/pt-br/acesso-a-informacao/participacao-social/conselhos-e-orgaos-colegiados/comissao-tripartite-partitaria-permanente/normas-regulamentadora/normas-regulamentadoras-vigentes/norma-regulamentadora-no-6-nr-6" target="_blank" rel="noopener noreferrer">NR-6</a> trata de equipamento de proteção individual. O Ministério do Trabalho também mantém a <a href="https://caepi.trabalho.gov.br/internet/ConsultaCAInternet.aspx" target="_blank" rel="noopener noreferrer">consulta do Certificado de Aprovação</a>. O CA indica aprovação do equipamento dentro do escopo informado; não significa que qualquer EPI serve para toda tarefa.</p>
+<h2>Durante a entrevista</h2>
+<p>Pergunte de forma concreta: “Quais produtos e superfícies fazem parte da rotina?”, “Há treinamento antes do primeiro uso?” e “Como funciona a troca de equipamento danificado?”. Uma resposta profissional descreve processo, não culpa o candidato por ainda não conhecer o local.</p>
+<h2>Ao iniciar o trabalho</h2>
+<ol>
+<li>confira tamanho, integridade e identificação do equipamento;</li>
+<li>aprenda como colocar, retirar, limpar e guardar;</li>
+<li>não misture produtos nem improvise embalagem;</li>
+<li>interrompa a tarefa e comunique vazamento, dano ou sintoma;</li>
+<li>registre a solicitação de substituição pelo canal indicado.</li>
+</ol>
+<p><strong>Exemplo ilustrativo:</strong> uma auxiliar recebe luvas, mas nota rasgo antes de limpar um banheiro. Ela separa o item, avisa a supervisão e solicita substituição antes de continuar. Fotografar pessoas, prontuários ou áreas restritas para “provar” o fato pode criar outro problema; siga o procedimento interno e preserve apenas o registro necessário.</p>
+<h2>EPI não substitui organização do trabalho</h2>
+<p>Equipamento individual é uma camada de proteção. Ventilação, isolamento da área, sinalização, equipamento adequado e procedimento de limpeza podem ser tão importantes quanto luvas, calçado ou máscara. Por isso, a pergunta correta não é “qual EPI eu uso?”, mas “qual é o risco avaliado e quais controles foram definidos?”.</p>
+<p>Se houver contato com material biológico, produto corrosivo, eletricidade, altura ou máquina, não improvise com equipamento doméstico. Peça a orientação específica e confirme quem está autorizado a executar a tarefa. Um CA válido não transforma um equipamento inadequado ao risco em escolha correta.</p>
+<h2>Sinais de posto mal organizado</h2>
+<ul><li>produto sem rótulo ou diluição feita “de memória”;</li><li>EPI compartilhado sem higienização definida;</li><li>treinamento reduzido a assinatura em lista;</li><li>pressão para continuar com item danificado;</li><li>tarefa perigosa fora do escopo sem supervisão.</li></ul>
+<h2>Como descrever experiência no currículo</h2>
+<p>Em vez de escrever apenas “serviços gerais”, liste tarefas verdadeiras: limpeza de áreas administrativas, coleta segregada, reposição de materiais ou uso de equipamento específico para o qual recebeu orientação. Não declare curso, produto ou ambiente de risco que você não conhece.</p>
+<p>Na entrevista, experiência inclui seguir procedimento, sinalizar área molhada, comunicar defeito e evitar mistura de produtos. Esses exemplos mostram cuidado sem inventar certificação. Se a vaga envolve hospital, cozinha industrial ou altura, peça que a empresa explique requisitos e treinamento do próprio posto.</p>
+<p>Não compre EPI exigido pela vaga como condição para participar de seleção e não aceite pagamento para “kit obrigatório” enviado por desconhecido. Em risco imediato, falta de orientação ou recusa de substituição, procure a supervisão e os canais de segurança do trabalho; conforme o caso, sindicato, inspeção do trabalho ou atendimento de saúde. O guia não substitui avaliação técnica do ambiente.</p>
+`.trim()
+  },
+  "sindicato-trabalhador-direitos-basico": {
+    reviewedAt: "2026-10-12",
+    contentHtml: `
+<p><strong>Revisão editorial: 12 de outubro de 2026.</strong> Para procurar um sindicato, comece pela categoria e pela base territorial, não pelo nome que apareceu em uma mensagem. Entidades diferentes podem representar trabalhadores e empregadores, categorias distintas ou regiões diferentes.</p>
+<h2>Como identificar a entidade</h2>
+<ol>
+<li>anote sua função, a atividade principal do empregador e o município de trabalho;</li>
+<li>pergunte ao RH qual instrumento coletivo foi usado no contrato ou holerite;</li>
+<li>consulte a situação e a representação no <a href="https://cnes.trabalho.gov.br/app/publico/consultas/cadastro-entidade" target="_blank" rel="noopener noreferrer">Cadastro Nacional de Entidades Sindicais</a>;</li>
+<li>confira convenções e acordos no serviço oficial de <a href="https://www.gov.br/pt-br/servicos/consultar-instrumento-coletivo-de-trabalho" target="_blank" rel="noopener noreferrer">consulta de instrumentos coletivos</a>;</li>
+<li>compare CNPJ, endereço, abrangência e vigência antes de enviar documentos ou pagar.</li>
+</ol>
+<p>O Ministério do Trabalho explica que o <a href="https://www.gov.br/trabalho-e-emprego/pt-br/servicos/sindicatos/cadastro-de-entidades/cadastro-de-entidades-sindicais/informacoes-gerais-sobre-o-cadastro-nacional-de-entidades-sindicais" target="_blank" rel="noopener noreferrer">CNES disponibiliza dados públicos de representação e situação cadastral</a>. Já o instrumento coletivo deve ser lido pela vigência, categoria, base e cláusula específica; encontrar um PDF não prova que ele se aplica ao seu vínculo.</p>
+<h2>Prepare uma consulta útil</h2>
+<p>Em vez de enviar todos os documentos, formule a pergunta: “Trabalho como X na empresa Y, em São Luís, desde tal mês. Qual instrumento coletivo vigente abrange esta situação e onde está a cláusula sobre Z?”. Compartilhe apenas o necessário e oculte senha, código, dados bancários e informações de terceiros.</p>
+<h2>O que conferir antes de contribuir ou se filiar</h2>
+<ul>
+<li>nome completo e CNPJ da entidade;</li>
+<li>categoria e municípios representados;</li>
+<li>finalidade da cobrança e forma de autorização;</li>
+<li>canal oficial e recibo;</li>
+<li>procedimento para contestar erro ou esclarecer dúvida.</li>
+</ul>
+<p><strong>Exemplo ilustrativo:</strong> duas entidades com nomes parecidos entram em contato. O trabalhador não escolhe pela foto do perfil: consulta o CNES, lê o instrumento vigente e pede confirmação escrita da representação. Se os dados não coincidem, não envia documento nem faz Pix.</p>
+<h2>Que ajuda pedir</h2>
+<p>Separe três tipos de demanda. Para entender uma cláusula, peça o instrumento completo e a página aplicável. Para divergência no holerite, leve contrato, demonstrativo e pergunta objetiva. Para negociação coletiva, confirme o canal de assembleia ou atendimento e a base representada. Essa separação evita mandar um dossiê inteiro a quem só precisa localizar uma norma.</p>
+<p>Ao telefonar ou escrever, peça protocolo, nome do setor e prazo estimado. Depois confirme a orientação por documento ou link oficial. Uma resposta recebida em conversa privada não substitui o texto do acordo nem prova automaticamente que ele se aplica a todas as pessoas da empresa.</p>
+<h2>Proteja-se de falsos contatos</h2>
+<p>Golpistas podem copiar logotipo e nome de entidade. Digite o endereço oficial em vez de abrir link recebido, confira o domínio e compare telefone e CNPJ com o cadastro. Nunca informe código de autenticação, senha bancária ou senha gov.br.</p>
+<h2>Leia uma convenção sem se perder</h2>
+<p>Comece pela identificação das partes, categoria, abrangência territorial e vigência. Depois busque a palavra da sua dúvida, como jornada, piso, refeição ou auxílio. Leia a cláusula inteira e as condições próximas; uma tabela isolada pode depender de cargo, tempo de empresa ou data.</p>
+<p>Registre o número do instrumento e a página consultada. Se o texto antigo aparece primeiro no buscador, compare a vigência com a data do seu fato e procure termo aditivo. Não use o valor de outra cidade ou categoria para negociar como se fosse obrigatório no seu vínculo.</p>
+<p>O sindicato pode orientar e negociar, mas a resposta para um caso individual depende dos fatos e documentos. Em prazo de rescisão, risco à saúde, assédio ou conflito relevante, busque também assistência jurídica ou o órgão competente. Este guia ensina a verificar identidade e fonte; não indica entidade específica nem presume filiação.</p>
+`.trim()
+  },
+  "transferencia-interna-emprego-como-pedir": {
+    reviewedAt: "2026-10-12",
+    contentHtml: `
+<p><strong>Revisão editorial: 12 de outubro de 2026.</strong> Transferência interna pode significar mudança de equipe, turno, função, unidade ou cidade. Antes de pedir, defina qual dessas mudanças você quer e que problema ela resolve para a organização sem ocultar os impactos para você.</p>
+<h2>Monte uma proposta verificável</h2>
+<ul>
+<li><strong>Objetivo:</strong> função, equipe ou unidade desejada.</li>
+<li><strong>Evidência:</strong> tarefas já realizadas, resultados e competências transferíveis.</li>
+<li><strong>Transição:</strong> entregas em aberto, documentação e prazo de passagem.</li>
+<li><strong>Condições:</strong> jornada, remuneração, benefícios, gestor, local e data de início.</li>
+<li><strong>Alternativa:</strong> treinamento ou projeto temporário antes da mudança definitiva.</li>
+</ul>
+<p><strong>Exemplo ilustrativo:</strong> uma atendente quer migrar para apoio administrativo. Em vez de dizer apenas que está insatisfeita, apresenta experiência com planilhas, registro de chamados e organização de documentos; propõe duas semanas para transferir a fila e pede a descrição formal da nova função.</p>
+<h2>Conversa e registro</h2>
+<p>Marque uma conversa com a liderança e depois resuma por e-mail: pedido, condições discutidas e próximos passos. Não anuncie a mudança a clientes ou colegas antes da confirmação. Se houver processo interno, respeite os critérios e evite acessar dados da nova área sem autorização.</p>
+<p>A <a href="https://www.planalto.gov.br/ccivil_03/decreto-lei/del5452.htm" target="_blank" rel="noopener noreferrer">CLT</a> contém regras sobre alteração contratual e transferência de localidade, especialmente nos artigos 468 e 469. Uma troca de equipe no mesmo endereço não é automaticamente igual a uma transferência geográfica. Mudança de cidade, prejuízo contratual, adicional, despesas e necessidade do serviço exigem análise dos fatos e do instrumento coletivo aplicável.</p>
+<h2>Confirme antes de aceitar</h2>
+<ol>
+<li>receba a função e as responsabilidades por escrito;</li>
+<li>compare salário, jornada, metas e benefícios;</li>
+<li>teste o novo deslocamento e seu custo;</li>
+<li>confirme período de experiência interna e critério de retorno, se houver;</li>
+<li>pergunte quando a alteração aparecerá no sistema e nos registros.</li>
+</ol>
+<h2>Se houver mudança de cidade</h2>
+<p>Peça por escrito endereço, duração, motivo, data, despesas cobertas e condição de retorno. Calcule moradia, transporte, tempo de deslocamento e impacto familiar; não aceite a frase “depois acertamos”. Verifique o instrumento coletivo e a política interna antes de assinar aditivo.</p>
+<h2>Se houver mudança de função</h2>
+<p>Compare tarefas novas com cargo, salário, metas, acesso a sistemas e responsabilidade por pessoas ou valores. Uma promoção verbal sem data, remuneração ou descrição pode criar expectativa impossível de conferir. Se for movimento temporário, defina início, fim, avaliação e quem decide a efetivação.</p>
+<p>Uma negativa também pode gerar plano útil. Peça os critérios que faltam, uma atividade de desenvolvimento e uma data realista para nova conversa. Evite ameaça de saída que você não pretende cumprir; preserve relação e mantenha busca externa separada dos sistemas da empresa.</p>
+<h2>Acompanhe sem pressionar</h2>
+<p>Combine quando haverá retorno e faça um único acompanhamento na data marcada. Enquanto isso, continue entregando o trabalho atual e organize evidências das competências pedidas. Se a vaga interna for publicada, candidate-se pelo processo oficial mesmo que já tenha conversado com a liderança.</p>
+<p>Não use acesso privilegiado para descobrir remuneração de colegas ou detalhes de outros candidatos. Compare apenas as condições que a empresa apresentou a você. Se houver potencial conflito com seu gestor atual, pergunte ao RH como funciona a confidencialidade do processo antes de formalizar.</p>
+<p>Se a mudança for imposta, não assine documento que você não entendeu. Peça tempo razoável para leitura e guarde a versão recebida. Pressão, redução indevida ou deslocamento relevante podem demandar sindicato ou orientação jurídica. Este guia ajuda a estruturar o pedido; não garante aprovação nem define a legalidade de um caso concreto.</p>
+`.trim()
+  },
+  "vale-alimentacao-ou-refeicao-diferenca": {
+    reviewedAt: "2026-10-12",
+    contentHtml: `
+<p><strong>Revisão editorial: 12 de outubro de 2026.</strong> Vale-alimentação e vale-refeição não devem ser comparados só pelo valor mensal. Rede aceita, frequência de crédito, regras do empregador, eventual participação do trabalhador e rotina de alimentação podem mudar a utilidade real em São Luís.</p>
+<h2>O que cada nome costuma indicar</h2>
+<p>O vale-refeição costuma ser direcionado a refeições prontas; o vale-alimentação, à compra de gêneros alimentícios. A aceitação concreta depende do arranjo e da rede credenciada. Não prometa que todo mercado ou restaurante aceitará: consulte o aplicativo ou canal oficial do emissor antes de contar com o saldo.</p>
+<p>O <a href="https://www.gov.br/trabalho-e-emprego/pt-br/servicos/empregador/programa-de-alimentacao-do-trabalhador-pat/programa-de-alimentacao-do-trabalhador-pat-1/" target="_blank" rel="noopener noreferrer">Programa de Alimentação do Trabalhador</a> e a <a href="https://www.planalto.gov.br/ccivil_03/_ato2019-2022/2022/lei/l14442.htm" target="_blank" rel="noopener noreferrer">Lei nº 14.442/2022</a> tratam do benefício alimentar e de sua finalidade. O Ministério do Trabalho também publica <a href="https://www.gov.br/trabalho-e-emprego/pt-br/noticias-e-conteudo/2026/julho/regras-do-auxilio-alimentacao-e-do-auxilio-refeicao-passam-a-valer-para-todas-as-empresas" target="_blank" rel="noopener noreferrer">orientações atuais sobre as regras do auxílio-alimentação e refeição</a>. Benefício, valor e condições do seu vínculo devem ser confirmados no contrato, política e instrumento coletivo; não presuma obrigação universal a partir de um resumo.</p>
+<h2>Compare uma proposta</h2>
+<ul>
+<li>valor e data do crédito;</li>
+<li>desconto informado no holerite;</li>
+<li>rede próxima de casa, trabalho e rota diária;</li>
+<li>uso em dias de ausência, férias ou admissão no meio do mês;</li>
+<li>procedimento para cartão perdido e prazo de substituição;</li>
+<li>regra para saldo e mudança de modalidade.</li>
+</ul>
+<p><strong>Exemplo ilustrativo:</strong> duas propostas informam o mesmo valor. A primeira tem rede próxima ao terminal usado pelo candidato; a segunda exige deslocamento adicional. Ele consulta a rede oficial, estima refeições reais e pergunta por escrito sobre desconto e calendário de crédito antes de decidir.</p>
+<h2>Evite fraude e surpresa</h2>
+<p>Não pague “taxa de liberação” por Pix nem entregue senha do aplicativo a recrutador. Em admissão, confirme o emissor pelo canal da empresa. Se o valor ou desconto divergir, guarde proposta, política, holerite e extrato do benefício e peça explicação ao RH.</p>
+<h2>Teste a rede antes do primeiro dia</h2>
+<p>Abra o mapa oficial do emissor e pesquise pontos próximos ao local de trabalho e ao trajeto que você realmente usa. Confirme endereço e horário diretamente com o estabelecimento, porque cadastros podem mudar. Faça uma simulação de cinco dias: preço de uma refeição compatível, distância a pé e tempo de intervalo.</p>
+<p>Se o cartão oferece modalidades separadas, pergunte se o valor pode ser dividido e quem define a proporção. Não presuma portabilidade, saque, transferência ou uso fora da finalidade alimentar. Recursos e regras devem ser confirmados no canal oficial vigente.</p>
+<h2>Registre a oferta corretamente</h2>
+<p>Guarde a proposta que informa o benefício e a política entregue na admissão. No primeiro crédito, confira competência, valor e desconto no holerite. Se a rede prometida não existe na região, relate com exemplos verificáveis em vez de apenas dizer que “não funciona”.</p>
+<h2>Perguntas que evitam comparação errada</h2>
+<p>O crédito começa no primeiro dia ou segue calendário? Há valor proporcional na admissão? Existe desconto e onde ele aparece? A rede é consultada por aplicativo, site ou central? O cartão físico chega antes do início? Essas respostas importam mais do que tratar o benefício como dinheiro livre.</p>
+<p>Se você prepara comida em casa, o vale-alimentação pode ter uso diferente do de quem almoça perto do trabalho. Se a jornada muda entre unidades, teste mais de uma região. A melhor modalidade depende da rotina e das regras confirmadas, não de uma resposta universal.</p>
+<p>Para avaliar o pacote total, some salário líquido estimado, benefícios confirmados e custo do trajeto; não converta benefício em dinheiro na sua planilha como se a rede fosse irrestrita. Dúvidas sobre natureza da parcela, instrumento coletivo ou desconto exigem orientação individual. Este guia apoia a comparação, não interpreta seu contrato.</p>
+`.trim()
+  },
+  "documentos-admissao-emprego-maranhao": {
+    reviewedAt: "2026-10-12",
+    contentHtml: `
+<p><strong>Revisão editorial: 12 de outubro de 2026.</strong> Não existe uma lista única que sirva para toda admissão. Os documentos necessários dependem do vínculo, da função e dos registros que o empregador precisa realizar. A empresa deve informar a relação e um canal seguro; o candidato deve evitar enviar dados extras “por garantia”.</p>
+<h2>Confirme primeiro a contratação</h2>
+<ul>
+<li>razão social e contato oficial do empregador;</li>
+<li>cargo, local, jornada, remuneração e data prevista;</li>
+<li>responsável pelo recebimento e finalidade dos documentos;</li>
+<li>canal protegido e prazo para envio;</li>
+<li>como corrigir dado ou substituir arquivo ilegível.</li>
+</ul>
+<p>A <a href="https://www.gov.br/trabalho-e-emprego/pt-br/servicos/trabalhador/carteira-de-trabalho/perguntas-frequentes-carteira-de-trabalho-digital" target="_blank" rel="noopener noreferrer">orientação oficial da Carteira de Trabalho Digital</a> informa que o empregador deve enviar ao eSocial o S-2200 antes do início das atividades ou, quando ainda faltarem dados, o S-2190 preliminar e depois a complementação no prazo do manual. O serviço para <a href="https://www.gov.br/pt-br/servicos/obter-a-carteira-de-trabalho" target="_blank" rel="noopener noreferrer">obter a Carteira de Trabalho Digital</a> explica o acesso oficial. O candidato nunca precisa entregar sua senha gov.br para que a empresa faça o registro.</p>
+<h2>Organize sem expor demais</h2>
+<ol>
+<li>peça a lista específica por escrito;</li>
+<li>digitalize apenas o documento solicitado, com boa leitura;</li>
+<li>nomeie os arquivos sem incluir informação sensível desnecessária;</li>
+<li>envie pelo canal confirmado e guarde o protocolo;</li>
+<li>apague cópias de computador público e não deixe documentos em grupo de mensagem.</li>
+</ol>
+<p>A <a href="https://www.planalto.gov.br/ccivil_03/_ato2015-2018/2018/lei/l13709.htm" target="_blank" rel="noopener noreferrer">Lei Geral de Proteção de Dados</a> estabelece princípios como finalidade, adequação e necessidade. Isso ajuda a formular uma pergunta legítima: “Para qual registro este documento será usado e é necessário enviar todas as páginas?” Não autoriza, por si só, recusar qualquer exigência sem analisar a finalidade legal.</p>
+<h2>Exemplo em São Luís</h2>
+<p>Um candidato recebe mensagem de número desconhecido pedindo foto de cartão bancário, senha e pagamento de exame. Ele não envia. Confirma a vaga no canal oficial da empresa, solicita a lista formal e pergunta quem realiza o exame e como será custeado. Documento bancário, quando realmente necessário para crédito salarial, não inclui senha, código de segurança ou acesso ao aplicativo.</p>
+<h2>Sinais de golpe</h2>
+<ul>
+<li>cobrança para reservar vaga, liberar uniforme ou acelerar admissão;</li>
+<li>pedido de código recebido por SMS ou acesso remoto ao celular;</li>
+<li>urgência para enviar documentos antes de confirmar empresa e cargo;</li>
+<li>link encurtado ou domínio que imita portal oficial;</li>
+<li>pedido de dados de familiares sem finalidade explicada.</li>
+</ul>
+<h2>Antes de enviar, revise a pasta</h2>
+<p>Abra cada arquivo e confirme legibilidade, frente e verso quando solicitado e correspondência com a lista. Não reúna documentos de várias pessoas em um único PDF. Se houver dependente, pergunte qual comprovação é necessária e para qual finalidade. Use senha diferente da sua conta pessoal quando o canal oferecer proteção própria; nunca envie essa senha junto do arquivo.</p>
+<p>Depois da admissão, consulte seus registros pela Carteira de Trabalho Digital e compare empregador, data e função com o que foi acordado. Uma divergência deve ser comunicada pelo canal formal, sem editar captura de tela nem publicar dados pessoais em rede social.</p>
+<h2>O que não enviar</h2>
+<p>Nunca envie senha gov.br, código de autenticação, senha de banco, número completo de cartão com código de segurança ou acesso remoto ao celular. Uma empresa pode precisar de dados cadastrais e bancários, mas não precisa assumir suas contas pessoais.</p>
+<p>Se houver dúvida, não comece atividade sem confirmação do vínculo e dos responsáveis. Divergência no registro, exigência discriminatória ou uso indevido de dados deve ser documentado e levado ao canal de privacidade, sindicato, inspeção do trabalho ou orientação jurídica conforme o caso. Este guia não cria uma lista universal nem substitui a instrução formal do empregador.</p>
+`.trim()
+  },
 };
 
 export function getEditorialContentOverride(slug: string) {
