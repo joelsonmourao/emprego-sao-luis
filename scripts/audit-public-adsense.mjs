@@ -69,7 +69,7 @@ async function crawlSitemap(){
   for(const indexUrl of collectionPages){
     const res=await fetchPage(indexUrl);
     if(res.status!==200)continue;
-    const matches=[...(res.body||"").matchAll(/href="(\\/(?:blog|noticias)\\/[a-z0-9-_]+)(?:[?#][^"]*)?"/gi)];
+    const matches=[...(res.body||"").matchAll(new RegExp('href="(/(?:blog|noticias)/[a-z0-9_-]+)(?:[?#][^"]*)?"','gi'))];
     for(const m of matches)pages.add(ORIGIN+m[1]);
   }
   return {pages:[...pages].slice(0,MAX_PAGES),sitemaps:sitemapResults};
