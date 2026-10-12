@@ -27,6 +27,21 @@ test("ferramenta CSV: funciona sem conta, nao transmite dados e respeita campos"
   expect(unexpectedApi).toEqual([]);
 });
 
+test("calculadora de deslocamento calcula em reais sem inventar tarifa", async ({ page }) => {
+  const response = await page.goto("/ferramentas/custo-deslocamento", { waitUntil: "domcontentloaded" });
+  expect(response?.status()).toBe(200);
+  await page.locator("#custo-trecho").fill("2.5");
+  await page.locator("#trechos-dia").fill("2");
+  await page.locator("#dias-mes").fill("22");
+  await page.locator("#gastos-extras").fill("10");
+  await page.locator("#salario-comparar").fill("2000");
+  await page.getByRole("button", { name: /calcular meu deslocamento/i }).click();
+  await expect(page.locator("#custo-transporte")).toContainText("110,00");
+  await expect(page.locator("#custo-total")).toContainText("120,00");
+  await expect(page.locator("#custo-percentual")).toContainText("6,0%");
+  await expect(page.locator("#resultado-deslocamento")).toBeVisible();
+});
+
 test("guia SINE possui fonte oficial, conteudo proprio e indexacao clara", async ({ page }) => {
   const response = await page.goto("/guias/emprego-sine-maranhao", { waitUntil: "domcontentloaded" });
   expect(response?.status()).toBe(200);
@@ -49,7 +64,7 @@ test("metadados de imagem para redes sociais usam URLs absolutas", async ({ page
 for (const width of [360, 768, 1440]) {
   test(`ferramenta e guia sem overflow horizontal no viewport ${width}`, async ({ page }) => {
     await page.setViewportSize({ width, height: 900 });
-    for (const route of ["/ferramentas/controle-candidaturas", "/guias/emprego-sine-maranhao"]) {
+    for (const route of ["/ferramentas/controle-candidaturas", "/guias/emprego-sine-maranhao", "/ferramentas/custo-deslocamento"]) {
       await page.goto(route, { waitUntil: "domcontentloaded" });
       const widths = await page.evaluate(() => ({ scroll: document.documentElement.scrollWidth, client: document.documentElement.clientWidth }));
       expect(widths.scroll, route).toBeLessThanOrEqual(widths.client + 1);
