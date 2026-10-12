@@ -957,3 +957,43 @@ main article .es-prose a { text-decoration-thickness: 1px; text-underline-offset
   .es-card, .es-btn, .es-site-header nav[aria-label="Principal"] a { transition: none; }
   .es-card:hover { transform: none; }
 }
+
+
+/* Collection cards and job listings use the same elevation and spacing. */
+.es-premium-article-card {
+  position: relative;
+  border-color: var(--es-premium-stroke);
+  border-radius: 1.45rem;
+  background: #fff;
+}
+.es-premium-article-card img.es-premium-card-image {
+  transition: transform .3s ease;
+}
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .es-premium-article-card:hover img.es-premium-card-image { transform: scale(1.025); }
+}
+.es-premium-article-card .es-premium-story-title {
+  line-height: 1.25;
+  letter-spacing: -.027em;
+  text-wrap: pretty;
+}
+.es-premium-article-card a:hover { color: var(--brand-primary); }
+.es-premium-tabs a {
+  transition: background-color .2s ease, border-color .2s ease, color .2s ease;
+}
+.es-premium-tabs a:hover {
+  border-color: var(--brand-primary);
+  color: var(--brand-primary);
+}
+.es-premium-tabs a[aria-current="page"]:hover { color: white; }
+.es-premium-job-card {
+  border-color: var(--es-premium-stroke);
+  box-shadow: var(--es-premium-shadow);
+}
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .es-premium-job-card:hover {
+    transform: translateY(-3px);
+    border-color: color-mix(in srgb, var(--brand-primary) 30%, #eae3e2);
+    box-shadow: var(--es-premium-shadow-strong);
+  }
+}
