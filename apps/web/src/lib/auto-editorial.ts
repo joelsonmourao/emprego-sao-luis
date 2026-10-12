@@ -46,6 +46,7 @@ export function getAutoEditorialStatus(now=new Date()) {
   const preparedTomorrow=all.filter(x=>valid(x)&&x.publishedAt.slice(0,10)===tomorrow).length;
   return {
     date:localDay,preparedToday:today.length,preparedTomorrow,publishedToday:published.length,
+    publishedSlugs:published.map(x=>x.slug),
     totalPrepared:all.filter(valid).length,upcoming:today.filter(x=>Date.parse(x.publishedAt)>now.getTime())
       .map(x=>({slug:x.slug,scheduledAt:x.publishedAt}))
   };
