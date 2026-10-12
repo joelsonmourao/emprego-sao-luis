@@ -18,7 +18,7 @@ export async function getAdSettings(): Promise<AdSettings> {
 
 export async function saveAdSettings(value: AdSettings) {
   if (!process.env.DATABASE_URL) throw new Error("DATABASE_URL não configurada.");
-  const connection = createPublicDatabase(process.env.DATABASE_URL);
+  const connection = createDatabase(process.env.DATABASE_URL);
   try {
     await connection.db.insert(settings).values({ key: SETTINGS_KEY, value, public: false }).onConflictDoUpdate({ target: settings.key, set: { value, updatedAt: new Date() } });
   } finally {
@@ -54,7 +54,7 @@ export async function resolveAdForSlot(slotKey: string, context: AdContext) {
   if (settings.blockedPageTypes.includes(context.pageType)) return null;
   if (!settings.allowedPageTypes.includes(context.pageType) && context.pageType !== "global") return null;
   if (!process.env.DATABASE_URL) return null;
-  const connection = createDatabase(process.env.DATABASE_URL);
+  const connection = createPublicDatabase(process.env.DATABASE_URL);
   const now = new Date();
   try {
     const [slot] = await connection.db.select().from(adSlots).where(and(eq(adSlots.key, slotKey), eq(adSlots.active, true))).limit(1);
