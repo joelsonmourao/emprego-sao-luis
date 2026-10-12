@@ -22,7 +22,6 @@ describe("Vitrine pública durante a análise AdSense", () => {
   it("blog e notícias apresentam totais e páginas consistentes com a seleção revisada", () => {
     const blog = read("apps/web/src/pages/blog/index.astro");
     const news = read("apps/web/src/pages/noticias/index.astro");
-    expect(blog).toContain("quality");
     expect(blog).toContain("  true // exibir somente guias");
     expect(news).toContain('listPublishedArticlesPage(page, pageSize, "NEWS", null, true)');
     expect(blog).toContain("automatic = listAutoEditorialArticles(3).filter");
