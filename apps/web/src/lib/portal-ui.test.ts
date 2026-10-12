@@ -39,7 +39,7 @@ describe("portal UI redesign", () => {
     expect(home).toContain('id="editorial-hero-title"');
     expect(home).toContain("newsArticles[0]");
     expect(home).toContain("blogArticles[0]");
-    expect(home).toContain('    home\\n  >');
+    expect(home).toMatch(/\bhome\s*>/);
     const hero = readFileSync(resolve("apps/web/src/components/ui/PageHero.astro"), "utf8");
     expect(hero).toContain('home ? "es-home-hero"');
     expect(home).toContain('href="/redacao"');
