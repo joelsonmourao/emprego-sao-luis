@@ -689,6 +689,7 @@ const overrides: Record<string, EditorialContentOverride> = {
 <p><strong>O salário-base está certo, então a folha está certa?</strong> Não necessariamente. Jornada, adicionais, faltas, benefícios e descontos também precisam corresponder aos registros do período.</p>
 <p><strong>Posso enviar o holerite inteiro por WhatsApp?</strong> Prefira o canal oficial e compartilhe só o necessário. O documento contém remuneração e outros dados pessoais.</p>
 <p><strong>Uma diferença pequena pode ser ignorada?</strong> Registre e pergunte. Valores pequenos repetidos se acumulam e podem indicar uma rubrica interpretada de forma diferente pelo RH.</p>
+<p>Quando a folha usa códigos internos, peça o glossário de rubricas em vez de adivinhar pelo nome abreviado. Na rescisão ou troca de sistema, exporte seus demonstrativos antes de perder o acesso ao portal corporativo. Arquivo pessoal não deve depender apenas do e-mail ou aplicativo da empresa.</p>
 <p>Guarde holerites, espelhos de ponto, contrato e comprovantes em local pessoal seguro. Se a diferença persistir, peça memória de cálculo ao empregador e consulte o sindicato da categoria ou profissional habilitado. Este guia ajuda a organizar a conferência; não calcula tributos nem substitui análise contábil ou jurídica.</p>
 `.trim()
   },
@@ -724,6 +725,7 @@ const overrides: Record<string, EditorialContentOverride> = {
 <h2>Três decisões antes de trocar de modelo</h2>
 <p><strong>Reserva:</strong> quantos meses você consegue cobrir despesas se um cliente atrasar ou cancelar? <strong>Dependência:</strong> qual percentual da renda viria de um único contratante? <strong>Capacidade:</strong> quantas horas cabem sem reduzir qualidade ou descanso?</p>
 <p>Se você já tem emprego, revise cláusulas de confidencialidade, conflito de interesse e horário antes de aceitar projeto paralelo. Nunca use lista de clientes, equipamento ou arquivo do empregador sem autorização. Se está desempregado, trate promessa de volume futuro como possibilidade, não como receita confirmada.</p>
+<p>Peça uma proposta-piloto paga quando ainda não houver histórico com o cliente; ela reduz incerteza sem transformar trabalho completo em “teste grátis”.</p>
 <p>Não abra CNPJ, pague taxa ou entregue senha gov.br só porque um anúncio exige urgência. Se a rotina real divergir do contrato ou houver dúvida sobre vínculo, tributação ou contribuição, leve os documentos a profissional habilitado. Este conteúdo é um roteiro de decisão, não enquadramento jurídico automático.</p>
 `.trim()
   },
