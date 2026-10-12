@@ -11,6 +11,7 @@ import { getEditorialPortalMode } from "../../lib/portal-modes";
 import { rewriteJobBoardLinksForPortal } from "../../lib/portal-content-rewrite";
 import { normalizeEditorialHtml } from "@es/shared";
 import { isEditorialReviewPending } from "../../data/editorial-review-pending";
+import { getNewsEditorialOverride } from "../../data/news-editorial-content-overrides";
 
 const slug = Astro.params.slug!;
 const portal = await getEditorialPortalMode();
@@ -34,10 +35,12 @@ if (!result) {
   });
 }
 const { article, authorName } = result;
-const editorialNoindex = isEditorialReviewPending("NEWS", article.slug);
-const normalizedHtml = normalizeEditorialHtml(article.contentHtml, { baseHeadingLevel: 2 });
+const editorialOverride = getNewsEditorialOverride(article.slug);
+const editorialNoindex = isEditorialReviewPending("NEWS", article.slug) && !editorialOverride;
+const normalizedHtml = normalizeEditorialHtml(editorialOverride?.contentHtml ?? article.contentHtml, { baseHeadingLevel: 2 });
 const contentHtml = portal.enabled ? rewriteJobBoardLinksForPortal(normalizedHtml) : normalizedHtml;
 const canonical = article.canonicalUrl ?? new URL(`/noticias/${article.slug}`, Astro.site).toString();
+const dateModified = editorialOverride ? new Date(`${editorialOverride.reviewedAt}T12:00:00-03:00`).toISOString() : article.updatedAt.toISOString();
 const variants = article.coverImageVariants && typeof article.coverImageVariants === "object"
   ? article.coverImageVariants as Record<string, { url?: string; width?: number; height?: number }>
   : {};
@@ -57,7 +60,7 @@ const jsonLd = {
   headline: article.title,
   description: article.metaDescription ?? article.excerpt,
   datePublished: article.publishedAt?.toISOString(),
-  dateModified: article.updatedAt.toISOString(),
+  dateModified,
   mainEntityOfPage: canonical,
   author: { "@type": "Person", name: authorName },
   publisher: { "@type": "Organization", name: "Empregos São Luís" },
