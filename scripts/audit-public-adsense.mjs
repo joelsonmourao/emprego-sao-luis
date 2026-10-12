@@ -86,7 +86,7 @@ function auditHtml(page){
   const metaDescription=/<meta\s+name="description"\s+content="([^"]*)"/i.exec(raw)?.[1]||"";
   const canonical=/<link\s+rel="canonical"\s+href="([^"]*)"/i.exec(raw)?.[1]||"";
   const robots=[...raw.matchAll(/<meta\s+name="robots"\s+content="([^"]*)"/gi)].map(m=>m[1]);
-  const links=extractAll(contentBlock,/<a\b[^>]*href="([^"]+)"/gi);
+  const links=extractAll(article,/<a\b[^>]*href="([^"]+)"/gi);
   const imgs=[...raw.matchAll(/<img\b([^>]+)>/gi)].map(m=>{
     const s=m[1],attr=(name)=>new RegExp('\\b'+name+'="([^"]*)"','i').exec(s)?.[1]||"";
     return {src:attr("src"),alt:attr("alt"),width:attr("width"),height:attr("height"),loading:attr("loading")};
