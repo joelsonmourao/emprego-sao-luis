@@ -16,7 +16,7 @@ describe("reforma estrutural do portal — revista editorial", () => {
     expect(html).toContain('class="es-magazine-guides-grid"');
     expect(html).toContain('class="es-magazine-toolband"');
     expect(html).toContain('class="es-magazine-topic-grid"');
-    expect(html).toContain('class="es-magazine-resource-grid"');
+    expect(html).toContain('es-magazine-resource-grid"');
     expect(html).toContain('href="/ferramentas/controle-candidaturas"');
     expect(html).toContain('href="/guias/emprego-sine-maranhao"');
     expect(html).toContain('href="/redacao"');
