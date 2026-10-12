@@ -10,6 +10,9 @@ import { categories, cities, companies, createPublicDatabase, jobs, states } fro
 import { and, count, desc, eq, gt, gte, lt, sql } from "drizzle-orm";
 import { articlePublicPath, listPublishedArticles } from "../lib/articles";
 import { listAutoEditorialArticles, findAutoEditorialArticle } from "../lib/auto-editorial";
+import { isEditorialReviewPending } from "../data/editorial-review-pending";
+import { getEditorialContentOverride } from "../data/editorial-content-overrides";
+import { getNewsEditorialOverride } from "../data/news-editorial-content-overrides";
 import { getEditorialPortalMode } from "../lib/portal-modes";
 import { getVisualIdentity } from "../lib/visual-identity";
 
@@ -70,15 +73,22 @@ if (!portalEditorial && process.env.DATABASE_URL) {
 // Não esconder notícias só porque os últimos artigos publicados são guias.
 // Consultas independentes, em paralelo, trazem até quatro itens reais de cada tipo.
 const [newsArticles, publishedGuides] = await Promise.all([
-  listPublishedArticles(4, undefined, "NEWS"),
-  listPublishedArticles(4, undefined, ["GUIDE", "DATA_REPORT"])
+  listPublishedArticles(6, undefined, "NEWS"),
+  listPublishedArticles(24, undefined, ["GUIDE", "DATA_REPORT"])
 ]);
 const autoGuides = listAutoEditorialArticles(4)
   .map((item) => findAutoEditorialArticle(item.slug))
   .filter((item): item is NonNullable<typeof item> => Boolean(item));
 const blogArticles = [...autoGuides, ...publishedGuides.filter((item) =>
   !autoGuides.some((auto) => auto.article.slug === item.article.slug)
-)].sort((a,b) => (b.article.publishedAt?.getTime() || 0) - (a.article.publishedAt?.getTime() || 0)).slice(0,4);
+)].filter((item) =>
+  !isEditorialReviewPending(item.article.type, item.article.slug) ||
+  Boolean(getEditorialContentOverride(item.article.slug))
+).sort((a,b) => (b.article.publishedAt?.getTime() || 0) - (a.article.publishedAt?.getTime() || 0)).slice(0,4);
+const verifiedNewsArticles = newsArticles.filter((item) =>
+  !isEditorialReviewPending("NEWS", item.article.slug) ||
+  Boolean(getNewsEditorialOverride(item.article.slug))
+).slice(0,4);
 const displayFeatured = featured.length ? featured : recent.slice(0, 3);
 const quickFilters = [
   ["Vagas SLZ", "/vagas-slz"],
@@ -159,7 +169,7 @@ const homeDescription = portalEditorial
         </div>
       </section>
 
-      {newsArticles.length > 0 && (
+      {verifiedNewsArticles.length > 0 && (
         <section class="es-magazine-news es-section" aria-labelledby="magazine-news-heading">
           <div class="es-container">
             <div class="es-magazine-section-header">
@@ -172,20 +182,20 @@ const homeDescription = portalEditorial
             </div>
             <div class="es-magazine-news-grid">
               <article class="es-magazine-news-feature">
-                <a href={articlePublicPath(newsArticles[0].article.type, newsArticles[0].article.slug)}>
-                  {newsArticles[0].article.coverImageUrl ? (
-                    <img src={newsArticles[0].article.coverImageUrl} alt={newsArticles[0].article.coverImageAlt ?? newsArticles[0].article.title} width="850" height="510" loading="lazy" decoding="async" />
+                <a href={articlePublicPath(verifiedNewsArticles[0].article.type, verifiedNewsArticles[0].article.slug)}>
+                  {verifiedNewsArticles[0].article.coverImageUrl ? (
+                    <img src={verifiedNewsArticles[0].article.coverImageUrl} alt={verifiedNewsArticles[0].article.coverImageAlt ?? verifiedNewsArticles[0].article.title} width="850" height="510" loading="lazy" decoding="async" />
                   ) : <div class="es-magazine-news-placeholder" aria-hidden="true">ES / NOTÍCIAS</div>}
                   <div class="es-magazine-news-feature-content">
                     <p>NOTÍCIA EM DESTAQUE</p>
-                    <h3 class="font-display">{newsArticles[0].article.title}</h3>
-                    {newsArticles[0].article.excerpt && <span>{newsArticles[0].article.excerpt}</span>}
+                    <h3 class="font-display">{verifiedNewsArticles[0].article.title}</h3>
+                    {verifiedNewsArticles[0].article.excerpt && <span>{verifiedNewsArticles[0].article.excerpt}</span>}
                     <strong>Leia a matéria <span aria-hidden="true">↗</span></strong>
                   </div>
                 </a>
               </article>
               <div class="es-magazine-news-list">
-                {newsArticles.slice(1).map(({ article }, index) => (
+                {verifiedNewsArticles.slice(1).map(({ article }, index) => (
                   <article class="es-magazine-news-row">
                     <a href={articlePublicPath(article.type, article.slug)}>
                       <span class="es-magazine-news-order">0{index + 2}</span>
