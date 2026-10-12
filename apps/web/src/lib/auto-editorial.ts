@@ -42,8 +42,10 @@ export function getAutoEditorialStatus(now=new Date()) {
   const localDay=new Date(now.getTime()-3*60*60*1000).toISOString().slice(0,10);
   const today=all.filter(x=>valid(x)&&x.publishedAt.slice(0,10)===localDay);
   const published=today.filter(x=>Date.parse(x.publishedAt)<=now.getTime());
+  const tomorrow=new Date(Date.parse(localDay+"T12:00:00Z")+86400000).toISOString().slice(0,10);
+  const preparedTomorrow=all.filter(x=>valid(x)&&x.publishedAt.slice(0,10)===tomorrow).length;
   return {
-    date:localDay,preparedToday:today.length,publishedToday:published.length,
+    date:localDay,preparedToday:today.length,preparedTomorrow,publishedToday:published.length,
     totalPrepared:all.filter(valid).length,upcoming:today.filter(x=>Date.parse(x.publishedAt)>now.getTime())
       .map(x=>({slug:x.slug,scheduledAt:x.publishedAt}))
   };
