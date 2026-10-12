@@ -9,7 +9,7 @@ describe("revisões editoriais substanciais para AdSense", () => {
     expect(override).not.toBeNull();
     const html = override?.contentHtml ?? "";
     const words = textOnly(html).split(/\s+/).filter(Boolean).length;
-    const outbound = [...html.matchAll(/href="(https:\/\/[^\"]+)"/g)].map((match) => match[1]);
+    const outbound = [...html.matchAll(/href="(https:\/\/[^"]+)"/g)].map((match) => match[1]);
 
     expect(override?.reviewedAt).toBe("2026-10-12");
     expect(words).toBeGreaterThanOrEqual(900);
