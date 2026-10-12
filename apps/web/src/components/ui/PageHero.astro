@@ -4,10 +4,11 @@ interface Props {
   title: string;
   description?: string;
   pattern?: boolean;
+  home?: boolean;
 }
-const { kicker, title, description, pattern = true } = Astro.props;
+const { kicker, title, description, pattern = true, home = false } = Astro.props;
 ---
-<section class={`es-section ${pattern ? "hero-pattern" : "bg-[var(--es-cream-dark)]"}`}>
+<section class={`es-section ${pattern ? "hero-pattern" : "bg-[var(--es-cream-dark)]"} ${home ? "es-home-hero" : ""}`}>
   <div class="es-container">
     <div class={pattern ? "text-white" : ""}>
       {kicker && <p class={`es-kicker ${pattern ? "text-white/80" : ""}`}>{kicker}</p>}
