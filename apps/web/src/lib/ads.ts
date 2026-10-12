@@ -1,13 +1,13 @@
 import { createHash } from "node:crypto";
 import { and, count, desc, eq, gte, isNull, lte, or, sql } from "drizzle-orm";
-import { adCreatives, adEvents, adSlots, campaigns, createDatabase, settings } from "@es/db";
+import { adCreatives, adEvents, adSlots, campaigns, createDatabase, createPublicDatabase, settings } from "@es/db";
 import { assertSlotNotNearCandidature, CANDIDATURE_BLOCKED_SLOT_KEYS, DEFAULT_AD_SLOTS, mergeAdSettings, type AdSettings, type AdTargeting } from "@es/ads";
 
 const SETTINGS_KEY = "ad_settings";
 
 export async function getAdSettings(): Promise<AdSettings> {
   if (!process.env.DATABASE_URL) return mergeAdSettings(null);
-  const connection = createDatabase(process.env.DATABASE_URL);
+  const connection = createPublicDatabase(process.env.DATABASE_URL);
   try {
     const [row] = await connection.db.select().from(settings).where(eq(settings.key, SETTINGS_KEY));
     return mergeAdSettings(row?.value);
@@ -54,7 +54,7 @@ export async function resolveAdForSlot(slotKey: string, context: AdContext) {
   if (settings.blockedPageTypes.includes(context.pageType)) return null;
   if (!settings.allowedPageTypes.includes(context.pageType) && context.pageType !== "global") return null;
   if (!process.env.DATABASE_URL) return null;
-  const connection = createDatabase(process.env.DATABASE_URL);
+  const connection = createPublicDatabase(process.env.DATABASE_URL);
   const now = new Date();
   try {
     const [slot] = await connection.db.select().from(adSlots).where(and(eq(adSlots.key, slotKey), eq(adSlots.active, true))).limit(1);

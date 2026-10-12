@@ -1,4 +1,4 @@
-import { auditLogs, createDatabase, settings } from "@es/db";
+import { auditLogs, createDatabase, createPublicDatabase, settings } from "@es/db";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
 
@@ -34,7 +34,7 @@ const CACHE_MS = 5_000;
 async function readPortalMode(): Promise<PortalModeState> {
   if (!process.env.DATABASE_URL) return fallback(false);
   if (portalCache && Date.now() - portalCache.at < CACHE_MS) return portalCache.value;
-  const connection = createDatabase(process.env.DATABASE_URL);
+  const connection = createPublicDatabase(process.env.DATABASE_URL);
   try {
     const [row] = await connection.db
       .select()

@@ -6,7 +6,7 @@ import JobCard from "../components/ui/JobCard.astro";
 import PageHero from "../components/ui/PageHero.astro";
 import SectionHeading from "../components/ui/SectionHeading.astro";
 import InstagramFollow from "../components/InstagramFollow.astro";
-import { categories, cities, companies, createDatabase, jobs, states } from "@es/db";
+import { categories, cities, companies, createPublicDatabase, jobs, states } from "@es/db";
 import { and, count, desc, eq, gt, gte, lt, sql } from "drizzle-orm";
 import { articlePublicPath, listPublishedArticles } from "../lib/articles";
 import { getEditorialPortalMode } from "../lib/portal-modes";
@@ -33,7 +33,7 @@ let publishedToday = 0;
 const identity = await getVisualIdentity();
 
 if (!portalEditorial && process.env.DATABASE_URL) {
-  const connection = createDatabase(process.env.DATABASE_URL);
+  const connection = createPublicDatabase(process.env.DATABASE_URL);
   try {
     const active = and(eq(jobs.publicationStatus, "PUBLISHED"), gt(jobs.expiresAt, new Date()));
     const fields = {
@@ -66,9 +66,12 @@ if (!portalEditorial && process.env.DATABASE_URL) {
   }
 }
 
-const articles = await listPublishedArticles(8);
-const newsArticles = articles.filter((item) => item.article.type === "NEWS").slice(0, 4);
-const blogArticles = articles.filter((item) => item.article.type !== "NEWS").slice(0, 4);
+// Não esconder notícias só porque os últimos artigos publicados são guias.
+// Consultas independentes, em paralelo, trazem até quatro itens reais de cada tipo.
+const [newsArticles, blogArticles] = await Promise.all([
+  listPublishedArticles(4, undefined, "NEWS"),
+  listPublishedArticles(4, undefined, ["GUIDE", "DATA_REPORT"])
+]);
 const displayFeatured = featured.length ? featured : recent.slice(0, 3);
 const quickFilters = [
   ["Vagas SLZ", "/vagas-slz"],

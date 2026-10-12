@@ -1,6 +1,6 @@
-import { eq } from "drizzle-orm";
+import { inArray } from "drizzle-orm";
 import { z } from "zod";
-import { createDatabase, settings } from "@es/db";
+import { createDatabase, createPublicDatabase, settings } from "@es/db";
 import { logServerError } from "./server-error";
 
 const KEY = "site_integrations";
@@ -80,15 +80,21 @@ export function normalizeSearchConsoleToken(raw: string): string {
 
 export async function getSiteIntegrations(): Promise<SiteIntegrations & { persisted: boolean }> {
   if (!process.env.DATABASE_URL) return { ...defaultSiteIntegrations, persisted: false };
-  const connection = createDatabase(process.env.DATABASE_URL);
+  const connection = createPublicDatabase(process.env.DATABASE_URL);
   try {
-    const [row] = await connection.db.select().from(settings).where(eq(settings.key, KEY));
+    // Uma consulta substitui três viagens sequenciais ao banco por visita.
+    // Os dados persistidos continuam sendo lidos a cada request (sem cache de tokens).
+    const rows = await connection.db.select().from(settings).where(
+      inArray(settings.key, [KEY, "seo_settings", "ad_settings"])
+    );
+    const byKey = new Map(rows.map((row) => [row.key, row]));
+    const row = byKey.get(KEY);
+    const seoRow = byKey.get("seo_settings");
+    const adsRow = byKey.get("ad_settings");
     const merged = mergeSiteIntegrations(row?.value);
     const hasOwnRow = Boolean(row);
 
     // Reaproveita tokens SEO e publisher AdSense já salvos em outras telas.
-    const [seoRow] = await connection.db.select().from(settings).where(eq(settings.key, "seo_settings"));
-    const [adsRow] = await connection.db.select().from(settings).where(eq(settings.key, "ad_settings"));
     const seoValue = seoRow?.value && typeof seoRow.value === "object" ? (seoRow.value as Record<string, unknown>) : {};
     const adsValue = adsRow?.value && typeof adsRow.value === "object" ? (adsRow.value as Record<string, unknown>) : {};
     const verifications =

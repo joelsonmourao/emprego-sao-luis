@@ -1,5 +1,5 @@
 import { and, count, desc, eq, gt, ilike, inArray, isNull, like, lte, or, type SQL } from "drizzle-orm";
-import { articles, authors, createDatabase } from "@es/db";
+import { articles, authors, createPublicDatabase } from "@es/db";
 import { slLocalSlugMap } from "../data/sl-local-slug-map";
 import {
   EDITORIAL_BLOG_THEMES,
@@ -46,7 +46,7 @@ function publishedWhere(now: Date, since?: Date, type?: ArticleType | ArticleTyp
 
 export async function listPublishedArticles(limit = 50, since?: Date, type?: ArticleType | ArticleType[]) {
   if (!process.env.DATABASE_URL) return [];
-  const connection = createDatabase(process.env.DATABASE_URL);
+  const connection = createPublicDatabase(process.env.DATABASE_URL);
   const now = new Date();
   try {
     return await connection.db
@@ -80,7 +80,7 @@ export async function listPublishedArticlesPage(
   const safeSize = Math.min(48, Math.max(1, pageSize));
   const theme = resolveEditorialBlogTheme(themeRaw);
   if (!process.env.DATABASE_URL) return { items: [], total: 0, page: 1, pages: 1, theme };
-  const connection = createDatabase(process.env.DATABASE_URL);
+  const connection = createPublicDatabase(process.env.DATABASE_URL);
   const now = new Date();
   try {
     const where = publishedWhere(now, undefined, type, theme) as SQL;
@@ -107,7 +107,7 @@ export async function listPublishedArticlesPage(
 
 export async function findPublishedArticle(slug: string, type?: ArticleType | ArticleType[]) {
   if (!process.env.DATABASE_URL) return null;
-  const connection = createDatabase(process.env.DATABASE_URL);
+  const connection = createPublicDatabase(process.env.DATABASE_URL);
   const now = new Date();
   try {
     const [result] = await connection.db
@@ -143,7 +143,7 @@ export async function findPublishedSlLocalByNumber(slug: string, type?: ArticleT
   const match = String(slug).match(/^sl-local-(\d+)-/i);
   if (!match || !process.env.DATABASE_URL) return null;
   const prefix = `sl-local-${match[1]}-`;
-  const connection = createDatabase(process.env.DATABASE_URL);
+  const connection = createPublicDatabase(process.env.DATABASE_URL);
   const now = new Date();
   try {
     const [result] = await connection.db

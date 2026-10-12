@@ -1,5 +1,5 @@
 import { and, eq } from "drizzle-orm";
-import { createDatabase, redirects } from "@es/db";
+import { createPublicDatabase, redirects } from "@es/db";
 import { defineMiddleware } from "astro:middleware";
 import { storageStartup } from "./instrumentation";
 import { adminJsonError, createRequestId, normalizeAdminApiResponse } from "./lib/admin-api-response";
@@ -61,7 +61,7 @@ export const onRequest = defineMiddleware(async (context, next) => {
     !path.startsWith("/admin") &&
     !isRouteWithin(path, "/empresa")
   ) {
-    const connection = createDatabase(process.env.DATABASE_URL);
+    const connection = createPublicDatabase(process.env.DATABASE_URL);
     try {
       const [rule] = await connection.db
         .select()
