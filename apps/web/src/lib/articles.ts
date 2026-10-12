@@ -1,6 +1,9 @@
-import { and, count, desc, eq, gt, ilike, inArray, isNull, like, lte, or, type SQL } from "drizzle-orm";
+import { and, count, desc, eq, gt, ilike, inArray, isNull, like, lte, notInArray, or, type SQL } from "drizzle-orm";
 import { articles, authors, createPublicDatabase } from "@es/db";
 import { slLocalSlugMap } from "../data/sl-local-slug-map";
+import { guidesPendingReview, newsPendingFactCheck } from "../data/editorial-review-pending";
+import { getEditorialContentOverride } from "../data/editorial-content-overrides";
+import { getNewsEditorialOverride } from "../data/news-editorial-content-overrides";
 import {
   EDITORIAL_BLOG_THEMES,
   resolveEditorialBlogTheme,
@@ -68,7 +71,8 @@ export async function listPublishedArticlesPage(
   page = 1,
   pageSize = 12,
   type?: ArticleType | ArticleType[],
-  themeRaw?: string | null
+  themeRaw?: string | null,
+  qualityReviewedOnly = false
 ): Promise<{
   items: Awaited<ReturnType<typeof listPublishedArticles>>;
   total: number;
@@ -83,7 +87,18 @@ export async function listPublishedArticlesPage(
   const connection = createPublicDatabase(process.env.DATABASE_URL);
   const now = new Date();
   try {
-    const where = publishedWhere(now, undefined, type, theme) as SQL;
+    // Apenas listagens públicas: artigos ainda em revisão continuam acessíveis por URL,
+    // porém não compõem a vitrine e a paginação de conteúdo aprovado.
+    const pendingSlugs = qualityReviewedOnly
+      ? [
+          ...[...guidesPendingReview].filter((slug) => !getEditorialContentOverride(slug)),
+          ...[...newsPendingFactCheck].filter((slug) => !getNewsEditorialOverride(slug))
+        ]
+      : [];
+    const where = and(
+      publishedWhere(now, undefined, type, theme),
+      pendingSlugs.length ? notInArray(articles.slug, pendingSlugs) : undefined
+    ) as SQL;
     const [totalRow] = await connection.db.select({ value: count() }).from(articles).where(where);
     const total = Number(totalRow?.value ?? 0);
     const pages = Math.max(1, Math.ceil(total / safeSize));

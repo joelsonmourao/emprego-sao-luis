@@ -19,10 +19,11 @@ const { items, total, page: current, pages, theme } = await listPublishedArticle
   page,
   pageSize,
   ["GUIDE", "DATA_REPORT"],
-  themeParam
+  themeParam,
+  true // exibir somente guias indexáveis e revisados durante a análise do AdSense
 );
 const portal = await getEditorialPortalMode();
-const automatic = listAutoEditorialArticles(3);
+const automatic = listAutoEditorialArticles(3).filter((item) => !items.some(({ article }) => article.slug === item.slug));
 const themeMeta = theme ? EDITORIAL_BLOG_THEMES[theme as EditorialBlogTheme] : null;
 const featuredGuide = current === 1 && !theme ? items[0] : undefined;
 const listingGuides = featuredGuide ? items.slice(1) : items;
