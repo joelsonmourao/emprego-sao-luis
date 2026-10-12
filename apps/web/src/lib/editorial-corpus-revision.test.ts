@@ -23,8 +23,8 @@ describe("Auditoria editorial real do corpus de 12/10/2026", () => {
     expect(flagged).toHaveLength(98);
     const reviewed = flagged.filter((item) => getEditorialContentOverride(item.slug));
     const pending = flagged.filter((item) => !getEditorialContentOverride(item.slug));
-    expect(reviewed).toHaveLength(28);
-    expect(pending).toHaveLength(70);
+    expect(reviewed).toHaveLength(36);
+    expect(pending).toHaveLength(62);
     expect(guidesPendingReview.size).toBe(pending.length);
     for (const item of pending) expect(guidesPendingReview.has(item.slug)).toBe(true);
     for (const item of reviewed) expect(guidesPendingReview.has(item.slug)).toBe(false);
@@ -53,7 +53,11 @@ describe("Auditoria editorial real do corpus de 12/10/2026", () => {
       "abono-pecuniario-ferias-holerite", "ferias-clt-periodo-aquisitivo",
       "periodo-experiencia-clt-o-que-saber", "ponto-eletronico-atraso-trabalho",
       "trabalhador-terceirizado-direitos", "trabalhar-fim-de-semana-folga-adicional",
-      "trabalho-noturno-adicional-o-que-perguntar", "retorno-trabalho-apos-maternidade"
+      "trabalho-noturno-adicional-o-que-perguntar", "retorno-trabalho-apos-maternidade",
+      "como-ler-holerite-descontos", "freelancer-ou-clt-vantagens",
+      "mitos-direitos-trabalhistas-whatsapp", "servicos-gerais-epi-vaga",
+      "sindicato-trabalhador-direitos-basico", "transferencia-interna-emprego-como-pedir",
+      "vale-alimentacao-ou-refeicao-diferenca", "documentos-admissao-emprego-maranhao"
     ];
     for (const slug of edited) {
       const override = getEditorialContentOverride(slug);
@@ -72,7 +76,11 @@ describe("Auditoria editorial real do corpus de 12/10/2026", () => {
       "abono-pecuniario-ferias-holerite", "ferias-clt-periodo-aquisitivo",
       "periodo-experiencia-clt-o-que-saber", "ponto-eletronico-atraso-trabalho",
       "trabalhador-terceirizado-direitos", "trabalhar-fim-de-semana-folga-adicional",
-      "trabalho-noturno-adicional-o-que-perguntar", "retorno-trabalho-apos-maternidade"
+      "trabalho-noturno-adicional-o-que-perguntar", "retorno-trabalho-apos-maternidade",
+      "como-ler-holerite-descontos", "freelancer-ou-clt-vantagens",
+      "mitos-direitos-trabalhistas-whatsapp", "servicos-gerais-epi-vaga",
+      "sindicato-trabalhador-direitos-basico", "transferencia-interna-emprego-como-pedir",
+      "vale-alimentacao-ou-refeicao-diferenca", "documentos-admissao-emprego-maranhao"
     ];
     for (const slug of sourceBacked) {
       expect(getEditorialContentOverride(slug)!.contentHtml).toMatch(/<a href="https:\/\//);
