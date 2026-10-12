@@ -9,6 +9,7 @@ import InstagramFollow from "../components/InstagramFollow.astro";
 import { categories, cities, companies, createPublicDatabase, jobs, states } from "@es/db";
 import { and, count, desc, eq, gt, gte, lt, sql } from "drizzle-orm";
 import { articlePublicPath, listPublishedArticles } from "../lib/articles";
+import { listAutoEditorialArticles, findAutoEditorialArticle } from "../lib/auto-editorial";
 import { getEditorialPortalMode } from "../lib/portal-modes";
 import { getVisualIdentity } from "../lib/visual-identity";
 
@@ -68,10 +69,16 @@ if (!portalEditorial && process.env.DATABASE_URL) {
 
 // Não esconder notícias só porque os últimos artigos publicados são guias.
 // Consultas independentes, em paralelo, trazem até quatro itens reais de cada tipo.
-const [newsArticles, blogArticles] = await Promise.all([
+const [newsArticles, publishedGuides] = await Promise.all([
   listPublishedArticles(4, undefined, "NEWS"),
   listPublishedArticles(4, undefined, ["GUIDE", "DATA_REPORT"])
 ]);
+const autoGuides = listAutoEditorialArticles(4)
+  .map((item) => findAutoEditorialArticle(item.slug))
+  .filter((item): item is NonNullable<typeof item> => Boolean(item));
+const blogArticles = [...autoGuides, ...publishedGuides.filter((item) =>
+  !autoGuides.some((auto) => auto.article.slug === item.article.slug)
+)].sort((a,b) => (b.article.publishedAt?.getTime() || 0) - (a.article.publishedAt?.getTime() || 0)).slice(0,4);
 const displayFeatured = featured.length ? featured : recent.slice(0, 3);
 const quickFilters = [
   ["Vagas SLZ", "/vagas-slz"],
