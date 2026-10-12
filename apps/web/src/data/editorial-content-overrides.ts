@@ -193,6 +193,153 @@ const overrides: Record<string, EditorialContentOverride> = {
       </ul>
       <p>LinkedIn é uma das ferramentas possíveis, não uma medida do valor profissional de alguém. Um perfil completo não cria experiência e uma rede grande não garante entrevista. Para combinar a plataforma com canais públicos no Maranhão, consulte o <a href="/guias/emprego-sine-maranhao">guia do SINE e da Carteira de Trabalho Digital</a>. Se um recurso ou link mudar depois desta revisão, confirme a versão atual na Central de Ajuda correspondente e avise a redação pela página de contato.</p>
     `.trim()
+  },
+  "mensagem-fria-recrutador-linkedin": {
+    reviewedAt: "2026-10-12",
+    contentHtml: `
+<p><strong>Guia revisado em 12/10/2026.</strong> Entrar em contato com alguém da área de recrutamento não significa pedir uma vaga imediatamente. O objetivo pode ser descobrir o canal oficial de seleção ou confirmar se existe processo aberto. Uma mensagem curta e específica respeita mais o destinatário do que copiar o mesmo texto para dezenas de pessoas.</p>
+<h2>Antes de escrever: três verificações</h2>
+<ol><li>Confira se o perfil realmente representa a empresa ou o profissional e se o canal de candidaturas aparece no site institucional.</li><li>Leia o cargo anunciado e identifique uma competência sua relacionada à descrição.</li><li>Decida qual informação precisa perguntar. Não peça indicação sem contexto a alguém que não conhece você.</li></ol>
+<h2>Modelo para perguntar sobre o canal oficial</h2>
+<blockquote><p>Olá, [nome]. Encontrei uma oportunidade de [cargo] divulgada por [empresa] e estou conferindo o procedimento correto. Tenho experiência em [atividade verificável] e gostaria de confirmar qual é a página oficial de inscrição. Obrigado pelo seu tempo.</p></blockquote>
+<p>Substitua os colchetes por informações verdadeiras. Se a empresa já publicou o link de candidatura, use-o diretamente em vez de enviar mensagem paralela. O modelo não garante resposta nem entrevista.</p>
+<h2>Modelo para uma conversa de orientação, sem vaga anunciada</h2>
+<blockquote><p>Olá, [nome]. Estou estudando funções de [área] em São Luís. Percebi que sua atuação envolve [atividade citada no perfil]. Posso perguntar quais conhecimentos você considera essenciais para quem está começando? Não quero tomar muito do seu tempo.</p></blockquote>
+<h2>O que deve ficar fora da primeira mensagem</h2>
+<ul><li>CPF, RG, foto de documento ou dados bancários.</li><li>Arquivos pesados enviados sem solicitação.</li><li>Afirmações como “tenho disponibilidade total” quando isso não é verdade.</li><li>Cobranças repetidas ou pedidos de contratação imediata.</li></ul>
+<p><strong>Exemplo local ilustrativo:</strong> se o anúncio menciona trabalho presencial no Turu e você só tem transporte viável até a região central, descubra horários e local antes de dizer que pode aceitar qualquer turno. Essa verificação é mais útil do que inserir “sou proativo” na abertura.</p>
+<h2>Depois do contato</h2>
+<p>Registre a data e o próximo passo na <a href="/ferramentas/controle-candidaturas">ferramenta gratuita de candidaturas</a>. Se o contato não responder, continue usando fontes oficiais em vez de insistir diariamente. Para buscar oportunidades pelo serviço público, conheça o <a href="https://www.gov.br/pt-br/servicos/buscar-emprego-no-sistema-nacional-de-emprego-sine" target="_blank" rel="noopener noreferrer">SINE (gov.br)</a>. Mensagem privada não substitui candidatura feita no canal da empresa.</p>`.trim()
+  },
+  "acompanhar-candidatura-emprego": {
+    reviewedAt: "2026-10-12",
+    contentHtml: `
+<p><strong>Revisão editorial de 12/10/2026.</strong> Acompanhar uma candidatura significa ter informações organizadas, não enviar cobranças constantes. Com um registro simples, você sabe a qual anúncio respondeu, em qual data, qual etapa foi confirmada e quando é adequado verificar uma atualização.</p>
+<h2>O que registrar em cada oportunidade</h2>
+<ol><li><strong>Cargo e empresa:</strong> use o nome do anúncio original. Se for recrutamento confidencial, anote o portal e o identificador público.</li><li><strong>Canal:</strong> site da empresa, sistema de RH ou e-mail divulgado. Guarde o link, sem copiar senhas.</li><li><strong>Data:</strong> registre quando enviou o currículo e quando recebeu confirmação.</li><li><strong>Situação:</strong> enviada, recebida, entrevista marcada, em avaliação, encerrada ou contratada.</li><li><strong>Próximo passo:</strong> aguardar prazo informado, revisar documentos ou preparar entrevista.</li></ol>
+<p>Abra a <a href="/ferramentas/controle-candidaturas">ferramenta de controle de candidaturas</a> e use o botão Baixar CSV antes de sair. Ela não exige conta e não envia os registros ao servidor. O arquivo é seu, então guarde-o em local privado.</p>
+<h2>Quando pedir retorno</h2>
+<p>Se o anúncio estabelece uma data, respeite esse prazo. Se não há previsão, uma pergunta educada depois de um intervalo razoável pode ser aceitável pelo canal de recrutamento divulgado. Não existe regra universal de número de dias: acompanhe o que foi comunicado pela empresa e não envie mensagens repetidas por várias redes.</p>
+<blockquote><p>Olá, equipe de recrutamento. Participei do processo para [cargo] em [data], pelo canal [site/e-mail]. Gostaria de saber se existe previsão para atualização da etapa. Obrigado pela atenção.</p></blockquote>
+<h2>Como interpretar o silêncio</h2>
+<p>Não receber resposta não comprova falha do currículo. Pode haver prazo interno, encerramento de vaga ou volume alto de candidaturas. Seu registro ajuda a identificar padrões: quais canais enviam confirmação, quais cargos combinam com sua experiência e quais anúncios permanecem sem atualização. Ajuste uma variável de cada vez, sem inventar experiência no PDF.</p>
+<p><strong>Segurança:</strong> não informe senha ou dados bancários para “liberar retorno”; suspeitas devem ser reportadas pelos canais oficiais. Veja <a href="/seguranca-candidatos">como reconhecer golpes de vaga</a>.</p>`.trim()
+  },
+  "pesquisar-empresa-antes-entrevista": {
+    reviewedAt: "2026-10-12",
+    contentHtml: `
+<p><strong>Guia revisado em 12/10/2026.</strong> Pesquisar uma empresa antes de uma entrevista serve para descobrir o que ela faz, como a vaga se relaciona com a operação e se o convite veio de um canal confiável. Isso ajuda a preparar perguntas e reduz risco de fraude.</p>
+<h2>Pesquisa em 15 minutos, sem adivinhar</h2>
+<ol><li>Abra o site institucional e identifique produto, serviço, região de atuação e canal de carreiras.</li><li>Confirme se a empresa e o local do anúncio coincidem com o convite recebido.</li><li>Leia novamente as atribuições e separe duas atividades que você consegue demonstrar.</li><li>Se houver entrevista remota, confira plataforma, horário e domínio do convite.</li><li>Prepare duas perguntas específicas sobre rotina, equipe ou treinamento.</li></ol>
+<h2>Exemplo: uma vaga de recepção</h2>
+<p>O anúncio pede atendimento ao público e pacote Office. Na pesquisa, você identifica que o estabelecimento atende por agendamento. Em vez de repetir “sou organizado”, prepare um exemplo real de como controla horários, confirma informação e evita dupla marcação. Pergunte qual sistema é utilizado e se haverá treinamento inicial.</p>
+<h2>Exemplo: uma vaga de estoque</h2>
+<p>Uma distribuidora descreve conferência e separação. Investigue a diferença entre recebimento, inventário e expedição. Se já trabalhou com contagem de itens ou planilhas, descreva exatamente a tarefa. Se não conhece o sistema mencionado, diga o que sabe e como pretende aprender; inventar domínio costuma causar problemas quando começa o treinamento.</p>
+<h2>O que a pesquisa não consegue garantir</h2>
+<p>Site bem apresentado e avaliações em redes não garantem contratação nem boas condições trabalhistas. Comentários isolados também não comprovam problemas estruturais. Compare informações por data e origem, faça perguntas sobre escala e contrato e mantenha postura profissional.</p>
+<p>Se receber pedido de pagamento para realizar a entrevista, interrompa o processo e verifique o anunciante. Para consultar oportunidades pelo sistema público, veja <a href="https://www.gov.br/pt-br/servicos/buscar-emprego-no-sistema-nacional-de-emprego-sine" target="_blank" rel="noopener noreferrer">Buscar Emprego no SINE</a>. O serviço não atesta uma empresa específica; é uma alternativa oficial de busca.</p>`.trim()
+  },
+  "seguro-desemprego-checklist-documentos": {
+    reviewedAt: "2026-10-12",
+    contentHtml: `
+<p><strong>Revisão editorial de 12/10/2026.</strong> O seguro-desemprego tem requisitos próprios. Ser demitido não significa que toda pessoa terá direito ao benefício. O procedimento correto é verificar o enquadramento e usar o sistema oficial, sem compartilhar senhas com intermediários.</p>
+<h2>Confira primeiro a modalidade de desligamento</h2>
+<p>O serviço <a href="https://www.gov.br/pt-br/servicos/solicitar-o-seguro-desemprego" target="_blank" rel="noopener noreferrer">Solicitar o Seguro-Desemprego, no gov.br</a>, detalha requisitos, canais e documentos. Para o trabalhador formal, considera-se em geral a dispensa involuntária sem justa causa, além de critérios sobre período trabalhado e renda. Existem regras específicas para cada categoria e solicitação.</p>
+<h2>Documentos e dados que vale separar</h2>
+<ol><li>CPF e acesso pessoal à conta gov.br, sem fornecer sua senha a terceiros.</li><li>Documento de Requerimento do Seguro-Desemprego fornecido pelo empregador quando aplicável.</li><li>Dados dos vínculos e datas de admissão e desligamento.</li><li>Documentos e comunicações de rescisão recebidos do empregador.</li><li>Um local privado para acompanhar número de protocolo e resposta.</li></ol>
+<p>A página do serviço oficial informa que o pedido pode ser feito por canais web ou pela Carteira de Trabalho Digital, entre outros atendimentos. Confirme no próprio portal qual canal está disponível na data da consulta e quais prazos se aplicam à sua situação.</p>
+<h2>Como acompanhar sem cair em golpes</h2>
+<p>Após solicitar, acompanhe diretamente no gov.br ou aplicativo oficial. Não clique em links recebidos de números desconhecidos prometendo “antecipar parcelas”. Nunca faça depósito para liberar benefício: cobrança desse tipo não faz parte do procedimento descrito pelo serviço público.</p>
+<p><strong>Exemplo ilustrativo:</strong> uma pessoa recebeu dois vínculos no histórico profissional e foi desligada recentemente. Ela deve verificar os requisitos da sua solicitação e os comprovantes, sem presumir direito ou valor apenas porque colegas receberam o benefício em outro período.</p>
+<p>Se houver indeferimento, o próprio portal informa como buscar revisão e recurso. Consulte o <a href="https://www.gov.br/pt-br/servicos/cadastrar-recurso-relativo-ao-seguro-desemprego" target="_blank" rel="noopener noreferrer">serviço de recurso</a>. Esta orientação não substitui análise individual por órgão competente.</p>`.trim()
+  },
+  "ctps-digital-carteira-trabalho-consultar": {
+    reviewedAt: "2026-10-12",
+    contentHtml: `
+<p><strong>Revisado em 12/10/2026.</strong> A Carteira de Trabalho Digital é um serviço público usado para consultar informações sobre vínculos profissionais e acessar funcionalidades relacionadas ao trabalho. Não confunda obter acesso ao aplicativo com garantir que uma vaga seja legítima.</p>
+<h2>Como começar pelo canal oficial</h2>
+<ol><li>Abra o serviço <a href="https://www.gov.br/pt-br/servicos/obter-a-carteira-de-trabalho" target="_blank" rel="noopener noreferrer">Obter a Carteira de Trabalho, no gov.br</a>.</li><li>Confira que está no domínio oficial antes de informar credenciais.</li><li>Tenha CPF e conta gov.br para autenticação conforme o procedimento do serviço.</li><li>Use o aplicativo oficial ou a opção web indicada no portal, conforme sua necessidade.</li><li>Consulte os vínculos e confira dados de empregadores e períodos trabalhados.</li></ol>
+<p>O Ministério do Trabalho e Emprego mantém também o <a href="https://www.gov.br/trabalho-e-emprego/pt-br/servicos/trabalhador/carteira-de-trabalho/passo-a-passo-da-carteira-de-trabalho-digital" target="_blank" rel="noopener noreferrer">passo a passo da CTPS Digital</a>, que pode ajudar na navegação. Os nomes de menus podem mudar com atualizações do aplicativo; use a documentação oficial mais recente.</p>
+<h2>Três situações práticas</h2>
+<ul><li><strong>Você começou um emprego:</strong> confira se o vínculo aparece e se os dados correspondem ao documento de contratação. Diferenças devem ser esclarecidas com o empregador.</li><li><strong>Você vai montar o currículo:</strong> use o histórico como apoio para datas e nomes, mas descreva apenas atividades que realmente exerceu.</li><li><strong>Recebeu mensagem para “validar a carteira”:</strong> não envie senha nem código de autenticação por WhatsApp. Acesse o aplicativo ou portal diretamente.</li></ul>
+<h2>Se um registro não aparece</h2>
+<p>Uma divergência pode ter diferentes causas; esta página não identifica qual ocorreu no seu caso. Guarde comprovantes, consulte orientações oficiais e procure atendimento pelos canais disponibilizados no serviço. Dados sensíveis não devem ser publicados em comentários ou enviados a perfis desconhecidos.</p>`.trim()
+  },
+  "fgts-consultar-trabalhador-clt": {
+    reviewedAt: "2026-10-12",
+    contentHtml: `
+<p><strong>Atualizado em 12/10/2026.</strong> Para verificar informações do FGTS, priorize os canais oficiais e compare o extrato ao histórico de trabalho. Este guia não consulta sua conta, não promete saque e não pede dados pessoais.</p>
+<h2>Separe dados antes de consultar</h2>
+<p>Tenha acesso ao aplicativo oficial FGTS ou canal da CAIXA e ao histórico profissional. Desconfie de páginas que reproduzem visual de banco e pedem senha, código de segurança ou pagamento para consultar extrato. Se estiver em dúvida, entre no endereço da instituição por navegação direta, não por link de mensagem.</p>
+<h2>O que observar no extrato</h2>
+<ol><li>Identifique cada vínculo empregatício exibido.</li><li>Compare os meses de referência com o período em que trabalhou.</li><li>Registre eventuais ausências ou divergências percebidas, com data.</li><li>Guarde comprovantes de pagamento e dados do contrato que possam ajudar a esclarecer o caso.</li><li>Procure os canais oficiais de atendimento antes de tomar qualquer medida.</li></ol>
+<p><strong>Exemplo ilustrativo:</strong> a pessoa trabalhou em duas empresas no mesmo ano e visualiza mais de uma conta vinculada. Isso não significa, por si, pagamento duplicado. É necessário relacionar cada conta ao empregador e aos meses correspondentes.</p>
+<h2>Consulta não é autorização para saque</h2>
+<p>As hipóteses de movimentação do FGTS têm regras próprias. Ver saldo não garante que ele esteja integralmente disponível para retirada. Verifique as modalidades no canal oficial e desconfie de pessoas prometendo liberação imediata mediante transferência ou taxa.</p>
+<p>Para confirmar dados do vínculo, consulte também a <a href="https://www.gov.br/pt-br/servicos/obter-a-carteira-de-trabalho" target="_blank" rel="noopener noreferrer">Carteira de Trabalho Digital</a>. A checagem de depósitos e eventuais divergências deve ser feita por atendimento competente; o Empregos São Luís não tem acesso a contas de FGTS nem resolve lançamentos financeiros.</p>`.trim()
+  },
+  "ler-contrato-trabalho-clt": {
+    reviewedAt: "2026-10-12",
+    contentHtml: `
+<p><strong>Revisão editorial de 12/10/2026.</strong> Antes de iniciar uma atividade, confira se os termos que recebeu correspondem à vaga anunciada. Este roteiro de leitura não substitui orientação jurídica, mas ajuda a formular perguntas concretas ao empregador.</p>
+<h2>Comece pelos dados que identificam o vínculo</h2>
+<ol><li>Nome e identificação da empresa contratante.</li><li>Função, local principal de trabalho e possibilidade de deslocamento.</li><li>Data de admissão, modalidade contratual e informações sobre experiência ou prazo, quando houver.</li><li>Remuneração, composição de benefícios e periodicidade do pagamento.</li><li>Jornada, escala, intervalos, plantões e registro de horas.</li><li>Condições relacionadas a alteração de local, sigilo, equipamentos ou responsabilidades específicas.</li></ol>
+<h2>Três dúvidas úteis para levar ao RH</h2>
+<p><strong>Escala:</strong> “A vaga inclui finais de semana? Como receberei a escala e a antecedência de alterações?”</p>
+<p><strong>Remuneração:</strong> “O valor anunciado corresponde ao salário fixo ou inclui componentes variáveis? Onde esses valores constam no documento?”</p>
+<p><strong>Local:</strong> “Trabalharei somente nesta unidade? Em caso de mudança de local, como isso será comunicado?”</p>
+<h2>O que confirmar em fonte oficial</h2>
+<p>A <a href="https://www.planalto.gov.br/ccivil_03/decreto-lei/del5452.htm" target="_blank" rel="noopener noreferrer">Consolidação das Leis do Trabalho (CLT)</a> reúne a legislação trabalhista federal e suas alterações. Para registro de vínculos, veja o serviço da <a href="https://www.gov.br/pt-br/servicos/obter-a-carteira-de-trabalho" target="_blank" rel="noopener noreferrer">Carteira de Trabalho Digital</a>. Questões sobre convenção coletiva, modalidade especial e caso individual devem ser verificadas com profissionais competentes.</p>
+<p><strong>Exemplo ilustrativo:</strong> um anúncio diz “comissão atrativa”, mas não explica critérios ou período. Antes de aceitar, peça a regra e a forma de apuração. Uma promessa verbal difícil de verificar pode criar expectativas distintas do contrato escrito.</p>
+<p>Guarde cópia do documento que recebeu. Não entregue documentos ou assine contratos por links cuja origem não conseguiu verificar.</p>`.trim()
+  },
+  "curriculo-pdf-erros-triagem": {
+    reviewedAt: "2026-10-12",
+    contentHtml: `
+<p><strong>Revisão de 12/10/2026.</strong> Um currículo em PDF pode facilitar a leitura, mas o arquivo não compensa informações genéricas, datas incorretas ou falta de relação com a vaga. O objetivo é apresentar sua trajetória de forma clara e verificável.</p>
+<h2>Checklist antes de exportar</h2>
+<ol><li>Use o nome pelo qual deseja ser chamado e um telefone/e-mail profissional que você realmente acompanha.</li><li>Resuma o cargo desejado sem frases vazias como “busco qualquer oportunidade”.</li><li>Organize experiências da mais recente para a mais antiga, com datas coerentes.</li><li>Descreva tarefas reais. “Conferi notas e registrei entrada de materiais” informa mais do que “responsável por tudo”.</li><li>Se ainda não trabalhou formalmente, inclua projetos, curso ou atividade informal com descrição honesta.</li><li>Revise ortografia, títulos, margens e se o PDF mantém texto selecionável.</li></ol>
+<h2>Teste em duas telas</h2>
+<p>Abra o PDF no celular e no computador. Confira se o título não quebra, se os dados de contato permanecem visíveis e se os itens não foram cortados. Se o arquivo ficou ilegível no telefone, reduza elementos decorativos e prefira hierarquia simples. Não há modelo único que garanta resultado em todos os sistemas de triagem.</p>
+<h2>Exemplo de descrição objetiva</h2>
+<p><strong>Vago:</strong> “Boa comunicação e muita experiência em atividades administrativas.”</p>
+<p><strong>Específico:</strong> “Organização de agendas, atendimento telefônico e atualização semanal de planilhas de controle.”</p>
+<p>Use somente a segunda versão se essas tarefas de fato fizerem parte da sua experiência.</p>
+<h2>O que não precisa entrar</h2>
+<p>CPF, número de conta, fotografia de documentos, senha e endereço residencial completo não são exigências universais de currículo. Compartilhe dados sensíveis apenas quando houver necessidade legítima e canal verificado.</p>
+<p>Na dúvida sobre cargo e candidatura, confirme a oportunidade no sistema oficial divulgado e registre o envio na <a href="/ferramentas/controle-candidaturas">planilha gratuita de acompanhamento</a>. O portal não garante entrevistas por utilizar determinado formato de currículo.</p>`.trim()
+  },
+  "entrevista-comportamental-exemplos": {
+    reviewedAt: "2026-10-12",
+    contentHtml: `
+<p><strong>Revisão editorial de 12/10/2026.</strong> Questões comportamentais pedem episódios da sua experiência: uma situação, uma decisão e um resultado. O melhor preparo é organizar fatos reais, não decorar respostas que qualquer pessoa poderia repetir.</p>
+<h2>Estrutura prática: contexto, ação e resultado</h2>
+<ol><li><strong>Contexto:</strong> onde ocorreu e qual era o problema?</li><li><strong>Seu papel:</strong> qual responsabilidade você realmente tinha?</li><li><strong>Ação:</strong> o que fez, com quais recursos e limites?</li><li><strong>Resultado:</strong> o que melhorou, o que não funcionou e o que aprendeu?</li></ol>
+<h2>Exemplo para atendimento</h2>
+<p><strong>Pergunta:</strong> “Conte sobre uma pessoa insatisfeita que você atendeu.”</p>
+<p><strong>Resposta-modelo ilustrativa, não experiência para copiar:</strong> “Durante um atendimento, um cliente contestou uma informação. Primeiro conferi o registro, depois expliquei a opção disponível e encaminhei ao responsável quando ultrapassava minha autorização. A conversa terminou com uma orientação clara, e passei a confirmar dados antes de responder.”</p>
+<p>Se você nunca viveu algo semelhante, relate uma situação de estágio, atividade escolar, trabalho informal ou projeto voluntário, deixando claro o contexto. Não afirme resultados numéricos que não mediu.</p>
+<h2>Exemplo para logística ou estoque</h2>
+<p><strong>Pergunta:</strong> “Como você lidou com erro em uma tarefa?”</p>
+<p>Uma resposta honesta descreve o momento em que percebeu diferença na conferência, como comunicou a supervisão e quais passos adotou para evitar repetição. O ponto não é parecer perfeito: é demonstrar atenção, comunicação e aprendizado.</p>
+<h2>Treine com limite de tempo</h2>
+<p>Escreva três episódios curtos: um desafio, uma colaboração e um erro corrigido. Conte cada um em cerca de um minuto, sem inventar cargos. Se a entrevista for para São Luís e exigir escala, prepare também perguntas sobre horário, unidade e deslocamento.</p>
+<p>Depois, anote aprendizados na <a href="/ferramentas/controle-candidaturas">ferramenta de candidaturas</a>, mas não coloque dados pessoais de entrevistadores no arquivo. Nenhuma resposta-modelo garante aprovação.</p>`.trim()
+  },
+  "primeiro-emprego-sao-luis-checklist": {
+    reviewedAt: "2026-10-12",
+    contentHtml: `
+<p><strong>Guia revisado em 12/10/2026.</strong> O primeiro emprego exige comprovar disposição para aprender e capacidade de cumprir tarefas, não inventar experiência. Antes de sair enviando currículo, defina para quais funções você consegue demonstrar habilidades básicas.</p>
+<h2>Primeira etapa: escolha três cargos possíveis</h2>
+<p>Liste funções próximas de sua formação e rotina: atendimento, estoque, auxiliar administrativo, apoio de produção ou outras que apareçam em anúncios reais. Leia os requisitos obrigatórios de cada vaga. Um curso não substitui automaticamente experiência quando o anúncio a exige; também não desqualifica todo candidato iniciante quando ela é apenas desejável.</p>
+<h2>Segunda etapa: monte provas simples de capacidade</h2>
+<ol><li>Se deseja atendimento, prepare uma história verdadeira de organização ou resolução de dúvida.</li><li>Para escritório, demonstre uma planilha que você mesmo montou, sem dados de terceiros.</li><li>Para estoque, explique como faria uma contagem e reportaria divergência, sem fingir prática profissional.</li><li>Inclua cursos concluídos somente com nome e instituição corretos.</li><li>Confirme telefone, e-mail e disponibilidade antes de enviar.</li></ol>
+<h2>Terceira etapa: encontre oportunidades confiáveis</h2>
+<p>Use o <a href="https://www.gov.br/pt-br/servicos/buscar-emprego-no-sistema-nacional-de-emprego-sine" target="_blank" rel="noopener noreferrer">Buscar Emprego no SINE</a> e páginas de carreiras de empresas. Confira cidade, horário, requisitos e validade. Publicação antiga em rede social não confirma processo ativo. Se o anúncio solicitar Pix ou taxa para concorrer, não prossiga.</p>
+<h2>Quarta etapa: acompanhe sem ansiedade desnecessária</h2>
+<p>Registre cargo, empresa, data e resposta recebida no <a href="/ferramentas/controle-candidaturas">controle gratuito</a>. Uma candidatura sem retorno não significa que seu esforço foi inútil; observe quais formatos de currículo e funções geram respostas reais antes de alterar tudo.</p>
+<p><strong>Exemplo ilustrativo:</strong> alguém que mora no Cohatrac encontra vaga no outro lado da cidade com jornada cedo. Antes de enviar, precisa calcular tempo de viagem, custo e condições de transporte no horário. O salário do anúncio não revela sozinho se a oportunidade é viável.</p>
+<p>Para documentação profissional, o serviço <a href="https://www.gov.br/pt-br/servicos/obter-a-carteira-de-trabalho" target="_blank" rel="noopener noreferrer">Carteira de Trabalho Digital</a> orienta o acesso ao documento. Nunca forneça senha da sua conta gov.br a recrutadores.</p>`.trim()
   }
 };
 
