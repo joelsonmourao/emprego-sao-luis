@@ -21,10 +21,8 @@ test("ferramenta CSV: funciona sem conta, nao transmite dados e respeita campos"
   await page.getByRole("button", { name: "Baixar CSV" }).click();
   const download = await downloadPromise;
   expect(download.suggestedFilename()).toBe("controle-candidaturas.csv");
-  const dialogPromise = page.waitForEvent("dialog");
+  page.once("dialog", (dialog) => void dialog.accept());
   await page.getByRole("button", { name: "Limpar a lista" }).click();
-  const dialog = await dialogPromise;
-  await dialog.accept();
   await expect(page.locator("#controle-contagem")).toContainText("0 candidaturas");
   expect(unexpectedApi).toEqual([]);
 });
