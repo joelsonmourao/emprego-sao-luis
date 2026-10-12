@@ -31,6 +31,22 @@ describe("portal UI redesign", () => {
     expect(source).toContain("LOGO_MAIN");
   });
 
+  it("layout editorial utiliza identidade oficial e conteúdo publicado ou links institucionais", () => {
+    const home = readFileSync(resolve("apps/web/src/pages/index.astro"), "utf8");
+    const header = readFileSync(resolve("apps/web/src/components/SiteHeader.astro"), "utf8");
+    const css = readFileSync(resolve("apps/web/src/styles/global.css"), "utf8");
+    expect(home).toContain('aria-labelledby="editorial-hero-title"');
+    expect(home).toContain('id="editorial-hero-title"');
+    expect(home).toContain("newsArticles[0]");
+    expect(home).toContain("blogArticles[0]");
+    expect(home).toContain('href="/redacao"');
+    expect(header).toContain("BRAND_ASSETS.instagramHandle");
+    expect(header).toContain("es-header-utility");
+    expect(header).not.toContain("@slz_empregos");
+    expect(css).toContain(".es-editorial-hero-grid");
+    expect(css).toContain("@media (max-width: 639px)");
+  });
+
   it("home inclui seção Instagram e busca", () => {
     const source = readFileSync(resolve("apps/web/src/pages/index.astro"), "utf8");
     expect(source).toContain("InstagramFollow");
