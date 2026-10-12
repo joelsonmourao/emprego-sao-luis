@@ -85,7 +85,7 @@ const heroDescription = themeMeta
                     src={article.coverImageUrl}
                     alt={article.coverImageAlt ?? article.title}
                     class="h-48 w-full object-cover"
-                    loading="lazy"
+                    width="640" height="360" loading="lazy" decoding="async"
                   />
                 )}
                 <div class="p-6">
