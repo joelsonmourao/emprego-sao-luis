@@ -60,7 +60,9 @@ describe("ativos de marca públicos", () => {
     expect(instagram).toContain("/brand/icon-instagram.webp");
     expect(instagram).toContain('width="66"');
     expect(instagram).toContain('class="es-instagram-avatar"');
-    expect(instagram).toMatch(/rounded-2xl|object-contain/);
+    const css = read("apps/web/src/styles/global.css");
+    expect(css).toContain(".es-instagram-avatar");
+    expect(css).toContain("object-fit: contain");
     expect(footer).toContain("LOGO_DARK");
     expect(footer).toMatch(/bg-white/);
     expect(header).toContain("LOGO_MAIN");
