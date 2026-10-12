@@ -23,8 +23,8 @@ describe("Auditoria editorial real do corpus de 12/10/2026", () => {
     expect(flagged).toHaveLength(98);
     const reviewed = flagged.filter((item) => getEditorialContentOverride(item.slug));
     const pending = flagged.filter((item) => !getEditorialContentOverride(item.slug));
-    expect(reviewed).toHaveLength(36);
-    expect(pending).toHaveLength(62);
+    expect(reviewed).toHaveLength(44);
+    expect(pending).toHaveLength(54);
     expect(guidesPendingReview.size).toBe(pending.length);
     for (const item of pending) expect(guidesPendingReview.has(item.slug)).toBe(true);
     for (const item of reviewed) expect(guidesPendingReview.has(item.slug)).toBe(false);
@@ -57,7 +57,11 @@ describe("Auditoria editorial real do corpus de 12/10/2026", () => {
       "como-ler-holerite-descontos", "freelancer-ou-clt-vantagens",
       "mitos-direitos-trabalhistas-whatsapp", "servicos-gerais-epi-vaga",
       "sindicato-trabalhador-direitos-basico", "transferencia-interna-emprego-como-pedir",
-      "vale-alimentacao-ou-refeicao-diferenca", "documentos-admissao-emprego-maranhao"
+      "vale-alimentacao-ou-refeicao-diferenca", "documentos-admissao-emprego-maranhao",
+      "auxiliar-administrativo-vagas-sao-luis", "vaga-recepcionista-clinica-sao-luis",
+      "vagas-call-center-sao-luis", "vagas-estoque-logistica-sao-luis",
+      "vagas-motorista-entregador-sao-luis", "vagas-restaurante-sao-luis-dicas",
+      "vaga-sazonal-comercio-sao-luis", "vagas-pcd-inclusao-emprego"
     ];
     for (const slug of edited) {
       const override = getEditorialContentOverride(slug);
@@ -80,7 +84,11 @@ describe("Auditoria editorial real do corpus de 12/10/2026", () => {
       "como-ler-holerite-descontos", "freelancer-ou-clt-vantagens",
       "mitos-direitos-trabalhistas-whatsapp", "servicos-gerais-epi-vaga",
       "sindicato-trabalhador-direitos-basico", "transferencia-interna-emprego-como-pedir",
-      "vale-alimentacao-ou-refeicao-diferenca", "documentos-admissao-emprego-maranhao"
+      "vale-alimentacao-ou-refeicao-diferenca", "documentos-admissao-emprego-maranhao",
+      "auxiliar-administrativo-vagas-sao-luis", "vaga-recepcionista-clinica-sao-luis",
+      "vagas-call-center-sao-luis", "vagas-estoque-logistica-sao-luis",
+      "vagas-motorista-entregador-sao-luis", "vagas-restaurante-sao-luis-dicas",
+      "vaga-sazonal-comercio-sao-luis", "vagas-pcd-inclusao-emprego"
     ];
     for (const slug of sourceBacked) {
       expect(getEditorialContentOverride(slug)!.contentHtml).toMatch(/<a href="https:\/\//);
