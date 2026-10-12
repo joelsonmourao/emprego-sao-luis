@@ -65,6 +65,7 @@
     "audit:performance": "node scripts/audit-performance.mjs",
     "audit:admin": "node scripts/audit-admin.mjs",
     "audit:site": "node scripts/audit-site.mjs",
+    "recovery:evidence:check": "node scripts/validate-recovery-evidence.mjs --self-test",
     "blog:images": "tsx scripts/generate-blog-images.ts",
     "lighthouse:local": "node scripts/lighthouse-local.mjs",
     "legacy:lint": "node -e \"console.log('legacy lint: no eslint config; use the workspace lint for new code')\""

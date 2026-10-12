@@ -7,7 +7,7 @@ import PageHero from "../components/ui/PageHero.astro";
 import SectionHeading from "../components/ui/SectionHeading.astro";
 import InstagramFollow from "../components/InstagramFollow.astro";
 import { categories, cities, companies, createDatabase, jobs, states } from "@es/db";
-import { and, count, desc, eq, gt, sql } from "drizzle-orm";
+import { and, count, desc, eq, gt, gte, lt, sql } from "drizzle-orm";
 import { articlePublicPath, listPublishedArticles } from "../lib/articles";
 import { getEditorialPortalMode } from "../lib/portal-modes";
 import { getVisualIdentity } from "../lib/visual-identity";
@@ -28,6 +28,7 @@ let categoryRows: Array<{ name: string; slug: string; total: number }> = [];
 let cityRows: Array<{ name: string; slug: string; state: string; total: number }> = [];
 let companyRows: Array<{ name: string; slug: string; total: number; logoUrl: string | null }> = [];
 let categoryOptions: Array<{ name: string; slug: string }> = [];
+let publishedToday = 0;
 
 const identity = await getVisualIdentity();
 
@@ -44,6 +45,14 @@ if (!portalEditorial && process.env.DATABASE_URL) {
       salaryVisible: jobs.salaryVisible, salaryMin: jobs.salaryMin, salaryMax: jobs.salaryMax,
       salaryCurrency: jobs.salaryCurrency, salaryPeriod: jobs.salaryPeriod
     };
+    const todayStart = sql<Date>`date_trunc('day', now() at time zone 'America/Sao_Paulo') at time zone 'America/Sao_Paulo'`;
+    const todayEnd = sql<Date>`${todayStart} + interval '1 day'`;
+    const [todayRow] = await connection.db
+      .select({ total: count(jobs.id) })
+      .from(jobs)
+      .where(and(active, gte(jobs.publishedAt, todayStart), lt(jobs.publishedAt, todayEnd)));
+    publishedToday = Number(todayRow?.total ?? 0);
+
     [recent, featured, categoryRows, cityRows, companyRows, categoryOptions] = await Promise.all([
       connection.db.select(fields).from(jobs).innerJoin(companies, eq(jobs.companyId, companies.id)).innerJoin(cities, eq(jobs.cityId, cities.id)).innerJoin(states, eq(jobs.stateId, states.id)).where(active).orderBy(desc(jobs.publishedAt)).limit(9),
       connection.db.select(fields).from(jobs).innerJoin(companies, eq(jobs.companyId, companies.id)).innerJoin(cities, eq(jobs.cityId, cities.id)).innerJoin(states, eq(jobs.stateId, states.id)).where(and(active, eq(jobs.featured, true))).orderBy(desc(jobs.publishedAt)).limit(6),
@@ -84,17 +93,54 @@ const homeDescription = portalEditorial
 <BaseLayout title={homeTitle} description={homeDescription}>
   {portalEditorial ? (
     <>
-      <PageHero
-        kicker="Portal editorial"
-        title={identity.siteName}
-        description="Notícias, guias e orientação prática sobre emprego, carreira, currículo e entrevistas em São Luís e no Maranhão."
-      >
-        <div class="mt-8 flex flex-wrap gap-3">
-          <a class="es-btn es-btn-primary" href="/noticias">Ver notícias</a>
-          <a class="es-btn es-btn-secondary" href="/blog">Ler o blog</a>
-          <a class="es-btn es-btn-secondary" href="/redacao">Conhecer a redação</a>
+      <section class="es-editorial-hero es-section" aria-labelledby="editorial-hero-title">
+        <div class="es-container es-editorial-hero-grid">
+          <div class="es-editorial-hero-main">
+            <p class="es-editorial-eyebrow">São Luís • Maranhão • Portal editorial</p>
+            <h1 id="editorial-hero-title" class="font-display es-editorial-hero-title">{identity.siteName}</h1>
+            <p class="es-editorial-hero-lead">
+              Informação que ajuda a avançar: notícias do mercado de trabalho,
+              orientações para o currículo e caminhos para se preparar melhor para uma entrevista.
+            </p>
+            <div class="es-editorial-hero-actions">
+              <a class="es-btn es-editorial-button-primary" href="/noticias">Últimas notícias <span aria-hidden="true">↗</span></a>
+              <a class="es-btn es-editorial-button-secondary" href="/blog">Guias de carreira</a>
+            </div>
+            <ul class="es-editorial-topics" aria-label="Assuntos do portal">
+              <li>Mercado de trabalho</li>
+              <li>Currículo</li>
+              <li>Entrevistas</li>
+            </ul>
+          </div>
+          <aside class="es-editorial-digest" aria-label="Leituras em destaque">
+            <p class="es-editorial-digest-kicker">Explore o portal</p>
+            <h2 class="font-display es-editorial-digest-title">Leituras para começar</h2>
+            {newsArticles[0] ? (
+              <article class="es-editorial-digest-item">
+                <p class="es-editorial-digest-label">Notícia</p>
+                <h3><a href={articlePublicPath(newsArticles[0].article.type, newsArticles[0].article.slug)}>{newsArticles[0].article.title}</a></h3>
+              </article>
+            ) : (
+              <article class="es-editorial-digest-item">
+                <p class="es-editorial-digest-label">Nosso compromisso</p>
+                <h3><a href="/redacao">Conheça os critérios editoriais e as fontes do portal</a></h3>
+              </article>
+            )}
+            {blogArticles[0] ? (
+              <article class="es-editorial-digest-item">
+                <p class="es-editorial-digest-label">Guia</p>
+                <h3><a href={articlePublicPath(blogArticles[0].article.type, blogArticles[0].article.slug)}>{blogArticles[0].article.title}</a></h3>
+              </article>
+            ) : (
+              <article class="es-editorial-digest-item">
+                <p class="es-editorial-digest-label">Proteção ao candidato</p>
+                <h3><a href="/seguranca-candidatos">Saiba como reconhecer anúncios suspeitos</a></h3>
+              </article>
+            )}
+            <a class="es-editorial-digest-more" href="/sobre">Conheça o Empregos São Luís <span aria-hidden="true">→</span></a>
+          </aside>
         </div>
-      </PageHero>
+      </section>
 
       <div class="es-container py-6"><AdSlot slot="home-top" pageType="home" /></div>
 
@@ -193,8 +239,9 @@ const homeDescription = portalEditorial
     <>
   <PageHero
     kicker={identity.siteName}
-    title="Vagas SLZ em São Luís — seu próximo emprego na capital"
-    description={homeDescription}
+    title="Encontre oportunidades em São Luís e no Maranhão"
+    description="Busque vagas por cargo, cidade e modalidade, explore notícias e encontre orientações confiáveis para sua carreira."
+    home
   >
     <form class="hero-search-panel mt-8 rounded-3xl border p-4 shadow-2xl sm:p-5" action="/vagas" method="get" role="search">
       <div class="grid gap-3 lg:grid-cols-4">
@@ -231,6 +278,11 @@ const homeDescription = portalEditorial
         {quickFilters.map(([label, href]) => <a class="chip hover:border-[var(--brand-primary)] hover:text-[var(--brand-primary)]" href={href}>{label}</a>)}
       </div>
     </form>
+    {publishedToday > 0 && (
+      <p class="mt-4 text-sm font-semibold text-white/90" aria-live="polite">
+        <strong>{publishedToday}</strong> {publishedToday === 1 ? "vaga publicada hoje" : "vagas publicadas hoje"}
+      </p>
+    )}
   </PageHero>
 
   <div class="es-container py-6"><AdSlot slot="home-top" pageType="home" /></div>

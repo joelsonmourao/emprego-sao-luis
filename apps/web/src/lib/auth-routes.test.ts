@@ -29,7 +29,8 @@ describe("rotas de autenticação separadas", () => {
     expect(read("apps/web/src/components/SiteHeader.astro")).not.toContain("Área da empresa");
     expect(read("apps/web/src/components/SiteFooter.astro")).toContain('href="/admin/login"');
     expect(read("apps/web/src/components/SiteFooter.astro")).toContain("Administração");
-    expect(read("apps/web/src/components/SiteFooter.astro")).not.toContain("Área da empresa");
+    expect(read("apps/web/src/components/SiteFooter.astro")).toContain('href="/empresa/login"');
+    expect(read("apps/web/src/components/SiteFooter.astro")).toContain("Área da empresa");
     expect(read("apps/web/src/components/SiteFooter.astro")).not.toContain("Entrar no painel administrativo");
   });
 
