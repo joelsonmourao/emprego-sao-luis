@@ -22,6 +22,11 @@ function isDate(value) {
   return typeof value === "string" && !Number.isNaN(Date.parse(value));
 }
 
+function postgresMajor(value) {
+  const match = String(value ?? "").match(/^(\d+)(?:\.\d+){1,2}$/);
+  return match ? Number(match[1]) : null;
+}
+
 function findSecretMaterial(value, path = "$", errors = []) {
   if (Array.isArray(value)) {
     value.forEach((child, index) =>
@@ -96,6 +101,14 @@ export function validateRecoveryEvidence(data) {
     /^\d+\.\d+(?:\.\d+)?$/.test(get(data, "backup.postgres_version") ?? ""),
     "backup.postgres_version inválido",
   );
+  require(
+    get(data, "backup.dump_command_exit_code") === 0,
+    "backup.dump_command_exit_code deve ser 0",
+  );
+  require(
+    get(data, "backup.dump_contents_verified") === true,
+    "backup.dump_contents_verified deve ser true",
+  );
 
   for (const artifact of ["database", "storage"]) {
     require(
@@ -163,6 +176,17 @@ export function validateRecoveryEvidence(data) {
     );
   }
 
+  require(
+    /^\d+\.\d+(?:\.\d+)?$/.test(get(data, "restore.postgres_version") ?? ""),
+    "restore.postgres_version inválido",
+  );
+  if (
+    postgresMajor(get(data, "backup.postgres_version")) !== null &&
+    postgresMajor(get(data, "restore.postgres_version")) !==
+      postgresMajor(get(data, "backup.postgres_version"))
+  ) {
+    errors.push("restore.postgres_version deve ter a mesma versão principal da origem");
+  }
   require(isDate(get(data, "restore.completed_at")), "restore.completed_at inválido");
   require(
     isDate(get(data, "rollback.completed_at")),
@@ -248,6 +272,8 @@ function validFixture() {
       authorization_ref: "issue-2",
       deployed_commit: "a".repeat(40),
       postgres_version: "16.4",
+      dump_command_exit_code: 0,
+      dump_contents_verified: true,
     },
     artifacts: {
       database_sha256: "b".repeat(64),
@@ -266,6 +292,7 @@ function validFixture() {
     },
     restore: {
       isolated: true,
+      postgres_version: "16.4",
       completed_at: "2026-10-11T19:15:00Z",
       database_restored: true,
       storage_restored: true,
@@ -297,6 +324,25 @@ function runSelfTest() {
   invalid.identity.application_uuid = FORBIDDEN_APP_UUID;
   invalid.database_url = "postgresql://user:password@example.invalid/db";
   const invalidErrors = validateRecoveryEvidence(invalid);
+
+  const invalidRecoveryProof = validFixture();
+  invalidRecoveryProof.backup.dump_command_exit_code = 1;
+  invalidRecoveryProof.backup.dump_contents_verified = false;
+  invalidRecoveryProof.restore.postgres_version = "15.9";
+  const recoveryProofErrors = validateRecoveryEvidence(invalidRecoveryProof);
+  const expectedRecoveryProofErrors = [
+    "backup.dump_command_exit_code deve ser 0",
+    "backup.dump_contents_verified deve ser true",
+    "restore.postgres_version deve ter a mesma versão principal da origem",
+  ];
+  if (
+    !expectedRecoveryProofErrors.every((error) =>
+      recoveryProofErrors.includes(error),
+    )
+  ) {
+    console.error("Recovery proof self-test failed", { recoveryProofErrors });
+    process.exit(1);
+  }
 
   const invalidChronology = validFixture();
   invalidChronology.restore.completed_at = "2026-10-11T18:59:59Z";
