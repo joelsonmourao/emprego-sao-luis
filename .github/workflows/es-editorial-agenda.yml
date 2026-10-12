@@ -1,0 +1,49 @@
+name: Empregos Sao Luis - agenda editorial em producao
+on:
+  schedule:
+    - cron: "30 10,11,15,19 * * *"
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: es-editorial-pipeline-main
+  cancel-in-progress: false
+jobs:
+  check-and-release:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - name: Ler apenas codigo editorial da branch de producao
+        uses: actions/checkout@v4
+        with:
+          ref: codex/admin-negocio-completo
+          persist-credentials: true
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+      - run: npm ci --legacy-peer-deps
+      - name: Validar textos existentes, bloquear duplicatas, gerar capas de autoresponsabilidade
+        run: node scripts/build-auto-editorial.mjs
+      - name: Checar integridade do projeto antes da entrega
+        run: npm run typecheck
+      - name: Atualizar apenas material aprovado na branch de producao
+        shell: bash
+        run: |
+          git config user.name "es-editorial-bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add apps/web/src/data/auto-editorial-manifest.json apps/web/public/covers/auto-editorial/ editorial/automation-report.json
+          if git diff --cached --quiet; then
+            echo "Nenhum artigo adicional aceito. Nada e publicado sem texto completo."
+          else
+            git commit -m "editorial(auto): registrar artigos validados e capas"
+            git push origin HEAD:codex/admin-negocio-completo
+          fi
+      - name: Guardar resultado de validacao e bloqueios
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: es-editorial-agenda
+          path: editorial/automation-report.json
+          if-no-files-found: warn
+          retention-days: 30
