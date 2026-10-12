@@ -11,6 +11,7 @@ import { getEditorialAuditReport } from "./editorial-audit";
 import { isEditorialReviewPending } from "../data/editorial-review-pending";
 import { getEditorialContentOverride } from "../data/editorial-content-overrides";
 import { getNewsEditorialOverride } from "../data/news-editorial-content-overrides";
+import { listAutoEditorialArticles } from "./auto-editorial";
 import { classifyCategoryPage, classifyCityPage, classifyCompanyPage } from "./entity-page-quality";
 import { getRuntimeSiteUrl } from "./canonical-url";
 import {
@@ -195,8 +196,14 @@ export async function listSitemapEntries(
     const noindexSlugs = reviewMode.enabled
       ? new Set((await getEditorialAuditReport()).assessments.filter((item) => ["NOINDEX", "REVISAR MANUALMENTE"].includes(item.classification)).map((item) => item.article.slug))
       : new Set<string>();
-    return dedupeEntries(
-      rows.filter((row) => {
+    const automatedEntries = category === "blog"
+      ? listAutoEditorialArticles().map(item =>
+          toEntry("/blog/" + item.slug, new Date(item.publishedAt), "weekly", 0.5)
+        )
+      : [];
+    return dedupeEntries([
+      ...automatedEntries,
+      ...rows.filter((row) => {
         const editorialRevision = row.type === "NEWS"
           ? getNewsEditorialOverride(row.slug)
           : getEditorialContentOverride(row.slug);
@@ -213,7 +220,7 @@ export async function listSitemapEntries(
           category === "news" ? 0.7 : 0.5
         )
       )
-    );
+    ]);
   } finally {
     await connection.close();
   }
