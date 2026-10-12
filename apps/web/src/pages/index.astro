@@ -93,17 +93,54 @@ const homeDescription = portalEditorial
 <BaseLayout title={homeTitle} description={homeDescription}>
   {portalEditorial ? (
     <>
-      <PageHero
-        kicker="Portal editorial"
-        title={identity.siteName}
-        description="Notícias, guias e orientação prática sobre emprego, carreira, currículo e entrevistas em São Luís e no Maranhão."
-      >
-        <div class="mt-8 flex flex-wrap gap-3">
-          <a class="es-btn es-btn-primary" href="/noticias">Ver notícias</a>
-          <a class="es-btn es-btn-secondary" href="/blog">Ler o blog</a>
-          <a class="es-btn es-btn-secondary" href="/redacao">Conhecer a redação</a>
+      <section class="es-editorial-hero es-section" aria-labelledby="editorial-hero-title">
+        <div class="es-container es-editorial-hero-grid">
+          <div class="es-editorial-hero-main">
+            <p class="es-editorial-eyebrow">São Luís • Maranhão • Portal editorial</p>
+            <h1 id="editorial-hero-title" class="font-display es-editorial-hero-title">{identity.siteName}</h1>
+            <p class="es-editorial-hero-lead">
+              Informação que ajuda a avançar: notícias do mercado de trabalho,
+              orientações para o currículo e caminhos para se preparar melhor para uma entrevista.
+            </p>
+            <div class="es-editorial-hero-actions">
+              <a class="es-btn es-editorial-button-primary" href="/noticias">Últimas notícias <span aria-hidden="true">↗</span></a>
+              <a class="es-btn es-editorial-button-secondary" href="/blog">Guias de carreira</a>
+            </div>
+            <ul class="es-editorial-topics" aria-label="Assuntos do portal">
+              <li>Mercado de trabalho</li>
+              <li>Currículo</li>
+              <li>Entrevistas</li>
+            </ul>
+          </div>
+          <aside class="es-editorial-digest" aria-label="Leituras em destaque">
+            <p class="es-editorial-digest-kicker">Explore o portal</p>
+            <h2 class="font-display es-editorial-digest-title">Leituras para começar</h2>
+            {newsArticles[0] ? (
+              <article class="es-editorial-digest-item">
+                <p class="es-editorial-digest-label">Notícia</p>
+                <h3><a href={articlePublicPath(newsArticles[0].article.type, newsArticles[0].article.slug)}>{newsArticles[0].article.title}</a></h3>
+              </article>
+            ) : (
+              <article class="es-editorial-digest-item">
+                <p class="es-editorial-digest-label">Nosso compromisso</p>
+                <h3><a href="/redacao">Conheça os critérios editoriais e as fontes do portal</a></h3>
+              </article>
+            )}
+            {blogArticles[0] ? (
+              <article class="es-editorial-digest-item">
+                <p class="es-editorial-digest-label">Guia</p>
+                <h3><a href={articlePublicPath(blogArticles[0].article.type, blogArticles[0].article.slug)}>{blogArticles[0].article.title}</a></h3>
+              </article>
+            ) : (
+              <article class="es-editorial-digest-item">
+                <p class="es-editorial-digest-label">Proteção ao candidato</p>
+                <h3><a href="/seguranca-candidatos">Saiba como reconhecer anúncios suspeitos</a></h3>
+              </article>
+            )}
+            <a class="es-editorial-digest-more" href="/sobre">Conheça o Empregos São Luís <span aria-hidden="true">→</span></a>
+          </aside>
         </div>
-      </PageHero>
+      </section>
 
       <div class="es-container py-6"><AdSlot slot="home-top" pageType="home" /></div>
 
