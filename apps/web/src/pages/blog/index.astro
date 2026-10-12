@@ -5,6 +5,7 @@ import EmptyState from "../../components/ui/EmptyState.astro";
 import PageHero from "../../components/ui/PageHero.astro";
 import Pagination from "../../components/ui/Pagination.astro";
 import { listPublishedArticlesPage } from "../../lib/articles";
+import { listAutoEditorialArticles, findAutoEditorialArticle } from "../../lib/auto-editorial";
 import { listAutoEditorialArticles } from "../../lib/auto-editorial";
 import {
   EDITORIAL_BLOG_THEMES,
@@ -21,6 +22,10 @@ const { items, total, page: current, pages, theme } = await listPublishedArticle
   ["GUIDE", "DATA_REPORT"],
   themeParam
 );
+const automated = !themeParam && page === 1
+  ? listAutoEditorialArticles(12).map((item) => findAutoEditorialArticle(item.slug)).filter((item): item is NonNullable<typeof item> => Boolean(item))
+  : [];
+const mergedItems = [...automated, ...items.filter((item) => !automated.some((auto) => auto.article.slug === item.article.slug))].slice(0, pageSize);
 const portal = await getEditorialPortalMode();
 const automatic = listAutoEditorialArticles(9);
 const themeMeta = theme ? EDITORIAL_BLOG_THEMES[theme as EditorialBlogTheme] : null;
@@ -50,7 +55,7 @@ const heroDescription = themeMeta
   breadcrumbs={[{ name: "Guias", url: "/blog" }, ...(themeMeta ? [{ name: themeMeta.label, url: `/blog?tema=${theme}` }] : [])]}
   pageSchemaType="CollectionPage"
   canonical={canonical}
-  noindex={items.length === 0 || current > 1 || Boolean(theme)}
+  noindex={mergedItems.length === 0 || current > 1 || Boolean(theme)}
 >
   <PageHero kicker="Conteúdo gratuito" title={heroTitle} description={heroDescription} pattern={false} />
   <section class="es-section pt-0">
@@ -83,7 +88,7 @@ const heroDescription = themeMeta
           </a>
         ))}
       </nav>
-      {items.length === 0 ? (
+      {mergedItems.length === 0 ? (
         <div class="mt-8">
           <EmptyState
             title={themeMeta ? `Nenhum guia sobre ${themeMeta.label.toLowerCase()}` : "Nenhum guia publicado"}
@@ -94,9 +99,9 @@ const heroDescription = themeMeta
         </div>
       ) : (
         <>
-          <p class="mt-6 text-sm text-[var(--text-secondary)]">{total} guia(s) · página {current} de {pages}</p>
+          <p class="mt-6 text-sm text-[var(--text-secondary)]">{total + automated.length} guia(s) · página {current} de {pages}</p>
           <ul class="mt-6 grid gap-5 md:grid-cols-2">
-            {items.map(({ article, authorName }) => (
+            {mergedItems.map(({ article, authorName }) => (
               <li class="es-card overflow-hidden">
                 {article.coverImageUrl && (
                   <img
