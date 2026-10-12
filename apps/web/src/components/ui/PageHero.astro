@@ -8,7 +8,7 @@ interface Props {
 }
 const { kicker, title, description, pattern = true, home = false } = Astro.props;
 ---
-<section class={`es-section ${pattern ? "hero-pattern" : "bg-[var(--es-cream-dark)]"} ${home ? "es-home-hero" : ""}`}>
+<section class={`es-section es-premium-page-hero ${pattern ? "hero-pattern" : "bg-[var(--es-cream-dark)]"} ${home ? "es-home-hero" : ""}`}>
   <div class="es-container">
     <div class={pattern ? "text-white" : ""}>
       {kicker && <p class={`es-kicker ${pattern ? "text-white/80" : ""}`}>{kicker}</p>}
