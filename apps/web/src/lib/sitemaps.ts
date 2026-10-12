@@ -197,8 +197,13 @@ export async function listSitemapEntries(
       : new Set<string>();
     return dedupeEntries(
       rows.filter((row) => {
-        if (noindexSlugs.has(row.slug)) return false;
-        if (isEditorialReviewPending(row.type, row.slug)) return row.type === "NEWS" ? Boolean(getNewsEditorialOverride(row.slug)) : Boolean(getEditorialContentOverride(row.slug));
+        const editorialRevision = row.type === "NEWS"
+          ? getNewsEditorialOverride(row.slug)
+          : getEditorialContentOverride(row.slug);
+        // Auditoria do banco avalia o texto antigo. Conteúdo novo e revisado em código
+        // pode voltar ao sitemap, desde que o HTML entregue também permita indexação.
+        if (noindexSlugs.has(row.slug) && !editorialRevision) return false;
+        if (isEditorialReviewPending(row.type, row.slug)) return Boolean(editorialRevision);
         return true;
       }).map((row) =>
         toEntry(
