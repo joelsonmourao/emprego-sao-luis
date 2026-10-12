@@ -1,4 +1,4 @@
-import { createDatabase, settings } from "@es/db";
+import { createDatabase, createPublicDatabase, settings } from "@es/db";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
 import { BRAND_ASSETS } from "./brand-assets";
@@ -21,7 +21,7 @@ const defaults = instagramCtaSchema.parse({});
 
 export async function getInstagramCtaSettings(): Promise<InstagramCtaSettings> {
   if (!process.env.DATABASE_URL) return defaults;
-  const connection = createDatabase(process.env.DATABASE_URL);
+  const connection = createPublicDatabase(process.env.DATABASE_URL);
   try {
     const [row] = await connection.db.select().from(settings).where(eq(settings.key, "instagram_cta")).limit(1);
     if (!row?.value) return defaults;
