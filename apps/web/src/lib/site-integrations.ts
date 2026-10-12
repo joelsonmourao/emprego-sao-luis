@@ -1,6 +1,6 @@
 import { eq } from "drizzle-orm";
 import { z } from "zod";
-import { createDatabase, settings } from "@es/db";
+import { createDatabase, createPublicDatabase, settings } from "@es/db";
 import { logServerError } from "./server-error";
 
 const KEY = "site_integrations";
@@ -80,7 +80,7 @@ export function normalizeSearchConsoleToken(raw: string): string {
 
 export async function getSiteIntegrations(): Promise<SiteIntegrations & { persisted: boolean }> {
   if (!process.env.DATABASE_URL) return { ...defaultSiteIntegrations, persisted: false };
-  const connection = createDatabase(process.env.DATABASE_URL);
+  const connection = createPublicDatabase(process.env.DATABASE_URL);
   try {
     const [row] = await connection.db.select().from(settings).where(eq(settings.key, KEY));
     const merged = mergeSiteIntegrations(row?.value);
