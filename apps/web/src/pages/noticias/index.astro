@@ -50,18 +50,18 @@ const canonical = new URL(current > 1 ? `/noticias?pagina=${current}` : "/notici
           <p class="mt-6 text-sm text-[var(--text-secondary)]">{total} notícia(s) · página {current} de {pages}</p>
           <div class="mt-6 grid gap-6 lg:grid-cols-3">
             {featured && (
-              <article class="es-card overflow-hidden lg:col-span-2">
+              <article class="es-card es-premium-article-card overflow-hidden lg:col-span-2">
                 {featured.article.coverImageUrl && (
                   <img
                     src={featured.article.coverImageUrl}
                     alt={featured.article.coverImageAlt ?? featured.article.title}
-                    class="h-56 w-full object-cover"
+                    class="es-premium-card-image h-56 w-full object-cover"
                     width="960" height="540" loading="eager" decoding="async" fetchpriority="high"
                   />
                 )}
                 <div class="p-6 sm:p-8">
                   <p class="es-kicker">{featured.article.section ?? "Notícia"}</p>
-                  <h2 class="font-display mt-2 text-3xl font-black">
+                  <h2 class="es-premium-story-title font-display mt-2 text-3xl font-black leading-tight">
                     <a href={`/noticias/${featured.article.slug}`}>{featured.article.title}</a>
                   </h2>
                   <p class="mt-3 text-[var(--es-muted)]">{featured.article.excerpt}</p>
@@ -73,9 +73,9 @@ const canonical = new URL(current > 1 ? `/noticias?pagina=${current}` : "/notici
             )}
             <div class="grid gap-4">
               {(featured ? rest.slice(0, 4) : rest.slice(0, 6)).map(({ article, authorName }) => (
-                <article class="es-card p-5">
+                <article class="es-card es-premium-article-card p-5">
                   <p class="text-xs font-bold text-[var(--brand-primary)]">{article.section ?? "Notícia"}</p>
-                  <h3 class="font-display mt-1 text-lg font-black">
+                  <h3 class="es-premium-story-title font-display mt-1 text-lg font-black leading-tight">
                     <a href={`/noticias/${article.slug}`}>{article.title}</a>
                   </h3>
                   <p class="mt-2 text-sm text-[var(--es-muted)]">
@@ -87,12 +87,12 @@ const canonical = new URL(current > 1 ? `/noticias?pagina=${current}` : "/notici
             {(featured ? rest.length > 4 : rest.length > 6) && (
               <div class="grid gap-5 sm:grid-cols-2 lg:col-span-3">
                 {(featured ? rest.slice(4) : rest.slice(6)).map(({ article, authorName }) => (
-                  <article class="es-card overflow-hidden">
+                  <article class="es-card es-premium-article-card overflow-hidden">
                     {article.coverImageUrl && (
                       <img
                         src={article.coverImageUrl}
                         alt={article.coverImageAlt ?? article.title}
-                        class="h-40 w-full object-cover"
+                        class="es-premium-card-image h-40 w-full object-cover"
                         width="640" height="360" loading="lazy" decoding="async"
                       />
                     )}
