@@ -685,6 +685,10 @@ const overrides: Record<string, EditorialContentOverride> = {
 <h2>Faça uma conferência mensal simples</h2>
 <p>Crie uma linha por competência com salário-base, dias trabalhados, horas registradas, faltas justificadas, férias, benefícios e líquido recebido. Quando houver variável, anote a origem: venda, plantão, comissão ou ajuste. Essa planilha não substitui a folha; ela ajuda a localizar em que mês surgiu a diferença.</p>
 <p>Não compare apenas dois líquidos: férias, afastamento, adiantamento, início ou término no meio do mês e fechamento de ponto podem alterar o resultado. Compare primeiro as rubricas e bases. Se receber folha retificadora, preserve também a versão anterior e a resposta que explica o motivo.</p>
+<h2>Dúvidas que o valor líquido não responde</h2>
+<p><strong>O salário-base está certo, então a folha está certa?</strong> Não necessariamente. Jornada, adicionais, faltas, benefícios e descontos também precisam corresponder aos registros do período.</p>
+<p><strong>Posso enviar o holerite inteiro por WhatsApp?</strong> Prefira o canal oficial e compartilhe só o necessário. O documento contém remuneração e outros dados pessoais.</p>
+<p><strong>Uma diferença pequena pode ser ignorada?</strong> Registre e pergunte. Valores pequenos repetidos se acumulam e podem indicar uma rubrica interpretada de forma diferente pelo RH.</p>
 <p>Guarde holerites, espelhos de ponto, contrato e comprovantes em local pessoal seguro. Se a diferença persistir, peça memória de cálculo ao empregador e consulte o sindicato da categoria ou profissional habilitado. Este guia ajuda a organizar a conferência; não calcula tributos nem substitui análise contábil ou jurídica.</p>
 `.trim()
   },
@@ -717,6 +721,9 @@ const overrides: Record<string, EditorialContentOverride> = {
 <h2>Coloque o acordo de serviço no papel</h2>
 <p>Uma proposta de prestação deve identificar as partes, o resultado esperado, os arquivos ou serviços incluídos, a data de entrega, a forma de aceite, o preço, o vencimento e o que acontece se o escopo mudar. Defina também quem fornece acesso, material e autorização para usar marcas ou dados. “Fazer as redes” ou “dar apoio” é amplo demais para cobrar e entregar com segurança.</p>
 <p>Para comparar renda, simule um mês fraco, um mês normal e um mês cheio. Reserve tempo não faturado para prospectar, organizar documentos e corrigir entregas. Se o contrato exige disponibilidade permanente, exclusividade ou controle diário, considere esse impacto antes de aceitar e procure orientação se a prática parecer diferente do rótulo usado.</p>
+<h2>Três decisões antes de trocar de modelo</h2>
+<p><strong>Reserva:</strong> quantos meses você consegue cobrir despesas se um cliente atrasar ou cancelar? <strong>Dependência:</strong> qual percentual da renda viria de um único contratante? <strong>Capacidade:</strong> quantas horas cabem sem reduzir qualidade ou descanso?</p>
+<p>Se você já tem emprego, revise cláusulas de confidencialidade, conflito de interesse e horário antes de aceitar projeto paralelo. Nunca use lista de clientes, equipamento ou arquivo do empregador sem autorização. Se está desempregado, trate promessa de volume futuro como possibilidade, não como receita confirmada.</p>
 <p>Não abra CNPJ, pague taxa ou entregue senha gov.br só porque um anúncio exige urgência. Se a rotina real divergir do contrato ou houver dúvida sobre vínculo, tributação ou contribuição, leve os documentos a profissional habilitado. Este conteúdo é um roteiro de decisão, não enquadramento jurídico automático.</p>
 `.trim()
   },
@@ -748,6 +755,9 @@ const overrides: Record<string, EditorialContentOverride> = {
 <p><strong>Exemplo de resposta responsável:</strong> “A CLT contém a regra geral, mas o instrumento coletivo e os documentos do vínculo precisam ser conferidos. O serviço oficial para pesquisar acordos está neste link. Consultei em 12/10/2026.” Esse formato permite que outra pessoa refaça a verificação.</p>
 <h2>Quando não responder em grupo</h2>
 <p>Atestado, acidente, assédio, dispensa e desconto podem expor dados pessoais ou exigir prazo. Nesses casos, preserve a mensagem, saia da discussão pública e use um canal individual com a entidade ou profissional adequado. Não publique nome da empresa ou colega como acusação sem apuração.</p>
+<h2>Perguntas para desmontar uma corrente</h2>
+<ul><li>Qual é o número da lei, cláusula ou decisão?</li><li>Qual órgão publicou e em que data?</li><li>A informação vale para empregado, servidor, autônomo ou uma categoria específica?</li><li>A regra está vigente na data do fato?</li><li>Há condição ou exceção que foi cortada da mensagem?</li></ul>
+<p>Se ninguém consegue responder, rotule a informação como não verificada. Não complete a lacuna com memória ou com outro post que cita a mesma corrente. Uma busca pode encontrar muitas repetições sem encontrar a fonte original.</p>
 <p>Ao compartilhar uma correção, envie o link oficial e uma frase limitada: “esta fonte diz X; é preciso confirmar se se aplica ao seu contrato”. Não exponha holerite, atestado ou dados de colegas em grupo. Se houver prazo, desconto, dispensa ou risco à saúde, preserve os documentos e procure orientação individual. Este guia combate desinformação; não oferece parecer jurídico.</p>
 `.trim()
   },
@@ -780,6 +790,9 @@ const overrides: Record<string, EditorialContentOverride> = {
 <p>Se houver contato com material biológico, produto corrosivo, eletricidade, altura ou máquina, não improvise com equipamento doméstico. Peça a orientação específica e confirme quem está autorizado a executar a tarefa. Um CA válido não transforma um equipamento inadequado ao risco em escolha correta.</p>
 <h2>Sinais de posto mal organizado</h2>
 <ul><li>produto sem rótulo ou diluição feita “de memória”;</li><li>EPI compartilhado sem higienização definida;</li><li>treinamento reduzido a assinatura em lista;</li><li>pressão para continuar com item danificado;</li><li>tarefa perigosa fora do escopo sem supervisão.</li></ul>
+<h2>Como descrever experiência no currículo</h2>
+<p>Em vez de escrever apenas “serviços gerais”, liste tarefas verdadeiras: limpeza de áreas administrativas, coleta segregada, reposição de materiais ou uso de equipamento específico para o qual recebeu orientação. Não declare curso, produto ou ambiente de risco que você não conhece.</p>
+<p>Na entrevista, experiência inclui seguir procedimento, sinalizar área molhada, comunicar defeito e evitar mistura de produtos. Esses exemplos mostram cuidado sem inventar certificação. Se a vaga envolve hospital, cozinha industrial ou altura, peça que a empresa explique requisitos e treinamento do próprio posto.</p>
 <p>Não compre EPI exigido pela vaga como condição para participar de seleção e não aceite pagamento para “kit obrigatório” enviado por desconhecido. Em risco imediato, falta de orientação ou recusa de substituição, procure a supervisão e os canais de segurança do trabalho; conforme o caso, sindicato, inspeção do trabalho ou atendimento de saúde. O guia não substitui avaliação técnica do ambiente.</p>
 `.trim()
   },
@@ -812,6 +825,9 @@ const overrides: Record<string, EditorialContentOverride> = {
 <p>Ao telefonar ou escrever, peça protocolo, nome do setor e prazo estimado. Depois confirme a orientação por documento ou link oficial. Uma resposta recebida em conversa privada não substitui o texto do acordo nem prova automaticamente que ele se aplica a todas as pessoas da empresa.</p>
 <h2>Proteja-se de falsos contatos</h2>
 <p>Golpistas podem copiar logotipo e nome de entidade. Digite o endereço oficial em vez de abrir link recebido, confira o domínio e compare telefone e CNPJ com o cadastro. Nunca informe código de autenticação, senha bancária ou senha gov.br.</p>
+<h2>Leia uma convenção sem se perder</h2>
+<p>Comece pela identificação das partes, categoria, abrangência territorial e vigência. Depois busque a palavra da sua dúvida, como jornada, piso, refeição ou auxílio. Leia a cláusula inteira e as condições próximas; uma tabela isolada pode depender de cargo, tempo de empresa ou data.</p>
+<p>Registre o número do instrumento e a página consultada. Se o texto antigo aparece primeiro no buscador, compare a vigência com a data do seu fato e procure termo aditivo. Não use o valor de outra cidade ou categoria para negociar como se fosse obrigatório no seu vínculo.</p>
 <p>O sindicato pode orientar e negociar, mas a resposta para um caso individual depende dos fatos e documentos. Em prazo de rescisão, risco à saúde, assédio ou conflito relevante, busque também assistência jurídica ou o órgão competente. Este guia ensina a verificar identidade e fonte; não indica entidade específica nem presume filiação.</p>
 `.trim()
   },
@@ -844,6 +860,9 @@ const overrides: Record<string, EditorialContentOverride> = {
 <h2>Se houver mudança de função</h2>
 <p>Compare tarefas novas com cargo, salário, metas, acesso a sistemas e responsabilidade por pessoas ou valores. Uma promoção verbal sem data, remuneração ou descrição pode criar expectativa impossível de conferir. Se for movimento temporário, defina início, fim, avaliação e quem decide a efetivação.</p>
 <p>Uma negativa também pode gerar plano útil. Peça os critérios que faltam, uma atividade de desenvolvimento e uma data realista para nova conversa. Evite ameaça de saída que você não pretende cumprir; preserve relação e mantenha busca externa separada dos sistemas da empresa.</p>
+<h2>Acompanhe sem pressionar</h2>
+<p>Combine quando haverá retorno e faça um único acompanhamento na data marcada. Enquanto isso, continue entregando o trabalho atual e organize evidências das competências pedidas. Se a vaga interna for publicada, candidate-se pelo processo oficial mesmo que já tenha conversado com a liderança.</p>
+<p>Não use acesso privilegiado para descobrir remuneração de colegas ou detalhes de outros candidatos. Compare apenas as condições que a empresa apresentou a você. Se houver potencial conflito com seu gestor atual, pergunte ao RH como funciona a confidencialidade do processo antes de formalizar.</p>
 <p>Se a mudança for imposta, não assine documento que você não entendeu. Peça tempo razoável para leitura e guarde a versão recebida. Pressão, redução indevida ou deslocamento relevante podem demandar sindicato ou orientação jurídica. Este guia ajuda a estruturar o pedido; não garante aprovação nem define a legalidade de um caso concreto.</p>
 `.trim()
   },
@@ -871,6 +890,9 @@ const overrides: Record<string, EditorialContentOverride> = {
 <p>Se o cartão oferece modalidades separadas, pergunte se o valor pode ser dividido e quem define a proporção. Não presuma portabilidade, saque, transferência ou uso fora da finalidade alimentar. Recursos e regras devem ser confirmados no canal oficial vigente.</p>
 <h2>Registre a oferta corretamente</h2>
 <p>Guarde a proposta que informa o benefício e a política entregue na admissão. No primeiro crédito, confira competência, valor e desconto no holerite. Se a rede prometida não existe na região, relate com exemplos verificáveis em vez de apenas dizer que “não funciona”.</p>
+<h2>Perguntas que evitam comparação errada</h2>
+<p>O crédito começa no primeiro dia ou segue calendário? Há valor proporcional na admissão? Existe desconto e onde ele aparece? A rede é consultada por aplicativo, site ou central? O cartão físico chega antes do início? Essas respostas importam mais do que tratar o benefício como dinheiro livre.</p>
+<p>Se você prepara comida em casa, o vale-alimentação pode ter uso diferente do de quem almoça perto do trabalho. Se a jornada muda entre unidades, teste mais de uma região. A melhor modalidade depende da rotina e das regras confirmadas, não de uma resposta universal.</p>
 <p>Para avaliar o pacote total, some salário líquido estimado, benefícios confirmados e custo do trajeto; não converta benefício em dinheiro na sua planilha como se a rede fosse irrestrita. Dúvidas sobre natureza da parcela, instrumento coletivo ou desconto exigem orientação individual. Este guia apoia a comparação, não interpreta seu contrato.</p>
 `.trim()
   },
@@ -909,6 +931,8 @@ const overrides: Record<string, EditorialContentOverride> = {
 <h2>Antes de enviar, revise a pasta</h2>
 <p>Abra cada arquivo e confirme legibilidade, frente e verso quando solicitado e correspondência com a lista. Não reúna documentos de várias pessoas em um único PDF. Se houver dependente, pergunte qual comprovação é necessária e para qual finalidade. Use senha diferente da sua conta pessoal quando o canal oferecer proteção própria; nunca envie essa senha junto do arquivo.</p>
 <p>Depois da admissão, consulte seus registros pela Carteira de Trabalho Digital e compare empregador, data e função com o que foi acordado. Uma divergência deve ser comunicada pelo canal formal, sem editar captura de tela nem publicar dados pessoais em rede social.</p>
+<h2>O que não enviar</h2>
+<p>Nunca envie senha gov.br, código de autenticação, senha de banco, número completo de cartão com código de segurança ou acesso remoto ao celular. Uma empresa pode precisar de dados cadastrais e bancários, mas não precisa assumir suas contas pessoais.</p>
 <p>Se houver dúvida, não comece atividade sem confirmação do vínculo e dos responsáveis. Divergência no registro, exigência discriminatória ou uso indevido de dados deve ser documentado e levado ao canal de privacidade, sindicato, inspeção do trabalho ou orientação jurídica conforme o caso. Este guia não cria uma lista universal nem substitui a instrução formal do empregador.</p>
 `.trim()
   },
