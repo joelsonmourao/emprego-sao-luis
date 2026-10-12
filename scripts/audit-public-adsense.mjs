@@ -119,7 +119,7 @@ function auditHtml(page){
   if(imgs.some(x=>!x.alt))issue.push("IMAGE_ALT_EMPTY");
   if(imgs.some(x=>!x.width||!x.height))issue.push("IMAGE_DIMENSIONS_MISSING");
   const phrases=uniq((normalize(prose).match(/\b(?:no tema em pauta|quando voce decide|uma situacao comum na pratica|roteiro aplicavel passo a passo|guarde este conteudo como referencia|na pratica o que importa)\b/g)||[]));
-  return {url:page.url,status:page.status,finalUrl:page.finalUrl,ttfbExcluded:true,title,words,h1Count:h1.length,headings:headings.slice(0,24),imageCount:imgs.length,imageWithAlt:imgs.filter(i=>!!i.alt).length,externalEditorialLinks:links.filter(offsite).length,phrases,issues:uniq(issue),canonical,cacheControl:page.headers?.cacheControl,articlePage,proseSample:articlePage?prose.slice(0,210):undefined};
+  return {url:page.url,status:page.status,finalUrl:page.finalUrl,ttfbExcluded:true,title,words,h1Count:h1.length,headings:headings.slice(0,24),imageCount:imgs.length,imageWithAlt:imgs.filter(i=>!!i.alt).length,imageUrls:uniq(imgs.map(i=>i.src)).slice(0,30),externalEditorialLinks:links.filter(offsite).length,phrases,issues:uniq(issue),canonical,cacheControl:page.headers?.cacheControl,articlePage,proseSample:articlePage?prose.slice(0,210):undefined};
 }
 const before=Date.now();
 const site=await crawlSitemap();
@@ -135,6 +135,25 @@ async function worker(){
   }
 }
 await Promise.all(Array.from({length:4},worker));
+// Verificar por HEAD cada imagem local única; nunca baixar imagens em massa.
+const imageUrls=uniq(results.flatMap(r=>r.imageUrls||[]).map(x=>{try{return new URL(x,ORIGIN).toString();}catch{return "";}}).filter(Boolean));
+const localImageUrls=imageUrls.filter(x=>permitted(x)).slice(0,140);
+let imageNext=0;
+const imageHealth=Array(localImageUrls.length);
+await Promise.all(Array.from({length:4},async()=>{
+  while(imageNext<localImageUrls.length){
+    const idx=imageNext++,url=localImageUrls[idx];
+    try{
+      const response=await fetch(url,{method:"HEAD",signal:AbortSignal.timeout(10000)});
+      const contentType=response.headers.get("content-type")||"";
+      const bytes=Number(response.headers.get("content-length")||0);
+      imageHealth[idx]={url,status:response.status,contentType,bytes,
+        issues:[...(!response.ok&&response.status!==405?["IMAGE_HTTP_"+response.status]:[]),
+          ...(response.ok&&!contentType.startsWith("image/")?["IMAGE_BAD_CONTENT_TYPE"]:[]),
+          ...(bytes>2000000?["IMAGE_OVER_2MB"]:[])]};
+    }catch(e){imageHealth[idx]={url,status:0,issues:["IMAGE_REQUEST_FAILED"],error:e instanceof Error?e.message:String(e)};}
+  }
+}));
 const counts={};
 for(const r of results){for(const i of r.issues||[])counts[i]=(counts[i]||0)+1;}
 const articles=results.filter(x=>x.articlePage);
@@ -147,11 +166,13 @@ const summary={
   articles:articles.length,
   articleWordsMedian:articles.length?[...articles.map(x=>x.words||0)].sort((a,b)=>a-b)[Math.floor(articles.length/2)]:0,
   articlesWithProblems:articles.filter(x=>x.issues?.length).length,
+  imageUrlsChecked:imageHealth.length,
+  imageProblems:imageHealth.filter(x=>x.issues?.length).length,
   issues:counts,
   note:"Auditoria heurística pública. Não é avaliação do Google AdSense nem substitui revisão editorial humana."
 };
 await mkdir(dirname(REPORT),{recursive:true});
-await writeFile(REPORT,JSON.stringify({summary,sitemaps:site.sitemaps,pages:results},null,2)+"\n","utf8");
+await writeFile(REPORT,JSON.stringify({summary,sitemaps:site.sitemaps,pages:results,imageHealth},null,2)+"\n","utf8");
 const priority=articles.filter(r=>r.issues?.some(i=>/NO_OUTBOUND|GENERIC_TEMPLATE|UNDER_300|NEWS_SOURCE/.test(i))).sort((a,b)=>b.issues.length-a.issues.length);
 const md=[
  "# Auditoria de conteúdo público — Empregos São Luís",
