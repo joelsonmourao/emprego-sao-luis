@@ -58,7 +58,16 @@ describe("Auditoria editorial real do corpus de 12/10/2026", () => {
       expect(override!.contentHtml).not.toContain("Uma situação comum na prática");
       expect(override!.contentHtml).not.toContain("No tema em pauta");
       expect(override!.contentHtml).toContain("<h2>");
-      expect(override!.contentHtml).toMatch(/<a href="https:\/\//);
+    }
+
+    const sourceBacked = [
+      "acidente-de-trabalho-o-que-fazer", "assedio-no-trabalho-o-que-fazer",
+      "atestado-medico-trabalho-como-entregar", "banco-de-horas-direitos-trabalhador",
+      "convencao-coletiva-holerite-trabalhador", "escala-6x1-o-que-perguntar",
+      "hora-extra-holerite-como-conferir", "pedido-demissao-aviso-previo-acerto"
+    ];
+    for (const slug of sourceBacked) {
+      expect(getEditorialContentOverride(slug)!.contentHtml).toMatch(/<a href="https:\/\//);
     }
   });
 
