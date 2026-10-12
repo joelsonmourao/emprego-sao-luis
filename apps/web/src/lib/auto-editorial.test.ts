@@ -35,7 +35,7 @@ describe("Agenda editorial automática com proteção contra publicação premat
     const blog = read("apps/web/src/pages/blog/index.astro");
     const sitemap = read("apps/web/src/lib/sitemaps.ts");
     expect(page).toContain("findAutoEditorialArticle(slug)");
-    expect(blog).toContain("listAutoEditorialArticles(9)");
+    expect(blog).toContain("listAutoEditorialArticles(3)");
     expect(sitemap).toContain("listAutoEditorialArticles()");
     expect(read("apps/web/src/lib/auto-editorial.ts")).toContain("Date.parse(x.publishedAt)<=now.getTime()");
   });
