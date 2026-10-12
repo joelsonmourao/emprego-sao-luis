@@ -129,7 +129,7 @@ if(!checkOnly){
   }
   fs.mkdirSync(path.dirname(output),{recursive:true});
   fs.writeFileSync(output,JSON.stringify(accepted,null,2)+"\n");
-  fs.writeFileSync("editorial/automation-report.json",JSON.stringify({generatedAt:new Date().toISOString(),validated:accepted.length,blocked:blocked.length,details:blocked},null,2)+"\n");
+  fs.writeFileSync("editorial/automation-report.json",JSON.stringify({period:plan.period,validated:accepted.length,blocked:blocked.length,details:blocked},null,2)+"\n");
 }
 console.log(JSON.stringify({validated:accepted.length,blocked:blocked.length,accepted:accepted.map(a=>a.slug).slice(-5),sampleBlocked:blocked.slice(0,5)}));
 if(!accepted.length)process.exitCode=1;
