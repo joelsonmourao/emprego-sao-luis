@@ -22,8 +22,10 @@ const { items, total, page: current, pages, theme } = await listPublishedArticle
   themeParam
 );
 const portal = await getEditorialPortalMode();
-const automatic = listAutoEditorialArticles(9);
+const automatic = listAutoEditorialArticles(3);
 const themeMeta = theme ? EDITORIAL_BLOG_THEMES[theme as EditorialBlogTheme] : null;
+const featuredGuide = current === 1 && !theme ? items[0] : undefined;
+const listingGuides = featuredGuide ? items.slice(1) : items;
 const pageUrl = (target: number) => {
   const params = new URLSearchParams(Astro.url.searchParams);
   if (target <= 1) params.delete("pagina");
@@ -62,7 +64,7 @@ const heroDescription = themeMeta
           <p class="mt-2 text-sm text-[var(--text-secondary)]">Publicações programadas e verificadas por critérios automáticos de estrutura, fontes e conteúdo. A verificação automática não substitui a checagem humana de fatos.</p>
           <ul class="mt-5 grid gap-4 md:grid-cols-2">
             {automatic.map(item => (
-              <li class="es-card es-premium-article-card overflow-hidden">
+              <li class="es-card es-premium-article-card es-blog-story-card overflow-hidden">
                 <a href={`/blog/${item.slug}`} class="block">
                   <img src={item.coverImageUrl} alt={item.coverImageAlt} width="600" height="338" loading="lazy" decoding="async" class="es-premium-card-image h-44 w-full object-cover" />
                   <span class="block p-4 font-display text-xl font-black">{item.title}</span>
@@ -83,6 +85,32 @@ const heroDescription = themeMeta
           </a>
         ))}
       </nav>
+      {featuredGuide && (
+        <article class="es-blog-editorial-feature mt-9">
+          <a href={"/blog/" + featuredGuide.article.slug} class="es-blog-feature-link">
+            <div class="es-blog-feature-visual">
+              {featuredGuide.article.coverImageUrl ? (
+                <img
+                  src={featuredGuide.article.coverImageUrl}
+                  alt={featuredGuide.article.coverImageAlt ?? featuredGuide.article.title}
+                  width="900"
+                  height="620"
+                  loading="eager"
+                  decoding="async"
+                  fetchpriority="high"
+                />
+              ) : <div class="es-blog-feature-fallback" aria-hidden="true">ES / GUIAS</div>}
+            </div>
+            <div class="es-blog-feature-content">
+              <p class="es-magazine-section-kicker">LEITURA PRINCIPAL</p>
+              <h2 class="font-display">{featuredGuide.article.title}</h2>
+              {featuredGuide.article.excerpt && <p>{featuredGuide.article.excerpt}</p>}
+              <span>Por {featuredGuide.authorName}</span>
+              <strong>Ler o guia completo <span aria-hidden="true">↗</span></strong>
+            </div>
+          </a>
+        </article>
+      )}
       {items.length === 0 ? (
         <div class="mt-8">
           <EmptyState
@@ -95,14 +123,14 @@ const heroDescription = themeMeta
       ) : (
         <>
           <p class="mt-6 text-sm text-[var(--text-secondary)]">{total} guia(s) · página {current} de {pages}</p>
-          <ul class="mt-6 grid gap-5 md:grid-cols-2">
-            {items.map(({ article, authorName }) => (
+          <ul class="es-blog-story-grid mt-7 grid gap-5 md:grid-cols-2">
+            {listingGuides.map(({ article, authorName }) => (
               <li class="es-card es-premium-article-card overflow-hidden">
                 {article.coverImageUrl && (
                   <img
                     src={article.coverImageUrl}
                     alt={article.coverImageAlt ?? article.title}
-                    class="es-premium-card-image h-48 w-full object-cover"
+                    class="es-premium-card-image es-blog-story-cover h-48 w-full object-cover"
                     width="640" height="360" loading="lazy" decoding="async"
                   />
                 )}
