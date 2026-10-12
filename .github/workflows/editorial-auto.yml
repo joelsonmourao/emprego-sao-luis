@@ -21,7 +21,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: codex/admin-negocio-completo
+          ref: ${{ github.event_name == 'pull_request' && github.head_ref || 'codex/admin-negocio-completo' }}
           persist-credentials: true
       - uses: actions/setup-node@v4
         with:
