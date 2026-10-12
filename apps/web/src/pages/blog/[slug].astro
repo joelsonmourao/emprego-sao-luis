@@ -10,6 +10,7 @@ import {
 import { getEditorialPortalMode } from "../../lib/portal-modes";
 import { rewriteJobBoardLinksForPortal } from "../../lib/portal-content-rewrite";
 import { normalizeEditorialHtml } from "@es/shared";
+import { getEditorialContentOverride } from "../../data/editorial-content-overrides";
 const slug = Astro.params.slug ?? "";
 const portal = await getEditorialPortalMode();
 const seoFromLegacy = resolveSlLocalSeoSlug(slug);
@@ -27,16 +28,18 @@ if (!result) {
 }
 const { article, authorName } = result;
 const canonical = article.canonicalUrl || new URL(`/blog/${article.slug}`, Astro.site).toString();
-const normalizedHtml = normalizeEditorialHtml(article.contentHtml, { baseHeadingLevel: 2 });
+const editorialOverride = getEditorialContentOverride(article.slug);
+const normalizedHtml = normalizeEditorialHtml(editorialOverride?.contentHtml ?? article.contentHtml, { baseHeadingLevel: 2 });
 const contentHtml = portal.enabled ? rewriteJobBoardLinksForPortal(normalizedHtml) : normalizedHtml;
-const schema = { "@type": "Article", headline: article.title, description: article.excerpt, datePublished: article.publishedAt?.toISOString(), dateModified: article.updatedAt.toISOString(), author: { "@type": "Person", name: authorName }, mainEntityOfPage: canonical, ...(article.coverImageUrl ? { image: [article.coverImageUrl] } : {}), ...(article.sponsoredContent ? { isAccessibleForFree: true } : {}) };
+const dateModified = editorialOverride ? new Date(`${editorialOverride.reviewedAt}T12:00:00-03:00`).toISOString() : article.updatedAt.toISOString();
+const schema = { "@type": "Article", headline: article.title, description: article.excerpt, datePublished: article.publishedAt?.toISOString(), dateModified, author: { "@type": "Person", name: authorName }, mainEntityOfPage: canonical, ...(article.coverImageUrl ? { image: [article.coverImageUrl] } : {}), ...(article.sponsoredContent ? { isAccessibleForFree: true } : {}) };
 ---
 <BaseLayout title={article.seoTitle || article.title} description={article.metaDescription || article.excerpt} canonical={canonical} ogImage={article.ogImageUrl ?? article.coverImageUrl ?? undefined} breadcrumbs={[{ name: "Guias", url: "/blog" }, { name: article.title, url: `/blog/${article.slug}` }]} schemas={[schema]}>
   <article class="es-section bg-white"><div class="mx-auto max-w-3xl px-4">
     <Breadcrumbs items={[{ name: "Início", url: "/" }, { name: "Guias", url: "/blog" }, { name: article.title }]} />
     {article.sponsoredContent && <p class="mt-6 rounded-lg bg-amber-50 p-3 text-sm font-bold text-amber-950">Conteúdo patrocinado{article.sponsorshipDisclosure ? ` — ${article.sponsorshipDisclosure}` : ""}</p>}
     <p class="es-kicker mt-6">{article.type === "DATA_REPORT" ? "Relatório" : "Guia gratuito"}</p><h1 class="font-display mt-3 text-4xl font-black sm:text-5xl">{article.title}</h1>
-    {article.subtitle && <p class="mt-4 text-xl text-[var(--es-muted)]">{article.subtitle}</p>}<p class="mt-4 text-sm text-[var(--es-muted)]">Por {authorName} · {article.publishedAt?.toLocaleDateString("pt-BR")}</p>
+    {article.subtitle && <p class="mt-4 text-xl text-[var(--es-muted)]">{article.subtitle}</p>}<p class="mt-4 text-sm text-[var(--es-muted)]">Por {authorName} · {article.publishedAt?.toLocaleDateString("pt-BR")}{editorialOverride ? ` · Revisado em ${new Date(`${editorialOverride.reviewedAt}T12:00:00-03:00`).toLocaleDateString("pt-BR")}` : ""}</p>
     {article.coverImageUrl && <figure class="mt-8"><img src={article.coverImageUrl} alt={article.coverImageAlt ?? article.title} class="w-full rounded-2xl" width={article.coverImageWidth ?? undefined} height={article.coverImageHeight ?? undefined} /><figcaption class="mt-2 text-xs text-[var(--es-muted)]">{article.coverImageCaption}{article.coverImageCredit ? ` · ${article.coverImageCredit}` : ""}</figcaption></figure>}
     <div class="es-prose mt-8 max-w-none" set:html={contentHtml} />
     {article.sourceUrl && <p class="mt-8 text-sm">Fonte: <a class="underline" href={article.sourceUrl} rel="nofollow noopener">{article.sourceName ?? "fonte original"}</a></p>}
