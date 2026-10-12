@@ -6,8 +6,8 @@ import { findAutoEditorialArticle, listAutoEditorialArticles } from "./auto-edit
 const read = (p: string) => readFileSync(resolve(p), "utf8");
 
 describe("Agenda editorial automática com proteção contra publicação prematura", () => {
-  it("manifesto vazio não inventa publicações", () => {
-    expect(listAutoEditorialArticles()).toEqual([]);
+  it("manifesto não antecipa uma publicação antes do primeiro dia", () => {
+    expect(listAutoEditorialArticles(undefined, new Date("2026-10-12T12:00:00Z"))).toEqual([]);
     expect(findAutoEditorialArticle("inexistente")).toBeNull();
   });
   it("a agenda cobre os 80 dias e mantém três horários definidos", () => {
