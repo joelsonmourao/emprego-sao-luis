@@ -8,6 +8,8 @@ import {
 } from "@es/shared";
 import { getAdsenseReviewMode, sitemapCategoryAllowedInReview, staticPathAllowedInReview } from "./adsense-review-mode";
 import { getEditorialAuditReport } from "./editorial-audit";
+import { isEditorialReviewPending } from "../data/editorial-review-pending";
+import { getEditorialContentOverride } from "../data/editorial-content-overrides";
 import { classifyCategoryPage, classifyCityPage, classifyCompanyPage } from "./entity-page-quality";
 import { getRuntimeSiteUrl } from "./canonical-url";
 import {
@@ -193,7 +195,11 @@ export async function listSitemapEntries(
       ? new Set((await getEditorialAuditReport()).assessments.filter((item) => ["NOINDEX", "REVISAR MANUALMENTE"].includes(item.classification)).map((item) => item.article.slug))
       : new Set<string>();
     return dedupeEntries(
-      rows.filter((row) => !noindexSlugs.has(row.slug)).map((row) =>
+      rows.filter((row) => {
+        if (noindexSlugs.has(row.slug)) return false;
+        if (isEditorialReviewPending(row.type, row.slug)) return row.type !== "NEWS" && Boolean(getEditorialContentOverride(row.slug));
+        return true;
+      }).map((row) =>
         toEntry(
           `/${category === "news" ? "noticias" : "blog"}/${row.slug}`,
           row.updatedAt,
