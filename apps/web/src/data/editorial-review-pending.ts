@@ -1,7 +1,7 @@
 /**
  * Triagem DOCUMENTADA em 12/10/2026: 106 artigos públicos examinados.
  * 98 guias tinham múltiplos trechos repetitivos ou menos de 350 palavras.
- * 20 já receberam revisão substantiva; 78 permanecem acessíveis, mas fora do índice.
+ * 28 já receberam revisão substantiva; 70 permanecem acessíveis, mas fora do índice.
  * 5 notícias de julho/2026 ainda precisam de fontes factuais externas.
  * Não inventar data ou prova e não confundir este controle com aprovação Google.
  * Relatórios: reports/adsense-revisao-integral-parte-{1,2}.json
@@ -9,7 +9,6 @@
 export const EDITORIAL_REVIEW_DATE = "2026-10-12";
 
 export const guidesPendingReview = new Set<string>([
-  "abono-pecuniario-ferias-holerite",
   "agradecimento-pos-entrevista-mensagem",
   "alfabetizacao-digital-emprego-basico",
   "auxiliar-administrativo-vagas-sao-luis",
@@ -36,7 +35,6 @@ export const guidesPendingReview = new Set<string>([
   "esgotamento-busca-emprego-sinais",
   "excel-basico-vagas-emprego",
   "experiencia-informal-curriculo-como-colocar",
-  "ferias-clt-periodo-aquisitivo",
   "follow-up-apos-entrevista-mensagem",
   "freelancer-ou-clt-vantagens",
   "gap-habilidades-candidatura-como-fechar",
@@ -53,10 +51,8 @@ export const guidesPendingReview = new Set<string>([
   "networking-emprego-sao-luis",
   "o-que-vestir-entrevista-emprego",
   "pedir-feedback-entrevista-emprego",
-  "periodo-experiencia-clt-o-que-saber",
   "plano-90-dias-emprego-sao-luis",
   "plano-semanal-vagas-sao-luis",
-  "ponto-eletronico-atraso-trabalho",
   "portfolio-simples-candidato-emprego",
   "pretensao-salarial-entrevista-dicas",
   "primeira-semana-emprego-novo",
@@ -64,17 +60,13 @@ export const guidesPendingReview = new Set<string>([
   "referencias-profissionais-emprego",
   "rejeicao-processo-seletivo-como-reagir",
   "retorno-mercado-trabalho-gap-curriculo",
-  "retorno-trabalho-apos-maternidade",
   "saude-mental-trabalho-limites",
   "seguranca-candidatas-entrevista-emprego",
   "servicos-gerais-epi-vaga",
   "sindicato-trabalhador-direitos-basico",
   "soft-skills-hard-skills-curriculo",
   "teste-online-processo-seletivo-dicas",
-  "trabalhador-terceirizado-direitos",
-  "trabalhar-fim-de-semana-folga-adicional",
   "trabalho-hibrido-sao-luis-checklist",
-  "trabalho-noturno-adicional-o-que-perguntar",
   "transferencia-interna-emprego-como-pedir",
   "transporte-entrevista-emprego-sao-luis",
   "vaga-recepcionista-clinica-sao-luis",

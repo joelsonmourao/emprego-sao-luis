@@ -505,6 +505,159 @@ const overrides: Record<string, EditorialContentOverride> = {
 <p>Se houver coação, doença, acidente, estabilidade, gravidez, afastamento, acordo especial ou divergência relevante, procure o sindicato, assistência jurídica ou profissional habilitado antes de concluir. Esses elementos podem mudar a análise.</p>
 <p>Para organizar a mudança sem interromper sua busca, registre propostas reais no <a href="/ferramentas/controle-candidaturas">controle de candidaturas</a>. O Empregos São Luís não recebe cartas de demissão nem calcula verbas rescisórias.</p>
 `.trim()
+  },
+  "abono-pecuniario-ferias-holerite": {
+    reviewedAt: "2026-10-12",
+    contentHtml: `
+<p><strong>Revisão editorial: 12 de outubro de 2026.</strong> Abono pecuniário é a conversão em dinheiro de até um terço do período de férias a que o trabalhador tem direito. Não é a venda informal de dias decidida no corredor, nem significa trabalhar durante todas as férias. A escolha precisa ser documentada e comparada com a necessidade real de descanso.</p>
+<h2>O que a CLT estabelece</h2>
+<p>O artigo 143 da <a href="https://www.planalto.gov.br/ccivil_03/decreto-lei/del5452.htm" target="_blank" rel="noopener noreferrer">Consolidação das Leis do Trabalho</a> permite ao empregado converter um terço do período de férias em abono. O pedido deve ser feito até quinze dias antes do fim do período aquisitivo. Em férias coletivas, a conversão depende de acordo coletivo, não de pedidos individuais isolados.</p>
+<p>O artigo 145 prevê que a remuneração das férias e o abono solicitado sejam pagos até dois dias antes do início do descanso. Consulte sempre a versão atualizada da lei e o instrumento coletivo aplicável; este guia não calcula valores.</p>
+<h2>Como decidir sem olhar apenas o dinheiro</h2>
+<p>Primeiro confirme quantos dias de férias constam do aviso. Depois simule a rotina com menos dias de repouso. O abono pode ajudar em uma despesa planejada, mas não substitui a recuperação física e mental. Pressão da empresa para converter dias ou promessa verbal de pagamento são sinais para pedir esclarecimento formal.</p>
+<p><strong>Exemplo ilustrativo:</strong> uma atendente recebe aviso de trinta dias de férias e avalia converter dez. Antes de decidir, verifica a data-limite do pedido, o período efetivo de descanso e como as rubricas aparecerão no recibo. Ela não assina documento retroativo nem trabalha nos dias registrados como férias.</p>
+<h2>Documentos para conferir</h2>
+<ol><li>Data de admissão e término do período aquisitivo.</li><li>Pedido de abono com data e comprovante de recebimento.</li><li>Aviso de férias com início e fim do descanso.</li><li>Recibo de férias e comprovante do pagamento.</li><li>Holerite da competência, observando rubricas separadas.</li></ol>
+<p>Os nomes das rubricas variam entre sistemas. Peça ao RH a memória de cálculo quando não entender a separação entre remuneração de férias, adicional constitucional e abono. Não conclua que houve erro apenas porque a folha usa uma sigla interna.</p>
+<h2>Perguntas objetivas ao RH</h2>
+<ul><li>Qual é a data final para protocolar o pedido neste período?</li><li>Quantos dias de descanso e quantos dias de abono constarão do aviso?</li><li>Quando o pagamento será feito e onde ficará o recibo?</li><li>Existe férias coletiva ou regra prevista em instrumento coletivo?</li><li>Quem corrige divergência entre aviso, recibo e depósito?</li></ul>
+<p>Guarde cópias fora do aparelho corporativo, sem divulgar CPF, conta bancária ou holerite completo. Se houver pressão, documento retroativo ou divergência persistente, procure sindicato, inspeção do trabalho ou orientação jurídica individual. Para entender o ciclo anterior ao pedido, leia também o guia sobre <a href="/blog/ferias-clt-periodo-aquisitivo">período aquisitivo de férias</a>.</p>
+`.trim()
+  },
+  "ferias-clt-periodo-aquisitivo": {
+    reviewedAt: "2026-10-12",
+    contentHtml: `
+<p><strong>Revisão editorial: 12 de outubro de 2026.</strong> Período aquisitivo é o intervalo usado para formar o direito às férias; período concessivo é o prazo seguinte em que o empregador deve concedê-las. Saber essa diferença evita confundir aniversário do contrato com escolha automática da data de descanso.</p>
+<h2>Localize o ciclo no seu vínculo</h2>
+<p>O artigo 130 da <a href="https://www.planalto.gov.br/ccivil_03/decreto-lei/del5452.htm" target="_blank" rel="noopener noreferrer">CLT</a> começa pela regra de que, após cada período de doze meses de vigência do contrato, o empregado adquire direito às férias. A própria lei trata de quantidade de dias, faltas injustificadas, concessão, comunicação e pagamento. Leia o texto atualizado e não use tabela sem fonte para decidir um caso individual.</p>
+<p>A data de admissão ajuda a identificar o primeiro ciclo, mas afastamentos, faltas e outras situações podem alterar a análise. Confirme o histórico com RH e documentos antes de concluir que a empresa atrasou ou que determinado número de dias está garantido.</p>
+<h2>O que perguntar na admissão</h2>
+<ul><li>Como a empresa solicita preferências de data?</li><li>Com quanta antecedência comunica o período concedido?</li><li>Há férias coletivas em alguma unidade ou época?</li><li>Onde ficam o aviso, o recibo e o histórico de períodos?</li><li>Qual canal deve ser usado para corrigir datas divergentes?</li></ul>
+<p>Essas perguntas organizam expectativa; não transformam a preferência do empregado em confirmação. A concessão segue a regra legal, o planejamento da empresa e, quando aplicável, instrumentos coletivos.</p>
+<h2>Monte uma linha do tempo</h2>
+<p><strong>Exemplo ilustrativo:</strong> uma pessoa admitida em 8 de agosto marca essa data como início do primeiro ciclo e registra cada documento recebido. Quando o sistema mostra outra data, ela não altera o cadastro por conta própria: envia ao RH o contrato, a tela e uma pergunta objetiva sobre a base usada.</p>
+<ol><li>Anote admissão e eventuais interrupções relevantes.</li><li>Separe avisos de férias por período, sem misturar anos.</li><li>Confira início, fim e quantidade de dias no aviso.</li><li>Compare recibo e depósito antes do descanso.</li><li>Guarde confirmação de retorno e eventual alteração.</li></ol>
+<h2>Férias coletivas e fracionamento</h2>
+<p>A CLT possui regras próprias para férias coletivas e para divisão do período. Não presuma que uma prática de outra empresa se aplica ao seu vínculo. Se houver instrumento coletivo, localize o documento oficial no serviço <a href="https://www.gov.br/pt-br/servicos/consultar-instrumento-coletivo-de-trabalho" target="_blank" rel="noopener noreferrer">Consultar Instrumento Coletivo de Trabalho</a>, conferindo categoria, partes, território e vigência.</p>
+<h2>Se as datas não fecharem</h2>
+<p>Peça por escrito a indicação do período aquisitivo, do período programado e do documento que sustenta eventual ajuste. Não assine aviso com data que não corresponde ao que recebeu sem pedir correção. Também não publique recibos com matrícula, CPF ou dados bancários.</p>
+<p>Este guia não calcula indenização nem determina a validade de uma concessão. Em caso de atraso, afastamento, rescisão ou divergência relevante, leve contrato, avisos e recibos ao sindicato, à inspeção do trabalho ou a profissional habilitado. Se considerar converter parte do descanso, consulte o guia de <a href="/blog/abono-pecuniario-ferias-holerite">abono pecuniário</a> antes de protocolar o pedido.</p>
+`.trim()
+  },
+  "periodo-experiencia-clt-o-que-saber": {
+    reviewedAt: "2026-10-12",
+    contentHtml: `
+<p><strong>Revisão editorial: 12 de outubro de 2026.</strong> Contrato de experiência é um contrato por prazo determinado usado para que empresa e trabalhador avaliem a relação. Ele não cria um período sem registro, sem salário ou sem regras. As condições essenciais precisam estar claras desde o início.</p>
+<h2>Limite legal e documento</h2>
+<p>O parágrafo único do artigo 445 da <a href="https://www.planalto.gov.br/ccivil_03/decreto-lei/del5452.htm" target="_blank" rel="noopener noreferrer">CLT</a> determina que o contrato de experiência não pode exceder noventa dias. O documento deve permitir identificar início, término e condições pactuadas. Prazo menor pode existir; o limite de noventa dias não autoriza renovações indefinidas.</p>
+<p>Não aceite “alguns dias de teste” trabalhando normalmente sem registro e sem definição de pagamento. Processo seletivo, prova prática e contrato de trabalho não são a mesma coisa; quando houver prestação de trabalho real, procure orientação se o vínculo estiver disfarçado.</p>
+<h2>Checklist antes de assinar</h2>
+<ol><li>Leia datas de início e término e peça uma via.</li><li>Confira cargo, unidade, jornada, intervalo, salário e benefícios.</li><li>Pergunte como será comunicada eventual prorrogação dentro do limite legal.</li><li>Entenda quais tarefas e critérios serão observados.</li><li>Confirme o canal para ponto, atestado, segurança e dúvidas.</li></ol>
+<p><strong>Exemplo ilustrativo:</strong> uma auxiliar recebe contrato de quarenta e cinco dias, com possibilidade de prorrogação. Ela anota a data final, guarda a via assinada e pede que qualquer extensão seja formalizada antes do vencimento. Não se orienta apenas por “depois o RH renova”.</p>
+<h2>A empresa também está sendo avaliada</h2>
+<p>Observe se a escala corresponde à proposta, se há treinamento para tarefas e equipamentos, se o ponto registra a jornada efetiva e se pagamentos e benefícios chegam como combinado. Registre dúvidas por canal oficial. Cobrar clareza não significa recusar avaliação de desempenho.</p>
+<p>Acompanhe o vínculo na <a href="https://www.gov.br/pt-br/servicos/obter-a-carteira-de-trabalho" target="_blank" rel="noopener noreferrer">Carteira de Trabalho Digital</a>, lembrando que a atualização depende das informações transmitidas pelo empregador e pode não ser instantânea. Divergência deve ser comunicada com documentos, não corrigida por aplicativos de terceiros.</p>
+<h2>No encerramento</h2>
+<p>O término na data prevista, a saída antecipada e a continuidade após o prazo podem produzir efeitos diferentes. Não aplique uma tabela genérica para calcular verbas. Peça termo, recibos, comprovantes e explicação das rubricas. Se houver cláusula sobre rescisão antecipada, leia antes de decidir sair.</p>
+<ul><li>Não pague taxa para “efetivação”.</li><li>Não entregue senha da conta gov.br.</li><li>Não assine documento em branco ou retroativo.</li><li>Não devolva uniforme ou equipamento sem recibo.</li><li>Não presuma que o silêncio significa prorrogação.</li></ul>
+<p>Se o prazo ultrapassar noventa dias, os documentos não coincidirem ou houver trabalho sem registro, procure sindicato, inspeção do trabalho ou orientação jurídica. Para conferir a rotina já iniciada, use também o guia de <a href="/blog/ponto-eletronico-atraso-trabalho">registro de ponto</a>.</p>
+`.trim()
+  },
+  "ponto-eletronico-atraso-trabalho": {
+    reviewedAt: "2026-10-12",
+    contentHtml: `
+<p><strong>Revisão editorial: 12 de outubro de 2026.</strong> Registro de ponto deve refletir a jornada realmente cumprida. Atraso, falha de equipamento e ajuste manual são situações diferentes. Pedir que um colega registre por você ou alterar horário para “fechar a folha” transforma uma dúvida simples em problema de confiabilidade.</p>
+<h2>O que a CLT diz sobre pequenas variações</h2>
+<p>O artigo 58, §1º, da <a href="https://www.planalto.gov.br/ccivil_03/decreto-lei/del5452.htm" target="_blank" rel="noopener noreferrer">CLT</a> estabelece que variações de até cinco minutos em cada marcação, observado o máximo de dez minutos diários, não são descontadas nem computadas como jornada extraordinária. Isso não é autorização para atrasar todos os dias: trata-se do tratamento da marcação para cálculo da jornada, enquanto assiduidade e disciplina seguem regras próprias e proporcionais.</p>
+<p>O artigo 74 determina registro de entrada e saída para estabelecimentos com mais de vinte trabalhadores. A marcação por exceção depende de acordo individual escrito, convenção ou acordo coletivo. O empregado deve saber qual sistema se aplica, sem assumir que toda empresa usa relógio eletrônico.</p>
+<h2>Quando o equipamento falha</h2>
+<ol><li>Registre a tentativa ou a mensagem de erro sem manipular a tela.</li><li>Avise imediatamente o canal indicado pelo RH.</li><li>Informe horário real e motivo do ajuste.</li><li>Confira o espelho antes do fechamento.</li><li>Guarde protocolo e resposta.</li></ol>
+<p><strong>Exemplo ilustrativo:</strong> ao chegar para a abertura de uma loja, a funcionária encontra o terminal fora do ar. Ela fotografa apenas a mensagem do equipamento, sem dados de colegas, avisa a liderança e solicita ajuste com o horário efetivo. Não pede ao próximo turno que bata o ponto em seu lugar.</p>
+<h2>Planeje o deslocamento sem inventar justificativa</h2>
+<p>Chuva, obras e mudança de linha podem afetar o trajeto em São Luís, mas o mapa consultado fora do horário da escala não mede toda a rotina. Teste o caminho no período real, identifique alternativa e avise assim que perceber que não chegará no horário. Uma justificativa pode explicar o fato; não apaga automaticamente o registro.</p>
+<p>Use a <a href="/ferramentas/custo-deslocamento">calculadora de custo de deslocamento</a> com tarifas informadas por você e separe custo de tempo. Para escala noturna, confirme transporte e segurança antes do aceite.</p>
+<h2>Como contestar um espelho</h2>
+<p>Indique data, marcação exibida, horário que você afirma ter cumprido e documento de apoio. Evite acusação genérica. Uma mensagem objetiva permite localizar o evento: “No dia 14, o sistema mostra saída às 18h, mas permaneci até 18h35 por solicitação registrada no chamado X. Como solicito a correção?”</p>
+<ul><li>Não assine espelho que não conferiu.</li><li>Não compartilhe senha ou biometria.</li><li>Não registre jornada de outra pessoa.</li><li>Não apague comprovantes após a correção.</li><li>Não publique tela com nomes e matrículas de colegas.</li></ul>
+<p>Se ajustes são recorrentes, negados sem explicação ou não correspondem à jornada, reúna espelhos, escalas e holerites e procure RH, sindicato, inspeção do trabalho ou orientação jurídica. O guia de <a href="/blog/hora-extra-holerite-como-conferir">horas extras no holerite</a> ajuda a comparar documentos do mesmo período.</p>
+`.trim()
+  },
+  "trabalhador-terceirizado-direitos": {
+    reviewedAt: "2026-10-12",
+    contentHtml: `
+<p><strong>Revisão editorial: 12 de outubro de 2026.</strong> Na terceirização, a empresa prestadora contrata e remunera os trabalhadores; a contratante recebe o serviço definido em contrato. Trabalhar dentro da unidade da contratante ou usar crachá de acesso não muda sozinho quem é o empregador formal.</p>
+<h2>Identifique as duas empresas</h2>
+<p>A <a href="https://www.planalto.gov.br/ccivil_03/leis/l6019.htm" target="_blank" rel="noopener noreferrer">Lei nº 6.019/1974</a> define a empresa prestadora e a contratante. O contrato de trabalho, o registro na Carteira de Trabalho Digital e o holerite devem ajudar a identificar a prestadora. A contratante não pode utilizar os trabalhadores em atividades diferentes das que foram objeto do contrato de prestação.</p>
+<p>Anote razão social, CNPJ, endereço e canais de RH da prestadora, além do responsável operacional no local da contratante. Nomes de fantasia parecidos e uniformes não bastam para localizar quem assina documentos.</p>
+<h2>Responsabilidades que precisam estar claras</h2>
+<p>A lei atribui à contratante a responsabilidade por garantir condições de segurança, higiene e salubridade quando o trabalho é realizado em suas dependências ou em local previamente convencionado. Ela também prevê responsabilidade subsidiária pelas obrigações trabalhistas referentes ao período da prestação. Esses termos têm aplicação jurídica própria; diante de inadimplemento, não escolha sozinho quem processar ou como cobrar.</p>
+<p><strong>Exemplo ilustrativo:</strong> uma auxiliar de limpeza presta serviço em um hospital de São Luís. O holerite é emitido pela prestadora, mas o local deve oferecer condições seguras para a atividade. Se falta equipamento ou treinamento, ela comunica imediatamente os responsáveis indicados pelas duas empresas e guarda protocolos.</p>
+<h2>Perguntas antes de iniciar</h2>
+<ul><li>Qual empresa assinará o contrato e fará os pagamentos?</li><li>Quem recebe atestado, pedido de férias e dúvida sobre holerite?</li><li>Quem orienta tarefas, acesso e segurança no posto?</li><li>O trabalho ocorrerá em uma ou mais unidades?</li><li>Como será comunicada troca de posto ou de horário?</li><li>Qual canal usar se a prestadora não responder?</li></ul>
+<h2>Guarde documentos por empresa e período</h2>
+<p>Separe contrato, holerites, ponto, escalas, avisos, treinamentos, recibos de equipamentos e mensagens oficiais. Ao relatar problema, diga qual empresa, posto, data e tarefa estão envolvidos. Não envie prontuário, dados de clientes ou documento sigiloso da contratante para provar a presença no local.</p>
+<p>Acompanhe o vínculo no serviço oficial da <a href="https://www.gov.br/pt-br/servicos/obter-a-carteira-de-trabalho" target="_blank" rel="noopener noreferrer">Carteira de Trabalho Digital</a>. Desconfie de cobrança para liberar uniforme, vaga ou cadastro e não compartilhe senha gov.br.</p>
+<h2>Quando houver troca de prestadora</h2>
+<p>Uma mudança anunciada no posto não explica automaticamente o que acontecerá com o contrato atual. Peça comunicação formal sobre data, rescisão, devolução de materiais e eventual novo processo de admissão. Não assine pedido de demissão ou documento em branco para “facilitar a troca”.</p>
+<p>Atraso de salário, falta de segurança, rescisão ou continuidade do serviço exigem análise dos fatos e contratos. Leve documentos ao sindicato, à inspeção do trabalho ou a profissional habilitado. Este guia organiza perguntas; não determina responsabilidade em um caso concreto.</p>
+`.trim()
+  },
+  "trabalhar-fim-de-semana-folga-adicional": {
+    reviewedAt: "2026-10-12",
+    contentHtml: `
+<p><strong>Revisão editorial: 12 de outubro de 2026.</strong> Trabalhar no sábado ou no domingo não gera, por si só, um adicional chamado “de fim de semana”. O resultado depende da jornada contratual, do repouso semanal, de feriados, de horas extras e do instrumento coletivo. Misturar essas categorias produz cálculo errado.</p>
+<h2>Repouso semanal não é a mesma coisa que feriado</h2>
+<p>A <a href="https://www.planalto.gov.br/ccivil_03/leis/l0605.htm" target="_blank" rel="noopener noreferrer">Lei nº 605/1949</a> assegura repouso semanal remunerado de vinte e quatro horas consecutivas, preferencialmente aos domingos. A mesma lei trata separadamente do trabalho em feriados e prevê pagamento em dobro, salvo concessão de outro dia de folga. Não conclua que todo domingo será pago em dobro nem que uma folga compensa qualquer situação.</p>
+<p>A <a href="https://www.planalto.gov.br/ccivil_03/decreto-lei/del5452.htm" target="_blank" rel="noopener noreferrer">CLT</a> reúne regras gerais sobre jornada e descanso. Categoria, atividade e convenção coletiva podem acrescentar escalas, folgas e adicionais específicos.</p>
+<h2>Transforme a escala em calendário</h2>
+<ol><li>Marque cada dia de trabalho e horário completo.</li><li>Identifique o repouso de vinte e quatro horas.</li><li>Separe domingos de feriados oficiais.</li><li>Registre trocas de folga e quem autorizou.</li><li>Compare com ponto, holerite e banco de horas.</li></ol>
+<p><strong>Exemplo ilustrativo:</strong> um atendente trabalha no domingo e descansa na terça-feira. Antes de exigir “adicional de domingo”, ele verifica a escala, o repouso concedido, a existência de feriado e a convenção da categoria. Se trabalhou em feriado sem folga compensatória, registra o dia de forma separada para pedir a memória de cálculo.</p>
+<h2>Perguntas na entrevista</h2>
+<ul><li>A folga é fixa ou rotativa?</li><li>Com quanta antecedência a escala é divulgada?</li><li>Como funcionam domingos e feriados?</li><li>Existe acordo coletivo ou convenção aplicável?</li><li>Como horas além da escala são registradas?</li><li>Qual o horário real de saída e o transporte disponível?</li></ul>
+<p>Para localizar o instrumento registrado, use o serviço oficial <a href="https://www.gov.br/pt-br/servicos/consultar-instrumento-coletivo-de-trabalho" target="_blank" rel="noopener noreferrer">Consultar Instrumento Coletivo de Trabalho</a>. Confira sindicato, empresa ou categoria, município, vigência e eventuais aditivos.</p>
+<h2>Deslocamento também entra na decisão</h2>
+<p>Uma saída no fechamento de shopping, restaurante ou hotel pode exigir rota diferente da usada durante o dia. Teste o trajeto no horário da escala e confirme como chegar e voltar com segurança. A <a href="/ferramentas/custo-deslocamento">calculadora de deslocamento</a> usa a tarifa e o número de viagens inseridos por você; ela não presume preço nem benefício.</p>
+<p>Se a escala muda sem registro, o repouso não aparece ou o holerite não explica feriado e hora extra, peça esclarecimento por escrito. Leve calendário, ponto, holerite e instrumento coletivo ao sindicato, à inspeção do trabalho ou a profissional habilitado. Este texto não calcula adicional e não substitui análise jurídica.</p>
+`.trim()
+  },
+  "trabalho-noturno-adicional-o-que-perguntar": {
+    reviewedAt: "2026-10-12",
+    contentHtml: `
+<p><strong>Revisão editorial: 12 de outubro de 2026.</strong> Trabalho noturno altera cálculo da jornada e também sono, transporte, alimentação e convivência familiar. Antes de aceitar, peça horário completo e condições práticas; a expressão “turno da noite” não informa quando começa, termina ou como será pago.</p>
+<h2>Regra urbana da CLT</h2>
+<p>O artigo 73 da <a href="https://www.planalto.gov.br/ccivil_03/decreto-lei/del5452.htm" target="_blank" rel="noopener noreferrer">CLT</a> considera noturno, para trabalho urbano, o período entre 22h e 5h. A remuneração tem acréscimo de pelo menos vinte por cento e a hora noturna é computada como cinquenta e dois minutos e trinta segundos. A lei também trata de horários mistos e da prorrogação do trabalho noturno.</p>
+<p>Essas regras não devem ser copiadas automaticamente para trabalho rural ou situações com disciplina própria. Norma coletiva pode trazer condições adicionais. Consulte a legislação atualizada e o instrumento aplicável.</p>
+<h2>Peça uma escala completa</h2>
+<ul><li>Hora de entrada, saída e intervalo.</li><li>Dias trabalhados, folgas e rotação.</li><li>Trechos que atravessam 22h ou 5h.</li><li>Rubrica do adicional no holerite.</li><li>Transporte no início e no fim do turno.</li><li>Refeição, local de descanso e protocolo de segurança.</li></ul>
+<p><strong>Exemplo ilustrativo:</strong> uma recepcionista recebe proposta das 21h às 5h20. Ela pede que o RH explique quais horas entram no período noturno, como o intervalo aparece no ponto e se há transporte após a saída. Não calcula o salário final apenas multiplicando horas do relógio, porque a hora reduzida e outras regras precisam estar na memória de cálculo.</p>
+<h2>Compare quatro documentos</h2>
+<p>Use contrato, escala, espelho de ponto e holerite do mesmo período. Marque plantões trocados e extensões após 5h. Pergunte por escrito sobre rubricas que não reconhece e guarde a resposta. Para norma coletiva, consulte o serviço <a href="https://www.gov.br/pt-br/servicos/consultar-instrumento-coletivo-de-trabalho" target="_blank" rel="noopener noreferrer">Consultar Instrumento Coletivo de Trabalho</a>.</p>
+<h2>Proteja o sono e o trajeto</h2>
+<p>Verifique se consegue manter período regular de descanso em ambiente escuro e silencioso. Planeje refeições e evite dirigir ou operar equipamento se estiver sonolento. Se a mudança de turno produzir sintomas persistentes, procure atendimento de saúde; um artigo não substitui avaliação clínica.</p>
+<p>Em São Luís, confirme a rota exatamente no horário de saída. Não presuma que a linha usada durante o dia circula na madrugada. Use a <a href="/ferramentas/custo-deslocamento">calculadora de deslocamento</a> com os valores que você verificou e considere alternativa segura para falhas do transporte.</p>
+<h2>Sinais de informação incompleta</h2>
+<ul><li>O anúncio diz apenas “disponibilidade total”.</li><li>O adicional é prometido sem explicar a jornada.</li><li>A saída varia sem escala ou ponto.</li><li>A troca de plantão ocorre só por mensagem informal.</li><li>Não há orientação sobre emergência e trabalho isolado.</li></ul>
+<p>Esses sinais pedem esclarecimento, não provam irregularidade por si mesmos. Se ponto e holerite divergirem ou houver risco à saúde e segurança, reúna documentos e procure RH, sindicato, inspeção do trabalho ou orientação profissional.</p>
+`.trim()
+  },
+  "retorno-trabalho-apos-maternidade": {
+    reviewedAt: "2026-10-12",
+    contentHtml: `
+<p><strong>Revisão editorial: 12 de outubro de 2026.</strong> Voltar ao emprego após licença-maternidade e retomar a busca por trabalho são situações diferentes. Em ambas, maternidade não precisa ser tratada como culpa nem como informação a ser escondida; o foco deve ser o que a pessoa precisa para exercer a função com segurança e quais direitos se aplicam ao vínculo.</p>
+<h2>Se o retorno é ao mesmo emprego</h2>
+<p>Antes da data prevista, confirme por canal oficial o dia, horário, unidade, escala e eventual exame ocupacional. Peça orientação sobre acesso, ponto e mudanças ocorridas durante a licença. Não assine pedido de demissão ou alteração contratual que não compreendeu.</p>
+<p>O artigo 396 da <a href="https://www.planalto.gov.br/ccivil_03/decreto-lei/del5452.htm" target="_blank" rel="noopener noreferrer">CLT</a> prevê, até que a criança complete seis meses, dois descansos especiais de meia hora durante a jornada para amamentação, inclusive em caso de adoção. Os horários devem ser definidos em acordo individual entre a mulher e o empregador, e o período pode ser ampliado quando a saúde do filho exigir.</p>
+<p>A proteção à maternidade também aparece na <a href="https://www.planalto.gov.br/ccivil_03/constituicao/constituicao.htm" target="_blank" rel="noopener noreferrer">Constituição Federal e no ADCT</a>. Estabilidade, afastamento, adoção, saúde e situação contratual exigem leitura do caso concreto; não use um resumo para calcular datas ou decidir uma rescisão.</p>
+<h2>Converse sobre logística sem expor a criança</h2>
+<p><strong>Exemplo ilustrativo:</strong> uma trabalhadora retorna a uma loja com escala rotativa. Ela solicita por escrito a definição dos intervalos do artigo 396 e confirma quem pode ajustar o ponto. Não precisa enviar fotografia, certidão ou informação médica além do documento necessário ao procedimento formal.</p>
+<ul><li>Quem confirma a escala da primeira semana?</li><li>Como serão registrados os descansos especiais?</li><li>Existe local apropriado e orientação interna?</li><li>Qual canal atende necessidade de saúde ou adaptação?</li><li>Como comunicar emergência familiar sem divulgar dados em grupo?</li></ul>
+<h2>Se o objetivo é voltar ao mercado</h2>
+<p>No currículo, descreva experiências, tarefas e resultados verdadeiros. Uma pausa pode ser indicada de forma breve quando necessário para tornar a cronologia compreensível, mas não invente trabalho informal, curso ou cargo para preencher datas. Na entrevista, responda sobre disponibilidade real e condições da vaga; detalhes íntimos da criança não demonstram competência.</p>
+<p>Atualize telefone, e-mail e acesso à <a href="https://www.gov.br/pt-br/servicos/obter-a-carteira-de-trabalho" target="_blank" rel="noopener noreferrer">Carteira de Trabalho Digital</a>. Pesquise jornada, unidade e deslocamento antes de candidatar. A <a href="/ferramentas/custo-deslocamento">calculadora de deslocamento</a> ajuda a comparar propostas com valores informados por você.</p>
+<h2>Planeje uma primeira semana realista</h2>
+<ol><li>Teste o trajeto no horário efetivo.</li><li>Defina contatos de emergência e limites de compartilhamento.</li><li>Revise documentos e acessos necessários ao trabalho.</li><li>Reserve margem para adaptação da rotina.</li><li>Registre qualquer combinação relevante com o RH.</li></ol>
+<p>Se houver pressão para pedir demissão, discriminação, recusa de direito, risco à saúde ou divergência sobre estabilidade, preserve mensagens e documentos e procure sindicato, inspeção do trabalho, assistência jurídica ou profissional habilitado. Este guia oferece organização prática; não substitui avaliação jurídica ou médica.</p>
+`.trim()
   }
 };
 
