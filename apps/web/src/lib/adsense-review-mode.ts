@@ -69,6 +69,7 @@ const REVIEW_INDEXABLE_EXACT = new Set([
   "/",
   "/blog",
   "/noticias",
+  "/ferramentas/controle-candidaturas",
   "/sobre",
   "/quem-somos",
   "/contato",
