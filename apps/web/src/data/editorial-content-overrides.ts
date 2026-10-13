@@ -1606,6 +1606,200 @@ const overrides: Record<string, EditorialContentOverride> = {
 <p>Guarde confirmação, data e contato de suporte. Não publique perguntas ou respostas. Registre quais competências apareceram e prepare exemplos verdadeiros para a entrevista. Se não avançar, o resultado não revela sozinho o motivo; evite inventar explicações sobre algoritmo ou nota de corte.</p>
 <p>A preparação correta reduz falhas evitáveis, mas não garante aprovação. Segurança, honestidade e respeito às regras preservam a candidatura e os seus dados.</p>
     `.trim()
+  },
+
+  "como-usar-empregos-sao-luis": {
+    reviewedAt: "2026-10-12",
+    contentHtml: `
+<p><strong>Revisão editorial: 12 de outubro de 2026.</strong> O Empregos São Luís é um ponto de pesquisa e orientação, não a empresa contratante. Usar o portal com segurança significa localizar uma oportunidade, conferir os requisitos e seguir apenas o canal de candidatura indicado. Nenhum anúncio, filtro ou cadastro garante entrevista.</p>
+<h2>Comece pelo cargo e pela rotina possível</h2>
+<p>Pesquise o nome da função e variações próximas, como “auxiliar administrativo” e “assistente administrativo”. Antes de abrir o anúncio, defina os bairros ou municípios que consegue alcançar, os turnos disponíveis e o tipo de atividade que sabe explicar. O filtro reduz ruído; ele não confirma que você atende a todos os requisitos.</p>
+<p>Leia a página inteira. Separe requisitos obrigatórios, itens desejáveis, horário, local informado, atividades e forma de candidatura. Se o anúncio não traz dado essencial, não complete com suposição. Guarde a URL e a data da consulta porque uma vaga pode ser alterada ou encerrada.</p>
+<h2>Confira o canal antes de enviar dados</h2>
+<p>O botão pode encaminhar para site, formulário, e-mail ou WhatsApp informado pelo anunciante. Compare empresa, cargo e endereço do destino com o texto que você acabou de ler. Se houver divergência, pare e procure o canal institucional da organização. Não pague taxa para liberar entrevista, prioridade ou material.</p>
+<p>A <a href="https://cartilha.cert.br/fasciculos/" target="_blank" rel="noopener noreferrer">Cartilha de Segurança para Internet do CERT.br</a> oferece orientações sobre phishing, senhas, autenticação e privacidade. Nunca forneça senha, código recebido por SMS ou controle remoto do aparelho. Documento pessoal só deve ser enviado quando houver motivo claro e destinatário confirmado.</p>
+<h2>Use também o serviço público de emprego</h2>
+<p>Não dependa de uma única fonte. O serviço federal <a href="https://www.gov.br/pt-br/servicos/buscar-emprego-no-sistema-nacional-de-emprego-sine" target="_blank" rel="noopener noreferrer">Buscar Emprego no SINE</a> explica que o trabalhador pode consultar vagas pelo Portal Emprega Brasil, pelo aplicativo da Carteira de Trabalho Digital ou em postos da rede. Consulte diretamente o serviço oficial e mantenha os dados atualizados.</p>
+<p>No portal Empregos São Luís, volte à busca depois de concluir uma candidatura, em vez de enviar o mesmo currículo para tudo. Uma vaga de atendimento e outra de estoque podem exigir versões diferentes do resumo e da ordem das experiências, sem mudar fatos.</p>
+<h2>Registre o que realmente aconteceu</h2>
+<p>Use o <a href="/ferramentas/controle-candidaturas">controle de candidaturas</a> ou uma planilha própria com cargo, empresa, URL, data, canal, versão do currículo e próximo passo. Não registre CPF, RG, senha ou dados bancários. Marque “enviado” somente depois de receber confirmação do formulário, e-mail ou aplicativo.</p>
+<p>Exemplo hipotético: uma candidata encontra vaga de recepção com turno incompatível. Ela não envia “para ver no que dá”; registra o motivo e procura outra escala. Em outra vaga compatível, adapta o resumo, confirma o domínio do formulário e salva a confirmação. O método reduz repetição e evita follow-up para processo errado.</p>
+<p>Se o portal não mostra oportunidade compatível, o resultado correto naquele momento é zero candidatura. Não use filtro amplo para transformar qualquer anúncio em opção. Revise palavras-chave, consulte novamente em outro dia e mantenha outras fontes oficiais. Uma busca sem resultado não autoriza copiar contato de postagem encerrada nem enviar currículo a número que não foi publicado para recrutamento.</p>
+<h2>Quando desconfiar</h2>
+<ul><li>cobrança para participar ou receber treinamento obrigatório antes da contratação;</li><li>pedido de senha, código de autenticação ou acesso ao celular;</li><li>empresa e cargo diferentes no link de destino;</li><li>pressão para enviar documento sensível antes de explicar a etapa;</li><li>promessa de contratação sem entrevista, análise ou identificação verificável.</li></ul>
+<p>Se encontrar risco, não prossiga. Consulte a página de <a href="/seguranca">segurança do candidato</a> e confirme a empresa por endereço digitado por você. O portal ajuda a organizar a busca; a decisão segura continua dependendo da leitura do anúncio e da verificação do canal.</p>
+    `.trim()
+  },
+
+  "vagas-vendedor-loja-comissao-dicas": {
+    reviewedAt: "2026-10-12",
+    contentHtml: `
+<p><strong>Revisão editorial: 12 de outubro de 2026.</strong> Uma vaga de vendas pode combinar salário fixo, comissão, prêmio e benefícios. Esses itens não significam a mesma coisa. Antes de comparar propostas, peça a regra escrita e faça uma simulação com valores hipotéticos; não trate o melhor mês de alguém como renda garantida.</p>
+<h2>Separe as partes da remuneração</h2>
+<p>Anote salário-base, percentual ou faixa de comissão, produto sobre o qual o cálculo incide, momento de apuração, data de pagamento e possíveis ajustes por cancelamento ou devolução. Pergunte se a comissão é individual, por equipe, por loja ou por meta. “Até determinado valor” não informa a média nem o mínimo.</p>
+<p>O texto oficial da <a href="https://www.planalto.gov.br/ccivil_03/decreto-lei/del5452.htm" target="_blank" rel="noopener noreferrer">Consolidação das Leis do Trabalho</a>, no artigo 457, inclui as comissões pagas pelo empregador na remuneração do empregado. Isso não permite calcular uma proposta sem conhecer contrato, política comercial e instrumento coletivo. Em dúvida sobre reflexos ou descontos, busque orientação profissional ou sindical.</p>
+<h2>Monte três cenários sem inventar histórico</h2>
+<p>Peça um exemplo de cálculo com regra e período identificados. Depois, simule um mês abaixo da meta, um mês na meta e um acima. Use números fictícios ou dados que a empresa forneceu formalmente. Inclua transporte, alimentação, jornada, domingos e feriados ao comparar duas vagas.</p>
+<p>Exemplo hipotético: a comissão incide apenas sobre vendas faturadas e pode ser ajustada quando há cancelamento. A candidata registra as perguntas, mas não afirma quanto receberá até saber a base, o percentual e o fechamento. Se a empresa não explica a política antes da contratação, ela trata a incerteza como risco, não como promessa.</p>
+<h2>Perguntas objetivas para a entrevista</h2>
+<ul><li>Qual é o salário-base e qual parte depende de resultado?</li><li>Como a comissão é calculada e quando é paga?</li><li>A meta é individual, coletiva ou acumulada?</li><li>Como trocas, devoluções e cancelamentos entram no cálculo?</li><li>Há treinamento, período de adaptação e acompanhamento?</li><li>Qual é a escala real, inclusive fins de semana e feriados?</li></ul>
+<p>Evite perguntar pelo “máximo que alguém já ganhou” como única referência. Prefira regra, faixa, período e quantidade de pessoas que alcançam a meta, caso a empresa possa informar. Não publique planilha interna, ranking ou dados de colegas.</p>
+<h2>Prepare exemplos de venda responsável</h2>
+<p>Na entrevista, descreva uma situação real: como identificou a necessidade, apresentou opção, respondeu dúvida e registrou o atendimento. Não invente percentual de conversão ou carteira de clientes. Se a experiência foi informal, diga onde ocorreu e quais tarefas você realizou.</p>
+<p>Uma boa resposta não precisa defender pressão agressiva. Pode mostrar escuta, conhecimento do produto, conferência de preço e encaminhamento de reclamação. Para cargo sem experiência, crie uma simulação transparente: atendimento fictício, comparação de duas opções e fechamento sem prometer o que o produto não entrega.</p>
+<h2>Antes de aceitar</h2>
+<p>Leia a proposta e confirme se remuneração, função, jornada e local correspondem ao que foi conversado. Depois da admissão, consulte os dados do vínculo na <a href="https://www.gov.br/pt-br/apps/ctps-digital" target="_blank" rel="noopener noreferrer">Carteira de Trabalho Digital</a>. Guarde documentos próprios e demonstrativos de pagamento; não leve cadastro de clientes para uso pessoal.</p>
+<p>Meta e comissão podem fazer parte do trabalho comercial, mas precisam ser compreendidas como regra, não como slogan. A comparação honesta considera o cenário conservador e os custos da rotina, não apenas o anúncio do melhor resultado possível.</p>
+<p>Quando receber o primeiro pagamento, compare o demonstrativo com a regra informada: período, vendas consideradas, ajustes e valor lançado. Faça a pergunta pelo canal interno antes de concluir que houve erro. Se a explicação não resolver, guarde seus registros e busque orientação adequada. Não exponha contracheque, CPF ou dados de venda em grupo público para pedir opinião.</p>
+    `.trim()
+  },
+
+  "saude-mental-trabalho-limites": {
+    reviewedAt: "2026-10-12",
+    contentHtml: `
+<p><strong>Revisão editorial: 12 de outubro de 2026.</strong> Este conteúdo é educativo e não substitui avaliação de profissional de saúde. Cansaço depois de um dia difícil não permite diagnóstico. O que merece atenção é a persistência, a intensidade e o impacto no sono, na alimentação, na segurança, nas relações e na capacidade de trabalhar.</p>
+<h2>Observe padrões sem se diagnosticar</h2>
+<p>Durante duas semanas, registre horário, situação, reação física ou emocional e quanto tempo levou para se recuperar. Use linguagem concreta: “acordei três vezes”, “chorei antes do turno”, “não consegui concluir a tarefa”. Evite rótulos clínicos retirados de vídeo ou postagem.</p>
+<p>A <a href="https://www.gov.br/saude/pt-br/assuntos/saude-de-a-a-z/s/saude-mental" target="_blank" rel="noopener noreferrer">página de Saúde Mental do Ministério da Saúde</a> apresenta a rede de cuidado do SUS e orientações de acesso. Procure uma Unidade Básica de Saúde, CAPS ou outro serviço indicado na sua região quando os sintomas persistirem ou prejudicarem a rotina.</p>
+<h2>Burnout não é sinônimo de qualquer estresse</h2>
+<p>A <a href="https://www.who.int/news/item/28-05-2019-burn-out-an-occupational-phenomenon-international-classification-of-diseases" target="_blank" rel="noopener noreferrer">Organização Mundial da Saúde</a> classifica o burnout como fenômeno ocupacional, não como condição médica, ligado a estresse crônico no trabalho que não foi administrado com sucesso. A descrição inclui exaustão, distanciamento mental ou cinismo em relação ao trabalho e redução da eficácia profissional.</p>
+<p>Essa referência não serve para autodiagnóstico. Sintomas parecidos podem ter causas diferentes. Só um atendimento adequado pode avaliar contexto, duração, outras condições e necessidade de afastamento ou tratamento.</p>
+<h2>Defina um limite que possa ser explicado</h2>
+<p>Escolha um problema observável: mensagem fora do expediente, intervalo interrompido, acúmulo de tarefas sem prioridade ou humilhação em público. Formule pedido específico: “Preciso confirmar qual entrega vem primeiro” ou “Posso responder essa demanda no início do próximo turno?”. Registre combinados importantes sem gravar pessoas às escondidas ou divulgar conversa privada.</p>
+<p>Nem todo limite pode ser resolvido individualmente. Quando há risco, violência, discriminação ou assédio, priorize segurança e procure canal interno confiável, representação sindical, serviço público ou orientação jurídica conforme o caso.</p>
+<h2>Inclua a rotina na comparação de vagas</h2>
+<p>Ao avaliar proposta em São Luís, some tempo de deslocamento, espera, escala, intervalo e custo informado por você. A <a href="/ferramentas/custo-deslocamento">calculadora de deslocamento</a> ajuda a visualizar gasto, mas não define se a vaga é saudável. Observe previsibilidade da jornada, apoio, treinamento e possibilidade real de descanso.</p>
+<p>Exemplo hipotético: uma trabalhadora percebe que o celular toca durante todo intervalo. Em vez de apenas silenciar e acumular conflito, ela registra a frequência, pergunta qual é a regra e propõe um responsável de plantão. Se houver retaliação ou risco, busca orientação antes de agir sozinha.</p>
+<h2>Quando buscar ajuda imediata</h2>
+<p>Se houver risco de ferir a si ou outra pessoa, desorientação, violência ou emergência, procure atendimento urgente da sua localidade ou acione o SAMU pelo 192. Não espere a próxima avaliação de desempenho. Peça apoio a alguém de confiança para chegar ao serviço.</p>
+<p>Cuidar da saúde não é falha profissional. O objetivo deste guia é transformar mal-estar difuso em observações que possam ser levadas a um serviço de saúde ou conversa segura, sem minimizar sintomas nem prometer solução rápida.</p>
+<p>Para uma consulta, leve a linha do tempo dos sintomas, medicamentos em uso, mudanças recentes e o que piora ou alivia. Não interrompa tratamento por conselho de colega ou conteúdo on-line. Se receber documento ou orientação profissional, confirme como entregar à empresa sem publicar diagnóstico para pessoas que não precisam dessa informação.</p>
+<p>Também registre fatores fora do trabalho, como luto, cuidado familiar ou mudança de medicação, porque eles ajudam o profissional a avaliar o conjunto. A anotação organiza a conversa; não substitui exame, diagnóstico ou conduta clínica.</p>
+    `.trim()
+  },
+
+  "esgotamento-busca-emprego-sinais": {
+    reviewedAt: "2026-10-12",
+    contentHtml: `
+<p><strong>Revisão editorial: 12 de outubro de 2026.</strong> Procurar emprego exige atenção, repetição e tolerância à incerteza. Quando a busca invade sono, alimentação e relações, aumentar o volume pode piorar decisões. Pausa não é abandono: pode ser parte de um plano que protege saúde e qualidade das candidaturas.</p>
+<h2>Troque a palavra “fraqueza” por observações</h2>
+<p>Registre por sete dias o horário de início e fim da busca, quantas vagas foram lidas, quantas eram compatíveis e como você terminou o bloco. Irritação, choro, insônia, dificuldade de concentração e sensação constante de ameaça merecem atenção, especialmente quando persistem ou impedem atividades básicas.</p>
+<p>Este guia não diagnostica burnout, ansiedade ou depressão. A <a href="https://www.who.int/news/item/28-05-2019-burn-out-an-occupational-phenomenon-international-classification-of-diseases" target="_blank" rel="noopener noreferrer">OMS</a> descreve burnout no contexto ocupacional; estar desempregado e esgotado exige olhar mais amplo, não adaptação automática desse rótulo.</p>
+<h2>Faça uma pausa com começo, fim e apoio</h2>
+<p>Se o material está saindo com erro e toda mensagem parece urgente, interrompa por algumas horas ou um dia. Defina quando voltará e o que ficará de fora. Pausa não precisa virar culpa nem desaparecer por prazo indefinido. Se há conta urgente, combine com alguém de confiança qual tarefa administrativa realmente precisa ser feita.</p>
+<p>Ao retornar, escolha no máximo três anúncios compatíveis. Leia, adapte e registre. Não tente compensar o descanso enviando dezenas de currículos genéricos. Use o <a href="/ferramentas/controle-candidaturas">controle de candidaturas</a> para separar envio concluído, retorno, entrevista e encerramento sem armazenar documento sensível.</p>
+<h2>Reduza decisões repetidas</h2>
+<ul><li>Defina dois cargos-alvo por ciclo.</li><li>Guarde currículo-base e versões enviadas.</li><li>Separe um horário curto para pesquisar e outro para responder.</li><li>Desative notificações de grupos que só repetem anúncio.</li><li>Tenha um dia sem candidatura.</li></ul>
+<p>Consulte também fontes oficiais em vez de depender de corrente. O serviço <a href="https://www.gov.br/pt-br/servicos/buscar-emprego-no-sistema-nacional-de-emprego-sine" target="_blank" rel="noopener noreferrer">Buscar Emprego no SINE</a> mostra os canais públicos disponíveis. Confirmar a fonte reduz o esforço desperdiçado com vaga encerrada ou mensagem falsa.</p>
+<h2>Leia o funil sem transformar silêncio em julgamento</h2>
+<p>Ausência de resposta não prova incapacidade. Registre o que pode ser verificado: candidatura concluída, confirmação, contato e entrevista. Se não há retorno após um conjunto de vagas realmente compatíveis, revise cargo, clareza do currículo e canal. Não aumente o volume antes de saber se o problema é filtro, material ou oportunidade.</p>
+<p>Exemplo hipotético: um candidato percebe que envia currículos depois da meia-noite, erra anexos e passa o dia seguinte exausto. Ele limita a busca a três blocos semanais, revisa o PDF pela manhã e pede a uma pessoa que confira apenas ortografia. O objetivo não é produzir número bonito, mas reduzir erro evitável.</p>
+<h2>Procure cuidado quando a pausa não basta</h2>
+<p>A <a href="https://www.gov.br/saude/pt-br/assuntos/saude-de-a-a-z/s/saude-mental" target="_blank" rel="noopener noreferrer">rede de saúde mental apresentada pelo Ministério da Saúde</a> inclui atenção básica e serviços especializados. Busque atendimento quando os sintomas são intensos, persistentes ou afetam segurança e funcionamento. Em emergência, acione o serviço urgente da sua localidade ou o SAMU 192.</p>
+<p>Uma rotina sustentável não garante contratação, mas preserva capacidade de ler, decidir e conversar. A meta útil é candidatura compatível e verificável, não atividade contínua até o esgotamento.</p>
+<p>Se a pressão financeira impede uma pausa completa, reduza o escopo: uma fonte confiável, um cargo e um bloco curto. Peça ajuda para tarefa definida, como revisar um PDF, não para outra pessoa se passar por você. Mantenha alimentação, sono e obrigações essenciais no plano; eles não são prêmio a ser recebido somente depois da contratação.</p>
+<p>Combine com quem mora com você um horário sem interrupção e outro em que a busca termina. Limite mensagens de grupos e silencie notificações fora do bloco. Essa organização não elimina preocupação financeira, mas cria uma fronteira que pode ser revista com apoio.</p>
+    `.trim()
+  },
+
+  "conflito-com-chefe-trabalho-dicas": {
+    reviewedAt: "2026-10-12",
+    contentHtml: `
+<p><strong>Revisão editorial: 12 de outubro de 2026.</strong> Discordar de prioridade, prazo ou método não é automaticamente assédio. O primeiro passo é identificar o fato: o que foi pedido, quando, qual orientação anterior existia e qual impacto ocorreu. Situação de violência, ameaça ou discriminação exige cuidado e apoio, não confronto improvisado.</p>
+<h2>Prepare a conversa com fatos</h2>
+<p>Escreva uma linha para cada evento: data, tarefa, instrução, resposta e consequência. Separe interpretação de observação. “Ele quer me prejudicar” é interpretação; “o prazo mudou às 16h e não houve redefinição das outras entregas” é um fato que permite conversa.</p>
+<p>Peça encontro privado e leve uma pergunta concreta: “Qual das duas demandas tem prioridade?” ou “Podemos registrar o procedimento atualizado?”. Evite áudio longo, indireta em grupo e exposição de colega. Seu objetivo é esclarecer trabalho e próximo passo.</p>
+<h2>Diferencie conflito de violência ou assédio</h2>
+<p>O <a href="https://mpt.mp.br/pgt/publicacoes?td=cartilhas" target="_blank" rel="noopener noreferrer">Ministério Público do Trabalho</a> disponibiliza cartilhas, incluindo material de perguntas e respostas sobre violência e assédio moral no trabalho. Consulte conceitos e canais antes de classificar o caso. Cobrança firme ou avaliação negativa pode ser desagradável sem, por si só, constituir assédio; humilhação repetida, ameaça ou discriminação exigem análise cuidadosa.</p>
+<p>Se houver risco imediato, não fique sozinho para “produzir prova”. Priorize sair do local seguro, procurar apoio e contatar serviço competente. Não publique nomes, prints ou acusações em rede social enquanto busca orientação.</p>
+<h2>Use o canal adequado</h2>
+<p>Quando a conversa direta é segura e possível, registre o combinado por e-mail ou sistema. Se não resolve, procure RH, ouvidoria, canal de ética, representação sindical ou responsável acima na estrutura. Leve cronologia curta e documentos que você pode usar legitimamente; não copie banco de clientes, prontuários ou dados pessoais.</p>
+<p>O <a href="https://mpt.mp.br/pgt/servicos/servico-denuncie" target="_blank" rel="noopener noreferrer">serviço de denúncia do MPT</a> explica o escopo de atuação em violações trabalhistas de relevância coletiva. Uma denúncia exige informações verdadeiras e documentos pertinentes. Caso individual pode também demandar orientação sindical, advocacia ou Justiça do Trabalho.</p>
+<h2>Proteja a execução do trabalho</h2>
+<p>Enquanto o conflito é tratado, confirme prioridades, prazos e responsáveis. Peça ajuda quando duas ordens forem incompatíveis. Não reduza qualidade de propósito nem use informação da empresa como moeda de pressão. Se precisar procurar outro emprego, faça isso fora dos recursos corporativos e sem levar material confidencial.</p>
+<p>Exemplo hipotético: uma funcionária recebe duas tarefas urgentes de líderes diferentes. Ela envia mensagem objetiva com prazos e pede definição. A resposta é registrada. Se um gestor a humilha publicamente de forma repetida, ela anota datas, testemunhas e procura o canal interno e orientação externa, sem divulgar clientes envolvidos.</p>
+<h2>Revise o resultado</h2>
+<ul><li>Houve definição de prioridade ou comportamento esperado?</li><li>O combinado foi registrado?</li><li>A situação se repetiu ou piorou?</li><li>Existe risco à saúde ou segurança?</li><li>Qual canal pode analisar o caso com imparcialidade?</li></ul>
+<p>Objetividade não significa aceitar abuso. Ela ajuda a apresentar o problema de forma compreensível e escolher entre ajuste, mediação, denúncia ou saída planejada. Se o impacto emocional persistir, procure também cuidado em saúde.</p>
+<p>Evite três atalhos: gravar ou acessar conta alheia sem entender os limites legais, ameaçar divulgar conteúdo confidencial e pedir que colegas escolham “um lado” em grupo. Essas ações podem ampliar o dano e desviar a análise do fato original. Busque orientação antes de coletar ou compartilhar evidências sensíveis.</p>
+<p>Se a saída se tornar necessária, confira aviso, documentos e canais antes de tomar decisão impulsiva. Não assine texto que não compreende sob pressão. Peça tempo para ler e orientação qualificada quando houver dúvida sobre consequência trabalhista.</p>
+    `.trim()
+  },
+
+  "avaliacao-de-desempenho-preparacao": {
+    reviewedAt: "2026-10-12",
+    contentHtml: `
+<p><strong>Revisão editorial: 12 de outubro de 2026.</strong> Uma avaliação de desempenho útil compara expectativa, evidência e próximo passo. Não é concurso de adjetivos nem momento para inventar números. Mesmo quando a empresa não tem formulário formal, você pode preparar exemplos e pedir critérios claros.</p>
+<h2>Descubra o que será avaliado</h2>
+<p>Antes da conversa, peça critérios, período e participantes. Separe metas, entregas, comportamento, aprendizagem e condições que afetaram o trabalho. Se não há documento, leve uma lista curta das responsabilidades combinadas e pergunte se ela corresponde à expectativa da liderança.</p>
+<p>A <a href="https://repositorio.enap.gov.br/items/d1dc6e7e-98b1-4941-9c8c-985215c3944e" target="_blank" rel="noopener noreferrer">Enap</a> mantém material sobre gestão do desempenho e modelos de feedback. É uma referência de aprendizagem, não regra para empresas privadas. O procedimento válido é o definido pela organização, respeitando contrato, políticas e direitos.</p>
+<h2>Monte uma página de evidências</h2>
+<p>Para cada responsabilidade, escreva contexto, ação e resultado observável. Resultado não precisa ser percentual: pode ser prazo cumprido, fila organizada, divergência identificada, cliente encaminhado ou procedimento documentado. Se não houve medição, não invente número.</p>
+<p>Inclua também um erro ou dificuldade e o que mudou depois. “Perdi um prazo porque não confirmei a prioridade; passei a registrar as entregas e pedir definição quando há conflito” demonstra aprendizagem melhor que “sou perfeccionista”. Não atribua a si trabalho feito pela equipe inteira.</p>
+<h2>Prepare perguntas para pontos subjetivos</h2>
+<p>Se ouvir “falta postura” ou “precisa ser mais estratégico”, peça comportamento observável: “Em qual situação isso ocorreu?” e “O que eu deveria fazer diferente?”. Repita o entendimento e combine como será acompanhado. Discordar pode ser feito sem interromper: apresente fato, documento e contexto.</p>
+<p>Exemplo hipotético: uma recepcionista recebe nota baixa em organização. Ela mostra o controle usado, pergunta qual erro foi observado e combina conferir a agenda em dois horários. Se a avaliação ignora falta de acesso ao sistema, registra essa dependência sem transformar a conversa em acusação.</p>
+<h2>Converta feedback em plano curto</h2>
+<ul><li>uma habilidade ou processo prioritário;</li><li>uma ação que cabe na rotina;</li><li>um apoio necessário, como treinamento ou acesso;</li><li>uma evidência de progresso;</li><li>uma data de revisão.</li></ul>
+<p>Evite plano com dez metas vagas. “Até o fim do mês, registrar cada devolução no sistema e revisar o relatório semanalmente” é verificável. “Ser mais proativo” não informa ação nem medida.</p>
+<h2>Registre sem expor pessoas</h2>
+<p>Depois da conversa, envie resumo dos combinados pelo canal usado pela empresa. Guarde documentos aos quais você tem direito, mas não copie avaliação de colegas nem dados confidenciais. Se houver erro factual, peça correção por escrito e anexe evidência pertinente.</p>
+<p>A avaliação pode influenciar desenvolvimento, movimentação ou decisões internas, mas este guia não promete promoção nem define validade jurídica. Se houver discriminação, retaliação ou violação de direito, procure o canal interno, sindicato ou orientação jurídica adequada.</p>
+<p>Chegue preparado para ouvir e perguntar. O resultado mais útil é sair sabendo o que manter, o que mudar, qual apoio existe e quando o avanço será revisto — sem teatro e sem apagar condições reais de trabalho.</p>
+<p>Mantenha um registro semanal simples até a próxima conversa: tarefa, evidência, dificuldade e apoio solicitado. Isso evita reconstruir meses de memória na véspera e permite corrigir o plano cedo. O registro não deve incluir dados pessoais de cliente, avaliação de colega ou documento que você não esteja autorizado a guardar.</p>
+<p>Se não houver nova data, proponha uma revisão breve e realista. Confirme quem acompanhará e qual evidência será observada. Sem acompanhamento, o plano vira lista esquecida e a próxima avaliação repete a mesma surpresa.</p>
+    `.trim()
+  },
+
+  "primeira-semana-emprego-novo": {
+    reviewedAt: "2026-10-12",
+    contentHtml: `
+<p><strong>Revisão editorial: 12 de outubro de 2026.</strong> Na primeira semana, a prioridade é entender segurança, horário, responsabilidades e canais. Você não precisa decorar tudo nem propor mudança no segundo dia. Anote processos, confirme dúvidas e preserve dados da empresa e de clientes.</p>
+<h2>Confirme o básico antes da primeira tarefa</h2>
+<p>Pergunte horário de entrada, intervalo, registro de ponto, uniforme ou equipamento, local de trabalho e quem deve ser avisado em atraso ou emergência. Saiba onde ficam saídas, itens de segurança e contatos essenciais. Não opere máquina, veículo ou sistema crítico sem orientação e autorização.</p>
+<p>Consulte os dados do vínculo na <a href="https://www.gov.br/pt-br/apps/ctps-digital" target="_blank" rel="noopener noreferrer">Carteira de Trabalho Digital</a>. O Ministério do Trabalho também mantém <a href="https://www.gov.br/trabalho-e-emprego/pt-br/servicos/trabalhador/carteira-de-trabalho/perguntas-frequentes-carteira-de-trabalho-digital/" target="_blank" rel="noopener noreferrer">perguntas frequentes</a> sobre visualização do contrato. Se informação relevante divergir do combinado, peça esclarecimento ao empregador; não altere registro por conta própria.</p>
+<h2>Faça um mapa de pessoas e processos</h2>
+<p>Anote quem orienta a atividade, quem aprova exceções e onde registrar problema. Use nomes profissionais e funções; não guarde senha de colega. Para cada tarefa, escreva entrada, passos, conferência e destino. Depois, repita com supervisão até saber onde pode decidir e onde precisa pedir autorização.</p>
+<p>Exemplo hipotético: em uma loja, duas pessoas explicam devolução de formas diferentes. O novo funcionário não escolhe a versão mais fácil. Ele registra a diferença e pergunta ao responsável qual procedimento está vigente antes de atender o próximo caso.</p>
+<h2>Proteja senhas e informações</h2>
+<p>Use credencial própria e troque senha inicial quando orientado. Não fotografe tela, cadastro, prontuário, pedido ou planilha para estudar em casa. A <a href="https://cartilha.cert.br/fasciculos/" target="_blank" rel="noopener noreferrer">Cartilha de Segurança para Internet do CERT.br</a> reúne boas práticas de senhas, autenticação, privacidade e dispositivos.</p>
+<p>Seu caderno pode conter etapas e termos, mas não CPF, telefone de cliente, cartão, segredo comercial ou senha. Ao sair da mesa, bloqueie o equipamento conforme a regra local.</p>
+<h2>Faça perguntas que economizam erro</h2>
+<ul><li>Qual tarefa vem primeiro quando duas chegam juntas?</li><li>Onde encontro o procedimento atualizado?</li><li>Quem autoriza desconto, troca, ausência ou exceção?</li><li>Como registro um erro ou incidente?</li><li>Quando meu treinamento será revisto?</li></ul>
+<p>Leve o que já tentou antes de pedir ajuda: “Segui as etapas A e B, mas o sistema mostrou esta mensagem”. Perguntar cedo não é incapacidade; repetir erro sem registrar orientação é que prolonga o problema.</p>
+<h2>Revise a semana sem se comparar</h2>
+<p>No fim de cada dia, registre três pontos: o que aprendeu, o que precisa confirmar e qual tarefa fará novamente. No fim da semana, peça dez minutos de alinhamento. Confirme prioridades e corrija anotações. Não use velocidade de colega antigo como medida do seu primeiro dia.</p>
+<p>Guarde contracheques e comunicados próprios quando forem emitidos. Não leve arquivo interno ao sair da empresa. Se houver risco, humilhação, discriminação ou divergência séria, documente fatos e procure canal confiável.</p>
+<p>A primeira semana não define toda a carreira. Ela serve para construir um mapa seguro do trabalho: quem orienta, como executar, onde conferir e quando pedir ajuda.</p>
+<p>Quando pedirem dados bancários ou documentos admissionais, confirme o canal e a pessoa responsável. Não envie por número pessoal desconhecido apenas porque alguém conhece o seu nome. Guarde protocolo ou confirmação, mas não mantenha cópias desnecessárias em aparelho compartilhado. Dúvida sobre documento deve ser resolvida com RH ou responsável identificado.</p>
+<p>Reserve ainda alguns minutos para conferir o trajeto de volta, especialmente em treinamento que termina fora do horário habitual. Informe alguém de confiança quando a rota mudar. Segurança no deslocamento faz parte da adaptação e deve ser considerada antes de aceitar troca de turno.</p>
+    `.trim()
+  },
+
+  "plano-90-dias-emprego-sao-luis": {
+    reviewedAt: "2026-10-12",
+    contentHtml: `
+<p><strong>Revisão editorial: 12 de outubro de 2026.</strong> Noventa dias são uma janela de organização, não prazo para conseguir emprego. O plano divide pesquisa, material, candidaturas e revisão em ciclos curtos. Ele deve caber na sua renda, saúde, cuidado familiar e deslocamento.</p>
+<h2>Semana zero: defina limites e duas funções</h2>
+<p>Escolha até dois cargos relacionados a tarefas que consegue demonstrar. Registre turnos possíveis, distância máxima, renda mínima e impedimentos documentais. Leia anúncios atuais antes de editar o currículo; não use lista antiga para concluir que existe contratação hoje.</p>
+<p>O serviço <a href="https://www.gov.br/pt-br/servicos/buscar-emprego-no-sistema-nacional-de-emprego-sine" target="_blank" rel="noopener noreferrer">Buscar Emprego no SINE</a> informa os canais públicos de consulta. O <a href="https://www.gov.br/trabalho-e-emprego/pt-br/assuntos/sistema-nacional-de-emprego-sine/portal-emprega-brasil" target="_blank" rel="noopener noreferrer">Portal Emprega Brasil</a> permite registrar perfil e procurar vagas compatíveis no município. Use também páginas institucionais de empresas e anúncios com origem confirmável.</p>
+<h2>Dias 1 a 30: arrume a base</h2>
+<p>Crie currículo-base e uma versão para cada cargo-alvo. Organize documentos sem enviar todos de uma vez. Prepare três exemplos de experiência: tarefa, ação e resultado observável. Se nunca trabalhou na área, use projeto escolar, voluntariado ou exercício, identificado corretamente.</p>
+<p>Faça de três a cinco candidaturas compatíveis por semana, ou quantidade menor que consiga revisar. Registre cada envio no <a href="/ferramentas/controle-candidaturas">controle de candidaturas</a>: empresa, cargo, URL, data, canal e versão do currículo. O número é exemplo de ritmo, não meta universal nem promessa de retorno.</p>
+<h2>Dias 31 a 60: leia o funil</h2>
+<p>Separe anúncios lidos, candidaturas concluídas, contatos e entrevistas. Se muitos anúncios são incompatíveis, reveja função ou filtros. Se há candidatura sem confirmação, confira o canal. Se há entrevista e nenhuma proposta, treine respostas e revise condições que impedem o aceite.</p>
+<p>Não conclua que o currículo falhou por uma semana silenciosa. Compare um conjunto de oportunidades realmente aderentes. Arquive vagas encerradas e nunca invente empresa, salário ou requisito para preencher a planilha.</p>
+<h2>Dias 61 a 90: ajuste uma coisa por vez</h2>
+<p>Escolha o principal gargalo: poucas vagas compatíveis, currículo pouco claro, falta de habilidade verificável, entrevista ou logística. Faça uma intervenção e acompanhe. Curso só entra quando o conteúdo corresponde a uma lacuna observada; nenhuma formação legítima garante contratação.</p>
+<p>Em São Luís, use a <a href="/ferramentas/custo-deslocamento">calculadora de deslocamento</a> com tarifas e viagens informadas por você. Compare custo e tempo com a escala da vaga. Não presuma benefício, último ônibus ou local exato quando o anúncio não informa.</p>
+<h2>Agenda semanal sustentável</h2>
+<ul><li>um bloco para pesquisar e arquivar anúncios;</li><li>dois blocos para adaptar e enviar;</li><li>um bloco para follow-up e treino;</li><li>um período sem busca;</li><li>quinze minutos para revisar métricas e segurança.</li></ul>
+<p>Exemplo hipotético: uma candidata alterna auxiliar administrativo e recepção. Após 30 dias, percebe que a maioria das vagas de recepção exige turno incompatível. Em vez de aumentar o volume, concentra-se no cargo e nos bairros possíveis, mantendo a outra função apenas quando a escala é clara.</p>
+<h2>Fechamento do ciclo</h2>
+<p>No dia 90, escreva uma página: fontes usadas, vagas compatíveis, respostas, entrevistas, impedimentos e próximo teste. Continue, pause ou mude o plano com base nisso. Se a busca estiver prejudicando sono e funcionamento, reduza o ritmo e procure apoio de saúde quando necessário.</p>
+<p>O valor dos 90 dias é permitir comparação e correção. A contratação depende de processos externos; o plano mede apenas ações e evidências sob seu controle.</p>
+<p>Faça revisões nos dias 15, 30, 60 e 90. Em cada uma, altere apenas o que a evidência sustenta. Se passou a receber contatos depois de esclarecer o cargo no currículo, mantenha a mudança. Se o retorno não mudou, confira anúncios e canais antes de concluir que precisa comprar curso, foto profissional ou serviço de candidatura.</p>
+    `.trim()
   }
 };
 
