@@ -23,8 +23,8 @@ describe("Auditoria editorial real do corpus de 12/10/2026", () => {
     expect(flagged).toHaveLength(98);
     const reviewed = flagged.filter((item) => getEditorialContentOverride(item.slug));
     const pending = flagged.filter((item) => !getEditorialContentOverride(item.slug));
-    expect(reviewed).toHaveLength(52);
-    expect(pending).toHaveLength(46);
+    expect(reviewed).toHaveLength(60);
+    expect(pending).toHaveLength(38);
     expect(guidesPendingReview.size).toBe(pending.length);
     for (const item of pending) expect(guidesPendingReview.has(item.slug)).toBe(true);
     for (const item of reviewed) expect(guidesPendingReview.has(item.slug)).toBe(false);
@@ -65,7 +65,11 @@ describe("Auditoria editorial real do corpus de 12/10/2026", () => {
       "golpe-vaga-emprego-sao-luis", "seguranca-candidatas-entrevista-emprego",
       "home-office-remoto-checklist-vaga", "trabalho-hibrido-sao-luis-checklist",
       "pretensao-salarial-entrevista-dicas", "como-pedir-aumento-salario",
-      "negociar-horario-deslocamento-emprego", "vagas-afirmativas-como-candidatar"
+      "negociar-horario-deslocamento-emprego", "vagas-afirmativas-como-candidatar",
+      "candidatura-whatsapp-emprego-mensagem", "email-candidatura-emprego-modelo",
+      "entrevista-por-video-emprego", "entrevista-presencial-sao-luis-dicas",
+      "referencias-profissionais-emprego", "experiencia-informal-curriculo-como-colocar",
+      "curriculo-ats-palavras-chave-sao-luis", "ingles-no-curriculo-nivel-honesto"
     ];
     for (const slug of edited) {
       const override = getEditorialContentOverride(slug);
@@ -96,7 +100,11 @@ describe("Auditoria editorial real do corpus de 12/10/2026", () => {
       "golpe-vaga-emprego-sao-luis", "seguranca-candidatas-entrevista-emprego",
       "home-office-remoto-checklist-vaga", "trabalho-hibrido-sao-luis-checklist",
       "pretensao-salarial-entrevista-dicas", "como-pedir-aumento-salario",
-      "negociar-horario-deslocamento-emprego", "vagas-afirmativas-como-candidatar"
+      "negociar-horario-deslocamento-emprego", "vagas-afirmativas-como-candidatar",
+      "candidatura-whatsapp-emprego-mensagem", "email-candidatura-emprego-modelo",
+      "entrevista-por-video-emprego", "entrevista-presencial-sao-luis-dicas",
+      "referencias-profissionais-emprego", "experiencia-informal-curriculo-como-colocar",
+      "curriculo-ats-palavras-chave-sao-luis", "ingles-no-curriculo-nivel-honesto"
     ];
     for (const slug of sourceBacked) {
       expect(getEditorialContentOverride(slug)!.contentHtml).toMatch(/<a href="https:\/\//);
