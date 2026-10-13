@@ -2,7 +2,6 @@ import { describe, expect, it } from "vitest";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { guidesPendingReview, newsPendingFactCheck } from "../data/editorial-review-pending";
-import { getEditorialContentOverride } from "../data/editorial-content-overrides";
 import { getNewsEditorialOverride } from "../data/news-editorial-content-overrides";
 import { BRAND_ASSETS, BRAND_COLORS } from "./brand-assets";
 
@@ -15,7 +14,7 @@ describe("Vitrine pública durante a análise AdSense", () => {
     expect(source).toContain("notInArray(articles.slug, pendingSlugs)");
     expect(source).toContain("getEditorialContentOverride(slug)");
     expect(source).toContain("getNewsEditorialOverride(slug)");
-    expect([...guidesPendingReview].filter((slug) => !getEditorialContentOverride(slug)).length).toBeGreaterThan(0);
+    expect(guidesPendingReview.size).toBe(0);
     expect([...newsPendingFactCheck].every((slug) => Boolean(getNewsEditorialOverride(slug)))).toBe(true);
   });
 

@@ -2186,6 +2186,148 @@ const overrides: Record<string, EditorialContentOverride> = {
 <ul><li>roupa adequada ao trajeto e ao local confirmado;</li><li>documentos e currículo apenas quando solicitados;</li><li>água e margem de chegada;</li><li>contato oficial da seleção;</li><li>alternativa simples para chuva ou climatização;</li><li>nenhum dado sensível visível em crachá antigo ou pasta.</li></ul>
 <p>O objetivo é reduzir distrações e riscos para que a conversa trate da sua experiência. Se a seleção valoriza aparência acima das tarefas ou pede gasto prévio não explicado, verifique a legitimidade antes de continuar.</p>
     `.trim()
+  },
+
+  "pedir-feedback-entrevista-emprego": {
+    reviewedAt: "2026-10-13",
+    contentHtml: `
+<p><strong>Revisão editorial: 13 de outubro de 2026.</strong> Pedir feedback depois de um processo seletivo é solicitar informação que ajude a melhorar uma candidatura futura. Não é exigir justificativa, reabrir uma decisão nem pressionar alguém a revelar critérios internos.</p>
+<h2>Escolha o momento e o canal</h2>
+<p>Se a empresa informou uma data para o resultado, espere esse prazo terminar. Quando a resposta já confirmou que você não seguirá, agradeça primeiro e faça uma pergunta curta na mesma conversa. Se houve silêncio, use o guia de <a href="/blog/follow-up-apos-entrevista-mensagem">follow-up</a> antes de pedir avaliação.</p>
+<p>O LinkedIn informa que algumas empresas podem enviar <a href="https://www.linkedin.com/help/linkedin/answer/a516878" target="_blank" rel="noopener noreferrer">atualizações sobre candidaturas</a> quando analisam o perfil ou o currículo. Isso depende da ferramenta e da decisão do recrutador; ausência de notificação não prova que ninguém leu seu material.</p>
+<h2>Faça uma pergunta que possa ser respondida</h2>
+<p>Modelo: “Obrigado pelo retorno e pela oportunidade de conversar sobre a vaga de auxiliar administrativo. Se for possível, você poderia indicar um ponto da minha apresentação ou experiência que eu deveria desenvolver para processos semelhantes? Entendo caso a empresa não forneça feedback individual.”</p>
+<p>Outra opção é limitar a pergunta: “Minha experiência ficou clara para as tarefas da vaga?” ou “Houve requisito técnico que eu não consegui demonstrar?” Evite “por que escolheram outra pessoa?”, porque isso pede comparação com dados de terceiros.</p>
+<h2>Separe resposta útil de opinião solta</h2>
+<ul><li><strong>fato observável:</strong> faltou exemplo, documento, experiência ou resposta a uma pergunta;</li><li><strong>critério da vaga:</strong> disponibilidade, ferramenta, formação ou rotina necessária;</li><li><strong>preferência vaga:</strong> “não combinou com o perfil”, sem exemplo;</li><li><strong>comentário inadequado:</strong> observação invasiva ou sem relação com o trabalho.</li></ul>
+<p>Registre as palavras exatas e não complete lacunas com suposição. Um retorno específico pode gerar uma ação; uma frase genérica não deve levar você a reconstruir todo o currículo.</p>
+<h2>Transforme um ponto em teste pequeno</h2>
+<p>Se disseram que faltou exemplo, prepare duas situações verdadeiras com contexto, ação e resultado. Se a lacuna foi planilha, confirme qual recurso era necessário antes de comprar curso. Se foi disponibilidade incompatível, ajuste os filtros de busca; não prometa um turno que não consegue cumprir.</p>
+<p>Exemplo hipotético: o recrutador informou que a resposta sobre atendimento ficou abstrata. Em vez de decorar adjetivos, o candidato prepara um caso real: recebeu uma reclamação, confirmou o pedido, registrou a pendência e encaminhou ao responsável. O aprendizado é demonstrar processo, não inventar resultado.</p>
+<h2>Proteja a relação e seus dados</h2>
+<p>Não envie documento, pagamento ou informação bancária para “receber o feedback”. Use o canal oficial já validado. Não publique nome do entrevistador, print privado ou áudio da conversa. Se o retorno contiver humilhação ou possível discriminação, guarde o registro e procure orientação adequada em vez de discutir em rede social.</p>
+<h2>Feche o contato sem insistência</h2>
+<p>Agradeça mesmo quando a empresa disser que não fornece avaliação individual. Uma solicitação é suficiente. O próprio LinkedIn explica <a href="https://www.linkedin.com/help/linkedin/answer/a508716" target="_blank" rel="noopener noreferrer">o que acontece depois de uma candidatura</a> na plataforma, mas cada organização mantém seu processo e seus prazos.</p>
+<p>Feedback ajuda quando aponta uma ação verificável. Ele não define seu valor profissional e não substitui a comparação entre o anúncio, as evidências do currículo e a resposta apresentada na entrevista.</p>
+    `.trim()
+  },
+
+  "plano-semanal-vagas-sao-luis": {
+    reviewedAt: "2026-10-13",
+    contentHtml: `
+<p><strong>Revisão editorial: 13 de outubro de 2026.</strong> Um plano semanal de busca de emprego deve caber na rotina e produzir candidaturas rastreáveis. Não existe número obrigatório de envios: qualidade, compatibilidade e prazo do anúncio importam mais que uma meta usada para gerar culpa.</p>
+<h2>Defina três resultados para a semana</h2>
+<ol><li>vagas compatíveis lidas até o fim;</li><li>currículos adaptados e enviados pelo canal correto;</li><li>uma melhoria concreta em currículo, entrevista ou qualificação.</li></ol>
+<p>Escolha quantidades possíveis para sua disponibilidade. Quem trabalha, estuda ou cuida de outra pessoa pode usar blocos menores. Uma semana com duas candidaturas fortes pode ser melhor que vinte envios para funções incompatíveis.</p>
+<h2>Monte uma tabela simples</h2>
+<p>Use as colunas: empresa, cargo, cidade, fonte, prazo, requisitos essenciais, versão do currículo, data do envio, canal e próxima ação. O <a href="https://www.linkedin.com/help/linkedin/answer/a8684146" target="_blank" rel="noopener noreferrer">rastreador de oportunidades do LinkedIn</a> organiza vagas salvas e etapas; para candidaturas fora da plataforma, uma planilha própria pode cumprir a mesma função.</p>
+<p>Não coloque CPF, RG, endereço completo, senha ou dado bancário nessa tabela. Guarde somente o necessário para acompanhar a seleção.</p>
+<h2>Distribua o trabalho por tipo</h2>
+<ul><li><strong>buscar:</strong> localizar canais oficiais e salvar anúncios;</li><li><strong>conferir:</strong> validar empresa, prazo, local e requisitos;</li><li><strong>adaptar:</strong> escolher evidências verdadeiras para a vaga;</li><li><strong>enviar:</strong> usar o canal indicado e registrar comprovante;</li><li><strong>preparar:</strong> treinar entrevista ou fechar uma lacuna real;</li><li><strong>encerrar:</strong> atualizar respostas e arquivar vagas vencidas.</li></ul>
+<p>Você pode executar esses blocos em dias diferentes. Não deixe toda adaptação para o último minuto e não envie candidatura depois do prazo fingindo que não viu a data.</p>
+<h2>Use São Luís como filtro prático</h2>
+<p>Confirme se a vaga é em São Luís, na Região Metropolitana, remota ou em outra cidade. Calcule deslocamento e horário antes de enviar. “Disponibilidade total” não deve esconder limite de transporte, estudo ou cuidado familiar. Se o anúncio não informa o local, procure o canal oficial e peça esclarecimento sem fornecer documentos.</p>
+<p>O serviço <a href="https://www.gov.br/pt-br/servicos/buscar-emprego-no-sistema-nacional-de-emprego-sine" target="_blank" rel="noopener noreferrer">Buscar Emprego no SINE</a> permite consultar e se candidatar a oportunidades conforme o cadastro. Combine fontes, mas mantenha um único registro para não duplicar envio.</p>
+<h2>Revise o funil sem inventar diagnóstico</h2>
+<p>No fim da semana, conte anúncios lidos, candidaturas compatíveis, convites e respostas. Pouco retorno em sete dias não prova que o currículo falhou. Observe várias semanas e procure padrões concretos: contatos incorretos, requisitos ausentes, vagas vencidas ou mensagens sem identificação do cargo.</p>
+<p>A Escola Virtual de Governo oferece o curso <a href="https://www.escolavirtual.gov.br/curso/468" target="_blank" rel="noopener noreferrer">Produtividade e Gestão do Tempo</a>. Use técnicas de planejamento para reduzir retrabalho, não para transformar a busca em jornada sem descanso.</p>
+<h2>Preserve um período sem candidatura</h2>
+<p>Defina quando a busca termina naquele dia. Desative alertas que repetem vagas incompatíveis e retome no próximo bloco. O plano funciona quando ajuda a escolher, registrar e aprender; ele falha quando mede apenas quantidade e empurra a pessoa para anúncios duvidosos.</p>
+    `.trim()
+  },
+
+  "produtividade-busca-emprego-sao-luis": {
+    reviewedAt: "2026-10-13",
+    contentHtml: `
+<p><strong>Revisão editorial: 13 de outubro de 2026.</strong> Produtividade na busca de emprego é concluir etapas úteis com qualidade: localizar uma vaga real, verificar compatibilidade, adaptar o material, enviar e registrar. Abrir muitas abas ou permanecer conectado o dia inteiro não mede avanço.</p>
+<h2>Comece com uma decisão de entrada</h2>
+<p>Antes de pesquisar, defina cargo, localização, modalidade e limite de deslocamento. Isso reduz anúncios irrelevantes. Mantenha uma lista curta de variações verdadeiras do cargo, como atendimento, recepção ou apoio administrativo; não misture funções que exigem experiências diferentes só para aumentar resultados.</p>
+<h2>Use um bloco com começo e fim</h2>
+<p>Exemplo adaptável de 50 minutos: dez para buscar, quinze para conferir anúncios, vinte para adaptar e enviar uma candidatura e cinco para registrar. Se não encontrar vaga compatível, encerre com os links verificados e retome depois. O bloco não promete entrevista; ele evita que pesquisa, envio e acompanhamento se confundam.</p>
+<p>O curso <a href="https://www.escolavirtual.gov.br/curso/468" target="_blank" rel="noopener noreferrer">Produtividade e Gestão do Tempo</a>, da Escola Virtual de Governo, aborda desempenho e atitudes produtivas. Aplique o que reduzir erro e sobrecarga, sem concluir que demora de recrutamento depende do seu esforço.</p>
+<h2>Leia o anúncio antes de adaptar</h2>
+<p>Marque requisitos essenciais, desejáveis, tarefas, local, escala, prazo e candidatura. Só depois escolha a versão do currículo. Repita termos técnicos verdadeiros que aparecem no anúncio, mas não copie parágrafos nem adicione ferramenta que nunca usou.</p>
+<p>Exemplo hipotético: uma vaga pede conferência de pedidos e planilha básica. A candidata destaca a experiência real em conferência e um exercício recente de planilha; ela não escreve “Excel avançado” para passar pelo filtro.</p>
+<h2>Reduza trocas desnecessárias</h2>
+<ul><li>mantenha um currículo-base e versões por família de cargo;</li><li>nomeie arquivos com cargo e data, sem CPF;</li><li>use uma mensagem curta que identifique a vaga;</li><li>registre onde enviou antes de abrir o próximo anúncio;</li><li>arquive vagas vencidas e duplicadas;</li><li>reserve outro bloco para cursos e portfólio.</li></ul>
+<p>Não automatize envio em massa, não contorne limites da plataforma e não deixe extensão desconhecida acessar seus dados. O LinkedIn informa que impõe <a href="https://www.linkedin.com/help/linkedin/answer/a512348/" target="_blank" rel="noopener noreferrer">limites em candidaturas simplificadas</a> para incentivar envios cuidadosos; fora da plataforma, o mesmo princípio de compatibilidade continua útil.</p>
+<h2>Acompanhe sem vigiar a caixa de entrada</h2>
+<p>Escolha um ou dois horários para conferir respostas. Atualize a etapa e a próxima ação. O <a href="https://www.linkedin.com/help/linkedin/answer/a8684146" target="_blank" rel="noopener noreferrer">Job tracker</a> mostra uma forma de organizar oportunidades; uma tabela local também funciona quando inclui data, canal e status.</p>
+<h2>Meça o que pode mudar</h2>
+<p>Revise semanalmente: anúncios compatíveis encontrados, envios concluídos, retornos, entrevistas e erros detectados. Não use visualizações de perfil como prova isolada. Se o contato está errado, corrija. Se faltam exemplos, prepare-os. Se não há vaga compatível naquele período, amplie fontes ou cargos adjacentes sem inventar experiência.</p>
+<p>Produtividade sustentável deixa tempo para descanso, trabalho atual e vida pessoal. O objetivo é manter um processo claro que possa ser repetido, não transformar cada hora livre em candidatura.</p>
+    `.trim()
+  },
+
+  "rejeicao-processo-seletivo-como-reagir": {
+    reviewedAt: "2026-10-13",
+    contentHtml: `
+<p><strong>Revisão editorial: 13 de outubro de 2026.</strong> Uma rejeição informa somente que aquela candidatura não avançou naquela seleção. Ela não revela automaticamente o motivo e não autoriza concluir que você é incapaz, que a vaga era falsa ou que o currículo inteiro precisa ser refeito.</p>
+<h2>Registre o que realmente aconteceu</h2>
+<p>Anote cargo, empresa, etapas concluídas, data do retorno e texto objetivo da resposta. Separe fatos de interpretações. “Recebi e-mail de encerramento depois da entrevista” é fato; “o recrutador não gostou de mim” é hipótese sem evidência.</p>
+<p>Em candidaturas pelo LinkedIn, a página <a href="https://www.linkedin.com/help/linkedin/answer/a508716" target="_blank" rel="noopener noreferrer">O que esperar depois de se candidatar</a> explica que o responsável pode analisar os dados enviados. A plataforma não garante resposta individual nem aprovação, e outros canais seguem processos próprios.</p>
+<h2>Faça uma pausa antes de alterar materiais</h2>
+<p>Evite reescrever currículo e perfil na mesma hora por impulso. Compare primeiro o anúncio salvo com a versão enviada. Confirme se havia requisito essencial ausente, informação confusa, erro de contato ou exemplo fraco. Sem evidência, mantenha o material e observe outros processos.</p>
+<h2>Use três perguntas de revisão</h2>
+<ol><li>Eu atendia aos requisitos obrigatórios ou apenas aos desejáveis?</li><li>Meu currículo mostrou evidência das tarefas principais?</li><li>Na entrevista, respondi com situações verdadeiras ou apenas adjetivos?</li></ol>
+<p>Exemplo hipotético: a vaga exigia trabalho aos sábados e a pessoa só podia de segunda a sexta. A rejeição não pede curso novo; indica incompatibilidade de horário. Em outro caso, a experiência existia, mas não apareceu no currículo: a ação é tornar a evidência visível.</p>
+<h2>Peça feedback sem tentar reverter o resultado</h2>
+<p>Quando houver canal aberto, envie uma mensagem curta: “Obrigado pelo retorno. Se for possível, poderia indicar um ponto que eu deveria desenvolver para processos semelhantes? Entendo caso não forneçam avaliação individual.” Não cobre resposta, não peça comparação com o aprovado e não publique conversa privada.</p>
+<h2>Mantenha o funil honesto</h2>
+<p>Arquive a seleção e escolha a próxima oportunidade compatível. O serviço <a href="https://www.gov.br/pt-br/servicos/buscar-emprego-no-sistema-nacional-de-emprego-sine" target="_blank" rel="noopener noreferrer">Buscar Emprego no SINE</a> é uma das fontes possíveis. Consulte também páginas oficiais de empresas e outros portais identificáveis; nunca pague para liberar candidatura.</p>
+<p>Não se candidate de novo à mesma vaga usando dados diferentes. Se ela reaparecer e seu perfil mudou de forma real, confira o prazo e o canal antes de novo envio.</p>
+<h2>Reconheça quando precisa reduzir o ritmo</h2>
+<p>Se a busca está impedindo sono, alimentação, trabalho atual ou cuidado básico, diminua blocos e procure apoio de pessoas de confiança ou serviço de saúde. Rejeição repetida pode ser difícil, mas conselho genérico de “ser positivo” não substitui descanso nem atendimento profissional quando necessário.</p>
+<p>A resposta mais útil combina registro, ajuste proporcional e continuidade. Não transforme uma decisão externa em sentença sobre sua carreira. Use apenas evidência verificável para mudar currículo, alvo ou preparação.</p>
+    `.trim()
+  },
+
+  "retorno-mercado-trabalho-gap-curriculo": {
+    reviewedAt: "2026-10-13",
+    contentHtml: `
+<p><strong>Revisão editorial: 13 de outubro de 2026.</strong> Um intervalo sem vínculo formal pode ocorrer por cuidado familiar, saúde, estudo, busca de trabalho, mudança de cidade ou decisão pessoal. O currículo não precisa esconder a pausa nem expor detalhes íntimos; precisa apresentar datas corretas e o que você pode demonstrar agora.</p>
+<h2>Confira primeiro o histórico objetivo</h2>
+<p>Liste empregos, atividades autônomas verdadeiras, cursos e projetos com mês e ano. Consulte seus registros na <a href="https://www.gov.br/pt-br/apps/ctps-digital" target="_blank" rel="noopener noreferrer">Carteira de Trabalho Digital</a> quando houver vínculo formal. Não altere datas para eliminar o intervalo e não crie trabalho informal que não existiu.</p>
+<h2>Decida se a pausa precisa aparecer</h2>
+<p>Um currículo cronológico já mostra o período entre experiências; não é obrigatório criar uma seção só para justificá-lo. Quando o intervalo é longo ou relevante para a conversa, uma linha pode bastar: “Pausa profissional por responsabilidade familiar, com retorno disponível a partir de outubro de 2026.” Informe apenas o que deseja e o que afeta a disponibilidade.</p>
+<p>Não inclua diagnóstico, nome de dependente, processo judicial ou documento de saúde. Na entrevista, você pode dizer: “Estive fora do mercado formal por uma questão pessoal já organizada. Hoje tenho disponibilidade para a escala informada.”</p>
+<h2>Reconstrua evidências atuais</h2>
+<p>Escolha tarefas do cargo-alvo e produza provas pequenas e honestas: exercício de planilha com dados fictícios, organização de arquivos, atendimento voluntário autorizado ou curso concluído. Identifique cada item como estudo, projeto ou voluntariado; não o apresente como emprego.</p>
+<p>O <a href="https://www.gov.br/pt-br/servicos/consultar-quadro-brasileiro-de-qualificacoes" target="_blank" rel="noopener noreferrer">Quadro Brasileiro de Qualificações</a> ajuda a consultar conhecimentos, habilidades e atitudes relacionados às ocupações. Use-o para mapear lacunas, não para copiar competências que ainda não desenvolveu.</p>
+<h2>Atualize contato, disponibilidade e referências</h2>
+<ul><li>telefone e e-mail funcionando;</li><li>cidade e modalidade de trabalho corretas;</li><li>turnos que realmente pode cumprir;</li><li>duas pessoas que conhecem trabalho anterior e autorizaram contato;</li><li>currículo em formato legível;</li><li>perfil profissional coerente com as mesmas datas.</li></ul>
+<p>Avise a referência sobre o tipo de vaga. Não use contato de alguém sem consentimento e não peça que confirme cargo ou atividade inexistente.</p>
+<h2>Prepare uma resposta curta para a entrevista</h2>
+<p>Use três partes: fato que deseja compartilhar, situação atual e conexão com a vaga. Exemplo: “Fiquei dois anos fora do mercado formal para cuidar de um familiar. Essa rotina está reorganizada. Atualizei meus conhecimentos de planilha e busco voltar para apoio administrativo, área em que já trabalhei com cadastro e conferência.”</p>
+<p>Se não fez curso durante a pausa, não peça desculpa. Mostre experiências anteriores e como pretende aprender a ferramenta da empresa. Retorno ao trabalho não exige uma história de produtividade permanente.</p>
+<h2>Teste a volta com condições sustentáveis</h2>
+<p>Antes de enviar, confira jornada, deslocamento, remuneração informada e responsabilidades. O serviço <a href="https://www.gov.br/pt-br/servicos/buscar-emprego-no-sistema-nacional-de-emprego-sine" target="_blank" rel="noopener noreferrer">Buscar Emprego no SINE</a> permite consultar oportunidades conforme o cadastro. Começar por função adjacente pode ser adequado, desde que as condições sejam reais e não haja promessa de crescimento inventada.</p>
+<p>A pausa é uma informação da trajetória, não a identidade do candidato. Datas corretas, evidências atuais e limites claros permitem que o recrutador avalie a compatibilidade com a função sem exigir exposição desnecessária.</p>
+    `.trim()
+  },
+
+  "transporte-entrevista-emprego-sao-luis": {
+    reviewedAt: "2026-10-13",
+    contentHtml: `
+<p><strong>Revisão editorial: 13 de outubro de 2026.</strong> Planejar o transporte para uma entrevista em São Luís reduz risco de atraso, gasto inesperado e chegada ao endereço errado. Como trânsito, clima e operação mudam, confirme as informações perto da data e mantenha contato oficial da seleção.</p>
+<h2>Valide o destino antes de montar a rota</h2>
+<p>Confirme nome da empresa, unidade, rua, número, ponto de referência, horário e pessoa ou setor responsável. Compare o endereço do convite com o site oficial. Não siga localização enviada por perfil desconhecido nem aceite mudança para residência, hotel ou local isolado sem verificar a empresa.</p>
+<p>Se a entrevista for em área industrial, shopping, hospital ou condomínio, pergunte qual entrada deve usar e quanto tempo costuma levar da portaria ao setor. Chegar ao prédio não é o mesmo que estar na recepção correta.</p>
+<h2>Pesquise ida e volta</h2>
+<p>Monte a rota no horário aproximado do compromisso e anote linha, integração, ponto de descida e caminhada. A Prefeitura mantém uma página sobre o <a href="https://www.saoluis.ma.gov.br/bilhete-unico/" target="_blank" rel="noopener noreferrer">Bilhete Único de São Luís</a>, com regras gerais de integração. Consulte informação atual antes da viagem; este guia não informa tarifa nem garante horário de linha.</p>
+<p>A página de <a href="https://www.saoluis.ma.gov.br/departamentos/smtt" target="_blank" rel="noopener noreferrer">departamentos da SMTT</a> identifica a área municipal responsável pelo planejamento, programação, gestão tarifária e fiscalização do transporte coletivo. Use canais oficiais para confirmar serviço quando houver alteração.</p>
+<h2>Crie margem a partir de etapas reais</h2>
+<ol><li>tempo até o ponto ou local de embarque;</li><li>espera prevista;</li><li>trajeto principal;</li><li>integração ou transbordo;</li><li>caminhada e acesso ao prédio;</li><li>margem para imprevisto.</li></ol>
+<p>Faça um teste prévio quando o endereço for desconhecido e isso couber no orçamento. Caso contrário, confira imagens públicas do local e pergunte sobre a entrada. Não compartilhe localização em tempo real com o recrutador; envie apenas atualização necessária sobre chegada.</p>
+<h2>Defina um plano B possível</h2>
+<p>Liste outra linha, ponto alternativo ou pessoa que possa ajudar. Calcule antes quanto custaria transporte por aplicativo, sem assumir que estará disponível. Leve saldo ou meio de pagamento compatível e mantenha bateria no telefone. O plano B deve ser realista para sua renda.</p>
+<h2>Se houver atraso, avise cedo</h2>
+<p>Entre em contato pelo canal usado na convocação assim que perceber o risco: “Olá, sou Ana, candidata à vaga de recepcionista marcada para 9h. O transporte sofreu uma interrupção e minha previsão atual é 9h15. Posso manter a entrevista ou vocês preferem outra orientação?” Não invente acidente nem envie foto de terceiros para provar.</p>
+<p>A orientação do <a href="https://sine.pb.gov.br/informacoes/documentos/dicas-para-entrevista" target="_blank" rel="noopener noreferrer">SINE-PB sobre entrevistas</a> destaca chegar antes do horário. Planejamento ajuda, mas um imprevisto comunicado não deve levar você a correr, atravessar em local inseguro ou aceitar motorista sem identificação.</p>
+<h2>Avalie o deslocamento como parte da vaga</h2>
+<p>Depois da entrevista, estime custo, duração, segurança e compatibilidade com a escala. Faça o cálculo para ida e volta durante o mês com os valores atuais que você confirmou. Se o trajeto inviabiliza a rotina, pergunte sobre unidade, horário ou modalidade; não aceite contando com mudança que a empresa não prometeu.</p>
+<p>Guarde endereço e contato apenas enquanto forem necessários. Um bom plano de transporte protege pontualidade e segurança sem transformar uma estimativa em garantia.</p>
+    `.trim()
   }
 };
 
