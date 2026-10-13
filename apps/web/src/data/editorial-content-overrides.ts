@@ -1048,6 +1048,9 @@ const overrides: Record<string, EditorialContentOverride> = {
   "vaga-sazonal-comercio-sao-luis": {
     reviewedAt: "2026-10-12",
     contentHtml: `
+Warning: truncated output (original token count: 20431)
+Total output lines: 350
+
 <p><strong>Revisão editorial: 12 de outubro de 2026.</strong> Este guia diferencia aumento sazonal de movimento e contrato de trabalho temporário. Ele não anuncia vaga nem prevê efetivação. Uma empresa pode reforçar a equipe em período de maior demanda por diferentes formas de contratação; somente o anúncio, a proposta e o contrato identificam a relação oferecida.</p>
 <h2>Sazonalidade não define sozinha o contrato</h2><p>A <a href="https://www.planalto.gov.br/ccivil_03/leis/l6019.htm" target="_blank" rel="noopener noreferrer">Lei nº 6.019/1974</a> define trabalho temporário como aquele em que uma empresa de trabalho temporário coloca o trabalhador à disposição de uma tomadora para substituir pessoal permanente de forma transitória ou atender demanda complementar de serviços. A lei inclui demanda previsível de natureza intermitente, periódica ou sazonal.</p>
 <p>Isso não significa que todo anúncio “de fim de ano” seja automaticamente contrato temporário nos termos da lei. Antes de aceitar, identifique quem será o empregador, qual empresa é a tomadora, qual o motivo, o prazo e a forma de registro. A lei determina contrato escrito entre a empresa de trabalho temporário e o trabalhador e proíbe a empresa de trabalho temporário de cobrar qualquer importância do trabalhador, salvo descontos previstos em lei.</p>
@@ -1192,11 +1195,7 @@ const overrides: Record<string, EditorialContentOverride> = {
 <h2>Calcule custo com seus próprios valores</h2><p>Use a <a href="/ferramentas/custo-deslocamento">calculadora de deslocamento</a> para registrar passagens, combustível, estacionamento ou transporte alternativo. A ferramenta não publica tarifa oficial e não decide benefício. Faça cenários para dias normais, fechamento tardio e perda de conexão.</p>
 <p>O vale-transporte possui regras próprias. Para uma fonte oficial de orientação, consulte o <a href="https://www.gov.br/trabalho-e-emprego/pt-br/servicos/trabalhador/vale-transporte" target="_blank" rel="noopener noreferrer">serviço do Ministério do Trabalho e Emprego sobre vale-transporte</a>, quando disponível, e verifique contrato e norma coletiva. Se a informação oficial mudar ou a página não responder, procure o RH, sindicato ou inspeção do trabalho.</p>
 <h2>Faça um pedido específico</h2><p>“O trânsito é ruim” não indica solução. Escolha uma alternativa compatível com o posto: entrada e saída deslocadas, tolerância ligada a compensação formal, unidade mais próxima, dias presenciais definidos ou transporte empresarial existente. Não ofereça trabalho fora da jornada para compensar informalmente sem entender como será registrado.</p>
-<p>Exemplo: “Testei o trajeto e, com a primeira conexão disponível, a chegada segura fica em torno de 8h15. Existe possibilidade de jornada das 8h30 às 17h30, mantendo a carga e as entregas? Se não, há outra escala ou unidade?” Ajuste horários à situação real; os números acima são apenas estrutura de fala.</p>
-<h2>Entenda o limite da função</h2><p>Atendimento de abertura, troca de turno, caixa e operação presencial podem exigir horário fixo. Pergunte qual atividade impede a mudança. Talvez exista solução parcial; talvez não exista. Recusar uma proposta inviável antes da admissão é mais profissional do que aceitar contando com alteração não aprovada.</p>
-<p>Se houver acordo, peça registro escrito com jornada, intervalo, local, data de início e quem autorizou. A <a href="https://www.planalto.gov.br/ccivil_03/decreto-lei/del5452compilado.htm" target="_blank" rel="noopener noreferrer">CLT consolidada</a> é a fonte legal geral sobre duração do trabalho, mas contrato e convenção coletiva precisam ser lidos para o caso. Não confunda mensagem informal com alteração contratual definitiva.</p>
-<h2>Inclua segurança e acessibilidade</h2><p>Considere iluminação, espera em ponto, última conexão, acessibilidade do percurso e chegada ao local. Se uma condição de saúde ou deficiência exige ajuste, você pode explicar a barreira funcional sem divulgar diagnóstico além do necessário. A <a href="https://www.planalto.gov.br/ccivil_03/_ato2015-2018/2015/lei/l13146.htm" target="_blank" rel="noopener noreferrer">Lei Brasileira de Inclusão</a> trata de igualdade de oportunidades e adaptação razoável; a aplicação concreta pode requerer orientação.</p>
-<h2>Decida pelo cenário aprovado</h2><p>Não compare a vaga com o horário que gostaria de obter. Compare com o que a empresa confirmou. Se o acordo não for registrado, trate o cenário original como vigente. Guarde a proposta e reveja a conta após o primeiro mês, sem faltar ou alterar jornada por conta própria.</p>
+<p>Exemplo: “Testei o trajeto e, com a primeira conexão disponível, a chegada segura fica em torno de 8h15. Existe possibilidade de jornada das 8h30 às 17h30, mantendo a carga e as entregas? Se não, há outra escala ou unidade?” Ajuste horários à situação real; os números…431 tokens truncated…ada por conta própria.</p>
 <p>Negociação útil é verificável: trajeto medido, pedido claro, impacto operacional discutido e resposta escrita.</p>
     `.trim()
   },
@@ -1997,6 +1996,194 @@ const overrides: Record<string, EditorialContentOverride> = {
 <p>Mantenha somente documentos pessoais e comprovantes que você está autorizado a guardar. Arquivos de cliente, listas internas, código, proposta comercial e conversa de colega continuam protegidos após a saída. Se precisar comprovar um fato em disputa, procure orientação antes de copiar material confidencial por conta própria.</p>
 <p>Se pedirem assinatura, leia, solicite cópia e peça explicação do que não entendeu. Assinar presença em reunião é diferente de concordar com toda narrativa; verifique o texto concreto. Para uma saída iniciada pelo trabalhador, consulte também o guia sobre <a href="/blog/pedido-demissao-aviso-previo-acerto">pedido de demissão e aviso</a>.</p>
 <p>Encerre confirmando quem responde por cada pendência e como você receberá comprovantes. Uma entrevista de desligamento útil deixa registro claro; ela não exige gratidão forçada, ataque pessoal nem renúncia a direitos.</p>
+    `.trim()
+  },
+
+  "follow-up-apos-entrevista-mensagem": {
+    reviewedAt: "2026-10-13",
+    contentHtml: `
+<p><strong>Revisão editorial: 13 de outubro de 2026.</strong> Follow-up é uma mensagem de acompanhamento depois da entrevista. Ele não acelera a decisão nem cria obrigação de resposta. A função é identificar o processo, respeitar o prazo informado e deixar claro que você continua disponível.</p>
+<h2>Antes de escrever, recupere o combinado</h2>
+<p>Consulte a anotação feita ao final da entrevista: cargo, data, canal, nome do contato e prazo de retorno. Se a empresa disse “até sexta”, aguarde o fim desse prazo. Se não houve data, não transforme silêncio de poucas horas em cobrança. Escolha um momento razoável e envie uma única mensagem objetiva pelo canal já usado pela seleção.</p>
+<p>O <a href="https://www.linkedin.com/help/linkedin/answer/a8684146" target="_blank" rel="noopener noreferrer">rastreador de oportunidades do LinkedIn</a> permite organizar vagas por etapa e incluir notas. Você pode obter o mesmo resultado em uma planilha própria: anúncio, candidatura, entrevista, prazo e próxima ação. Não guarde documento pessoal ou conversa confidencial nessa planilha.</p>
+<h2>Monte a mensagem com cinco informações</h2>
+<ol><li>nome da pessoa, se confirmado;</li><li>cargo e data da entrevista;</li><li>referência ao prazo, quando existiu;</li><li>pergunta curta sobre o andamento;</li><li>disponibilidade para complementar informação.</li></ol>
+<p>Modelo quando o prazo terminou: “Olá, Carla. Participei da entrevista de terça-feira para a vaga de atendente. Como o retorno estava previsto para esta semana, gostaria de saber se há atualização sobre a etapa. Continuo interessado e disponível caso precisem de outra informação. Obrigado.”</p>
+<p>Sem nome confirmado: “Olá, equipe de recrutamento. Participei em 8 de outubro da entrevista para auxiliar administrativo. Gostaria de confirmar se o processo segue em andamento e se existe previsão para a próxima etapa. Fico disponível. Obrigado.” Não invente intimidade, não use áudio longo e não acrescente urgência pessoal para pressionar.</p>
+<h2>Adapte ao canal sem perder o registro</h2>
+<p>No e-mail, responda à conversa original e mantenha o assunto. Em aplicativo de mensagem, escreva em horário comercial e cite a vaga logo no início. Em plataforma de recrutamento, use a área de mensagens, se existir. Evite procurar perfil pessoal do entrevistador quando a empresa forneceu outro canal.</p>
+<p>Se a candidatura veio do SINE, acompanhe pelo canal indicado no próprio serviço ou encaminhamento. A página oficial <a href="https://www.gov.br/pt-br/servicos/buscar-emprego-no-sistema-nacional-de-emprego-sine" target="_blank" rel="noopener noreferrer">Buscar Emprego no SINE</a> descreve consulta e candidatura; ela não autoriza contato por números encontrados fora do anúncio.</p>
+<h2>Leia cada tipo de resposta</h2>
+<ul><li><strong>processo em andamento:</strong> agradeça e anote a nova data;</li><li><strong>pedido de informação:</strong> envie apenas o solicitado pelo canal validado;</li><li><strong>vaga encerrada:</strong> agradeça e arquive, sem discutir a decisão;</li><li><strong>nenhuma resposta:</strong> registre a tentativa e continue outras candidaturas;</li><li><strong>pedido de pagamento ou dado sensível inesperado:</strong> interrompa e confirme a identidade da empresa.</li></ul>
+<p>Uma segunda mensagem só faz sentido quando o recrutador indicou nova janela ou deixou uma pendência concreta. Repetir “alguma novidade?” todos os dias não produz evidência nova e pode dificultar a comunicação.</p>
+<h2>Proteja seus dados no acompanhamento</h2>
+<p>Não reenvie RG, CPF, dados bancários ou foto de documento “para agilizar” sem saber quem pediu, por que precisa e qual é o canal autorizado. O <a href="https://cartilha.cert.br/fasciculos/" target="_blank" rel="noopener noreferrer">CERT.br</a> reúne orientações sobre privacidade, perfis falsos e verificação em duas etapas. Desconfie de mudança repentina de número, domínio parecido ou link encurtado.</p>
+<p>Feche o ciclo na sua lista com data e resultado. Follow-up profissional é um registro curto, não uma tentativa de convencer depois da entrevista. Enquanto espera, mantenha outras candidaturas compatíveis ativas e não interprete silêncio como aprovação ou reprovação.</p>
+    `.trim()
+  },
+
+  "gestao-de-tempo-trabalho-dicas": {
+    reviewedAt: "2026-10-13",
+    contentHtml: `
+<p><strong>Revisão editorial: 13 de outubro de 2026.</strong> No emprego novo, administrar o tempo começa por entender o que precisa ser entregue, quem define a prioridade e quais interrupções não podem esperar. Aplicativo nenhum resolve uma fila contraditória sem alinhamento com a liderança.</p>
+<h2>Transforme pedidos soltos em uma fila visível</h2>
+<p>Para cada demanda, anote: resultado esperado, responsável pela aprovação, prazo, dependência e próximo passo. “Ver pedidos” é vago; “conferir número, forma de pagamento e endereço dos pedidos recebidos até 14h” permite estimar e conferir. Não copie dados de cliente para caderno pessoal: use o sistema ou registro autorizado.</p>
+<p>A Escola Virtual de Governo apresenta, no curso <a href="https://www.escolavirtual.gov.br/curso/468" target="_blank" rel="noopener noreferrer">Produtividade e Gestão do Tempo</a>, temas como autoconhecimento, desempenho e atitudes produtivas. Use materiais assim para experimentar métodos, não para concluir que todo atraso é falha individual. Volume excessivo, sistema indisponível e prioridade conflitante precisam ser comunicados.</p>
+<h2>Negocie prioridade com dados curtos</h2>
+<p>Quando duas tarefas urgentes chegam juntas, não escolha em silêncio. Diga o que está fazendo, o tempo restante e a consequência: “Estou fechando o relatório que vence às 11h; o cadastro novo leva cerca de 30 minutos. Qual deve vir primeiro?” A decisão fica com quem coordena o trabalho e você registra a ordem.</p>
+<p>Evite prometer horário que ainda não estimou. Quebre a tarefa, execute uma amostra e atualize a previsão. Se a atividade depende de outra pessoa, registre o pedido e o ponto bloqueado. Isso diferencia atraso de espera por insumo.</p>
+<h2>Use blocos adequados ao tipo de trabalho</h2>
+<ul><li><strong>atendimento:</strong> organize retorno, pendência e passagem de caso;</li><li><strong>estoque:</strong> separe recebimento, conferência, registro e armazenamento;</li><li><strong>administrativo:</strong> agrupe lançamentos semelhantes e reserve conferência;</li><li><strong>produção:</strong> respeite sequência, segurança e tempo técnico, sem acelerar etapa obrigatória;</li><li><strong>trabalho criativo:</strong> combine períodos sem interrupção com janelas de resposta.</li></ul>
+<p>A <a href="https://www.gov.br/trabalho-e-emprego/pt-br/assuntos/cbo/pagina-inicial/" target="_blank" rel="noopener noreferrer">Classificação Brasileira de Ocupações</a> descreve conteúdos de ocupações para fins classificatórios. Ela pode ajudar a entender famílias de tarefas, mas não substitui a descrição da vaga, o treinamento, o contrato ou o procedimento da empresa.</p>
+<h2>Trate interrupções sem perder a tarefa original</h2>
+<p>Antes de mudar de assunto, deixe uma marca: última etapa concluída, arquivo aberto e próximo passo. Se a interrupção puder esperar, registre e combine quando responderá. Se envolver segurança, cliente presente ou parada de operação, siga a prioridade definida no local. Depois, retome pela marca; confiar só na memória aumenta retrabalho.</p>
+<h2>Avise risco antes do prazo</h2>
+<p>Uma atualização útil contém quatro partes: entrega, estado, obstáculo e opção. Exemplo: “Conferi 18 de 25 cadastros. Sete dependem da planilha corrigida. Se ela chegar até 15h, concluo hoje; se não, posso finalizar os já válidos e entregar o restante amanhã.” Não espere o fim do turno para revelar bloqueio conhecido de manhã.</p>
+<h2>Faça uma revisão de dez minutos</h2>
+<p>No fim do dia, confira o que terminou, o que ficou bloqueado e o que precisa ser retomado. Apague lembretes com dados sensíveis e transfira o registro necessário ao sistema oficial. Uma vez por semana, identifique repetição que merece checklist, não vigilância permanente sobre cada minuto.</p>
+<p>Gestão do tempo saudável não significa trabalhar sem pausa ou esconder sobrecarga. Significa tornar compromissos visíveis, confirmar prioridades e preservar qualidade e segurança. Se a demanda não cabe na jornada, leve evidências para o alinhamento em vez de compensar continuamente com trabalho não combinado.</p>
+    `.trim()
+  },
+
+  "inteligencia-emocional-entrevista": {
+    reviewedAt: "2026-10-13",
+    contentHtml: `
+<p><strong>Revisão editorial: 13 de outubro de 2026.</strong> Em entrevista, inteligência emocional não é sorrir o tempo todo nem aceitar desrespeito. É perceber a própria reação, escutar a pergunta, escolher uma resposta profissional e estabelecer limite quando necessário.</p>
+<h2>Prepare fatos antes de treinar a calma</h2>
+<p>Selecione três situações verdadeiras: conflito de prioridade, erro corrigido e atendimento difícil. Para cada uma, anote contexto, sua responsabilidade, ação e resultado. Se o resultado não tiver número, descreva uma mudança observável: pedido entregue, registro corrigido, cliente encaminhado ou prazo renegociado.</p>
+<p>O curso oficial <a href="https://www.escolavirtual.gov.br/curso/318" target="_blank" rel="noopener noreferrer">Inteligência Emocional</a>, da Escola Virtual de Governo, aborda gestão das próprias emoções e relações interpessoais. O conceito pode orientar preparação, mas não existe frase mágica que prove maturidade; a evidência está em como você relata decisões e limites.</p>
+<h2>Use uma pausa com propósito</h2>
+<p>Quando a pergunta surpreender, respire e confirme o foco: “Você gostaria de um exemplo de conflito com colega ou de pressão de prazo?” Essa pausa organiza a resposta e evita atacar alguém. Se não souber, diga o limite e explique como buscaria a informação. Inventar procedimento técnico para parecer calmo é mais arriscado que admitir a dúvida.</p>
+<p>Exemplo hipotético: “Dois pedidos chegaram com o mesmo prazo. Confirmei com a supervisão qual impactava o cliente naquele turno, avisei a outra área e registrei a nova entrega. Ambos foram concluídos na ordem acordada.” O exemplo mostra ação; “sou equilibrado sob qualquer pressão” é apenas adjetivo.</p>
+<h2>Responda ao conflito sem julgar pessoas</h2>
+<p>Descreva comportamento e impacto, não personalidade. Troque “meu colega era irresponsável” por “a conferência não foi feita no horário combinado, então sinalizei a pendência e propus dupla checagem”. Conte também o que você faria diferente. A entrevista não é lugar para expor nome, diagnóstico, dado de cliente ou conversa privada.</p>
+<h2>Na dinâmica, contribua sem dominar</h2>
+<ul><li>confirme objetivo e tempo;</li><li>apresente uma ideia de cada vez;</li><li>convide quem ainda não falou;</li><li>registre decisão e divergência;</li><li>não se aproprie da proposta de outra pessoa;</li><li>se discordar, explique o critério usado.</li></ul>
+<p>Falar menos pode ser adequado quando você está organizando informações ou ouvindo. A meta não é encenar liderança, mas ajudar o grupo a produzir uma resposta.</p>
+<h2>Reconheça pergunta inadequada</h2>
+<p>Você pode redirecionar pergunta pessoal para requisito da vaga: “Posso detalhar minha disponibilidade para a escala e viagens.” A <a href="https://www.gov.br/trabalho-e-emprego/pt-br/assuntos/inspecao-do-trabalho/combate_a_discriminacao" target="_blank" rel="noopener noreferrer">área de combate à discriminação do Ministério do Trabalho</a> reúne referências sobre práticas discriminatórias. Se houver humilhação, ameaça ou critério alheio à função, encerrar a conversa pode ser uma medida de proteção, não falta de controle emocional.</p>
+<h2>Cuide do antes e do depois</h2>
+<p>Planeje trajeto, água, documento e margem de chegada. Se o atraso acontecer, avise pelo canal oficial com estimativa real. Depois da entrevista, registre perguntas e respostas enquanto lembra, mas não publique acusação impulsiva nem exponha participantes. Se ocorreu fato grave, preserve evidências e procure canal adequado.</p>
+<p>Nervosismo não invalida competência. Você pode pedir alguns segundos, beber água e retomar. A melhor preparação combina histórias verdadeiras, escuta e limite — não a obrigação de parecer imperturbável.</p>
+    `.trim()
+  },
+
+  "linkedin-emprego-sao-luis-perfil": {
+    reviewedAt: "2026-10-13",
+    contentHtml: `
+<p><strong>Revisão editorial: 13 de outubro de 2026.</strong> Um perfil do LinkedIn pode complementar o currículo, mas não é obrigatório para toda vaga e não substitui o canal indicado no anúncio. Atualize apenas informações que consegue comprovar e decida conscientemente o que ficará público.</p>
+<h2>Defina o cargo-alvo antes do título</h2>
+<p>Use a nomenclatura encontrada em anúncios compatíveis e confirme o significado na <a href="https://www.gov.br/trabalho-e-emprego/pt-br/assuntos/cbo/pagina-inicial/" target="_blank" rel="noopener noreferrer">Classificação Brasileira de Ocupações</a>. A CBO ajuda a identificar ocupações, mas não regulamenta profissão nem prova que há vaga aberta. Um título possível é “Auxiliar administrativo | cadastro, atendimento e conferência de documentos”, desde que essas tarefas façam parte da sua experiência.</p>
+<p>Evite “em busca de oportunidades” como única informação. Localização e preferência de trabalho devem refletir sua disponibilidade real; não prometa mudança ou turno que não consegue cumprir.</p>
+<h2>Escreva o resumo em três blocos</h2>
+<ol><li>função ou área desejada;</li><li>duas ou três tarefas que sabe executar;</li><li>tipo de oportunidade e cidade compatíveis.</li></ol>
+<p>Exemplo: “Atuo com atendimento e organização de documentos. Já registrei pedidos, conferi dados e acompanhei pendências em planilhas. Busco funções administrativas presenciais ou híbridas em São Luís, conforme a escala informada.” Não inclua salário, documento, endereço completo ou justificativa íntima.</p>
+<h2>Converta experiências em evidência</h2>
+<p>Em cada trabalho, projeto ou atividade voluntária, informe contexto, tarefa e resultado observável. “Organizei arquivos digitais por cliente e data, reduzindo a procura manual da equipe” é melhor que copiar palavras-chave. Se não mediu redução, retire a promessa e descreva o processo. Curso em andamento precisa aparecer como em andamento.</p>
+<p>O próprio LinkedIn explica que <a href="https://www.linkedin.com/help/linkedin/answer/a512279/" target="_blank" rel="noopener noreferrer">recomendações de vagas usam informações do perfil</a>, como título, resumo, experiência, educação e preferências. Isso não garante visibilidade nem contratação; serve para entender por que informação imprecisa também piora as recomendações recebidas.</p>
+<h2>Configure alertas sem criar ruído</h2>
+<p>Crie poucos alertas com cargo, localização e modalidade realistas. Compare o anúncio no site da empresa quando possível e registre candidatura. O guia oficial <a href="https://www.linkedin.com/help/linkedin/answer/a6208092" target="_blank" rel="noopener noreferrer">Primeiros passos no LinkedIn</a> reúne recursos de perfil e alertas. Desative alertas que só repetem funções incompatíveis, em vez de abrir todos por impulso.</p>
+<h2>Revise privacidade e segurança</h2>
+<p>Não publique telefone pessoal em seção aberta se o contato pela plataforma ou e-mail profissional for suficiente. Ative verificação em duas etapas, revise sessões e desconfie de recrutador que migra imediatamente para número desconhecido, pede pagamento ou envia arquivo inesperado. O <a href="https://cartilha.cert.br/fasciculos/" target="_blank" rel="noopener noreferrer">fascículo de Redes Sociais do CERT.br</a> orienta sobre exposição, perfis falsos e configurações de privacidade.</p>
+<h2>Faça uma conferência cruzada</h2>
+<ul><li>datas e cargos iguais aos do currículo;</li><li>nome usado profissionalmente consistente;</li><li>links funcionando;</li><li>experiências sem informação confidencial;</li><li>competências demonstradas no texto;</li><li>preferências de localização atualizadas.</li></ul>
+<p>Foto, capa e publicações são opcionais; não invente rotina de conteúdo para “alimentar algoritmo”. Um perfil simples, coerente e seguro é mais útil que atividade diária genérica. Candidate-se sempre pelo canal oficial da vaga e trate convite recebido na rede como início de verificação, não como contratação.</p>
+    `.trim()
+  },
+
+  "marca-pessoal-candidatura-sao-luis": {
+    reviewedAt: "2026-10-13",
+    contentHtml: `
+<p><strong>Revisão editorial: 13 de outubro de 2026.</strong> Marca pessoal para candidatura não exige logotipo, ensaio fotográfico ou postagem diária. É a coerência entre o que você diz que faz, as evidências apresentadas e a forma como mantém contato.</p>
+<h2>Comece por uma frase verificável</h2>
+<p>Complete: “Posso ajudar uma equipe de ___ executando ___ e ___.” Um candidato a estoque pode citar recebimento, separação e conferência se realmente fez essas tarefas. Um candidato a atendimento pode mencionar registro de pedidos e encaminhamento de dúvidas. Troque adjetivos vagos por atividades.</p>
+<p>Consulte anúncios atuais e a <a href="https://www.gov.br/trabalho-e-emprego/pt-br/assuntos/cbo/pagina-inicial/" target="_blank" rel="noopener noreferrer">Classificação Brasileira de Ocupações</a> para entender nomes e conteúdos de ocupações. A CBO é classificatória: não use o código como certificado de competência nem como prova de que uma profissão é regulamentada.</p>
+<h2>Monte um conjunto mínimo de apresentação</h2>
+<ul><li>currículo-base sem dados excessivos;</li><li>versão adaptada ao cargo;</li><li>e-mail com nome reconhecível;</li><li>mensagem curta de candidatura;</li><li>até três exemplos de trabalho, quando a função permite;</li><li>registro das vagas e versões enviadas.</li></ul>
+<p>Os exemplos podem ser planilha fictícia sem dados de terceiros, foto de peça produzida com autorização, certificado verificável ou breve descrição de projeto. Nunca publique material de cliente, tela interna, uniforme com informação sensível ou documento da empresa para provar experiência.</p>
+<h2>Alinhe seus pontos de contato</h2>
+<p>Use o mesmo nome profissional no currículo, e-mail e perfil. Confira mensagem da caixa postal e foto do aplicativo usado com recrutadores. Isso não significa apagar identidade, crença ou vida pessoal; significa escolher o que pertence ao canal profissional. Não forneça endereço completo, CPF ou documento na apresentação pública.</p>
+<p>O <a href="https://cartilha.cert.br/dicas-rapidas/" target="_blank" rel="noopener noreferrer">CERT.br</a> recomenda pensar antes de publicar e usar configurações de privacidade. Revise o que está aberto, mas não tente criar uma biografia artificial. Se alguém pedir senha, código de verificação ou pagamento, interrompa o contato.</p>
+<h2>Demonstre consistência sem virar influenciador</h2>
+<p>Você não precisa produzir conteúdo. Pode manter o perfil atualizado, comentar apenas quando tem algo útil e enviar materiais diretamente na candidatura. Se decidir publicar, descreva aprendizado ou projeto sem copiar texto de terceiros. Uma atualização mensal verdadeira vale mais que frases motivacionais diárias que não mostram trabalho.</p>
+<h2>Teste a mensagem em uma vaga real</h2>
+<p>Escolha um anúncio compatível e marque cada requisito como: comprovado, parcialmente comprovado ou ausente. Ajuste o currículo para destacar evidências verdadeiras; não adicione ferramenta só porque aparece na vaga. O serviço <a href="https://www.gov.br/pt-br/servicos/buscar-emprego-no-sistema-nacional-de-emprego-sine" target="_blank" rel="noopener noreferrer">Buscar Emprego no SINE</a> é um canal público para consulta e candidatura, além dos sites institucionais das empresas.</p>
+<h2>Evite custos sem problema definido</h2>
+<p>Antes de pagar foto, curso, domínio ou consultoria, escreva qual lacuna pretende resolver e qual evidência mostrará melhora. Muitas vezes basta corrigir contato, simplificar o PDF ou preparar exemplos. Nenhum serviço legítimo pode prometer contratação.</p>
+<p>Revise o conjunto a cada mudança real de experiência ou cargo-alvo. Marca pessoal útil é a repetição coerente de fatos: mesma trajetória, exemplos compreensíveis e contato seguro. Ela não substitui qualificação, processo seletivo ou disponibilidade para a vaga.</p>
+    `.trim()
+  },
+
+  "mudanca-de-carreira-sao-luis-curriculo": {
+    reviewedAt: "2026-10-13",
+    contentHtml: `
+<p><strong>Revisão editorial: 13 de outubro de 2026.</strong> Mudar de carreira não exige apagar empregos anteriores. O currículo precisa mostrar a ponte entre o que você já fez, as tarefas da área nova e as evidências que ainda está construindo.</p>
+<h2>Defina a transição em termos de trabalho</h2>
+<p>Escolha um ou dois cargos-alvo e reúna anúncios verdadeiros. Liste tarefas recorrentes, ferramentas, formação exigida e condições. A <a href="https://www.gov.br/pt-br/servicos/consultar-quadro-brasileiro-de-qualificacoes" target="_blank" rel="noopener noreferrer">consulta ao Quadro Brasileiro de Qualificações</a> ajuda a mapear conhecimentos, habilidades e atitudes relacionados às ocupações da CBO. Use a descrição como referência, não como promessa de vaga.</p>
+<p>Exemplo: quem trabalhou no comércio e busca apoio administrativo pode ter evidência de atendimento, conferência, registro, organização e fechamento. Isso não prova domínio de sistema contábil; a lacuna deve permanecer visível até existir aprendizado real.</p>
+<h2>Crie uma matriz de ponte</h2>
+<table><thead><tr><th>Requisito do anúncio</th><th>Evidência atual</th><th>Lacuna</th><th>Próxima ação</th></tr></thead><tbody><tr><td>planilha básica</td><td>controle de pedidos</td><td>fórmulas simples</td><td>exercício próprio</td></tr><tr><td>atendimento</td><td>balcão e telefone</td><td>vocabulário do setor</td><td>ler procedimentos públicos</td></tr><tr><td>arquivo digital</td><td>documentos físicos</td><td>nomeação e pastas</td><td>projeto demonstrativo</td></tr></tbody></table>
+<p>Preencha com sua realidade. Não crie resultado, cliente ou emprego “ponte” que não existiu. Curso entra somente quando responde a uma lacuna concreta e pode ser concluído dentro dos seus recursos.</p>
+<h2>Reescreva o topo do currículo</h2>
+<p>No objetivo, informe o cargo novo. No resumo, combine experiência transferível e direção atual: “Profissional de atendimento com experiência em registro de pedidos e conferência de caixa, em transição para apoio administrativo. Prática recente com organização de arquivos digitais e planilhas básicas.” Retire “especialista” se a experiência ainda é inicial.</p>
+<p>Mantenha os empregos anteriores com datas e fatos. Reduza tarefas distantes do alvo, mas preserve entregas que mostram responsabilidade. Curso em andamento deve trazer situação e instituição; projeto de estudo deve ser identificado como projeto.</p>
+<h2>Construa uma evidência pequena</h2>
+<p>Para área administrativa, crie uma planilha fictícia sem dados reais e documente conferências. Para comunicação, produza um texto com briefing próprio e revisão. Para suporte, registre um roteiro de diagnóstico em ambiente de teste. O objetivo é demonstrar método, não fingir experiência comercial.</p>
+<p>O serviço <a href="https://www.gov.br/pt-br/servicos/buscar-emprego-no-sistema-nacional-de-emprego-sine" target="_blank" rel="noopener noreferrer">Buscar Emprego no SINE</a> permite consultar oportunidades compatíveis com o cadastro. Compare também sites de empresas e outros canais identificáveis; nenhuma fonte isolada representa todo o mercado de São Luís.</p>
+<h2>Explique a mudança sem rejeitar o passado</h2>
+<p>Estrutura de entrevista: motivo profissional, habilidade transferível, ação de preparação e limite atual. “Quero migrar do atendimento para rotinas administrativas porque já trabalho com registro e conferência. Estou praticando planilhas e arquivo digital; ainda não usei o sistema da empresa e precisarei do treinamento previsto.”</p>
+<p>Não prometa aceitar qualquer salário ou horário. Calcule deslocamento, renda mínima e responsabilidades antes de escolher uma vaga de entrada. Transição pode ser gradual; um cargo ponte só é útil quando suas condições são sustentáveis.</p>
+<h2>Revise com evidência, não ansiedade</h2>
+<p>A cada duas semanas, compare vagas lidas, requisitos compatíveis, candidaturas e retornos. Se a maioria exige algo ausente, decida entre aprender, mudar o cargo-alvo ou buscar função adjacente. Não compre curso novo apenas porque uma candidatura ficou sem resposta.</p>
+<p>O currículo de transição precisa ser honesto sobre o presente e claro sobre a direção. A trajetória anterior oferece evidências; o plano de aprendizagem cobre lacunas; a contratação continua dependendo de oportunidade e seleção externas.</p>
+    `.trim()
+  },
+
+  "networking-emprego-sao-luis": {
+    reviewedAt: "2026-10-13",
+    contentHtml: `
+<p><strong>Revisão editorial: 13 de outubro de 2026.</strong> Networking não é pedir emprego a toda pessoa conhecida. É manter relações profissionais, trocar informação verificável e fazer pedidos que o contato consegue entender, aceitar ou recusar sem constrangimento.</p>
+<h2>Mapeie relações reais</h2>
+<p>Comece por ex-colegas, professores, fornecedores, clientes com contato autorizado e pessoas de cursos ou projetos. Registre de onde você conhece cada pessoa e qual assunto profissional compartilham. Não importe agenda inteira para plataforma, adicione desconhecidos em massa nem use grupo alheio para propaganda.</p>
+<p>O <a href="https://cartilha.cert.br/fasciculos/" target="_blank" rel="noopener noreferrer">CERT.br</a> orienta sobre exposição em redes sociais, perfis falsos e privacidade. Antes de responder a um novo contato, confirme identidade, vínculo com a empresa e domínio do link enviado.</p>
+<h2>Faça um pedido específico</h2>
+<p>Explique o cargo-alvo, a cidade, o tipo de ajuda e o limite. Exemplo: “Oi, Marcos. Trabalhamos juntos no atendimento da loja X. Estou buscando vagas de auxiliar administrativo em São Luís e atualizei meu currículo com experiência em cadastro e conferência. Se você souber de processo pelo canal oficial, poderia me enviar o link? Não precisa encaminhar meus dados sem me avisar.”</p>
+<p>Outro pedido possível é informação: “Você atua em logística. Posso fazer duas perguntas sobre as tarefas de entrada e os conhecimentos mais usados?” Não peça informação confidencial, nome de candidato ou acesso a sistema.</p>
+<h2>Prepare material fácil de encaminhar</h2>
+<ul><li>uma frase de objetivo;</li><li>currículo em PDF legível;</li><li>e-mail profissional;</li><li>link de portfólio, se relevante;</li><li>disponibilidade verdadeira;</li><li>canal oficial para a vaga, quando já existe.</li></ul>
+<p>Não envie CPF, RG, endereço completo, dado bancário ou certificado que não foi solicitado. Se o contato oferecer “garantia” em troca de dinheiro, interrompa. Indicação legítima não elimina a verificação da empresa e do anúncio.</p>
+<h2>Converta informação em candidatura</h2>
+<p>Ao receber um link, leia requisitos e candidate-se pelo canal indicado. Agradeça sem atribuir responsabilidade pelo resultado. O serviço <a href="https://www.gov.br/pt-br/servicos/buscar-emprego-no-sistema-nacional-de-emprego-sine" target="_blank" rel="noopener noreferrer">Buscar Emprego no SINE</a> é uma alternativa pública; páginas institucionais de empresas também ajudam a verificar processos.</p>
+<p>Registre quem enviou a oportunidade e só mencione indicação se a pessoa autorizou. Escrever “fulano me indicou” sem consentimento pode expor o contato e não comprova vínculo.</p>
+<h2>Ofereça reciprocidade sem moeda de troca</h2>
+<p>Compartilhe edital público, curso oficial ou anúncio verificável que combine com o perfil da pessoa. Revise um currículo se você tiver disponibilidade e conhecimento. Não espere que cada ajuda retorne como vaga. Relação profissional se sustenta por respeito e atualização honesta, não contabilidade de favores.</p>
+<h2>Acompanhe sem insistência</h2>
+<p>Se alguém pediu seu currículo, confirme o envio uma vez. Se não respondeu, não cobre toda semana. Volte a conversar quando houver atualização real: curso concluído, mudança de alvo ou vaga específica. Respeite “não posso ajudar” e não adicione familiares do contato para contornar a resposta.</p>
+<p>Networking útil amplia acesso a informação, mas não garante seleção. Continue consultando canais abertos, adapte o currículo e preserve a autonomia de quem ajuda. O melhor pedido é curto, verificável e fácil de recusar.</p>
+    `.trim()
+  },
+
+  "o-que-vestir-entrevista-emprego": {
+    reviewedAt: "2026-10-13",
+    contentHtml: `
+<p><strong>Revisão editorial: 13 de outubro de 2026.</strong> A roupa da entrevista deve permitir que você chegue com segurança, participe da conversa e, se houver teste autorizado, execute a atividade prevista. Ela não substitui competência nem deve exigir gasto que comprometa sua renda.</p>
+<h2>Descubra o contexto antes de escolher</h2>
+<p>Confirme endereço, formato, duração e se haverá visita ou teste prático. Leia o anúncio e a página oficial da empresa para entender o ambiente, sem tentar imitar fotografias de campanha. Se a seleção não informa traje, uma pergunta objetiva é válida: “Haverá acesso à área operacional ou alguma orientação de vestimenta?”</p>
+<p>Consulte a <a href="https://www.gov.br/trabalho-e-emprego/pt-br/assuntos/cbo/pagina-inicial/" target="_blank" rel="noopener noreferrer">Classificação Brasileira de Ocupações</a> para conhecer conteúdos gerais da função, lembrando que a CBO é classificatória e não define o uniforme de uma empresa. Regras de segurança e treinamento devem vir do responsável pelo local.</p>
+<h2>Priorize limpeza, ajuste e movimento</h2>
+<p>Escolha peças limpas, íntegras e confortáveis para sentar, caminhar e esperar. Não existe cor universal de aprovação. Em São Luís, planeje o calor e o trajeto: tecido respirável e uma opção leve para ambiente climatizado podem evitar desconforto. Leve a peça protegida se parte do percurso puder sujá-la.</p>
+<p>Calçado precisa ser seguro para o deslocamento. Não use equipamento de proteção improvisado. Se o processo inclui cozinha, oficina, estoque ou obra, pergunte se a empresa fornecerá EPI e instrução; não entre em área de risco só para demonstrar disposição.</p>
+<h2>Ajuste ao tipo de encontro</h2>
+<ul><li><strong>escritório ou atendimento:</strong> roupa simples e organizada, compatível com mobilidade;</li><li><strong>varejo:</strong> considere tempo em pé e regras informadas pela loja;</li><li><strong>área operacional:</strong> confirme segurança, acessórios e teste prático;</li><li><strong>vídeo:</strong> teste enquadramento, luz e áudio; vista-se como se pudesse levantar;</li><li><strong>dinâmica externa:</strong> peça detalhes do local, duração e esforço.</li></ul>
+<p>Perfume forte pode incomodar em sala pequena; acessórios que prendem em equipamento podem ser inseguros. Essas são decisões funcionais, não julgamento sobre estilo pessoal.</p>
+<h2>Não aceite mito discriminatório como regra</h2>
+<p>A <a href="https://www.planalto.gov.br/ccivil_03/leis/l9029.htm" target="_blank" rel="noopener noreferrer">Lei nº 9.029/1995</a> proíbe práticas discriminatórias e limitativas no acesso e manutenção da relação de trabalho pelos motivos previstos no texto legal. Orientação sobre roupa não autoriza pergunta invasiva, humilhação ou critério sem relação com a função.</p>
+<p>Se a empresa impõe requisito específico, pergunte a finalidade e como ele se relaciona à atividade. Registre anúncio ou mensagem problemática e procure orientação do Ministério do Trabalho, sindicato ou profissional jurídico quando necessário.</p>
+<h2>Resolva o que tem sem comprar por impulso</h2>
+<p>Separe duas combinações na véspera, experimente sentado e em movimento, confira botões e organize pequenos reparos. Empréstimo pode ser opção se não criar desconforto. Não compre terno, sapato ou maquiagem por promessa de contratação; nenhum item garante resultado.</p>
+<h2>Checklist do dia</h2>
+<ul><li>roupa adequada ao trajeto e ao local confirmado;</li><li>documentos e currículo apenas quando solicitados;</li><li>água e margem de chegada;</li><li>contato oficial da seleção;</li><li>alternativa simples para chuva ou climatização;</li><li>nenhum dado sensível visível em crachá antigo ou pasta.</li></ul>
+<p>O objetivo é reduzir distrações e riscos para que a conversa trate da sua experiência. Se a seleção valoriza aparência acima das tarefas ou pede gasto prévio não explicado, verifique a legitimidade antes de continuar.</p>
     `.trim()
   }
 };
