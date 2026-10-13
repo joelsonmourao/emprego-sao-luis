@@ -2,7 +2,6 @@ import { describe, expect, it } from "vitest";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { guidesPendingReview, newsPendingFactCheck } from "../data/editorial-review-pending";
-import { getEditorialContentOverride } from "../data/editorial-content-overrides";
 import { getNewsEditorialOverride } from "../data/news-editorial-content-overrides";
 import { BRAND_ASSETS, BRAND_COLORS } from "./brand-assets";
 
