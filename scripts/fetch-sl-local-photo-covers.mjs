@@ -3,6 +3,7 @@
  * Baixa fotos reais (Unsplash, fallback Picsum) → apps/web/public/covers/sl-local/{slug}.webp
  *   node scripts/fetch-sl-local-photo-covers.mjs
  *   node scripts/fetch-sl-local-photo-covers.mjs --force
+ *   node scripts/fetch-sl-local-photo-covers.mjs --force --replace-original
  */
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";
@@ -11,6 +12,7 @@ import sharp from "sharp";
 import { catalog, slugFor } from "./data/sl-local-editorial-catalog.mjs";
 
 const force = process.argv.includes("--force");
+const replaceOriginal = process.argv.includes("--replace-original");
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const outDir = resolve(root, "apps/web/public/covers/sl-local");
 const creditsPath = resolve(outDir, "credits.json");
@@ -136,7 +138,15 @@ for (let i = 0; i < catalog.length; i += 1) {
   const item = catalog[i];
   const slug = slugFor(item);
   const outFile = resolve(outDir, `${slug}.webp`);
-  if (!force && existsSync(outFile) && metaBySlug.get(slug)?.source === "unsplash") {
+  const existingSource = metaBySlug.get(slug)?.source;
+  // Capas próprias são ativos editoriais controlados pelo portal. Mesmo --force
+  // não deve trocá-las por fotografia externa sem uma opção deliberada separada.
+  if (existsSync(outFile) && existingSource === "original" && !replaceOriginal) {
+    skipped += 1;
+    process.stdout.write(`\r[photos] skip original ${i + 1}/${catalog.length} ${slug}             `);
+    continue;
+  }
+  if (!force && existsSync(outFile) && existingSource === "unsplash") {
     skipped += 1;
     process.stdout.write(`\r[photos] skip ${i + 1}/${catalog.length} ${slug}                    `);
     continue;
