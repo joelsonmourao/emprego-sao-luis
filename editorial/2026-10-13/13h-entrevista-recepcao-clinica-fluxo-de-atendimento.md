@@ -12,7 +12,7 @@ primary_keyword: "entrevista recepcao clinica"
 image_status: "PENDING_APPROVED_COVER"
 review_status: "PENDING_EDITORIAL_REVIEW"
 sources:
-  - "https://www.gov.br/anpd/pt-br"
+  - "https://www.gov.br/saude/pt-br/acesso-a-informacao/lgpd"
 ---
 
 # Entrevista para recepção de clínica: demonstre como organiza o atendimento
@@ -37,6 +37,12 @@ Anote também os requisitos obrigatórios: escolaridade, horários, localizaçã
 
 Uma resposta útil pode seguir: *situação → sua responsabilidade → ação → resultado*. Não invente percentuais de redução de filas nem quantidade de atendimentos se nunca mediu esses números.
 
+## Como demonstrar sua experiência em um minuto
+
+Prepare uma resposta com quatro partes: o contexto de uma situação verdadeira, a tarefa que estava sob sua responsabilidade, a ação que você tomou e o resultado que observou. Se você organizou uma agenda em um curso, por exemplo, descreva a ferramenta utilizada e como comunicou alterações. Não diga que trabalhou em clínica quando a atividade ocorreu em outro ambiente.
+
+Quem atuou no comércio pode explicar como acolhia clientes, conferia pedidos e encaminhava problemas ao responsável. Quem ainda não teve emprego formal pode apresentar uma atividade de estágio, projeto ou voluntariado, identificando claramente o contexto. A experiência precisa ser real; o exercício é apenas uma forma de comunicá-la.
+
 ## Simulação: duas pessoas chegam para o mesmo horário
 
 Imagine a seguinte situação fictícia. Duas pessoas afirmam ter agendamento para 14h e o sistema mostra apenas uma confirmação. O candidato não deveria improvisar que a outra pessoa está errada.
@@ -49,7 +55,13 @@ Esse exemplo ilustra organização e respeito. **Não representa um protocolo m�
 
 Uma recepção pode lidar com informações que merecem cuidado. Pergunte como a instituição orienta o acesso a agendas, como registrar recados e quem está autorizado a receber informações. Evite comentar dados de pacientes em locais públicos ou repassar capturas de tela por contas pessoais. Em caso de dúvida, siga o procedimento institucional e peça orientação à supervisão.
 
-A [Autoridade Nacional de Proteção de Dados](https://www.gov.br/anpd/pt-br) disponibiliza informações públicas sobre proteção de dados. Isso não substitui o treinamento e as políticas internas do estabelecimento.
+O [Ministério da Saúde explica a LGPD e as responsabilidades de quem trata dados pessoais](https://www.gov.br/saude/pt-br/acesso-a-informacao/lgpd). Informações sobre saúde exigem cuidado especial; o candidato deve perguntar quais são os procedimentos de identificação, registro e encaminhamento adotados pela clínica. Essa referência não substitui o treinamento da instituição.
+
+## Quando o pedido ultrapassa a função da recepção
+
+Imagine que uma pessoa peça acesso ao resultado de exame de um familiar. Não é papel da recepção improvisar uma autorização: o correto é consultar o procedimento institucional e encaminhar o pedido à equipe responsável. O mesmo vale para reclamações que dependem de decisão clínica ou alteração de conduta profissional.
+
+Em outra situação hipotética, o sistema de agendamento deixa de funcionar. Uma resposta prudente na entrevista seria explicar que você informaria o problema, buscaria o procedimento de contingência autorizado e evitaria prometer um horário sem confirmação. Esse raciocínio mostra organização e respeito aos limites da função.
 
 ## Cinco perguntas úteis para fazer na entrevista
 
