@@ -1,14 +1,19 @@
 import { describe, expect, it } from "vitest";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
-import { guidesPendingReview, newsPendingFactCheck, isEditorialReviewPending } from "../data/editorial-review-pending";
+import {
+  guidesPendingReview,
+  newsPendingFactCheck,
+  isEditorialReviewPending
+} from "../data/editorial-review-pending";
 import { getEditorialContentOverride } from "../data/editorial-content-overrides";
 import { getNewsEditorialOverride } from "../data/news-editorial-content-overrides";
 
 const load = (p: string) => readFileSync(resolve(p), "utf8");
-const report = (n: 1 | 2) => JSON.parse(load(`reports/adsense-revisao-integral-parte-${n}.json`)) as {
-  findings: { slug: string; words: number; flags: string[]; images: string[] }[];
-};
+const report = (n: 1 | 2) =>
+  JSON.parse(load(`reports/adsense-revisao-integral-parte-${n}.json`)) as {
+    findings: { slug: string; words: number; flags: string[]; images: string[] }[];
+  };
 const all = [...report(1).findings, ...report(2).findings];
 
 describe("Auditoria editorial real do corpus de 12/10/2026", () => {
@@ -23,8 +28,8 @@ describe("Auditoria editorial real do corpus de 12/10/2026", () => {
     expect(flagged).toHaveLength(98);
     const reviewed = flagged.filter((item) => getEditorialContentOverride(item.slug));
     const pending = flagged.filter((item) => !getEditorialContentOverride(item.slug));
-    expect(reviewed).toHaveLength(60);
-    expect(pending).toHaveLength(38);
+    expect(reviewed).toHaveLength(68);
+    expect(pending).toHaveLength(30);
     expect(guidesPendingReview.size).toBe(pending.length);
     for (const item of pending) expect(guidesPendingReview.has(item.slug)).toBe(true);
     for (const item of reviewed) expect(guidesPendingReview.has(item.slug)).toBe(false);
@@ -41,35 +46,72 @@ describe("Auditoria editorial real do corpus de 12/10/2026", () => {
 
   it("revisões de guias possuem conteúdo específico e não repetem o template antigo", () => {
     const edited = [
-      "mensagem-fria-recrutador-linkedin", "acompanhar-candidatura-emprego",
-      "pesquisar-empresa-antes-entrevista", "seguro-desemprego-checklist-documentos",
-      "ctps-digital-carteira-trabalho-consultar", "fgts-consultar-trabalhador-clt",
-      "ler-contrato-trabalho-clt", "curriculo-pdf-erros-triagem",
-      "entrevista-comportamental-exemplos", "primeiro-emprego-sao-luis-checklist",
-      "acidente-de-trabalho-o-que-fazer", "assedio-no-trabalho-o-que-fazer",
-      "atestado-medico-trabalho-como-entregar", "banco-de-horas-direitos-trabalhador",
-      "convencao-coletiva-holerite-trabalhador", "escala-6x1-o-que-perguntar",
-      "hora-extra-holerite-como-conferir", "pedido-demissao-aviso-previo-acerto",
-      "abono-pecuniario-ferias-holerite", "ferias-clt-periodo-aquisitivo",
-      "periodo-experiencia-clt-o-que-saber", "ponto-eletronico-atraso-trabalho",
-      "trabalhador-terceirizado-direitos", "trabalhar-fim-de-semana-folga-adicional",
-      "trabalho-noturno-adicional-o-que-perguntar", "retorno-trabalho-apos-maternidade",
-      "como-ler-holerite-descontos", "freelancer-ou-clt-vantagens",
-      "mitos-direitos-trabalhistas-whatsapp", "servicos-gerais-epi-vaga",
-      "sindicato-trabalhador-direitos-basico", "transferencia-interna-emprego-como-pedir",
-      "vale-alimentacao-ou-refeicao-diferenca", "documentos-admissao-emprego-maranhao",
-      "auxiliar-administrativo-vagas-sao-luis", "vaga-recepcionista-clinica-sao-luis",
-      "vagas-call-center-sao-luis", "vagas-estoque-logistica-sao-luis",
-      "vagas-motorista-entregador-sao-luis", "vagas-restaurante-sao-luis-dicas",
-      "vaga-sazonal-comercio-sao-luis", "vagas-pcd-inclusao-emprego",
-      "golpe-vaga-emprego-sao-luis", "seguranca-candidatas-entrevista-emprego",
-      "home-office-remoto-checklist-vaga", "trabalho-hibrido-sao-luis-checklist",
-      "pretensao-salarial-entrevista-dicas", "como-pedir-aumento-salario",
-      "negociar-horario-deslocamento-emprego", "vagas-afirmativas-como-candidatar",
-      "candidatura-whatsapp-emprego-mensagem", "email-candidatura-emprego-modelo",
-      "entrevista-por-video-emprego", "entrevista-presencial-sao-luis-dicas",
-      "referencias-profissionais-emprego", "experiencia-informal-curriculo-como-colocar",
-      "curriculo-ats-palavras-chave-sao-luis", "ingles-no-curriculo-nivel-honesto"
+      "mensagem-fria-recrutador-linkedin",
+      "acompanhar-candidatura-emprego",
+      "pesquisar-empresa-antes-entrevista",
+      "seguro-desemprego-checklist-documentos",
+      "ctps-digital-carteira-trabalho-consultar",
+      "fgts-consultar-trabalhador-clt",
+      "ler-contrato-trabalho-clt",
+      "curriculo-pdf-erros-triagem",
+      "entrevista-comportamental-exemplos",
+      "primeiro-emprego-sao-luis-checklist",
+      "acidente-de-trabalho-o-que-fazer",
+      "assedio-no-trabalho-o-que-fazer",
+      "atestado-medico-trabalho-como-entregar",
+      "banco-de-horas-direitos-trabalhador",
+      "convencao-coletiva-holerite-trabalhador",
+      "escala-6x1-o-que-perguntar",
+      "hora-extra-holerite-como-conferir",
+      "pedido-demissao-aviso-previo-acerto",
+      "abono-pecuniario-ferias-holerite",
+      "ferias-clt-periodo-aquisitivo",
+      "periodo-experiencia-clt-o-que-saber",
+      "ponto-eletronico-atraso-trabalho",
+      "trabalhador-terceirizado-direitos",
+      "trabalhar-fim-de-semana-folga-adicional",
+      "trabalho-noturno-adicional-o-que-perguntar",
+      "retorno-trabalho-apos-maternidade",
+      "como-ler-holerite-descontos",
+      "freelancer-ou-clt-vantagens",
+      "mitos-direitos-trabalhistas-whatsapp",
+      "servicos-gerais-epi-vaga",
+      "sindicato-trabalhador-direitos-basico",
+      "transferencia-interna-emprego-como-pedir",
+      "vale-alimentacao-ou-refeicao-diferenca",
+      "documentos-admissao-emprego-maranhao",
+      "auxiliar-administrativo-vagas-sao-luis",
+      "vaga-recepcionista-clinica-sao-luis",
+      "vagas-call-center-sao-luis",
+      "vagas-estoque-logistica-sao-luis",
+      "vagas-motorista-entregador-sao-luis",
+      "vagas-restaurante-sao-luis-dicas",
+      "vaga-sazonal-comercio-sao-luis",
+      "vagas-pcd-inclusao-emprego",
+      "golpe-vaga-emprego-sao-luis",
+      "seguranca-candidatas-entrevista-emprego",
+      "home-office-remoto-checklist-vaga",
+      "trabalho-hibrido-sao-luis-checklist",
+      "pretensao-salarial-entrevista-dicas",
+      "como-pedir-aumento-salario",
+      "negociar-horario-deslocamento-emprego",
+      "vagas-afirmativas-como-candidatar",
+      "candidatura-whatsapp-emprego-mensagem",
+      "email-candidatura-emprego-modelo",
+      "entrevista-por-video-emprego",
+      "entrevista-presencial-sao-luis-dicas",
+      "referencias-profissionais-emprego",
+      "experiencia-informal-curriculo-como-colocar",
+      "curriculo-ats-palavras-chave-sao-luis",
+      "ingles-no-curriculo-nivel-honesto",
+      "alfabetizacao-digital-emprego-basico",
+      "certificado-ou-experiencia-curriculo",
+      "cursos-no-curriculo-sem-enchimento",
+      "excel-basico-vagas-emprego",
+      "gap-habilidades-candidatura-como-fechar",
+      "soft-skills-hard-skills-curriculo",
+      "portfolio-simples-candidato-emprego",
+      "teste-online-processo-seletivo-dicas"
     ];
     for (const slug of edited) {
       const override = getEditorialContentOverride(slug);
@@ -81,30 +123,62 @@ describe("Auditoria editorial real do corpus de 12/10/2026", () => {
     }
 
     const sourceBacked = [
-      "acidente-de-trabalho-o-que-fazer", "assedio-no-trabalho-o-que-fazer",
-      "atestado-medico-trabalho-como-entregar", "banco-de-horas-direitos-trabalhador",
-      "convencao-coletiva-holerite-trabalhador", "escala-6x1-o-que-perguntar",
-      "hora-extra-holerite-como-conferir", "pedido-demissao-aviso-previo-acerto",
-      "abono-pecuniario-ferias-holerite", "ferias-clt-periodo-aquisitivo",
-      "periodo-experiencia-clt-o-que-saber", "ponto-eletronico-atraso-trabalho",
-      "trabalhador-terceirizado-direitos", "trabalhar-fim-de-semana-folga-adicional",
-      "trabalho-noturno-adicional-o-que-perguntar", "retorno-trabalho-apos-maternidade",
-      "como-ler-holerite-descontos", "freelancer-ou-clt-vantagens",
-      "mitos-direitos-trabalhistas-whatsapp", "servicos-gerais-epi-vaga",
-      "sindicato-trabalhador-direitos-basico", "transferencia-interna-emprego-como-pedir",
-      "vale-alimentacao-ou-refeicao-diferenca", "documentos-admissao-emprego-maranhao",
-      "auxiliar-administrativo-vagas-sao-luis", "vaga-recepcionista-clinica-sao-luis",
-      "vagas-call-center-sao-luis", "vagas-estoque-logistica-sao-luis",
-      "vagas-motorista-entregador-sao-luis", "vagas-restaurante-sao-luis-dicas",
-      "vaga-sazonal-comercio-sao-luis", "vagas-pcd-inclusao-emprego",
-      "golpe-vaga-emprego-sao-luis", "seguranca-candidatas-entrevista-emprego",
-      "home-office-remoto-checklist-vaga", "trabalho-hibrido-sao-luis-checklist",
-      "pretensao-salarial-entrevista-dicas", "como-pedir-aumento-salario",
-      "negociar-horario-deslocamento-emprego", "vagas-afirmativas-como-candidatar",
-      "candidatura-whatsapp-emprego-mensagem", "email-candidatura-emprego-modelo",
-      "entrevista-por-video-emprego", "entrevista-presencial-sao-luis-dicas",
-      "referencias-profissionais-emprego", "experiencia-informal-curriculo-como-colocar",
-      "curriculo-ats-palavras-chave-sao-luis", "ingles-no-curriculo-nivel-honesto"
+      "acidente-de-trabalho-o-que-fazer",
+      "assedio-no-trabalho-o-que-fazer",
+      "atestado-medico-trabalho-como-entregar",
+      "banco-de-horas-direitos-trabalhador",
+      "convencao-coletiva-holerite-trabalhador",
+      "escala-6x1-o-que-perguntar",
+      "hora-extra-holerite-como-conferir",
+      "pedido-demissao-aviso-previo-acerto",
+      "abono-pecuniario-ferias-holerite",
+      "ferias-clt-periodo-aquisitivo",
+      "periodo-experiencia-clt-o-que-saber",
+      "ponto-eletronico-atraso-trabalho",
+      "trabalhador-terceirizado-direitos",
+      "trabalhar-fim-de-semana-folga-adicional",
+      "trabalho-noturno-adicional-o-que-perguntar",
+      "retorno-trabalho-apos-maternidade",
+      "como-ler-holerite-descontos",
+      "freelancer-ou-clt-vantagens",
+      "mitos-direitos-trabalhistas-whatsapp",
+      "servicos-gerais-epi-vaga",
+      "sindicato-trabalhador-direitos-basico",
+      "transferencia-interna-emprego-como-pedir",
+      "vale-alimentacao-ou-refeicao-diferenca",
+      "documentos-admissao-emprego-maranhao",
+      "auxiliar-administrativo-vagas-sao-luis",
+      "vaga-recepcionista-clinica-sao-luis",
+      "vagas-call-center-sao-luis",
+      "vagas-estoque-logistica-sao-luis",
+      "vagas-motorista-entregador-sao-luis",
+      "vagas-restaurante-sao-luis-dicas",
+      "vaga-sazonal-comercio-sao-luis",
+      "vagas-pcd-inclusao-emprego",
+      "golpe-vaga-emprego-sao-luis",
+      "seguranca-candidatas-entrevista-emprego",
+      "home-office-remoto-checklist-vaga",
+      "trabalho-hibrido-sao-luis-checklist",
+      "pretensao-salarial-entrevista-dicas",
+      "como-pedir-aumento-salario",
+      "negociar-horario-deslocamento-emprego",
+      "vagas-afirmativas-como-candidatar",
+      "candidatura-whatsapp-emprego-mensagem",
+      "email-candidatura-emprego-modelo",
+      "entrevista-por-video-emprego",
+      "entrevista-presencial-sao-luis-dicas",
+      "referencias-profissionais-emprego",
+      "experiencia-informal-curriculo-como-colocar",
+      "curriculo-ats-palavras-chave-sao-luis",
+      "ingles-no-curriculo-nivel-honesto",
+      "alfabetizacao-digital-emprego-basico",
+      "certificado-ou-experiencia-curriculo",
+      "cursos-no-curriculo-sem-enchimento",
+      "excel-basico-vagas-emprego",
+      "gap-habilidades-candidatura-como-fechar",
+      "soft-skills-hard-skills-curriculo",
+      "portfolio-simples-candidato-emprego",
+      "teste-online-processo-seletivo-dicas"
     ];
     for (const slug of sourceBacked) {
       expect(getEditorialContentOverride(slug)!.contentHtml).toMatch(/<a href="https:\/\//);
