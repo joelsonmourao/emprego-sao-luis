@@ -1413,9 +1413,202 @@ const overrides: Record<string, EditorialContentOverride> = {
     `.trim()
   },
 
+  "alfabetizacao-digital-emprego-basico": {
+    reviewedAt: "2026-10-12",
+    contentHtml: `
+<p><strong>Revisão editorial: 12 de outubro de 2026.</strong> Alfabetização digital para procurar emprego não é saber usar todo aplicativo. É conseguir ler um anúncio, confirmar o canal, preparar um arquivo, preencher um formulário e proteger a própria conta. Este guia propõe um treino prático no celular ou computador, sem prometer contratação.</p>
+<h2>Faça um diagnóstico com uma candidatura simulada</h2>
+<p>Crie uma pasta de treino e tente concluir cinco tarefas: abrir um anúncio em outra aba; salvar a URL e a data; escrever uma mensagem curta; anexar um PDF; e localizar o arquivo enviado. Marque onde precisou de ajuda. O ponto fraco pode ser nomear arquivos, recuperar senha, alternar entre aplicativos ou entender um campo obrigatório.</p>
+<p>Use dados fictícios no ensaio. Não coloque CPF, RG, endereço completo, senha ou documento de outra pessoa. Quando repetir o exercício com uma vaga real, confira se o destinatário é o mesmo informado no canal institucional.</p>
+<h2>Domine o ciclo do arquivo</h2>
+<p>Mantenha um currículo-base editável e uma cópia em PDF. Nomeie a versão enviada com nome, cargo e mês, por exemplo <em>ana-silva-auxiliar-out-2026.pdf</em>. Abra o arquivo depois de salvar: confira telefone, e-mail, quebras de página e se o texto pode ser selecionado. Foto da tela não substitui PDF quando o anúncio pede documento.</p>
+<p>Crie pastas simples: “currículo-base”, “versões enviadas”, “certificados” e “anúncios”. Dentro do controle de candidaturas, registre empresa, cargo, URL, data, canal e próxima ação. Não armazene senhas na mesma planilha.</p>
+<h2>Treine e-mail e formulário antes do prazo</h2>
+<p>No e-mail, pratique assunto identificável, saudação, duas linhas de contexto e assinatura. Antes de enviar, confirme anexo e destinatário. Em formulário, leia todos os campos antes de começar, separe arquivos aceitos e observe limite de tamanho. Se a conexão cair, verifique se houve confirmação antes de repetir o envio.</p>
+<p>A <a href="https://www.escolavirtual.gov.br/catalogo" target="_blank" rel="noopener noreferrer">Escola Virtual de Governo</a> mantém catálogo gratuito com filtros de carga horária e temas como mentalidade digital e segurança da informação. Escolha formação pelo obstáculo identificado, não pela promessa de “emprego garantido”. Curso é apoio; a candidatura ainda depende de requisitos e seleção.</p>
+<h2>Proteja as contas usadas na busca</h2>
+<p>Use senhas diferentes e ative verificação em duas etapas quando disponível. Nunca entregue código recebido por SMS ou aplicativo autenticador. A <a href="https://cartilha.cert.br/fasciculos/" target="_blank" rel="noopener noreferrer">Cartilha de Segurança para Internet do CERT.br</a> reúne orientações sobre senhas, autenticação, phishing, privacidade e dispositivos móveis.</p>
+<p>Desconfie de urgência artificial, cobrança, link encurtado sem contexto e pedido de instalação de aplicativo para “liberar” vaga. Digite o endereço oficial no navegador em vez de entrar pelo link da mensagem. Se alguém pedir pagamento ou controle remoto do aparelho, interrompa.</p>
+<h2>Plano de sete dias</h2>
+<ol><li>Dia 1: organizar pastas e contatos.</li><li>Dia 2: revisar e exportar o currículo.</li><li>Dia 3: enviar um e-mail de teste a si mesmo.</li><li>Dia 4: preencher um formulário fictício.</li><li>Dia 5: recuperar um arquivo e uma senha com segurança.</li><li>Dia 6: conferir um anúncio e seu canal oficial.</li><li>Dia 7: repetir o ciclo sem ajuda e anotar dúvidas.</li></ol>
+<p>Peça apoio a uma pessoa de confiança apenas para observar o processo; não compartilhe senha. O objetivo é sair do “não sei mexer” para uma lista concreta de tarefas já praticadas e pontos que ainda precisam de treino.</p>
+<p>Repita o exercício no aparelho que costuma usar. No celular, pratique alternar entre navegador, e-mail e arquivos sem perder o formulário. No computador, localize downloads e anexos. Anote o caminho de cada tarefa com suas próprias palavras para conseguir repetir depois sem depender da memória.</p>
+    `.trim()
+  },
+
+  "certificado-ou-experiencia-curriculo": {
+    reviewedAt: "2026-10-12",
+    contentHtml: `
+<p><strong>Revisão editorial: 12 de outubro de 2026.</strong> Certificado registra uma atividade formativa; experiência descreve trabalho realizado. Um não substitui automaticamente o outro. O anúncio define se determinado documento é obrigatório, desejável ou apenas complementar.</p>
+<h2>Separe exigência formal de evidência prática</h2>
+<p>Leia cada requisito e classifique em quatro grupos: formação obrigatória, habilitação ou registro, conhecimento técnico e experiência. Se a vaga exige documento específico por norma ou política da empresa, prática informal não elimina a exigência. Se pede “experiência com atendimento”, um exemplo bem explicado pode ser mais útil que uma lista de cursos genéricos.</p>
+<p>A <a href="https://www.gov.br/trabalho-e-emprego/pt-br/servicos/trabalhador/mais-acoes/classificacao-brasileira-de-ocupacoes" target="_blank" rel="noopener noreferrer">Classificação Brasileira de Ocupações do Ministério do Trabalho e Emprego</a> ajuda a reconhecer nomes e famílias de ocupações. Ela serve como referência de vocabulário; não certifica a pessoa nem comprova vínculo.</p>
+<h2>Transforme curso em competência demonstrável</h2>
+<p>Para cada curso relevante, responda: o que aprendi, o que pratiquei e qual produto consigo mostrar ou explicar? Um curso de planilha pode resultar em controle fictício de estoque; atendimento pode virar roteiro de registro e encaminhamento; escrita pode produzir um e-mail claro. Use dados inventados no exercício, nunca informações reais de clientes.</p>
+<p>No currículo, registre nome do curso, instituição, ano e carga horária quando constarem no documento. Não altere duração, nível ou entidade emissora. Se está cursando, escreva “em andamento” e a previsão real, sem antecipar conclusão.</p>
+<h2>Escolha a ordem conforme a vaga</h2>
+<p>Experiência recente e relacionada costuma merecer mais espaço do que certificado antigo sem conexão com a função. Para quem ainda não trabalhou na área, um curso acompanhado de projeto pode aparecer antes. Exemplo: “Excel básico, 20 h, concluído em 2026 — prática com soma, filtro e controle fictício de entradas”.</p>
+<p>A <a href="https://www.escolavirtual.gov.br/catalogo" target="_blank" rel="noopener noreferrer">Escola Virtual de Governo</a> permite consultar catálogo, carga horária, tema e instituição conteudista. Use a página do próprio emissor para confirmar conteúdo e validação. Captura de tela, selo em rede social ou arquivo sem origem identificável merece checagem antes de entrar no currículo.</p>
+<h2>Prepare duas provas para a entrevista</h2>
+<p>Para experiência, use uma situação real: contexto, tarefa, ação e resultado observável. Para curso, escolha um exercício que mostre aplicação. Se o recrutador perguntar por algo que você só estudou, diga isso. “Pratiquei em atividade simulada, mas ainda não usei no trabalho” é preciso e evita expectativa falsa.</p>
+<p>Não leve pasta inteira no primeiro contato. Envie certificado apenas quando solicitado e pelo canal confirmado. O currículo pode mencionar a formação; documentos pessoais e comprovações ficam para etapa legítima do processo.</p>
+<p>Exemplo hipotético: uma candidata a recepção possui curso recente de atendimento e ajudou na organização de agenda de uma associação. No currículo, ela pode separar “formação complementar” da experiência voluntária e explicar o que fez em cada uma. Não deve transformar a associação em emprego, nem afirmar que o certificado prova domínio de um sistema que não utilizou.</p>
+<h2>Critério de decisão</h2>
+<ul><li>É requisito obrigatório? Confirme documento e validade.</li><li>É conhecimento desejável? Mostre prática proporcional ao nível.</li><li>É experiência? Descreva tarefa, contexto e período.</li><li>É curso sem relação? Retire da versão adaptada.</li><li>Não possui o requisito? Não invente; avalie se a vaga aceita desenvolvimento.</li></ul>
+<p>O melhor currículo não escolhe entre papel e prática como se fossem rivais. Ele apresenta cada evidência pelo que realmente comprova.</p>
+<p>Antes do envio, peça a alguém que leia apenas trinta segundos e diga o que entendeu como habilidade principal. Se a resposta for apenas “tem muitos cursos”, reorganize. A mensagem desejada é qual tarefa você consegue executar, qual formação sustenta isso e onde ainda está aprendendo.</p>
+    `.trim()
+  },
+
+  "cursos-no-curriculo-sem-enchimento": {
+    reviewedAt: "2026-10-12",
+    contentHtml: `
+<p><strong>Revisão editorial: 12 de outubro de 2026.</strong> A seção de cursos deve ajudar o recrutador a entender preparação para aquela função. Quantidade não compensa falta de relação, data ou aplicação. Faça uma seleção diferente para cada cargo-alvo, sem apagar o histórico do seu arquivo-base.</p>
+<h2>Crie um inventário antes de cortar</h2>
+<p>Em uma folha separada, liste curso, instituição, situação, ano, carga horária, conteúdo principal e onde aplicou. Inclua somente dados que consegue confirmar. Depois marque A para diretamente relacionado à vaga, B para complementar e C para sem relação atual.</p>
+<p>Na versão enviada, comece pelos cursos A e use B apenas se acrescentarem informação. Os C podem permanecer no arquivo-base, mas não precisam ocupar o currículo de uma página. Curso abandonado não deve aparecer como concluído; registre “em andamento” apenas se houver atividade real.</p>
+<h2>Leia o anúncio como matriz de seleção</h2>
+<p>Separe tarefas, ferramentas e requisitos. Para atendimento, por exemplo, um curso de comunicação pode ser relevante se você consegue relacioná-lo a registro de demanda, escuta ou resposta. Para estoque, planilha, conferência e segurança podem fazer sentido. Não afirme que “empresas de São Luís preferem” certo certificado sem pesquisa e sem anúncio verificável.</p>
+<p>A <a href="https://europass.europa.eu/pt/create-europass-cv" target="_blank" rel="noopener noreferrer">orientação oficial do Europass para criar currículo</a> organiza formação, competências e experiências em campos distintos. O formato europeu não é exigência local; a utilidade está em separar informação e adaptar o documento à oportunidade.</p>
+<h2>Escreva cada item com precisão</h2>
+<p>Um padrão suficiente é: “Nome do curso — instituição, carga horária, ano”. Se a relação não estiver clara, acrescente uma linha curta de aplicação, como “prática de filtros e soma em controle fictício de estoque”. Evite copiar a ementa inteira ou usar adjetivos como “completo” e “avançado” quando o documento não diz isso.</p>
+<p>O catálogo da <a href="https://www.escolavirtual.gov.br/catalogo" target="_blank" rel="noopener noreferrer">Escola Virtual de Governo</a> mostra filtros por tema, competência e carga horária. Ele é um exemplo de como conferir detalhes na fonte. Para qualquer instituição, volte ao site emissor e verifique nome, conteúdo, duração e forma de validação antes de registrar.</p>
+<h2>Use um teste de relevância</h2>
+<ol><li>O curso aparece como requisito ou ajuda em uma tarefa do anúncio?</li><li>Foi concluído ou a situação está descrita corretamente?</li><li>Você consegue explicar um conceito ou exercício sem ler o certificado?</li><li>Há item mais recente e relacionado ocupando menos espaço?</li><li>O recrutador precisa do certificado agora ou só da informação?</li></ol>
+<p>Se a resposta à primeira e à terceira perguntas for não, retire da versão adaptada. Um curso pode ter valor pessoal sem ser útil para aquela seleção.</p>
+<h2>Exemplo de antes e depois</h2>
+<p>Antes: “Informática, liderança, empreendedorismo, vendas, marketing, atendimento, inglês”. Depois: “Excel básico — instituição X, 20 h, 2026; prática com filtros e soma” e “Atendimento ao público — instituição Y, 12 h, 2025; registro e encaminhamento de solicitações”. O segundo formato permite perguntas e verificação.</p>
+<p>Guarde certificados em pasta organizada e envie somente quando solicitado. Não anexe vários documentos ao primeiro e-mail nem exponha CPF, assinatura ou código de validação em portfólio público. O objetivo da seção é facilitar a triagem, não decorar margem.</p>
+<p>Revise também o espaço consumido. Se seis cursos empurram a experiência relacionada para a segunda página, reduza a lista. O recrutador precisa localizar primeiro o que responde ao anúncio. Formação complementar pode ter três ou quatro itens fortes; o inventário completo fica guardado para outras vagas ou para comprovação quando houver pedido legítimo.</p>
+    `.trim()
+  },
+
+  "excel-basico-vagas-emprego": {
+    reviewedAt: "2026-10-12",
+    contentHtml: `
+<p><strong>Revisão editorial: 12 de outubro de 2026.</strong> “Excel básico” ou “intermediário” varia entre anúncios e empresas. Em vez de adivinhar o nível, leia as tarefas e treine operações que correspondem ao cargo. Este roteiro usa dados fictícios e não afirma o conteúdo de testes específicos.</p>
+<h2>Traduza o anúncio em tarefas de planilha</h2>
+<p>Se a vaga menciona estoque, pratique cadastro de item, quantidade, entrada, saída e alerta de reposição. Para administrativo, organize data, documento, responsável e status. Em atendimento, monte lista de solicitações sem dados pessoais reais. Cada cenário deve caber em uma tabela simples.</p>
+<p>Comece com digitação consistente: uma informação por coluna, datas como datas, valores como números e cabeçalhos claros. Uma planilha visualmente bonita, mas com texto e número misturados, dificulta filtro e cálculo.</p>
+<h2>Treine o núcleo antes das funções avançadas</h2>
+<p>A página oficial de <a href="https://support.microsoft.com/pt-br/excel/" target="_blank" rel="noopener noreferrer">ajuda e aprendizado do Excel</a> organiza conteúdos de introdução, fórmulas e funções, importação, análise e formatação. Use a documentação compatível com sua versão; menus podem mudar entre navegador, celular e computador.</p>
+<ul><li>ordenar por texto, data e número;</li><li>aplicar e limpar filtros;</li><li>formatar data, moeda e porcentagem;</li><li>usar SOMA, MÉDIA, MÍNIMO e MÁXIMO;</li><li>criar referências simples entre células;</li><li>localizar erro e desfazer uma alteração;</li><li>salvar cópia e exportar quando solicitado.</li></ul>
+<p>Não pule direto para macro, PROCX ou tabela dinâmica porque parecem mais valiosos. Eles só entram no currículo se você realmente utiliza e consegue explicar.</p>
+<h2>Monte um exercício de 30 minutos</h2>
+<p>Crie uma tabela fictícia com vinte produtos, categorias, quantidades e preços. Calcule o total por linha, some o estoque, filtre uma categoria e ordene do menor para o maior valor. Depois altere três entradas e confirme se os resultados mudaram.</p>
+<p>Em outro arquivo, registre dez atendimentos fictícios com data, assunto, responsável e status. Filtre os pendentes e conte manualmente para conferir. Essa verificação mostra se a fórmula e o filtro produziram resultado coerente.</p>
+<h2>Descreva o nível pelo que você faz</h2>
+<p>No currículo, prefira “Excel: tabelas, filtros, ordenação e fórmulas básicas” a “Excel 80%”. Se usa tabela dinâmica ou procura valores, cite somente quando praticou. Se aprendeu em curso e ainda não aplicou no trabalho, deixe a situação transparente.</p>
+<p>Em entrevista, prepare uma explicação curta: objetivo da planilha, colunas, fórmula e conferência. Não leve arquivo de emprego anterior com nomes, vendas ou dados de clientes. Recrie o exemplo com informações fictícias.</p>
+<p>Um exemplo de resposta honesta seria: “Usei planilha em atividade escolar para organizar materiais. Sei criar tabela, filtrar e somar; ainda não usei Excel em estoque profissional.” A frase diferencia prática real de experiência de trabalho e permite que a empresa decida se o nível atende à função ou se haverá treinamento.</p>
+<h2>Antes de um teste</h2>
+<ul><li>Confirme versão, duração, formato e regras informadas.</li><li>Teste teclado, mouse, navegador e conexão.</li><li>Leia a questão inteira antes de editar.</li><li>Salve quando o sistema permitir.</li><li>Se houver falha técnica, registre horário e mensagem sem fotografar conteúdo proibido.</li></ul>
+<p>Treinar o básico com conferência vale mais que decorar atalhos. A afirmação mais forte no currículo é aquela que você consegue repetir diante de uma planilha vazia.</p>
+<p>Faça o exercício novamente depois de dois dias, sem seguir passo a passo escrito. Compare o resultado com a primeira versão: fórmulas corretas, filtros removidos, datas consistentes e arquivo salvo no local certo. Se errar, documente o caminho da correção. Saber conferir e recuperar um erro também faz parte do uso cotidiano.</p>
+    `.trim()
+  },
+
+  "gap-habilidades-candidatura-como-fechar": {
+    reviewedAt: "2026-10-12",
+    contentHtml: `
+<p><strong>Revisão editorial: 12 de outubro de 2026.</strong> Uma lacuna de habilidade é a diferença entre o que a função pede e o que você consegue demonstrar hoje. Ela não deve ser escondida nem transformada em lista aleatória de cursos. O caminho é classificar o requisito, estimar o esforço e produzir evidência proporcional.</p>
+<h2>Compare anúncios do mesmo cargo</h2>
+<p>Reúna de cinco a dez anúncios atuais com origem confirmada. Em uma tabela, registre tarefa, ferramenta, requisito obrigatório, item desejável e frequência. Não misture cargos diferentes. O que aparece uma vez pode ser particular de uma empresa; o que se repete ajuda a definir prioridade, sem provar uma regra para todo o mercado.</p>
+<p>Use a <a href="https://www.gov.br/trabalho-e-emprego/pt-br/servicos/trabalhador/mais-acoes/classificacao-brasileira-de-ocupacoes" target="_blank" rel="noopener noreferrer">Classificação Brasileira de Ocupações</a> para entender nomes de ocupações e famílias relacionadas. A CBO não substitui o anúncio nem certifica competência; ela ajuda a comparar linguagem.</p>
+<h2>Classifique a lacuna antes de estudar</h2>
+<ul><li><strong>Legal ou documental:</strong> habilitação, registro ou formação exigida. Não se resolve com tutorial.</li><li><strong>Técnica:</strong> ferramenta, procedimento ou conhecimento que pode ser praticado.</li><li><strong>Experiência:</strong> uso em contexto real, estágio, projeto ou atividade informal.</li><li><strong>Comportamental:</strong> conduta observável em situação, não adjetivo.</li><li><strong>Logística:</strong> horário, deslocamento ou equipamento; não é curso.</li></ul>
+<p>Essa separação evita estudar Excel quando o verdadeiro impeditivo é disponibilidade de turno, ou buscar certificado curto quando a vaga exige habilitação formal.</p>
+<h2>Escolha uma entrega verificável</h2>
+<p>Para ferramenta, construa exercício com dados fictícios. Para atendimento, escreva roteiro e simule registro. Para comunicação, produza e revise um e-mail. Para organização, monte cronograma com prioridade e prazo. A entrega precisa mostrar o nível atual e respeitar dados de terceiros.</p>
+<p>O catálogo da <a href="https://www.escolavirtual.gov.br/catalogo" target="_blank" rel="noopener noreferrer">Escola Virtual de Governo</a> permite filtrar temas, competências e carga horária. Use esse ou outro catálogo confiável depois de definir a lacuna. Antes de se inscrever, confirme ementa, instituição, duração, custo e se a prática corresponde ao objetivo.</p>
+<h2>Use um ciclo curto de aprendizagem</h2>
+<ol><li>Defina uma habilidade e uma tarefa-alvo.</li><li>Faça um diagnóstico sem consulta.</li><li>Estude o conteúdo necessário.</li><li>Repita a tarefa em cenário diferente.</li><li>Peça revisão específica.</li><li>Registre o que já faz sozinho e o que ainda exige apoio.</li></ol>
+<p>Ao final, decida entre candidatar-se agora, buscar vaga de entrada ou adiar. Se o requisito é desejável e você cobre o núcleo da função, pode fazer sentido enviar currículo informando “em desenvolvimento”. Se é obrigatório e você não possui, não marque como concluído.</p>
+<p>Registre a decisão em uma linha: “candidatar agora”, “reavaliar em sete dias” ou “não elegível”. Junte a URL e a data do anúncio. Isso evita que uma exigência antiga continue guiando estudo depois que o processo encerrou e ajuda a comparar novas vagas sem reconstruir a análise toda vez.</p>
+<h2>Explique sem se diminuir</h2>
+<p>Na entrevista: “Ainda não usei a ferramenta em emprego. Concluí o módulo X e montei este exercício; consigo fazer A e B, mas ainda preciso de apoio em C.” Essa resposta oferece limite e evidência. Evite “aprendo qualquer coisa rápido” sem exemplo.</p>
+<p>Revise a matriz a cada duas semanas e arquive anúncios encerrados. O objetivo não é zerar toda lacuna, mas direcionar tempo para aquilo que aparece no cargo escolhido e que pode ser comprovado honestamente.</p>
+<p>Evite comprar curso sob pressão de anúncio que expira. Primeiro confirme se a exigência se repete e se a formação tem conteúdo, instituição e suporte identificáveis. Nenhum curso legítimo pode prometer que a seleção vai aprovar você; ele só pode oferecer aprendizagem e, quando previsto, documento de participação ou conclusão.</p>
+    `.trim()
+  },
+
+  "soft-skills-hard-skills-curriculo": {
+    reviewedAt: "2026-10-12",
+    contentHtml: `
+<p><strong>Revisão editorial: 12 de outubro de 2026.</strong> “Soft skill” e “hard skill” são rótulos úteis apenas quando ligados a uma tarefa. No currículo, uma ferramenta pode ser demonstrada por uso; um comportamento precisa de situação observável. Listas de adjetivos sem contexto não permitem avaliação.</p>
+<h2>Comece pelas tarefas, não pelos rótulos</h2>
+<p>Copie três tarefas centrais do anúncio. Para cada uma, pergunte: que conhecimento técnico é necessário e que comportamento ajuda a executá-la? Atender reclamação pode exigir uso do sistema e escrita, além de escuta e autocontrole. Conferir estoque pede planilha e método, além de atenção e comunicação de divergência.</p>
+<p>A <a href="https://www.gov.br/trabalho-e-emprego/pt-br/servicos/trabalhador/mais-acoes/classificacao-brasileira-de-ocupacoes" target="_blank" rel="noopener noreferrer">CBO do Ministério do Trabalho e Emprego</a> reúne títulos e descrições de ocupações. Consulte-a para entender vocabulário, mas use o anúncio e sua experiência como base. A classificação não prova que você possui as competências.</p>
+<h2>Prove habilidade técnica em contexto</h2>
+<p>Em vez de “Pacote Office”, escreva “planilhas com filtros e soma para controle de entradas”. Em vez de “sistema de vendas”, informe o tipo de tarefa: cadastro, fechamento ou consulta, sem revelar senha ou dado empresarial. Curso pode apoiar a evidência, mas não substitui prática quando a vaga pede experiência.</p>
+<p>Se a habilidade está em desenvolvimento, declare o limite. “Excel básico: filtros, ordenação e SOMA” é mais claro que “intermediário” quando você ainda não usa tabela dinâmica.</p>
+<h2>Conte comportamento como cena verificável</h2>
+<p>Escolha uma situação real e use quatro partes: contexto, responsabilidade, ação e resultado observável. Para organização: “Durante uma semana de pedidos, mantive lista com prazo e confirmei retirada; os pedidos ficaram identificados até a entrega.” Para colaboração: “Percebi divergência no estoque, conferi com a colega e avisei o responsável antes da venda.”</p>
+<p>Não transforme participação em liderança. Se coordenou apenas uma tarefa, descreva isso. Se o resultado não foi medido, não invente percentual. Resultado pode ser prazo cumprido, erro identificado ou demanda encaminhada.</p>
+<h2>Distribua as evidências pelo currículo</h2>
+<p>Use resumo curto para duas ou três forças ligadas ao cargo. Nas experiências, mostre onde elas apareceram. Na seção de cursos, registre formação relevante. Um bloco com vinte palavras — “proativo, resiliente, líder, comunicativo” — ocupa espaço sem explicar nada.</p>
+<p>O <a href="https://europass.europa.eu/pt/create-europass-cv" target="_blank" rel="noopener noreferrer">Europass</a> separa experiências, formação e competências ao estruturar um currículo. Ele não é requisito para São Luís; serve como referência de organização e adaptação.</p>
+<h2>Prepare a entrevista com pares de prova</h2>
+<p>Para cada habilidade destacada, leve um exemplo e um limite. “Consigo organizar agenda de atendimento; ainda não administrei escala de equipe.” “Uso filtros e soma; ainda estou aprendendo tabela dinâmica.” Isso permite avaliar aderência sem exagero.</p>
+<p>Exemplo hipotético: quem ajudou em comércio familiar pode demonstrar comunicação ao explicar como registrava pedido, confirmava preço com o responsável e orientava retirada. A hard skill pode ser o uso da planilha ou do aplicativo; a soft skill aparece na sequência de ações, não na palavra “comunicativo”. Deixe claro que a atividade foi informal.</p>
+<ul><li>A habilidade aparece em tarefa real?</li><li>Há exemplo que você consegue explicar?</li><li>O nível está descrito sem porcentagem inventada?</li><li>Curso e experiência estão separados?</li><li>O texto evita dado confidencial?</li></ul>
+<p>Currículo forte não precisa escolher entre técnica e comportamento. Ele mostra como as duas se encontram no trabalho e onde começa a aprendizagem necessária.</p>
+<p>Revise a linguagem para não discriminar experiências informais, escolares ou voluntárias. Elas podem demonstrar comportamento e técnica quando o contexto está claro. O que não podem é aparecer como emprego formal, cargo de chefia ou resultado comercial inexistente. Transparência aumenta a consistência entre currículo, portfólio e entrevista.</p>
+    `.trim()
+  },
+
+  "portfolio-simples-candidato-emprego": {
+    reviewedAt: "2026-10-12",
+    contentHtml: `
+<p><strong>Revisão editorial: 12 de outubro de 2026.</strong> Portfólio não é exclusivo de design. Ele pode demonstrar organização, escrita, planilha, atendimento ou procedimento, desde que a amostra tenha contexto e não exponha dados. Nem toda vaga precisa desse material; envie quando o anúncio pedir ou quando a prova esclarecer uma competência central.</p>
+<h2>Escolha três evidências alinhadas ao cargo</h2>
+<p>Para administrativo, use planilha fictícia, modelo de e-mail e fluxo de arquivo. Para atendimento, apresente roteiro de registro, resposta a caso simulado e organização de fila. Para estoque, mostre tabela de entradas e saídas com dados inventados. Se o trabalho pertence a empregador ou cliente, obtenha autorização ou recrie do zero.</p>
+<p>Cada peça precisa responder: qual era o problema, o que você fez, qual ferramenta usou e o que a amostra demonstra. Sem essa legenda, o recrutador vê arquivo, não competência.</p>
+<h2>Remova dados e direitos que não são seus</h2>
+<p>Apague nomes, telefones, endereços, documentos, matrículas, vendas e informações internas. Cobrir com retângulo pode não remover o texto embutido; recriar a amostra com conteúdo fictício é mais seguro. Não publique foto de colega, cliente ou estabelecimento sem autorização.</p>
+<p>A <a href="https://www.planalto.gov.br/ccivil_03/_ato2015-2018/2018/lei/l13709.htm" target="_blank" rel="noopener noreferrer">Lei Geral de Proteção de Dados</a> estabelece princípios como finalidade, adequação e necessidade no tratamento de dados pessoais. O portfólio deve usar apenas o indispensável — na maioria dos casos, nenhum dado real.</p>
+<h2>Monte um PDF curto e acessível</h2>
+<p>Abra com nome, cargo-alvo, contato profissional e uma frase de escopo. Depois, dedique uma página por projeto: título, contexto, ação, imagem ou tabela e aprendizado. Use fonte legível, contraste, texto alternativo quando a plataforma aceitar e links descritivos.</p>
+<p>Exporte, abra no celular e confirme peso, páginas, ortografia e links. Nomeie o arquivo de forma clara. Se usar site, ofereça também PDF, pois conexão, bloqueio de plataforma ou login podem impedir acesso.</p>
+<h2>Explique o que é simulação</h2>
+<p>Projeto criado para treinar deve aparecer como “exercício autoral” ou “caso simulado”. Não invente cliente, contratação ou resultado. Exemplo: “Controle fictício de estoque com 30 itens, criado para praticar validação, filtro e alerta de reposição”. Isso demonstra iniciativa sem fabricar experiência.</p>
+<p>O <a href="https://europass.europa.eu/pt/create-europass-cv" target="_blank" rel="noopener noreferrer">Europass</a> permite organizar experiências, competências e documentos de apoio. Não é exigência local, mas ajuda a entender que portfólio complementa — e não substitui — o currículo adaptado.</p>
+<h2>Envie com contexto e controle de acesso</h2>
+<p>No e-mail, diga por que o material é relevante e quantas páginas possui. Se o anúncio não pede link, não force. Em armazenamento compartilhado, teste permissão em janela anônima e evite dar acesso de edição. Não use encurtador desconhecido.</p>
+<p>Faça ainda uma revisão de autoria. Identifique o que foi produzido sozinho, em grupo ou adaptado de modelo. Em trabalho coletivo, descreva sua parte. Template público pode ser citado como ponto de partida, mas não deve ser apresentado como criação integral. Guarde versão e data para saber qual arquivo acompanhou cada candidatura.</p>
+<ul><li>Três peças relacionadas à vaga.</li><li>Dados fictícios ou autorização documentada.</li><li>Legenda com contexto, ação e aprendizado.</li><li>Arquivo leve, legível e sem login obrigatório.</li><li>Nenhuma senha, documento ou informação confidencial.</li></ul>
+<p>Atualize o conjunto quando mudar de cargo-alvo. Portfólio curto e explicável é melhor que pasta extensa sem autoria, contexto ou proteção de dados.</p>
+<p>Antes de publicar, abra o link sem estar conectado, no celular e em conexão comum. Confira se o arquivo não revela histórico de edição, comentários, nome de cliente ou versões antigas. Se houver dúvida sobre autorização ou propriedade intelectual, mantenha a peça privada e substitua por exercício autoral claramente identificado.</p>
+    `.trim()
+  },
+
+  "teste-online-processo-seletivo-dicas": {
+    reviewedAt: "2026-10-12",
+    contentHtml: `
+<p><strong>Revisão editorial: 12 de outubro de 2026.</strong> Testes on-line variam: podem avaliar raciocínio, escrita, ferramenta, idioma ou situação de trabalho. A regra válida é a informada pela empresa ou plataforma. Este guia ajuda a preparar ambiente, segurança e registro de falha sem ensinar a burlar avaliação.</p>
+<h2>Confirme o convite antes de abrir</h2>
+<p>Compare remetente, empresa, cargo e processo ao qual você se candidatou. Volte ao canal oficial por um endereço digitado por você e confirme se houver divergência. Desconfie de cobrança, instalação de programa de acesso remoto, pedido de senha, código de autenticação ou documento bancário.</p>
+<p>A <a href="https://cartilha.cert.br/fasciculos/" target="_blank" rel="noopener noreferrer">Cartilha de Segurança para Internet do CERT.br</a> reúne orientações sobre phishing, senhas, autenticação, privacidade e dispositivos móveis. Use essas práticas também em processos seletivos.</p>
+<h2>Leia regras e prazo antes do cronômetro</h2>
+<p>Anote data limite, duração, número de tentativas, navegador compatível, documentos permitidos e política de pausa. Verifique se câmera ou microfone são exigidos e qual finalidade foi informada. Se houver necessidade de acessibilidade, procure o contato do processo antes de iniciar.</p>
+<p>Não presuma que captura de tela, calculadora, consulta ou ajuda externa são permitidas. Siga a regra escrita. Se algo não estiver claro, pergunte ao responsável e guarde a resposta.</p>
+<h2>Faça um ensaio técnico</h2>
+<ul><li>Reinicie o aparelho e feche atualizações pendentes.</li><li>Teste conexão, carregador, teclado, câmera e áudio.</li><li>Abra o navegador indicado e permita somente acessos necessários.</li><li>Escolha local silencioso e avise quem mora com você.</li><li>Tenha o contato de suporte e o identificador da candidatura.</li></ul>
+<p>Plano B não significa duas pessoas respondendo. Pode ser carregador, outro ponto de conexão permitido ou orientação prévia de suporte. Trocar de dispositivo durante a prova pode invalidar a sessão; confirme antes.</p>
+<h2>Gerencie tempo sem inventar resposta</h2>
+<p>Leia o enunciado e identifique o que precisa ser entregue. Em prova com navegação livre, resolva primeiro o que entende e reserve tempo para revisão. Em sequência fixa, não gaste metade do período em uma única questão. Só chute quando a regra não penalizar e quando não houver alternativa melhor.</p>
+<p>Em teste de planilha ou escrita, salve conforme o sistema permite e revise formato. Em teste comportamental, responda com consistência e sem tentar adivinhar “perfil perfeito”. A etapa seguinte pode explorar as mesmas situações.</p>
+<h2>Registre falha de forma adequada</h2>
+<p>Se o sistema travar, anote horário, etapa e mensagem. Capture apenas erro técnico quando as regras permitirem; não copie questão confidencial. Contate o suporte com descrição objetiva e peça orientação sobre reabertura. Não crie várias contas ou repita por conta própria.</p>
+<p>Quando o teste coleta imagem, voz ou outros dados, leia o aviso apresentado. A <a href="https://www.planalto.gov.br/ccivil_03/_ato2015-2018/2018/lei/l13709.htm" target="_blank" rel="noopener noreferrer">LGPD</a> prevê princípios como finalidade, adequação e necessidade. Você pode buscar esclarecimento sobre controlador, finalidade e canal de atendimento, sem concluir automaticamente que toda coleta é irregular.</p>
+<p>Se o ambiente não permite cumprir uma exigência técnica, informe antes do prazo. Exemplo: câmera indisponível, incompatibilidade do leitor de tela ou internet interrompida no bairro. Peça instrução, não garantia de nova tentativa. Guarde protocolo e siga a resposta do responsável; não tente contornar o sistema com conta de outra pessoa.</p>
+<h2>Depois do envio</h2>
+<p>Guarde confirmação, data e contato de suporte. Não publique perguntas ou respostas. Registre quais competências apareceram e prepare exemplos verdadeiros para a entrevista. Se não avançar, o resultado não revela sozinho o motivo; evite inventar explicações sobre algoritmo ou nota de corte.</p>
+<p>A preparação correta reduz falhas evitáveis, mas não garante aprovação. Segurança, honestidade e respeito às regras preservam a candidatura e os seus dados.</p>
+    `.trim()
+  }
 };
 
 export function getEditorialContentOverride(slug: string) {
   return overrides[slug] ?? null;
 }
-
