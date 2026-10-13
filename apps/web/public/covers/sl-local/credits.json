@@ -1123,29 +1123,35 @@
   },
   {
     "slug": "esgotamento-busca-emprego-sinais",
-    "photoId": "1600880292203-757bb62b4baf",
-    "source": "unsplash",
-    "photographer": "Jason Goodman",
-    "credit": "Foto: Jason Goodman / Unsplash",
-    "caption": "Foto ilustrativa para “Esgotamento na busca de emprego: sinais e quando pausar”.",
-    "alt": "Capa: Esgotamento na busca de emprego: sinais e quando pausar"
+    "source": "original",
+    "photographer": "Equipe editorial Empregos São Luís",
+    "credit": "Ilustração editorial original: Empregos São Luís",
+    "caption": "Ilustração editorial original para “Busca de emprego: hora de pausar”.",
+    "alt": "Ilustração de capa: Busca de emprego: hora de pausar",
+    "licenseStatus": "owned",
+    "licenseBasis": "Criação gráfica original produzida para o portal; sem fotografia, rosto, logotipo de terceiro ou banco externo.",
+    "createdAt": "2026-10-13"
   },
   {
     "slug": "mensagem-fria-recrutador-linkedin",
-    "photoId": "1486312338219-ce68d2c6f44d",
-    "source": "unsplash",
-    "photographer": "Glenn Carstens-Peters",
-    "credit": "Foto: Glenn Carstens-Peters / Unsplash",
-    "caption": "Foto ilustrativa para “Mensagem fria a recrutador: template LinkedIn/WhatsApp sem spam”.",
-    "alt": "Capa: Mensagem fria a recrutador: template LinkedIn/WhatsApp sem spam"
+    "source": "original",
+    "photographer": "Equipe editorial Empregos São Luís",
+    "credit": "Ilustração editorial original: Empregos São Luís",
+    "caption": "Ilustração editorial original para “Mensagem a recrutador sem spam”.",
+    "alt": "Ilustração de capa: Mensagem a recrutador sem spam",
+    "licenseStatus": "owned",
+    "licenseBasis": "Criação gráfica original produzida para o portal; sem fotografia, rosto, logotipo de terceiro ou banco externo.",
+    "createdAt": "2026-10-13"
   },
   {
     "slug": "busca-emprego-sao-luis-2026",
-    "photoId": "1454165804606-c3d57bc86b40",
-    "source": "unsplash",
-    "photographer": "Scott Graham",
-    "credit": "Foto: Scott Graham / Unsplash",
-    "caption": "Foto ilustrativa para “Busca de emprego em São Luís 2026: o que priorizar no semestre”.",
-    "alt": "Capa: Busca de emprego em São Luís 2026: o que priorizar no semestre"
+    "source": "original",
+    "photographer": "Equipe editorial Empregos São Luís",
+    "credit": "Ilustração editorial original: Empregos São Luís",
+    "caption": "Ilustração editorial original para “Busca de emprego em São Luís”.",
+    "alt": "Ilustração de capa: Busca de emprego em São Luís",
+    "licenseStatus": "owned",
+    "licenseBasis": "Criação gráfica original produzida para o portal; sem fotografia, rosto, logotipo de terceiro ou banco externo.",
+    "createdAt": "2026-10-13"
   }
 ]
