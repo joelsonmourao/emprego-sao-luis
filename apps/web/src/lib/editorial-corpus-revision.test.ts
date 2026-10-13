@@ -28,8 +28,8 @@ describe("Auditoria editorial real do corpus de 12/10/2026", () => {
     expect(flagged).toHaveLength(98);
     const reviewed = flagged.filter((item) => getEditorialContentOverride(item.slug));
     const pending = flagged.filter((item) => !getEditorialContentOverride(item.slug));
-    expect(reviewed).toHaveLength(84);
-    expect(pending).toHaveLength(14);
+    expect(reviewed).toHaveLength(92);
+    expect(pending).toHaveLength(6);
     expect(guidesPendingReview.size).toBe(pending.length);
     for (const item of pending) expect(guidesPendingReview.has(item.slug)).toBe(true);
     for (const item of reviewed) expect(guidesPendingReview.has(item.slug)).toBe(false);
@@ -127,7 +127,15 @@ describe("Auditoria editorial real do corpus de 12/10/2026", () => {
       "dinamica-de-grupo-entrevista-dicas",
       "empatia-atendimento-cliente-entrevista",
       "emprego-apos-40-anos-curriculo",
-      "entrevista-desligamento-o-que-falar"
+      "entrevista-desligamento-o-que-falar",
+      "follow-up-apos-entrevista-mensagem",
+      "gestao-de-tempo-trabalho-dicas",
+      "inteligencia-emocional-entrevista",
+      "linkedin-emprego-sao-luis-perfil",
+      "marca-pessoal-candidatura-sao-luis",
+      "mudanca-de-carreira-sao-luis-curriculo",
+      "networking-emprego-sao-luis",
+      "o-que-vestir-entrevista-emprego"
     ];
     for (const slug of edited) {
       const override = getEditorialContentOverride(slug);
@@ -210,7 +218,15 @@ describe("Auditoria editorial real do corpus de 12/10/2026", () => {
       "dinamica-de-grupo-entrevista-dicas",
       "empatia-atendimento-cliente-entrevista",
       "emprego-apos-40-anos-curriculo",
-      "entrevista-desligamento-o-que-falar"
+      "entrevista-desligamento-o-que-falar",
+      "follow-up-apos-entrevista-mensagem",
+      "gestao-de-tempo-trabalho-dicas",
+      "inteligencia-emocional-entrevista",
+      "linkedin-emprego-sao-luis-perfil",
+      "marca-pessoal-candidatura-sao-luis",
+      "mudanca-de-carreira-sao-luis-curriculo",
+      "networking-emprego-sao-luis",
+      "o-que-vestir-entrevista-emprego"
     ];
     for (const slug of sourceBacked) {
       expect(getEditorialContentOverride(slug)!.contentHtml).toMatch(/<a href="https:\/\//);
