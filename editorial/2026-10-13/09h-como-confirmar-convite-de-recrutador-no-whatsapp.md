@@ -12,7 +12,7 @@ primary_keyword: "confirmar recrutador whatsapp"
 image_status: "PENDING_APPROVED_COVER"
 review_status: "PENDING_EDITORIAL_REVIEW"
 sources:
-  - "https://www.gov.br/anpd/pt-br/assuntos/noticias/a-anpd-alerta-sobre-o-envio-de-e-mails-falsos-em-nome-da-autoridade-com-a-tentativa-de-phishing1"
+  - "https://www.gov.br/cisc/pt-br/alertas-de-golpes-digitais/golpistas-enviam-mensagens-no-whatsapp-se-passando-por-entidades-do-governo"
   - "https://www.gov.br/pt-br/servicos/buscar-emprego-no-sistema-nacional-de-emprego-sine"
 ---
 
@@ -45,6 +45,12 @@ Imagine que uma pessoa receba uma mensagem para uma vaga de recepcionista, dizen
 > Obrigado pelo contato. Você pode me informar o título e o código da vaga, o nome da unidade e onde posso confirmar esse processo no site oficial?
 
 Em seguida, pesquisa o canal institucional da clínica. Se não houver confirmação suficiente, mantém seus documentos em segurança e não prossegue naquele endereço. Isso não significa concluir automaticamente que o contato é fraudulento: significa **não aceitar risco desnecessário enquanto a origem permanece desconhecida**.
+
+## Como classificar um convite depois da checagem
+
+Se o processo aparece em um canal institucional obtido independentemente e a empresa confirma os detalhes, você reuniu evidências para continuar com cautela. Se a vaga existe, mas o número de contato não foi confirmado, mantenha o envio de documentos suspenso. Se houver pressão por pagamento imediato ou pedido de senha, encerre a interação até que a legitimidade seja esclarecida.
+
+Para quem mora em São Luís, confirme também a unidade e o bairro de trabalho. Uma vaga de recepção pode ser anunciada para diferentes endereços, e saber a localização exata ajuda a verificar se a entrevista é coerente com o anúncio. Não conclua que uma mensagem é autêntica só porque contém seu nome ou menciona um cargo para o qual você se candidatou.
 
 ## Se o link já foi aberto
 
