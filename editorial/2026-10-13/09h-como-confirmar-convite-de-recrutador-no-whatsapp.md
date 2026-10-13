@@ -56,7 +56,7 @@ Para quem mora em São Luís, confirme também a unidade e o bairro de trabalho.
 
 Abrir uma página não significa, por si só, que seus dados foram comprometidos. Avalie o que aconteceu: você apenas visualizou o site, baixou um arquivo, digitou senha ou informou códigos? Quanto mais informação foi fornecida, mais importante é agir pelos canais oficiais das contas envolvidas, como alterar senhas ou consultar orientações do serviço utilizado. Evite responder a novas mensagens do contato suspeito pedindo “ajuda” para recuperar acesso.
 
-A Autoridade Nacional de Proteção de Dados já publicou um [alerta sobre mensagens de phishing](https://www.gov.br/anpd/pt-br/assuntos/noticias/a-anpd-alerta-sobre-o-envio-de-e-mails-falsos-em-nome-da-autoridade-com-a-tentativa-de-phishing1), explicando riscos de links, anexos e pedidos de credenciais.
+O [Centro Integrado de Segurança Cibernética](https://www.gov.br/cisc/pt-br/alertas-de-golpes-digitais/golpistas-enviam-mensagens-no-whatsapp-se-passando-por-entidades-do-governo) alerta sobre mensagens falsas que usam aparência institucional e informações pessoais para transmitir credibilidade. O alerta trata de contatos que imitam órgãos públicos; a orientação de confirmar a identidade por canais independentes também é útil para avaliar convites de recrutamento.
 
 ## Um caminho alternativo para encontrar oportunidades
 
