@@ -43,8 +43,8 @@ describe("Segundo lote de substituição das capas Unsplash", () => {
     }
   });
 
-  it("reduz o acervo Unsplash para 63 itens", () => {
-    expect(credits.filter((item) => item.source === "unsplash")).toHaveLength(63);
+  it("não permite que o acervo Unsplash volte a superar 63 itens", () => {
+    expect(credits.filter((item) => item.source === "unsplash").length).toBeLessThanOrEqual(63);
   });
 
   it("mantém 12 WebP próprios, distintos e em 1200 × 630", () => {
