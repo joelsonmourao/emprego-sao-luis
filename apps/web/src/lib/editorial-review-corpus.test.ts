@@ -28,8 +28,8 @@ describe("Auditoria editorial real do corpus de 12/10/2026", () => {
     expect(flagged).toHaveLength(98);
     const reviewed = flagged.filter((item) => getEditorialContentOverride(item.slug));
     const pending = flagged.filter((item) => !getEditorialContentOverride(item.slug));
-    expect(reviewed).toHaveLength(92);
-    expect(pending).toHaveLength(6);
+    expect(reviewed).toHaveLength(98);
+    expect(pending).toHaveLength(0);
     expect(guidesPendingReview.size).toBe(pending.length);
     for (const item of pending) expect(guidesPendingReview.has(item.slug)).toBe(true);
     for (const item of reviewed) expect(guidesPendingReview.has(item.slug)).toBe(false);
@@ -135,7 +135,13 @@ describe("Auditoria editorial real do corpus de 12/10/2026", () => {
       "marca-pessoal-candidatura-sao-luis",
       "mudanca-de-carreira-sao-luis-curriculo",
       "networking-emprego-sao-luis",
-      "o-que-vestir-entrevista-emprego"
+      "o-que-vestir-entrevista-emprego",
+      "pedir-feedback-entrevista-emprego",
+      "plano-semanal-vagas-sao-luis",
+      "produtividade-busca-emprego-sao-luis",
+      "rejeicao-processo-seletivo-como-reagir",
+      "retorno-mercado-trabalho-gap-curriculo",
+      "transporte-entrevista-emprego-sao-luis"
     ];
     for (const slug of edited) {
       const override = getEditorialContentOverride(slug);
@@ -226,7 +232,13 @@ describe("Auditoria editorial real do corpus de 12/10/2026", () => {
       "marca-pessoal-candidatura-sao-luis",
       "mudanca-de-carreira-sao-luis-curriculo",
       "networking-emprego-sao-luis",
-      "o-que-vestir-entrevista-emprego"
+      "o-que-vestir-entrevista-emprego",
+      "pedir-feedback-entrevista-emprego",
+      "plano-semanal-vagas-sao-luis",
+      "produtividade-busca-emprego-sao-luis",
+      "rejeicao-processo-seletivo-como-reagir",
+      "retorno-mercado-trabalho-gap-curriculo",
+      "transporte-entrevista-emprego-sao-luis"
     ];
     for (const slug of sourceBacked) {
       expect(getEditorialContentOverride(slug)!.contentHtml).toMatch(/<a href="https:\/\//);

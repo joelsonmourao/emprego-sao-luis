@@ -15,7 +15,7 @@ describe("Vitrine pública durante a análise AdSense", () => {
     expect(source).toContain("notInArray(articles.slug, pendingSlugs)");
     expect(source).toContain("getEditorialContentOverride(slug)");
     expect(source).toContain("getNewsEditorialOverride(slug)");
-    expect([...guidesPendingReview].filter((slug) => !getEditorialContentOverride(slug)).length).toBeGreaterThan(0);
+    expect(guidesPendingReview.size).toBe(0);
     expect([...newsPendingFactCheck].every((slug) => Boolean(getNewsEditorialOverride(slug)))).toBe(true);
   });
 
