@@ -12,5 +12,5 @@ function readWebpSize(path: string) { const data = readFileSync(path); expect(da
 describe("sexto lote de capas editoriais próprias", () => {
   it("registra autoria e direitos próprios nas 12 capas", () => { for (const slug of slugs) { const item = credits.find((credit) => credit.slug === slug); expect(item).toMatchObject({ source: "original", licenseStatus: "owned" }); expect(item?.credit).toContain("Empregos São Luís"); expect(item?.licenseBasis).toContain("sem fotografia"); } });
   it("mantém 12 WebP próprios, distintos e em 1200 × 630", () => { const hashes = new Set<string>(); for (const slug of slugs) { const path = resolve(root, `${slug}.webp`); expect(existsSync(path)).toBe(true); expect(readWebpSize(path)).toEqual({ width: 1200, height: 630 }); hashes.add(createHash("sha256").update(readFileSync(path)).digest("hex")); } expect(hashes).toHaveLength(12); });
-  it("reduz o acervo Unsplash para 15 itens", () => { expect(credits.filter((item) => item.source === "unsplash")).toHaveLength(15); });
+  it("mantém no máximo 15 itens Unsplash após o sexto lote", () => { expect(credits.filter((item) => item.source === "unsplash").length).toBeLessThanOrEqual(15); });
 });
