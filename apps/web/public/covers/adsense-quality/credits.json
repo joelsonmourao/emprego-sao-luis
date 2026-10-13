@@ -1,13 +1,19 @@
 {
-  "packageId": "adsense-quality-guides-v1",
+  "packageId": "adsense-quality-guides-v2-original",
   "covers": [
     {
       "slug": "objetivo-profissional-curriculo",
       "file": "objetivo-profissional-curriculo.webp",
       "width": 1280,
       "height": 720,
-      "alt": "Pessoa jovem organizando anotações ao lado de um notebook para montar o currículo",
-      "credit": "Ilustração editorial Empregos São Luís",
+      "source": "original",
+      "photographer": "Equipe editorial Empregos São Luís",
+      "credit": "Ilustração editorial original: Empregos São Luís",
+      "caption": "Ilustração editorial original para “Objetivo profissional no currículo”.",
+      "alt": "Ilustração de alvo e currículo para definir um objetivo profissional",
+      "licenseStatus": "owned",
+      "licenseBasis": "Criação vetorial original produzida pela equipe editorial do portal, sem fotografia, rosto, logotipo de terceiro ou banco de imagens externo.",
+      "createdAt": "2026-10-13",
       "status": "GERADA_E_OTIMIZADA"
     },
     {
@@ -15,8 +21,14 @@
       "file": "perguntas-comuns-entrevista-emprego.webp",
       "width": 1280,
       "height": 720,
-      "alt": "Candidato e recrutador conversando em entrevista profissional em escritório",
-      "credit": "Ilustração editorial Empregos São Luís",
+      "source": "original",
+      "photographer": "Equipe editorial Empregos São Luís",
+      "credit": "Ilustração editorial original: Empregos São Luís",
+      "caption": "Ilustração editorial original para “Perguntas comuns na entrevista”.",
+      "alt": "Ilustração de diálogo entre candidato e recrutador durante entrevista",
+      "licenseStatus": "owned",
+      "licenseBasis": "Criação vetorial original produzida pela equipe editorial do portal, sem fotografia, rosto, logotipo de terceiro ou banco de imagens externo.",
+      "createdAt": "2026-10-13",
       "status": "GERADA_E_OTIMIZADA"
     },
     {
@@ -24,8 +36,14 @@
       "file": "pesquisar-empresa-antes-entrevista.webp",
       "width": 1280,
       "height": 720,
-      "alt": "Pessoa pesquisando informações de uma empresa no notebook antes de uma entrevista",
-      "credit": "Ilustração editorial Empregos São Luís",
+      "source": "original",
+      "photographer": "Equipe editorial Empregos São Luís",
+      "credit": "Ilustração editorial original: Empregos São Luís",
+      "caption": "Ilustração editorial original para “Pesquise a empresa antes da entrevista”.",
+      "alt": "Ilustração de lupa sobre informações de uma empresa antes da entrevista",
+      "licenseStatus": "owned",
+      "licenseBasis": "Criação vetorial original produzida pela equipe editorial do portal, sem fotografia, rosto, logotipo de terceiro ou banco de imagens externo.",
+      "createdAt": "2026-10-13",
       "status": "GERADA_E_OTIMIZADA"
     },
     {
@@ -33,8 +51,14 @@
       "file": "acompanhar-candidatura-emprego.webp",
       "width": 1280,
       "height": 720,
-      "alt": "Pessoa organizando agenda e anotações para acompanhar candidaturas de emprego",
-      "credit": "Ilustração editorial Empregos São Luís",
+      "source": "original",
+      "photographer": "Equipe editorial Empregos São Luís",
+      "credit": "Ilustração editorial original: Empregos São Luís",
+      "caption": "Ilustração editorial original para “Acompanhe cada candidatura”.",
+      "alt": "Ilustração de etapas para acompanhar candidaturas de emprego",
+      "licenseStatus": "owned",
+      "licenseBasis": "Criação vetorial original produzida pela equipe editorial do portal, sem fotografia, rosto, logotipo de terceiro ou banco de imagens externo.",
+      "createdAt": "2026-10-13",
       "status": "GERADA_E_OTIMIZADA"
     },
     {
@@ -42,8 +66,14 @@
       "file": "linkedin-primeiro-emprego.webp",
       "width": 1280,
       "height": 720,
-      "alt": "Jovem adulto montando perfil profissional em notebook para busca do primeiro emprego",
-      "credit": "Ilustração editorial Empregos São Luís",
+      "source": "original",
+      "photographer": "Equipe editorial Empregos São Luís",
+      "credit": "Ilustração editorial original: Empregos São Luís",
+      "caption": "Ilustração editorial original para “LinkedIn para o primeiro emprego”.",
+      "alt": "Ilustração de perfil profissional para a busca do primeiro emprego",
+      "licenseStatus": "owned",
+      "licenseBasis": "Criação vetorial original produzida pela equipe editorial do portal, sem fotografia, rosto, logotipo de terceiro ou banco de imagens externo.",
+      "createdAt": "2026-10-13",
       "status": "GERADA_E_OTIMIZADA"
     },
     {
@@ -51,8 +81,14 @@
       "file": "jovem-aprendiz-como-funciona.webp",
       "width": 1280,
       "height": 720,
-      "alt": "Jovem em ambiente de trabalho aprendendo com supervisão em atividade profissional",
-      "credit": "Ilustração editorial Empregos São Luís",
+      "source": "original",
+      "photographer": "Equipe editorial Empregos São Luís",
+      "credit": "Ilustração editorial original: Empregos São Luís",
+      "caption": "Ilustração editorial original para “Como funciona o Jovem Aprendiz”.",
+      "alt": "Ilustração de jovem aprendendo uma atividade com acompanhamento profissional",
+      "licenseStatus": "owned",
+      "licenseBasis": "Criação vetorial original produzida pela equipe editorial do portal, sem fotografia, rosto, logotipo de terceiro ou banco de imagens externo.",
+      "createdAt": "2026-10-13",
       "status": "GERADA_E_OTIMIZADA"
     },
     {
@@ -60,8 +96,14 @@
       "file": "estagio-x-jovem-aprendiz.webp",
       "width": 1280,
       "height": 720,
-      "alt": "Dois jovens em contextos profissionais distintos, sugerindo caminhos de estágio e aprendizagem",
-      "credit": "Ilustração editorial Empregos São Luís",
+      "source": "original",
+      "photographer": "Equipe editorial Empregos São Luís",
+      "credit": "Ilustração editorial original: Empregos São Luís",
+      "caption": "Ilustração editorial original para “Estágio ou Jovem Aprendiz?”.",
+      "alt": "Ilustração de dois caminhos para comparar estágio e Jovem Aprendiz",
+      "licenseStatus": "owned",
+      "licenseBasis": "Criação vetorial original produzida pela equipe editorial do portal, sem fotografia, rosto, logotipo de terceiro ou banco de imagens externo.",
+      "createdAt": "2026-10-13",
       "status": "GERADA_E_OTIMIZADA"
     },
     {
@@ -69,8 +111,14 @@
       "file": "organizar-busca-emprego.webp",
       "width": 1280,
       "height": 720,
-      "alt": "Pessoa planejando a semana de busca de emprego com anotações em mesa organizada",
-      "credit": "Ilustração editorial Empregos São Luís",
+      "source": "original",
+      "photographer": "Equipe editorial Empregos São Luís",
+      "credit": "Ilustração editorial original: Empregos São Luís",
+      "caption": "Ilustração editorial original para “Organize sua busca de emprego”.",
+      "alt": "Ilustração de quadro semanal para organizar a busca de emprego",
+      "licenseStatus": "owned",
+      "licenseBasis": "Criação vetorial original produzida pela equipe editorial do portal, sem fotografia, rosto, logotipo de terceiro ou banco de imagens externo.",
+      "createdAt": "2026-10-13",
       "status": "GERADA_E_OTIMIZADA"
     }
   ]
