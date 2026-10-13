@@ -496,12 +496,14 @@
   },
   {
     "slug": "linkedin-emprego-sao-luis-perfil",
-    "photoId": "1497215842964-222b430dc094",
-    "source": "unsplash",
-    "photographer": "Alesia Kazantceva",
-    "credit": "Foto: Alesia Kazantceva / Unsplash",
-    "caption": "Foto ilustrativa para “LinkedIn para vagas em São Luís: perfil que gera conversa”.",
-    "alt": "Capa: LinkedIn para vagas em São Luís: perfil que gera conversa"
+    "source": "original",
+    "photographer": "Equipe editorial Empregos São Luís",
+    "credit": "Ilustração editorial original: Empregos São Luís",
+    "caption": "Ilustração editorial original para “Perfil profissional que gera conversa”.",
+    "alt": "Ilustração de capa: Perfil profissional que gera conversa",
+    "licenseStatus": "owned",
+    "licenseBasis": "Criação gráfica original produzida para o portal; sem fotografia, rosto, logotipo de terceiro ou banco externo.",
+    "createdAt": "2026-10-13"
   },
   {
     "slug": "follow-up-apos-entrevista-mensagem",
@@ -527,12 +529,14 @@
   },
   {
     "slug": "primeira-semana-emprego-novo",
-    "photoId": "1552664730-d307ca884978",
-    "source": "unsplash",
-    "photographer": "Headway",
-    "credit": "Foto: Headway / Unsplash",
-    "caption": "Foto ilustrativa para “Primeira semana no emprego novo: o que observar e anotar”.",
-    "alt": "Capa: Primeira semana no emprego novo: o que observar e anotar"
+    "source": "original",
+    "photographer": "Equipe editorial Empregos São Luís",
+    "credit": "Ilustração editorial original: Empregos São Luís",
+    "caption": "Ilustração editorial original para “Primeira semana no emprego novo”.",
+    "alt": "Ilustração de capa: Primeira semana no emprego novo",
+    "licenseStatus": "owned",
+    "licenseBasis": "Criação gráfica original produzida para o portal; sem fotografia, rosto, logotipo de terceiro ou banco externo.",
+    "createdAt": "2026-10-13"
   },
   {
     "slug": "como-pedir-aumento-salario",
@@ -547,39 +551,47 @@
   },
   {
     "slug": "banco-de-horas-direitos-trabalhador",
-    "photoId": "1522202176988-66273c2fd55f",
-    "source": "unsplash",
-    "photographer": "Brooke Cagle",
-    "credit": "Foto: Brooke Cagle / Unsplash",
-    "caption": "Foto ilustrativa para “Banco de horas: o que confirmar no regulamento da empresa”.",
-    "alt": "Capa: Banco de horas: o que confirmar no regulamento da empresa"
+    "source": "original",
+    "photographer": "Equipe editorial Empregos São Luís",
+    "credit": "Ilustração editorial original: Empregos São Luís",
+    "caption": "Ilustração editorial original para “Banco de horas sem dúvida”.",
+    "alt": "Ilustração de capa: Banco de horas sem dúvida",
+    "licenseStatus": "owned",
+    "licenseBasis": "Criação gráfica original produzida para o portal; sem fotografia, rosto, logotipo de terceiro ou banco externo.",
+    "createdAt": "2026-10-13"
   },
   {
     "slug": "hora-extra-holerite-como-conferir",
-    "photoId": "1556761175-5973dc0f32e7",
-    "source": "unsplash",
-    "photographer": "LinkedIn Sales Solutions",
-    "credit": "Foto: LinkedIn Sales Solutions / Unsplash",
-    "caption": "Foto ilustrativa para “Hora extra no holerite: como conferir se o adicional entrou”.",
-    "alt": "Capa: Hora extra no holerite: como conferir se o adicional entrou"
+    "source": "original",
+    "photographer": "Equipe editorial Empregos São Luís",
+    "credit": "Ilustração editorial original: Empregos São Luís",
+    "caption": "Ilustração editorial original para “Confira a hora extra no holerite”.",
+    "alt": "Ilustração de capa: Confira a hora extra no holerite",
+    "licenseStatus": "owned",
+    "licenseBasis": "Criação gráfica original produzida para o portal; sem fotografia, rosto, logotipo de terceiro ou banco externo.",
+    "createdAt": "2026-10-13"
   },
   {
     "slug": "fgts-consultar-trabalhador-clt",
-    "photoId": "1486312338219-ce68d2c6f44d",
-    "source": "unsplash",
-    "photographer": "Glenn Carstens-Peters",
-    "credit": "Foto: Glenn Carstens-Peters / Unsplash",
-    "caption": "Foto ilustrativa para “FGTS do trabalhador CLT: o que acompanhar no app oficial”.",
-    "alt": "Capa: FGTS do trabalhador CLT: o que acompanhar no app oficial"
+    "source": "original",
+    "photographer": "Equipe editorial Empregos São Luís",
+    "credit": "Ilustração editorial original: Empregos São Luís",
+    "caption": "Ilustração editorial original para “Acompanhe seu FGTS com segurança”.",
+    "alt": "Ilustração de capa: Acompanhe seu FGTS com segurança",
+    "licenseStatus": "owned",
+    "licenseBasis": "Criação gráfica original produzida para o portal; sem fotografia, rosto, logotipo de terceiro ou banco externo.",
+    "createdAt": "2026-10-13"
   },
   {
     "slug": "seguro-desemprego-checklist-documentos",
-    "photoId": "1454165804606-c3d57bc86b40",
-    "source": "unsplash",
-    "photographer": "Scott Graham",
-    "credit": "Foto: Scott Graham / Unsplash",
-    "caption": "Foto ilustrativa para “Seguro-desemprego: checklist após demissão sem justa causa”.",
-    "alt": "Capa: Seguro-desemprego: checklist após demissão sem justa causa"
+    "source": "original",
+    "photographer": "Equipe editorial Empregos São Luís",
+    "credit": "Ilustração editorial original: Empregos São Luís",
+    "caption": "Ilustração editorial original para “Documentos do seguro-desemprego”.",
+    "alt": "Ilustração de capa: Documentos do seguro-desemprego",
+    "licenseStatus": "owned",
+    "licenseBasis": "Criação gráfica original produzida para o portal; sem fotografia, rosto, logotipo de terceiro ou banco externo.",
+    "createdAt": "2026-10-13"
   },
   {
     "slug": "vale-alimentacao-ou-refeicao-diferenca",
@@ -594,57 +606,69 @@
   },
   {
     "slug": "periodo-experiencia-clt-o-que-saber",
-    "photoId": "1460925895917-afdab827c52f",
-    "source": "unsplash",
-    "photographer": "Carlos Muza",
-    "credit": "Foto: Carlos Muza / Unsplash",
-    "caption": "Foto ilustrativa para “Período de experiência CLT: o que perguntar na admissão”.",
-    "alt": "Capa: Período de experiência CLT: o que perguntar na admissão"
+    "source": "original",
+    "photographer": "Equipe editorial Empregos São Luís",
+    "credit": "Ilustração editorial original: Empregos São Luís",
+    "caption": "Ilustração editorial original para “Período de experiência CLT”.",
+    "alt": "Ilustração de capa: Período de experiência CLT",
+    "licenseStatus": "owned",
+    "licenseBasis": "Criação gráfica original produzida para o portal; sem fotografia, rosto, logotipo de terceiro ou banco externo.",
+    "createdAt": "2026-10-13"
   },
   {
     "slug": "contrato-temporario-temporada-direitos",
-    "photoId": "1553877522-43269d4ea984",
-    "source": "unsplash",
-    "photographer": "You X Ventures",
-    "credit": "Foto: You X Ventures / Unsplash",
-    "caption": "Foto ilustrativa para “Contrato temporário na temporada: o que ler antes de assinar”.",
-    "alt": "Capa: Contrato temporário na temporada: o que ler antes de assinar"
+    "source": "original",
+    "photographer": "Equipe editorial Empregos São Luís",
+    "credit": "Ilustração editorial original: Empregos São Luís",
+    "caption": "Ilustração editorial original para “Leia o contrato temporário”.",
+    "alt": "Ilustração de capa: Leia o contrato temporário",
+    "licenseStatus": "owned",
+    "licenseBasis": "Criação gráfica original produzida para o portal; sem fotografia, rosto, logotipo de terceiro ou banco externo.",
+    "createdAt": "2026-10-13"
   },
   {
     "slug": "assedio-no-trabalho-o-que-fazer",
-    "photoId": "1519389950473-47ba0277781c",
-    "source": "unsplash",
-    "photographer": "Marvin Meyer",
-    "credit": "Foto: Marvin Meyer / Unsplash",
-    "caption": "Foto ilustrativa para “Assédio no trabalho: sinais, registro e canais com menos risco”.",
-    "alt": "Capa: Assédio no trabalho: sinais, registro e canais com menos risco"
+    "source": "original",
+    "photographer": "Equipe editorial Empregos São Luís",
+    "credit": "Ilustração editorial original: Empregos São Luís",
+    "caption": "Ilustração editorial original para “Assédio no trabalho: registre e busque apoio”.",
+    "alt": "Ilustração de capa: Assédio no trabalho: registre e busque apoio",
+    "licenseStatus": "owned",
+    "licenseBasis": "Criação gráfica original produzida para o portal; sem fotografia, rosto, logotipo de terceiro ou banco externo.",
+    "createdAt": "2026-10-13"
   },
   {
     "slug": "saude-mental-trabalho-limites",
-    "photoId": "1573164713714-d95e436ab8d6",
-    "source": "unsplash",
-    "photographer": "Christina Wocintechchat",
-    "credit": "Foto: Christina Wocintechchat / Unsplash",
-    "caption": "Foto ilustrativa para “Saúde mental e trabalho: limites saudáveis sem culpa excessiva”.",
-    "alt": "Capa: Saúde mental e trabalho: limites saudáveis sem culpa excessiva"
+    "source": "original",
+    "photographer": "Equipe editorial Empregos São Luís",
+    "credit": "Ilustração editorial original: Empregos São Luís",
+    "caption": "Ilustração editorial original para “Saúde mental e limites no trabalho”.",
+    "alt": "Ilustração de capa: Saúde mental e limites no trabalho",
+    "licenseStatus": "owned",
+    "licenseBasis": "Criação gráfica original produzida para o portal; sem fotografia, rosto, logotipo de terceiro ou banco externo.",
+    "createdAt": "2026-10-13"
   },
   {
     "slug": "home-office-remoto-checklist-vaga",
-    "photoId": "1522071820081-009f0129c71c",
-    "source": "unsplash",
-    "photographer": "Austin Distel",
-    "credit": "Foto: Austin Distel / Unsplash",
-    "caption": "Foto ilustrativa para “Home office: checklist antes de aceitar vaga 100% remota”.",
-    "alt": "Capa: Home office: checklist antes de aceitar vaga 100% remota"
+    "source": "original",
+    "photographer": "Equipe editorial Empregos São Luís",
+    "credit": "Ilustração editorial original: Empregos São Luís",
+    "caption": "Ilustração editorial original para “Checklist da vaga em home office”.",
+    "alt": "Ilustração de capa: Checklist da vaga em home office",
+    "licenseStatus": "owned",
+    "licenseBasis": "Criação gráfica original produzida para o portal; sem fotografia, rosto, logotipo de terceiro ou banco externo.",
+    "createdAt": "2026-10-13"
   },
   {
     "slug": "mudanca-de-carreira-sao-luis-curriculo",
-    "photoId": "1543269865-cbf427effbad",
-    "source": "unsplash",
-    "photographer": "Brooke Cagle",
-    "credit": "Foto: Brooke Cagle / Unsplash",
-    "caption": "Foto ilustrativa para “Mudança de carreira em São Luís: transição sem apagar o passado”.",
-    "alt": "Capa: Mudança de carreira em São Luís: transição sem apagar o passado"
+    "source": "original",
+    "photographer": "Equipe editorial Empregos São Luís",
+    "credit": "Ilustração editorial original: Empregos São Luís",
+    "caption": "Ilustração editorial original para “Mudança de carreira com direção”.",
+    "alt": "Ilustração de capa: Mudança de carreira com direção",
+    "licenseStatus": "owned",
+    "licenseBasis": "Criação gráfica original produzida para o portal; sem fotografia, rosto, logotipo de terceiro ou banco externo.",
+    "createdAt": "2026-10-13"
   },
   {
     "slug": "carta-apresentacao-emprego-curta",
