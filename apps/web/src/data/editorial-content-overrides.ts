@@ -1800,6 +1800,204 @@ const overrides: Record<string, EditorialContentOverride> = {
 <p>O valor dos 90 dias é permitir comparação e correção. A contratação depende de processos externos; o plano mede apenas ações e evidências sob seu controle.</p>
 <p>Faça revisões nos dias 15, 30, 60 e 90. Em cada uma, altere apenas o que a evidência sustenta. Se passou a receber contatos depois de esclarecer o cargo no currículo, mantenha a mudança. Se o retorno não mudou, confira anúncios e canais antes de concluir que precisa comprar curso, foto profissional ou serviço de candidatura.</p>
     `.trim()
+  },
+
+  "agradecimento-pos-entrevista-mensagem": {
+    reviewedAt: "2026-10-13",
+    contentHtml: `
+<p><strong>Revisão editorial: 13 de outubro de 2026.</strong> A mensagem de agradecimento não é cobrança disfarçada nem garantia de vantagem. Ela serve para confirmar interesse, registrar um ponto relevante da conversa e manter um canal profissional aberto. Deve ser curta, verdadeira e enviada apenas a um contato que participou do processo ou foi indicado pela empresa.</p>
+<h2>Escolha o canal e o momento</h2>
+<p>Use o mesmo canal pelo qual a entrevista foi organizada, salvo orientação diferente. Se recebeu e-mail corporativo, prefira responder à conversa existente; se o contato ocorreu por plataforma, mantenha-se nela. Não procure telefone pessoal do entrevistador nem envie a mesma mensagem para várias pessoas.</p>
+<p>Enviar no mesmo dia ou no próximo dia útil costuma ser suficiente. Se a empresa informou prazo de retorno, agradeça sem pedir resposta imediata. Para acompanhar a seleção depois, use um <a href="/blog/follow-up-apos-entrevista-mensagem">follow-up separado</a> e respeite o prazo combinado.</p>
+<h2>Escreva quatro partes específicas</h2>
+<ol><li>cumprimento com o nome correto;</li><li>agradecimento pela conversa e identificação da vaga;</li><li>um ponto real que aumentou seu interesse;</li><li>disponibilidade para complementar informações.</li></ol>
+<p>Exemplo adaptável: “Olá, Ana. Obrigado pela conversa de hoje sobre a vaga de auxiliar administrativo. A explicação sobre a conferência diária de pedidos ajudou a entender a prioridade da função. Minha experiência organizando documentos e registrando pendências pode contribuir nesse fluxo. Fico disponível caso precisem de outra informação.”</p>
+<p>Não copie o exemplo palavra por palavra. Troque o detalhe pelo que realmente foi discutido. Se você não lembra de um ponto específico, limite-se a agradecer e confirmar interesse; inventar processo, nome de sistema ou desafio prejudica a credibilidade.</p>
+<h2>Quando houve algo a corrigir</h2>
+<p>Uma mensagem pode corrigir informação objetiva e curta: “Na conversa, mencionei que o curso terminou em maio; conferi o certificado e a data correta é junho.” Não reescreva todas as respostas nem envie arquivos não solicitados. Para portfólio ou certificado pedido, use o formato e o canal indicados e confirme o destinatário.</p>
+<p>Se concluiu que a vaga não é compatível, agradeça e retire a candidatura com clareza: “Após revisar a escala informada, não conseguirei cumprir o horário. Agradeço a conversa e peço que desconsiderem minha candidatura.” Isso evita silêncio e não exige justificativa pessoal detalhada.</p>
+<h2>Proteja dados e reconheça golpes</h2>
+<p>Uma resposta legítima não depende de pagamento, senha ou código recebido por SMS. O <a href="https://cartilha.cert.br/fasciculos/" target="_blank" rel="noopener noreferrer">CERT.br</a> mantém orientações públicas sobre phishing, autenticação e privacidade. Se a conversa mudar para número desconhecido, confirme o domínio, a vaga e o contato antes de abrir link ou enviar documento.</p>
+<h2>O que evitar</h2>
+<ul><li>elogios exagerados que não correspondem à conversa;</li><li>pressão por decisão ou sequência de mensagens;</li><li>informação confidencial de emprego anterior;</li><li>promessa de disponibilidade que você não pode cumprir;</li><li>anexo pesado ou documento pessoal não solicitado.</li></ul>
+<h2>Assunto e versões para situações diferentes</h2>
+<p>Em e-mail novo, use assunto identificável: “Agradecimento — entrevista para [cargo] — [seu nome]”. Em resposta, preserve o assunto existente para manter o histórico. Para entrevista coletiva, agradeça à equipe sem listar pessoas que você não conheceu. Para conversa muito curta de triagem, duas ou três frases bastam. Para etapa técnica, mencione uma dúvida esclarecida ou um aspecto do desafio, sem reenviar a solução inteira.</p>
+<p>Se a empresa avisou que não seguirá com a candidatura, você ainda pode agradecer e pedir autorização para acompanhar futuras vagas, mas não conteste a decisão em sequência. Se houve comportamento inadequado, não é obrigatório enviar agradecimento; registre o ocorrido pelo canal apropriado.</p>
+<p>Revise nome, cargo, empresa e ortografia antes de enviar. Guarde a mensagem no seu <a href="/ferramentas/controle-candidaturas">controle de candidaturas</a>, junto com a data e o prazo informado. A ausência de resposta não prova rejeição nem autoriza contato diário; o objetivo é deixar um registro respeitoso e verificável.</p>
+    `.trim()
+  },
+
+  "carta-apresentacao-emprego-curta": {
+    reviewedAt: "2026-10-13",
+    contentHtml: `
+<p><strong>Revisão editorial: 13 de outubro de 2026.</strong> Carta de apresentação não é autobiografia nem cópia do currículo. Ela conecta uma necessidade explícita da vaga a uma evidência real da sua experiência. Só envie quando o anúncio solicitar, quando houver campo próprio ou quando a candidatura por e-mail permitir uma apresentação breve.</p>
+<h2>Leia a vaga antes de escrever</h2>
+<p>Marque função, tarefas, requisitos obrigatórios, local, escala e forma de candidatura. Escolha no máximo duas evidências que respondam ao trabalho. Se o anúncio pede atendimento e organização de agenda, não ocupe a carta inteira com um curso sem relação.</p>
+<p>Para conferir o significado de uma ocupação sem inventar atribuições, consulte a <a href="https://www.gov.br/trabalho-e-emprego/pt-br/assuntos/trabalhador/qualificacao-profissional/classificacao-brasileira-de-ocupacoes" target="_blank" rel="noopener noreferrer">Classificação Brasileira de Ocupações do Ministério do Trabalho e Emprego</a>. A CBO ajuda a entender famílias ocupacionais, mas o anúncio e o contrato definem a vaga concreta.</p>
+<h2>Use três parágrafos, cada um com função</h2>
+<p><strong>Abertura:</strong> diga qual é a vaga, onde a encontrou e por que seu perfil é pertinente. <strong>Evidência:</strong> descreva uma tarefa executada, o contexto e um resultado observável. <strong>Fechamento:</strong> confirme disponibilidade compatível e informe que o currículo segue anexado ou cadastrado.</p>
+<p>Modelo para adaptar: “Prezada equipe de recrutamento, candidato-me à vaga de recepcionista publicada no canal oficial da empresa. Em meu trabalho anterior, organizei agenda, confirmei atendimentos e registrei pendências para a equipe do turno seguinte. Essa prática se relaciona às rotinas descritas no anúncio. Tenho disponibilidade para a escala informada e fico à disposição para conversar. Meu currículo segue em anexo.”</p>
+<p>Resultado observável não precisa ser número. Pode ser uma planilha conferida, uma fila organizada, um procedimento documentado ou uma divergência identificada. Se não mediu tempo ou volume, não invente porcentagem.</p>
+<h2>Quando falta experiência formal</h2>
+<p>Use projeto, trabalho autônomo, atividade escolar ou voluntariado, identificado como tal. Exemplo: “Em projeto escolar, fui responsável por receber inscrições, conferir nomes e orientar participantes.” Não transforme atividade eventual em emprego registrado. Veja também como registrar <a href="/blog/experiencia-informal-curriculo-como-colocar">experiência informal no currículo</a>.</p>
+<h2>Formato e envio seguro</h2>
+<p>Se a plataforma possui campo de texto, escreva nele. Em e-mail, a própria mensagem pode cumprir o papel da carta. Quando pedirem arquivo, use PDF com nome profissional e confira se abre. O <a href="https://europass.europa.eu/pt/create-europass-cover-letter" target="_blank" rel="noopener noreferrer">Europass</a>, serviço oficial da União Europeia, apresenta uma ferramenta de estruturação de carta; use como referência de organização, não como modelo obrigatório no Brasil.</p>
+<p>Não inclua CPF, RG, endereço completo, estado civil, foto ou pretensão salarial sem necessidade. Não envie documento para endereço diferente do divulgado sem confirmar a origem. Uma carta curta e específica é melhor que texto longo cheio de adjetivos: troque “sou proativo e excelente” por uma ação que o leitor possa compreender e verificar.</p>
+<h2>Checklist antes de enviar</h2>
+<ul><li>vaga e empresa estão corretas;</li><li>as duas evidências são verdadeiras;</li><li>horário e local são compatíveis;</li><li>não há dado pessoal desnecessário;</li><li>currículo e carta não se contradizem;</li><li>o canal pertence à empresa ou plataforma anunciada.</li></ul>
+<h2>Adapte ao tipo de candidatura</h2>
+<p>Para indicação, cite a pessoa somente com autorização: “Soube da vaga por ___, que autorizou mencionar seu nome.” Para candidatura espontânea, diga a área de interesse e por que escolheu aquela organização, sem afirmar que existe vaga aberta. Para mudança de carreira, conecte uma habilidade transferível a uma tarefa: conferência, atendimento, manutenção, registro ou organização. Não diga “aceito qualquer cargo”, pois isso impede o leitor de entender onde seu perfil se encaixa.</p>
+<p>Leia a carta em voz alta e retire frases que serviriam para qualquer empresa. Se um parágrafo só repete “dedicado, pontual, comunicativo”, substitua por situação real ou apague. Uma página é limite, não meta; muitas candidaturas ficam claras em 150 a 250 palavras.</p>
+<p>Guarde a versão enviada e o link da oportunidade. Personalizar não significa reescrever sua história; significa selecionar apenas o que responde àquela vaga.</p>
+    `.trim()
+  },
+
+  "comparar-beneficios-vaga-emprego": {
+    reviewedAt: "2026-10-13",
+    contentHtml: `
+<p><strong>Revisão editorial: 13 de outubro de 2026.</strong> “Salário mais benefícios” não informa sozinho o valor nem as condições de uma vaga. Para comparar, transforme cada item em perguntas concretas: quem pode usar, quando começa, qual desconto existe, onde é aceito e o que ocorre em afastamento, férias ou término do contrato.</p>
+<h2>Separe remuneração, benefício e reembolso</h2>
+<p>Registre salário bruto, periodicidade e forma de pagamento em uma linha. Em outras, liste vale-transporte, alimentação, refeição, plano de saúde, seguro, bônus, comissão e ajuda de custo. Não some tudo como se fosse dinheiro disponível: há itens condicionais, coparticipações, regras internas e despesas que só são reembolsadas mediante comprovante.</p>
+<p>O vale-transporte tem finalidade específica de deslocamento residência-trabalho e vice-versa, conforme a <a href="https://www.planalto.gov.br/ccivil_03/leis/l7418.htm" target="_blank" rel="noopener noreferrer">Lei nº 7.418/1985</a>. Confirme com a empresa o procedimento e o desconto aplicável ao caso; não deduza a regra apenas pelo nome “auxílio transporte”.</p>
+<h2>Faça uma ficha para cada item</h2>
+<ul><li><strong>Valor ou cobertura:</strong> o anúncio informa ou depende de política interna?</li><li><strong>Início:</strong> começa na admissão, após período definido ou mediante adesão?</li><li><strong>Custo do trabalhador:</strong> há desconto, coparticipação ou mensalidade por dependente?</li><li><strong>Uso real:</strong> a rede atende seu bairro, trajeto e rotina?</li><li><strong>Condição:</strong> depende de presença, meta, resultado coletivo ou comprovante?</li><li><strong>Documento:</strong> a condição aparece na proposta, política ou instrumento coletivo?</li></ul>
+<p>Em plano de saúde, pergunte operadora, tipo de cobertura, acomodação, rede, carência quando aplicável, coparticipação e dependentes. A <a href="https://www.gov.br/ans/pt-br/assuntos/consumidor" target="_blank" rel="noopener noreferrer">Agência Nacional de Saúde Suplementar</a> reúne informações ao consumidor; a página pública ajuda a formular perguntas, mas não substitui a proposta específica do plano empresarial.</p>
+<h2>Calcule o que muda no mês</h2>
+<p>Use valores fornecidos pela empresa e custos seus. Exemplo hipotético: uma proposta oferece alimentação, mas exige duas integrações extras no trajeto; outra paga menos nominalmente, porém fica perto de casa. Registre transporte, refeições não cobertas, cuidado de dependente e tempo de deslocamento. A <a href="/ferramentas/custo-deslocamento">calculadora de deslocamento</a> permite inserir tarifa e quantidade de viagens sem presumir preço local.</p>
+<p>Não atribua preço fictício a ambiente, estabilidade ou chance de promoção. Trate-os como critérios separados: clareza da função, segurança, escala, treinamento, duração do contrato e qualidade da comunicação.</p>
+<h2>Benefício prometido precisa de condição clara</h2>
+<p>Se o anúncio diz apenas “comissão”, pergunte base, momento de pagamento, estorno, meta e existência de garantia prevista na proposta. Para bônus, confirme se é fixo, variável ou discricionário. Para alimentação, verifique modalidade, dias creditados, desconto e rede. Para trabalho híbrido, confirme frequência presencial e equipamentos.</p>
+<p>Não pressione atendente a enviar documento confidencial. Peça uma proposta com salário, jornada, local, tipo de contrato e benefícios aplicáveis. Se a resposta permanecer vaga, registre a incerteza em vez de completar a planilha com suposição.</p>
+<h2>Compare sem reduzir tudo a um número</h2>
+<p>Monte três colunas: confirmado por escrito, informado verbalmente e ainda pendente. Só a primeira deve sustentar decisão financeira. Depois, use o guia para <a href="/blog/comparar-duas-propostas-emprego">comparar duas propostas</a> considerando função, risco e compatibilidade. O melhor pacote é o que atende necessidades reais com regras compreendidas — não o que reúne mais nomes de benefícios no anúncio.</p>
+<h2>Atualize a comparação quando chegar a proposta</h2>
+<p>O anúncio pode resumir condições que mudam por unidade, cargo ou jornada. Ao receber proposta, refaça a ficha e marque a origem de cada informação. Se houver convenção ou acordo coletivo aplicável, peça qual instrumento e vigência, sem presumir que uma regra de outro setor vale para você. Guarde cópia do que foi destinado ao candidato.</p>
+<p>Faça um cenário mensal comum e outro de maior gasto, por exemplo com mais dias presenciais ou coparticipação de saúde. Não desconte imposto ou contribuição com tabela antiga; para estimativa financeira, use fonte oficial vigente ou aguarde o demonstrativo. O objetivo é enxergar dependências, não prever o primeiro contracheque com falsa exatidão.</p>
+    `.trim()
+  },
+
+  "comparar-duas-propostas-emprego": {
+    reviewedAt: "2026-10-13",
+    contentHtml: `
+<p><strong>Revisão editorial: 13 de outubro de 2026.</strong> Duas conversas positivas não são necessariamente duas propostas. Antes de escolher, confirme se cada empresa apresentou cargo, remuneração, jornada, local, tipo de contrato, data prevista e benefícios. Não peça demissão nem recuse outra oportunidade com base apenas em promessa informal.</p>
+<h2>Crie uma folha de evidências</h2>
+<p>Para cada opção, separe três estados: confirmado por escrito, informado em conversa e não esclarecido. Copie apenas os dados recebidos; não complete lacunas com estimativa. Se o recrutador não puder formalizar naquele momento, pergunte quando a informação estará disponível e até quando precisa responder.</p>
+<p>A <a href="https://www.gov.br/pt-br/apps/ctps-digital" target="_blank" rel="noopener noreferrer">Carteira de Trabalho Digital</a> permite acompanhar vínculos e dados do contrato quando registrados. Ela não substitui a conferência da proposta antes da admissão nem transforma conversa em vínculo.</p>
+<h2>Compare cinco dimensões</h2>
+<ol><li><strong>Trabalho:</strong> tarefas, autonomia, treinamento, ferramentas e liderança.</li><li><strong>Tempo:</strong> jornada, escala, intervalo, início e deslocamento.</li><li><strong>Dinheiro:</strong> salário, parte variável, descontos conhecidos e despesas para trabalhar.</li><li><strong>Proteção:</strong> tipo e duração do contrato, segurança e clareza dos procedimentos.</li><li><strong>Vida real:</strong> saúde, cuidado familiar, estudo e transporte no horário exigido.</li></ol>
+<p>Dê peso de zero a três apenas para organizar sua preferência, não para criar falsa precisão. Um critério impeditivo, como escala incompatível, não deve ser compensado por café gratuito ou promessa vaga de crescimento.</p>
+<h2>Faça perguntas equivalentes às duas empresas</h2>
+<ul><li>Qual é a jornada e como funciona a escala?</li><li>Qual será o local habitual e há deslocamentos?</li><li>O valor informado é bruto? Existe parcela variável?</li><li>Quais benefícios, descontos e datas de início?</li><li>Qual é o tipo de contrato e a previsão de admissão?</li><li>Quem orientará os primeiros dias?</li></ul>
+<p>Para benefícios, use a <a href="/blog/comparar-beneficios-vaga-emprego">ficha de comparação</a>. Para transporte em São Luís, insira as tarifas e viagens que você confirmou na <a href="/ferramentas/custo-deslocamento">calculadora</a>.</p>
+<h2>Peça tempo sem inventar outra oferta</h2>
+<p>Mensagem possível: “Obrigado pela proposta para a função de ___. Gostaria de revisar as condições com cuidado. Posso confirmar minha decisão até ___? Antes disso, poderia esclarecer ___?” Use uma data realista e cumpra-a. Não alegue proposta inexistente para pressionar aumento; a mentira pode encerrar o processo.</p>
+<p>Se a empresa exigir resposta imediata, registre que não houve tempo para conferir. Isso é informação relevante para sua decisão. Evite enviar a proposta completa de uma empresa para a concorrente; você pode mencionar que está avaliando outra oportunidade sem expor documento ou pessoa.</p>
+<h2>Aceite uma e encerre a outra</h2>
+<p>Após decidir, confirme por escrito as condições e os próximos passos. Para recusar: “Agradeço a proposta e o tempo da equipe. Após comparar as condições, decidi seguir outra opção e retiro minha candidatura.” Não precisa explicar salário da concorrente ou criticar o processo.</p>
+<h2>Verifique sinais de risco antes de decidir</h2>
+<p>Proposta não deve exigir pagamento para exame, material, uniforme, cadastro ou liberação de salário. Confirme CNPJ, domínio de e-mail e canal institucional, especialmente quando a conversa migra para aplicativo de mensagens. Não entregue senha gov.br nem código de autenticação. A <a href="https://cartilha.cert.br/fasciculos/" target="_blank" rel="noopener noreferrer">Cartilha do CERT.br</a> reúne orientações de prevenção a golpes e proteção de contas.</p>
+<p>Também registre o que falta: endereço exato, gestor, equipamento, treinamento e data de início. Uma condição não esclarecida não precisa encerrar a negociação, mas deve permanecer visível na decisão. Se a empresa se recusa a identificar função ou contrato, trate essa incerteza como risco real.</p>
+<p>Se ainda houver exame, documento ou etapa condicional, pergunte explicitamente o que falta antes de tratar a contratação como concluída. Uma decisão responsável preserva prova, prazo e respeito; não existe fórmula universal que torne uma proposta melhor para todas as pessoas.</p>
+    `.trim()
+  },
+
+  "dinamica-de-grupo-entrevista-dicas": {
+    reviewedAt: "2026-10-13",
+    contentHtml: `
+<p><strong>Revisão editorial: 13 de outubro de 2026.</strong> Dinâmica de grupo não tem um roteiro universal. Pode envolver apresentação, discussão de caso, priorização ou construção coletiva. O objetivo do candidato não é falar mais nem assumir liderança a qualquer custo, e sim compreender a tarefa, contribuir com clareza e permitir que o grupo trabalhe.</p>
+<h2>Confirme a instrução antes de agir</h2>
+<p>Ouça tempo, entrega esperada, materiais e restrições. Se algo estiver ambíguo, faça pergunta curta: “Devemos apresentar uma única decisão do grupo ou alternativas?” Não comece a resolver enquanto o facilitador ainda explica. Anote o enunciado e o horário final.</p>
+<p>A <a href="https://suap.enap.gov.br/vitrine/curso/2687/" target="_blank" rel="noopener noreferrer">Enap</a> relaciona escuta ativa, assertividade e empatia às relações de trabalho. É uma referência de desenvolvimento, não uma regra secreta de seleção. A empresa deve explicar a atividade e avaliar conforme seus critérios.</p>
+<h2>Escolha uma contribuição útil</h2>
+<p>No começo, o grupo pode precisar de alguém para repetir o objetivo, controlar tempo, registrar opções ou organizar a apresentação. Ofereça-se sem impor: “Posso anotar as alternativas; alguém acompanha o tempo?” Se outra pessoa já assumiu, procure uma lacuna diferente.</p>
+<p>Ao discordar, ataque a ideia, não a pessoa: “Essa opção atende o prazo, mas ainda não considerou o custo. Podemos comparar os dois critérios?” Dê espaço para quem foi interrompido e não transforme toda fala em disputa.</p>
+<h2>Use evidência sem inventar autoridade</h2>
+<p>Quando o caso trouxer números, faça conta visível e diga a hipótese. Quando faltar informação, sinalize: “Com os dados disponíveis, esta é uma possibilidade; precisaríamos confirmar ___.” Não alegue que já liderou equipe, operou sistema ou resolveu crise se isso não aconteceu.</p>
+<p>Exemplo hipotético: o grupo precisa priorizar entregas de uma loja com atraso. Uma candidata organiza os pedidos por prazo e dependência, outro participante verifica capacidade e uma terceira prepara a apresentação. O valor não está em “mandar”; está em tornar o raciocínio compreensível e incluir contribuições.</p>
+<h2>Quando a atividade incomoda ou exclui</h2>
+<p>Se houver necessidade de acessibilidade, informe ao contato do processo com antecedência quando possível. Durante a tarefa, peça ajuste concreto: leitura do material, mais contraste, espaço de circulação ou instrução escrita. Não é necessário revelar diagnóstico além do necessário para solicitar a condição.</p>
+<p>Você pode recusar atividade que exponha dado sensível, cause risco físico ou exija comportamento humilhante. Peça alternativa e registre o fato. Em processo remoto, não compartilhe tela com mensagens, documentos ou senhas; feche janelas antes.</p>
+<h2>Prepare-se com prática, não personagem</h2>
+<ul><li>treine apresentação de 40 segundos com nome, foco e uma evidência;</li><li>resolva um caso simples em grupo observando tempo;</li><li>pratique resumir uma fala antes de discordar;</li><li>prepare perguntas sobre função e critérios;</li><li>revise o anúncio e pesquise a empresa por fonte oficial.</li></ul>
+<h2>Cuidados em dinâmica remota</h2>
+<p>Teste áudio, câmera quando solicitada, nome exibido e conexão antes do horário. Entre pelo link confirmado e mantenha documento pessoal fora da câmera. Use o recurso de levantar a mão ou uma frase curta para pedir turno; silêncio de internet pode parecer interrupção, então confirme se sua fala foi ouvida. Tenha papel para anotar o enunciado, mas não grave participantes sem autorização.</p>
+<p>Se a plataforma falhar, registre a tela de erro sem capturar dados de terceiros e avise o contato pelo canal oficial. Não conclua que foi eliminado nem entre em links alternativos enviados por perfil desconhecido. A avaliação deve considerar a atividade, não a sua capacidade de adivinhar instruções ausentes.</p>
+<p>Depois, anote o que fez, onde interrompeu e como lidou com a decisão. Se houver contato, use o guia de <a href="/blog/pedir-feedback-entrevista-emprego">pedido de feedback</a> sem pressionar. A dinâmica avalia uma situação limitada; ela não mede todo o seu valor profissional.</p>
+    `.trim()
+  },
+
+  "empatia-atendimento-cliente-entrevista": {
+    reviewedAt: "2026-10-13",
+    contentHtml: `
+<p><strong>Revisão editorial: 13 de outubro de 2026.</strong> Em entrevista para atendimento, “ter empatia” não significa concordar com tudo nem prometer solução fora da regra. Significa compreender a demanda, mostrar que ouviu, separar fato de emoção e encaminhar o que está dentro da sua responsabilidade.</p>
+<h2>Responda com uma situação verificável</h2>
+<p>Escolha um episódio real e organize em quatro partes: demanda recebida, informação que você confirmou, ação dentro do procedimento e resultado observável. Se nunca trabalhou com clientes, use atividade escolar, voluntária ou familiar, identificando o contexto corretamente.</p>
+<p>A <a href="https://repositorio.enap.gov.br/items/391a0d4d-f3ca-4667-b63e-8e1b401748c1" target="_blank" rel="noopener noreferrer">Enap</a> disponibiliza material sobre atendimento ao cidadão que diferencia tratamento e qualidade do serviço e trabalha comunicação, cortesia e responsabilidade. O conteúdo é voltado ao serviço público, mas ajuda a compreender que falar com educação não substitui resolver ou encaminhar a demanda.</p>
+<h2>Use a sequência ouvir, confirmar, agir</h2>
+<ol><li><strong>Ouvir:</strong> deixe a pessoa concluir e identifique a necessidade central.</li><li><strong>Confirmar:</strong> resuma sem ironia: “Entendi que o pedido chegou incompleto e você precisa saber o prazo de correção.”</li><li><strong>Agir:</strong> explique o que pode fazer, o que depende de outra área e qual será o próximo contato.</li></ol>
+<p>Evite frases automáticas como “entendo perfeitamente” quando não entendeu. Pergunte o dado que falta e não repita coleta que já está registrada. Se não souber, diga que verificará; não invente política para encerrar a fila.</p>
+<h2>Exemplo de resposta de entrevista</h2>
+<p>“Em uma recepção, uma pessoa chegou para atendimento sem constar na agenda. Primeiro conferi nome e horário no sistema e no comprovante, sem expor seus dados na frente da fila. Expliquei que havia divergência e pedi apoio à responsável pela agenda. Enquanto ela verificava, informei a previsão realista e ofereci as opções autorizadas. O atendimento foi remarcado conforme a decisão da responsável e deixei a ocorrência registrada para evitar nova informação desencontrada.”</p>
+<p>O exemplo mostra limite, privacidade e encaminhamento. Adapte apenas se tiver vivido situação comparável. Não transforme atraso alheio em heroísmo nem atribua a si decisão do supervisor.</p>
+<h2>Empatia também tem limites</h2>
+<p>Ofensa, ameaça e assédio não são parte normal do atendimento. Siga o protocolo, chame supervisão e preserve a segurança. Não forneça telefone pessoal, senha, cadastro de outro cliente ou informação que a função não autoriza. Em caso de erro da empresa, reconheça o fato conhecido e indique o canal de correção; não prometa indenização ou prazo sem autorização.</p>
+<h2>Perguntas para fazer ao recrutador</h2>
+<ul><li>Quais canais e tipos de demanda a função atende?</li><li>Existe roteiro e autonomia para exceções?</li><li>Como registrar e escalar um caso?</li><li>Quais dados podem ser consultados e compartilhados?</li><li>Há treinamento para conflito e segurança?</li></ul>
+<h2>Treine três variações sem decorar discurso</h2>
+<p>Prepare um caso com pessoa confusa, outro com erro operacional e um terceiro em que você precisou dizer “não” com respeito. Em cada um, identifique qual informação confirmou e quem tinha autoridade para decidir. Isso ajuda a responder perguntas diferentes sem repetir uma história genérica.</p>
+<p>Se o entrevistador perguntar por um erro seu, não transfira culpa ao cliente. Explique o que fez, como corrigiu e qual barreira adicionou. Exemplo: registrou o número errado, avisou a supervisão, corrigiu no sistema autorizado e passou a repetir o dado antes de concluir. Só use se for verdadeiro e sem revelar a identidade de quem foi atendido.</p>
+<p>Na entrevista, combine empatia com procedimento. Para outras respostas baseadas em fatos, veja <a href="/blog/entrevista-comportamental-exemplos">entrevista comportamental</a>. Uma boa resposta não é “eu trato todo mundo bem”; é uma sequência concreta que respeita pessoa, dado, limite e solução possível.</p>
+    `.trim()
+  },
+
+  "emprego-apos-40-anos-curriculo": {
+    reviewedAt: "2026-10-13",
+    contentHtml: `
+<p><strong>Revisão editorial: 13 de outubro de 2026.</strong> Um currículo após os 40 não precisa esconder idade nem narrar toda a vida profissional. O objetivo é mostrar o que você sabe fazer hoje, quais problemas já resolveu e por que isso se relaciona à vaga. Data de nascimento, estado civil e foto não devem ser incluídos automaticamente.</p>
+<h2>Comece pelo cargo possível agora</h2>
+<p>Escolha uma ou duas funções compatíveis com sua experiência, saúde, horário e deslocamento. Leia anúncios atuais e liste tarefas recorrentes. Use a <a href="https://www.gov.br/trabalho-e-emprego/pt-br/assuntos/trabalhador/qualificacao-profissional/classificacao-brasileira-de-ocupacoes" target="_blank" rel="noopener noreferrer">Classificação Brasileira de Ocupações</a> para entender a família ocupacional, sem copiar descrições como se fossem atividades que você executou.</p>
+<p>No título, prefira “Auxiliar administrativo | atendimento e controle de documentos” a “profissional experiente em busca de oportunidade”. O primeiro orienta a leitura; o segundo não informa função.</p>
+<h2>Selecione trajetória, não apague contexto</h2>
+<p>Nas experiências recentes ou mais relacionadas, registre empresa, função, período e três a cinco realizações verdadeiras. Experiências antigas podem ser resumidas em uma seção curta quando ainda ajudam a comprovar habilidade. Não é obrigatório detalhar cada emprego de décadas anteriores, mas datas informadas devem ser corretas.</p>
+<p>Troque “responsável por tudo” por evidência: “conferia pedidos e separava divergências para o fechamento”; “organizava agenda e repassava pendências ao turno seguinte”. Sem medição, não crie percentuais. Conhecimento de processo, cliente ou equipamento continua útil quando ligado à vaga atual.</p>
+<h2>Atualize ferramentas com demonstração</h2>
+<p>Não escreva “informática” de forma genérica. Indique o que faz: editar documento, preencher planilha, anexar arquivo, participar de chamada ou usar sistema específico. Se está aprendendo, informe “curso em andamento” com instituição e conteúdo real. O guia de <a href="/blog/alfabetizacao-digital-emprego-basico">alfabetização digital</a> ajuda a montar uma prática básica sem comprar certificado desnecessário.</p>
+<p>Exemplo hipotético: uma profissional de comércio retoma a busca para estoque. Ela mantém experiência com recebimento e conferência, acrescenta uso recente de planilha e retira um curso antigo sem relação. Não afirma dominar o sistema da empresa antes de conhecê-lo.</p>
+<h2>Idade não pode ser critério discriminatório</h2>
+<p>A <a href="https://www.gov.br/trabalho-e-emprego/pt-br/assuntos/inspecao-do-trabalho/combate_a_discriminacao" target="_blank" rel="noopener noreferrer">Secretaria de Inspeção do Trabalho</a> inclui idade entre critérios discriminatórios e referencia a Lei nº 9.029/1995. A <a href="https://legis.senado.gov.br/norma/550905/publicacao/34619617" target="_blank" rel="noopener noreferrer">lei publicada pelo Senado</a> proíbe prática discriminatória e limitativa no acesso ou manutenção da relação de trabalho por idade, entre outros motivos.</p>
+<p>Isso não significa aprovação automática nem elimina requisitos reais da função. Se uma pergunta sobre idade desviar do trabalho, você pode redirecionar: “Posso explicar minha disponibilidade e como executo as tarefas da vaga.” Registre anúncio ou mensagem discriminatória e procure orientação da Inspeção do Trabalho, sindicato ou profissional jurídico quando necessário.</p>
+<h2>Revise o documento final</h2>
+<ul><li>até duas páginas quando a trajetória exigir, sem enchimento;</li><li>contato profissional e cidade, sem endereço completo;</li><li>resumo alinhado ao cargo;</li><li>experiências com fatos, não estereótipos de “maturidade”;</li><li>cursos recentes e relevantes;</li><li>PDF legível, sem informação sensível desnecessária.</li></ul>
+<h2>Prepare a conversa sobre transições</h2>
+<p>Se mudou de área, explique o movimento em uma frase e apresente evidência da nova direção: prática, curso relevante ou projeto. Se ficou um período fora, indique a atividade que deseja mencionar sem fornecer detalhes pessoais: “Fiquei fora do mercado formal por responsabilidade familiar e agora tenho disponibilidade para esta escala.” Não crie trabalho autônomo para preencher o intervalo.</p>
+<p>Treine respostas sobre tecnologia e aprendizagem com exemplos atuais. “Aprendi a anexar documentos e organizar dados em planilha durante ___” é mais convincente que “aprendo qualquer coisa”. Pergunte sobre treinamento, ferramentas e esforço físico real da função; adequação é uma via de mão dupla, não teste de juventude.</p>
+<p>Use também o guia de <a href="/blog/retorno-mercado-trabalho-gap-curriculo">retorno ao mercado</a> se houver intervalo. O currículo deve tornar a competência visível no presente; não pedir desculpas pela idade nem prometer que experiência resolve tudo.</p>
+    `.trim()
+  },
+
+  "entrevista-desligamento-o-que-falar": {
+    reviewedAt: "2026-10-13",
+    contentHtml: `
+<p><strong>Revisão editorial: 13 de outubro de 2026.</strong> Entrevista de desligamento é uma conversa sobre a saída, não substitui documentos rescisórios, devolução de bens ou conferência do vínculo. Prepare fatos que você presenciou, escolha o que deseja registrar e não assine declaração que não compreendeu.</p>
+<h2>Separe quatro assuntos antes da reunião</h2>
+<ol><li><strong>motivo informado:</strong> o que a empresa comunicou e o que você deseja esclarecer;</li><li><strong>trabalho:</strong> processos que funcionavam, falhas observadas e sugestões;</li><li><strong>pendências:</strong> equipamento, acesso, documento, reembolso e contato responsável;</li><li><strong>próximos passos:</strong> datas, canais e comprovantes que serão entregues.</li></ol>
+<p>Leve anotações curtas. Datas, tarefa, impacto e tentativa de solução são mais úteis que “era tudo desorganizado”. Não fale por colegas nem revele dado de cliente para provar um ponto.</p>
+<h2>Dê feedback sem apagar o problema</h2>
+<p>Estrutura possível: “Em três fechamentos, recebi a planilha depois do horário combinado. Avisei a supervisão nos dias correspondentes e propus antecipar a conferência. A entrega continuou chegando tarde, o que reduziu o tempo de revisão.” Se não houver contagem ou registro, diga “em algumas ocasiões” e descreva um exemplo verdadeiro.</p>
+<p>Para reconhecer algo positivo, seja igualmente específico: treinamento acompanhado, instrução escrita, equipamento adequado ou retorno rápido. Evite elogio automático em troca de promessa de referência.</p>
+<h2>Defina limites para perguntas pessoais</h2>
+<p>Você pode responder de forma profissional sobre o trabalho e recusar especulação sobre colegas, diagnóstico de saúde ou vida privada. Se a saída envolve assédio, discriminação ou risco, registre fatos, datas, canais usados e documentos existentes. Não confronte pessoa envolvida sozinho se houver ameaça; busque canal interno, sindicato, Inspeção do Trabalho ou orientação jurídica.</p>
+<h2>Confira o que é operacional</h2>
+<p>Peça uma lista de itens a devolver e protocolo de recebimento. Encerre acesso conforme orientação; não copie banco de clientes, arquivos internos ou senha. Informe um contato pessoal apenas pelo canal autorizado para receber documentos seus.</p>
+<p>Depois, consulte o vínculo na <a href="https://www.gov.br/pt-br/apps/ctps-digital" target="_blank" rel="noopener noreferrer">Carteira de Trabalho Digital</a>. O Ministério do Trabalho mantém <a href="https://www.gov.br/trabalho-e-emprego/pt-br/servicos/trabalhador/carteira-de-trabalho/perguntas-frequentes-carteira-de-trabalho-digital/" target="_blank" rel="noopener noreferrer">perguntas frequentes</a> sobre acesso e visualização de contratos. Se houver divergência, peça esclarecimento formal; este guia não calcula verbas nem determina qual modalidade de desligamento se aplica.</p>
+<h2>Frases úteis para situações difíceis</h2>
+<ul><li>“Posso relatar o fato que presenciei, mas não avaliar a intenção da pessoa.”</li><li>“Não tenho essa informação; prefiro não supor.”</li><li>“Gostaria de receber por escrito a data e o canal para essa pendência.”</li><li>“Preciso ler o documento antes de confirmar que concordo.”</li><li>“Este ponto envolve informação pessoal e não quero detalhá-lo nesta conversa.”</li></ul>
+<h2>Faça um fechamento por escrito</h2>
+<p>Após a reunião, envie ou guarde um resumo com data, participantes, bens devolvidos e responsáveis pelas pendências. Se a empresa fornecer protocolo, confira descrição e quantidade. Não leve equipamento até outra unidade sem confirmação do destino e não deixe item na recepção sem recibo.</p>
+<p>Mantenha somente documentos pessoais e comprovantes que você está autorizado a guardar. Arquivos de cliente, listas internas, código, proposta comercial e conversa de colega continuam protegidos após a saída. Se precisar comprovar um fato em disputa, procure orientação antes de copiar material confidencial por conta própria.</p>
+<p>Se pedirem assinatura, leia, solicite cópia e peça explicação do que não entendeu. Assinar presença em reunião é diferente de concordar com toda narrativa; verifique o texto concreto. Para uma saída iniciada pelo trabalhador, consulte também o guia sobre <a href="/blog/pedido-demissao-aviso-previo-acerto">pedido de demissão e aviso</a>.</p>
+<p>Encerre confirmando quem responde por cada pendência e como você receberá comprovantes. Uma entrevista de desligamento útil deixa registro claro; ela não exige gratidão forçada, ataque pessoal nem renúncia a direitos.</p>
+    `.trim()
   }
 };
 
