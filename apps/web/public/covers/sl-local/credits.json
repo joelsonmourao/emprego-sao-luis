@@ -815,12 +815,14 @@
   },
   {
     "slug": "vagas-hotelaria-temporada-sao-luis",
-    "photoId": "1556742049-0cfed4f6a45d",
-    "source": "unsplash",
-    "photographer": "Blake Wisz",
-    "credit": "Foto: Blake Wisz / Unsplash",
-    "caption": "Foto ilustrativa para “Vagas de hotelaria em São Luís: temporada e atendimento”.",
-    "alt": "Capa: Vagas de hotelaria em São Luís: temporada e atendimento"
+    "source": "original",
+    "photographer": "Equipe editorial Empregos São Luís",
+    "credit": "Ilustração editorial original: Empregos São Luís",
+    "caption": "Ilustração editorial original para “Hotelaria em São Luís: rotina e atendimento”.",
+    "alt": "Ilustração de capa: Hotelaria em São Luís: rotina e atendimento",
+    "licenseStatus": "owned",
+    "licenseBasis": "Criação gráfica original produzida para o portal; sem fotografia, rosto, logotipo de terceiro ou banco externo.",
+    "createdAt": "2026-10-13"
   },
   {
     "slug": "vagas-motorista-entregador-sao-luis",
@@ -835,12 +837,14 @@
   },
   {
     "slug": "plano-90-dias-emprego-sao-luis",
-    "photoId": "1441986300917-64674bd600d8",
-    "source": "unsplash",
-    "photographer": "Austin Distel",
-    "credit": "Foto: Austin Distel / Unsplash",
-    "caption": "Foto ilustrativa para “Plano de 90 dias na busca de emprego: ritmo até a entrevista”.",
-    "alt": "Capa: Plano de 90 dias na busca de emprego: ritmo até a entrevista"
+    "source": "original",
+    "photographer": "Equipe editorial Empregos São Luís",
+    "credit": "Ilustração editorial original: Empregos São Luís",
+    "caption": "Ilustração editorial original para “Plano de 90 dias para buscar emprego”.",
+    "alt": "Ilustração de capa: Plano de 90 dias para buscar emprego",
+    "licenseStatus": "owned",
+    "licenseBasis": "Criação gráfica original produzida para o portal; sem fotografia, rosto, logotipo de terceiro ou banco externo.",
+    "createdAt": "2026-10-13"
   },
   {
     "slug": "sindicato-trabalhador-direitos-basico",
@@ -855,57 +859,69 @@
   },
   {
     "slug": "convencao-coletiva-holerite-trabalhador",
-    "photoId": "1497366216548-37526070297c",
-    "source": "unsplash",
-    "photographer": "Nastuh Abootalebi",
-    "credit": "Foto: Nastuh Abootalebi / Unsplash",
-    "caption": "Foto ilustrativa para “Acordo e convenção coletiva: o que isso muda no holerite”.",
-    "alt": "Capa: Acordo e convenção coletiva: o que isso muda no holerite"
+    "source": "original",
+    "photographer": "Equipe editorial Empregos São Luís",
+    "credit": "Ilustração editorial original: Empregos São Luís",
+    "caption": "Ilustração editorial original para “Convenção coletiva e holerite”.",
+    "alt": "Ilustração de capa: Convenção coletiva e holerite",
+    "licenseStatus": "owned",
+    "licenseBasis": "Criação gráfica original produzida para o portal; sem fotografia, rosto, logotipo de terceiro ou banco externo.",
+    "createdAt": "2026-10-13"
   },
   {
     "slug": "atestado-medico-trabalho-como-entregar",
-    "photoId": "1486406146926-c627a92ad1ab",
-    "source": "unsplash",
-    "photographer": "Sean Pollock",
-    "credit": "Foto: Sean Pollock / Unsplash",
-    "caption": "Foto ilustrativa para “Atestado médico no emprego: prazo, entrega e cuidados”.",
-    "alt": "Capa: Atestado médico no emprego: prazo, entrega e cuidados"
+    "source": "original",
+    "photographer": "Equipe editorial Empregos São Luís",
+    "credit": "Ilustração editorial original: Empregos São Luís",
+    "caption": "Ilustração editorial original para “Atestado médico: entrega e registro”.",
+    "alt": "Ilustração de capa: Atestado médico: entrega e registro",
+    "licenseStatus": "owned",
+    "licenseBasis": "Criação gráfica original produzida para o portal; sem fotografia, rosto, logotipo de terceiro ou banco externo.",
+    "createdAt": "2026-10-13"
   },
   {
     "slug": "acidente-de-trabalho-o-que-fazer",
-    "photoId": "1515378791036-0648a3ef77b2",
-    "source": "unsplash",
-    "photographer": "Andrew Neel",
-    "credit": "Foto: Andrew Neel / Unsplash",
-    "caption": "Foto ilustrativa para “Acidente de trabalho: primeiros passos e registro sem pânico”.",
-    "alt": "Capa: Acidente de trabalho: primeiros passos e registro sem pânico"
+    "source": "original",
+    "photographer": "Equipe editorial Empregos São Luís",
+    "credit": "Ilustração editorial original: Empregos São Luís",
+    "caption": "Ilustração editorial original para “Acidente de trabalho: primeiros passos”.",
+    "alt": "Ilustração de capa: Acidente de trabalho: primeiros passos",
+    "licenseStatus": "owned",
+    "licenseBasis": "Criação gráfica original produzida para o portal; sem fotografia, rosto, logotipo de terceiro ou banco externo.",
+    "createdAt": "2026-10-13"
   },
   {
     "slug": "trabalhador-terceirizado-direitos",
-    "photoId": "1521737604893-d14cc237f11d",
-    "source": "unsplash",
-    "photographer": "LinkedIn Sales Solutions",
-    "credit": "Foto: LinkedIn Sales Solutions / Unsplash",
-    "caption": "Foto ilustrativa para “Trabalho terceirizado: quem é o empregador e o que perguntar”.",
-    "alt": "Capa: Trabalho terceirizado: quem é o empregador e o que perguntar"
+    "source": "original",
+    "photographer": "Equipe editorial Empregos São Luís",
+    "credit": "Ilustração editorial original: Empregos São Luís",
+    "caption": "Ilustração editorial original para “Trabalho terceirizado sem dúvida de vínculo”.",
+    "alt": "Ilustração de capa: Trabalho terceirizado sem dúvida de vínculo",
+    "licenseStatus": "owned",
+    "licenseBasis": "Criação gráfica original produzida para o portal; sem fotografia, rosto, logotipo de terceiro ou banco externo.",
+    "createdAt": "2026-10-13"
   },
   {
     "slug": "trabalho-noturno-adicional-o-que-perguntar",
-    "photoId": "1517048676732-d65bc937f952",
-    "source": "unsplash",
-    "photographer": "Christina Wocintechchat",
-    "credit": "Foto: Christina Wocintechchat / Unsplash",
-    "caption": "Foto ilustrativa para “Trabalho noturno: adicional, sono e perguntas antes de aceitar”.",
-    "alt": "Capa: Trabalho noturno: adicional, sono e perguntas antes de aceitar"
+    "source": "original",
+    "photographer": "Equipe editorial Empregos São Luís",
+    "credit": "Ilustração editorial original: Empregos São Luís",
+    "caption": "Ilustração editorial original para “Trabalho noturno: jornada e adicional”.",
+    "alt": "Ilustração de capa: Trabalho noturno: jornada e adicional",
+    "licenseStatus": "owned",
+    "licenseBasis": "Criação gráfica original produzida para o portal; sem fotografia, rosto, logotipo de terceiro ou banco externo.",
+    "createdAt": "2026-10-13"
   },
   {
     "slug": "conflito-com-chefe-trabalho-dicas",
-    "photoId": "1523240795612-9a054b0db644",
-    "source": "unsplash",
-    "photographer": "Priscilla Du Preez",
-    "credit": "Foto: Priscilla Du Preez / Unsplash",
-    "caption": "Foto ilustrativa para “Conflito com a chefia: documentar e falar com objetividade”.",
-    "alt": "Capa: Conflito com a chefia: documentar e falar com objetividade"
+    "source": "original",
+    "photographer": "Equipe editorial Empregos São Luís",
+    "credit": "Ilustração editorial original: Empregos São Luís",
+    "caption": "Ilustração editorial original para “Conflito com a chefia: diálogo objetivo”.",
+    "alt": "Ilustração de capa: Conflito com a chefia: diálogo objetivo",
+    "licenseStatus": "owned",
+    "licenseBasis": "Criação gráfica original produzida para o portal; sem fotografia, rosto, logotipo de terceiro ou banco externo.",
+    "createdAt": "2026-10-13"
   },
   {
     "slug": "pedir-feedback-entrevista-emprego",
@@ -920,30 +936,36 @@
   },
   {
     "slug": "inteligencia-emocional-entrevista",
-    "photoId": "1504384308090-c894fdcc538d",
-    "source": "unsplash",
-    "photographer": "Marvin Meyer",
-    "credit": "Foto: Marvin Meyer / Unsplash",
-    "caption": "Foto ilustrativa para “Inteligência emocional na entrevista: calma na prática”.",
-    "alt": "Capa: Inteligência emocional na entrevista: calma na prática"
+    "source": "original",
+    "photographer": "Equipe editorial Empregos São Luís",
+    "credit": "Ilustração editorial original: Empregos São Luís",
+    "caption": "Ilustração editorial original para “Calma e clareza durante a entrevista”.",
+    "alt": "Ilustração de capa: Calma e clareza durante a entrevista",
+    "licenseStatus": "owned",
+    "licenseBasis": "Criação gráfica original produzida para o portal; sem fotografia, rosto, logotipo de terceiro ou banco externo.",
+    "createdAt": "2026-10-13"
   },
   {
     "slug": "gestao-de-tempo-trabalho-dicas",
-    "photoId": "1497215842964-222b430dc094",
-    "source": "unsplash",
-    "photographer": "Alesia Kazantceva",
-    "credit": "Foto: Alesia Kazantceva / Unsplash",
-    "caption": "Foto ilustrativa para “Gestão de tempo no posto novo: priorizar sem parecer lento”.",
-    "alt": "Capa: Gestão de tempo no posto novo: priorizar sem parecer lento"
+    "source": "original",
+    "photographer": "Equipe editorial Empregos São Luís",
+    "credit": "Ilustração editorial original: Empregos São Luís",
+    "caption": "Ilustração editorial original para “Gestão do tempo no emprego novo”.",
+    "alt": "Ilustração de capa: Gestão do tempo no emprego novo",
+    "licenseStatus": "owned",
+    "licenseBasis": "Criação gráfica original produzida para o portal; sem fotografia, rosto, logotipo de terceiro ou banco externo.",
+    "createdAt": "2026-10-13"
   },
   {
     "slug": "alfabetizacao-digital-emprego-basico",
-    "photoId": "1563986768609-322da13575f3",
-    "source": "unsplash",
-    "photographer": "Christin Hume",
-    "credit": "Foto: Christin Hume / Unsplash",
-    "caption": "Foto ilustrativa para “Alfabetização digital para emprego: o mínimo que destrava”.",
-    "alt": "Capa: Alfabetização digital para emprego: o mínimo que destrava"
+    "source": "original",
+    "photographer": "Equipe editorial Empregos São Luís",
+    "credit": "Ilustração editorial original: Empregos São Luís",
+    "caption": "Ilustração editorial original para “Habilidades digitais para começar”.",
+    "alt": "Ilustração de capa: Habilidades digitais para começar",
+    "licenseStatus": "owned",
+    "licenseBasis": "Criação gráfica original produzida para o portal; sem fotografia, rosto, logotipo de terceiro ou banco externo.",
+    "createdAt": "2026-10-13"
   },
   {
     "slug": "portfolio-simples-candidato-emprego",
@@ -958,12 +980,14 @@
   },
   {
     "slug": "comparar-portais-emprego-seguranca",
-    "photoId": "1434030216411-0b793f4b4173",
-    "source": "unsplash",
-    "photographer": "Green Chameleon",
-    "credit": "Foto: Green Chameleon / Unsplash",
-    "caption": "Foto ilustrativa para “Comparar portais de emprego: checklist anti-duplicata e golpe”.",
-    "alt": "Capa: Comparar portais de emprego: checklist anti-duplicata e golpe"
+    "source": "original",
+    "photographer": "Equipe editorial Empregos São Luís",
+    "credit": "Ilustração editorial original: Empregos São Luís",
+    "caption": "Ilustração editorial original para “Comparar vagas e evitar golpes”.",
+    "alt": "Ilustração de capa: Comparar vagas e evitar golpes",
+    "licenseStatus": "owned",
+    "licenseBasis": "Criação gráfica original produzida para o portal; sem fotografia, rosto, logotipo de terceiro ou banco externo.",
+    "createdAt": "2026-10-13"
   },
   {
     "slug": "ler-contrato-trabalho-clt",
