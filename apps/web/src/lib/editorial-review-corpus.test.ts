@@ -28,8 +28,8 @@ describe("Auditoria editorial real do corpus de 12/10/2026", () => {
     expect(flagged).toHaveLength(98);
     const reviewed = flagged.filter((item) => getEditorialContentOverride(item.slug));
     const pending = flagged.filter((item) => !getEditorialContentOverride(item.slug));
-    expect(reviewed).toHaveLength(68);
-    expect(pending).toHaveLength(30);
+    expect(reviewed).toHaveLength(76);
+    expect(pending).toHaveLength(22);
     expect(guidesPendingReview.size).toBe(pending.length);
     for (const item of pending) expect(guidesPendingReview.has(item.slug)).toBe(true);
     for (const item of reviewed) expect(guidesPendingReview.has(item.slug)).toBe(false);
@@ -111,7 +111,15 @@ describe("Auditoria editorial real do corpus de 12/10/2026", () => {
       "gap-habilidades-candidatura-como-fechar",
       "soft-skills-hard-skills-curriculo",
       "portfolio-simples-candidato-emprego",
-      "teste-online-processo-seletivo-dicas"
+      "teste-online-processo-seletivo-dicas",
+      "como-usar-empregos-sao-luis",
+      "vagas-vendedor-loja-comissao-dicas",
+      "saude-mental-trabalho-limites",
+      "esgotamento-busca-emprego-sinais",
+      "conflito-com-chefe-trabalho-dicas",
+      "avaliacao-de-desempenho-preparacao",
+      "primeira-semana-emprego-novo",
+      "plano-90-dias-emprego-sao-luis"
     ];
     for (const slug of edited) {
       const override = getEditorialContentOverride(slug);
@@ -178,7 +186,15 @@ describe("Auditoria editorial real do corpus de 12/10/2026", () => {
       "gap-habilidades-candidatura-como-fechar",
       "soft-skills-hard-skills-curriculo",
       "portfolio-simples-candidato-emprego",
-      "teste-online-processo-seletivo-dicas"
+      "teste-online-processo-seletivo-dicas",
+      "como-usar-empregos-sao-luis",
+      "vagas-vendedor-loja-comissao-dicas",
+      "saude-mental-trabalho-limites",
+      "esgotamento-busca-emprego-sinais",
+      "conflito-com-chefe-trabalho-dicas",
+      "avaliacao-de-desempenho-preparacao",
+      "primeira-semana-emprego-novo",
+      "plano-90-dias-emprego-sao-luis"
     ];
     for (const slug of sourceBacked) {
       expect(getEditorialContentOverride(slug)!.contentHtml).toMatch(/<a href="https:\/\//);
