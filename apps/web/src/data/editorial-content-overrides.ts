@@ -1219,6 +1219,200 @@ const overrides: Record<string, EditorialContentOverride> = {
     `.trim()
   },
 
+  "candidatura-whatsapp-emprego-mensagem": {
+    reviewedAt: "2026-10-12",
+    contentHtml: `
+<p><strong>Revisão editorial: 12 de outubro de 2026.</strong> Candidatura por WhatsApp pede duas coisas ao mesmo tempo: clareza para quem faz a triagem e cautela com seus dados. Este guia ensina a responder a um anúncio verificado; não autoriza envio para números copiados de comentários nem substitui as instruções da vaga.</p>
+<h2>Antes da mensagem, valide o caminho</h2>
+<p>Volte ao anúncio e confira cargo, empresa, cidade, prazo e número indicado. Salve a URL ou uma captura que mostre a origem. Se o contato chegou por encaminhamento, procure a oportunidade no site da empresa ou em outro canal institucional encontrado por você. O <a href="https://cartilha.cert.br/fasciculos/" target="_blank" rel="noopener noreferrer">CERT.br reúne orientações sobre golpes em aplicativos de mensagem</a>, links desconhecidos e códigos de verificação. Nome e foto de perfil não comprovam identidade.</p>
+<p>Não inicie pagando taxa, comprando curso do recrutador ou enviando código recebido por SMS. Também não compartilhe senha, acesso remoto ao aparelho, dado bancário ou foto segurando documento. Se o anúncio for do Empregos São Luís, compare o contato com a página publicada e use a nossa <a href="/seguranca-candidatos">política de segurança do candidato</a>.</p>
+<h2>Uma primeira mensagem que a pessoa consegue triar</h2>
+<p>Em vez de “oi” isolado, reúna contexto em quatro linhas. Exemplo adaptável: “Olá, meu nome é Ana Silva. Vi a vaga de auxiliar administrativo publicada em [origem] no dia [data do anúncio]. Tenho experiência com atendimento e planilhas e gostaria de participar. Segue meu currículo em PDF. Posso confirmar o nome da empresa e as próximas etapas?”</p>
+<p>Troque os colchetes por fatos verdadeiros. Se você não tem a experiência citada, use outra evidência: curso concluído, tarefa informal ou disponibilidade exigida. Não copie a mesma frase para cargos incompatíveis. Uma mensagem curta é útil porque permite identificar imediatamente candidato, vaga e anexo; não porque exista uma fórmula que garanta resposta.</p>
+<h2>Prepare o arquivo e limite os dados</h2>
+<ul><li>Nomeie o PDF com nome e cargo, por exemplo <em>Ana-Silva-Auxiliar-Administrativo.pdf</em>.</li><li>Abra o arquivo no celular antes de enviar e confirme se o texto está legível.</li><li>Use telefone e e-mail próprios, mas evite endereço residencial completo, documentos, dados bancários e assinaturas digitalizadas na primeira etapa.</li><li>Envie um currículo, não uma sequência de fotos, certificados e documentos sem solicitação.</li></ul>
+<p>A <a href="https://www.planalto.gov.br/ccivil_03/_ato2015-2018/2018/lei/l13709.htm" target="_blank" rel="noopener noreferrer">LGPD</a> inclui finalidade, necessidade, transparência e segurança entre os princípios do tratamento de dados. Para o candidato, isso vira uma pergunta prática: “por que este dado é necessário agora e quem o receberá?”. A lei não significa que toda solicitação seja ilegal; significa que o contexto e a finalidade importam.</p>
+<h2>Conduza a conversa sem perder o registro</h2>
+<p>Se houver resposta, peça confirmação de cargo, local, etapa e responsável. Prefira texto para informações essenciais. Áudio pode complementar, mas dificulta conferir endereço, horário e instruções. Não apague o anúncio antes do processo terminar. Guarde os dados da vaga separadamente para não misturar conversas.</p>
+<p>Se pedirem disponibilidade, responda com intervalo real: “Posso conversar amanhã entre 9h e 11h ou depois das 15h”. Se o trabalho for presencial, não declare disponibilidade irrestrita antes de conferir escala e deslocamento. Use a <a href="/ferramentas/custo-deslocamento">calculadora de custo de deslocamento</a> com a tarifa informada por você.</p>
+<h2>Faça um acompanhamento sóbrio</h2>
+<p>Quando o anúncio não der prazo, uma mensagem de acompanhamento pode ser enviada depois de alguns dias úteis: “Olá, enviei meu currículo para a vaga de [cargo] em [data]. Gostaria de confirmar o recebimento e saber se há previsão para a próxima etapa. Obrigado.” Evite mensagens repetidas no mesmo dia, chamadas sucessivas ou cobrança agressiva. Ausência de resposta não autoriza insistência indefinida.</p>
+<p>Encerre imediatamente se o contato mudar a vaga sem explicação, pedir dinheiro, tentar obter código de autenticação ou recusar identificação mínima. Registre número, URL, horário e conteúdo e procure os canais oficiais adequados. Candidatura cuidadosa é objetiva, verificável e proporcional à etapa.</p>
+    `.trim()
+  },
+
+  "email-candidatura-emprego-modelo": {
+    reviewedAt: "2026-10-12",
+    contentHtml: `
+<p><strong>Revisão editorial: 12 de outubro de 2026.</strong> Um e-mail de candidatura não precisa contar sua vida inteira. Ele precisa permitir que a pessoa identifique a vaga, entenda sua aderência e abra um arquivo confiável. O modelo abaixo é ponto de partida, não garantia de entrevista.</p>
+<h2>Leia o anúncio como instrução</h2>
+<p>Use exatamente o canal informado. Se a vaga pede formulário, não suponha que um e-mail paralelo substituirá a inscrição. Confira endereço do destinatário, prazo, formato do arquivo e itens solicitados. Endereço parecido com o da empresa pode ser falso; confirme o domínio no site institucional encontrado por você.</p>
+<p>O assunto deve sobreviver a uma caixa cheia. Uma forma simples é “Candidatura — cargo — nome completo”. Quando o anúncio traz código da vaga, inclua-o sem inventar outro: “Candidatura — Auxiliar de Estoque — REF 123 — João Lima”. Não escreva apenas “currículo”, “vaga” ou “urgente”.</p>
+<h2>Monte um corpo de três blocos</h2>
+<p><strong>Abertura:</strong> diga quem é, qual vaga busca e onde a encontrou. <strong>Aderência:</strong> escolha duas evidências verificáveis relacionadas ao anúncio. <strong>Fechamento:</strong> indique o anexo e um meio de contato. Exemplo:</p>
+<blockquote><p>Olá, equipe de recrutamento. Meu nome é João Lima e envio minha candidatura à vaga de auxiliar de estoque divulgada em [origem]. Atuei com conferência de mercadorias e registro de entrada em planilha; também tenho disponibilidade para a escala descrita no anúncio. Anexo meu currículo em PDF. Fico disponível pelo telefone [número] para esclarecer informações ou participar das próximas etapas. Atenciosamente, João Lima.</p></blockquote>
+<p>Substitua os campos e só mantenha o que for verdadeiro. “Sou perfeito para a vaga”, listas de adjetivos e texto copiado da empresa não demonstram trabalho. Uma evidência pequena — tarefa, ferramenta ou resultado que você consegue explicar — vale mais que uma apresentação grandiosa.</p>
+<h2>Revise o anexo como o destinatário</h2>
+<ul><li>Abra o PDF em outro aparelho e selecione uma linha para confirmar que não virou foto.</li><li>Use nome de arquivo claro, sem “currículo-final-agora-v3”.</li><li>Não envie link com permissão restrita se a vaga pede anexo.</li><li>Não compacte o currículo em arquivo executável e não inclua vários certificados sem pedido.</li><li>Confirme que telefone, e-mail e datas do currículo correspondem ao corpo.</li></ul>
+<p>Na primeira etapa, evite anexar RG, CPF, comprovante de residência, dado bancário ou documento médico. A <a href="https://www.planalto.gov.br/ccivil_03/_ato2015-2018/2018/lei/l13709.htm" target="_blank" rel="noopener noreferrer">LGPD</a> prevê finalidade, necessidade e transparência no tratamento de dados pessoais. Perguntar por que um documento é necessário e como será usado é compatível com uma candidatura profissional.</p>
+<h2>Proteja o caminho de resposta</h2>
+<p>Mensagens de phishing podem imitar recrutamento. O <a href="https://cartilha.cert.br/dicas-rapidas/" target="_blank" rel="noopener noreferrer">CERT.br recomenda desconfiar de mensagens mesmo quando parecem vir de conhecidos</a> e cuidar de links, contas e dados. Antes de abrir convite ou formulário recebido em resposta, confira domínio, remetente e relação com a vaga. Não envie senha nem código de verificação por e-mail.</p>
+<p>Se o processo migrar para WhatsApp, registre qual pessoa fez a mudança e confirme o número. Se pedirem pagamento para liberar entrevista, material ou contratação, interrompa e verifique com a empresa por canal independente.</p>
+<h2>Quando acompanhar</h2>
+<p>Se o anúncio trouxer calendário, respeite-o. Sem prazo, um acompanhamento curto após alguns dias úteis pode confirmar o recebimento: “Enviei minha candidatura à vaga X em [data] e gostaria de confirmar o recebimento. Permaneço disponível.” Responda no mesmo tópico para preservar o histórico. Não reenvie o anexo diariamente nem marque várias pessoas que não participam da seleção.</p>
+<p>Antes de clicar em enviar, verifique destinatário, assunto, cargo, empresa, anexo e telefone. Essa revisão de trinta segundos evita os erros que realmente impedem a leitura. Depois, registre a candidatura em uma lista simples com data, canal e retorno.</p>
+    `.trim()
+  },
+
+  "entrevista-por-video-emprego": {
+    reviewedAt: "2026-10-12",
+    contentHtml: `
+<p><strong>Revisão editorial: 12 de outubro de 2026.</strong> Entrevista por vídeo combina conteúdo, tecnologia e privacidade. Preparar o aparelho reduz ruído, mas não transforma conexão instável em falta de competência. Este roteiro organiza teste, ambiente, resposta e plano alternativo.</p>
+<h2>Confirme o convite antes de instalar qualquer coisa</h2>
+<p>Leia remetente, empresa, data, fuso, duração, plataforma e nome do entrevistador. Compare o domínio do convite com o canal institucional. Aplicativo baixado por link desconhecido, extensão sem necessidade ou pedido de acesso remoto ao computador são motivos para parar e verificar. Consulte as recomendações do <a href="https://cartilha.cert.br/fasciculos/" target="_blank" rel="noopener noreferrer">CERT.br sobre links, aplicativos de mensagem e proteção de contas</a>.</p>
+<p>Pergunte se haverá gravação, teste técnico, compartilhamento de tela ou dinâmica em grupo. Se a gravação for informada, você pode solicitar finalidade, acesso e prazo de retenção. A <a href="https://www.planalto.gov.br/ccivil_03/_ato2015-2018/2018/lei/l13709.htm" target="_blank" rel="noopener noreferrer">LGPD</a> trata imagem e voz identificáveis como dados pessoais e exige transparência e segurança no tratamento.</p>
+<h2>Teste no mesmo conjunto que será usado</h2>
+<p>Não basta a câmera funcionar em outro aplicativo. Abra a plataforma, autorize somente câmera e microfone necessários e confira entrada, saída, enquadramento e nome exibido. O <a href="https://zoom.us/test" target="_blank" rel="noopener noreferrer">Zoom mantém uma reunião oficial de teste</a>; em outra plataforma, use o recurso equivalente ou crie uma chamada curta com alguém conhecido.</p>
+<ul><li>Posicione a câmera na altura dos olhos e a luz à frente, sem filtro que altere o rosto.</li><li>Teste o microfone com ventilador e ruído reais; fone simples pode reduzir eco.</li><li>Conecte o carregador e feche downloads, jogos e abas que consomem rede.</li><li>Desative notificações com nomes, mensagens ou dados que possam aparecer.</li><li>Deixe o telefone do contato e o currículo acessíveis sem cobrir a tela.</li></ul>
+<p>Em São Luís, a qualidade da conexão varia por endereço e horário. Não prometa “dados móveis como plano B” sem testar sinal e franquia no cômodo. Se não houver alternativa, avise antes: “Minha conexão pode oscilar; se cair, retorno pelo mesmo link e envio mensagem para este número”.</p>
+<h2>Organize o espaço sem expor a casa</h2>
+<p>Escolha fundo simples e enquadramento que não mostre documentos, endereço, medicamentos, crianças ou rotina de terceiros. Fundo virtual pode ajudar, mas consome recursos e recorta a imagem em aparelhos fracos. O que importa é áudio compreensível e postura profissional, não uma decoração sofisticada.</p>
+<p>Avise quem estiver no local sobre o horário e use fone quando necessário. Se precisar de acessibilidade, peça legenda, intérprete, tempo adicional ou outra plataforma com antecedência. A adaptação deve permitir participação, não exigir exposição de diagnóstico além do necessário.</p>
+<h2>Prepare respostas que cabem na conversa</h2>
+<p>Tenha três exemplos verdadeiros no formato situação, ação e resultado: uma prioridade conflitante, um problema resolvido e uma aprendizagem. Escreva palavras-chave, não um discurso para ler. Olhar constantemente para outro monitor parece desconexão; consultar uma data no currículo é diferente.</p>
+<p>No início, confirme cargo e etapa. Durante a conversa, peça esclarecimento quando a pergunta for vaga. No fim, pergunte próximos passos, prazo de retorno e canal oficial. Não compartilhe a tela inteira se basta mostrar um portfólio; feche arquivos e contas pessoais antes.</p>
+<h2>Quando a conexão falhar</h2>
+<p>Espere alguns segundos, tente retornar uma vez e envie uma mensagem objetiva: “A conexão caiu às 10h18. Estou entrando novamente; se preferir, posso continuar por áudio ou reagendar.” Não transforme a falha em longa justificativa. Depois, registre o ocorrido e o combinado.</p>
+<p>Se o entrevistador pedir senha, código, pagamento, acesso remoto ou documento sem explicar finalidade, encerre a etapa e valide a empresa. Uma entrevista segura avalia experiência e aderência; não precisa controlar o aparelho do candidato.</p>
+    `.trim()
+  },
+
+  "entrevista-presencial-sao-luis-dicas": {
+    reviewedAt: "2026-10-12",
+    contentHtml: `
+<p><strong>Revisão editorial: 12 de outubro de 2026.</strong> Entrevista presencial começa antes da sala: endereço confirmado, deslocamento possível e identidade do processo verificada. Este guia não promete que chegar cedo gere contratação; ajuda a evitar improvisos que escondem sua preparação.</p>
+<h2>Confirme o local por um canal independente</h2>
+<p>Peça nome da empresa, cargo, endereço completo, ponto de referência, nome de quem receberá você e duração aproximada. Compare com o site institucional ou telefone geral encontrado por você. Um pino no mapa prova que o endereço existe, não que aquele recrutador está autorizado a usá-lo.</p>
+<p>Se houver mudança de última hora para residência, quarto, veículo ou lugar isolado, não siga automaticamente. Pergunte o motivo e confirme com a empresa. Consulte também a <a href="/seguranca-candidatos">política de segurança do candidato</a>. Não leve dinheiro para “garantir” vaga e não aceite retenção do telefone ou documento.</p>
+<h2>Faça dois cálculos de deslocamento</h2>
+<p>Primeiro, simule o trajeto no mesmo dia e horário da entrevista. Identifique ponto de embarque, integração, caminhada final e entrada correta do prédio. Segundo, calcule se o deslocamento seria sustentável na escala da vaga. Use a <a href="/ferramentas/custo-deslocamento">ferramenta de custo de deslocamento</a> com tarifa, quantidade de viagens e dias informados por você.</p>
+<p>Planeje margem para trânsito e chuva, mas não chegue tão cedo a ponto de pressionar a recepção. Se o prédio tiver controle de acesso, considere o tempo de cadastro. Em atraso inevitável, avise antes com horário estimado honesto; não invente uma desculpa detalhada.</p>
+<h2>Leve o necessário, não uma pasta de dados</h2>
+<ul><li>currículo impresso ou arquivo acessível no telefone;</li><li>documento de identificação para acesso ao prédio, quando solicitado;</li><li>caneta e anotação com endereço, contato e perguntas;</li><li>água e alternativa de retorno compatível com o horário.</li></ul>
+<p>Não entregue original sem saber por quê e como será devolvido. Na seleção, CPF, dados bancários, prontuário e comprovante de residência merecem pergunta específica sobre finalidade. A <a href="https://www.planalto.gov.br/ccivil_03/_ato2015-2018/2018/lei/l13709.htm" target="_blank" rel="noopener noreferrer">LGPD</a> inclui necessidade, transparência e segurança entre os princípios aplicáveis ao tratamento de dados pessoais.</p>
+<h2>Responda com cenas de trabalho</h2>
+<p>Prepare exemplos curtos: tarefa, dificuldade, ação e resultado. Para atendimento, descreva como resolveu uma reclamação; para estoque, como conferiu divergência; para administração, como organizou prazo. Não invente números. Se não lembrar a medida exata, diga “aproximadamente” ou explique o efeito observado.</p>
+<p>Faça perguntas sobre rotina: equipe, jornada, treinamento, critérios da etapa e prazo de retorno. Salário e benefícios podem ser abordados quando o processo permitir; perguntar com educação não é desinteresse. Anote o que foi realmente informado para comparar depois.</p>
+<h2>Reconheça limites da entrevista</h2>
+<p>A <a href="https://www.planalto.gov.br/ccivil_03/leis/l9029.htm" target="_blank" rel="noopener noreferrer">Lei nº 9.029/1995</a> proíbe práticas discriminatórias para acesso e manutenção da relação de trabalho. Estado civil, plano de ter filhos, religião e outras informações alheias à capacidade profissional não devem substituir avaliação do cargo. Disponibilidade de horário pode ser legítima; pergunta íntima sem relação com a função exige cautela.</p>
+<p>Você pode responder: “Posso explicar minha disponibilidade para a escala, mas prefiro manter informações pessoais que não interferem no trabalho.” Se houver discriminação ou constrangimento, registre pergunta, data, local e participantes e procure orientação adequada, como Ministério Público do Trabalho, sindicato ou profissional jurídico.</p>
+<h2>Saída e acompanhamento</h2>
+<p>Antes de sair, confirme próximo passo e canal. Avise uma pessoa de confiança de que encerrou o compromisso. No mesmo dia, anote impressões factuais: função, jornada, local, pontos pendentes. Um agradecimento curto pode ser enviado pelo canal usado, sem insistência.</p>
+<p>Roupa limpa e compatível com a função é suficiente; não existe uniforme universal de entrevista. Preparação visível é saber onde vai, o que pode demonstrar e quais limites precisa manter.</p>
+    `.trim()
+  },
+
+  "referencias-profissionais-emprego": {
+    reviewedAt: "2026-10-12",
+    contentHtml: `
+<p><strong>Revisão editorial: 12 de outubro de 2026.</strong> Referência profissional é uma pessoa que presenciou seu trabalho e aceitou falar sobre ele. Não é favor para preencher campo, nem autorização para divulgar telefone alheio sem aviso. Uma referência coerente sustenta fatos que já aparecem no currículo.</p>
+<h2>Escolha quem viu uma entrega</h2>
+<p>Prefira liderança, colega experiente, cliente institucional, professor de projeto ou responsável por trabalho voluntário que consiga descrever contexto e comportamento. Cargo famoso não substitui convivência. Parente pode conhecer seu esforço, mas costuma ter menos independência para avaliar desempenho profissional.</p>
+<p>Faça uma lista de três pessoas e, para cada uma, anote: onde trabalharam juntas, qual período, quais tarefas ela observou e qual contato ainda funciona. Se ninguém acompanhou seu trabalho formal, considere responsável por atividade informal, curso prático ou projeto. A referência deve dizer o que viu, não inventar vínculo.</p>
+<h2>Peça autorização com contexto</h2>
+<p>Mensagem possível: “Olá, Carla. Estou participando de uma seleção para auxiliar administrativo e a empresa pode pedir referência. Você acompanhou meu trabalho com atendimento e planilhas na Loja X entre março e agosto. Posso informar seu nome, cargo à época e telefone? Envio a descrição da vaga para você decidir.”</p>
+<p>A resposta precisa ser livre. Se a pessoa recusar ou não responder, não use o número. Quando aceitar, confirme canal preferido e horários razoáveis. A <a href="https://www.planalto.gov.br/ccivil_03/_ato2015-2018/2018/lei/l13709.htm" target="_blank" rel="noopener noreferrer">LGPD</a> define telefone e informações ligadas a pessoa identificável como dados pessoais e estabelece finalidade, necessidade e transparência. Isso reforça uma prática simples: compartilhe só o necessário, com conhecimento da referência.</p>
+<h2>Prepare fatos, não um roteiro combinado</h2>
+<p>Envie cargo, empresa, anúncio e versão do currículo usada. Relembre projetos reais, mas não peça elogio pronto. A referência pode dizer que não sabe responder a determinado ponto. Tentar controlar a fala ou combinar informação falsa cria incoerência que aparece na checagem.</p>
+<ul><li>Confirme datas aproximadas e relação profissional.</li><li>Explique quais tarefas do novo cargo se conectam ao trabalho anterior.</li><li>Avise quando a empresa informar que fará contato.</li><li>Atualize a pessoa se o processo terminar para que ela não espere ligação indefinidamente.</li></ul>
+<h2>O que colocar no currículo</h2>
+<p>Em geral, não inclua lista de referências e telefones no PDF público. Use “referências disponíveis mediante solicitação” apenas se fizer sentido; muitas vezes nem essa frase é necessária. Quando o formulário pedir, forneça nome, relação profissional, organização à época e contato autorizado. Não publique CPF, endereço ou dado pessoal excessivo.</p>
+<p>Se a empresa solicitar contato do emprego atual e isso puder expor uma busca confidencial, explique: “Meu empregador atual ainda não sabe da candidatura. Posso oferecer referências de experiências anteriores e autorizar o contato atual após a etapa X.” A empresa pode manter seu requisito, mas você terá registrado o risco e proposto alternativa.</p>
+<h2>Experiência informal também pode ser verificável</h2>
+<p>Uma pessoa que acompanhou vendas por encomenda, cuidado remunerado, apoio em comércio familiar ou projeto comunitário pode validar tarefas e período, desde que a relação seja descrita honestamente. Use títulos funcionais, não cargos que não existiram. A <a href="https://www.gov.br/trabalho-e-emprego/pt-br/servicos/trabalhador/mais-acoes/classificacao-brasileira-de-ocupacoes" target="_blank" rel="noopener noreferrer">Classificação Brasileira de Ocupações do MTE</a> pode ajudar a identificar nomes e tarefas, mas consultar a CBO não transforma atividade informal em vínculo registrado.</p>
+<h2>Quando a checagem der errado</h2>
+<p>Número desatualizado não precisa encerrar uma seleção se você agir cedo. Avise o recrutador, substitua por contato autorizado e explique a relação. Se a referência trouxe crítica, peça ao recrutador que avalie evidências do trabalho; não ataque a pessoa.</p>
+<p>Depois, agradeça sem pedir detalhes confidenciais da conversa. Uma boa rede se mantém com respeito. O objetivo da referência é acrescentar contexto verificável, não garantir contratação.</p>
+    `.trim()
+  },
+
+  "experiencia-informal-curriculo-como-colocar": {
+    reviewedAt: "2026-10-12",
+    contentHtml: `
+<p><strong>Revisão editorial: 12 de outubro de 2026.</strong> Trabalho informal pode demonstrar competência quando o currículo descreve tarefa, contexto e período com honestidade. O erro não é ter experiência sem registro; é transformá-la em cargo, empresa ou vínculo que nunca existiu.</p>
+<h2>Comece por um inventário de trabalho real</h2>
+<p>Liste atividades realizadas, para quem, com que frequência, quais ferramentas e como a entrega era conferida. Exemplos: vender refeições por encomenda, atender em comércio familiar, organizar agenda de profissional autônomo, cuidar de crianças, fazer manutenção, editar peças ou separar mercadorias. Não comece pelo título; comece pelo que você conseguia fazer.</p>
+<p>Depois, compare essas tarefas com o anúncio. Se a vaga pede atendimento, procure situações de dúvida, reclamação e pagamento. Se pede estoque, identifique contagem, armazenamento e conferência. Se pede organização, mostre prazo, lista ou rotina usada. Só leve para o currículo o que ajuda a entender sua aderência.</p>
+<h2>Escolha um título funcional e transparente</h2>
+<p>Use rótulo que descreva o trabalho: “Atendimento e vendas por encomenda — atividade autônoma”, “Auxílio em loja familiar — experiência informal” ou “Cuidadora infantil — trabalhos eventuais”. Evite “gerente” quando você não tinha decisão sobre equipe, caixa ou operação.</p>
+<p>A <a href="https://www.gov.br/trabalho-e-emprego/pt-br/servicos/trabalhador/mais-acoes/classificacao-brasileira-de-ocupacoes" target="_blank" rel="noopener noreferrer">Classificação Brasileira de Ocupações (CBO)</a> organiza nomes e descrições de ocupações e pode ajudar a reconhecer a linguagem do mercado. Use-a como referência de vocabulário, não como certificado nem prova de vínculo.</p>
+<h2>Escreva período e frequência sem fabricar precisão</h2>
+<p>Se você lembra mês e ano, informe. Se a atividade foi eventual, deixe isso claro: “2024–2025, demandas mensais” ou “finais de semana entre março e junho de 2026”. Não preencha lacunas com datas exatas inventadas. Prepare uma explicação simples para períodos alternados.</p>
+<p>A <a href="https://www.gov.br/pt-br/temas/carteira-de-trabalho-digital" target="_blank" rel="noopener noreferrer">Carteira de Trabalho Digital</a> permite consultar contratos formais informados nos sistemas oficiais. Uma atividade informal não aparecer ali como vínculo; por isso, o currículo deve separar experiência profissional demonstrável de registro trabalhista.</p>
+<h2>Transforme a tarefa em evidência</h2>
+<p>Use de duas a quatro linhas por experiência. Estrutura: verbo + objeto + contexto + resultado observável. Exemplos honestos:</p>
+<ul><li>“Atendi pedidos por WhatsApp, confirmei endereço e organizei entregas por bairro.”</li><li>“Conferi entradas e saídas em planilha simples e sinalizei falta de produtos ao responsável.”</li><li>“Organizei agenda semanal e confirmei horários com clientes antes do atendimento.”</li><li>“Preparei alimentos sob encomenda seguindo quantidade e horário combinados.”</li></ul>
+<p>Número ajuda quando é lembrado e defensável: quantidade média de pedidos, frequência semanal ou prazo. Se você não registrou, não invente. “Atendia volume alto” pode ser explicado; “cresci vendas em 47%” exige base.</p>
+<h2>Separe portfólio, referência e documento pessoal</h2>
+<p>Guarde fotos, planilhas sem dados de clientes, cardápios, peças ou depoimentos autorizados que demonstrem a atividade. Não publique nomes, telefones ou pedidos de terceiros. A <a href="https://www.planalto.gov.br/ccivil_03/_ato2015-2018/2018/lei/l13709.htm" target="_blank" rel="noopener noreferrer">LGPD</a> reforça finalidade e necessidade no uso de dados pessoais.</p>
+<p>Peça referência a quem viu o trabalho: cliente recorrente, responsável pelo comércio ou parceiro de projeto. Solicite autorização antes de compartilhar contato e explique para qual vaga. A referência valida contexto; não transforma atividade informal em emprego formal.</p>
+<h2>Prepare a resposta da entrevista</h2>
+<p>Explique por que começou, como organizava a rotina, um problema que resolveu e o que aprendeu. Exemplo: “Eu ajudava na loja da família aos sábados. Percebi que faltava registro dos pedidos, criei uma planilha simples e passei a confirmar retirada. Não era gerente e não tinha equipe; eu cuidava dessa rotina.”</p>
+<p>Essa precisão gera confiança. Se a vaga exigir experiência formal específica, não tente esconder a diferença. Mostre habilidades transferíveis e pergunte se a empresa aceita experiência equivalente. Currículo bom torna o trabalho compreensível sem mudar sua natureza.</p>
+    `.trim()
+  },
+
+  "curriculo-ats-palavras-chave-sao-luis": {
+    reviewedAt: "2026-10-12",
+    contentHtml: `
+<p><strong>Revisão editorial: 12 de outubro de 2026.</strong> ATS é uma categoria de sistemas usados para organizar candidaturas; não existe um leitor único nem uma lista universal de palavras que “libera” o currículo. A estratégia segura é alinhar linguagem verdadeira ao anúncio e manter o arquivo legível também para pessoas.</p>
+<h2>Extraia o vocabulário da própria vaga</h2>
+<p>Copie o anúncio para uma folha e marque quatro grupos: cargo, tarefas, ferramentas e requisitos. Para auxiliar administrativo, por exemplo, podem aparecer atendimento, arquivo, planilha, emissão de documento e sistema interno. Só use termos que correspondam ao seu histórico.</p>
+<p>A <a href="https://www.gov.br/trabalho-e-emprego/pt-br/servicos/trabalhador/mais-acoes/classificacao-brasileira-de-ocupacoes" target="_blank" rel="noopener noreferrer">Classificação Brasileira de Ocupações do Ministério do Trabalho e Emprego</a> ajuda a conferir nomes de ocupações e famílias de tarefas. Ela não informa se uma empresa usa ATS e não substitui o texto do anúncio; serve para padronizar linguagem quando o seu título anterior era muito local ou informal.</p>
+<h2>Crie uma base e uma versão adaptada</h2>
+<p>Mantenha um currículo-base com todas as experiências comprováveis. Para cada candidatura relevante, duplique e reorganize: título-alvo, resumo curto, competências realmente exigidas e experiências mais próximas. Adaptar é escolher ênfase, não criar habilidade.</p>
+<p>Em vez de “proativo e comunicativo”, escreva “atendimento presencial e por WhatsApp; registro de pedidos em planilha”. Em vez de repetir “Excel” dez vezes, cite onde usou: “controle de entrada e saída em planilha com filtros e soma”. A palavra aparece em contexto que você consegue explicar na entrevista.</p>
+<h2>Use uma estrutura que continue legível fora do seu editor</h2>
+<ul><li>Nome e contato em texto comum.</li><li>Título profissional específico.</li><li>Experiência com organização, período e tarefas.</li><li>Formação e cursos relevantes.</li><li>Ferramentas e idiomas com nível honesto.</li></ul>
+<p>Evite esconder informação essencial apenas em cabeçalho, rodapé, imagem, gráfico de barras ou caixa de texto. Salve em PDF quando o anúncio aceitar e teste: selecione e copie uma frase para um editor simples. Se a ordem ficar embaralhada, reduza colunas e elementos decorativos. Quando a empresa exigir outro formato, siga a instrução.</p>
+<p>O <a href="https://europass.europa.eu/en/create-europass-cv" target="_blank" rel="noopener noreferrer">Europass, serviço oficial da União Europeia, orienta adaptar o CV à oportunidade</a> e descrever habilidades e experiências de forma estruturada. O modelo europeu não é requisito para vagas de São Luís; a utilidade da fonte está no princípio de conteúdo organizado e ajustado ao objetivo.</p>
+<h2>Audite palavras-chave sem “encher” o documento</h2>
+<p>Faça uma tabela com três colunas: termo do anúncio, evidência que você possui e seção do currículo. “PDV” só entra se você operou ponto de venda ou concluiu prática que consiga demonstrar. “Disponibilidade de horário” não deve ser copiada se conflita com sua realidade. “CNH B” exige habilitação válida.</p>
+<p>Sinônimos ajudam quando são naturais: “atendimento ao cliente” e “suporte ao público”. Não crie bloco invisível, texto branco ou repetição mecânica. Mesmo que um sistema aceite o arquivo, a entrevista revela contradição.</p>
+<h2>Considere o canal de São Luís</h2>
+<p>Algumas vagas locais recebem PDF por e-mail ou WhatsApp; outras usam formulário ou plataforma. Não conclua que há filtro automático sem evidência. Em canal direto, assunto, nome do arquivo e mensagem de contexto também influenciam a organização da triagem. Em plataforma, preencha os campos porque eles podem ser a principal fonte de busca.</p>
+<p>Nomeie o arquivo com nome e cargo, abra no celular e confirme telefone. Não inclua CPF, RG, endereço completo ou dado bancário no currículo inicial. Se houver pedido de pagamento ou código de autenticação, use a <a href="/seguranca-candidatos">página de segurança</a> e valide a empresa.</p>
+<h2>Checklist final</h2>
+<p>Compare cada requisito com uma evidência; remova palavras sem prova; teste seleção de texto; verifique datas; mantenha tamanho razoável; peça a alguém para ler em trinta segundos. O objetivo não é derrotar um robô imaginário. É criar um documento encontrável, compreensível e consistente com a conversa seguinte.</p>
+    `.trim()
+  },
+
+  "ingles-no-curriculo-nivel-honesto": {
+    reviewedAt: "2026-10-12",
+    contentHtml: `
+<p><strong>Revisão editorial: 12 de outubro de 2026.</strong> “Básico”, “intermediário” e “fluente” significam coisas diferentes para pessoas diferentes. Um currículo útil informa o que você consegue fazer no idioma, em qual contexto e com que segurança. Honestidade evita uma expectativa que a entrevista pode testar imediatamente.</p>
+<h2>Comece pela tarefa da vaga</h2>
+<p>Leia por que o inglês aparece no anúncio. Pode ser leitura de manual, resposta a e-mail, atendimento oral, reunião ou contato diário com equipe estrangeira. Pergunte quando não estiver claro. A mesma pessoa pode ler documentação bem e ainda precisar de apoio para conversar ao vivo.</p>
+<p>Não coloque o idioma no centro do currículo se a vaga não usa inglês. Para posição que exige uso diário, leve a informação para uma seção visível e descreva evidência. Certificado antigo sem prática recente deve ser apresentado como formação, não como prova automática de desempenho atual.</p>
+<h2>Use uma referência compreensível</h2>
+<p>O <a href="https://www.coe.int/en/web/common-european-framework-reference-languages/level-descriptions" target="_blank" rel="noopener noreferrer">Quadro Europeu Comum de Referência para Línguas, do Conselho da Europa</a>, organiza níveis de A1 a C2 e descreve capacidades de compreensão, fala e escrita. Ele é referência, não certificado individual. Só escreva “B2” se você entende o descritor e possui avaliação ou autoavaliação consistente que possa explicar.</p>
+<p>Se não usa CEFR, prefira descrição concreta: “inglês para leitura de manuais; escrita de e-mails simples com revisão; conversação básica”. Isso é mais informativo que “intermediário” isolado. Evite porcentagens como “inglês 80%”: elas não revelam tarefa nem critério.</p>
+<h2>Faça um teste ligado ao trabalho</h2>
+<p>Escolha três atividades do anúncio e simule sem ferramenta automática no primeiro momento:</p>
+<ul><li>ler uma página de manual e resumir o procedimento em português;</li><li>escrever um e-mail curto confirmando prazo e pedido;</li><li>apresentar-se por dois minutos e explicar uma experiência;</li><li>ouvir uma instrução e repetir os pontos principais.</li></ul>
+<p>Marque o que faz sozinho, com consulta e somente com tradução. Depois, atualize o currículo. Aplicativo de tradução pode fazer parte do trabalho real, mas não deve ser escondido quando a empresa pergunta por autonomia.</p>
+<h2>Escreva uma linha que aguente a entrevista</h2>
+<p>Exemplos: “Inglês: leitura de documentação técnica; conversação básica”; “Inglês B1 — curso concluído em 2025; uso em e-mails simples”; “Inglês avançado para reuniões e relatórios — uso semanal no projeto X”. Remova certificado sem relação com sua capacidade atual ou deixe claro o ano.</p>
+<p>Não invente intercâmbio, curso, nota ou uso profissional. Se aprendeu sozinho, diga “estudo autônomo” e mostre o que consegue fazer. Portfólio traduzido, atendimento real ou projeto bilíngue podem ser evidência, desde que não exponham dados de terceiros.</p>
+<h2>Prepare a etapa em outro idioma</h2>
+<p>Se o anúncio menciona entrevista em inglês, pergunte formato e duração. Treine apresentação, experiência relevante, disponibilidade e uma pergunta sobre a função. Memorize ideias, não um texto inteiro; pergunta fora do roteiro exige compreensão.</p>
+<p>Quando não entender, peça repetição: “Could you please repeat or rephrase the question?” Se precisar de alguns segundos, diga. Fingir compreensão pode gerar resposta incoerente. Se o nível exigido excede o seu, ainda é possível candidatar-se quando o anúncio admite desenvolvimento, mas registre a diferença com clareza.</p>
+<h2>Revise sem diminuir sua experiência</h2>
+<p>Idioma é uma competência entre outras. Para vagas de atendimento local, estoque, administração ou serviços em São Luís, as tarefas principais podem pesar mais. Não elimine experiência relevante para abrir espaço a uma longa lista de cursos de inglês.</p>
+<p>Atualize a descrição quando sua prática mudar. Um nível honesto não é fraqueza: ele permite que a empresa avalie treinamento e que você entre sabendo o que será cobrado. A decisão final deve se apoiar em capacidade demonstrável, não em adjetivo inflado.</p>
+    `.trim()
+  },
+
 };
 
 export function getEditorialContentOverride(slug: string) {
