@@ -1,7 +1,7 @@
 /**
  * Triagem DOCUMENTADA em 12/10/2026: 106 artigos públicos examinados.
  * 98 guias tinham múltiplos trechos repetitivos ou menos de 350 palavras.
- * 84 já receberam revisão substantiva; 14 permanecem acessíveis, mas fora do índice.
+ * 92 já receberam revisão substantiva; 6 permanecem acessíveis, mas fora do índice.
  * 5 notícias de julho/2026 ainda precisam de fontes factuais externas.
  * Não inventar data ou prova e não confundir este controle com aprovação Google.
  * Relatórios: reports/adsense-revisao-integral-parte-{1,2}.json
@@ -9,14 +9,6 @@
 export const EDITORIAL_REVIEW_DATE = "2026-10-13";
 
 export const guidesPendingReview = new Set<string>([
-  "follow-up-apos-entrevista-mensagem",
-  "gestao-de-tempo-trabalho-dicas",
-  "inteligencia-emocional-entrevista",
-  "linkedin-emprego-sao-luis-perfil",
-  "marca-pessoal-candidatura-sao-luis",
-  "mudanca-de-carreira-sao-luis-curriculo",
-  "networking-emprego-sao-luis",
-  "o-que-vestir-entrevista-emprego",
   "pedir-feedback-entrevista-emprego",
   "plano-semanal-vagas-sao-luis",
   "produtividade-busca-emprego-sao-luis",
