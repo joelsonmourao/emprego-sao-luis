@@ -10,6 +10,6 @@ function readWebpSize(path: string) { const data = readFileSync(path); expect(da
 describe("Quarto lote de substituição das capas Unsplash", () => {
   const credits = JSON.parse(readFileSync(resolve("apps/web/public/covers/sl-local/credits.json"), "utf8")) as Credit[];
   it("registra autoria e direitos próprios nas 12 capas", () => { for (const slug of slugs) { const item = credits.find((credit) => credit.slug === slug); expect(item).toMatchObject({ source: "original", licenseStatus: "owned" }); expect(item?.credit).toContain("Empregos São Luís"); expect(item?.licenseBasis).toContain("sem fotografia"); } });
-  it("reduz o acervo Unsplash para 39 itens", () => { expect(credits.filter((item) => item.source === "unsplash")).toHaveLength(39); });
+  it("não regride o acervo além dos 39 itens do lote", () => { expect(credits.filter((item) => item.source === "unsplash").length).toBeLessThanOrEqual(39); });
   it("mantém 12 WebP próprios, distintos e em 1200 × 630", () => { const hashes = new Set<string>(); for (const slug of slugs) { const path = resolve(`apps/web/public/covers/sl-local/${slug}.webp`); expect(existsSync(path)).toBe(true); expect(readWebpSize(path)).toEqual({ width: 1200, height: 630 }); hashes.add(createHash("sha256").update(readFileSync(path)).digest("hex")); } expect(hashes).toHaveLength(12); });
 });
