@@ -15,6 +15,7 @@ export const INSTITUTIONAL_SLUGS = [
   "politica-editorial",
   "politica-correcoes",
   "politica-fontes",
+  "politica-imagens",
   "seguranca-candidatos",
   "anunciar-vaga",
   "area-empresas",
@@ -142,6 +143,15 @@ const defaults: Record<InstitutionalSlug, InstitutionalPage> = {
     canonicalPath: "/politica-fontes",
     published: true,
     contentHtml: INSTITUTIONAL_DEFAULTS_HTML["politica-fontes"]
+  },
+  "politica-imagens": {
+    slug: "politica-imagens",
+    title: "Política de imagens",
+    seoTitle: "Política de imagens — Empregos São Luís",
+    metaDescription: "Como o Empregos São Luís produz, identifica, credita e corrige imagens editoriais.",
+    canonicalPath: "/politica-imagens",
+    published: true,
+    contentHtml: INSTITUTIONAL_DEFAULTS_HTML["politica-imagens"]
   },
   "seguranca-candidatos": {
     slug: "seguranca-candidatos",

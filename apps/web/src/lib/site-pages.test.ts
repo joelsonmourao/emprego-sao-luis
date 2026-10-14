@@ -13,6 +13,7 @@ describe("site-pages", () => {
       "politica-editorial",
       "politica-correcoes",
       "politica-fontes",
+      "politica-imagens",
       "seguranca-candidatos",
       "anunciar-vaga",
       "area-empresas",

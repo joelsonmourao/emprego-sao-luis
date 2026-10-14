@@ -58,6 +58,7 @@ const INSTITUTIONAL_PATHS = [
   "/lgpd",
   "/politica-editorial",
   "/politica-fontes",
+  "/politica-imagens",
   "/politica-correcoes",
   "/redacao",
   "/seguranca-candidatos",

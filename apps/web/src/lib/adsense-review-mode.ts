@@ -80,6 +80,7 @@ const REVIEW_INDEXABLE_EXACT = new Set([
   "/lgpd",
   "/politica-editorial",
   "/politica-fontes",
+  "/politica-imagens",
   "/politica-correcoes",
   "/redacao",
   "/seguranca-candidatos",
