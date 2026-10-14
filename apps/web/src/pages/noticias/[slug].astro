@@ -13,6 +13,7 @@ import { normalizeEditorialHtml } from "@es/shared";
 import { isEditorialReviewPending } from "../../data/editorial-review-pending";
 import { getNewsEditorialOverride } from "../../data/news-editorial-content-overrides";
 import { getRuntimeSiteUrl, resolveCanonicalUrl, resolvePublicHttpUrl } from "../../lib/canonical-url";
+import { buildEditorialSchema } from "../../lib/editorial-schema";
 
 const slug = Astro.params.slug!;
 const portal = await getEditorialPortalMode();
@@ -43,7 +44,6 @@ const contentHtml = portal.enabled ? rewriteJobBoardLinksForPortal(normalizedHtm
 const runtimeSite = getRuntimeSiteUrl(Astro.site);
 const canonical = resolveCanonicalUrl(article.canonicalUrl ?? undefined, `/noticias/${article.slug}`, runtimeSite);
 const reviewedAt = editorialOverride ? new Date(`${editorialOverride.reviewedAt}T12:00:00-03:00`) : null;
-const dateModified = reviewedAt?.toISOString() ?? article.updatedAt.toISOString();
 const variants = article.coverImageVariants && typeof article.coverImageVariants === "object"
   ? article.coverImageVariants as Record<string, { url?: string; width?: number; height?: number }>
   : {};
@@ -61,18 +61,17 @@ const structuredImages = [variants.hero, variants.landscape43, variants.square]
     ...(article.coverImageCredit ? { creditText: article.coverImageCredit } : {})
     }];
   });
-const jsonLd = {
-  "@context": "https://schema.org",
-  "@type": "NewsArticle",
-  headline: article.title,
+const jsonLd = buildEditorialSchema({
+  type: "NewsArticle",
+  title: article.title,
   description: article.metaDescription ?? article.excerpt,
-  datePublished: article.publishedAt?.toISOString(),
-  dateModified,
-  mainEntityOfPage: canonical,
-  author: { "@type": "Person", name: authorName },
-  publisher: { "@type": "Organization", name: "Empregos São Luís" },
-  ...(structuredImages.length ? { image: structuredImages } : {})
-};
+  canonical,
+  authorName,
+  publishedAt: article.publishedAt,
+  updatedAt: reviewedAt ?? article.updatedAt,
+  ...(structuredImages.length ? { image: structuredImages } : {}),
+  siteUrl: runtimeSite.toString()
+});
 ---
 <BaseLayout title={`${article.seoTitle ?? article.title} — Empregos São Luís`} description={article.metaDescription ?? article.excerpt} canonical={canonical} ogImage={article.ogImageUrl ?? article.coverImageUrl ?? undefined} breadcrumbs={[{ name: "Notícias", url: "/noticias" }, { name: article.title, url: `/noticias/${article.slug}` }]} schemas={[jsonLd]} noindex={editorialNoindex}>
   <article class="es-section">

@@ -264,9 +264,13 @@ describe("Auditoria editorial real do corpus de 12/10/2026", () => {
 
   it("preserva a publicação original e usa a revisão apenas como dateModified", () => {
     const news = load("apps/web/src/pages/noticias/[slug].astro");
-    expect(news).toContain("datePublished: article.publishedAt?.toISOString()");
+    const schema = load("apps/web/src/lib/editorial-schema.ts");
+    expect(news).toContain("publishedAt: article.publishedAt");
     expect(news).toContain("article.publishedAt?.toLocaleDateString(\"pt-BR\")");
     expect(news).toContain("editorialOverride.reviewedAt");
+    expect(news).toContain("updatedAt: reviewedAt ?? article.updatedAt");
+    expect(schema).toContain("datePublished: input.publishedAt.toISOString()");
+    expect(schema).toContain("dateModified: modifiedAt.toISOString()");
   });
 
   it("não monetiza artigos pendentes marcados noindex", () => {

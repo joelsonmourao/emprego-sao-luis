@@ -1,4 +1,6 @@
 import { describe, expect, it } from "vitest";
+import { readFileSync } from "node:fs";
+import { resolve } from "node:path";
 import { buildEditorialSchema } from "./editorial-schema";
 
 const base = {
@@ -41,5 +43,19 @@ describe("editorial structured data", () => {
       updatedAt: new Date("2026-07-01T12:00:00Z")
     });
     expect(schema.dateModified).toBe(base.publishedAt.toISOString());
+  });
+
+  it("uses the audited schema builder in guides and news instead of inline legacy authors", () => {
+    const pages = [
+      readFileSync(resolve("apps/web/src/pages/blog/[slug].astro"), "utf8"),
+      readFileSync(resolve("apps/web/src/pages/noticias/[slug].astro"), "utf8")
+    ];
+
+    for (const page of pages) {
+      expect(page).toContain('import { buildEditorialSchema } from "../../lib/editorial-schema"');
+      expect(page).toContain("buildEditorialSchema({");
+      expect(page).toContain("updatedAt: reviewedAt ?? article.updatedAt");
+      expect(page).not.toContain('author: { "@type": "Person", name: authorName }');
+    }
   });
 });

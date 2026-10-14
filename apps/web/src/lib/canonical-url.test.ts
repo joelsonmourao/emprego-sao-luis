@@ -22,11 +22,14 @@ describe("resolveCanonicalUrl", () => {
   it("usa a mesma canonical segura no JSON-LD de guias e notícias", () => {
     const blog = readFileSync(resolve("apps/web/src/pages/blog/[slug].astro"), "utf8");
     const news = readFileSync(resolve("apps/web/src/pages/noticias/[slug].astro"), "utf8");
+    const schema = readFileSync(resolve("apps/web/src/lib/editorial-schema.ts"), "utf8");
     for (const page of [blog, news]) {
       expect(page).toContain("getRuntimeSiteUrl(Astro.site)");
       expect(page).toContain("resolveCanonicalUrl(article.canonicalUrl ?? undefined");
-      expect(page).toContain("mainEntityOfPage: canonical");
+      expect(page).toContain("buildEditorialSchema({");
+      expect(page).toContain("canonical,");
     }
+    expect(schema).toContain('mainEntityOfPage: { "@type": "WebPage", "@id": input.canonical }');
   });
 
   it("normaliza imagens estruturadas para URLs públicas absolutas", () => {
