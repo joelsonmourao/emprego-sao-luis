@@ -25,6 +25,25 @@ export type EditorialCoverMetadata = {
   licenseBasis: string;
 };
 
+export type OwnedEditorialCoverImageObject = {
+  "@type": "ImageObject";
+  contentUrl: string;
+  url: string;
+  width: number;
+  height: number;
+  caption: string;
+  creditText: string;
+  creator: { "@type": "Organization"; name: string; url: string };
+  copyrightHolder: { "@type": "Organization"; name: string; url: string };
+  copyrightNotice: string;
+};
+
+const PORTAL_ORGANIZATION = {
+  "@type": "Organization" as const,
+  name: "Empregos São Luís",
+  url: "https://empregossaoluis.com.br/"
+};
+
 const packages = [
   {
     prefix: "/covers/sl-local/",
@@ -93,4 +112,35 @@ export function getEditorialCoverMetadata(
   }
 
   return null;
+}
+
+
+/**
+ * Publica autoria no JSON-LD somente após o arquivo passar pela validação
+ * de slug, caminho e titularidade de getEditorialCoverMetadata.
+ */
+export function buildOwnedEditorialCoverImageObject(
+  metadata: EditorialCoverMetadata | null,
+  contentUrl?: string | null
+): OwnedEditorialCoverImageObject | null {
+  if (!metadata || !contentUrl) return null;
+  try {
+    const parsed = new URL(contentUrl);
+    if (parsed.protocol !== "http:" && parsed.protocol !== "https:") return null;
+  } catch {
+    return null;
+  }
+
+  return {
+    "@type": "ImageObject",
+    contentUrl,
+    url: contentUrl,
+    width: metadata.width,
+    height: metadata.height,
+    caption: metadata.caption,
+    creditText: metadata.credit,
+    creator: PORTAL_ORGANIZATION,
+    copyrightHolder: PORTAL_ORGANIZATION,
+    copyrightNotice: "© Empregos São Luís"
+  };
 }
