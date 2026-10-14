@@ -108,4 +108,32 @@ describe("revisões editoriais substanciais para AdSense", () => {
       expect(html).not.toMatch(/vagas abertas hoje|salário médio|contratação garantida/i);
     }
   });
+
+  it("aprofunda oito guias trabalhistas com revisão individual e fontes oficiais", () => {
+    const laborGuides = [
+      "trabalhar-fim-de-semana-folga-adicional",
+      "convencao-coletiva-holerite-trabalhador",
+      "periodo-experiencia-clt-o-que-saber",
+      "abono-pecuniario-ferias-holerite",
+      "trabalho-noturno-adicional-o-que-perguntar",
+      "hora-extra-holerite-como-conferir",
+      "retorno-trabalho-apos-maternidade",
+      "escala-6x1-o-que-perguntar"
+    ];
+
+    for (const slug of laborGuides) {
+      const override = getEditorialContentOverride(slug);
+      const html = override?.contentHtml ?? "";
+      const words = textOnly(html).split(/\s+/).filter(Boolean);
+      const outbound = [...html.matchAll(/href="(https:\/\/[^"]+)"/g)].map((match) => match[1]);
+
+      expect(override).not.toBeNull();
+      expect(override?.reviewedAt).toBe("2026-10-14");
+      expect(words.length).toBeGreaterThanOrEqual(550);
+      expect(new Set(outbound).size).toBeGreaterThanOrEqual(2);
+      expect(outbound.every((url) => /https:\/\/(?:www\.)?(?:gov\.br|planalto\.gov\.br)\//.test(url))).toBe(true);
+      expect(html).not.toMatch(/uma situação comum na prática|roteiro aplicável passo a passo|feche o ciclo com uma ação/i);
+      expect(html).not.toMatch(/vagas abertas hoje|salário médio|contratação garantida/i);
+    }
+  });
 });
