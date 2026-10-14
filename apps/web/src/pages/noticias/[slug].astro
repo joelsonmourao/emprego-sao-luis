@@ -12,6 +12,7 @@ import { rewriteJobBoardLinksForPortal } from "../../lib/portal-content-rewrite"
 import { normalizeEditorialHtml } from "@es/shared";
 import { isEditorialReviewPending } from "../../data/editorial-review-pending";
 import { getNewsEditorialOverride } from "../../data/news-editorial-content-overrides";
+import { getRuntimeSiteUrl, resolveCanonicalUrl, resolvePublicHttpUrl } from "../../lib/canonical-url";
 
 const slug = Astro.params.slug!;
 const portal = await getEditorialPortalMode();
@@ -39,21 +40,27 @@ const editorialOverride = getNewsEditorialOverride(article.slug);
 const editorialNoindex = isEditorialReviewPending("NEWS", article.slug) && !editorialOverride;
 const normalizedHtml = normalizeEditorialHtml(editorialOverride?.contentHtml ?? article.contentHtml, { baseHeadingLevel: 2 });
 const contentHtml = portal.enabled ? rewriteJobBoardLinksForPortal(normalizedHtml) : normalizedHtml;
-const canonical = article.canonicalUrl ?? new URL(`/noticias/${article.slug}`, Astro.site).toString();
-const dateModified = editorialOverride ? new Date(`${editorialOverride.reviewedAt}T12:00:00-03:00`).toISOString() : article.updatedAt.toISOString();
+const runtimeSite = getRuntimeSiteUrl(Astro.site);
+const canonical = resolveCanonicalUrl(article.canonicalUrl ?? undefined, `/noticias/${article.slug}`, runtimeSite);
+const reviewedAt = editorialOverride ? new Date(`${editorialOverride.reviewedAt}T12:00:00-03:00`) : null;
+const dateModified = reviewedAt?.toISOString() ?? article.updatedAt.toISOString();
 const variants = article.coverImageVariants && typeof article.coverImageVariants === "object"
   ? article.coverImageVariants as Record<string, { url?: string; width?: number; height?: number }>
   : {};
 const structuredImages = [variants.hero, variants.landscape43, variants.square]
-  .filter((image): image is { url: string; width?: number; height?: number } => Boolean(image?.url))
-  .map((image) => ({
+  .flatMap((image) => {
+    if (!image) return [];
+    const url = resolvePublicHttpUrl(image?.url, runtimeSite);
+    if (!url) return [];
+    return [{
     "@type": "ImageObject",
-    url: image.url,
+    url,
     ...(image.width ? { width: image.width } : {}),
     ...(image.height ? { height: image.height } : {}),
     ...(article.coverImageCaption ? { caption: article.coverImageCaption } : {}),
     ...(article.coverImageCredit ? { creditText: article.coverImageCredit } : {})
-  }));
+    }];
+  });
 const jsonLd = {
   "@context": "https://schema.org",
   "@type": "NewsArticle",
@@ -74,7 +81,7 @@ const jsonLd = {
       <p class="es-kicker mt-6">{article.section ?? "Notícia"}</p>
       <h1 class="font-display mt-2 text-4xl font-black sm:text-5xl">{article.title}</h1>
       {article.subtitle && <p class="mt-4 text-xl text-[var(--es-muted)]">{article.subtitle}</p>}
-      <p class="mt-4 text-sm text-[var(--es-muted)]">Por {authorName} · {article.publishedAt?.toLocaleDateString("pt-BR")}</p>
+      <p class="mt-4 text-sm text-[var(--es-muted)]">Por {authorName} · {article.publishedAt?.toLocaleDateString("pt-BR")}{reviewedAt ? ` · Revisado em ${reviewedAt.toLocaleDateString("pt-BR")}` : ""}</p>
       {article.coverImageUrl && (
         <figure class="mt-8 overflow-hidden rounded-3xl">
           <img class="w-full max-h-[34rem] bg-[var(--es-cream)] object-contain" decoding="async" src={variants.hero?.url ?? article.coverImageUrl} srcset={variants.card?.url && variants.hero?.url ? `${variants.card.url} 640w, ${variants.hero.url} 1600w` : undefined} sizes="(max-width: 768px) 100vw, 896px" alt={article.coverImageAlt ?? article.title} width={article.coverImageWidth ?? 1600} height={article.coverImageHeight ?? 900} loading="eager" fetchpriority="high" />
