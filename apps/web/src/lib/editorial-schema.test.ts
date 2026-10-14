@@ -58,7 +58,7 @@ describe("editorial structured data", () => {
     ];
 
     for (const page of pages) {
-      expect(page).toContain('import { buildEditorialSchema } from "../../lib/editorial-schema"');
+      expect(page).toContain('import { buildEditorialSchema, isNewsroomAuthor } from "../../lib/editorial-schema"');
       expect(page).toContain("buildEditorialSchema({");
       expect(page).toContain("updatedAt: reviewedAt ?? article.updatedAt");
       expect(page).not.toContain('author: { "@type": "Person", name: authorName }');
