@@ -48,7 +48,7 @@ describe("revisões editoriais substanciais para AdSense", () => {
     const words = textOnly(html).split(/\s+/).filter(Boolean).length;
     const outbound = [...html.matchAll(/href="(https:\/\/[^"]+)"/g)].map((match) => match[1]);
 
-    expect(override?.reviewedAt).toBe("2026-10-12");
+    expect(override?.reviewedAt).toBe("2026-10-14");
     expect(words).toBeGreaterThanOrEqual(1200);
     expect(new Set(outbound).size).toBeGreaterThanOrEqual(5);
     expect(html).toContain("linkedin.com/help/linkedin/answer/a554351");
@@ -58,6 +58,8 @@ describe("revisões editoriais substanciais para AdSense", () => {
     expect(html).toContain("buscar-emprego-no-sistema-nacional-de-emprego-sine");
     expect(html).toContain('href="/ferramentas/controle-candidaturas"');
     expect(html).toContain('href="/guias/emprego-sine-maranhao"');
+    expect(html).toContain('href="/blog/objetivo-profissional-curriculo"');
+    expect(html).not.toContain('href="/blog/objetivo-profissional"');
     expect(html).not.toMatch(/uma situação comum na prática|roteiro aplicável passo a passo|feche o ciclo com uma ação/i);
     expect(html).not.toMatch(/salário médio|vagas abertas hoje|empresas contratando agora|contratação garantida/i);
   });
