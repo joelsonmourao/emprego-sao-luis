@@ -23,7 +23,7 @@ interface Props {
   breadcrumbs?: Array<{ name: string; url: string }>;
   noindex?: boolean;
   pageSchemaType?: "WebPage" | "CollectionPage" | "SearchResultsPage" | "AboutPage" | "ContactPage" | "ProfilePage";
-  pageSchemaMainEntity?: Record<string, unknown>;
+  pageSchemaMainEntity?: Record<string, unknown> | undefined;
   schemas?: Array<Record<string, unknown>>;
   disableSeoGraph?: boolean;
 }
