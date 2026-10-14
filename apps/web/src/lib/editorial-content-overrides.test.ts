@@ -165,4 +165,32 @@ describe("revisões editoriais substanciais para AdSense", () => {
       expect(html).not.toMatch(/vagas abertas hoje|salário médio|contratação garantida/i);
     }
   });
+
+  it("aprofundou oito guias factuais com pelo menos duas fontes primárias", () => {
+    const factualGuides = [
+      "pesquisar-empresa-antes-entrevista",
+      "primeiro-emprego-sao-luis-checklist",
+      "acidente-de-trabalho-o-que-fazer",
+      "transferencia-interna-emprego-como-pedir",
+      "freelancer-ou-clt-vantagens",
+      "servicos-gerais-epi-vaga",
+      "home-office-remoto-checklist-vaga",
+      "documentos-admissao-emprego-maranhao"
+    ];
+
+    for (const slug of factualGuides) {
+      const override = getEditorialContentOverride(slug);
+      const html = override?.contentHtml ?? "";
+      const words = textOnly(html).split(/\s+/).filter(Boolean);
+      const outbound = [...html.matchAll(/href="(https:\/\/[^"]+)"/g)].map((match) => match[1]);
+
+      expect(override).not.toBeNull();
+      expect(override?.reviewedAt).toBe("2026-10-14");
+      expect(words.length).toBeGreaterThanOrEqual(600);
+      expect(new Set(outbound).size).toBeGreaterThanOrEqual(2);
+      expect(outbound.every((url) => /https:\/\/(?:www\.)?(?:gov\.br|planalto\.gov\.br|caepi\.trabalho\.gov\.br)\//.test(url))).toBe(true);
+      expect(html).not.toMatch(/uma situação comum na prática|roteiro aplicável passo a passo|feche o ciclo com uma ação/i);
+      expect(html).not.toMatch(/vagas abertas hoje|salário médio|contratação garantida|aprovação garantida/i);
+    }
+  });
 });
