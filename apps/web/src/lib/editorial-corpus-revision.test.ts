@@ -267,6 +267,8 @@ describe("Auditoria editorial real do corpus de 12/10/2026", () => {
     expect(news).toContain("datePublished: article.publishedAt?.toISOString()");
     expect(news).toContain("article.publishedAt?.toLocaleDateString(\"pt-BR\")");
     expect(news).toContain("editorialOverride.reviewedAt");
+    expect(news).toContain("Revisado em");
+    expect(news).toContain("dateModified = reviewedAt?.toISOString()");
   });
 
   it("não monetiza artigos pendentes marcados noindex", () => {
