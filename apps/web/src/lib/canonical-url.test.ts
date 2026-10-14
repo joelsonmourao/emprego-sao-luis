@@ -19,6 +19,24 @@ describe("resolveCanonicalUrl", () => {
     expect(layout).not.toContain("canonical ? new URL(canonical");
   });
 
+  it("usa a mesma canonical segura no JSON-LD de guias e notícias", () => {
+    const blog = readFileSync(resolve("apps/web/src/pages/blog/[slug].astro"), "utf8");
+    const news = readFileSync(resolve("apps/web/src/pages/noticias/[slug].astro"), "utf8");
+    for (const page of [blog, news]) {
+      expect(page).toContain("getRuntimeSiteUrl(Astro.site)");
+      expect(page).toContain("resolveCanonicalUrl(article.canonicalUrl ?? undefined");
+      expect(page).toContain("mainEntityOfPage: canonical");
+    }
+  });
+
+  it("normaliza imagens estruturadas para URLs públicas absolutas", () => {
+    const blog = readFileSync(resolve("apps/web/src/pages/blog/[slug].astro"), "utf8");
+    const news = readFileSync(resolve("apps/web/src/pages/noticias/[slug].astro"), "utf8");
+    expect(blog).toContain("resolvePublicHttpUrl(article.coverImageUrl ?? undefined, runtimeSite)");
+    expect(news).toContain("resolvePublicHttpUrl(image?.url, runtimeSite)");
+    expect(news).not.toContain("url: image.url");
+  });
+
   it("removes tracking parameters and trailing slash", () => {
     expect(resolveCanonicalUrl("/blog/guia/?utm_source=teste#topo", "/blog/guia", site))
       .toBe("https://empregossaoluis.com.br/blog/guia");
