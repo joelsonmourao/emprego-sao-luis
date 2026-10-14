@@ -149,6 +149,20 @@ export const INSTITUTIONAL_DEFAULTS_HTML: Record<InstitutionalSlug, string> = {
   "politica-fontes": `
 <p>Priorizamos fontes oficiais, empresas identificadas e evidências verificáveis. Vagas sem fonte clara podem ser retidas para revisão.</p>
 `,
+  "politica-imagens": `
+<p>Esta política explica como o <strong>Empregos São Luís</strong> seleciona, produz, identifica e corrige imagens usadas em guias, notícias e páginas institucionais.</p>
+<h2>Ilustração não é prova de uma vaga</h2>
+<p>Uma capa serve para identificar visualmente o tema do conteúdo. Ela não comprova que existe uma contratação aberta, não representa necessariamente uma empresa citada e não deve ser interpretada como fotografia de um candidato, recrutador ou local real.</p>
+<h2>Capas produzidas pelo portal</h2>
+<p>Quando a legenda informa “Ilustração editorial original: Empregos São Luís”, a capa corresponde a um arquivo produzido para o portal e registrado em manifesto interno com slug, dimensões, texto alternativo, legenda, crédito e base de direitos. O crédito só é exibido dessa forma quando o arquivo mostrado coincide com o registro auditado.</p>
+<h2>Imagens de terceiros</h2>
+<p>Uma imagem externa só deve permanecer publicada quando houver origem identificada, autorização ou licença aplicável e crédito compatível. Nome de arquivo, endereço antigo ou referência a banco de imagens não comprovam, isoladamente, o direito de uso. Em caso de dúvida, a imagem deve ser mantida fora da superfície indexável até revisão.</p>
+<h2>Acessibilidade e contexto</h2>
+<p>Capas editoriais devem ter texto alternativo que descreva a função da imagem sem repetir mecanicamente o título. Legendas e créditos precisam deixar claro quando se trata de ilustração e evitar sugerir vínculo com empresa, salário, vaga ou processo seletivo não confirmado.</p>
+<h2>Correção, contestação e retirada</h2>
+<p>Se você identificar crédito incorreto, uso indevido, pessoa reconhecível, logotipo de terceiro ou imagem sem relação com o conteúdo, envie a URL e a descrição do problema pelo <a href="/contato">formulário de contato</a>. A solicitação será analisada conforme a <a href="/politica-correcoes">política de correções</a>; quando necessário, a imagem pode ser substituída ou retirada enquanto a origem é verificada.</p>
+<p><em>Última atualização editorial: 14 de outubro de 2026.</em></p>
+`,
   "seguranca-candidatos": `
 <p><strong>Nunca pague para participar de processo seletivo.</strong> O Empregos São Luís não cobra candidatos. Desconfie de qualquer pedido de Pix, taxa de cadastro ou compra de uniforme antes da contratação formal.</p>
 <h2>Golpes comuns</h2>
