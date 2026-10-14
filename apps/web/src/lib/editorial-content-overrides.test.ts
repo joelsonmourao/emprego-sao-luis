@@ -85,4 +85,27 @@ describe("revisões editoriais substanciais para AdSense", () => {
       expect(override?.contentHtml).not.toMatch(/No tema em pauta|Leitura útil do cenário/i);
     }
   });
+
+  it("aprofunda os quatro guias trabalhistas mais curtos com fontes oficiais", () => {
+    const laborGuides = [
+      "seguro-desemprego-checklist-documentos",
+      "ctps-digital-carteira-trabalho-consultar",
+      "fgts-consultar-trabalhador-clt",
+      "ler-contrato-trabalho-clt"
+    ];
+
+    for (const slug of laborGuides) {
+      const override = getEditorialContentOverride(slug);
+      const html = override?.contentHtml ?? "";
+      const words = textOnly(html).split(/\s+/).filter(Boolean);
+
+      expect(override).not.toBeNull();
+      expect(override?.reviewedAt).toBe("2026-10-14");
+      expect(words.length).toBeGreaterThanOrEqual(550);
+      expect(html).toMatch(/<a href="https:\/\//);
+      expect(html).toMatch(/gov\.br|fgts\.gov\.br|planalto\.gov\.br/);
+      expect(html).not.toMatch(/uma situação comum na prática|roteiro aplicável passo a passo|feche o ciclo com uma ação/i);
+      expect(html).not.toMatch(/vagas abertas hoje|salário médio|contratação garantida/i);
+    }
+  });
 });
