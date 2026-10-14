@@ -3,6 +3,7 @@ import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import {
   guidesPendingReview,
+  newsFactChecked,
   newsPendingFactCheck,
   isEditorialReviewPending
 } from "../data/editorial-review-pending";
@@ -41,7 +42,8 @@ describe("Auditoria editorial real do corpus de 12/10/2026", () => {
       const expected = flagged && !getEditorialContentOverride(item.slug);
       expect(isEditorialReviewPending("GUIDE", item.slug)).toBe(expected);
     }
-    expect(newsPendingFactCheck.size).toBe(5);
+    expect(newsFactChecked.size).toBe(5);
+    expect(newsPendingFactCheck.size).toBe(0);
   });
 
   it("revisões de guias possuem conteúdo específico e não repetem o template antigo", () => {
@@ -245,14 +247,26 @@ describe("Auditoria editorial real do corpus de 12/10/2026", () => {
     }
   });
 
-  it("cinco notícias antigas possuem revisões factuais próprias e referências identificáveis", () => {
-    for (const slug of newsPendingFactCheck) {
+  it("cinco notícias antigas possuem revisões factuais substanciais e referências identificáveis", () => {
+    for (const slug of newsFactChecked) {
       const revised = getNewsEditorialOverride(slug);
       expect(revised).not.toBeNull();
-      expect(revised!.contentHtml.length).toBeGreaterThan(1600);
-      expect(revised!.contentHtml).toMatch(/<a href="https:\/\/(?:www\.)?(?:gov\.br|planalto\.gov\.br)/);
+      const words = revised!.contentHtml.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim().split(" ");
+      const sources = [...revised!.contentHtml.matchAll(/href="(https:\/\/[^"]+)"/g)].map((match) => match[1]);
+      expect(revised!.reviewedAt).toBe("2026-10-13");
+      expect(words.length).toBeGreaterThanOrEqual(500);
+      expect(new Set(sources).size).toBeGreaterThanOrEqual(2);
+      expect(revised!.contentHtml).toMatch(/<a href="https:\/\/(?:www\.)?(?:gov\.br|planalto\.gov\.br|diariooficial\.saoluis\.ma\.gov\.br)/);
       expect(revised!.contentHtml).not.toContain("No tema em pauta");
+      expect(revised!.contentHtml).not.toMatch(/vagas abertas hoje|contratação garantida|salário médio/i);
     }
+  });
+
+  it("preserva a publicação original e usa a revisão apenas como dateModified", () => {
+    const news = load("apps/web/src/pages/noticias/[slug].astro");
+    expect(news).toContain("datePublished: article.publishedAt?.toISOString()");
+    expect(news).toContain("article.publishedAt?.toLocaleDateString(\"pt-BR\")");
+    expect(news).toContain("editorialOverride.reviewedAt");
   });
 
   it("não monetiza artigos pendentes marcados noindex", () => {
