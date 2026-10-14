@@ -64,7 +64,25 @@ describe("revisões editoriais substanciais para AdSense", () => {
     expect(html).not.toMatch(/salário médio|vagas abertas hoje|empresas contratando agora|contratação garantida/i);
   });
 
-  it("não altera artigos ainda não revisados", () => {
-    expect(getEditorialContentOverride("salario-custo-de-vida-sao-luis")).toBeNull();
+  it("revisa o lote residual que estava sem fonte externa", () => {
+    const residual = [
+      "perguntas-comuns-entrevista-emprego",
+      "objetivo-profissional-curriculo",
+      "salario-custo-de-vida-sao-luis",
+      "comparar-portais-emprego-seguranca",
+      "quantas-vagas-candidatar-por-semana",
+      "vagas-comercio-servicos-sao-luis-perfil",
+      "mapa-setores-vagas-sao-luis"
+    ];
+
+    for (const slug of residual) {
+      const override = getEditorialContentOverride(slug);
+      const words = textOnly(override?.contentHtml ?? "").split(/\s+/).filter(Boolean);
+      expect(override).not.toBeNull();
+      expect(override?.reviewedAt).toBe("2026-10-14");
+      expect(words.length).toBeGreaterThanOrEqual(500);
+      expect(override?.contentHtml).toMatch(/<a href="https:\/\//);
+      expect(override?.contentHtml).not.toMatch(/No tema em pauta|Leitura útil do cenário/i);
+    }
   });
 });

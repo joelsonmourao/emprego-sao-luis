@@ -212,9 +212,9 @@ const overrides: Record<string, EditorialContentOverride> = {
 <p>Registre a data e o próximo passo na <a href="/ferramentas/controle-candidaturas">ferramenta gratuita de candidaturas</a>. Se o contato não responder, continue usando fontes oficiais em vez de insistir diariamente. Para buscar oportunidades pelo serviço público, conheça o <a href="https://www.gov.br/pt-br/servicos/buscar-emprego-no-sistema-nacional-de-emprego-sine" target="_blank" rel="noopener noreferrer">SINE (gov.br)</a>. Mensagem privada não substitui candidatura feita no canal da empresa.</p>`.trim()
   },
   "acompanhar-candidatura-emprego": {
-    reviewedAt: "2026-10-12",
+    reviewedAt: "2026-10-14",
     contentHtml: `
-<p><strong>Revisão editorial de 12/10/2026.</strong> Acompanhar uma candidatura significa ter informações organizadas, não enviar cobranças constantes. Com um registro simples, você sabe a qual anúncio respondeu, em qual data, qual etapa foi confirmada e quando é adequado verificar uma atualização.</p>
+<p><strong>Revisão editorial de 14/10/2026.</strong> Acompanhar uma candidatura significa ter informações organizadas, não enviar cobranças constantes. Com um registro simples, você sabe a qual anúncio respondeu, em qual data, qual etapa foi confirmada e quando é adequado verificar uma atualização.</p>
 <h2>O que registrar em cada oportunidade</h2>
 <ol><li><strong>Cargo e empresa:</strong> use o nome do anúncio original. Se for recrutamento confidencial, anote o portal e o identificador público.</li><li><strong>Canal:</strong> site da empresa, sistema de RH ou e-mail divulgado. Guarde o link, sem copiar senhas.</li><li><strong>Data:</strong> registre quando enviou o currículo e quando recebeu confirmação.</li><li><strong>Situação:</strong> enviada, recebida, entrevista marcada, em avaliação, encerrada ou contratada.</li><li><strong>Próximo passo:</strong> aguardar prazo informado, revisar documentos ou preparar entrevista.</li></ol>
 <p>Abra a <a href="/ferramentas/controle-candidaturas">ferramenta de controle de candidaturas</a> e use o botão Baixar CSV antes de sair. Ela não exige conta e não envia os registros ao servidor. O arquivo é seu, então guarde-o em local privado.</p>
@@ -223,6 +223,8 @@ const overrides: Record<string, EditorialContentOverride> = {
 <blockquote><p>Olá, equipe de recrutamento. Participei do processo para [cargo] em [data], pelo canal [site/e-mail]. Gostaria de saber se existe previsão para atualização da etapa. Obrigado pela atenção.</p></blockquote>
 <h2>Como interpretar o silêncio</h2>
 <p>Não receber resposta não comprova falha do currículo. Pode haver prazo interno, encerramento de vaga ou volume alto de candidaturas. Seu registro ajuda a identificar padrões: quais canais enviam confirmação, quais cargos combinam com sua experiência e quais anúncios permanecem sem atualização. Ajuste uma variável de cada vez, sem inventar experiência no PDF.</p>
+<p>A página oficial <a href="https://www.linkedin.com/help/linkedin/answer/a508716" target="_blank" rel="noopener noreferrer">O que esperar depois de se candidatar no LinkedIn</a> explica que o responsável pode analisar os dados enviados, mas a plataforma não garante resposta ou aprovação. Outros portais e empresas seguem processos próprios; use sempre o prazo e o canal informados no anúncio real.</p>
+<p>Quando quiser continuar buscando por um serviço público, consulte <a href="https://www.gov.br/pt-br/servicos/buscar-emprego-no-sistema-nacional-de-emprego-sine" target="_blank" rel="noopener noreferrer">Buscar Emprego no SINE</a>. Uma nova candidatura deve ser compatível e identificável, não uma tentativa de compensar silêncio com disparos em massa.</p>
 <p><strong>Segurança:</strong> não informe senha ou dados bancários para “liberar retorno”; suspeitas devem ser reportadas pelos canais oficiais. Veja <a href="/seguranca-candidatos">como reconhecer golpes de vaga</a>.</p>`.trim()
   },
   "pesquisar-empresa-antes-entrevista": {
@@ -294,9 +296,9 @@ const overrides: Record<string, EditorialContentOverride> = {
 <p>Guarde cópia do documento que recebeu. Não entregue documentos ou assine contratos por links cuja origem não conseguiu verificar.</p>`.trim()
   },
   "curriculo-pdf-erros-triagem": {
-    reviewedAt: "2026-10-12",
+    reviewedAt: "2026-10-14",
     contentHtml: `
-<p><strong>Revisão de 12/10/2026.</strong> Um currículo em PDF pode facilitar a leitura, mas o arquivo não compensa informações genéricas, datas incorretas ou falta de relação com a vaga. O objetivo é apresentar sua trajetória de forma clara e verificável.</p>
+<p><strong>Revisão de 14/10/2026.</strong> Um currículo em PDF pode facilitar a leitura, mas o arquivo não compensa informações genéricas, datas incorretas ou falta de relação com a vaga. O objetivo é apresentar sua trajetória de forma clara e verificável.</p>
 <h2>Checklist antes de exportar</h2>
 <ol><li>Use o nome pelo qual deseja ser chamado e um telefone/e-mail profissional que você realmente acompanha.</li><li>Resuma o cargo desejado sem frases vazias como “busco qualquer oportunidade”.</li><li>Organize experiências da mais recente para a mais antiga, com datas coerentes.</li><li>Descreva tarefas reais. “Conferi notas e registrei entrada de materiais” informa mais do que “responsável por tudo”.</li><li>Se ainda não trabalhou formalmente, inclua projetos, curso ou atividade informal com descrição honesta.</li><li>Revise ortografia, títulos, margens e se o PDF mantém texto selecionável.</li></ol>
 <h2>Teste em duas telas</h2>
@@ -307,12 +309,13 @@ const overrides: Record<string, EditorialContentOverride> = {
 <p>Use somente a segunda versão se essas tarefas de fato fizerem parte da sua experiência.</p>
 <h2>O que não precisa entrar</h2>
 <p>CPF, número de conta, fotografia de documentos, senha e endereço residencial completo não são exigências universais de currículo. Compartilhe dados sensíveis apenas quando houver necessidade legítima e canal verificado.</p>
-<p>Na dúvida sobre cargo e candidatura, confirme a oportunidade no sistema oficial divulgado e registre o envio na <a href="/ferramentas/controle-candidaturas">planilha gratuita de acompanhamento</a>. O portal não garante entrevistas por utilizar determinado formato de currículo.</p>`.trim()
+<p>Para conferir o nome e o conteúdo geral de uma ocupação, consulte a <a href="https://www.gov.br/trabalho-e-emprego/pt-br/assuntos/trabalhador/qualificacao-profissional/classificacao-brasileira-de-ocupacoes" target="_blank" rel="noopener noreferrer">Classificação Brasileira de Ocupações</a>. Use a nomenclatura como referência; não copie atribuições que você nunca exerceu.</p>
+<p>Na dúvida sobre cargo e candidatura, consulte o serviço <a href="https://www.gov.br/pt-br/servicos/buscar-emprego-no-sistema-nacional-de-emprego-sine" target="_blank" rel="noopener noreferrer">Buscar Emprego no SINE</a> ou o canal oficial divulgado e registre o envio na <a href="/ferramentas/controle-candidaturas">planilha gratuita de acompanhamento</a>. O portal não garante entrevistas por utilizar determinado formato de currículo.</p>`.trim()
   },
   "entrevista-comportamental-exemplos": {
-    reviewedAt: "2026-10-12",
+    reviewedAt: "2026-10-14",
     contentHtml: `
-<p><strong>Revisão editorial de 12/10/2026.</strong> Questões comportamentais pedem episódios da sua experiência: uma situação, uma decisão e um resultado. O melhor preparo é organizar fatos reais, não decorar respostas que qualquer pessoa poderia repetir.</p>
+<p><strong>Revisão editorial de 14/10/2026.</strong> Questões comportamentais pedem episódios da sua experiência: uma situação, uma decisão e um resultado. O melhor preparo é organizar fatos reais, não decorar respostas que qualquer pessoa poderia repetir.</p>
 <h2>Estrutura prática: contexto, ação e resultado</h2>
 <ol><li><strong>Contexto:</strong> onde ocorreu e qual era o problema?</li><li><strong>Seu papel:</strong> qual responsabilidade você realmente tinha?</li><li><strong>Ação:</strong> o que fez, com quais recursos e limites?</li><li><strong>Resultado:</strong> o que melhorou, o que não funcionou e o que aprendeu?</li></ol>
 <h2>Exemplo para atendimento</h2>
@@ -324,6 +327,8 @@ const overrides: Record<string, EditorialContentOverride> = {
 <p>Uma resposta honesta descreve o momento em que percebeu diferença na conferência, como comunicou a supervisão e quais passos adotou para evitar repetição. O ponto não é parecer perfeito: é demonstrar atenção, comunicação e aprendizado.</p>
 <h2>Treine com limite de tempo</h2>
 <p>Escreva três episódios curtos: um desafio, uma colaboração e um erro corrigido. Conte cada um em cerca de um minuto, sem inventar cargos. Se a entrevista for para São Luís e exigir escala, prepare também perguntas sobre horário, unidade e deslocamento.</p>
+<p>Antes de escolher exemplos, compare as tarefas do anúncio com a <a href="https://www.gov.br/trabalho-e-emprego/pt-br/assuntos/trabalhador/qualificacao-profissional/classificacao-brasileira-de-ocupacoes" target="_blank" rel="noopener noreferrer">Classificação Brasileira de Ocupações</a>. Ela ajuda a entender a família ocupacional, mas a vaga concreta define o trabalho e nenhuma descrição oficial autoriza criar experiência.</p>
+<p>Se o convite chegou por mensagem, confirme empresa, endereço e canal. A <a href="https://cartilha.cert.br/fasciculos/" target="_blank" rel="noopener noreferrer">Cartilha de Segurança para Internet do CERT.br</a> reúne cuidados com perfis falsos, phishing, privacidade e autenticação.</p>
 <p>Depois, anote aprendizados na <a href="/ferramentas/controle-candidaturas">ferramenta de candidaturas</a>, mas não coloque dados pessoais de entrevistadores no arquivo. Nenhuma resposta-modelo garante aprovação.</p>`.trim()
   },
   "primeiro-emprego-sao-luis-checklist": {
@@ -2327,6 +2332,199 @@ const overrides: Record<string, EditorialContentOverride> = {
 <h2>Avalie o deslocamento como parte da vaga</h2>
 <p>Depois da entrevista, estime custo, duração, segurança e compatibilidade com a escala. Faça o cálculo para ida e volta durante o mês com os valores atuais que você confirmou. Se o trajeto inviabiliza a rotina, pergunte sobre unidade, horário ou modalidade; não aceite contando com mudança que a empresa não prometeu.</p>
 <p>Guarde endereço e contato apenas enquanto forem necessários. Um bom plano de transporte protege pontualidade e segurança sem transformar uma estimativa em garantia.</p>
+    `.trim()
+  },
+
+  "perguntas-comuns-entrevista-emprego": {
+    reviewedAt: "2026-10-14",
+    contentHtml: `
+<p><strong>Revisão editorial: 14 de outubro de 2026.</strong> Uma entrevista não tem gabarito universal. A resposta útil conecta o que a vaga pede a uma situação que você realmente viveu, sem decorar frases, inventar resultados ou revelar informação pessoal desnecessária. Este roteiro ajuda a preparar evidências e perguntas; não promete aprovação.</p>
+<h2>Leia o anúncio antes de ensaiar respostas</h2>
+<p>Marque no anúncio tarefas, requisitos obrigatórios, horário, local e canal da seleção. Depois, escolha três experiências que possam demonstrar parte desse trabalho. Vale emprego formal, serviço autônomo, aprendizagem, voluntariado ou atividade escolar, desde que o contexto seja identificado corretamente. A <a href="https://www.gov.br/trabalho-e-emprego/pt-br/assuntos/trabalhador/qualificacao-profissional/classificacao-brasileira-de-ocupacoes" target="_blank" rel="noopener noreferrer">Classificação Brasileira de Ocupações</a> ajuda a entender famílias ocupacionais, mas não substitui a descrição da vaga nem autoriza acrescentar tarefas que você nunca realizou.</p>
+<p>Em São Luís, inclua na preparação o deslocamento e a escala. Se a vaga informa atendimento em shopping, hospital ou área industrial, confirme unidade e horário antes de afirmar disponibilidade. Use a <a href="/ferramentas/custo-deslocamento">calculadora de deslocamento</a> com valores conferidos por você; o portal não presume tarifa, salário ou benefício.</p>
+<h2>“Fale sobre você” sem contar a vida inteira</h2>
+<p>Organize a resposta em três partes: situação profissional atual, duas evidências relacionadas à vaga e objetivo imediato. Um exemplo hipotético: “Trabalho com atendimento e organização de pedidos em comércio familiar. Aprendi a registrar solicitações e conferir entregas. Procuro uma vaga de atendimento em que essas tarefas sejam relevantes.” Retire qualquer parte que não corresponda à sua história.</p>
+<p>Não informe estado civil, religião, endereço completo, documentos, diagnóstico ou situação financeira para preencher silêncio. Quando a pergunta não estiver ligada ao trabalho, você pode redirecionar: “Posso explicar minha disponibilidade para a escala e o deslocamento informado.”</p>
+<h2>Por que esta vaga e esta empresa?</h2>
+<p>Use elementos verificáveis do anúncio ou do site institucional: atividade, unidade, produto, público atendido ou tarefa. Evite elogio genérico. Uma resposta possível é: “A vaga combina atendimento com conferência de cadastro, duas atividades que já pratiquei. Quero entender como funciona o treinamento e quais sistemas são usados.”</p>
+<p>Se você não conseguiu confirmar a empresa, não invente pesquisa. Procure o domínio institucional e compare o anúncio. O serviço <a href="https://www.gov.br/pt-br/servicos/buscar-emprego-no-sistema-nacional-de-emprego-sine" target="_blank" rel="noopener noreferrer">Buscar Emprego no SINE</a> é um canal público adicional; ele não valida automaticamente vagas vistas em redes sociais.</p>
+<h2>Conte uma situação com começo, ação e resultado</h2>
+<p>Escolha um caso curto. Primeiro descreva o contexto; depois diga o que você fez; por fim, informe o resultado que consegue sustentar. Se não registrou números, não crie percentuais. “Organizei a fila e avisei o responsável” é melhor que “aumentei a eficiência em 40%” sem prova.</p>
+<ul><li><strong>Problema:</strong> o que precisava ser resolvido?</li><li><strong>Sua ação:</strong> qual parte você executou, sem tomar crédito pelo grupo inteiro?</li><li><strong>Resultado:</strong> o que mudou ou foi entregue?</li><li><strong>Aprendizado:</strong> o que faria igual ou diferente?</li></ul>
+<p>Prepare exemplos de organização, atendimento, prazo, erro corrigido e trabalho em equipe. O mesmo caso pode responder perguntas diferentes, mas não force uma história sem relação com a vaga.</p>
+<h2>Ponto forte e aspecto a desenvolver</h2>
+<p>Para o ponto forte, cite uma habilidade e uma evidência. Para desenvolvimento, escolha algo real que não inviabilize requisito essencial e explique a ação em andamento. “Estou praticando planilhas básicas com exercícios próprios” é verificável; “sou perfeccionista” costuma esconder a resposta.</p>
+<h2>Pretensão, horário e disponibilidade</h2>
+<p>Quando o anúncio informa faixa e jornada, confirme se elas cabem na sua rotina. Se não há informação, pergunte antes de assumir. Não diga “qualquer horário” se transporte, estudo ou cuidado familiar impõem limite. Disponibilidade verdadeira evita avançar até uma proposta inviável.</p>
+<h2>Perguntas que o candidato pode fazer</h2>
+<ul><li>Quais são as tarefas prioritárias nos primeiros dias?</li><li>Como funciona treinamento e acompanhamento?</li><li>Qual é a unidade, jornada e escala real?</li><li>Quais são as próximas etapas e o canal de retorno?</li></ul>
+<p>Não é necessário adiar toda pergunta sobre remuneração. Se a empresa não informou condições essenciais, peça esclarecimento com respeito antes de aceitar deslocamento, teste ou proposta.</p>
+<h2>Segurança antes e depois da entrevista</h2>
+<p>Não pague taxa, exame, material, cadastro ou liberação de vaga. Não entregue senha, código de autenticação ou acesso à conta gov.br. A <a href="https://cartilha.cert.br/fasciculos/" target="_blank" rel="noopener noreferrer">Cartilha de Segurança para Internet do CERT.br</a> reúne orientações sobre perfis falsos, phishing e proteção de contas.</p>
+<p>Depois, registre data, canal e próximo passo no <a href="/ferramentas/controle-candidaturas">controle de candidaturas</a>. Se o recrutador informou prazo, aguarde-o antes de fazer um contato curto. Entrevista bem preparada é aquela em que você entende a vaga, apresenta fatos e preserva seus limites — independentemente do resultado.</p>
+    `.trim()
+  },
+
+  "objetivo-profissional-curriculo": {
+    reviewedAt: "2026-10-14",
+    contentHtml: `
+<p><strong>Revisão editorial: 14 de outubro de 2026.</strong> O objetivo profissional é uma linha de orientação, não uma promessa. Ele deve ajudar quem lê a identificar o cargo ou a área pretendida e verificar se o restante do currículo sustenta essa direção. Não existe frase obrigatória nem palavra capaz de garantir entrevista.</p>
+<h2>Comece pelo anúncio e pela sua experiência real</h2>
+<p>Leia o título e as tarefas de oportunidades compatíveis. Separe o nome do cargo, o nível e duas atividades que você já executou ou estudou. A <a href="https://www.gov.br/trabalho-e-emprego/pt-br/assuntos/trabalhador/qualificacao-profissional/classificacao-brasileira-de-ocupacoes" target="_blank" rel="noopener noreferrer">Classificação Brasileira de Ocupações</a> pode esclarecer nomes e famílias ocupacionais, mas é classificatória: não transforma curso em experiência e não prova que uma vaga está aberta.</p>
+<p>Se o anúncio usa “auxiliar administrativo” e você procura essa função, use o mesmo título. Se sua experiência é apenas atendimento, não troque para “analista” para parecer mais qualificado. O currículo precisa continuar verdadeiro quando o recrutador perguntar onde, quando e como cada tarefa foi realizada.</p>
+<h2>Uma estrutura curta que pode ser adaptada</h2>
+<p>Combine três elementos: cargo-alvo, momento profissional e evidência breve. Exemplos ilustrativos:</p>
+<ul><li>“Auxiliar de loja em primeiro emprego, com prática de atendimento em atividade familiar.”</li><li>“Assistente administrativo, com experiência em cadastro e conferência de documentos.”</li><li>“Estágio em atendimento, para estudante com disponibilidade no turno da manhã.”</li></ul>
+<p>Use os exemplos somente se cada informação for verdadeira. “Em busca de novos desafios”, “profissional proativo” e “qualquer oportunidade” não ajudam a distinguir a candidatura. Um objetivo não precisa listar todas as competências nem explicar a trajetória inteira.</p>
+<h2>Primeiro emprego, transição e retorno</h2>
+<p>No primeiro emprego, cite formação, projeto, voluntariado ou atividade informal identificada como tal. Em transição, conecte tarefas transferíveis sem declarar que já exerceu o novo cargo. No retorno ao mercado, não é necessário explicar uma pausa no objetivo; datas corretas e uma resposta curta podem tratar disso quando for relevante.</p>
+<p>Quem ainda não escolheu um cargo pode comparar anúncios e consultar o <a href="https://www.gov.br/pt-br/servicos/consultar-quadro-brasileiro-de-qualificacoes" target="_blank" rel="noopener noreferrer">Quadro Brasileiro de Qualificações</a>. Use conhecimentos, habilidades e atitudes como mapa de estudo, não como texto para copiar para o currículo.</p>
+<h2>Adapte sem produzir versões contraditórias</h2>
+<p>Mantenha um currículo-base com datas, contatos e experiências. Para cargos próximos, faça cópias identificadas e mude a ordem das informações verdadeiras. Se uma versão diz “atendimento” e outra “estoque”, ambas devem corresponder a atividades que você consegue explicar.</p>
+<p>Registre qual arquivo foi enviado no <a href="/ferramentas/controle-candidaturas">controle de candidaturas</a>. Isso evita apresentar objetivo diferente durante a entrevista. Não inclua CPF, RG, dados bancários ou senha no PDF.</p>
+<h2>Quando o campo pode ser dispensado</h2>
+<p>Se o formulário já obriga a escolher cargo e o currículo começa com um resumo específico, repetir a mesma frase pode ser desnecessário. Em candidaturas acadêmicas ou técnicas, portfólio, formação e experiências podem ter prioridade. O critério é clareza: a pessoa deve entender a direção sem percorrer o documento inteiro.</p>
+<h2>Teste antes de enviar</h2>
+<ol><li>O cargo existe no anúncio e combina com a sua trajetória?</li><li>A evidência citada aparece no restante do currículo?</li><li>A frase cabe em uma ou duas linhas sem adjetivos vazios?</li><li>Horário, cidade e modalidade não entram em conflito com sua disponibilidade?</li><li>Você consegue explicar cada palavra em uma entrevista?</li></ol>
+<p>O serviço <a href="https://www.gov.br/pt-br/servicos/buscar-emprego-no-sistema-nacional-de-emprego-sine" target="_blank" rel="noopener noreferrer">Buscar Emprego no SINE</a> permite consultar oportunidades compatíveis com o cadastro. Compare anúncios atuais antes de definir o cargo-alvo; uma publicação antiga não confirma demanda presente.</p>
+<p>Objetivo profissional útil é específico, curto e sustentado por evidência. Ele orienta a leitura, mas a decisão depende da vaga, dos requisitos, do processo e da avaliação da empresa.</p>
+    `.trim()
+  },
+
+  "salario-custo-de-vida-sao-luis": {
+    reviewedAt: "2026-10-14",
+    contentHtml: `
+<p><strong>Revisão editorial: 14 de outubro de 2026.</strong> Este guia não publica “salário ideal” nem estima custo de vida por bairro. Ele propõe uma conta individual para comparar propostas em São Luís usando valores confirmados pelo candidato. Preços, tarifas, benefícios e descontos mudam; não use número antigo como se fosse condição atual.</p>
+<h2>Comece pelo que a proposta realmente informa</h2>
+<p>Registre remuneração bruta, jornada, escala, local, benefícios, descontos informados e data prevista de início. Separe valor garantido de comissão, prêmio ou variável. Quando a proposta não detalhar uma condição, pergunte por escrito; não preencha a lacuna com média da internet.</p>
+<p>Salário bruto não é o valor disponível para todas as despesas. O líquido depende de descontos e situações individuais. Este portal não calcula folha nem substitui o holerite. Depois da admissão, confira o vínculo e informações registradas na <a href="https://www.gov.br/pt-br/apps/ctps-digital" target="_blank" rel="noopener noreferrer">Carteira de Trabalho Digital</a> e peça esclarecimento ao empregador quando houver divergência.</p>
+<h2>Calcule o deslocamento por cenário</h2>
+<p>Use a <a href="/ferramentas/custo-deslocamento">calculadora gratuita de deslocamento</a> com tarifa, quantidade de viagens e dias informados por você. Faça ao menos três cenários: rotina normal, dia com integração diferente e alternativa de emergência. O resultado é uma estimativa pessoal, não uma tarifa oficial nem recomendação financeira.</p>
+<p>Para transporte coletivo municipal, consulte a página do <a href="https://www.saoluis.ma.gov.br/bilhete-unico/" target="_blank" rel="noopener noreferrer">Bilhete Único de São Luís</a> e confirme as regras vigentes perto da data. A <a href="https://www.planalto.gov.br/ccivil_03/leis/l7418.htm" target="_blank" rel="noopener noreferrer">Lei nº 7.418/1985</a> trata do vale-transporte para deslocamento residência-trabalho e vice-versa; o enquadramento e o procedimento devem ser confirmados com a empresa.</p>
+<h2>Monte uma planilha sem inventar médias</h2>
+<ul><li><strong>Receitas confirmadas:</strong> remuneração fixa e benefícios com regra conhecida.</li><li><strong>Custos para trabalhar:</strong> transporte, alimentação não coberta, vestuário necessário e cuidado de dependentes quando aplicável.</li><li><strong>Tempo:</strong> deslocamento, espera, integração e caminhada.</li><li><strong>Riscos:</strong> variável incerta, escala ainda não confirmada e custo de emergência.</li></ul>
+<p>Não desconte vale-alimentação como dinheiro livre se ele possui uso específico. Não some comissão máxima como renda certa. Não trate plano de saúde como valor em espécie; registre cobertura, coparticipação e custo para dependentes separadamente.</p>
+<h2>Compare duas propostas na mesma base</h2>
+<p>Use o mesmo mês de referência, quantidade de dias e premissas. Uma proposta com bruto maior pode exigir mais viagens ou alimentação; outra pode ter jornada incompatível. A comparação não determina qual é “melhor”: mostra quais perguntas ainda precisam de resposta.</p>
+<p>Exemplo hipotético, sem valores: a proposta A tem unidade próxima e escala confirmada; a B informa remuneração maior, mas exige duas integrações e encerra após o horário de transporte que o candidato conhece. Antes de escolher, ele confirma o turno da B e calcula uma alternativa realista. Sem essa informação, não transforma o maior bruto em vantagem garantida.</p>
+<h2>Use dados públicos apenas como contexto</h2>
+<p>O perfil de <a href="https://www.ibge.gov.br/cidades-e-estados/ma/sao-luis.html" target="_blank" rel="noopener noreferrer">São Luís no IBGE</a> reúne indicadores municipais com anos de referência diferentes. Eles ajudam a entender o município, mas não informam o orçamento da sua casa nem comprovam salário de uma vaga. Para mercado formal, os painéis de <a href="https://www.gov.br/trabalho-e-emprego/pt-br/acesso-a-informacao/acoes-e-programas/programas-projetos-acoes-obras-e-atividades/estatisticas-trabalho" target="_blank" rel="noopener noreferrer">estatísticas do Ministério do Trabalho e Emprego</a> oferecem RAIS e Novo Caged; ainda assim, dado agregado não substitui proposta individual.</p>
+<h2>Checklist antes de aceitar</h2>
+<ol><li>Recebi cargo, unidade, jornada, escala e remuneração por canal verificável?</li><li>Separei fixo de variável?</li><li>Calculei ida e volta com valores atuais?</li><li>Entendi benefícios, descontos e coparticipações?</li><li>O horário é compatível com transporte e responsabilidades pessoais?</li><li>Não há cobrança para liberar contratação, exame ou uniforme?</li></ol>
+<p>Guarde a proposta e as premissas usadas na conta. Se alguma condição mudar, refaça o cenário. Decisão responsável usa valores confirmados, limites pessoais e tempo de deslocamento — não uma média genérica chamada “custo de vida”.</p>
+    `.trim()
+  },
+
+  "comparar-portais-emprego-seguranca": {
+    reviewedAt: "2026-10-14",
+    contentHtml: `
+<p><strong>Revisão editorial: 14 de outubro de 2026.</strong> Ver a mesma vaga em vários portais não aumenta sua autenticidade. A comparação útil identifica a origem, a data, o canal de candidatura e eventuais divergências. Este guia não certifica plataformas nem recomenda pagar para concorrer.</p>
+<h2>Crie uma ficha para cada oportunidade</h2>
+<p>Registre empresa, cargo, cidade, modalidade, data de publicação, prazo, URL e canal de candidatura. Acrescente um identificador do anúncio quando existir. Use o <a href="/ferramentas/controle-candidaturas">controle de candidaturas</a> ou uma planilha própria, sem guardar senhas ou documentos pessoais.</p>
+<p>Quando dois anúncios parecem iguais, compare descrição, local, requisitos e destino do botão. Uma diferença de título pode ser apenas adaptação do portal; salário, prazo ou canal divergentes exigem confirmação na empresa ou no responsável identificado.</p>
+<h2>Procure a fonte mais próxima do processo</h2>
+<p>Priorize página de carreiras da empresa, sistema indicado por ela ou serviço público. O <a href="https://www.gov.br/pt-br/servicos/buscar-emprego-no-sistema-nacional-de-emprego-sine" target="_blank" rel="noopener noreferrer">Buscar Emprego no SINE</a> descreve cadastro, consulta e candidatura pelo sistema público. Ele é uma fonte possível, não confirmação automática de qualquer anúncio que use o nome SINE.</p>
+<p>Rede social, grupo ou agregador pode servir para descobrir a oportunidade. Antes de enviar documento, procure o mesmo processo no canal institucional. Se não encontrar, marque “origem não confirmada” e peça o endereço oficial; não transforme ausência de prova em acusação pública.</p>
+<h2>Compare o destino, não apenas o logotipo</h2>
+<ul><li>Leia o domínio completo antes de abrir ou preencher.</li><li>Desconfie de caracteres trocados, encurtadores e páginas que imitam login.</li><li>Não reutilize senha do e-mail em portal de vagas.</li><li>Não envie código de autenticação para recrutador.</li><li>Feche a página se a candidatura exigir pagamento inesperado.</li></ul>
+<p>A <a href="https://cartilha.cert.br/fasciculos/" target="_blank" rel="noopener noreferrer">Cartilha de Segurança para Internet do CERT.br</a> reúne orientações sobre phishing, privacidade, autenticação e perfis falsos. Use essas verificações mesmo quando a mensagem contém nome e imagem de uma empresa conhecida.</p>
+<h2>Identifique republicação antiga</h2>
+<p>Uma captura de tela não mostra se o processo continua ativo. Abra a URL original e procure data, prazo ou indicação de encerramento. Quando o portal não informa validade, confirme no canal responsável. Não atualize a data por conta própria ao compartilhar.</p>
+<p>Se a mesma oportunidade aparece com cidades diferentes, não escolha a versão mais conveniente sem confirmação. Pode haver unidades distintas, erro de republicação ou anúncio copiado. Guarde a evidência e use a informação mais próxima da fonte.</p>
+<h2>Evite candidatura duplicada</h2>
+<p>Antes de enviar, pesquise empresa e cargo no seu controle. Se já houve candidatura no canal oficial, outro portal não exige novo envio, salvo instrução clara da empresa. Duplicar pode criar cadastros divergentes ou dificultar o acompanhamento.</p>
+<p>Se o processo mudou de sistema, confirme se deve reenviar. Registre a nova URL e preserve a data do primeiro envio. Não use dados diferentes para tentar contornar uma seleção.</p>
+<h2>Proteja documentos e dados</h2>
+<p>Currículo inicial geralmente não precisa de CPF, RG, dados bancários, senha ou foto de documento. Pergunte qual dado é necessário, para qual finalidade e quem receberá. Em caso de suspeita, interrompa o contato e use o canal oficial independente.</p>
+<p>A página do <a href="https://www.gov.br/pt-br/perfil_usuario/trabalhador" target="_blank" rel="noopener noreferrer">Trabalhador no gov.br</a> reúne serviços oficiais de emprego, documentos e benefícios. Digite o endereço gov.br diretamente quando a mensagem recebida causar dúvida.</p>
+<h2>Checklist de comparação</h2>
+<ol><li>A empresa ou o responsável estão identificados?</li><li>O domínio pertence ao canal esperado?</li><li>Cargo, cidade, prazo e requisitos coincidem?</li><li>Já enviei candidatura para esse processo?</li><li>Há cobrança, urgência artificial ou pedido de credencial?</li><li>Guardei URL e data da verificação?</li></ol>
+<p>Portal seguro não é o que promete mais vagas; é aquele cujo anúncio pode ser rastreado, comparado e usado sem exigir confiança cega. A decisão final deve se apoiar no canal verificável do processo.</p>
+    `.trim()
+  },
+
+  "quantas-vagas-candidatar-por-semana": {
+    reviewedAt: "2026-10-14",
+    contentHtml: `
+<p><strong>Revisão editorial: 14 de outubro de 2026.</strong> Não existe número universal de candidaturas por semana. A quantidade útil depende de vagas compatíveis, tempo para verificar anúncios, qualidade do material e condições pessoais. Este guia propõe medir o processo sem criar meta artificial nem prometer entrevistas.</p>
+<h2>Conte somente candidaturas concluídas e verificadas</h2>
+<p>Uma vaga salva não é candidatura. Um currículo enviado para endereço duvidoso também não deve ser contado como progresso. Registre empresa, cargo, URL, data, versão do currículo e confirmação recebida no <a href="/ferramentas/controle-candidaturas">controle de candidaturas</a>.</p>
+<p>O serviço <a href="https://www.gov.br/pt-br/servicos/buscar-emprego-no-sistema-nacional-de-emprego-sine" target="_blank" rel="noopener noreferrer">Buscar Emprego no SINE</a> oferece consulta e candidatura conforme o cadastro. Combine fontes, mas mantenha um registro único para reconhecer anúncios repetidos.</p>
+<h2>Separe compatibilidade de volume</h2>
+<p>Antes de enviar, classifique cada anúncio:</p>
+<ul><li><strong>Compatível:</strong> requisitos obrigatórios, local e jornada cabem na sua realidade.</li><li><strong>A confirmar:</strong> falta informação essencial sobre escala, unidade ou canal.</li><li><strong>Incompatível:</strong> há requisito obrigatório ausente ou condição inviável.</li></ul>
+<p>Envie primeiro as compatíveis. Não transforme “a confirmar” em candidatura só para aumentar a contagem. Para entender nomes de ocupações e tarefas, consulte a <a href="https://www.gov.br/trabalho-e-emprego/pt-br/assuntos/trabalhador/qualificacao-profissional/classificacao-brasileira-de-ocupacoes" target="_blank" rel="noopener noreferrer">Classificação Brasileira de Ocupações</a>, lembrando que ela não substitui o anúncio.</p>
+<h2>Escolha uma capacidade sustentável</h2>
+<p>Durante uma semana, cronometre três etapas: verificar a origem, adaptar o currículo e preencher a candidatura. Some o tempo de acompanhamento. A capacidade é o número que cabe sem pular essas etapas, não o máximo de cliques que a plataforma permite.</p>
+<p>Exemplo hipotético: uma pessoa encontra quinze anúncios, confirma oito e identifica cinco realmente compatíveis. Ela conclui quatro envios e deixa um para o dia seguinte. O dado útil é quatro candidaturas completas, não quinze “vagas vistas”. Na semana seguinte, pode ajustar a rotina conforme o tempo e os retornos.</p>
+<h2>Leia o funil sem inventar taxa ideal</h2>
+<p>Acompanhe encontrados, confirmados, enviados, retornos e entrevistas. Compare períodos do mesmo tamanho, mas não trate poucos casos como estatística definitiva. Ausência de resposta pode resultar de concorrência, pausa ou encerramento do processo; não prova sozinha que o currículo está errado.</p>
+<p>Se muitos anúncios são descartados por horário ou deslocamento, refine os filtros. Se as candidaturas são compatíveis, mas os documentos contêm erros ou informações genéricas, revise-os antes de aumentar volume. Se há entrevistas, analise preparação e condições das propostas, não apenas quantidade.</p>
+<h2>Evite automação e envio em massa</h2>
+<p>Não use extensão desconhecida para preencher formulários, coletar contatos ou contornar limites. Ela pode expor dados e produzir respostas incorretas. A <a href="https://cartilha.cert.br/fasciculos/" target="_blank" rel="noopener noreferrer">Cartilha do CERT.br</a> orienta sobre proteção de contas, privacidade e golpes.</p>
+<p>Currículo adaptado não significa reescrever tudo. Ajuste título, resumo e ordem das experiências para destacar fatos relacionados à vaga. Datas, cargos, empresas e atividades precisam permanecer coerentes em todas as versões.</p>
+<h2>Planeje a semana em blocos</h2>
+<ol><li>Um bloco para localizar e verificar anúncios.</li><li>Um bloco para comparar requisitos e preparar documentos.</li><li>Um bloco para concluir candidaturas.</li><li>Um bloco curto para atualizar status e responder contatos.</li><li>Tempo sem busca para descanso e outras responsabilidades.</li></ol>
+<p>Se a rotina prejudica sono, trabalho atual ou cuidado básico, reduza a meta. Procura de emprego é um processo, não uma obrigação de permanecer on-line o dia inteiro.</p>
+<h2>Revisão quinzenal</h2>
+<ul><li>Quantas candidaturas tinham origem e requisitos confirmados?</li><li>Quais foram descartadas e por quê?</li><li>Qual versão do currículo gerou conversa relevante?</li><li>Quais requisitos apareceram repetidamente?</li><li>A área de busca continua compatível com deslocamento e jornada?</li></ul>
+<p>A meta adequada é aquela que preserva verificação, honestidade e acompanhamento. Aumente ou reduza com base no tempo real e nos obstáculos observados, nunca em promessa de que determinado número garante contratação.</p>
+    `.trim()
+  },
+
+  "vagas-comercio-servicos-sao-luis-perfil": {
+    reviewedAt: "2026-10-14",
+    contentHtml: `
+<p><strong>Revisão editorial: 14 de outubro de 2026.</strong> Este guia não afirma que comércio ou serviços estejam contratando hoje. Ele ensina a ler anúncios desses setores em São Luís, comparar tarefas e decidir se o perfil e a rotina são compatíveis. A vaga concreta deve ser confirmada no canal responsável.</p>
+<h2>Comece pela função, não pelo nome amplo do setor</h2>
+<p>“Comércio” pode incluir caixa, estoque, vendas, reposição e atendimento; “serviços” reúne atividades muito diferentes. Leia as tarefas e identifique o que será feito no turno. A <a href="https://www.gov.br/trabalho-e-emprego/pt-br/assuntos/trabalhador/qualificacao-profissional/classificacao-brasileira-de-ocupacoes" target="_blank" rel="noopener noreferrer">Classificação Brasileira de Ocupações</a> ajuda a entender famílias ocupacionais, mas o anúncio e o contrato definem a função real.</p>
+<p>Não copie a descrição da CBO para o currículo. Selecione apenas atividades que você executou e consiga explicar. Atendimento pode significar registrar pedido, orientar cliente ou organizar fila; estoque pode envolver conferência, endereçamento e separação. O nome sozinho não comprova experiência.</p>
+<h2>Transforme requisito genérico em pergunta concreta</h2>
+<ul><li>“Boa comunicação”: com qual público, por qual canal e para resolver quais demandas?</li><li>“Disponibilidade”: quais dias, horários e unidade?</li><li>“Informática”: quais sistemas ou tarefas?</li><li>“Organização”: de produtos, documentos, agenda ou caixa?</li><li>“Trabalho em equipe”: como se dividem responsabilidades e supervisão?</li></ul>
+<p>Se o anúncio não esclarece, pergunte antes de afirmar compatibilidade. Não declare disponibilidade total quando transporte, estudo ou cuidado familiar impõem limite.</p>
+<h2>Compare a escala com o deslocamento em São Luís</h2>
+<p>Confirme endereço, entrada, saída e trabalho em fins de semana. Use a <a href="/ferramentas/custo-deslocamento">calculadora de deslocamento</a> com valores atuais informados por você. A página municipal do <a href="https://www.saoluis.ma.gov.br/bilhete-unico/" target="_blank" rel="noopener noreferrer">Bilhete Único</a> reúne regras gerais; horários e operação devem ser confirmados perto da candidatura ou entrevista.</p>
+<p>Uma vaga pode combinar com a experiência e ainda ser inviável por escala ou trajeto. Não aceite contando com mudança de unidade ou horário que a empresa não prometeu.</p>
+<h2>Monte evidências para o currículo</h2>
+<p>Para cada tarefa central, escreva uma situação verdadeira:</p>
+<ol><li>onde aconteceu;</li><li>qual era sua responsabilidade;</li><li>que ação realizou;</li><li>qual resultado observável houve, sem número inventado.</li></ol>
+<p>Exemplo hipotético: “Conferia pedidos e separava divergências para o responsável” é mais verificável que “excelente em logística”. Se a experiência foi informal ou familiar, identifique esse contexto sem criar vínculo empregatício.</p>
+<h2>Use dados de mercado com cautela</h2>
+<p>Os painéis de <a href="https://www.gov.br/trabalho-e-emprego/pt-br/acesso-a-informacao/acoes-e-programas/programas-projetos-acoes-obras-e-atividades/estatisticas-trabalho" target="_blank" rel="noopener noreferrer">estatísticas do Ministério do Trabalho e Emprego</a> reúnem Novo Caged e RAIS. Eles ajudam a observar emprego formal por período e território, mas não provam que uma empresa esteja com seleção aberta. Confira recorte, competência e atualização antes de citar um dado.</p>
+<p>O perfil de <a href="https://www.ibge.gov.br/cidades-e-estados/ma/sao-luis.html" target="_blank" rel="noopener noreferrer">São Luís no IBGE</a> oferece contexto municipal com anos de referência distintos. Não converta indicador agregado em salário, benefício ou quantidade de vagas de um anúncio.</p>
+<h2>Verifique o processo antes de enviar documentos</h2>
+<p>Compare empresa, cargo, cidade, prazo e canal. O serviço <a href="https://www.gov.br/pt-br/servicos/buscar-emprego-no-sistema-nacional-de-emprego-sine" target="_blank" rel="noopener noreferrer">Buscar Emprego no SINE</a> é uma alternativa pública. Nenhum canal legítimo precisa da senha da sua conta gov.br ou de pagamento para liberar entrevista.</p>
+<p>Registre a candidatura e o anúncio no <a href="/ferramentas/controle-candidaturas">controle gratuito</a>. Não inclua CPF, RG, dados bancários ou foto de documento no primeiro currículo.</p>
+<h2>Checklist de compatibilidade</h2>
+<ul><li>Entendi as tarefas, não apenas o título?</li><li>Consigo demonstrar os requisitos essenciais?</li><li>Unidade, jornada e escala cabem na rotina?</li><li>Remuneração e benefícios foram informados por canal verificável?</li><li>A candidatura está no site ou contato correto?</li><li>Não há cobrança, promessa ou pedido de credencial?</li></ul>
+<p>O melhor alvo não é “o setor que mais contrata” sem fonte e data. É a oportunidade atual cuja função, condições e canal você consegue verificar e para a qual possui evidência real de compatibilidade.</p>
+    `.trim()
+  },
+
+  "mapa-setores-vagas-sao-luis": {
+    reviewedAt: "2026-10-14",
+    contentHtml: `
+<p><strong>Revisão editorial: 14 de outubro de 2026.</strong> Não existe um mapa fixo de setores “com vagas” em São Luís. O mercado muda por período, fonte e recorte. Este guia mostra como montar um mapa pessoal com estatísticas oficiais, anúncios atuais e limites de deslocamento, sem anunciar oportunidade inexistente.</p>
+<h2>Defina setor, ocupação e vaga separadamente</h2>
+<p>Setor descreve atividade econômica; ocupação descreve o trabalho; vaga é uma oportunidade concreta. Um hospital pertence a determinado setor, mas pode contratar funções administrativas, técnicas, de limpeza ou atendimento. Não conclua que experiência em uma função se transfere automaticamente para todas as outras.</p>
+<p>Consulte a <a href="https://www.gov.br/trabalho-e-emprego/pt-br/assuntos/trabalhador/qualificacao-profissional/classificacao-brasileira-de-ocupacoes" target="_blank" rel="noopener noreferrer">Classificação Brasileira de Ocupações</a> para entender famílias e conteúdos ocupacionais. Use como referência de nomenclatura; a CBO não regulamenta profissão, não certifica competência e não comprova vaga aberta.</p>
+<h2>Leia estatísticas com data e território</h2>
+<p>O Ministério do Trabalho e Emprego disponibiliza <a href="https://www.gov.br/trabalho-e-emprego/pt-br/acesso-a-informacao/acoes-e-programas/programas-projetos-acoes-obras-e-atividades/estatisticas-trabalho" target="_blank" rel="noopener noreferrer">Novo Caged, RAIS e microdados</a>. Antes de comparar setores, anote período, município ou estado, tipo de vínculo e atualização. Saldo de emprego formal não equivale ao número de vagas disponíveis hoje.</p>
+<p>O perfil de <a href="https://www.ibge.gov.br/cidades-e-estados/ma/sao-luis.html" target="_blank" rel="noopener noreferrer">São Luís no IBGE</a> oferece indicadores do município. Cada indicador possui ano de referência; não misture valores de períodos diferentes nem transforme contexto populacional em previsão de contratação.</p>
+<h2>Monte seu mapa em três camadas</h2>
+<ol><li><strong>Ocupações compatíveis:</strong> funções que você consegue demonstrar ou para as quais possui formação exigida.</li><li><strong>Território viável:</strong> bairros, municípios e horários alcançáveis com segurança.</li><li><strong>Anúncios confirmados:</strong> processos atuais com empresa ou canal identificável.</li></ol>
+<p>Crie uma tabela com cargo, setor da organização, local, jornada, requisito principal, fonte e data. Depois de duas semanas, conte padrões sem generalizar além da amostra. Cinco anúncios vistos por você não representam todo o mercado da cidade.</p>
+<h2>Use deslocamento como filtro real</h2>
+<p>Compare entrada e saída com o transporte disponível. A página do <a href="https://www.saoluis.ma.gov.br/bilhete-unico/" target="_blank" rel="noopener noreferrer">Bilhete Único de São Luís</a> reúne regras gerais; confirme operação e valores atuais. Na <a href="/ferramentas/custo-deslocamento">calculadora de deslocamento</a>, informe tarifa e viagens do seu cenário.</p>
+<p>Não descarte setor inteiro por uma unidade distante. Procure outras localizações, horários ou funções próximas. Também não aceite processo apenas porque a empresa fica perto; requisitos, remuneração e segurança do canal continuam necessários.</p>
+<h2>Classifique prioridades sem prometer resultado</h2>
+<ul><li><strong>Prioridade alta:</strong> ocupação comprovável, jornada viável e anúncios atuais confirmados.</li><li><strong>Prioridade média:</strong> parte dos requisitos atendida e uma informação essencial ainda a confirmar.</li><li><strong>Formação necessária:</strong> requisito obrigatório legítimo que você ainda não possui.</li><li><strong>Fora do ciclo:</strong> deslocamento, horário ou requisito inviável neste momento.</li></ul>
+<p>Reavalie a cada duas semanas. Mudar prioridade não significa reescrever experiências nem acrescentar curso inexistente. Significa concentrar tempo onde há compatibilidade verificável.</p>
+<h2>Confirme oportunidades em canais identificáveis</h2>
+<p>O serviço <a href="https://www.gov.br/pt-br/servicos/buscar-emprego-no-sistema-nacional-de-emprego-sine" target="_blank" rel="noopener noreferrer">Buscar Emprego no SINE</a> permite consulta conforme o cadastro. Compare também páginas institucionais e portais que mostram origem. Rede social pode alertar sobre um processo, mas não deve substituir a verificação.</p>
+<p>Registre empresa, cargo, URL, data, cidade e próxima ação no <a href="/ferramentas/controle-candidaturas">controle de candidaturas</a>. Não conte anúncio duplicado como nova oportunidade e não compartilhe documento com contato cuja identidade não foi confirmada.</p>
+<h2>O que o mapa pode responder</h2>
+<p>Ele pode mostrar onde sua experiência encontra anúncios verificáveis, quais requisitos se repetem e quais limites reduzem o campo. Ele não pode prever contratação, salário, abertura futura ou “melhor setor” para toda pessoa. Use estatística como contexto e cada vaga como decisão individual.</p>
     `.trim()
   }
 };
