@@ -136,4 +136,33 @@ describe("revisões editoriais substanciais para AdSense", () => {
       expect(html).not.toMatch(/vagas abertas hoje|salário médio|contratação garantida/i);
     }
   });
+
+  it("fecha os nove guias trabalhistas ainda abaixo de 550 palavras", () => {
+    const laborGuides = [
+      "trabalhador-terceirizado-direitos",
+      "ponto-eletronico-atraso-trabalho",
+      "pedido-demissao-aviso-previo-acerto",
+      "ferias-clt-periodo-aquisitivo",
+      "banco-de-horas-direitos-trabalhador",
+      "assedio-no-trabalho-o-que-fazer",
+      "atestado-medico-trabalho-como-entregar",
+      "mitos-direitos-trabalhistas-whatsapp",
+      "como-ler-holerite-descontos"
+    ];
+
+    for (const slug of laborGuides) {
+      const override = getEditorialContentOverride(slug);
+      const html = override?.contentHtml ?? "";
+      const words = textOnly(html).split(/\s+/).filter(Boolean);
+      const outbound = [...html.matchAll(/href="(https:\/\/[^"]+)"/g)].map((match) => match[1]);
+
+      expect(override).not.toBeNull();
+      expect(override?.reviewedAt).toBe("2026-10-14");
+      expect(words.length).toBeGreaterThanOrEqual(550);
+      expect(new Set(outbound).size).toBeGreaterThanOrEqual(2);
+      expect(outbound.every((url) => /https:\/\/(?:www\.)?(?:gov\.br|planalto\.gov\.br|mpt\.mp\.br|sistemas\.cfm\.org\.br|cnes\.trabalho\.gov\.br)\//.test(url))).toBe(true);
+      expect(html).not.toMatch(/uma situação comum na prática|roteiro aplicável passo a passo|feche o ciclo com uma ação/i);
+      expect(html).not.toMatch(/vagas abertas hoje|salário médio|contratação garantida/i);
+    }
+  });
 });
