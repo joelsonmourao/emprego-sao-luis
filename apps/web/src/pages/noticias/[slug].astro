@@ -13,7 +13,7 @@ import { normalizeEditorialHtml } from "@es/shared";
 import { isEditorialReviewPending } from "../../data/editorial-review-pending";
 import { getNewsEditorialOverride } from "../../data/news-editorial-content-overrides";
 import { getRuntimeSiteUrl, resolveCanonicalUrl, resolvePublicHttpUrl } from "../../lib/canonical-url";
-import { buildEditorialSchema, isNewsroomAuthor } from "../../lib/editorial-schema";
+import { buildEditorialSchema, extractExternalEditorialCitations, isNewsroomAuthor } from "../../lib/editorial-schema";
 import { buildOwnedEditorialCoverImageObject, getEditorialCoverMetadata } from "../../lib/editorial-cover-metadata";
 
 const slug = Astro.params.slug!;
@@ -44,6 +44,7 @@ const editorialNoindex = isEditorialReviewPending("NEWS", article.slug) && !edit
 const normalizedHtml = normalizeEditorialHtml(editorialOverride?.contentHtml ?? article.contentHtml, { baseHeadingLevel: 2 });
 const contentHtml = portal.enabled ? rewriteJobBoardLinksForPortal(normalizedHtml) : normalizedHtml;
 const runtimeSite = getRuntimeSiteUrl(Astro.site);
+const citations = extractExternalEditorialCitations(contentHtml, runtimeSite.toString());
 const canonical = resolveCanonicalUrl(article.canonicalUrl ?? undefined, `/noticias/${article.slug}`, runtimeSite);
 const reviewedAt = editorialOverride ? new Date(`${editorialOverride.reviewedAt}T12:00:00-03:00`) : null;
 const coverMetadata = getEditorialCoverMetadata(article.slug, article.coverImageUrl);
@@ -90,6 +91,7 @@ const jsonLd = buildEditorialSchema({
   authorName,
   publishedAt: article.publishedAt,
   updatedAt: reviewedAt ?? article.updatedAt,
+  ...(citations.length ? { citations } : {}),
   ...(structuredImages.length ? { image: structuredImages } : {}),
   siteUrl: runtimeSite.toString()
 });
