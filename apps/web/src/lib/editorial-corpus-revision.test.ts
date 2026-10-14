@@ -24,6 +24,17 @@ describe("Auditoria editorial real do corpus de 12/10/2026", () => {
     expect(new Set(all.map((x) => x.images[0])).size).toBe(106);
   });
 
+  it("corrige todos os 106 guias que estavam sem fonte externa na captura pública", () => {
+    const sourceLess = all.filter((item) => item.flags.includes("NO_EXTERNAL_SOURCE"));
+    expect(sourceLess).toHaveLength(106);
+
+    for (const item of sourceLess) {
+      const revised = getEditorialContentOverride(item.slug);
+      expect(revised).not.toBeNull();
+      expect(revised!.contentHtml).toMatch(/<a href="https:\/\//);
+    }
+  });
+
   it("registra exatamente os 98 guias com conteúdo repetitivo ou curto", () => {
     const flagged = all.filter((x) => x.flags.includes("TEMPLATE_REPEATED") || x.flags.includes("SHORT"));
     expect(flagged).toHaveLength(98);
