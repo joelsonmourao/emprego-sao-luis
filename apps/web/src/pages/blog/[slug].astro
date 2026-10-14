@@ -13,6 +13,7 @@ import { normalizeEditorialHtml } from "@es/shared";
 import { getEditorialContentOverride } from "../../data/editorial-content-overrides";
 import { isEditorialReviewPending } from "../../data/editorial-review-pending";
 import { findAutoEditorialArticle } from "../../lib/auto-editorial";
+import { getRuntimeSiteUrl, resolveCanonicalUrl, resolvePublicHttpUrl } from "../../lib/canonical-url";
 const slug = Astro.params.slug ?? "";
 const portal = await getEditorialPortalMode();
 const seoFromLegacy = resolveSlLocalSeoSlug(slug);
@@ -29,13 +30,15 @@ if (!result) {
   return new Response("Conteúdo não encontrado", { status: 404, headers: { "X-Robots-Tag": "noindex, follow" } });
 }
 const { article, authorName } = result;
-const canonical = article.canonicalUrl || new URL(`/blog/${article.slug}`, Astro.site).toString();
+const runtimeSite = getRuntimeSiteUrl(Astro.site);
+const canonical = resolveCanonicalUrl(article.canonicalUrl ?? undefined, `/blog/${article.slug}`, runtimeSite);
+const structuredImage = resolvePublicHttpUrl(article.coverImageUrl ?? undefined, runtimeSite);
 const editorialOverride = getEditorialContentOverride(article.slug);
 const editorialNoindex = isEditorialReviewPending(article.type, article.slug) && !editorialOverride;
 const normalizedHtml = normalizeEditorialHtml(editorialOverride?.contentHtml ?? article.contentHtml, { baseHeadingLevel: 2 });
 const contentHtml = portal.enabled ? rewriteJobBoardLinksForPortal(normalizedHtml) : normalizedHtml;
 const dateModified = editorialOverride ? new Date(`${editorialOverride.reviewedAt}T12:00:00-03:00`).toISOString() : article.updatedAt.toISOString();
-const schema = { "@type": "Article", headline: article.title, description: article.excerpt, datePublished: article.publishedAt?.toISOString(), dateModified, author: { "@type": "Person", name: authorName }, mainEntityOfPage: canonical, ...(article.coverImageUrl ? { image: [article.coverImageUrl] } : {}), ...(article.sponsoredContent ? { isAccessibleForFree: true } : {}) };
+const schema = { "@type": "Article", headline: article.title, description: article.excerpt, datePublished: article.publishedAt?.toISOString(), dateModified, author: { "@type": "Person", name: authorName }, mainEntityOfPage: canonical, ...(structuredImage ? { image: [structuredImage] } : {}), ...(article.sponsoredContent ? { isAccessibleForFree: true } : {}) };
 ---
 <BaseLayout title={article.seoTitle || article.title} description={article.metaDescription || article.excerpt} canonical={canonical} ogImage={article.ogImageUrl ?? article.coverImageUrl ?? undefined} breadcrumbs={[{ name: "Guias", url: "/blog" }, { name: article.title, url: `/blog/${article.slug}` }]} schemas={[schema]} noindex={editorialNoindex}>
   <article class="es-section bg-white"><div class="mx-auto max-w-3xl px-4">
