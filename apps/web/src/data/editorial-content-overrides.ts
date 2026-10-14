@@ -1609,9 +1609,9 @@ const overrides: Record<string, EditorialContentOverride> = {
   },
 
   "como-usar-empregos-sao-luis": {
-    reviewedAt: "2026-10-12",
+    reviewedAt: "2026-10-14",
     contentHtml: `
-<p><strong>Revisão editorial: 12 de outubro de 2026.</strong> O Empregos São Luís é um ponto de pesquisa e orientação, não a empresa contratante. Usar o portal com segurança significa localizar uma oportunidade, conferir os requisitos e seguir apenas o canal de candidatura indicado. Nenhum anúncio, filtro ou cadastro garante entrevista.</p>
+<p><strong>Revisão editorial: 14 de outubro de 2026.</strong> O Empregos São Luís é um ponto de pesquisa e orientação, não a empresa contratante. Usar o portal com segurança significa localizar uma oportunidade, conferir os requisitos e seguir apenas o canal de candidatura indicado. Nenhum anúncio, filtro ou cadastro garante entrevista.</p>
 <h2>Comece pelo cargo e pela rotina possível</h2>
 <p>Pesquise o nome da função e variações próximas, como “auxiliar administrativo” e “assistente administrativo”. Antes de abrir o anúncio, defina os bairros ou municípios que consegue alcançar, os turnos disponíveis e o tipo de atividade que sabe explicar. O filtro reduz ruído; ele não confirma que você atende a todos os requisitos.</p>
 <p>Leia a página inteira. Separe requisitos obrigatórios, itens desejáveis, horário, local informado, atividades e forma de candidatura. Se o anúncio não traz dado essencial, não complete com suposição. Guarde a URL e a data da consulta porque uma vaga pode ser alterada ou encerrada.</p>
@@ -1627,7 +1627,7 @@ const overrides: Record<string, EditorialContentOverride> = {
 <p>Se o portal não mostra oportunidade compatível, o resultado correto naquele momento é zero candidatura. Não use filtro amplo para transformar qualquer anúncio em opção. Revise palavras-chave, consulte novamente em outro dia e mantenha outras fontes oficiais. Uma busca sem resultado não autoriza copiar contato de postagem encerrada nem enviar currículo a número que não foi publicado para recrutamento.</p>
 <h2>Quando desconfiar</h2>
 <ul><li>cobrança para participar ou receber treinamento obrigatório antes da contratação;</li><li>pedido de senha, código de autenticação ou acesso ao celular;</li><li>empresa e cargo diferentes no link de destino;</li><li>pressão para enviar documento sensível antes de explicar a etapa;</li><li>promessa de contratação sem entrevista, análise ou identificação verificável.</li></ul>
-<p>Se encontrar risco, não prossiga. Consulte a página de <a href="/seguranca">segurança do candidato</a> e confirme a empresa por endereço digitado por você. O portal ajuda a organizar a busca; a decisão segura continua dependendo da leitura do anúncio e da verificação do canal.</p>
+<p>Se encontrar risco, não prossiga. Consulte a página de <a href="/seguranca-candidatos">segurança do candidato</a> e confirme a empresa por endereço digitado por você. O portal ajuda a organizar a busca; a decisão segura continua dependendo da leitura do anúncio e da verificação do canal.</p>
     `.trim()
   },
 
