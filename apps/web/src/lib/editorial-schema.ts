@@ -12,6 +12,16 @@ type EditorialSchemaInput = {
 
 const NEWSROOM_NAME = "Redação Empregos São Luís";
 
+export function buildNewsroomOrganization(siteUrl: string): Record<string, unknown> {
+  const root = siteUrl.replace(/\/$/, "");
+  return {
+    "@type": "Organization",
+    "@id": `${root}/redacao#organization`,
+    name: NEWSROOM_NAME,
+    url: `${root}/redacao`
+  };
+}
+
 export function isNewsroomAuthor(authorName: string): boolean {
   const normalizedName = authorName.trim() || NEWSROOM_NAME;
   return /\bredação\b/i.test(normalizedName.normalize("NFC"));
@@ -33,7 +43,7 @@ export function buildEditorialSchema(input: EditorialSchemaInput): Record<string
     dateModified: modifiedAt.toISOString(),
     mainEntityOfPage: { "@type": "WebPage", "@id": input.canonical },
     author: newsroom
-      ? { "@type": "Organization", name: authorName, url: `${root}/redacao` }
+      ? { ...buildNewsroomOrganization(root), name: authorName }
       : { "@type": "Person", name: authorName },
     publisher: { "@id": `${root}#organization` },
     isAccessibleForFree: true,
