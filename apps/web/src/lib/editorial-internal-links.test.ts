@@ -1,4 +1,4 @@
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { describe, expect, it } from "vitest";
 
@@ -27,19 +27,31 @@ const editorialSources = [
 ];
 
 describe("links internos do corpus editorial revisado", () => {
-  it("aponta links de guias e notícias para slugs existentes no inventário auditado", () => {
+  it("aponta links editoriais para artigos ou páginas públicas existentes", () => {
     const links = editorialSources.flatMap((path) => {
       const source = readFileSync(resolve(path), "utf8");
-      return [...source.matchAll(/href="\/(blog|noticias)\/([^"?#]+)(?:[?#][^"]*)?"/g)].map(
-        (match) => ({ section: match[1], slug: match[2], source: path })
-      );
+      return [...source.matchAll(/href="(\/[^"#?]+)(?:[?#][^"]*)?"/g)].map((match) => ({
+        href: match[1],
+        source: path
+      }));
     });
 
     expect(links.length).toBeGreaterThan(0);
 
-    const broken = links.filter(({ section, slug }) =>
-      section === "blog" ? !guideSlugs.has(slug) : !newsSlugs.has(slug)
-    );
+    const broken = links.filter(({ href }) => {
+      const [, section, slug] = href.match(/^\/(blog|noticias)\/([^/]+)$/) ?? [];
+
+      if (section === "blog") return !guideSlugs.has(slug);
+      if (section === "noticias") return !newsSlugs.has(slug);
+
+      const route = href === "/" ? "index" : href.replace(/^\//, "").replace(/\/$/, "");
+      return ![
+        `apps/web/src/pages/${route}.astro`,
+        `apps/web/src/pages/${route}.ts`,
+        `apps/web/src/pages/${route}/index.astro`,
+        `apps/web/src/pages/${route}/index.ts`
+      ].some((candidate) => existsSync(resolve(candidate)));
+    });
 
     expect(broken).toEqual([]);
   });
