@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
-import { buildEditorialSchema, isNewsroomAuthor } from "./editorial-schema";
+import { buildEditorialSchema, buildNewsroomOrganization, isNewsroomAuthor } from "./editorial-schema";
 
 const base = {
   type: "Article" as const,
@@ -25,10 +25,26 @@ describe("editorial structured data", () => {
     const schema = buildEditorialSchema(base);
     expect(schema.author).toEqual({
       "@type": "Organization",
+      "@id": "https://empregossaoluis.com.br/redacao#organization",
       name: "Redação Empregos São Luís",
       url: "https://empregossaoluis.com.br/redacao"
     });
     expect(schema.isAccessibleForFree).toBe(true);
+  });
+
+  it("uses the same newsroom entity on articles and the institutional profile", () => {
+    const newsroom = buildNewsroomOrganization("https://empregossaoluis.com.br/");
+    expect(newsroom).toEqual({
+      "@type": "Organization",
+      "@id": "https://empregossaoluis.com.br/redacao#organization",
+      name: "Redação Empregos São Luís",
+      url: "https://empregossaoluis.com.br/redacao"
+    });
+
+    const institutionalPage = readFileSync(resolve("apps/web/src/components/InstitutionalPage.astro"), "utf8");
+    expect(institutionalPage).toContain('slug === "redacao" ? "ProfilePage"');
+    expect(institutionalPage).toContain("buildNewsroomOrganization(getRuntimeSiteUrl(Astro.site).toString())");
+    expect(institutionalPage).toContain("pageSchemaMainEntity={pageSchemaMainEntity}");
   });
 
   it("does not invent a publication date", () => {
@@ -38,6 +54,7 @@ describe("editorial structured data", () => {
   it("uses the real newsroom identity when a legacy row has no author", () => {
     expect(buildEditorialSchema({ ...base, authorName: "  " })).toHaveProperty("author", {
       "@type": "Organization",
+      "@id": "https://empregossaoluis.com.br/redacao#organization",
       name: "Redação Empregos São Luís",
       url: "https://empregossaoluis.com.br/redacao"
     });

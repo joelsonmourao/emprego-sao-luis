@@ -22,7 +22,8 @@ interface Props {
   ogImage?: string | undefined;
   breadcrumbs?: Array<{ name: string; url: string }>;
   noindex?: boolean;
-  pageSchemaType?: "WebPage" | "CollectionPage" | "SearchResultsPage" | "AboutPage" | "ContactPage";
+  pageSchemaType?: "WebPage" | "CollectionPage" | "SearchResultsPage" | "AboutPage" | "ContactPage" | "ProfilePage";
+  pageSchemaMainEntity?: Record<string, unknown> | undefined;
   schemas?: Array<Record<string, unknown>>;
   disableSeoGraph?: boolean;
 }
@@ -32,7 +33,7 @@ const brand = await getBrandIdentity();
 const seo = await getSeoSettings();
 const integrations = await getSiteIntegrations();
 const stagingLike = isStagingLikeEnvironment();
-const { title, description = seo.defaultDescription, robots = seo.robotsDefault, canonical, ogImage = identity.ogImageUrl ?? seo.og.image, breadcrumbs, noindex = false, pageSchemaType = "WebPage", schemas = [], disableSeoGraph = false } = Astro.props;
+const { title, description = seo.defaultDescription, robots = seo.robotsDefault, canonical, ogImage = identity.ogImageUrl ?? seo.og.image, breadcrumbs, noindex = false, pageSchemaType = "WebPage", pageSchemaMainEntity, schemas = [], disableSeoGraph = false } = Astro.props;
 const pageTitle = title.includes(seo.titleSuffix) ? title : `${title} — ${seo.titleSuffix}`;
 const runtimeSite = getRuntimeSiteUrl(Astro.site);
 const siteUrl = runtimeSite.toString();
@@ -101,7 +102,8 @@ const pageNode = {
   url: canonicalUrl,
   name: pageTitle,
   description,
-  isPartOf: { "@id": `${siteUrl.replace(/\/$/, "")}#website` }
+  isPartOf: { "@id": `${siteUrl.replace(/\/$/, "")}#website` },
+  ...(pageSchemaMainEntity ? { mainEntity: pageSchemaMainEntity } : {})
 };
 const seoGraph = disableSeoGraph || stagingLike ? null : {
   "@context": "https://schema.org",

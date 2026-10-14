@@ -3,6 +3,8 @@ import BaseLayout from "../layouts/BaseLayout.astro";
 import Breadcrumbs from "./ui/Breadcrumbs.astro";
 import { normalizeEditorialHtml } from "@es/shared";
 import { getInstitutionalPage } from "../lib/site-pages";
+import { getRuntimeSiteUrl } from "../lib/canonical-url";
+import { buildNewsroomOrganization } from "../lib/editorial-schema";
 
 interface Props {
   slug: Parameters<typeof getInstitutionalPage>[0];
@@ -15,7 +17,10 @@ const contentHtml = normalizeEditorialHtml(page.contentHtml, { baseHeadingLevel:
 const sent = Astro.url.searchParams.get("sent") === "1";
 const protocol = Astro.url.searchParams.get("protocolo");
 const error = Astro.url.searchParams.get("error");
-const pageSchemaType = slug === "contato" ? "ContactPage" : ["sobre", "quem-somos", "redacao"].includes(slug) ? "AboutPage" : "WebPage";
+const pageSchemaType = slug === "contato" ? "ContactPage" : slug === "redacao" ? "ProfilePage" : ["sobre", "quem-somos"].includes(slug) ? "AboutPage" : "WebPage";
+const pageSchemaMainEntity = slug === "redacao"
+  ? buildNewsroomOrganization(getRuntimeSiteUrl(Astro.site).toString())
+  : undefined;
 const categories = [
   ["suporte_candidato", "Suporte ao candidato"],
   ["correcao_vaga", "Correção de vaga"],
@@ -28,7 +33,7 @@ const categories = [
   ["outro", "Outro"]
 ] as const;
 ---
-<BaseLayout title={page.seoTitle} description={page.metaDescription} canonical={page.canonicalPath} breadcrumbs={[{ name: page.title, url: page.canonicalPath }]} pageSchemaType={pageSchemaType}>
+<BaseLayout title={page.seoTitle} description={page.metaDescription} canonical={page.canonicalPath} breadcrumbs={[{ name: page.title, url: page.canonicalPath }]} pageSchemaType={pageSchemaType} pageSchemaMainEntity={pageSchemaMainEntity}>
   <section class="es-section">
     <div class="es-container max-w-4xl">
       <Breadcrumbs items={[{ name: "Início", url: "/" }, { name: page.title }]} />
