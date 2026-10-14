@@ -15,6 +15,7 @@ import { isEditorialReviewPending } from "../../data/editorial-review-pending";
 import { findAutoEditorialArticle } from "../../lib/auto-editorial";
 import { getRuntimeSiteUrl, resolveCanonicalUrl, resolvePublicHttpUrl } from "../../lib/canonical-url";
 import { buildEditorialSchema } from "../../lib/editorial-schema";
+import { getEditorialCoverMetadata } from "../../lib/editorial-cover-metadata";
 const slug = Astro.params.slug ?? "";
 const portal = await getEditorialPortalMode();
 const seoFromLegacy = resolveSlLocalSeoSlug(slug);
@@ -34,6 +35,12 @@ const { article, authorName } = result;
 const runtimeSite = getRuntimeSiteUrl(Astro.site);
 const canonical = resolveCanonicalUrl(article.canonicalUrl ?? undefined, `/blog/${article.slug}`, runtimeSite);
 const structuredImage = resolvePublicHttpUrl(article.coverImageUrl ?? undefined, runtimeSite);
+const coverMetadata = getEditorialCoverMetadata(article.slug, article.coverImageUrl);
+const effectiveCoverAlt = coverMetadata?.alt ?? article.coverImageAlt ?? article.title;
+const effectiveCoverCaption = coverMetadata?.caption ?? article.coverImageCaption;
+const effectiveCoverCredit = coverMetadata?.credit ?? article.coverImageCredit;
+const effectiveCoverWidth = coverMetadata?.width ?? article.coverImageWidth ?? 1200;
+const effectiveCoverHeight = coverMetadata?.height ?? article.coverImageHeight ?? 675;
 const editorialOverride = getEditorialContentOverride(article.slug);
 const editorialNoindex = isEditorialReviewPending(article.type, article.slug) && !editorialOverride;
 const normalizedHtml = normalizeEditorialHtml(editorialOverride?.contentHtml ?? article.contentHtml, { baseHeadingLevel: 2 });
@@ -47,7 +54,16 @@ const schema = buildEditorialSchema({
   authorName,
   publishedAt: article.publishedAt,
   updatedAt: reviewedAt ?? article.updatedAt,
-  ...(structuredImage ? { image: [structuredImage] } : {}),
+  ...(structuredImage ? {
+    image: [{
+      "@type": "ImageObject",
+      url: structuredImage,
+      width: effectiveCoverWidth,
+      height: effectiveCoverHeight,
+      ...(effectiveCoverCaption ? { caption: effectiveCoverCaption } : {}),
+      ...(effectiveCoverCredit ? { creditText: effectiveCoverCredit } : {})
+    }]
+  } : {}),
   siteUrl: runtimeSite.toString()
 });
 ---
@@ -58,7 +74,7 @@ const schema = buildEditorialSchema({
     {article.sponsoredContent && <p class="mt-6 rounded-lg bg-amber-50 p-3 text-sm font-bold text-amber-950">Conteúdo patrocinado{article.sponsorshipDisclosure ? ` — ${article.sponsorshipDisclosure}` : ""}</p>}
     <p class="es-kicker mt-6">{article.type === "DATA_REPORT" ? "Relatório" : "Guia gratuito"}</p><h1 class="font-display mt-3 text-4xl font-black sm:text-5xl">{article.title}</h1>
     {article.subtitle && <p class="mt-4 text-xl text-[var(--es-muted)]">{article.subtitle}</p>}<p class="mt-4 text-sm text-[var(--es-muted)]">Por {authorName} · {article.publishedAt?.toLocaleDateString("pt-BR")}{reviewedAt ? ` · Revisado em ${reviewedAt.toLocaleDateString("pt-BR")}` : ""}</p>
-    {article.coverImageUrl && <figure class="mt-8"><img src={article.coverImageUrl} alt={article.coverImageAlt ?? article.title} class="w-full max-h-[34rem] rounded-2xl bg-[var(--es-cream)] object-contain" width={article.coverImageWidth ?? 1200} height={article.coverImageHeight ?? 675} loading="eager" decoding="async" fetchpriority="high" />{(article.coverImageCaption || article.coverImageCredit) && <figcaption class="mt-2 text-xs text-[var(--es-muted)]">{article.coverImageCaption}{article.coverImageCaption && article.coverImageCredit ? " · " : ""}{article.coverImageCredit ? `Crédito: ${article.coverImageCredit}` : ""}</figcaption>}</figure>}
+    {article.coverImageUrl && <figure class="mt-8"><img src={article.coverImageUrl} alt={effectiveCoverAlt} class="w-full max-h-[34rem] rounded-2xl bg-[var(--es-cream)] object-contain" width={effectiveCoverWidth} height={effectiveCoverHeight} loading="eager" decoding="async" fetchpriority="high" />{(effectiveCoverCaption || effectiveCoverCredit) && <figcaption class="mt-2 text-xs text-[var(--es-muted)]">{effectiveCoverCaption}{effectiveCoverCaption && effectiveCoverCredit ? " · " : ""}{effectiveCoverCredit ? `Crédito: ${effectiveCoverCredit}` : ""}</figcaption>}</figure>}
     <div class="es-prose mt-8 max-w-none break-words" set:html={contentHtml} />
     {!editorialOverride && article.sourceUrl && <p class="mt-8 text-sm">Fonte: <a class="underline" href={article.sourceUrl} rel="nofollow noopener">{article.sourceName ?? "fonte original"}</a></p>}
     <aside class="mt-10 rounded-2xl bg-[var(--es-cream)] p-5">

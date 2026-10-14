@@ -14,6 +14,7 @@ import { isEditorialReviewPending } from "../../data/editorial-review-pending";
 import { getNewsEditorialOverride } from "../../data/news-editorial-content-overrides";
 import { getRuntimeSiteUrl, resolveCanonicalUrl, resolvePublicHttpUrl } from "../../lib/canonical-url";
 import { buildEditorialSchema } from "../../lib/editorial-schema";
+import { getEditorialCoverMetadata } from "../../lib/editorial-cover-metadata";
 
 const slug = Astro.params.slug!;
 const portal = await getEditorialPortalMode();
@@ -44,10 +45,28 @@ const contentHtml = portal.enabled ? rewriteJobBoardLinksForPortal(normalizedHtm
 const runtimeSite = getRuntimeSiteUrl(Astro.site);
 const canonical = resolveCanonicalUrl(article.canonicalUrl ?? undefined, `/noticias/${article.slug}`, runtimeSite);
 const reviewedAt = editorialOverride ? new Date(`${editorialOverride.reviewedAt}T12:00:00-03:00`) : null;
+const coverMetadata = getEditorialCoverMetadata(article.slug, article.coverImageUrl);
+const effectiveCoverAlt = coverMetadata?.alt ?? article.coverImageAlt ?? article.title;
+const effectiveCoverCaption = coverMetadata?.caption ?? article.coverImageCaption;
+const effectiveCoverCredit = coverMetadata?.credit ?? article.coverImageCredit;
+const effectiveCoverWidth = coverMetadata?.width ?? article.coverImageWidth ?? 1600;
+const effectiveCoverHeight = coverMetadata?.height ?? article.coverImageHeight ?? 900;
 const variants = article.coverImageVariants && typeof article.coverImageVariants === "object"
   ? article.coverImageVariants as Record<string, { url?: string; width?: number; height?: number }>
   : {};
-const structuredImages = [variants.hero, variants.landscape43, variants.square]
+const manifestedCoverUrl = coverMetadata
+  ? resolvePublicHttpUrl(article.coverImageUrl ?? undefined, runtimeSite)
+  : null;
+const structuredImages = manifestedCoverUrl
+  ? [{
+      "@type": "ImageObject",
+      url: manifestedCoverUrl,
+      width: effectiveCoverWidth,
+      height: effectiveCoverHeight,
+      ...(effectiveCoverCaption ? { caption: effectiveCoverCaption } : {}),
+      ...(effectiveCoverCredit ? { creditText: effectiveCoverCredit } : {})
+    }]
+  : [variants.hero, variants.landscape43, variants.square]
   .flatMap((image) => {
     if (!image) return [];
     const url = resolvePublicHttpUrl(image?.url, runtimeSite);
@@ -57,8 +76,8 @@ const structuredImages = [variants.hero, variants.landscape43, variants.square]
     url,
     ...(image.width ? { width: image.width } : {}),
     ...(image.height ? { height: image.height } : {}),
-    ...(article.coverImageCaption ? { caption: article.coverImageCaption } : {}),
-    ...(article.coverImageCredit ? { creditText: article.coverImageCredit } : {})
+    ...(effectiveCoverCaption ? { caption: effectiveCoverCaption } : {}),
+    ...(effectiveCoverCredit ? { creditText: effectiveCoverCredit } : {})
     }];
   });
 const jsonLd = buildEditorialSchema({
@@ -83,8 +102,8 @@ const jsonLd = buildEditorialSchema({
       <p class="mt-4 text-sm text-[var(--es-muted)]">Por {authorName} · {article.publishedAt?.toLocaleDateString("pt-BR")}{reviewedAt ? ` · Revisado em ${reviewedAt.toLocaleDateString("pt-BR")}` : ""}</p>
       {article.coverImageUrl && (
         <figure class="mt-8 overflow-hidden rounded-3xl">
-          <img class="w-full max-h-[34rem] bg-[var(--es-cream)] object-contain" decoding="async" src={variants.hero?.url ?? article.coverImageUrl} srcset={variants.card?.url && variants.hero?.url ? `${variants.card.url} 640w, ${variants.hero.url} 1600w` : undefined} sizes="(max-width: 768px) 100vw, 896px" alt={article.coverImageAlt ?? article.title} width={article.coverImageWidth ?? 1600} height={article.coverImageHeight ?? 900} loading="eager" fetchpriority="high" />
-          {(article.coverImageCaption || article.coverImageCredit) && <figcaption class="mt-2 text-sm text-[var(--es-muted)]">{article.coverImageCaption}{article.coverImageCaption && article.coverImageCredit ? " · " : ""}{article.coverImageCredit ? `Crédito: ${article.coverImageCredit}` : ""}</figcaption>}
+          <img class="w-full max-h-[34rem] bg-[var(--es-cream)] object-contain" decoding="async" src={coverMetadata ? article.coverImageUrl : variants.hero?.url ?? article.coverImageUrl} srcset={!coverMetadata && variants.card?.url && variants.hero?.url ? `${variants.card.url} 640w, ${variants.hero.url} 1600w` : undefined} sizes="(max-width: 768px) 100vw, 896px" alt={effectiveCoverAlt} width={effectiveCoverWidth} height={effectiveCoverHeight} loading="eager" fetchpriority="high" />
+          {(effectiveCoverCaption || effectiveCoverCredit) && <figcaption class="mt-2 text-sm text-[var(--es-muted)]">{effectiveCoverCaption}{effectiveCoverCaption && effectiveCoverCredit ? " · " : ""}{effectiveCoverCredit ? `Crédito: ${effectiveCoverCredit}` : ""}</figcaption>}
         </figure>
       )}
       <div class="es-prose mt-8 max-w-none text-[1.05rem] leading-8" set:html={contentHtml} />
