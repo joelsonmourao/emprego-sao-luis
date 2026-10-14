@@ -12,10 +12,15 @@ type EditorialSchemaInput = {
 
 const NEWSROOM_NAME = "Redação Empregos São Luís";
 
+export function isNewsroomAuthor(authorName: string): boolean {
+  const normalizedName = authorName.trim() || NEWSROOM_NAME;
+  return /\bredação\b/i.test(normalizedName.normalize("NFC"));
+}
+
 export function buildEditorialSchema(input: EditorialSchemaInput): Record<string, unknown> {
   const root = input.siteUrl.replace(/\/$/, "");
   const authorName = input.authorName.trim() || NEWSROOM_NAME;
-  const newsroom = /\bredação\b/i.test(authorName.normalize("NFC"));
+  const newsroom = isNewsroomAuthor(authorName);
   const modifiedAt = input.publishedAt && input.updatedAt < input.publishedAt
     ? input.publishedAt
     : input.updatedAt;

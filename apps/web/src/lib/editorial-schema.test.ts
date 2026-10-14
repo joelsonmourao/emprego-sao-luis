@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
-import { buildEditorialSchema } from "./editorial-schema";
+import { buildEditorialSchema, isNewsroomAuthor } from "./editorial-schema";
 
 const base = {
   type: "Article" as const,
@@ -15,6 +15,12 @@ const base = {
 };
 
 describe("editorial structured data", () => {
+  it("recognizes only the institutional newsroom signature", () => {
+    expect(isNewsroomAuthor("Redação Empregos São Luís")).toBe(true);
+    expect(isNewsroomAuthor("  ")).toBe(true);
+    expect(isNewsroomAuthor("Maria Silva")).toBe(false);
+  });
+
   it("represents the newsroom as an organization with a real profile page", () => {
     const schema = buildEditorialSchema(base);
     expect(schema.author).toEqual({
@@ -52,10 +58,12 @@ describe("editorial structured data", () => {
     ];
 
     for (const page of pages) {
-      expect(page).toContain('import { buildEditorialSchema } from "../../lib/editorial-schema"');
+      expect(page).toContain('import { buildEditorialSchema, isNewsroomAuthor } from "../../lib/editorial-schema"');
       expect(page).toContain("buildEditorialSchema({");
       expect(page).toContain("updatedAt: reviewedAt ?? article.updatedAt");
       expect(page).not.toContain('author: { "@type": "Person", name: authorName }');
+      expect(page).toContain('href="/redacao"');
+      expect(page).toContain('rel="author"');
     }
   });
 });
