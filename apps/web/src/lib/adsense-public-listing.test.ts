@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
-import { guidesPendingReview, newsPendingFactCheck } from "../data/editorial-review-pending";
+import { guidesPendingReview, newsFactChecked, newsPendingFactCheck } from "../data/editorial-review-pending";
 import { getNewsEditorialOverride } from "../data/news-editorial-content-overrides";
 import { BRAND_ASSETS, BRAND_COLORS } from "./brand-assets";
 
@@ -15,7 +15,8 @@ describe("Vitrine pública durante a análise AdSense", () => {
     expect(source).toContain("getEditorialContentOverride(slug)");
     expect(source).toContain("getNewsEditorialOverride(slug)");
     expect(guidesPendingReview.size).toBe(0);
-    expect([...newsPendingFactCheck].every((slug) => Boolean(getNewsEditorialOverride(slug)))).toBe(true);
+    expect(newsPendingFactCheck.size).toBe(0);
+    expect([...newsFactChecked].every((slug) => Boolean(getNewsEditorialOverride(slug)))).toBe(true);
   });
 
   it("blog e notícias apresentam totais e páginas consistentes com a seleção revisada", () => {
