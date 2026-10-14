@@ -37,6 +37,16 @@ function jobHasIndexableApplicationChannel(row: {
   );
 }
 
+export function resolveEditorialSitemapUpdatedAt(
+  databaseUpdatedAt: Date,
+  reviewedAt?: string
+): Date {
+  if (!reviewedAt) return databaseUpdatedAt;
+  const reviewed = new Date(`${reviewedAt}T12:00:00-03:00`);
+  if (Number.isNaN(reviewed.getTime())) return databaseUpdatedAt;
+  return reviewed > databaseUpdatedAt ? reviewed : databaseUpdatedAt;
+}
+
 const INSTITUTIONAL_PATHS = [
   "/",
   "/sobre",
@@ -212,14 +222,17 @@ export async function listSitemapEntries(
         if (noindexSlugs.has(row.slug) && !editorialRevision) return false;
         if (isEditorialReviewPending(row.type, row.slug)) return Boolean(editorialRevision);
         return true;
-      }).map((row) =>
-        toEntry(
+      }).map((row) => {
+        const editorialRevision = row.type === "NEWS"
+          ? getNewsEditorialOverride(row.slug)
+          : getEditorialContentOverride(row.slug);
+        return toEntry(
           `/${category === "news" ? "noticias" : "blog"}/${row.slug}`,
-          row.updatedAt,
+          resolveEditorialSitemapUpdatedAt(row.updatedAt, editorialRevision?.reviewedAt),
           category === "news" ? "daily" : "weekly",
           category === "news" ? 0.7 : 0.5
-        )
-      )
+        );
+      })
     ]);
   } finally {
     await connection.close();
