@@ -14,7 +14,7 @@ import { isEditorialReviewPending } from "../../data/editorial-review-pending";
 import { getNewsEditorialOverride } from "../../data/news-editorial-content-overrides";
 import { getRuntimeSiteUrl, resolveCanonicalUrl, resolvePublicHttpUrl } from "../../lib/canonical-url";
 import { buildEditorialSchema } from "../../lib/editorial-schema";
-import { getEditorialCoverMetadata } from "../../lib/editorial-cover-metadata";
+import { buildOwnedEditorialCoverImageObject, getEditorialCoverMetadata } from "../../lib/editorial-cover-metadata";
 
 const slug = Astro.params.slug!;
 const portal = await getEditorialPortalMode();
@@ -57,8 +57,9 @@ const variants = article.coverImageVariants && typeof article.coverImageVariants
 const manifestedCoverUrl = coverMetadata
   ? resolvePublicHttpUrl(article.coverImageUrl ?? undefined, runtimeSite)
   : null;
+const ownedStructuredImage = buildOwnedEditorialCoverImageObject(coverMetadata, manifestedCoverUrl);
 const structuredImages = manifestedCoverUrl
-  ? [{
+  ? [ownedStructuredImage ?? {
       "@type": "ImageObject",
       url: manifestedCoverUrl,
       width: effectiveCoverWidth,

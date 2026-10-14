@@ -15,7 +15,7 @@ import { isEditorialReviewPending } from "../../data/editorial-review-pending";
 import { findAutoEditorialArticle } from "../../lib/auto-editorial";
 import { getRuntimeSiteUrl, resolveCanonicalUrl, resolvePublicHttpUrl } from "../../lib/canonical-url";
 import { buildEditorialSchema } from "../../lib/editorial-schema";
-import { getEditorialCoverMetadata } from "../../lib/editorial-cover-metadata";
+import { buildOwnedEditorialCoverImageObject, getEditorialCoverMetadata } from "../../lib/editorial-cover-metadata";
 const slug = Astro.params.slug ?? "";
 const portal = await getEditorialPortalMode();
 const seoFromLegacy = resolveSlLocalSeoSlug(slug);
@@ -36,6 +36,7 @@ const runtimeSite = getRuntimeSiteUrl(Astro.site);
 const canonical = resolveCanonicalUrl(article.canonicalUrl ?? undefined, `/blog/${article.slug}`, runtimeSite);
 const structuredImage = resolvePublicHttpUrl(article.coverImageUrl ?? undefined, runtimeSite);
 const coverMetadata = getEditorialCoverMetadata(article.slug, article.coverImageUrl);
+const ownedStructuredImage = buildOwnedEditorialCoverImageObject(coverMetadata, structuredImage);
 const effectiveCoverAlt = coverMetadata?.alt ?? article.coverImageAlt ?? article.title;
 const effectiveCoverCaption = coverMetadata?.caption ?? article.coverImageCaption;
 const effectiveCoverCredit = coverMetadata?.credit ?? article.coverImageCredit;
@@ -55,7 +56,7 @@ const schema = buildEditorialSchema({
   publishedAt: article.publishedAt,
   updatedAt: reviewedAt ?? article.updatedAt,
   ...(structuredImage ? {
-    image: [{
+    image: [ownedStructuredImage ?? {
       "@type": "ImageObject",
       url: structuredImage,
       width: effectiveCoverWidth,
