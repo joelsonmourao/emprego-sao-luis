@@ -157,7 +157,7 @@ describe("revisões editoriais substanciais para AdSense", () => {
       const outbound = [...html.matchAll(/href="(https:\/\/[^"]+)"/g)].map((match) => match[1]);
 
       expect(override).not.toBeNull();
-      expect(override?.reviewedAt).toBe("2026-10-14");
+      expect(override?.reviewedAt).toBe(slug === "trabalhador-terceirizado-direitos" ? "2026-10-15" : "2026-10-14");
       expect(words.length).toBeGreaterThanOrEqual(550);
       expect(new Set(outbound).size).toBeGreaterThanOrEqual(2);
       expect(outbound.every((url) => /https:\/\/(?:www\.)?(?:gov\.br|planalto\.gov\.br|mpt\.mp\.br|sistemas\.cfm\.org\.br|cnes\.trabalho\.gov\.br)\//.test(url))).toBe(true);
@@ -275,6 +275,57 @@ describe("revisões editoriais substanciais para AdSense", () => {
       expect(override).not.toBeNull();
       expect(override?.reviewedAt).toBe("2026-10-15");
       expect(words.length).toBeGreaterThanOrEqual(700);
+      expect(new Set(outbound).size).toBeGreaterThanOrEqual(2);
+      for (const excerpt of item.required) expect(html).toContain(excerpt);
+      expect(html).not.toMatch(/vagas abertas hoje|salário médio|contratação garantida|aprovação garantida/i);
+    }
+  });
+
+  it("aprofunda o segundo lote de oito guias prioritários com fontes e seções próprias", () => {
+    const cases = [
+      {
+        slug: "mensagem-fria-recrutador-linkedin",
+        required: ["Escolha o tipo de contato antes de abrir a conversa", "Confirme quem está do outro lado"]
+      },
+      {
+        slug: "acompanhar-candidatura-emprego",
+        required: ["Diferencie confirmação automática de avanço real", "Encerre e arquive com privacidade"]
+      },
+      {
+        slug: "o-que-vestir-entrevista-emprego",
+        required: ["Considere acessibilidade e necessidade pessoal", "Prepare uma alternativa sem transformar isso em compra"]
+      },
+      {
+        slug: "transporte-entrevista-emprego-sao-luis",
+        required: ["Faça a checagem em duas janelas de horário", "Calcule o deslocamento sem inventar tarifa ou benefício"]
+      },
+      {
+        slug: "pedir-feedback-entrevista-emprego",
+        required: ["Registre o feedback sem reescrever a fala", "Reconheça limite, discriminação e conflito"]
+      },
+      {
+        slug: "mudanca-de-carreira-sao-luis-curriculo",
+        required: ["Organize um ciclo de transição de duas semanas", "Ordene o currículo para explicar a ponte"]
+      },
+      {
+        slug: "gestao-de-tempo-trabalho-dicas",
+        required: ["Separe urgência, importância e capacidade", "Faça uma passagem de turno completa"]
+      },
+      {
+        slug: "trabalhador-terceirizado-direitos",
+        required: ["Não confunda terceirização com trabalho temporário", "Escolha o canal conforme o problema"]
+      }
+    ];
+
+    for (const item of cases) {
+      const override = getEditorialContentOverride(item.slug);
+      const html = override?.contentHtml ?? "";
+      const words = textOnly(html).split(/\s+/).filter(Boolean);
+      const outbound = [...html.matchAll(/href="(https:\/\/[^"]+)"/g)].map((match) => match[1]);
+
+      expect(override).not.toBeNull();
+      expect(override?.reviewedAt).toBe("2026-10-15");
+      expect(words.length).toBeGreaterThanOrEqual(740);
       expect(new Set(outbound).size).toBeGreaterThanOrEqual(2);
       for (const excerpt of item.required) expect(html).toContain(excerpt);
       expect(html).not.toMatch(/vagas abertas hoje|salário médio|contratação garantida|aprovação garantida/i);
