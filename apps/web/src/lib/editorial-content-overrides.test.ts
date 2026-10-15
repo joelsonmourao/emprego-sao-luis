@@ -79,7 +79,7 @@ describe("revisões editoriais substanciais para AdSense", () => {
       const override = getEditorialContentOverride(slug);
       const words = textOnly(override?.contentHtml ?? "").split(/\s+/).filter(Boolean);
       expect(override).not.toBeNull();
-      expect(override?.reviewedAt).toBe(slug === "mapa-setores-vagas-sao-luis" ? "2026-10-15" : "2026-10-14");
+      expect(override?.reviewedAt).toBe(["mapa-setores-vagas-sao-luis", "salario-custo-de-vida-sao-luis"].includes(slug) ? "2026-10-15" : "2026-10-14");
       expect(words.length).toBeGreaterThanOrEqual(500);
       expect(override?.contentHtml).toMatch(/<a href="https:\/\//);
       expect(override?.contentHtml).not.toMatch(/No tema em pauta|Leitura útil do cenário/i);
@@ -157,7 +157,7 @@ describe("revisões editoriais substanciais para AdSense", () => {
       const outbound = [...html.matchAll(/href="(https:\/\/[^"]+)"/g)].map((match) => match[1]);
 
       expect(override).not.toBeNull();
-      expect(override?.reviewedAt).toBe(["trabalhador-terceirizado-direitos", "ponto-eletronico-atraso-trabalho"].includes(slug) ? "2026-10-15" : "2026-10-14");
+      expect(override?.reviewedAt).toBe(["trabalhador-terceirizado-direitos", "ponto-eletronico-atraso-trabalho", "ferias-clt-periodo-aquisitivo"].includes(slug) ? "2026-10-15" : "2026-10-14");
       expect(words.length).toBeGreaterThanOrEqual(550);
       expect(new Set(outbound).size).toBeGreaterThanOrEqual(2);
       expect(outbound.every((url) => /https:\/\/(?:www\.)?(?:gov\.br|planalto\.gov\.br|mpt\.mp\.br|sistemas\.cfm\.org\.br|cnes\.trabalho\.gov\.br)\//.test(url))).toBe(true);
@@ -404,6 +404,34 @@ describe("revisões editoriais substanciais para AdSense", () => {
       expect(override).not.toBeNull();
       expect(override?.reviewedAt).toBe("2026-10-15");
       expect(words.length).toBeGreaterThanOrEqual(760);
+      expect(new Set(outbound).size).toBeGreaterThanOrEqual(2);
+      for (const excerpt of item.required) expect(html).toContain(excerpt);
+      expect(html).not.toMatch(/vagas abertas hoje|salário médio|contratação garantida|aprovação garantida/i);
+    }
+  });
+
+
+  it("aprofunda o lote 8e de direitos trabalhistas e decisões locais com controles por URL", () => {
+    const cases = [
+      { slug: "entrevista-desligamento-o-que-falar", required: ["Monte uma matriz de pendências, documentos e responsáveis", "Diferencie relato, opinião e solicitação"] },
+      { slug: "experiencia-informal-curriculo-como-colocar", required: ["Monte prova em três camadas sem expor terceiros", "Cheque consistência entre currículo, entrevista e cadastro"] },
+      { slug: "saude-mental-trabalho-limites", required: ["Separe cuidado individual de risco na organização", "Crie um plano de escalonamento antes da crise"] },
+      { slug: "sindicato-trabalhador-direitos-basico", required: ["Faça o teste de quatro chaves antes de aplicar uma cláusula", "Diferencie entidade de trabalhadores e entidade patronal"] },
+      { slug: "como-pedir-aumento-salario", required: ["Converta o pedido em uma tabela verificável", "Prepare três respostas possíveis antes da reunião"] },
+      { slug: "salario-custo-de-vida-sao-luis", required: ["Faça um teste de estresse do primeiro mês", "Registre o custo de tempo separado do dinheiro"] },
+      { slug: "ferias-clt-periodo-aquisitivo", required: ["Confira comunicação, concessão e pagamento em documentos separados", "Leia o fracionamento com os requisitos completos"] },
+      { slug: "entrevista-presencial-sao-luis-dicas", required: ["Use um protocolo de chegada e saída segura", "Faça uma ficha pós-entrevista em quinze minutos"] }
+    ];
+
+    for (const item of cases) {
+      const override = getEditorialContentOverride(item.slug);
+      const html = override?.contentHtml ?? "";
+      const words = textOnly(html).split(/\s+/).filter(Boolean);
+      const outbound = [...html.matchAll(/href="(https:\/\/[^"]+)"/g)].map((match) => match[1]);
+
+      expect(override).not.toBeNull();
+      expect(override?.reviewedAt).toBe("2026-10-15");
+      expect(words.length).toBeGreaterThanOrEqual(780);
       expect(new Set(outbound).size).toBeGreaterThanOrEqual(2);
       for (const excerpt of item.required) expect(html).toContain(excerpt);
       expect(html).not.toMatch(/vagas abertas hoje|salário médio|contratação garantida|aprovação garantida/i);
