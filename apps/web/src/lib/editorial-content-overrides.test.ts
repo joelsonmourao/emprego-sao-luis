@@ -128,13 +128,7 @@ describe("revisões editoriais substanciais para AdSense", () => {
       const outbound = [...html.matchAll(/href="(https:\/\/[^"]+)"/g)].map((match) => match[1]);
 
       expect(override).not.toBeNull();
-      expect(override?.reviewedAt).toBe([
-        "trabalhar-fim-de-semana-folga-adicional",
-        "convencao-coletiva-holerite-trabalhador",
-        "periodo-experiencia-clt-o-que-saber",
-        "abono-pecuniario-ferias-holerite",
-        "trabalho-noturno-adicional-o-que-perguntar"
-      ].includes(slug) ? "2026-10-15" : "2026-10-14");
+      expect(override?.reviewedAt).toBe("2026-10-15");
       expect(words.length).toBeGreaterThanOrEqual(550);
       expect(new Set(outbound).size).toBeGreaterThanOrEqual(2);
       expect(outbound.every((url) => /https:\/\/(?:www\.)?(?:gov\.br|planalto\.gov\.br)\//.test(url))).toBe(true);
@@ -163,7 +157,7 @@ describe("revisões editoriais substanciais para AdSense", () => {
       const outbound = [...html.matchAll(/href="(https:\/\/[^"]+)"/g)].map((match) => match[1]);
 
       expect(override).not.toBeNull();
-      expect(override?.reviewedAt).toBe(["trabalhador-terceirizado-direitos", "ponto-eletronico-atraso-trabalho", "pedido-demissao-aviso-previo-acerto", "ferias-clt-periodo-aquisitivo", "banco-de-horas-direitos-trabalhador"].includes(slug) ? "2026-10-15" : "2026-10-14");
+      expect(override?.reviewedAt).toBe("2026-10-15");
       expect(words.length).toBeGreaterThanOrEqual(550);
       expect(new Set(outbound).size).toBeGreaterThanOrEqual(2);
       expect(outbound.every((url) => /https:\/\/(?:www\.)?(?:gov\.br|planalto\.gov\.br|mpt\.mp\.br|sistemas\.cfm\.org\.br|cnes\.trabalho\.gov\.br)\//.test(url))).toBe(true);
@@ -191,7 +185,13 @@ describe("revisões editoriais substanciais para AdSense", () => {
       const outbound = [...html.matchAll(/href="(https:\/\/[^"]+)"/g)].map((match) => match[1]);
 
       expect(override).not.toBeNull();
-      expect(override?.reviewedAt).toBe("2026-10-14");
+      expect(override?.reviewedAt).toBe([
+        "acidente-de-trabalho-o-que-fazer",
+        "transferencia-interna-emprego-como-pedir",
+        "freelancer-ou-clt-vantagens",
+        "servicos-gerais-epi-vaga",
+        "documentos-admissao-emprego-maranhao"
+      ].includes(slug) ? "2026-10-15" : "2026-10-14");
       expect(words.length).toBeGreaterThanOrEqual(600);
       expect(new Set(outbound).size).toBeGreaterThanOrEqual(2);
       expect(outbound.every((url) => /https:\/\/(?:www\.)?(?:gov\.br|planalto\.gov\.br|caepi\.trabalho\.gov\.br)\//.test(url))).toBe(true);
@@ -537,6 +537,37 @@ describe("revisões editoriais substanciais para AdSense", () => {
       { slug: "pretensao-salarial-entrevista-dicas", minimumWords: 880, required: ["Faça uma ficha de comparabilidade antes de buscar números", "Prepare três respostas para a negociação"] },
       { slug: "certificado-ou-experiencia-curriculo", minimumWords: 840, required: ["Construa uma matriz de evidência, não uma pilha de anexos", "Teste a coerência em três documentos"] },
       { slug: "soft-skills-hard-skills-curriculo", minimumWords: 860, required: ["Faça um inventário em pares de tarefa e comportamento", "Faça o teste da pergunta seguinte"] }
+    ];
+
+    for (const item of cases) {
+      const override = getEditorialContentOverride(item.slug);
+      const html = override?.contentHtml ?? "";
+      const words = textOnly(html).split(/\s+/).filter(Boolean);
+      const outbound = [...html.matchAll(/href="(https:\/\/[^"]+)"/g)].map((match) => match[1]);
+
+      expect(override).not.toBeNull();
+      expect(override?.reviewedAt).toBe("2026-10-15");
+      expect(words.length).toBeGreaterThanOrEqual(item.minimumWords);
+      expect(new Set(outbound).size).toBeGreaterThanOrEqual(2);
+      for (const excerpt of item.required) expect(html).toContain(excerpt);
+      expect(html).not.toMatch(/vagas abertas hoje|salário médio|contratação garantida|aprovação garantida|empresa está contratando/i);
+    }
+  });
+
+  it("aprofunda o lote 8j de direitos trabalhistas com rastreabilidade e limites", () => {
+    const cases = [
+      { slug: "transferencia-interna-emprego-como-pedir", minimumWords: 950, required: ["Faça uma matriz de mudança contratual", "Defina critérios de sucesso e saída"] },
+      { slug: "mitos-direitos-trabalhistas-whatsapp", minimumWords: 830, required: ["Use uma ficha de rastreabilidade da afirmação", "Classifique antes de encaminhar"] },
+      { slug: "acidente-de-trabalho-o-que-fazer", minimumWords: 950, required: ["Faça uma reconciliação entre cinco registros", "Prepare retorno e restrição como um plano de tarefa"] },
+      { slug: "atestado-medico-trabalho-como-entregar", minimumWords: 820, required: ["Separe emissão, entrega, validação e afastamento", "Use uma ficha mínima de rastreio"] },
+      { slug: "retorno-trabalho-apos-maternidade", minimumWords: 850, required: ["Monte um mapa de retorno com três responsáveis", "Teste a primeira quinzena, não apenas o primeiro dia"] },
+      { slug: "assedio-no-trabalho-o-que-fazer", minimumWords: 850, required: ["Construa um mapa de risco antes de escolher o canal", "Faça um relato em duas camadas"] },
+      { slug: "hora-extra-holerite-como-conferir", minimumWords: 820, required: ["Reconcilie dia, competência e destino", "Faça uma auditoria em três documentos"] },
+      { slug: "servicos-gerais-epi-vaga", minimumWords: 950, required: ["Monte uma matriz tarefa–risco–controle", "Faça um teste de entrega em quatro passos"] },
+      { slug: "escala-6x1-o-que-perguntar", minimumWords: 820, required: ["Simule dois ciclos completos antes de aceitar", "Faça o teste de alteração previsível"] },
+      { slug: "como-ler-holerite-descontos", minimumWords: 850, required: ["Reconstrua o líquido sem começar pelas alíquotas", "Faça um teste de continuidade entre meses"] },
+      { slug: "freelancer-ou-clt-vantagens", minimumWords: 990, required: ["Faça uma simulação de noventa dias", "Defina um portão antes de mudar de regime"] },
+      { slug: "documentos-admissao-emprego-maranhao", minimumWords: 980, required: ["Use um protocolo de envio em duas etapas", "Audite o primeiro dia em quatro confirmações"] }
     ];
 
     for (const item of cases) {

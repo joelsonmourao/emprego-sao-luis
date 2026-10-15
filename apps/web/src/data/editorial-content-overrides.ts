@@ -523,9 +523,9 @@ const overrides: Record<string, EditorialContentOverride> = {
 <p>O objetivo não é completar um número diário. É produzir candidaturas que você consiga defender, com deslocamento possível e origem verificável. Se não houver retorno, compare os requisitos reais antes de adicionar palavras ao currículo ou pagar por curso.</p>`.trim()
   },
   "acidente-de-trabalho-o-que-fazer": {
-    reviewedAt: "2026-10-14",
+    reviewedAt: "2026-10-15",
     contentHtml: `
-<p><strong>Revisão editorial: 14 de outubro de 2026.</strong> Um acidente durante o trabalho ou no trajeto precisa ser tratado primeiro como questão de saúde e segurança. Este guia organiza ações práticas, mas não determina se um caso específico gera benefício, estabilidade ou indenização. Essas conclusões dependem dos fatos, dos documentos e da análise do órgão ou profissional competente.</p>
+<p><strong>Revisão editorial: 15 de outubro de 2026.</strong> Um acidente durante o trabalho ou no trajeto precisa ser tratado primeiro como questão de saúde e segurança. Este guia organiza ações práticas, mas não determina se um caso específico gera benefício, estabilidade ou indenização. Essas conclusões dependem dos fatos, dos documentos e da análise do órgão ou profissional competente.</p>
 <h2>Primeiro: interrompa o risco e procure atendimento</h2>
 <p>Se houver perigo ativo, afaste-se quando isso puder ser feito com segurança e peça ajuda. Em situação urgente, priorize o serviço de emergência e as orientações da equipe de saúde. Não continue uma tarefa apenas para “terminar o turno” quando houver dor, sangramento, tontura, queda, queimadura, choque ou outra alteração relevante.</p>
 <p>Informe ao atendimento como o evento aconteceu, quais partes do corpo foram afetadas e quais equipamentos estavam envolvidos. Não acrescente detalhes que não presenciou. Guarde receitas, relatórios, exames e orientações de retorno; esses documentos ajudam a acompanhar a saúde e a reconstruir a sequência do ocorrido.</p>
@@ -547,12 +547,18 @@ const overrides: Record<string, EditorialContentOverride> = {
 <p>Escreva uma linha do tempo com verbos concretos: qual tarefa executava, qual evento ocorreu, o que sentiu, quem foi avisado e onde recebeu atendimento. Separe observação de conclusão. “O piso estava molhado quando escorreguei” descreve algo observado; “a empresa é culpada” é uma conclusão que exige apuração. Se corrigir informação, registre a correção e preserve a versão anterior.</p>
 <p>Quando houver retorno ao trabalho, leve as orientações recebidas e pergunte como serão aplicadas eventuais restrições. Se sintomas piorarem, procure atendimento novamente. Este roteiro organiza evidências e cuidados; não recomenda automedicação, retorno antecipado ou assinatura de documento incompreendido.</p>
 <p>Não publique prontuário, CPF ou fotos de lesão em redes abertas. Para reconhecer contatos falsos que tentam cobrar por benefício ou vaga, consulte também a página de <a href="/seguranca-candidatos">segurança do candidato</a>.</p>
+<h2>Faça uma reconciliação entre cinco registros</h2>
+<p>Depois do atendimento inicial, coloque lado a lado cinco peças: sua linha do tempo, o documento do serviço de saúde, a comunicação feita à empresa, a CAT quando houver e o espelho de ponto ou escala daquele dia. Elas têm finalidades diferentes e não precisam usar as mesmas palavras, mas datas, local e sequência básica devem ser compatíveis. Se encontrar diferença, peça correção ao responsável pelo documento; não edite arquivo nem produza uma versão “mais conveniente”.</p>
+<p><strong>Exemplo ilustrativo:</strong> o ponto registra entrada às 8h, a mensagem à supervisão foi enviada às 10h18 e o atendimento ocorreu às 11h05. A trabalhadora anota o deslocamento entre esses eventos e guarda os comprovantes. Ela não preenche o intervalo com suposições nem pede a testemunhas que repitam sua narrativa.</p>
+<h2>Prepare retorno e restrição como um plano de tarefa</h2>
+<p>Antes de retornar, transforme a orientação recebida em perguntas operacionais: qual tarefa será evitada, por quanto tempo, quem confirmará a adaptação e quando haverá nova avaliação? Entregue apenas o documento necessário pelo canal definido. Diagnóstico e prontuário não devem circular entre colegas para provar que a restrição existe.</p>
+<p>Se empresa, serviço de saúde e INSS derem orientações aparentemente incompatíveis, registre cada fonte, data e protocolo. Não abandone tratamento nem retorne antes do indicado por causa de mensagem informal. Procure o canal responsável e orientação individual para resolver a divergência.</p>
 `.trim()
   },
   "assedio-no-trabalho-o-que-fazer": {
-    reviewedAt: "2026-10-14",
+    reviewedAt: "2026-10-15",
     contentHtml: `
-<p><strong>Revisão editorial: 14 de outubro de 2026.</strong> Violência e assédio no trabalho podem envolver humilhação, isolamento, ameaça, constrangimento sexual, perseguição ou outras condutas que afetam dignidade e segurança. Nem todo conflito ou cobrança profissional é assédio; por isso, é importante registrar fatos concretos e buscar orientação sem tentar fechar um diagnóstico jurídico sozinho.</p>
+<p><strong>Revisão editorial: 15 de outubro de 2026.</strong> Violência e assédio no trabalho podem envolver humilhação, isolamento, ameaça, constrangimento sexual, perseguição ou outras condutas que afetam dignidade e segurança. Nem todo conflito ou cobrança profissional é assédio; por isso, é importante registrar fatos concretos e buscar orientação sem tentar fechar um diagnóstico jurídico sozinho.</p>
 <h2>Descreva condutas, não rótulos</h2>
 <p>Em vez de anotar apenas “meu chefe me assedia”, registre o que foi dito ou feito, em que dia, onde e diante de quem. Uma cobrança de prazo pode ser legítima; xingamentos, ameaças, exposição vexatória ou comentários sexualizados são fatos diferentes e precisam ser descritos com precisão.</p>
 <p>O Ministério Público do Trabalho mantém as cartilhas oficiais <a href="https://mpt.mp.br/pgt/publicacoes?td=cartilhas" target="_blank" rel="noopener noreferrer">Violência e Assédio Moral no Trabalho</a> e <a href="https://mpt.mp.br/pgt/publicacoes?td=cartilhas" target="_blank" rel="noopener noreferrer">Violência e Assédio Sexual no Trabalho</a>. Consulte a edição e a data do material, porque conceitos e canais podem ser atualizados.</p>
@@ -570,12 +576,18 @@ const overrides: Record<string, EditorialContentOverride> = {
 <h2>Perguntas para organizar a decisão</h2>
 <ul><li>Existe risco de ficar sozinho com a pessoa envolvida?</li><li>Quais fatos consigo datar e comprovar sem acessar conteúdo proibido?</li><li>Há um canal formal seguro e como obtenho protocolo?</li><li>Preciso de acompanhamento de saúde ou apoio emocional agora?</li><li>Qual órgão ou profissional pode analisar o meu caso individual?</li></ul>
 <p>Não assine retratação, pedido de demissão ou declaração que não compreendeu. Peça cópia e tempo para orientação. Se o problema começou ainda no recrutamento, interrompa pedidos impróprios e consulte a página de <a href="/seguranca-candidatos">segurança para candidatos</a>.</p>
+<h2>Construa um mapa de risco antes de escolher o canal</h2>
+<p>Separe risco imediato, risco de repetição e risco de retaliação. Para cada um, anote quem pode oferecer proteção prática: pessoa de confiança, serviço de saúde, canal interno independente, sindicato, assistência jurídica ou órgão público. A escolha não precisa começar pela chefia direta quando ela participa dos fatos ou quando o contato aumenta o perigo.</p>
+<p>Defina também o que não fazer: confrontar a pessoa sozinho em local isolado, copiar base de clientes, acessar conta alheia, gravar informação sigilosa sem orientação ou publicar acusações com nomes. Preservar prova não autoriza criar outro risco. As cartilhas do MPT e o <a href="https://mpt.mp.br/pgt/servicos/servico-denuncie" target="_blank" rel="noopener noreferrer">Serviço Denuncie</a> ajudam a entender informações e encaminhamento, mas urgência policial ou de saúde deve seguir o canal apropriado à situação.</p>
+<h2>Faça um relato em duas camadas</h2>
+<p>A primeira camada é uma página objetiva: datas, condutas, pessoas presentes, documentos e providências. A segunda reúne anexos preservados no formato original. Esse desenho permite que quem recebe compreenda o caso antes de abrir arquivos sensíveis. Numere os anexos e mencione cada um na linha do tempo; não entregue o telefone inteiro quando bastam mensagens relacionadas ao episódio.</p>
+<p>Se houver resposta interna, registre prazo, medida anunciada e pessoa responsável, sem exigir detalhes confidenciais sobre terceiros. Ausência de retorno, repetição ou agravamento deve ser adicionada à cronologia. A qualificação jurídica pertence ao órgão ou profissional que examinará o conjunto.</p>
 `.trim()
   },
   "atestado-medico-trabalho-como-entregar": {
-    reviewedAt: "2026-10-14",
+    reviewedAt: "2026-10-15",
     contentHtml: `
-<p><strong>Revisão editorial: 14 de outubro de 2026.</strong> Um documento médico deve ser entregue de forma íntegra, legível e pelo canal correto. Não existe um único procedimento interno para todas as empresas. O trabalhador precisa separar o que consta da lei e das normas profissionais do que é prazo, sistema ou rotina administrativa do empregador.</p>
+<p><strong>Revisão editorial: 15 de outubro de 2026.</strong> Um documento médico deve ser entregue de forma íntegra, legível e pelo canal correto. Não existe um único procedimento interno para todas as empresas. O trabalhador precisa separar o que consta da lei e das normas profissionais do que é prazo, sistema ou rotina administrativa do empregador.</p>
 <h2>Antes de sair do atendimento</h2>
 <p>Confira se o documento identifica o profissional e informa o período recomendado de afastamento ou comparecimento conforme o atendimento realizado. Não acrescente, apague ou corrija conteúdo por conta própria. Se houver erro, solicite correção ao profissional ou estabelecimento responsável.</p>
 <p>A norma do Conselho Federal de Medicina sobre documentos médicos pode ser consultada no sistema oficial em <a href="https://sistemas.cfm.org.br/normas/visualizar/resolucoes/BR/2024/2381" target="_blank" rel="noopener noreferrer">Resolução CFM nº 2.381/2024</a>. Ela trata da emissão de documentos por médicos; o trabalhador não deve usar um resumo de internet como substituto da norma ou da orientação recebida.</p>
@@ -594,6 +606,12 @@ const overrides: Record<string, EditorialContentOverride> = {
 <h2>Checklist de entrega responsável</h2>
 <ul><li>Documento original conferido, sem alteração.</li><li>Canal e prazo confirmados no regulamento aplicável.</li><li>Somente destinatários necessários receberam o arquivo.</li><li>Comprovante de entrega guardado.</li><li>Rejeição ou falha de sistema registrada e comunicada.</li><li>Dúvida individual levada à medicina do trabalho, sindicato ou orientação competente.</li></ul>
 <p>Não compre atestado e não compartilhe senha, CPF ou documento médico com perfis que prometem “abonar falta”. Suspeitas de fraude também podem colocar a própria pessoa em risco disciplinar e criminal.</p>
+<h2>Separe emissão, entrega, validação e afastamento</h2>
+<p>Essas quatro etapas não devem ser tratadas como uma única aprovação. O profissional emite o documento; o trabalhador o entrega pelo canal informado; a empresa pode realizar conferências legítimas pelo procedimento aplicável; e eventual afastamento previdenciário segue regras e serviços próprios. Guarde quem praticou cada ato e em qual data. Uma confirmação de upload prova o envio, mas não prova por si só o resultado de todas as etapas.</p>
+<p>Se receber mensagem de rejeição, peça que indique o problema concreto: legibilidade, identificação, período, formato ou destinatário. Não envie prontuário completo para responder a uma falha técnica. Corrija apenas com o emissor ou pelo fluxo formal, preservando o arquivo original e o histórico da conversa.</p>
+<h2>Use uma ficha mínima de rastreio</h2>
+<table><thead><tr><th>Campo</th><th>Registro seguro</th></tr></thead><tbody><tr><td>Documento</td><td>tipo, emissor e data, sem transcrever diagnóstico</td></tr><tr><td>Entrega</td><td>canal, horário e protocolo</td></tr><tr><td>Resposta</td><td>aceite, pendência ou motivo informado</td></tr><tr><td>Próximo passo</td><td>responsável e prazo confirmado</td></tr></tbody></table>
+<p>O objetivo é comprovar o fluxo, não criar um arquivo clínico paralelo no trabalho. Se a dúvida envolver afastamento prolongado, acidente, restrição ou retorno, confirme com medicina ocupacional, INSS ou orientação qualificada qual documento é necessário. Este guia não decide justificativa, benefício ou aptidão.</p>
 `.trim()
   },
   "banco-de-horas-direitos-trabalhador": {
@@ -663,9 +681,9 @@ const overrides: Record<string, EditorialContentOverride> = {
 `.trim()
   },
   "escala-6x1-o-que-perguntar": {
-    reviewedAt: "2026-10-14",
+    reviewedAt: "2026-10-15",
     contentHtml: `
-<p><strong>Revisão editorial: 14 de outubro de 2026.</strong> “6x1” descreve uma sequência de seis dias de trabalho e um de descanso, mas não informa sozinho a duração diária, os intervalos, a folga dominical, o trabalho em feriados ou o modo de compensação. Antes de aceitar uma vaga, transforme o nome da escala em horários concretos.</p>
+<p><strong>Revisão editorial: 15 de outubro de 2026.</strong> “6x1” descreve uma sequência de seis dias de trabalho e um de descanso, mas não informa sozinho a duração diária, os intervalos, a folga dominical, o trabalho em feriados ou o modo de compensação. Antes de aceitar uma vaga, transforme o nome da escala em horários concretos.</p>
 <h2>Peça uma semana de exemplo</h2>
 <p>Solicite ao recrutador ou RH um exemplo de segunda a domingo: hora de entrada, saída, intervalo e dia de descanso. Pergunte se a folga é fixa ou rotativa e com que antecedência a escala é divulgada. Uma resposta como “horário comercial, depois vemos a folga” não permite calcular deslocamento nem organizar cuidados familiares.</p>
 <p>A <a href="https://www.planalto.gov.br/ccivil_03/decreto-lei/del5452.htm" target="_blank" rel="noopener noreferrer">CLT</a> reúne regras gerais sobre jornada e intervalos, e a <a href="https://www.planalto.gov.br/ccivil_03/leis/l0605.htm" target="_blank" rel="noopener noreferrer">Lei nº 605/1949</a> trata do repouso semanal e de feriados. Normas coletivas podem trazer condições específicas; verifique o instrumento aplicável.</p>
@@ -683,12 +701,18 @@ const overrides: Record<string, EditorialContentOverride> = {
 <h2>Sinais de que ainda faltam informações</h2>
 <ul><li>A empresa não informa horário de entrada ou saída.</li><li>A folga depende apenas de aviso verbal no dia anterior.</li><li>O intervalo é descrito de forma contraditória.</li><li>Horas além da escala são tratadas como “ajuda” sem registro.</li><li>Unidade e deslocamentos entre locais não estão claros.</li></ul>
 <p>Esses sinais não provam irregularidade, mas justificam pedir esclarecimento antes do aceite. Nenhum guia substitui a leitura do contrato ou a orientação sobre uma escala concreta. Registre a oportunidade no <a href="/ferramentas/controle-candidaturas">controle de candidaturas</a> e compare alternativas com os mesmos critérios.</p>
+<h2>Simule dois ciclos completos antes de aceitar</h2>
+<p>Uma única semana pode esconder a rotação de folgas. Monte quatorze linhas consecutivas e preencha entrada, saída, intervalo, descanso, unidade e deslocamento. Marque separadamente domingo, feriado e troca de turno. Pergunte quem publica a escala, com que antecedência e como uma alteração é comunicada e registrada.</p>
+<p><strong>Exemplo ilustrativo:</strong> uma candidata vê folga na terça na primeira semana e na quinta na segunda. Ela testa o ônibus nos horários reais e verifica quem ficará responsável por uma criança nos dias alternados. A conta inclui ida, volta e margem de atraso; não pressupõe transporte fornecido porque a entrevista ocorreu em local de fácil acesso.</p>
+<h2>Faça o teste de alteração previsível</h2>
+<p>Pergunte o que ocorre quando alguém falta, a loja estende o horário ou a unidade muda a programação. A resposta precisa indicar responsável, forma de aviso e como jornada ou compensação serão registradas. “A equipe se ajuda” não esclarece obrigação, limite ou pagamento.</p>
+<p>Antes de concluir se uma escala é regular, compare a CLT, a <a href="https://www.planalto.gov.br/ccivil_03/leis/l0605.htm" target="_blank" rel="noopener noreferrer">Lei nº 605/1949</a> e o instrumento coletivo realmente aplicável. O nome 6x1 não determina sozinho todas as respostas. Leve contrato, quadro de horários e exemplos datados ao sindicato ou profissional competente se houver divergência persistente.</p>
 `.trim()
   },
   "hora-extra-holerite-como-conferir": {
-    reviewedAt: "2026-10-14",
+    reviewedAt: "2026-10-15",
     contentHtml: `
-<p><strong>Revisão editorial: 14 de outubro de 2026.</strong> Conferir hora extra exige comparar jornada registrada, regra aplicável e lançamentos do holerite. Um valor isolado não permite concluir se o pagamento está correto, porque podem existir banco de horas, períodos de fechamento, adicionais previstos em norma coletiva e outros componentes.</p>
+<p><strong>Revisão editorial: 15 de outubro de 2026.</strong> Conferir hora extra exige comparar jornada registrada, regra aplicável e lançamentos do holerite. Um valor isolado não permite concluir se o pagamento está correto, porque podem existir banco de horas, períodos de fechamento, adicionais previstos em norma coletiva e outros componentes.</p>
 <h2>Reúna documentos do mesmo período</h2>
 <ol><li>Espelho de ponto ou registro de jornada.</li><li>Escala e alterações comunicadas.</li><li>Holerite da competência correspondente.</li><li>Contrato e política de banco de horas, se houver.</li><li>Acordo ou convenção coletiva vigente.</li></ol>
 <p>A <a href="https://www.planalto.gov.br/ccivil_03/decreto-lei/del5452.htm" target="_blank" rel="noopener noreferrer">CLT</a> reúne regras gerais sobre duração do trabalho, horas suplementares e compensação. A Constituição também prevê remuneração do serviço extraordinário; consulte o texto oficial e o instrumento da categoria em vez de usar calculadora sem contexto.</p>
@@ -708,6 +732,12 @@ const overrides: Record<string, EditorialContentOverride> = {
 <h2>Não comprometa o próprio registro</h2>
 <ul><li>Não bata ponto por colega.</li><li>Não altere captura de tela.</li><li>Não deixe de registrar saída por ordem apenas verbal sem pedir orientação formal.</li><li>Não publique holerite completo com CPF, matrícula ou dados bancários.</li><li>Não aceite cálculo de perfil desconhecido como decisão final.</li></ul>
 <p>Se a divergência persistir, leve o conjunto de documentos ao sindicato, à inspeção do trabalho ou a profissional competente. Este guia ensina a conferir e formular perguntas; ele não calcula crédito trabalhista nem substitui perícia contábil.</p>
+<h2>Reconcilie dia, competência e destino</h2>
+<p>Para cada ocorrência, crie uma linha com data, horário previsto, marcações reais, justificativa, quantidade reconhecida, competência da folha e destino informado: pagamento, compensação, pendência ou correção. Não some como débito tudo o que excede a escala sem antes classificar intervalo, ajuste autorizado, fechamento do ponto e regra aplicável.</p>
+<p><strong>Exemplo ilustrativo:</strong> três saídas posteriores aparecem no espelho. Uma foi corrigida por erro de marcação, outra entrou no banco e a terceira não tem destino. A pergunta útil trata apenas da terceira e cita data, marcações e competência. Isso evita misturar fatos diferentes em um total impossível de auditar.</p>
+<h2>Faça uma auditoria em três documentos</h2>
+<p>O ponto mostra o tempo; a regra aplicável explica tratamento e percentual; o holerite ou extrato do banco mostra o destino. Só marque uma linha como conferida quando os três lados puderem ser ligados. Consulte no <a href="https://www.gov.br/pt-br/servicos/consultar-instrumento-coletivo-de-trabalho" target="_blank" rel="noopener noreferrer">Sistema Mediador</a> o acordo ou a convenção da categoria, verificando partes, território e vigência.</p>
+<p>Se a empresa corrigir na folha seguinte, guarde a resposta e confira a rubrica posterior. Não apague a pendência quando houver apenas promessa verbal. Em rescisão ou bloqueio de acesso ao sistema, exporte os documentos antes da data final e preserve os arquivos em conta pessoal protegida.</p>
 `.trim()
   },
   "pedido-demissao-aviso-previo-acerto": {
@@ -962,9 +992,9 @@ const overrides: Record<string, EditorialContentOverride> = {
 `.trim()
   },
   "retorno-trabalho-apos-maternidade": {
-    reviewedAt: "2026-10-14",
+    reviewedAt: "2026-10-15",
     contentHtml: `
-<p><strong>Revisão editorial: 14 de outubro de 2026.</strong> Voltar ao emprego após licença-maternidade e retomar a busca por trabalho são situações diferentes. Em ambas, maternidade não precisa ser tratada como culpa nem como informação a ser escondida; o foco deve ser o que a pessoa precisa para exercer a função com segurança e quais direitos se aplicam ao vínculo.</p>
+<p><strong>Revisão editorial: 15 de outubro de 2026.</strong> Voltar ao emprego após licença-maternidade e retomar a busca por trabalho são situações diferentes. Em ambas, maternidade não precisa ser tratada como culpa nem como informação a ser escondida; o foco deve ser o que a pessoa precisa para exercer a função com segurança e quais direitos se aplicam ao vínculo.</p>
 <h2>Se o retorno é ao mesmo emprego</h2>
 <p>Antes da data prevista, confirme por canal oficial o dia, horário, unidade, escala e eventual exame ocupacional. Peça orientação sobre acesso, ponto e mudanças ocorridas durante a licença. Não assine pedido de demissão ou alteração contratual que não compreendeu.</p>
 <p>O artigo 396 da <a href="https://www.planalto.gov.br/ccivil_03/decreto-lei/del5452.htm" target="_blank" rel="noopener noreferrer">CLT</a> prevê, até que a criança complete seis meses, dois descansos especiais de meia hora durante a jornada para amamentação, inclusive em caso de adoção. Os horários devem ser definidos em acordo individual entre a mulher e o empregador, e o período pode ser ampliado quando a saúde do filho exigir.</p>
@@ -983,13 +1013,19 @@ const overrides: Record<string, EditorialContentOverride> = {
 <h2>Planeje uma primeira semana realista</h2>
 <ol><li>Teste o trajeto no horário efetivo.</li><li>Defina contatos de emergência e limites de compartilhamento.</li><li>Revise documentos e acessos necessários ao trabalho.</li><li>Reserve margem para adaptação da rotina.</li><li>Registre qualquer combinação relevante com o RH.</li></ol>
 <p>Se houver pressão para pedir demissão, discriminação, recusa de direito, risco à saúde ou divergência sobre estabilidade, preserve mensagens e documentos e procure sindicato, inspeção do trabalho, assistência jurídica ou profissional habilitado. Este guia oferece organização prática; não substitui avaliação jurídica ou médica.</p>
+<h2>Monte um mapa de retorno com três responsáveis</h2>
+<p>Crie uma página com três colunas: RH, liderança e saúde ocupacional. Na primeira, registre data, documentos, benefícios e ponto; na segunda, tarefas, acessos, escala e treinamento; na terceira, apenas avaliações, restrições e encaminhamentos necessários. Essa separação reduz mensagens contraditórias e evita enviar dado clínico a quem só precisa organizar a rotina.</p>
+<p><strong>Exemplo ilustrativo:</strong> uma trabalhadora de atendimento volta a uma unidade de São Luís após mudança de sistema. O RH confirma a data, a supervisão agenda atualização operacional e a área ocupacional recebe o documento cabível. O grupo da equipe não recebe laudo, certidão ou informações da criança.</p>
+<h2>Teste a primeira quinzena, não apenas o primeiro dia</h2>
+<p>Registre horário real, deslocamento, descansos combinados, tarefas retomadas e qualquer ajuste. Faça uma revisão no terceiro e no décimo dia com perguntas objetivas: o acesso funciona, a escala coincide com o combinado, os intervalos foram registrados e existe necessidade de nova orientação? Não transforme dificuldade de adaptação em pedido de demissão preparado sob pressão.</p>
+<p>Para datas de licença, estabilidade, adoção, ampliação por motivo de saúde ou situação individual, use os documentos e procure orientação qualificada. A <a href="https://www.planalto.gov.br/ccivil_03/decreto-lei/del5452.htm" target="_blank" rel="noopener noreferrer">CLT</a> e a <a href="https://www.planalto.gov.br/ccivil_03/constituicao/constituicao.htm" target="_blank" rel="noopener noreferrer">Constituição</a> são pontos de partida, não calculadoras automáticas para o caso concreto.</p>
 `.trim()
   },
 
   "como-ler-holerite-descontos": {
-    reviewedAt: "2026-10-14",
+    reviewedAt: "2026-10-15",
     contentHtml: `
-<p><strong>Revisão editorial: 14 de outubro de 2026.</strong> O holerite é um registro para conferir, não uma conta que o trabalhador precisa aceitar sem entender. Compare o documento com o contrato, o controle de jornada e o valor que entrou na conta. Não use uma tabela antiga da internet para concluir que há erro: alíquotas, bases e regras podem mudar.</p>
+<p><strong>Revisão editorial: 15 de outubro de 2026.</strong> O holerite é um registro para conferir, não uma conta que o trabalhador precisa aceitar sem entender. Compare o documento com o contrato, o controle de jornada e o valor que entrou na conta. Não use uma tabela antiga da internet para concluir que há erro: alíquotas, bases e regras podem mudar.</p>
 <h2>Leia em quatro blocos</h2>
 <ol>
 <li><strong>Identificação e competência:</strong> confirme nome, empregador, cargo e o mês a que o pagamento se refere.</li>
@@ -1019,12 +1055,19 @@ const overrides: Record<string, EditorialContentOverride> = {
 <p><strong>Uma diferença pequena pode ser ignorada?</strong> Registre e pergunte. Valores pequenos repetidos se acumulam e podem indicar uma rubrica interpretada de forma diferente pelo RH.</p>
 <p>Quando a folha usa códigos internos, peça o glossário de rubricas em vez de adivinhar pelo nome abreviado. Na rescisão ou troca de sistema, exporte seus demonstrativos antes de perder o acesso ao portal corporativo. Arquivo pessoal não deve depender apenas do e-mail ou aplicativo da empresa.</p>
 <p>Guarde holerites, espelhos de ponto, contrato e comprovantes em local pessoal seguro. Se a diferença persistir, peça memória de cálculo ao empregador e consulte o sindicato da categoria ou profissional habilitado. Este guia ajuda a organizar a conferência; não calcula tributos nem substitui análise contábil ou jurídica.</p>
+<h2>Reconstrua o líquido sem começar pelas alíquotas</h2>
+<p>Primeiro some as rubricas de proventos e, em separado, as rubricas de descontos. Verifique se a diferença coincide com o líquido indicado e com o depósito. Depois investigue a base e a regra de cada linha. Começar por uma tabela encontrada na internet pode produzir erro quando competência, teto, dependentes, faixa, arredondamento ou natureza da parcela são diferentes.</p>
+<p>Crie quatro marcas: conferido, explicado, aguardando documento e divergente. Um item só passa para conferido quando você consegue ligar nome da rubrica, base, período e comprovante. “Valor parecido” não basta; também não conclua ilegalidade porque a sigla é desconhecida.</p>
+<h2>Faça um teste de continuidade entre meses</h2>
+<p>Compare três competências consecutivas e destaque o que surgiu, desapareceu ou mudou. Salário-base e parcelas fixas pedem uma leitura; férias, adiantamento, variável, falta ou ajuste retroativo pedem outra. Se uma correção foi prometida, confira a folha seguinte e mantenha a pergunta anterior anexada.</p>
+<p><strong>Exemplo ilustrativo:</strong> o líquido cai em agosto. Em vez de atribuir a mudança a um único desconto, a trabalhadora compara proventos, faltas, benefício e competência do ponto. Ela pergunta ao RH sobre duas rubricas específicas e solicita memória de cálculo, sem enviar holerite completo em grupo.</p>
+<p>Para descontos e comprovantes, os artigos 462 e 464 da <a href="https://www.planalto.gov.br/ccivil_03/decreto-lei/del5452.htm" target="_blank" rel="noopener noreferrer">CLT</a> oferecem referência geral. Tributos, previdência, decisão judicial e norma coletiva têm fontes próprias; confirme a regra vigente antes de aplicar um percentual.</p>
 `.trim()
   },
   "freelancer-ou-clt-vantagens": {
-    reviewedAt: "2026-10-14",
+    reviewedAt: "2026-10-15",
     contentHtml: `
-<p><strong>Revisão editorial: 14 de outubro de 2026.</strong> “Freelancer” descreve uma forma comum de prestar serviços, mas não resolve sozinho se existe ou não vínculo de emprego. A escolha prática deve considerar autonomia real, previsibilidade de renda, custos, proteção previdenciária e o contrato proposto — não apenas o valor anunciado.</p>
+<p><strong>Revisão editorial: 15 de outubro de 2026.</strong> “Freelancer” descreve uma forma comum de prestar serviços, mas não resolve sozinho se existe ou não vínculo de emprego. A escolha prática deve considerar autonomia real, previsibilidade de renda, custos, proteção previdenciária e o contrato proposto — não apenas o valor anunciado.</p>
 <h2>Compare o trabalho concreto</h2>
 <table>
 <thead><tr><th>Ponto</th><th>Emprego formal</th><th>Prestação por conta própria</th></tr></thead>
@@ -1061,12 +1104,18 @@ const overrides: Record<string, EditorialContentOverride> = {
 <p>Imagine que o cliente pede uma quinta revisão depois do aceite. O texto diz quantas revisões estavam incluídas, quem aprovou a entrega e como o novo escopo será orçado? Se o projeto for cancelado no meio, existe critério de pagamento proporcional? Se houver dados de clientes, estão definidos acesso, finalidade, armazenamento e eliminação? Perguntas assim revelam risco melhor que uma lista abstrata de “vantagens”.</p>
 <p>Guarde proposta, aceite, versões entregues e comprovantes pelo prazo adequado à sua situação, sem armazenar dados além do necessário. Em projeto presencial em São Luís, some deslocamento e tempo de espera; em projeto remoto, identifique equipamento e licenças. Se um único contratante controla rotina, horário e modo de execução, não tente resolver possível vínculo apenas trocando o título do documento: procure orientação qualificada.</p>
 <p>Não abra CNPJ, pague taxa ou entregue senha gov.br só porque um anúncio exige urgência. Se a rotina real divergir do contrato ou houver dúvida sobre vínculo, tributação ou contribuição, leve os documentos a profissional habilitado. Este conteúdo é um roteiro de decisão, não enquadramento jurídico automático.</p>
+<h2>Faça uma simulação de noventa dias</h2>
+<p>Monte três cenários: demanda cheia, metade da demanda e nenhum projeto novo. Em cada mês, registre receita recebida — não apenas faturada —, tributos, contribuição, ferramentas, deslocamento, horas administrativas e reserva. Para a proposta de emprego, use somente salário e benefícios confirmados, descontando custos reais de transporte e alimentação. Não atribua preço imaginário a férias, liberdade ou estabilidade.</p>
+<p><strong>Exemplo ilustrativo:</strong> uma pessoa recebe oferta para produzir quatro peças por mês. Ela mede briefing, execução, revisão, cobrança e deslocamento. Quando simula atraso de um cliente e substituição do computador, percebe se o preço cobre o risco sem precisar afirmar que um modelo é sempre melhor.</p>
+<h2>Defina um portão antes de mudar de regime</h2>
+<p>Não encerre vínculo, compre equipamento ou abra empresa antes de confirmar por escrito escopo, preço, prazo, propriedade do trabalho, forma de aceite e rescisão. Verifique no <a href="https://www.gov.br/empresas-e-negocios/pt-br/empreendedor" target="_blank" rel="noopener noreferrer">Portal do Empreendedor</a> as informações oficiais e, no <a href="https://www.gov.br/inss/pt-br/direitos-e-deveres/inscricao-e-contribuicao/tipos-de-filiacao" target="_blank" rel="noopener noreferrer">INSS</a>, o tipo de filiação; elegibilidade e atividade precisam ser conferidas no caso concreto.</p>
+<p>Se o contratante controla rotina, horário, pessoalidade e execução de modo incompatível com o documento, preserve contrato e comunicações e procure orientação. Mudar o nome para “parceria” ou emitir nota não decide sozinho a natureza da relação.</p>
 `.trim()
   },
   "mitos-direitos-trabalhistas-whatsapp": {
-    reviewedAt: "2026-10-14",
+    reviewedAt: "2026-10-15",
     contentHtml: `
-<p><strong>Revisão editorial: 14 de outubro de 2026.</strong> Mensagens virais misturam regra geral, exceção, decisão sobre um caso específico e informação já superada. Em vez de responder “verdadeiro” ou “falso” sem contexto, verifique a fonte, a data, a categoria profissional e o documento aplicável.</p>
+<p><strong>Revisão editorial: 15 de outubro de 2026.</strong> Mensagens virais misturam regra geral, exceção, decisão sobre um caso específico e informação já superada. Em vez de responder “verdadeiro” ou “falso” sem contexto, verifique a fonte, a data, a categoria profissional e o documento aplicável.</p>
 <h2>Um método de verificação em cinco passos</h2>
 <ol>
 <li><strong>Capture a afirmação exata.</strong> Salve texto, data e link; áudio sem origem é difícil de auditar.</li>
@@ -1098,12 +1147,18 @@ const overrides: Record<string, EditorialContentOverride> = {
 <ul><li>Qual é o número da lei, cláusula ou decisão?</li><li>Qual órgão publicou e em que data?</li><li>A informação vale para empregado, servidor, autônomo ou uma categoria específica?</li><li>A regra está vigente na data do fato?</li><li>Há condição ou exceção que foi cortada da mensagem?</li></ul>
 <p>Se ninguém consegue responder, rotule a informação como não verificada. Não complete a lacuna com memória ou com outro post que cita a mesma corrente. Uma busca pode encontrar muitas repetições sem encontrar a fonte original.</p>
 <p>Ao compartilhar uma correção, envie o link oficial e uma frase limitada: “esta fonte diz X; é preciso confirmar se se aplica ao seu contrato”. Não exponha holerite, atestado ou dados de colegas em grupo. Se houver prazo, desconto, dispensa ou risco à saúde, preserve os documentos e procure orientação individual. Este guia combate desinformação; não oferece parecer jurídico.</p>
+<h2>Use uma ficha de rastreabilidade da afirmação</h2>
+<table><thead><tr><th>Campo</th><th>Pergunta</th></tr></thead><tbody><tr><td>Texto</td><td>qual frase exata está sendo verificada?</td></tr><tr><td>Origem</td><td>qual órgão, norma ou decisão é citada?</td></tr><tr><td>Data</td><td>quando foi publicada e qual período alcança?</td></tr><tr><td>Abrangência</td><td>qual categoria, território e situação contratual?</td></tr><tr><td>Limite</td><td>que exceção ou condição acompanha a regra?</td></tr></tbody></table>
+<p>Se a corrente diz “nova lei”, procure número e texto no portal oficial. Se fala em piso, jornada ou benefício, consulte o instrumento coletivo registrado e confira partes, vigência e base territorial. Se cita decisão, não transforme resultado de um processo em regra automática para todas as pessoas.</p>
+<h2>Classifique antes de encaminhar</h2>
+<p>Use quatro rótulos: confirmado pela fonte, verdadeiro apenas sob condições, desatualizado ou não verificado. Escreva o motivo em uma frase e guarde a URL. “Parece certo” e “todo mundo recebeu” não são categorias de verificação.</p>
+<p><strong>Exemplo ilustrativo:</strong> uma mensagem afirma que determinada folga vale para todo comércio de São Luís. A pessoa localiza o instrumento no <a href="https://www.gov.br/pt-br/servicos/consultar-instrumento-coletivo-de-trabalho" target="_blank" rel="noopener noreferrer">Sistema Mediador</a>, confere categoria, municípios e vigência e então responde apenas sobre o que o documento alcança. Não publica o CPF nem o holerite para pedir opinião.</p>
 `.trim()
   },
   "servicos-gerais-epi-vaga": {
-    reviewedAt: "2026-10-14",
+    reviewedAt: "2026-10-15",
     contentHtml: `
-<p><strong>Revisão editorial: 14 de outubro de 2026.</strong> Em uma vaga de serviços gerais, perguntar sobre risco e proteção é parte da avaliação profissional. “Usa luva” não basta: o equipamento precisa corresponder ao risco da tarefa, ter orientação de uso e estar integrado às medidas de prevenção do local.</p>
+<p><strong>Revisão editorial: 15 de outubro de 2026.</strong> Em uma vaga de serviços gerais, perguntar sobre risco e proteção é parte da avaliação profissional. “Usa luva” não basta: o equipamento precisa corresponder ao risco da tarefa, ter orientação de uso e estar integrado às medidas de prevenção do local.</p>
 <h2>O que a vaga deve esclarecer</h2>
 <ul>
 <li>ambientes e tarefas: limpeza comum, resíduos, produtos químicos, altura ou área de saúde;</li>
@@ -1139,6 +1194,12 @@ const overrides: Record<string, EditorialContentOverride> = {
 <p>Um aviso objetivo contém tarefa, local, risco observado, equipamento afetado e medida imediata: “A luva destinada à limpeza do sanitário estava rasgada antes do uso; separei o item e pedi reposição ao supervisor”. Evite fotografar pessoas ou áreas restritas. Guarde o protocolo quando o canal fornecer e peça retorno antes de reiniciar tarefa que dependa daquela proteção.</p>
 <p>Se aparecer novo produto ou atividade, não suponha que o EPI anterior continua adequado. Peça a ficha do produto, procedimento atualizado e orientação específica. O trabalhador não deve improvisar mistura, diluição ou embalagem para cumprir prazo.</p>
 <p>Não compre EPI exigido pela vaga como condição para participar de seleção e não aceite pagamento para “kit obrigatório” enviado por desconhecido. Em risco imediato, falta de orientação ou recusa de substituição, procure a supervisão e os canais de segurança do trabalho; conforme o caso, sindicato, inspeção do trabalho ou atendimento de saúde. O guia não substitui avaliação técnica do ambiente.</p>
+<h2>Monte uma matriz tarefa–risco–controle</h2>
+<p>Para cada rotina, descreva a tarefa concreta, o risco percebido, a medida coletiva existente, o procedimento e o EPI orientado. Limpar piso, manipular resíduo, usar produto concentrado e trabalhar em altura não formam uma única atividade chamada “serviços gerais”. A matriz ajuda a fazer perguntas sem escolher equipamento por conta própria.</p>
+<p><strong>Exemplo ilustrativo:</strong> na limpeza de um corredor, a equipe isola a área, usa diluição indicada e sinalização antes de considerar proteção individual. Se a tarefa muda para coleta de material perfurocortante, não se presume que a mesma luva basta. A supervisão e a área de segurança precisam definir o procedimento.</p>
+<h2>Faça um teste de entrega em quatro passos</h2>
+<ol><li>Confirme identificação, tamanho, integridade e, quando aplicável, o CA no <a href="https://caepi.trabalho.gov.br/internet/ConsultaCAInternet.aspx" target="_blank" rel="noopener noreferrer">sistema oficial</a>.</li><li>Receba orientação de colocação, retirada, limitação, guarda e troca.</li><li>Teste o ajuste antes de entrar na tarefa.</li><li>Registre defeito, desconforto ou substituição no canal informado.</li></ol>
+<p>O registro de entrega não encerra a prevenção. A <a href="https://www.gov.br/trabalho-e-emprego/pt-br/acesso-a-informacao/participacao-social/conselhos-e-orgaos-colegiados/comissao-tripartite-partitaria-permanente/normas-regulamentadora/normas-regulamentadoras-vigentes/norma-regulamentadora-no-6-nr-6" target="_blank" rel="noopener noreferrer">NR-6</a> deve ser lida junto da avaliação do ambiente e das demais medidas. Em seleção, pergunte sobre processo e treinamento; não prometa operar produto ou equipamento que não conhece.</p>
 `.trim()
   },
   "sindicato-trabalhador-direitos-basico": {
@@ -1184,9 +1245,9 @@ const overrides: Record<string, EditorialContentOverride> = {
     `.trim()
   },
   "transferencia-interna-emprego-como-pedir": {
-    reviewedAt: "2026-10-14",
+    reviewedAt: "2026-10-15",
     contentHtml: `
-<p><strong>Revisão editorial: 14 de outubro de 2026.</strong> Transferência interna pode significar mudança de equipe, turno, função, unidade ou cidade. Antes de pedir, defina qual dessas mudanças você quer e que problema ela resolve para a organização sem ocultar os impactos para você.</p>
+<p><strong>Revisão editorial: 15 de outubro de 2026.</strong> Transferência interna pode significar mudança de equipe, turno, função, unidade ou cidade. Antes de pedir, defina qual dessas mudanças você quer e que problema ela resolve para a organização sem ocultar os impactos para você.</p>
 <h2>Monte uma proposta verificável</h2>
 <ul>
 <li><strong>Objetivo:</strong> função, equipe ou unidade desejada.</li>
@@ -1222,6 +1283,12 @@ const overrides: Record<string, EditorialContentOverride> = {
 <ol><li>Explique a mudança pretendida em uma frase, sem depreciar a equipe atual.</li><li>Apresente duas evidências ligadas à nova função.</li><li>Pergunte critérios, responsável pela decisão e prazo.</li><li>Confirme como serão tratados acesso, treinamento e entregas atuais.</li><li>Envie resumo factual e peça correção se algo estiver errado.</li></ol>
 <p>Se a transferência envolve São Luís e outro município, simule o trajeto no horário real, visite a região quando possível e estime moradia ou deslocamento com valores próprios. Não trate ajuda de custo verbal como renda garantida nem entregue pedido de demissão antes de receber condições formais.</p>
 <p>Se a mudança for imposta, não assine documento que você não entendeu. Peça tempo razoável para leitura e guarde a versão recebida. Pressão, redução indevida ou deslocamento relevante podem demandar sindicato ou orientação jurídica. Este guia ajuda a estruturar o pedido; não garante aprovação nem define a legalidade de um caso concreto.</p>
+<h2>Faça uma matriz de mudança contratual</h2>
+<p>Antes de responder, use uma linha para cada condição: função, tarefas, salário fixo, variável, jornada, escala, unidade, gestor, benefícios, acessos, duração e retorno. Nas colunas, registre situação atual, proposta, fonte da informação e pendência. Uma conversa pode explicar intenção; contrato, aditivo ou política identificam o que será efetivamente aplicado.</p>
+<p><strong>Exemplo ilustrativo:</strong> a proposta muda uma trabalhadora do atendimento no Centro para apoio em outra unidade. O cargo parece semelhante, mas horário, transporte e fechamento de caixa mudam. Ela pede descrição, simula o trajeto na saída real e confirma quem responderá pelos valores antes de aceitar.</p>
+<h2>Defina critérios de sucesso e saída</h2>
+<p>Se houver período temporário ou teste interno, combine entregas observáveis, suporte, data de revisão e o que ocorre ao final. “Ver se dá certo” não permite avaliar nem retornar. Registre quem decide a efetivação e como ficam salário, sistemas e tarefas durante a transição.</p>
+<p>Para mudança geográfica, alteração prejudicial ou interpretação de cláusula coletiva, leve a matriz, a proposta e o instrumento aplicável a sindicato ou profissional qualificado. Os artigos 468 e 469 da <a href="https://www.planalto.gov.br/ccivil_03/decreto-lei/del5452.htm" target="_blank" rel="noopener noreferrer">CLT</a> são referências gerais; distância, necessidade, duração e documentos do caso alteram a análise. Não peça demissão como condição informal para ser recontratado em outra unidade sem orientação individual.</p>
 `.trim()
   },
   "vale-alimentacao-ou-refeicao-diferenca": {
@@ -1262,9 +1329,9 @@ const overrides: Record<string, EditorialContentOverride> = {
 `.trim()
   },
   "documentos-admissao-emprego-maranhao": {
-    reviewedAt: "2026-10-14",
+    reviewedAt: "2026-10-15",
     contentHtml: `
-<p><strong>Revisão editorial: 14 de outubro de 2026.</strong> Não existe uma lista única que sirva para toda admissão. Os documentos necessários dependem do vínculo, da função e dos registros que o empregador precisa realizar. A empresa deve informar a relação e um canal seguro; o candidato deve evitar enviar dados extras “por garantia”.</p>
+<p><strong>Revisão editorial: 15 de outubro de 2026.</strong> Não existe uma lista única que sirva para toda admissão. Os documentos necessários dependem do vínculo, da função e dos registros que o empregador precisa realizar. A empresa deve informar a relação e um canal seguro; o candidato deve evitar enviar dados extras “por garantia”.</p>
 <h2>Confirme primeiro a contratação</h2>
 <ul>
 <li>razão social e contato oficial do empregador;</li>
@@ -1306,6 +1373,12 @@ const overrides: Record<string, EditorialContentOverride> = {
 <h2>O que não enviar</h2>
 <p>Nunca envie senha gov.br, código de autenticação, senha de banco, número completo de cartão com código de segurança ou acesso remoto ao celular. Uma empresa pode precisar de dados cadastrais e bancários, mas não precisa assumir suas contas pessoais.</p>
 <p>Se houver dúvida, não comece atividade sem confirmação do vínculo e dos responsáveis. Divergência no registro, exigência discriminatória ou uso indevido de dados deve ser documentado e levado ao canal de privacidade, sindicato, inspeção do trabalho ou orientação jurídica conforme o caso. Este guia não cria uma lista universal nem substitui a instrução formal do empregador.</p>
+<h2>Use um protocolo de envio em duas etapas</h2>
+<p>Primeiro confirme a lista por um canal institucional que identifique empresa, cargo e responsável. Depois envie somente os itens solicitados e guarde protocolo, data e versão. Se o contato mudar de número ou domínio no meio do processo, pause e valide novamente pela página ou telefone oficial; não transfira automaticamente a pasta para o novo destinatário.</p>
+<p><strong>Exemplo ilustrativo:</strong> uma candidata em São Luís recebe a lista por e-mail corporativo e, depois, um pedido de reenvio por conta pessoal. Ela consulta o RH pelo canal inicial e descobre que o segundo contato não fazia parte da admissão. A verificação protege documentos sem atrasar um processo legítimo.</p>
+<h2>Audite o primeiro dia em quatro confirmações</h2>
+<ol><li>Empregador, cargo, unidade e responsável coincidem com a proposta.</li><li>Jornada, remuneração e benefícios têm fonte escrita identificável.</li><li>Exame ocupacional e ASO seguiram o procedimento informado; prontuário não circulou com a equipe.</li><li>O acesso à Carteira de Trabalho Digital continua sendo pessoal, sem entrega de senha ou código.</li></ol>
+<p>A <a href="https://www.gov.br/trabalho-e-emprego/pt-br/acesso-a-informacao/participacao-social/conselhos-e-orgaos-colegiados/comissao-tripartite-partitaria-permanente/normas-regulamentadora/normas-regulamentadoras-vigentes/norma-regulamentadora-no-7-nr-7" target="_blank" rel="noopener noreferrer">NR-7</a>, a <a href="https://www.planalto.gov.br/ccivil_03/_ato2015-2018/2018/lei/l13709.htm" target="_blank" rel="noopener noreferrer">LGPD</a> e o serviço da <a href="https://www.gov.br/pt-br/servicos/obter-a-carteira-de-trabalho" target="_blank" rel="noopener noreferrer">Carteira de Trabalho Digital</a> ajudam a conferir partes diferentes do fluxo. Nenhuma delas autoriza pagamento para garantir vaga nem entrega de credenciais pessoais.</p>
 `.trim()
   },
   "auxiliar-administrativo-vagas-sao-luis": {
