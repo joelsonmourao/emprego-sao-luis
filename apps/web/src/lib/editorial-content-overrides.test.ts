@@ -190,6 +190,7 @@ describe("revisões editoriais substanciais para AdSense", () => {
         "transferencia-interna-emprego-como-pedir",
         "freelancer-ou-clt-vantagens",
         "servicos-gerais-epi-vaga",
+        "home-office-remoto-checklist-vaga",
         "documentos-admissao-emprego-maranhao"
       ].includes(slug) ? "2026-10-15" : "2026-10-14");
       expect(words.length).toBeGreaterThanOrEqual(600);
@@ -568,6 +569,36 @@ describe("revisões editoriais substanciais para AdSense", () => {
       { slug: "como-ler-holerite-descontos", minimumWords: 850, required: ["Reconstrua o líquido sem começar pelas alíquotas", "Faça um teste de continuidade entre meses"] },
       { slug: "freelancer-ou-clt-vantagens", minimumWords: 990, required: ["Faça uma simulação de noventa dias", "Defina um portão antes de mudar de regime"] },
       { slug: "documentos-admissao-emprego-maranhao", minimumWords: 980, required: ["Use um protocolo de envio em duas etapas", "Audite o primeiro dia em quatro confirmações"] }
+    ];
+
+    for (const item of cases) {
+      const override = getEditorialContentOverride(item.slug);
+      const html = override?.contentHtml ?? "";
+      const words = textOnly(html).split(/\s+/).filter(Boolean);
+      const outbound = [...html.matchAll(/href="(https:\/\/[^"]+)"/g)].map((match) => match[1]);
+
+      expect(override).not.toBeNull();
+      expect(override?.reviewedAt).toBe("2026-10-15");
+      expect(words.length).toBeGreaterThanOrEqual(item.minimumWords);
+      expect(new Set(outbound).size).toBeGreaterThanOrEqual(2);
+      for (const excerpt of item.required) expect(html).toContain(excerpt);
+      expect(html).not.toMatch(/vagas abertas hoje|salário médio|contratação garantida|aprovação garantida|empresa está contratando/i);
+    }
+  });
+
+  it("conclui o lote 8k com evidencias, canais e decisoes verificaveis", () => {
+    const cases = [
+      { slug: "portfolio-simples-candidato-emprego", minimumWords: 860, required: ["Monte uma ficha de prova para cada peça", "Use um portão de privacidade antes de compartilhar"] },
+      { slug: "emprego-apos-40-anos-curriculo", minimumWords: 900, required: ["Construa um mapa de evidências dos últimos cinco anos", "Teste a consistência entre três versões da sua história"] },
+      { slug: "agradecimento-pos-entrevista-mensagem", minimumWords: 870, required: ["Escolha entre três mensagens, conforme a etapa", "Faça um teste de consequência antes de enviar"] },
+      { slug: "carta-apresentacao-emprego-curta", minimumWords: 880, required: ["Crie um banco de evidências antes de abrir o editor", "Faça o teste dos noventa segundos"] },
+      { slug: "home-office-remoto-checklist-vaga", minimumWords: 1000, required: ["Monte uma matriz de custo, propriedade e suporte", "Audite a primeira semana contra o contrato"] },
+      { slug: "como-usar-empregos-sao-luis", minimumWords: 860, required: ["Use uma trilha de cinco confirmações por oportunidade", "Relate erro sem transformar suspeita em fato"] },
+      { slug: "dinamica-de-grupo-entrevista-dicas", minimumWords: 830, required: ["Faça uma rotação de contribuição sem disputar cargo", "Registre uma ficha pós-dinâmica em dez minutos"] },
+      { slug: "email-candidatura-emprego-modelo", minimumWords: 870, required: ["Faça uma conferência em duas camadas", "Corrija um erro sem multiplicar mensagens"] },
+      { slug: "comparar-beneficios-vaga-emprego", minimumWords: 870, required: ["Separe valor garantido, condicionado e reembolso", "Teste uso real em São Luís por uma semana"] },
+      { slug: "curriculo-ats-palavras-chave-sao-luis", minimumWords: 870, required: ["Monte um inventário de evidência por palavra-chave", "Adapte o canal sem inventar tecnologia"] },
+      { slug: "candidatura-whatsapp-emprego-mensagem", minimumWords: 920, required: ["Use uma mensagem de cinco linhas que possa ser auditada", "Faça uma reconciliação após cada mudança de etapa"] }
     ];
 
     for (const item of cases) {

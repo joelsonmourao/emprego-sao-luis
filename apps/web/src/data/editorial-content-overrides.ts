@@ -1628,9 +1628,9 @@ const overrides: Record<string, EditorialContentOverride> = {
   },
 
   "home-office-remoto-checklist-vaga": {
-    reviewedAt: "2026-10-14",
+    reviewedAt: "2026-10-15",
     contentHtml: `
-<p><strong>Revisão editorial: 14 de outubro de 2026.</strong> “Remoto” descreve onde parte do trabalho acontece, não o contrato inteiro. Antes de aceitar, transforme o anúncio em perguntas sobre presença, jornada, equipamento, despesas, segurança e resultado. Este guia não define direitos para todo caso; contrato, convenção coletiva e situação concreta podem mudar a resposta.</p>
+<p><strong>Revisão editorial: 15 de outubro de 2026.</strong> “Remoto” descreve onde parte do trabalho acontece, não o contrato inteiro. Antes de aceitar, transforme o anúncio em perguntas sobre presença, jornada, equipamento, despesas, segurança e resultado. Este guia não define direitos para todo caso; contrato, convenção coletiva e situação concreta podem mudar a resposta.</p>
 <h2>Descubra o que a empresa chama de remoto</h2><p>Pergunte se o posto é remoto desde a admissão, se exige treinamento presencial, quantos comparecimentos podem ocorrer e qual é o endereço de referência. Confirme se a contratação aceita residência em São Luís ou se existe restrição geográfica. “100% remoto” não deveria esconder viagens frequentes, mas uma reunião presencial ocasional pode fazer parte de um acordo claramente informado.</p>
 <p>A CLT trata o teletrabalho nos artigos 75-A e seguintes. O <a href="https://www.planalto.gov.br/ccivil_03/decreto-lei/del5452compilado.htm" target="_blank" rel="noopener noreferrer">texto consolidado oficial</a> prevê que a prestação em regime de teletrabalho conste expressamente do contrato individual e que aquisição, manutenção ou fornecimento de equipamentos, infraestrutura e reembolso de despesas sejam previstos em contrato escrito. Leia o documento; não presuma que notebook, internet ou cadeira serão pagos.</p>
 <h2>Perguntas antes do aceite</h2><ul><li>Qual é o horário e como a disponibilidade será registrada?</li><li>Há metas por entrega, controle de jornada ou plantão? Como funciona cada um?</li><li>Quem fornece notebook, headset, licenças e suporte técnico?</li><li>Quais despesas são reembolsadas e como comprovar?</li><li>Qual canal recebe incidentes de segurança e falhas de equipamento?</li><li>Existem comparecimentos presenciais e com quanto aviso?</li><li>O retorno ao presencial está previsto? Em quais condições?</li></ul>
@@ -1647,6 +1647,15 @@ const overrides: Record<string, EditorialContentOverride> = {
 <p>Um teste técnico legítimo avalia requisito da função; ele não exige senha bancária, código de autenticação ou pagamento. Se houver comparecimento, confirme endereço e responsável antes de viajar. Guarde contrato e política fornecidos, pois a palavra “remoto” no anúncio não substitui essas condições.</p>
 <h2>Compare a proposta inteira</h2><p>Salário, benefícios, jornada, equipamento, deslocamento eventual e previsibilidade importam juntos. Uma vaga remota pode ser boa sem auxílio; outra pode transferir custo incompatível com a remuneração. Não existe resposta universal. Registre o combinado, leia a convenção coletiva aplicável no <a href="https://www.gov.br/pt-br/servicos/consultar-instrumento-coletivo-de-trabalho" target="_blank" rel="noopener noreferrer">Sistema Mediador</a> e procure orientação especializada se o contrato divergir da prática.</p>
 <p>Se a seleção cobrar equipamento, certificado ou taxa para “liberar o acesso”, interrompa e valide a empresa. Trabalho remoto legítimo não elimina a necessidade de identificação, contrato claro e canal de suporte.</p>
+<h2>Monte uma matriz de custo, propriedade e suporte</h2>
+<p>Coloque notebook, monitor, headset, cadeira, internet, energia, software e deslocamento eventual em linhas separadas. Para cada item, registre quem compra, quem é proprietário, quem mantém, como funciona o reembolso e o que acontece na devolução. “Ajuda de custo” sem valor, periodicidade ou despesa coberta continua sendo informação pendente.</p>
+<p>Exemplo: a empresa fornece notebook e licenças, mas o trabalhador usa internet própria. A decisão precisa considerar o pacote já contratado, eventual aumento, plano para indisponibilidade e se existe reembolso escrito. Não cobre toda a conta da casa automaticamente nem zera o custo; registra a parcela realmente alterada pela vaga.</p>
+<h2>Faça um ensaio de um dia completo</h2>
+<ol><li>Inicie no horário proposto e teste autenticação sem compartilhar senha.</li><li>Simule chamada com áudio, iluminação e privacidade.</li><li>Observe ruído, temperatura e postura após dois blocos de trabalho.</li><li>Teste o canal de suporte e anote o que fazer se a conexão cair.</li><li>Encerre o perfil de trabalho e confira se arquivos pessoais ficaram separados.</li></ol>
+<p>O ensaio não substitui orientação ergonômica nem obrigação contratual. Ele revela limitações antes da primeira cobrança: tomada distante, ambiente compartilhado, pacote insuficiente ou falta de local para guardar equipamento.</p>
+<h2>Audite a primeira semana contra o contrato</h2>
+<p>Registre horário praticado, pausas orientadas, ferramentas, chamados, comparecimentos e despesas. Ao final, compare com anúncio, proposta e contrato. Se houver diferença, peça esclarecimento com fatos: “O documento prevê comparecimento mensal; nesta semana foram solicitados três dias. Qual regra será usada daqui em diante?”</p>
+<p>Não espere meses para documentar divergência nem publique tela interna. Use o canal responsável, preserve mensagens e, se a situação envolver direito ou risco à saúde, procure sindicato, inspeção do trabalho ou orientação profissional competente.</p>
     `.trim()
   },
 
@@ -1777,9 +1786,9 @@ const overrides: Record<string, EditorialContentOverride> = {
   },
 
   "candidatura-whatsapp-emprego-mensagem": {
-    reviewedAt: "2026-10-12",
+    reviewedAt: "2026-10-15",
     contentHtml: `
-<p><strong>Revisão editorial: 12 de outubro de 2026.</strong> Candidatura por WhatsApp pede duas coisas ao mesmo tempo: clareza para quem faz a triagem e cautela com seus dados. Este guia ensina a responder a um anúncio verificado; não autoriza envio para números copiados de comentários nem substitui as instruções da vaga.</p>
+<p><strong>Revisão editorial: 15 de outubro de 2026.</strong> Candidatura por WhatsApp pede duas coisas ao mesmo tempo: clareza para quem faz a triagem e cautela com seus dados. Este guia ensina a responder a um anúncio verificado; não autoriza envio para números copiados de comentários nem substitui as instruções da vaga.</p>
 <h2>Antes da mensagem, valide o caminho</h2>
 <p>Volte ao anúncio e confira cargo, empresa, cidade, prazo e número indicado. Salve a URL ou uma captura que mostre a origem. Se o contato chegou por encaminhamento, procure a oportunidade no site da empresa ou em outro canal institucional encontrado por você. O <a href="https://cartilha.cert.br/fasciculos/" target="_blank" rel="noopener noreferrer">CERT.br reúne orientações sobre golpes em aplicativos de mensagem</a>, links desconhecidos e códigos de verificação. Nome e foto de perfil não comprovam identidade.</p>
 <p>Não inicie pagando taxa, comprando curso do recrutador ou enviando código recebido por SMS. Também não compartilhe senha, acesso remoto ao aparelho, dado bancário ou foto segurando documento. Se o anúncio for do Empregos São Luís, compare o contato com a página publicada e use a nossa <a href="/seguranca-candidatos">política de segurança do candidato</a>.</p>
@@ -1795,13 +1804,24 @@ const overrides: Record<string, EditorialContentOverride> = {
 <h2>Faça um acompanhamento sóbrio</h2>
 <p>Quando o anúncio não der prazo, uma mensagem de acompanhamento pode ser enviada depois de alguns dias úteis: “Olá, enviei meu currículo para a vaga de [cargo] em [data]. Gostaria de confirmar o recebimento e saber se há previsão para a próxima etapa. Obrigado.” Evite mensagens repetidas no mesmo dia, chamadas sucessivas ou cobrança agressiva. Ausência de resposta não autoriza insistência indefinida.</p>
 <p>Encerre imediatamente se o contato mudar a vaga sem explicação, pedir dinheiro, tentar obter código de autenticação ou recusar identificação mínima. Registre número, URL, horário e conteúdo e procure os canais oficiais adequados. Candidatura cuidadosa é objetiva, verificável e proporcional à etapa.</p>
+<h2>Use uma mensagem de cinco linhas que possa ser auditada</h2>
+<ol><li>cumprimento e nome;</li><li>cargo e origem do anúncio;</li><li>uma ou duas evidências ligadas à vaga;</li><li>menção ao currículo solicitado;</li><li>disponibilidade e encerramento.</li></ol>
+<p>Exemplo: “Olá, meu nome é Carla Sousa. Vi a vaga de recepcionista na página [origem]. Tenho experiência com agenda e registro de atendimento. Envio o currículo em PDF conforme a orientação e fico disponível para conversar no turno da tarde. Obrigada.” Troque apenas por fatos reais e preserve a URL de origem fora da conversa.</p>
+<h2>Classifique cada pedido antes de responder</h2>
+<p><strong>Triagem:</strong> currículo e perguntas sobre disponibilidade. <strong>Entrevista:</strong> confirmação de horário, plataforma ou endereço. <strong>Admissão:</strong> documentos necessários após identificação e orientação formal. <strong>Pedido incompatível:</strong> senha, código, pagamento, acesso remoto ou movimentação bancária. Não trate os quatro níveis como se exigissem os mesmos dados.</p>
+<p>Um perfil com foto, logotipo ou conta comercial não comprova sozinho a empresa. Confirme domínio, endereço institucional ou anúncio original. Se a conversa migrar para outro número, peça identificação e valide pelo canal que você já havia confirmado.</p>
+<h2>Faça uma reconciliação após cada mudança de etapa</h2>
+<p>Compare cargo, empresa, local, jornada e responsável com a ficha inicial. Mudança pode ser legítima, mas precisa de explicação. Se a vaga passa de auxiliar administrativo para venda autônoma, ou de São Luís para outro município, não continue apenas porque o contato já tem seu currículo.</p>
+<p>Ao receber convite, confirme data e endereço por texto. Ao receber proposta, peça condições por escrito. Ao chegar à admissão, envie somente os documentos solicitados pelo canal indicado e guarde comprovante. Não publique a conversa nem encaminhe dados do recrutador para grupos.</p>
+<h2>Separe ausência de resposta de sinal de fraude</h2>
+<p>Silêncio pode significar processo lento, alto volume ou encerramento; não comprova golpe. Fraude exige sinais verificáveis, como cobrança, identidade divergente ou pedido de credencial. Registre fatos e use o <a href="https://www.gov.br/anpd/pt-br/assuntos/titular-de-dados" target="_blank" rel="noopener noreferrer">canal da ANPD sobre direitos do titular</a> como referência quando a dúvida envolver uso de dados pessoais, sem transformar toda demora em denúncia.</p>
     `.trim()
   },
 
   "email-candidatura-emprego-modelo": {
-    reviewedAt: "2026-10-12",
+    reviewedAt: "2026-10-15",
     contentHtml: `
-<p><strong>Revisão editorial: 12 de outubro de 2026.</strong> Um e-mail de candidatura não precisa contar sua vida inteira. Ele precisa permitir que a pessoa identifique a vaga, entenda sua aderência e abra um arquivo confiável. O modelo abaixo é ponto de partida, não garantia de entrevista.</p>
+<p><strong>Revisão editorial: 15 de outubro de 2026.</strong> Um e-mail de candidatura não precisa contar sua vida inteira. Ele precisa permitir que a pessoa identifique a vaga, entenda sua aderência e abra um arquivo confiável. O modelo abaixo é ponto de partida, não garantia de entrevista.</p>
 <h2>Leia o anúncio como instrução</h2>
 <p>Use exatamente o canal informado. Se a vaga pede formulário, não suponha que um e-mail paralelo substituirá a inscrição. Confira endereço do destinatário, prazo, formato do arquivo e itens solicitados. Endereço parecido com o da empresa pode ser falso; confirme o domínio no site institucional encontrado por você.</p>
 <p>O assunto deve sobreviver a uma caixa cheia. Uma forma simples é “Candidatura — cargo — nome completo”. Quando o anúncio traz código da vaga, inclua-o sem inventar outro: “Candidatura — Auxiliar de Estoque — REF 123 — João Lima”. Não escreva apenas “currículo”, “vaga” ou “urgente”.</p>
@@ -1818,6 +1838,15 @@ const overrides: Record<string, EditorialContentOverride> = {
 <h2>Quando acompanhar</h2>
 <p>Se o anúncio trouxer calendário, respeite-o. Sem prazo, um acompanhamento curto após alguns dias úteis pode confirmar o recebimento: “Enviei minha candidatura à vaga X em [data] e gostaria de confirmar o recebimento. Permaneço disponível.” Responda no mesmo tópico para preservar o histórico. Não reenvie o anexo diariamente nem marque várias pessoas que não participam da seleção.</p>
 <p>Antes de clicar em enviar, verifique destinatário, assunto, cargo, empresa, anexo e telefone. Essa revisão de trinta segundos evita os erros que realmente impedem a leitura. Depois, registre a candidatura em uma lista simples com data, canal e retorno.</p>
+<h2>Faça uma conferência em duas camadas</h2>
+<p>Na primeira, verifique conteúdo: cargo, código da vaga, nome da empresa, duas evidências e disponibilidade. Na segunda, verifique transmissão: endereço completo do destinatário, extensão e tamanho do anexo, nome do arquivo, ausência de senha e domínio de qualquer link. Leia o endereço da direita para a esquerda; pequenas trocas no domínio podem passar despercebidas.</p>
+<p>Abra o PDF gerado e selecione uma frase para confirmar que o texto não virou imagem ilegível. Veja a primeira e a última página, telefone e e-mail. Remova comentários, controle de alterações e páginas em branco. O arquivo deve conter apenas o que foi pedido para a etapa.</p>
+<h2>Use modelos diferentes para três situações</h2>
+<p><strong>Anúncio com código:</strong> repita código e cargo no assunto. <strong>Candidatura por indicação:</strong> mencione a pessoa somente com autorização e preserve a vaga de referência. <strong>Banco de talentos:</strong> indique área e duas competências, sem afirmar que existe oportunidade aberta. Em todos os casos, evite “segue currículo para qualquer vaga”.</p>
+<p>Exemplo de banco de talentos: “Olá, equipe de recrutamento. Tenho experiência com atendimento e registro de ocorrências e gostaria de integrar o banco para funções de recepção em São Luís. Anexo currículo com histórico e contato. Caso não exista canal para essa finalidade, peço que desconsiderem a mensagem.”</p>
+<h2>Corrija um erro sem multiplicar mensagens</h2>
+<p>Se esqueceu o anexo, responda imediatamente no mesmo tópico: “Peço desculpas; segue o arquivo mencionado.” Se informou cargo errado, corrija a linha exata. Não mande três novos e-mails com assuntos diferentes. Se o destinatário estiver errado e a mensagem contiver dado pessoal, registre o ocorrido e avalie o canal adequado para solicitar exclusão.</p>
+<p>Resposta automática confirma recebimento técnico, não participação nem aprovação. Guarde-a com a candidatura. Se o servidor rejeitar a mensagem, confira o motivo e o anúncio antes de tentar outro endereço; não adivinhe variações do e-mail da empresa.</p>
     `.trim()
   },
 
@@ -1961,9 +1990,9 @@ const overrides: Record<string, EditorialContentOverride> = {
   },
 
   "curriculo-ats-palavras-chave-sao-luis": {
-    reviewedAt: "2026-10-12",
+    reviewedAt: "2026-10-15",
     contentHtml: `
-<p><strong>Revisão editorial: 12 de outubro de 2026.</strong> ATS é uma categoria de sistemas usados para organizar candidaturas; não existe um leitor único nem uma lista universal de palavras que “libera” o currículo. A estratégia segura é alinhar linguagem verdadeira ao anúncio e manter o arquivo legível também para pessoas.</p>
+<p><strong>Revisão editorial: 15 de outubro de 2026.</strong> ATS é uma categoria de sistemas usados para organizar candidaturas; não existe um leitor único nem uma lista universal de palavras que “libera” o currículo. A estratégia segura é alinhar linguagem verdadeira ao anúncio e manter o arquivo legível também para pessoas.</p>
 <h2>Extraia o vocabulário da própria vaga</h2>
 <p>Copie o anúncio para uma folha e marque quatro grupos: cargo, tarefas, ferramentas e requisitos. Para auxiliar administrativo, por exemplo, podem aparecer atendimento, arquivo, planilha, emissão de documento e sistema interno. Só use termos que correspondam ao seu histórico.</p>
 <p>A <a href="https://www.gov.br/trabalho-e-emprego/pt-br/servicos/trabalhador/mais-acoes/classificacao-brasileira-de-ocupacoes" target="_blank" rel="noopener noreferrer">Classificação Brasileira de Ocupações do Ministério do Trabalho e Emprego</a> ajuda a conferir nomes de ocupações e famílias de tarefas. Ela não informa se uma empresa usa ATS e não substitui o texto do anúncio; serve para padronizar linguagem quando o seu título anterior era muito local ou informal.</p>
@@ -1982,6 +2011,15 @@ const overrides: Record<string, EditorialContentOverride> = {
 <p>Nomeie o arquivo com nome e cargo, abra no celular e confirme telefone. Não inclua CPF, RG, endereço completo ou dado bancário no currículo inicial. Se houver pedido de pagamento ou código de autenticação, use a <a href="/seguranca-candidatos">página de segurança</a> e valide a empresa.</p>
 <h2>Checklist final</h2>
 <p>Compare cada requisito com uma evidência; remova palavras sem prova; teste seleção de texto; verifique datas; mantenha tamanho razoável; peça a alguém para ler em trinta segundos. O objetivo não é derrotar um robô imaginário. É criar um documento encontrável, compreensível e consistente com a conversa seguinte.</p>
+<h2>Monte um inventário de evidência por palavra-chave</h2>
+<p>Para cada termo do anúncio, escreva onde ele aparece na sua história. “Inventário” pode estar ligado a contagem, registro de entrada, análise de divergência ou sistema; escolha o sentido verdadeiro. Se não existe evidência, marque “não possuo” ou “em aprendizagem” e não repita a palavra para forçar correspondência.</p>
+<p>Depois transforme a evidência em frase: “Conferia mercadoria recebida e registrava diferenças para o fechamento” comunica mais que “estoque, inventário, logística”. A frequência do termo não substitui contexto. Use o nome completo antes de sigla quando isso melhora a leitura.</p>
+<h2>Faça dois testes de leitura do arquivo</h2>
+<ol><li>Copie o texto do PDF para um editor simples e veja se títulos, datas e experiências permanecem na ordem.</li><li>Abra no celular e peça a outra pessoa para localizar cargo, experiência recente e contato em trinta segundos.</li></ol>
+<p>Colunas, caixas flutuantes, ícones sem texto e tabelas complexas podem embaralhar a extração. Isso não prova reprovação por um ATS específico; apenas identifica risco de legibilidade. Mantenha visual simples e conteúdo que ainda funcione fora do layout.</p>
+<h2>Adapte o canal sem inventar tecnologia</h2>
+<p>Se a candidatura ocorre por formulário, preencha os campos mesmo quando a informação está no PDF. Se ocorre por e-mail, assunto e nome do arquivo ajudam a triagem. Se ocorre por WhatsApp indicado, a mensagem precisa identificar cargo e candidato. Não anuncie que “passou pelo robô” nem conclua que um silêncio foi causado por palavras-chave.</p>
+<p>Em São Luís, anúncios podem usar plataformas nacionais, páginas próprias ou contato direto. A estratégia não é tentar adivinhar o software, mas preservar três coisas: linguagem alinhada ao anúncio, evidência verdadeira e arquivo legível. Registre a versão enviada para explicar qualquer diferença na entrevista.</p>
     `.trim()
   },
 
@@ -2213,9 +2251,9 @@ const overrides: Record<string, EditorialContentOverride> = {
   },
 
   "portfolio-simples-candidato-emprego": {
-    reviewedAt: "2026-10-12",
+    reviewedAt: "2026-10-15",
     contentHtml: `
-<p><strong>Revisão editorial: 12 de outubro de 2026.</strong> Portfólio não é exclusivo de design. Ele pode demonstrar organização, escrita, planilha, atendimento ou procedimento, desde que a amostra tenha contexto e não exponha dados. Nem toda vaga precisa desse material; envie quando o anúncio pedir ou quando a prova esclarecer uma competência central.</p>
+<p><strong>Revisão editorial: 15 de outubro de 2026.</strong> Portfólio não é exclusivo de design. Ele pode demonstrar organização, escrita, planilha, atendimento ou procedimento, desde que a amostra tenha contexto e não exponha dados. Nem toda vaga precisa desse material; envie quando o anúncio pedir ou quando a prova esclarecer uma competência central.</p>
 <h2>Escolha três evidências alinhadas ao cargo</h2>
 <p>Para administrativo, use planilha fictícia, modelo de e-mail e fluxo de arquivo. Para atendimento, apresente roteiro de registro, resposta a caso simulado e organização de fila. Para estoque, mostre tabela de entradas e saídas com dados inventados. Se o trabalho pertence a empregador ou cliente, obtenha autorização ou recrie do zero.</p>
 <p>Cada peça precisa responder: qual era o problema, o que você fez, qual ferramenta usou e o que a amostra demonstra. Sem essa legenda, o recrutador vê arquivo, não competência.</p>
@@ -2234,6 +2272,15 @@ const overrides: Record<string, EditorialContentOverride> = {
 <ul><li>Três peças relacionadas à vaga.</li><li>Dados fictícios ou autorização documentada.</li><li>Legenda com contexto, ação e aprendizado.</li><li>Arquivo leve, legível e sem login obrigatório.</li><li>Nenhuma senha, documento ou informação confidencial.</li></ul>
 <p>Atualize o conjunto quando mudar de cargo-alvo. Portfólio curto e explicável é melhor que pasta extensa sem autoria, contexto ou proteção de dados.</p>
 <p>Antes de publicar, abra o link sem estar conectado, no celular e em conexão comum. Confira se o arquivo não revela histórico de edição, comentários, nome de cliente ou versões antigas. Se houver dúvida sobre autorização ou propriedade intelectual, mantenha a peça privada e substitua por exercício autoral claramente identificado.</p>
+<h2>Monte uma ficha de prova para cada peça</h2>
+<p>Antes de cuidar da aparência, escreva cinco linhas: cargo-alvo, problema simulado ou real autorizado, sua contribuição, ferramenta utilizada e limite da amostra. Para uma planilha de estoque fictícia, por exemplo, explique que os produtos e números foram inventados, mostre a regra de entrada e saída e indique qual conferência você faria antes de usar dados reais. A ficha impede que um arquivo bonito pareça trabalho de outra pessoa.</p>
+<p>Inclua também uma pergunta que a peça consegue responder na entrevista. “Como você encontra uma divergência?” é melhor que “veja meu Excel”. Prepare uma explicação de dois minutos e abra o arquivo no ponto exato. Se não consegue defender fórmula, texto ou decisão, retire a peça ou identifique claramente o que foi adaptado.</p>
+<h2>Crie versões por função, não uma pasta universal</h2>
+<p>Para administrativo, priorize fluxo, documento e planilha. Para atendimento, use registro de caso e resposta simulada. Para logística, mostre conferência, identificação de divergência e passagem de turno sem dados de empresa. Uma candidatura para recepção em São Luís não precisa receber dez exemplos de redes sociais; três provas ligadas às tarefas ajudam mais.</p>
+<p>Mantenha uma versão-mestra privada e gere uma cópia somente leitura para cada candidatura. Nomeie com cargo e mês, teste permissão e registre qual link enviou. Se remover uma peça depois, a cópia preservada permite explicar o que o recrutador recebeu.</p>
+<h2>Use um portão de privacidade antes de compartilhar</h2>
+<ol><li>Consigo provar que produzi ou tenho autorização?</li><li>O arquivo contém apenas dados necessários?</li><li>Comentários, histórico, metadados e abas ocultas foram revisados?</li><li>A pessoa consegue abrir sem pedir acesso de edição?</li><li>O material demonstra uma competência pedida?</li></ol>
+<p>A <a href="https://www.gov.br/anpd/pt-br/assuntos/titular-de-dados" target="_blank" rel="noopener noreferrer">ANPD explica os direitos do titular de dados pessoais</a>. Se uma amostra ainda expõe terceiros, não conte com tarja visual ou promessa de sigilo: recrie com dados fictícios ou não envie.</p>
     `.trim()
   },
 
@@ -2275,9 +2322,9 @@ const overrides: Record<string, EditorialContentOverride> = {
   },
 
   "como-usar-empregos-sao-luis": {
-    reviewedAt: "2026-10-14",
+    reviewedAt: "2026-10-15",
     contentHtml: `
-<p><strong>Revisão editorial: 14 de outubro de 2026.</strong> O Empregos São Luís é um ponto de pesquisa e orientação, não a empresa contratante. Usar o portal com segurança significa localizar uma oportunidade, conferir os requisitos e seguir apenas o canal de candidatura indicado. Nenhum anúncio, filtro ou cadastro garante entrevista.</p>
+<p><strong>Revisão editorial: 15 de outubro de 2026.</strong> O Empregos São Luís é um ponto de pesquisa e orientação, não a empresa contratante. Usar o portal com segurança significa localizar uma oportunidade, conferir os requisitos e seguir apenas o canal de candidatura indicado. Nenhum anúncio, filtro ou cadastro garante entrevista.</p>
 <h2>Comece pelo cargo e pela rotina possível</h2>
 <p>Pesquise o nome da função e variações próximas, como “auxiliar administrativo” e “assistente administrativo”. Antes de abrir o anúncio, defina os bairros ou municípios que consegue alcançar, os turnos disponíveis e o tipo de atividade que sabe explicar. O filtro reduz ruído; ele não confirma que você atende a todos os requisitos.</p>
 <p>Leia a página inteira. Separe requisitos obrigatórios, itens desejáveis, horário, local informado, atividades e forma de candidatura. Se o anúncio não traz dado essencial, não complete com suposição. Guarde a URL e a data da consulta porque uma vaga pode ser alterada ou encerrada.</p>
@@ -2294,6 +2341,15 @@ const overrides: Record<string, EditorialContentOverride> = {
 <h2>Quando desconfiar</h2>
 <ul><li>cobrança para participar ou receber treinamento obrigatório antes da contratação;</li><li>pedido de senha, código de autenticação ou acesso ao celular;</li><li>empresa e cargo diferentes no link de destino;</li><li>pressão para enviar documento sensível antes de explicar a etapa;</li><li>promessa de contratação sem entrevista, análise ou identificação verificável.</li></ul>
 <p>Se encontrar risco, não prossiga. Consulte a página de <a href="/seguranca-candidatos">segurança do candidato</a> e confirme a empresa por endereço digitado por você. O portal ajuda a organizar a busca; a decisão segura continua dependendo da leitura do anúncio e da verificação do canal.</p>
+<h2>Use uma trilha de cinco confirmações por oportunidade</h2>
+<ol><li><strong>Origem:</strong> guarde a URL exata da página que você leu.</li><li><strong>Identidade:</strong> compare cargo e empresa com o destino da candidatura.</li><li><strong>Compatibilidade:</strong> confirme tarefas, requisitos, local e turno.</li><li><strong>Envio:</strong> siga apenas o canal indicado e registre o comprovante.</li><li><strong>Acompanhamento:</strong> anote prazo comunicado sem insistência diária.</li></ol>
+<p>Se uma etapa não pode ser confirmada, marque “pendente” e pare antes de enviar documento adicional. O <a href="https://www.gov.br/pt-br/servicos/buscar-emprego-no-sistema-nacional-de-emprego-sine" target="_blank" rel="noopener noreferrer">serviço oficial do Sine</a> é outra fonte que pode integrar a busca; ele não valida automaticamente anúncios encontrados em outros lugares.</p>
+<h2>Organize uma sessão de vinte minutos</h2>
+<p>Nos primeiros cinco minutos, defina cargo, escala e raio de deslocamento. Nos dez seguintes, leia integralmente até três páginas compatíveis. Nos cinco finais, adapte e envie somente a candidatura pronta ou registre por que ela foi descartada. Esse limite reduz o hábito de abrir dezenas de abas sem conferir nenhuma.</p>
+<p>Exemplo local: uma vaga informa unidade em São Luís, mas não o bairro. A candidata não presume que o trajeto cabe no orçamento; registra a pendência e pergunta pelo endereço de referência antes de aceitar entrevista presencial. Se a resposta mudar o município ou turno, ela atualiza a ficha.</p>
+<h2>Relate erro sem transformar suspeita em fato</h2>
+<p>Ao encontrar link quebrado, cargo divergente ou prazo encerrado, guarde URL, data e captura da informação pública. Descreva o que ocorreu: “o botão levou para cargo diferente”. Não publique acusação de fraude sem verificação. Um erro editorial, uma vaga encerrada e um golpe são situações distintas.</p>
+<p>Não envie currículo junto com o relato, a menos que o canal correto solicite. A finalidade é corrigir ou verificar a página. Depois, atualize seu controle e procure outra oportunidade; nenhum anúncio individual justifica compartilhar senha, código ou pagamento.</p>
     `.trim()
   },
 
@@ -2535,9 +2591,9 @@ const overrides: Record<string, EditorialContentOverride> = {
   },
 
   "agradecimento-pos-entrevista-mensagem": {
-    reviewedAt: "2026-10-13",
+    reviewedAt: "2026-10-15",
     contentHtml: `
-<p><strong>Revisão editorial: 13 de outubro de 2026.</strong> A mensagem de agradecimento não é cobrança disfarçada nem garantia de vantagem. Ela serve para confirmar interesse, registrar um ponto relevante da conversa e manter um canal profissional aberto. Deve ser curta, verdadeira e enviada apenas a um contato que participou do processo ou foi indicado pela empresa.</p>
+<p><strong>Revisão editorial: 15 de outubro de 2026.</strong> A mensagem de agradecimento não é cobrança disfarçada nem garantia de vantagem. Ela serve para confirmar interesse, registrar um ponto relevante da conversa e manter um canal profissional aberto. Deve ser curta, verdadeira e enviada apenas a um contato que participou do processo ou foi indicado pela empresa.</p>
 <h2>Escolha o canal e o momento</h2>
 <p>Use o mesmo canal pelo qual a entrevista foi organizada, salvo orientação diferente. Se recebeu e-mail corporativo, prefira responder à conversa existente; se o contato ocorreu por plataforma, mantenha-se nela. Não procure telefone pessoal do entrevistador nem envie a mesma mensagem para várias pessoas.</p>
 <p>Enviar no mesmo dia ou no próximo dia útil costuma ser suficiente. Se a empresa informou prazo de retorno, agradeça sem pedir resposta imediata. Para acompanhar a seleção depois, use um <a href="/blog/follow-up-apos-entrevista-mensagem">follow-up separado</a> e respeite o prazo combinado.</p>
@@ -2556,13 +2612,22 @@ const overrides: Record<string, EditorialContentOverride> = {
 <p>Em e-mail novo, use assunto identificável: “Agradecimento — entrevista para [cargo] — [seu nome]”. Em resposta, preserve o assunto existente para manter o histórico. Para entrevista coletiva, agradeça à equipe sem listar pessoas que você não conheceu. Para conversa muito curta de triagem, duas ou três frases bastam. Para etapa técnica, mencione uma dúvida esclarecida ou um aspecto do desafio, sem reenviar a solução inteira.</p>
 <p>Se a empresa avisou que não seguirá com a candidatura, você ainda pode agradecer e pedir autorização para acompanhar futuras vagas, mas não conteste a decisão em sequência. Se houve comportamento inadequado, não é obrigatório enviar agradecimento; registre o ocorrido pelo canal apropriado.</p>
 <p>Revise nome, cargo, empresa e ortografia antes de enviar. Guarde a mensagem no seu <a href="/ferramentas/controle-candidaturas">controle de candidaturas</a>, junto com a data e o prazo informado. A ausência de resposta não prova rejeição nem autoriza contato diário; o objetivo é deixar um registro respeitoso e verificável.</p>
+<h2>Escolha entre três mensagens, conforme a etapa</h2>
+<p><strong>Triagem curta:</strong> agradeça o tempo, cite o cargo e confirme disponibilidade para o próximo passo. <strong>Entrevista com liderança:</strong> mencione um aspecto real da função que ficou mais claro e uma evidência relacionada. <strong>Etapa técnica:</strong> agradeça a orientação recebida e registre que entregou o material pelo canal combinado. Não use o mesmo texto para as três situações.</p>
+<p>Exemplo após entrevista: “Olá, Ana. Obrigado pela conversa sobre a vaga de auxiliar administrativo. A explicação sobre a conferência dos pedidos reforçou meu interesse porque já trabalhei com registro de divergências e passagem de pendências. Fico disponível para complementar informações pelo canal do processo.” O exemplo não pede decisão nem promete experiência que não existe.</p>
+<h2>Faça um teste de consequência antes de enviar</h2>
+<ol><li>A mensagem acrescenta algo específico ou apenas repete “obrigado”?</li><li>Ela respeita o prazo comunicado?</li><li>O destinatário participou da seleção ou foi indicado oficialmente?</li><li>Há dado, arquivo ou link que não foi solicitado?</li><li>Você aceitaria que essa mensagem fosse lida junto com seu currículo?</li></ol>
+<p>Se a resposta falhar em duas perguntas, reduza ou não envie. Agradecimento é opcional; silêncio profissional é melhor que contato invasivo.</p>
+<h2>Preserve somente o registro necessário</h2>
+<p>A conversa pode conter nome, e-mail e avaliação ligada a uma pessoa. A <a href="https://www.planalto.gov.br/ccivil_03/_ato2015-2018/2018/lei/l13709.htm" target="_blank" rel="noopener noreferrer">LGPD</a> estabelece princípios como finalidade e necessidade. Guarde data, canal e prazo para organizar a candidatura, mas não publique captura com telefone, rosto ou avaliação do entrevistador. Quando o processo terminar, revise o que ainda precisa ser mantido.</p>
+<p>Se perceber erro depois do envio, corrija uma vez no mesmo tópico: “Corrijo o nome da unidade citado na mensagem anterior: é ___.” Não apague a conversa nem envie várias justificativas. Um ajuste objetivo preserva o histórico.</p>
     `.trim()
   },
 
   "carta-apresentacao-emprego-curta": {
-    reviewedAt: "2026-10-13",
+    reviewedAt: "2026-10-15",
     contentHtml: `
-<p><strong>Revisão editorial: 13 de outubro de 2026.</strong> Carta de apresentação não é autobiografia nem cópia do currículo. Ela conecta uma necessidade explícita da vaga a uma evidência real da sua experiência. Só envie quando o anúncio solicitar, quando houver campo próprio ou quando a candidatura por e-mail permitir uma apresentação breve.</p>
+<p><strong>Revisão editorial: 15 de outubro de 2026.</strong> Carta de apresentação não é autobiografia nem cópia do currículo. Ela conecta uma necessidade explícita da vaga a uma evidência real da sua experiência. Só envie quando o anúncio solicitar, quando houver campo próprio ou quando a candidatura por e-mail permitir uma apresentação breve.</p>
 <h2>Leia a vaga antes de escrever</h2>
 <p>Marque função, tarefas, requisitos obrigatórios, local, escala e forma de candidatura. Escolha no máximo duas evidências que respondam ao trabalho. Se o anúncio pede atendimento e organização de agenda, não ocupe a carta inteira com um curso sem relação.</p>
 <p>Para conferir o significado de uma ocupação sem inventar atribuições, consulte a <a href="https://www.gov.br/trabalho-e-emprego/pt-br/assuntos/trabalhador/qualificacao-profissional/classificacao-brasileira-de-ocupacoes" target="_blank" rel="noopener noreferrer">Classificação Brasileira de Ocupações do Ministério do Trabalho e Emprego</a>. A CBO ajuda a entender famílias ocupacionais, mas o anúncio e o contrato definem a vaga concreta.</p>
@@ -2581,13 +2646,22 @@ const overrides: Record<string, EditorialContentOverride> = {
 <p>Para indicação, cite a pessoa somente com autorização: “Soube da vaga por ___, que autorizou mencionar seu nome.” Para candidatura espontânea, diga a área de interesse e por que escolheu aquela organização, sem afirmar que existe vaga aberta. Para mudança de carreira, conecte uma habilidade transferível a uma tarefa: conferência, atendimento, manutenção, registro ou organização. Não diga “aceito qualquer cargo”, pois isso impede o leitor de entender onde seu perfil se encaixa.</p>
 <p>Leia a carta em voz alta e retire frases que serviriam para qualquer empresa. Se um parágrafo só repete “dedicado, pontual, comunicativo”, substitua por situação real ou apague. Uma página é limite, não meta; muitas candidaturas ficam claras em 150 a 250 palavras.</p>
 <p>Guarde a versão enviada e o link da oportunidade. Personalizar não significa reescrever sua história; significa selecionar apenas o que responde àquela vaga.</p>
+<h2>Crie um banco de evidências antes de abrir o editor</h2>
+<p>Liste seis fatos que você consegue sustentar: tarefa, contexto, ferramenta, limite, resultado e aprendizado. Depois escolha apenas os dois que respondem ao anúncio. Para vaga de estoque, “conferi entrada e registrei divergências” vale mais que uma lista de adjetivos. Para recepção, mostre como organizou agenda ou encaminhou demanda sem expor cliente.</p>
+<p>O banco reduz contradições porque a carta, o currículo e a entrevista partem das mesmas evidências. Ele também evita inventar um resultado quando o anúncio parece exigir experiência maior. Se o fato pertence a trabalho coletivo, descreva sua parte e reconheça a dependência.</p>
+<h2>Faça o teste dos noventa segundos</h2>
+<ol><li>Em trinta segundos, o leitor identifica vaga e nome?</li><li>Em mais trinta, encontra duas evidências ligadas às tarefas?</li><li>No último trecho, entende anexo, disponibilidade e contato?</li></ol>
+<p>Se o texto depende de contexto que não está na carta, reescreva. Se uma frase cabe em qualquer candidatura, retire. O objetivo não é chegar a uma quantidade de palavras, mas reduzir o esforço para relacionar seu histórico à necessidade apresentada.</p>
+<h2>Trate mudança de carreira sem apagar o ponto de partida</h2>
+<p>Use uma ponte concreta: “Em atendimento, desenvolvi registro de ocorrências e organização de fila; estou direcionando essas competências para rotinas administrativas e concluí prática recente de planilha.” Não se apresente como profissional pleno de uma área que ainda está estudando. Indique o que já faz e o que precisa de treinamento.</p>
+<p>Para candidatura espontânea, confirme no site institucional se existe canal para talentos; não transforme formulário de contato geral em caixa de currículos. Para indicação, preserve a autorização da pessoa mencionada. Para plataforma, use o campo próprio e evite colar carta longa em toda resposta obrigatória.</p>
     `.trim()
   },
 
   "comparar-beneficios-vaga-emprego": {
-    reviewedAt: "2026-10-13",
+    reviewedAt: "2026-10-15",
     contentHtml: `
-<p><strong>Revisão editorial: 13 de outubro de 2026.</strong> “Salário mais benefícios” não informa sozinho o valor nem as condições de uma vaga. Para comparar, transforme cada item em perguntas concretas: quem pode usar, quando começa, qual desconto existe, onde é aceito e o que ocorre em afastamento, férias ou término do contrato.</p>
+<p><strong>Revisão editorial: 15 de outubro de 2026.</strong> “Salário mais benefícios” não informa sozinho o valor nem as condições de uma vaga. Para comparar, transforme cada item em perguntas concretas: quem pode usar, quando começa, qual desconto existe, onde é aceito e o que ocorre em afastamento, férias ou término do contrato.</p>
 <h2>Separe remuneração, benefício e reembolso</h2>
 <p>Registre salário bruto, periodicidade e forma de pagamento em uma linha. Em outras, liste vale-transporte, alimentação, refeição, plano de saúde, seguro, bônus, comissão e ajuda de custo. Não some tudo como se fosse dinheiro disponível: há itens condicionais, coparticipações, regras internas e despesas que só são reembolsadas mediante comprovante.</p>
 <p>O vale-transporte tem finalidade específica de deslocamento residência-trabalho e vice-versa, conforme a <a href="https://www.planalto.gov.br/ccivil_03/leis/l7418.htm" target="_blank" rel="noopener noreferrer">Lei nº 7.418/1985</a>. Confirme com a empresa o procedimento e o desconto aplicável ao caso; não deduza a regra apenas pelo nome “auxílio transporte”.</p>
@@ -2605,6 +2679,15 @@ const overrides: Record<string, EditorialContentOverride> = {
 <h2>Atualize a comparação quando chegar a proposta</h2>
 <p>O anúncio pode resumir condições que mudam por unidade, cargo ou jornada. Ao receber proposta, refaça a ficha e marque a origem de cada informação. Se houver convenção ou acordo coletivo aplicável, peça qual instrumento e vigência, sem presumir que uma regra de outro setor vale para você. Guarde cópia do que foi destinado ao candidato.</p>
 <p>Faça um cenário mensal comum e outro de maior gasto, por exemplo com mais dias presenciais ou coparticipação de saúde. Não desconte imposto ou contribuição com tabela antiga; para estimativa financeira, use fonte oficial vigente ou aguarde o demonstrativo. O objetivo é enxergar dependências, não prever o primeiro contracheque com falsa exatidão.</p>
+<h2>Separe valor garantido, condicionado e reembolso</h2>
+<p>Crie três blocos. No primeiro, coloque salário fixo e benefício confirmado para seu cargo e jornada. No segundo, comissão, bônus, premiação e benefício sujeito a regra. No terceiro, reembolso de despesa comprovada. Não some os três como renda mensal. Para o variável, registre regra, período de apuração, teto e cenário zero.</p>
+<p>Exemplo: uma proposta informa vale-refeição, plano de saúde e bônus. A candidata confirma valor do vale, desconto e data de início; pergunta mensalidade, coparticipação e dependentes do plano; e mantém o bônus fora do orçamento fixo até receber a regra. O nome dos itens não vira valor por estimativa.</p>
+<h2>Teste uso real em São Luís por uma semana</h2>
+<p>Simule cinco dias com o endereço e horário informados: transporte de ida e volta, alimentação, cuidado familiar e eventual estacionamento. Para benefício com rede, confirme onde seria usado no trajeto real; para trabalho híbrido, multiplique somente os dias presenciais confirmados. Não publique uma tarifa como universal nem suponha que todas as unidades aceitam o mesmo cartão.</p>
+<p>Marque também o custo de tempo separado do dinheiro. Duas propostas com o mesmo valor podem produzir rotinas muito diferentes. Se o endereço exato ainda não foi informado, a comparação permanece provisória.</p>
+<h2>Faça perguntas específicas sobre assistência médica</h2>
+<p>A <a href="https://www.gov.br/ans/pt-br/assuntos/consumidor" target="_blank" rel="noopener noreferrer">ANS mantém orientações ao consumidor de planos de saúde</a>. Na proposta, pergunte operadora, tipo de contratação, abrangência, acomodação, carência quando aplicável, mensalidade, coparticipação e regra para dependentes. Não conclua cobertura apenas pelo logotipo exibido no anúncio.</p>
+<p>Benefício valioso é o que tem condição compreendida e utilidade para sua rotina. Antes de aceitar, peça que salário, jornada, local, contrato e pacote aplicável constem do documento destinado ao candidato; depois compare sem preencher lacunas com promessa verbal.</p>
     `.trim()
   },
 
@@ -2643,9 +2726,9 @@ const overrides: Record<string, EditorialContentOverride> = {
   },
 
   "dinamica-de-grupo-entrevista-dicas": {
-    reviewedAt: "2026-10-13",
+    reviewedAt: "2026-10-15",
     contentHtml: `
-<p><strong>Revisão editorial: 13 de outubro de 2026.</strong> Dinâmica de grupo não tem um roteiro universal. Pode envolver apresentação, discussão de caso, priorização ou construção coletiva. O objetivo do candidato não é falar mais nem assumir liderança a qualquer custo, e sim compreender a tarefa, contribuir com clareza e permitir que o grupo trabalhe.</p>
+<p><strong>Revisão editorial: 15 de outubro de 2026.</strong> Dinâmica de grupo não tem um roteiro universal. Pode envolver apresentação, discussão de caso, priorização ou construção coletiva. O objetivo do candidato não é falar mais nem assumir liderança a qualquer custo, e sim compreender a tarefa, contribuir com clareza e permitir que o grupo trabalhe.</p>
 <h2>Confirme a instrução antes de agir</h2>
 <p>Ouça tempo, entrega esperada, materiais e restrições. Se algo estiver ambíguo, faça pergunta curta: “Devemos apresentar uma única decisão do grupo ou alternativas?” Não comece a resolver enquanto o facilitador ainda explica. Anote o enunciado e o horário final.</p>
 <p>A <a href="https://suap.enap.gov.br/vitrine/curso/2687/" target="_blank" rel="noopener noreferrer">Enap</a> relaciona escuta ativa, assertividade e empatia às relações de trabalho. É uma referência de desenvolvimento, não uma regra secreta de seleção. A empresa deve explicar a atividade e avaliar conforme seus critérios.</p>
@@ -2664,6 +2747,15 @@ const overrides: Record<string, EditorialContentOverride> = {
 <p>Teste áudio, câmera quando solicitada, nome exibido e conexão antes do horário. Entre pelo link confirmado e mantenha documento pessoal fora da câmera. Use o recurso de levantar a mão ou uma frase curta para pedir turno; silêncio de internet pode parecer interrupção, então confirme se sua fala foi ouvida. Tenha papel para anotar o enunciado, mas não grave participantes sem autorização.</p>
 <p>Se a plataforma falhar, registre a tela de erro sem capturar dados de terceiros e avise o contato pelo canal oficial. Não conclua que foi eliminado nem entre em links alternativos enviados por perfil desconhecido. A avaliação deve considerar a atividade, não a sua capacidade de adivinhar instruções ausentes.</p>
 <p>Depois, anote o que fez, onde interrompeu e como lidou com a decisão. Se houver contato, use o guia de <a href="/blog/pedir-feedback-entrevista-emprego">pedido de feedback</a> sem pressionar. A dinâmica avalia uma situação limitada; ela não mede todo o seu valor profissional.</p>
+<h2>Faça uma rotação de contribuição sem disputar cargo</h2>
+<p>Divida a tarefa em entender, gerar opções, escolher critérios, controlar tempo e apresentar. Você pode assumir uma etapa e apoiar outra, sem tentar centralizar todas. Se o grupo já tem apresentador, sintetize riscos; se já tem alguém anotando, verifique se o enunciado foi atendido.</p>
+<p>Exemplo: o caso pede reduzir fila em um atendimento. Uma pessoa mapeia causas, outra calcula capacidade e você organiza critérios de prioridade. Antes de apresentar, o grupo confirma quais informações vieram do enunciado e quais são hipóteses. Essa distinção mostra raciocínio sem fingir dado que não foi fornecido.</p>
+<h2>Peça acessibilidade de forma operacional</h2>
+<p>A <a href="https://www.planalto.gov.br/ccivil_03/_ato2015-2018/2015/lei/l13146.htm" target="_blank" rel="noopener noreferrer">Lei Brasileira de Inclusão</a> trata de igualdade de oportunidades e acessibilidade. No processo, descreva o recurso necessário para participar: material compatível com leitor de tela, instrução escrita, tempo adicional justificado, intérprete ou acesso físico. Não é preciso narrar todo o histórico médico para pedir uma condição concreta.</p>
+<p>Confirme com antecedência quando possível e guarde a resposta. Se o formato mudar no dia, explique o impacto e proponha alternativa. A adaptação não deve revelar dado de saúde aos demais participantes sem necessidade.</p>
+<h2>Registre uma ficha pós-dinâmica em dez minutos</h2>
+<ul><li>qual era a entrega;</li><li>qual papel você desempenhou;</li><li>uma contribuição aceita;</li><li>uma discordância e como foi tratada;</li><li>um ponto que faria diferente.</li></ul>
+<p>A ficha prepara entrevista posterior e evita memória exagerada. Não avalie colegas nem publique nomes. Se o processo não avançar, use o registro para treinar comportamento observável, não para concluir que existe uma personalidade “certa” para toda dinâmica.</p>
     `.trim()
   },
 
@@ -2701,9 +2793,9 @@ const overrides: Record<string, EditorialContentOverride> = {
   },
 
   "emprego-apos-40-anos-curriculo": {
-    reviewedAt: "2026-10-13",
+    reviewedAt: "2026-10-15",
     contentHtml: `
-<p><strong>Revisão editorial: 13 de outubro de 2026.</strong> Um currículo após os 40 não precisa esconder idade nem narrar toda a vida profissional. O objetivo é mostrar o que você sabe fazer hoje, quais problemas já resolveu e por que isso se relaciona à vaga. Data de nascimento, estado civil e foto não devem ser incluídos automaticamente.</p>
+<p><strong>Revisão editorial: 15 de outubro de 2026.</strong> Um currículo após os 40 não precisa esconder idade nem narrar toda a vida profissional. O objetivo é mostrar o que você sabe fazer hoje, quais problemas já resolveu e por que isso se relaciona à vaga. Data de nascimento, estado civil e foto não devem ser incluídos automaticamente.</p>
 <h2>Comece pelo cargo possível agora</h2>
 <p>Escolha uma ou duas funções compatíveis com sua experiência, saúde, horário e deslocamento. Leia anúncios atuais e liste tarefas recorrentes. Use a <a href="https://www.gov.br/trabalho-e-emprego/pt-br/assuntos/trabalhador/qualificacao-profissional/classificacao-brasileira-de-ocupacoes" target="_blank" rel="noopener noreferrer">Classificação Brasileira de Ocupações</a> para entender a família ocupacional, sem copiar descrições como se fossem atividades que você executou.</p>
 <p>No título, prefira “Auxiliar administrativo | atendimento e controle de documentos” a “profissional experiente em busca de oportunidade”. O primeiro orienta a leitura; o segundo não informa função.</p>
@@ -2722,6 +2814,15 @@ const overrides: Record<string, EditorialContentOverride> = {
 <p>Se mudou de área, explique o movimento em uma frase e apresente evidência da nova direção: prática, curso relevante ou projeto. Se ficou um período fora, indique a atividade que deseja mencionar sem fornecer detalhes pessoais: “Fiquei fora do mercado formal por responsabilidade familiar e agora tenho disponibilidade para esta escala.” Não crie trabalho autônomo para preencher o intervalo.</p>
 <p>Treine respostas sobre tecnologia e aprendizagem com exemplos atuais. “Aprendi a anexar documentos e organizar dados em planilha durante ___” é mais convincente que “aprendo qualquer coisa”. Pergunte sobre treinamento, ferramentas e esforço físico real da função; adequação é uma via de mão dupla, não teste de juventude.</p>
 <p>Use também o guia de <a href="/blog/retorno-mercado-trabalho-gap-curriculo">retorno ao mercado</a> se houver intervalo. O currículo deve tornar a competência visível no presente; não pedir desculpas pela idade nem prometer que experiência resolve tudo.</p>
+<h2>Construa um mapa de evidências dos últimos cinco anos</h2>
+<p>Faça três colunas: tarefa atual, situação em que executou e prova que consegue explicar. A prova pode ser resultado, rotina, curso recente ou projeto, sem expor documento de empregador. Se a experiência importante é antiga, acrescente como a competência foi mantida: uso em trabalho posterior, atividade autônoma verdadeira ou prática atual. Não altere datas para parecer recente.</p>
+<p>Exemplo: um profissional trabalhou com almoxarifado há anos e hoje busca função de estoque. Ele não afirma conhecer o sistema da nova empresa. Mostra que ainda sabe receber, contar, registrar divergência e organizar localização, e declara que está atualizando planilhas e leitura de coletor. O que importa é separar competência transferível de ferramenta ainda não utilizada.</p>
+<h2>Prepare uma atualização de trinta dias</h2>
+<ol><li>Escolha uma ferramenta realmente citada nos anúncios que você lê.</li><li>Faça uma prática curta e guarde evidência sem comprar certificado por impulso.</li><li>Reescreva duas experiências com tarefa, contexto e resultado observável.</li><li>Peça a alguém para localizar cargo, contato e experiência relevante em trinta segundos.</li><li>Candidate-se apenas a vagas cuja escala, local e exigências façam sentido.</li></ol>
+<p>O plano não promete recolocação em trinta dias. Ele produz fatos recentes para currículo e entrevista. Registre o que aprendeu e o que ainda depende de treinamento da empresa.</p>
+<h2>Teste a consistência entre três versões da sua história</h2>
+<p>Compare currículo, formulário da plataforma e resposta de entrevista. Empresas, funções e períodos precisam permanecer compatíveis. Um resumo pode omitir experiência pouco relacionada; não pode transformar omissão em data falsa. Se houve promoção, mostre as duas funções ou explique a mudança sem duplicar o mesmo período.</p>
+<p>Na entrevista, responda à pergunta sobre idade ou transição sem aceitar estereótipo: confirme disponibilidade, mostre uma tarefa atual e pergunte quais condições reais serão avaliadas. Se houver requisito físico, tecnológico ou de horário, peça descrição objetiva. Competência presente se demonstra com evidência, não com frases sobre “energia de jovem” ou “maturidade garantida”.</p>
     `.trim()
   },
 
