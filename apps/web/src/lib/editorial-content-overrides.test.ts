@@ -100,7 +100,7 @@ describe("revisões editoriais substanciais para AdSense", () => {
       const words = textOnly(html).split(/\s+/).filter(Boolean);
 
       expect(override).not.toBeNull();
-      expect(override?.reviewedAt).toBe(slug === "fgts-consultar-trabalhador-clt" ? "2026-10-15" : "2026-10-14");
+      expect(override?.reviewedAt).toBe(["fgts-consultar-trabalhador-clt", "seguro-desemprego-checklist-documentos"].includes(slug) ? "2026-10-15" : "2026-10-14");
       expect(words.length).toBeGreaterThanOrEqual(550);
       expect(html).toMatch(/<a href="https:\/\//);
       expect(html).toMatch(/gov\.br|fgts\.gov\.br|planalto\.gov\.br/);
@@ -128,7 +128,13 @@ describe("revisões editoriais substanciais para AdSense", () => {
       const outbound = [...html.matchAll(/href="(https:\/\/[^"]+)"/g)].map((match) => match[1]);
 
       expect(override).not.toBeNull();
-      expect(override?.reviewedAt).toBe("2026-10-14");
+      expect(override?.reviewedAt).toBe([
+        "trabalhar-fim-de-semana-folga-adicional",
+        "convencao-coletiva-holerite-trabalhador",
+        "periodo-experiencia-clt-o-que-saber",
+        "abono-pecuniario-ferias-holerite",
+        "trabalho-noturno-adicional-o-que-perguntar"
+      ].includes(slug) ? "2026-10-15" : "2026-10-14");
       expect(words.length).toBeGreaterThanOrEqual(550);
       expect(new Set(outbound).size).toBeGreaterThanOrEqual(2);
       expect(outbound.every((url) => /https:\/\/(?:www\.)?(?:gov\.br|planalto\.gov\.br)\//.test(url))).toBe(true);
@@ -157,7 +163,7 @@ describe("revisões editoriais substanciais para AdSense", () => {
       const outbound = [...html.matchAll(/href="(https:\/\/[^"]+)"/g)].map((match) => match[1]);
 
       expect(override).not.toBeNull();
-      expect(override?.reviewedAt).toBe(["trabalhador-terceirizado-direitos", "ponto-eletronico-atraso-trabalho", "pedido-demissao-aviso-previo-acerto", "ferias-clt-periodo-aquisitivo"].includes(slug) ? "2026-10-15" : "2026-10-14");
+      expect(override?.reviewedAt).toBe(["trabalhador-terceirizado-direitos", "ponto-eletronico-atraso-trabalho", "pedido-demissao-aviso-previo-acerto", "ferias-clt-periodo-aquisitivo", "banco-de-horas-direitos-trabalhador"].includes(slug) ? "2026-10-15" : "2026-10-14");
       expect(words.length).toBeGreaterThanOrEqual(550);
       expect(new Set(outbound).size).toBeGreaterThanOrEqual(2);
       expect(outbound.every((url) => /https:\/\/(?:www\.)?(?:gov\.br|planalto\.gov\.br|mpt\.mp\.br|sistemas\.cfm\.org\.br|cnes\.trabalho\.gov\.br)\//.test(url))).toBe(true);
@@ -477,6 +483,33 @@ describe("revisões editoriais substanciais para AdSense", () => {
       { slug: "ingles-no-curriculo-nivel-honesto", minimumWords: 900, required: ["Faça uma matriz por habilidade, não uma média abstrata", "Use os níveis A1 a C2 com o descritor correspondente"] },
       { slug: "plano-90-dias-emprego-sao-luis", minimumWords: 900, required: ["Transforme os 90 dias em seis ciclos de quinze", "Defina uma regra de pausa e outra de mudança"] },
       { slug: "esgotamento-busca-emprego-sinais", minimumWords: 940, required: ["Use um semáforo de funcionamento, não um autodiagnóstico", "Prepare apoio concreto para dias difíceis"] }
+    ];
+
+    for (const item of cases) {
+      const override = getEditorialContentOverride(item.slug);
+      const html = override?.contentHtml ?? "";
+      const words = textOnly(html).split(/\s+/).filter(Boolean);
+      const outbound = [...html.matchAll(/href="(https:\/\/[^"]+)"/g)].map((match) => match[1]);
+
+      expect(override).not.toBeNull();
+      expect(override?.reviewedAt).toBe("2026-10-15");
+      expect(words.length).toBeGreaterThanOrEqual(item.minimumWords);
+      expect(new Set(outbound).size).toBeGreaterThanOrEqual(2);
+      for (const excerpt of item.required) expect(html).toContain(excerpt);
+      expect(html).not.toMatch(/vagas abertas hoje|salário médio|contratação garantida|aprovação garantida|empresa está contratando/i);
+    }
+  });
+
+  it("aprofunda o lote 8h de direitos trabalhistas com fontes e conferencias por URL", () => {
+    const cases = [
+      { slug: "seguro-desemprego-checklist-documentos", minimumWords: 950, required: ["Monte uma linha do tempo que outra pessoa consiga conferir", "Prepare um recurso ligado ao motivo apresentado"] },
+      { slug: "trabalhar-fim-de-semana-folga-adicional", minimumWords: 800, required: ["Use uma matriz de quatro classificações", "Faça a conferência em três camadas"] },
+      { slug: "vale-alimentacao-ou-refeicao-diferenca", minimumWords: 810, required: ["Separe existência, modalidade e uso", "Faça um teste de utilidade por cinco dias"] },
+      { slug: "abono-pecuniario-ferias-holerite", minimumWords: 850, required: ["Separe decisão, pedido, descanso e pagamento", "Teste o documento com três contas independentes"] },
+      { slug: "convencao-coletiva-holerite-trabalhador", minimumWords: 920, required: ["Faça o teste de enquadramento em quatro chaves", "Converta a cláusula em uma conferência de folha"] },
+      { slug: "trabalho-noturno-adicional-o-que-perguntar", minimumWords: 830, required: ["Faça um mapa por trecho do plantão", "Reconcilie plantão, ponto e folha"] },
+      { slug: "banco-de-horas-direitos-trabalhador", minimumWords: 940, required: ["Classifique cada lançamento antes de somar", "Faça uma auditoria em três datas"] },
+      { slug: "periodo-experiencia-clt-o-que-saber", minimumWords: 900, required: ["Monte uma ficha de início que caiba em uma página", "Prepare três cenários antes da data final"] }
     ];
 
     for (const item of cases) {
