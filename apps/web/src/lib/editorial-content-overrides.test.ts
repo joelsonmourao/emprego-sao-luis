@@ -527,4 +527,31 @@ describe("revisões editoriais substanciais para AdSense", () => {
     }
   });
 
+  it("aprofunda o lote 8i de vagas locais, inclusao e avaliacao profissional", () => {
+    const cases = [
+      { slug: "vagas-restaurante-sao-luis-dicas", minimumWords: 900, required: ["Monte um mapa de risco para um turno simulado", "Compare duas propostas sem somar valores incertos"] },
+      { slug: "vaga-sazonal-comercio-sao-luis", minimumWords: 890, required: ["Diferencie três modelos antes de comparar propostas", "Faça uma conferência em quatro momentos"] },
+      { slug: "vaga-recepcionista-clinica-sao-luis", minimumWords: 860, required: ["Use o mínimo necessário em cada mensagem", "Faça uma passagem de turno que possa ser auditada"] },
+      { slug: "auxiliar-administrativo-vagas-sao-luis", minimumWords: 900, required: ["Resolva um caso de duplicidade sem apagar o histórico", "Classifique a autonomia pedida no anúncio"] },
+      { slug: "vagas-afirmativas-como-candidatar", minimumWords: 870, required: ["Separe critério de elegibilidade, avaliação e acessibilidade", "Audite o processo sem expor outras pessoas"] },
+      { slug: "pretensao-salarial-entrevista-dicas", minimumWords: 880, required: ["Faça uma ficha de comparabilidade antes de buscar números", "Prepare três respostas para a negociação"] },
+      { slug: "certificado-ou-experiencia-curriculo", minimumWords: 840, required: ["Construa uma matriz de evidência, não uma pilha de anexos", "Teste a coerência em três documentos"] },
+      { slug: "soft-skills-hard-skills-curriculo", minimumWords: 860, required: ["Faça um inventário em pares de tarefa e comportamento", "Faça o teste da pergunta seguinte"] }
+    ];
+
+    for (const item of cases) {
+      const override = getEditorialContentOverride(item.slug);
+      const html = override?.contentHtml ?? "";
+      const words = textOnly(html).split(/\s+/).filter(Boolean);
+      const outbound = [...html.matchAll(/href="(https:\/\/[^"]+)"/g)].map((match) => match[1]);
+
+      expect(override).not.toBeNull();
+      expect(override?.reviewedAt).toBe("2026-10-15");
+      expect(words.length).toBeGreaterThanOrEqual(item.minimumWords);
+      expect(new Set(outbound).size).toBeGreaterThanOrEqual(2);
+      for (const excerpt of item.required) expect(html).toContain(excerpt);
+      expect(html).not.toMatch(/vagas abertas hoje|salário médio|contratação garantida|aprovação garantida|empresa está contratando/i);
+    }
+  });
+
 });
