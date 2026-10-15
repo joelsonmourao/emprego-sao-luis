@@ -273,9 +273,9 @@ const overrides: Record<string, EditorialContentOverride> = {
 <p>Anote três fatos com fonte e data: o que a organização oferece, onde atua e como a função contribui. Depois associe cada fato a uma pergunta ou experiência verdadeira. Se o site diz que o atendimento ocorre em unidades físicas, por exemplo, pergunte como a equipe divide recepção e registro; não afirme conhecer a operação interna. Avaliações públicas podem indicar temas para perguntar, mas não devem ser repetidas como fatos sem confirmação.</p>`.trim()
   },
   "seguro-desemprego-checklist-documentos": {
-    reviewedAt: "2026-10-14",
+    reviewedAt: "2026-10-15",
     contentHtml: `
-<p><strong>Revisão editorial de 14/10/2026.</strong> O seguro-desemprego é uma assistência temporária e tem requisitos cumulativos. A dispensa, sozinha, não comprova direito, quantidade de parcelas ou valor. Este roteiro ajuda a organizar a solicitação de trabalhador formal pelos canais públicos; categorias como empregado doméstico, pescador artesanal e trabalhador resgatado têm regras próprias que devem ser consultadas no serviço correspondente.</p>
+<p><strong>Revisão editorial de 15/10/2026.</strong> O seguro-desemprego é uma assistência temporária e tem requisitos cumulativos. A dispensa, sozinha, não comprova direito, quantidade de parcelas ou valor. Este roteiro ajuda a organizar a solicitação de trabalhador formal pelos canais públicos; categorias como empregado doméstico, pescador artesanal e trabalhador resgatado têm regras próprias que devem ser consultadas no serviço correspondente.</p>
 <h2>Antes do pedido: confira se os dados contam a mesma história</h2>
 <p>Comece pelo <a href="https://www.gov.br/pt-br/servicos/solicitar-o-seguro-desemprego" target="_blank" rel="noopener noreferrer">serviço oficial de solicitação do Seguro-Desemprego</a>. Para trabalhador formal, a página informa, entre outras condições, dispensa involuntária sem justa causa, ausência de renda própria suficiente e períodos mínimos de salários que variam conforme seja a primeira, a segunda ou uma solicitação posterior. Em vez de aplicar uma regra ouvida de colega, identifique qual solicitação é a sua e leia os critérios atualizados no portal.</p>
 <p>Compare nome, CPF, empregador e datas do desligamento nos documentos recebidos. Uma diferença de grafia ou data não deve ser “corrigida” por conta própria: registre o que diverge e peça orientação ao empregador ou ao atendimento oficial. A Carteira de Trabalho Digital ajuda a consultar vínculos, mas não substitui o Requerimento do Seguro-Desemprego.</p>
@@ -288,6 +288,15 @@ const overrides: Record<string, EditorialContentOverride> = {
 <p>No portal ou aplicativo oficial é possível consultar o andamento e, quando houver habilitação, informações sobre parcelas, valores e datas de liberação. “Em análise” não equivale a aprovação. Evite planejar pagamentos contando com um valor ainda não confirmado e não repasse captura de tela que exponha CPF, protocolo ou dados bancários.</p>
 <h2>Indeferimento: leia o motivo antes de recorrer</h2>
 <p>Se o pedido for negado, confira a justificativa apresentada e reúna apenas documentos relacionados a ela. O serviço <a href="https://www.gov.br/pt-br/servicos/cadastrar-recurso-relativo-ao-seguro-desemprego" target="_blank" rel="noopener noreferrer">Cadastrar Recurso relativo ao Seguro-Desemprego</a> informa que a revisão administrativa pode ser solicitada pelos canais oficiais e indica prazo de 120 dias contado da notificação. O próprio fluxo aponta os documentos necessários conforme o motivo; enviar arquivos aleatórios ou ilegíveis pode dificultar a análise.</p>
+<h2>Monte uma linha do tempo que outra pessoa consiga conferir</h2>
+<p>Crie uma tabela privada com data do desligamento, data em que recebeu o requerimento, data do pedido, canal utilizado, número do protocolo, situação exibida e próxima ação. Não inclua senha, código de autenticação nem cópia integral de documento em uma planilha compartilhada. A <a href="https://www.planalto.gov.br/ccivil_03/leis/l7998.htm" target="_blank" rel="noopener noreferrer">Lei nº 7.998/1990</a> é a base legal do programa, mas a página do serviço deve ser consultada para o procedimento e os canais atuais.</p>
+<p><strong>Exemplo delimitado:</strong> uma trabalhadora recebe o requerimento com uma data diferente daquela visível na CTPS Digital. Ela não altera o PDF nem inicia vários pedidos. Registra os dois campos, confirma qual empregador e vínculo estão envolvidos e solicita correção pelo canal competente. Depois anota o protocolo e só então retoma o pedido. A tabela documenta a divergência; não decide sozinha qual informação prevalece.</p>
+<h2>Separe elegibilidade, protocolo e pagamento</h2>
+<ul><li><strong>Elegibilidade:</strong> depende dos requisitos aplicáveis à pessoa e à solicitação.</li><li><strong>Protocolo:</strong> comprova que um pedido ou recurso foi encaminhado, não que foi deferido.</li><li><strong>Acompanhamento:</strong> mostra a situação informada pelo sistema naquela consulta.</li><li><strong>Pagamento:</strong> deve ser conferido no canal oficial, sem antecipar valor ou data não confirmados.</li></ul>
+<p>Essa separação evita dois erros comuns: tratar uma tela de envio como aprovação e organizar o orçamento com parcela ainda não liberada. Se aparecer um novo emprego, benefício previdenciário ou outra mudança relevante durante a análise, não esconda a informação nem aceite orientação informal; use o canal do programa para saber como proceder.</p>
+<h2>Prepare um recurso ligado ao motivo apresentado</h2>
+<p>Faça uma lista de três colunas: motivo exibido, documento que trata daquele ponto e pergunta que ainda precisa de resposta. Se o problema é dado do vínculo, um comprovante sem relação com o vínculo não esclarece a divergência. Preserve o arquivo original, nomeie a cópia com data e envie somente pelo canal confirmado. Se o sistema falhar, registre horário, mensagem exibida e tentativa realizada, sem publicar CPF ou protocolo em rede social.</p>
+<p>Quando o caso envolver decisão judicial, vínculos simultâneos, renda própria, benefício previdenciário ou modalidade de trabalhador diferente da tratada nesta página, procure atendimento oficial ou orientação habilitada. Não adapte o exemplo de outra pessoa como se fosse prova do seu direito.</p>
 <p><strong>Segurança:</strong> não pague taxa para liberar parcela, não instale aplicativo enviado por mensagem e não compartilhe senha gov.br. Este guia é informativo e não decide direito individual. Para um caso concreto, use o atendimento do Ministério do Trabalho e Emprego indicado nas páginas oficiais.</p>`.trim()
   },
   "ctps-digital-carteira-trabalho-consultar": {
@@ -588,9 +597,9 @@ const overrides: Record<string, EditorialContentOverride> = {
 `.trim()
   },
   "banco-de-horas-direitos-trabalhador": {
-    reviewedAt: "2026-10-14",
+    reviewedAt: "2026-10-15",
     contentHtml: `
-<p><strong>Revisão editorial: 14 de outubro de 2026.</strong> Banco de horas é uma forma de compensar variações de jornada; não é um saldo informal controlado apenas pela memória do supervisor. A validade, o prazo de compensação e a forma do acordo dependem da legislação e do instrumento aplicável ao vínculo.</p>
+<p><strong>Revisão editorial: 15 de outubro de 2026.</strong> Banco de horas é uma forma de compensar variações de jornada; não é um saldo informal controlado apenas pela memória do supervisor. A validade, o prazo de compensação e a forma do acordo dependem da legislação e do instrumento aplicável ao vínculo.</p>
 <h2>Comece identificando qual regra existe</h2>
 <p>Pergunte ao RH se o regime decorre do contrato, de acordo individual, de acordo coletivo ou de convenção coletiva. Peça acesso ao texto e verifique a vigência. A <a href="https://www.planalto.gov.br/ccivil_03/decreto-lei/del5452.htm" target="_blank" rel="noopener noreferrer">Consolidação das Leis do Trabalho (CLT)</a> trata da jornada e das formas de compensação; leia a versão atualizada e não confie em tabela sem data.</p>
 <p>Quando houver instrumento coletivo, consulte o serviço oficial <a href="https://www.gov.br/pt-br/servicos/consultar-instrumento-coletivo-de-trabalho" target="_blank" rel="noopener noreferrer">Consultar Instrumento Coletivo de Trabalho</a>. Categoria, sindicato, empresa, território e período de vigência importam. Um acordo de outra empresa ou de outro estado pode não responder ao seu caso em São Luís.</p>
@@ -608,13 +617,22 @@ const overrides: Record<string, EditorialContentOverride> = {
 <p><strong>Exemplo em São Luís:</strong> durante uma semana de evento, uma equipe altera horários em três dias. Cada trabalhador compara escala, marcações e extrato quando a folha fecha. Se houver diferença, informa as datas e pede qual cláusula ou acordo foi aplicado, em vez de somar todas as horas do mês sem distinguir jornada registrada, intervalo e compensação.</p>
 <h2>Checklist mensal</h2>
 <ul><li>Regra aplicável e vigência identificadas.</li><li>Espelho de ponto conferido antes do fechamento.</li><li>Saldo positivo e negativo compreendidos.</li><li>Compensações registradas com data.</li><li>Divergências comunicadas por escrito.</li><li>Documentos guardados fora do dispositivo corporativo.</li></ul>
+<h2>Classifique cada lançamento antes de somar</h2>
+<p>Monte uma tabela com data, horário previsto, entrada, saída, intervalo, motivo da alteração, autorização e destino informado para a diferença. Marque separadamente hora extra paga, hora destinada ao banco, folga usada para compensar e ajuste de ponto. Somar todos os minutos positivos e negativos numa única coluna pode misturar rubricas e períodos que seguem regras diferentes.</p>
+<p>O artigo 59 da CLT prevê formas distintas de compensação e prazos que dependem do tipo de acordo. Por isso, a pergunta útil não é apenas “qual é meu saldo?”, mas “qual documento instituiu este banco, qual período de compensação se aplica e onde cada movimentação aparece?”. Se o RH citar convenção ou acordo coletivo, localize o arquivo no Sistema Mediador e confira partes, abrangência e vigência.</p>
+<h2>Faça uma auditoria em três datas</h2>
+<ol><li><strong>Na semana da ocorrência:</strong> guarde escala, marcações e autorização da mudança.</li><li><strong>No fechamento do ponto:</strong> compare as marcações com o espelho disponibilizado.</li><li><strong>No fim do período de compensação:</strong> confira folgas, saldo remanescente e eventual pagamento informado.</li></ol>
+<p><strong>Exemplo ilustrativo:</strong> uma auxiliar fica uma hora a mais em dois dias e sai antes em outro, com autorização registrada. Ela não presume saldo de uma hora. Primeiro confere intervalos, arredondamentos apresentados pelo sistema e a regra aplicável; depois pergunta ao RH como as três ocorrências foram classificadas. Se o extrato mudar após o fechamento, guarda as duas versões e pede a justificativa.</p>
+<h2>Não trate saldo negativo como dívida automática</h2>
+<p>Um número negativo pode decorrer de folga autorizada, ajuste pendente, marcação incompleta ou regra específica. Não assine reconhecimento de dívida sem entender origem, período e base documental. Em caso de rescisão, peça memória de cálculo e a indicação do acordo usado; a CLT trata das horas não compensadas, mas a aplicação ao caso exige conferir o documento e os fatos.</p>
+<p>Quando houver trabalho habitual além da jornada, impedimento para usar folgas, alteração retroativa de marcações ou diferença recorrente entre ponto e holerite, preserve os documentos e procure sindicato, inspeção do trabalho ou orientação jurídica. O objetivo da conferência é formular uma divergência verificável, não produzir uma sentença caseira.</p>
 <p>Este guia não calcula horas nem declara que um banco específico é válido ou inválido. Para entender também os lançamentos pagos, leia o guia de <a href="/blog/hora-extra-holerite-como-conferir">conferência de horas extras no holerite</a>.</p>
 `.trim()
   },
   "convencao-coletiva-holerite-trabalhador": {
-    reviewedAt: "2026-10-14",
+    reviewedAt: "2026-10-15",
     contentHtml: `
-<p><strong>Revisão editorial: 14 de outubro de 2026.</strong> Convenção coletiva e acordo coletivo podem estabelecer regras relevantes para remuneração, jornada, benefícios e procedimentos. O nome da empresa ou do cargo, sozinho, não identifica qual instrumento se aplica. É preciso conferir categoria, partes, abrangência territorial e período de vigência.</p>
+<p><strong>Revisão editorial: 15 de outubro de 2026.</strong> Convenção coletiva e acordo coletivo podem estabelecer regras relevantes para remuneração, jornada, benefícios e procedimentos. O nome da empresa ou do cargo, sozinho, não identifica qual instrumento se aplica. É preciso conferir categoria, partes, abrangência territorial e período de vigência.</p>
 <h2>Entenda a diferença prática</h2>
 <p>De forma geral, a convenção é negociada entre entidades sindicais e o acordo envolve sindicato de trabalhadores e uma ou mais empresas. Essa distinção não resolve automaticamente qual texto vale para você. A fonte correta é o instrumento registrado e vigente, combinado com o vínculo concreto.</p>
 <p>O Ministério do Trabalho e Emprego explica o registro de <a href="https://www.gov.br/trabalho-e-emprego/pt-br/servicos/empregador/mediacao/registro-de-convencoes-e-acordo-coletivo-de-trabalho" target="_blank" rel="noopener noreferrer">convenções e acordos coletivos</a> e informa que os documentos ficam disponíveis para consulta. Use também o serviço <a href="https://www.gov.br/pt-br/servicos/consultar-instrumento-coletivo-de-trabalho" target="_blank" rel="noopener noreferrer">Consultar Instrumento Coletivo de Trabalho</a>.</p>
@@ -632,6 +650,15 @@ const overrides: Record<string, EditorialContentOverride> = {
 <ul><li>Usar instrumento vencido porque o PDF aparece primeiro na busca.</li><li>Confundir proposta interna com direito coletivo registrado.</li><li>Aplicar convenção de outra categoria por semelhança de cargo.</li><li>Ignorar termo aditivo ou data-base.</li><li>Compartilhar recorte sem cabeçalho, vigência e partes.</li></ul>
 <h2>Organize uma pasta mínima</h2>
 <p>Guarde contrato, holerites, espelhos de ponto e o PDF do instrumento com o endereço e a data de consulta. Nomeie o arquivo com categoria e vigência. Assim, uma dúvida sobre piso, adicional ou benefício pode ser discutida com documento completo.</p>
+<h2>Faça o teste de enquadramento em quatro chaves</h2>
+<ol><li><strong>Trabalhador:</strong> qual categoria profissional aparece no vínculo e qual atividade é efetivamente exercida?</li><li><strong>Empregador:</strong> qual é a atividade econômica e a razão social responsável pelo contrato?</li><li><strong>Território:</strong> o instrumento alcança São Luís, outro município ou todo o estado?</li><li><strong>Tempo:</strong> a vigência cobre a competência do holerite ou existe termo aditivo posterior?</li></ol>
+<p>Um cargo com o mesmo nome pode estar em categorias diferentes conforme o empregador. Por isso, não escolha o PDF apenas pelo título da função ou pelo valor que parece mais favorável. A CLT distingue convenção coletiva, celebrada entre entidades sindicais, e acordo coletivo, firmado entre entidade sindical dos trabalhadores e uma ou mais empresas. O serviço oficial do MTE permite consultar ACT, CCT e termos aditivos registrados.</p>
+<h2>Converta a cláusula em uma conferência de folha</h2>
+<p>Copie para uma nota privada o número da cláusula, a regra, a data de início, as exceções e os documentos necessários. Em seguida, relacione a competência, a rubrica e o valor do holerite. Não recorte apenas a frase principal: parágrafos seguintes podem limitar quem recebe, prever proporcionalidade ou estabelecer procedimento.</p>
+<p><strong>Exemplo ilustrativo:</strong> uma recepcionista encontra cláusula sobre benefício alimentar, mas o instrumento abrange empresas de um segmento diferente. Ela não exige a aplicação imediata. Confere a razão social do empregador, a representação sindical e a abrangência territorial; só depois apresenta a dúvida ao RH ou ao sindicato, citando documento, cláusula e competência.</p>
+<h2>Trate termo aditivo como parte da mesma investigação</h2>
+<p>O aditivo pode alterar apenas algumas cláusulas e manter as demais. Registre qual trecho foi modificado e desde quando. Se houver mais de um resultado no sistema, organize-os por número de registro e vigência, sem apagar a versão anterior. Essa sequência ajuda a explicar por que o valor de uma rubrica mudou entre competências diferentes.</p>
+<p>Se o enquadramento continuar incerto, leve contrato, razão social, função, holerite e PDFs completos ao sindicato correspondente ou a profissional habilitado. O portal comprova que um instrumento foi consultado; não resolve sozinho qual norma se aplica a uma relação específica.</p>
 <p>A <a href="https://www.planalto.gov.br/ccivil_03/decreto-lei/del5452.htm" target="_blank" rel="noopener noreferrer">CLT atualizada</a> reúne normas gerais sobre negociação coletiva. A lei e o instrumento precisam ser lidos de forma coordenada; um resumo editorial não determina o resultado de um caso individual.</p>
 `.trim()
   },
@@ -716,9 +743,9 @@ const overrides: Record<string, EditorialContentOverride> = {
 `.trim()
   },
   "abono-pecuniario-ferias-holerite": {
-    reviewedAt: "2026-10-14",
+    reviewedAt: "2026-10-15",
     contentHtml: `
-<p><strong>Revisão editorial: 14 de outubro de 2026.</strong> Abono pecuniário é a conversão em dinheiro de até um terço do período de férias a que o trabalhador tem direito. Não é a venda informal de dias decidida no corredor, nem significa trabalhar durante todas as férias. A escolha precisa ser documentada e comparada com a necessidade real de descanso.</p>
+<p><strong>Revisão editorial: 15 de outubro de 2026.</strong> Abono pecuniário é a conversão em dinheiro de até um terço do período de férias a que o trabalhador tem direito. Não é a venda informal de dias decidida no corredor, nem significa trabalhar durante todas as férias. A escolha precisa ser documentada e comparada com a necessidade real de descanso.</p>
 <h2>O que a CLT estabelece</h2>
 <p>O artigo 143 da <a href="https://www.planalto.gov.br/ccivil_03/decreto-lei/del5452.htm" target="_blank" rel="noopener noreferrer">Consolidação das Leis do Trabalho</a> permite ao empregado converter um terço do período de férias em abono. O pedido deve ser feito até quinze dias antes do fim do período aquisitivo. Em férias coletivas, a conversão depende de acordo coletivo, não de pedidos individuais isolados.</p>
 <p>O artigo 145 prevê que a remuneração das férias e o abono solicitado sejam pagos até dois dias antes do início do descanso. Consulte sempre a versão atualizada da lei e o instrumento coletivo aplicável; este guia não calcula valores.</p>
@@ -734,6 +761,14 @@ const overrides: Record<string, EditorialContentOverride> = {
 <h2>Perguntas objetivas ao RH</h2>
 <ul><li>Qual é a data final para protocolar o pedido neste período?</li><li>Quantos dias de descanso e quantos dias de abono constarão do aviso?</li><li>Quando o pagamento será feito e onde ficará o recibo?</li><li>Existe férias coletiva ou regra prevista em instrumento coletivo?</li><li>Quem corrige divergência entre aviso, recibo e depósito?</li></ul>
 <p>Quando houver referência a acordo ou convenção, use o serviço oficial <a href="https://www.gov.br/pt-br/servicos/consultar-instrumento-coletivo-de-trabalho" target="_blank" rel="noopener noreferrer">Consultar Instrumento Coletivo de Trabalho</a> e confirme partes, categoria, território e vigência. Um instrumento de outra empresa ou período não resolve a dúvida atual.</p>
+<h2>Separe decisão, pedido, descanso e pagamento</h2>
+<p>Organize quatro blocos, sem presumir que um documento prova todos os outros: a decisão pessoal de converter dias, o pedido protocolado dentro do prazo, o aviso com os dias efetivos de descanso e o recibo com cada parcela. O artigo 143 da <a href="https://www.planalto.gov.br/ccivil_03/decreto-lei/del5452.htm" target="_blank" rel="noopener noreferrer">CLT compilada</a> trata da conversão de um terço e do prazo do requerimento; o artigo 145 trata do momento do pagamento. Confira o texto vigente e não transforme esses marcos em uma conta automática.</p>
+<h2>Teste o documento com três contas independentes</h2>
+<ol><li><strong>Dias:</strong> confira quantos dias de férias foram reconhecidos, quantos serão convertidos e quantos permanecerão como descanso.</li><li><strong>Datas:</strong> relacione protocolo, início das férias, pagamento e competência do holerite.</li><li><strong>Rubricas:</strong> peça a separação entre remuneração das férias, adicional constitucional, abono e descontos.</li></ol>
+<p><strong>Exemplo ilustrativo:</strong> o aviso apresenta vinte dias de descanso e dez de abono. A trabalhadora confere se essa distribuição corresponde ao período reconhecido, compara recibo e depósito e pergunta sobre qualquer rubrica sem descrição. Ela não conclui que o líquido está correto apenas porque recebeu antes do afastamento.</p>
+<h2>Não aceite transformar descanso em trabalho informal</h2>
+<p>Os dias registrados como férias devem ser tratados como descanso. Pedido para “ajudar só algumas horas”, responder mensagens ou comparecer sem marcação precisa ser recusado e documentado pelo canal oficial. Se o trabalho ocorreu, preserve escala, mensagens e ponto e procure orientação individual; não tente compensar por conta própria em outro dia.</p>
+<p>Em férias coletivas, a própria CLT dá tratamento específico à conversão. Confirme com RH e sindicato qual instrumento abrange a unidade, a categoria e o período antes de protocolar um pedido individual baseado na rotina de férias comuns.</p>
 <p>Guarde cópias fora do aparelho corporativo, sem divulgar CPF, conta bancária ou holerite completo. Se houver pressão, documento retroativo ou divergência persistente, procure sindicato, inspeção do trabalho ou orientação jurídica individual. Para entender o ciclo anterior ao pedido, leia também o guia sobre <a href="/blog/ferias-clt-periodo-aquisitivo">período aquisitivo de férias</a>.</p>
 `.trim()
   },
@@ -771,9 +806,9 @@ const overrides: Record<string, EditorialContentOverride> = {
     `.trim()
   },
   "periodo-experiencia-clt-o-que-saber": {
-    reviewedAt: "2026-10-14",
+    reviewedAt: "2026-10-15",
     contentHtml: `
-<p><strong>Revisão editorial: 14 de outubro de 2026.</strong> Contrato de experiência é um contrato por prazo determinado usado para que empresa e trabalhador avaliem a relação. Ele não cria um período sem registro, sem salário ou sem regras. As condições essenciais precisam estar claras desde o início.</p>
+<p><strong>Revisão editorial: 15 de outubro de 2026.</strong> Contrato de experiência é um contrato por prazo determinado usado para que empresa e trabalhador avaliem a relação. Ele não cria um período sem registro, sem salário ou sem regras. As condições essenciais precisam estar claras desde o início.</p>
 <h2>Limite legal e documento</h2>
 <p>O parágrafo único do artigo 445 da <a href="https://www.planalto.gov.br/ccivil_03/decreto-lei/del5452.htm" target="_blank" rel="noopener noreferrer">CLT</a> determina que o contrato de experiência não pode exceder noventa dias. O documento deve permitir identificar início, término e condições pactuadas. Prazo menor pode existir; o limite de noventa dias não autoriza renovações indefinidas.</p>
 <p>Não aceite “alguns dias de teste” trabalhando normalmente sem registro e sem definição de pagamento. Processo seletivo, prova prática e contrato de trabalho não são a mesma coisa; quando houver prestação de trabalho real, procure orientação se o vínculo estiver disfarçado.</p>
@@ -791,6 +826,15 @@ const overrides: Record<string, EditorialContentOverride> = {
 <h2>No encerramento</h2>
 <p>O término na data prevista, a saída antecipada e a continuidade após o prazo podem produzir efeitos diferentes. Não aplique uma tabela genérica para calcular verbas. Peça termo, recibos, comprovantes e explicação das rubricas. Se houver cláusula sobre rescisão antecipada, leia antes de decidir sair.</p>
 <ul><li>Não pague taxa para “efetivação”.</li><li>Não entregue senha da conta gov.br.</li><li>Não assine documento em branco ou retroativo.</li><li>Não devolva uniforme ou equipamento sem recibo.</li><li>Não presuma que o silêncio significa prorrogação.</li></ul>
+<h2>Monte uma ficha de início que caiba em uma página</h2>
+<p>Registre empregador, local, cargo, salário, jornada, início, fim do prazo inicial e hipótese de prorrogação. Vincule cada informação ao contrato, à proposta ou ao canal oficial. A <a href="https://www.planalto.gov.br/ccivil_03/decreto-lei/del5452.htm" target="_blank" rel="noopener noreferrer">CLT compilada</a> enquadra o contrato de experiência como contrato por prazo determinado e fixa o limite de noventa dias; ela não transforma proposta verbal ou acesso ao local em documento suficiente.</p>
+<h2>Trate cada prorrogação como novo ponto de conferência</h2>
+<p>Antes de assinar um aditivo, compare a nova data final com o contrato original, veja quando o documento foi apresentado e guarde as duas versões. O artigo 451 trata da prorrogação dos contratos por prazo determinado. Como os efeitos dependem do histórico real, não aceite uma sequência de alterações retroativas para “regularizar o sistema”.</p>
+<p><strong>Exemplo ilustrativo:</strong> um contrato de quarenta e cinco dias termina em uma sexta-feira. Na quarta, o RH apresenta uma prorrogação por mais quarenta e cinco dias. O empregado verifica as datas, pede sua via e confirma a escala seguinte. Se o aditivo surgisse somente depois do término, ele registraria a data de recebimento e pediria orientação antes de assinar.</p>
+<h2>Registre aprendizado sem copiar informação da empresa</h2>
+<p>Mantenha anotações pessoais sobre treinamentos recebidos, tarefas executadas e feedbacks, sem retirar listas de clientes, telas, documentos internos ou segredos comerciais. Para conversar sobre efetivação, use resultados que possa descrever legitimamente: cumprimento de procedimento, redução de retrabalho observada pelo gestor ou domínio de uma rotina ensinada.</p>
+<h2>Prepare três cenários antes da data final</h2>
+<ul><li><strong>Continuidade:</strong> pergunte quando receberá confirmação, quais condições permanecem e como o registro será atualizado.</li><li><strong>Término previsto:</strong> combine devolução de bens, documentos e canal para dúvidas sobre o acerto.</li><li><strong>Saída antecipada:</strong> leia as cláusulas e busque análise individual antes de calcular consequências.</li></ul>
 <p>Se o prazo ultrapassar noventa dias, os documentos não coincidirem ou houver trabalho sem registro, procure sindicato, inspeção do trabalho ou orientação jurídica. Para conferir a rotina já iniciada, use também o guia de <a href="/blog/ponto-eletronico-atraso-trabalho">registro de ponto</a>.</p>
 `.trim()
   },
@@ -859,9 +903,9 @@ const overrides: Record<string, EditorialContentOverride> = {
 `.trim()
   },
   "trabalhar-fim-de-semana-folga-adicional": {
-    reviewedAt: "2026-10-14",
+    reviewedAt: "2026-10-15",
     contentHtml: `
-<p><strong>Revisão editorial: 14 de outubro de 2026.</strong> Trabalhar no sábado ou no domingo não gera, por si só, um adicional chamado “de fim de semana”. O resultado depende da jornada contratual, do repouso semanal, de feriados, de horas extras e do instrumento coletivo. Misturar essas categorias produz cálculo errado.</p>
+<p><strong>Revisão editorial: 15 de outubro de 2026.</strong> Trabalhar no sábado ou no domingo não gera, por si só, um adicional chamado “de fim de semana”. O resultado depende da jornada contratual, do repouso semanal, de feriados, de horas extras e do instrumento coletivo. Misturar essas categorias produz cálculo errado.</p>
 <h2>Repouso semanal não é a mesma coisa que feriado</h2>
 <p>A <a href="https://www.planalto.gov.br/ccivil_03/leis/l0605.htm" target="_blank" rel="noopener noreferrer">Lei nº 605/1949</a> assegura repouso semanal remunerado de vinte e quatro horas consecutivas, preferencialmente aos domingos. A mesma lei trata separadamente do trabalho em feriados e prevê pagamento em dobro, salvo concessão de outro dia de folga. Não conclua que todo domingo será pago em dobro nem que uma folga compensa qualquer situação.</p>
 <p>A <a href="https://www.planalto.gov.br/ccivil_03/decreto-lei/del5452.htm" target="_blank" rel="noopener noreferrer">CLT</a> reúne regras gerais sobre jornada e descanso. Categoria, atividade e convenção coletiva podem acrescentar escalas, folgas e adicionais específicos.</p>
@@ -877,13 +921,20 @@ const overrides: Record<string, EditorialContentOverride> = {
 <p>Uma saída no fechamento de shopping, restaurante ou hotel pode exigir rota diferente da usada durante o dia. Teste o trajeto no horário da escala e confirme como chegar e voltar com segurança. A <a href="/ferramentas/custo-deslocamento">calculadora de deslocamento</a> usa a tarifa e o número de viagens inseridos por você; ela não presume preço nem benefício.</p>
 <h2>Concilie o mês antes de questionar o valor</h2>
 <p>No fim do período, coloque lado a lado calendário, espelho de ponto, extrato do banco de horas e holerite. Indique ao RH o dia e a rubrica que não entendeu, perguntando se houve folga, compensação ou pagamento e qual regra foi aplicada. Uma pergunta documentada permite correção; uma conta baseada apenas no número de domingos do calendário pode misturar situações diferentes.</p>
+<h2>Use uma matriz de quatro classificações</h2>
+<p>Para cada data, marque se era sábado, domingo, feriado ou outro dia; depois registre se havia jornada prevista, se houve trabalho, qual repouso foi concedido e qual regra foi informada. A <a href="https://www.planalto.gov.br/ccivil_03/leis/l0605.htm" target="_blank" rel="noopener noreferrer">Lei nº 605/1949</a> disciplina o repouso semanal remunerado e o pagamento do trabalho em feriados. Use o texto oficial com a CLT e o instrumento coletivo, porque “fim de semana” não é uma categoria única de pagamento.</p>
+<h2>Faça a conferência em três camadas</h2>
+<ol><li><strong>Calendário:</strong> identifique a natureza de cada dia e a escala divulgada.</li><li><strong>Execução:</strong> confira ponto, troca autorizada e folga realmente usufruída.</li><li><strong>Folha:</strong> relacione rubrica, competência, compensação e eventual pagamento.</li></ol>
+<p><strong>Exemplo ilustrativo:</strong> em uma mesma semana, uma balconista trabalha no domingo e também em um feriado que caiu na terça-feira. Ela folga na quarta. Em vez de chamar tudo de “domingo dobrado”, registra os dois fatos separadamente e pede que o RH identifique a regra usada para o repouso semanal e para o feriado.</p>
+<h2>Inclua transporte e segurança na decisão</h2>
+<p>Peça o horário efetivo de abertura e fechamento, inclusive tempo de organização após o atendimento. Verifique iluminação, espera, ponto de embarque e plano para falha do transporte. Uma folga adequada não resolve, sozinha, o risco de sair tarde sem rota segura. Se a empresa oferece transporte, confirme quem aciona, onde embarca e como registrar uma ocorrência.</p>
 <p>Se a escala muda sem registro, o repouso não aparece ou o holerite não explica feriado e hora extra, peça esclarecimento por escrito. Leve calendário, ponto, holerite e instrumento coletivo ao sindicato, à inspeção do trabalho ou a profissional habilitado. Este texto não calcula adicional e não substitui análise jurídica.</p>
 `.trim()
   },
   "trabalho-noturno-adicional-o-que-perguntar": {
-    reviewedAt: "2026-10-14",
+    reviewedAt: "2026-10-15",
     contentHtml: `
-<p><strong>Revisão editorial: 14 de outubro de 2026.</strong> Trabalho noturno altera cálculo da jornada e também sono, transporte, alimentação e convivência familiar. Antes de aceitar, peça horário completo e condições práticas; a expressão “turno da noite” não informa quando começa, termina ou como será pago.</p>
+<p><strong>Revisão editorial: 15 de outubro de 2026.</strong> Trabalho noturno altera cálculo da jornada e também sono, transporte, alimentação e convivência familiar. Antes de aceitar, peça horário completo e condições práticas; a expressão “turno da noite” não informa quando começa, termina ou como será pago.</p>
 <h2>Regra urbana da CLT</h2>
 <p>O artigo 73 da <a href="https://www.planalto.gov.br/ccivil_03/decreto-lei/del5452.htm" target="_blank" rel="noopener noreferrer">CLT</a> considera noturno, para trabalho urbano, o período entre 22h e 5h. A remuneração tem acréscimo de pelo menos vinte por cento e a hora noturna é computada como cinquenta e dois minutos e trinta segundos. A lei também trata de horários mistos e da prorrogação do trabalho noturno.</p>
 <p>Essas regras não devem ser copiadas automaticamente para trabalho rural ou situações com disciplina própria. Norma coletiva pode trazer condições adicionais. Consulte a legislação atualizada e o instrumento aplicável.</p>
@@ -900,6 +951,13 @@ const overrides: Record<string, EditorialContentOverride> = {
 <p>Em São Luís, confirme a rota exatamente no horário de saída. Não presuma que a linha usada durante o dia circula na madrugada. Use a <a href="/ferramentas/custo-deslocamento">calculadora de deslocamento</a> com os valores que você verificou e considere alternativa segura para falhas do transporte.</p>
 <h2>Sinais de informação incompleta</h2>
 <ul><li>O anúncio diz apenas “disponibilidade total”.</li><li>O adicional é prometido sem explicar a jornada.</li><li>A saída varia sem escala ou ponto.</li><li>A troca de plantão ocorre só por mensagem informal.</li><li>Não há orientação sobre emergência e trabalho isolado.</li></ul>
+<h2>Faça um mapa por trecho do plantão</h2>
+<p>Divida cada turno em horário anterior ao período noturno, trecho noturno, intervalo e eventual prorrogação. Registre início e fim conforme o relógio e deixe o cálculo para a memória apresentada pelo empregador. Se houver regra diferente na categoria, localize o instrumento no serviço oficial para <a href="https://www.gov.br/pt-br/servicos/consultar-instrumento-coletivo-de-trabalho" target="_blank" rel="noopener noreferrer">consultar instrumento coletivo de trabalho</a>, conferindo partes, município, vigência e aditivos.</p>
+<h2>Teste a rotina por sete dias antes de aceitar</h2>
+<p>Simule hora de dormir, refeições, deslocamento de ida e volta, cuidado familiar e tempo de recuperação entre plantões. Consulte a rota no mesmo horário da escala e não use apenas a duração exibida durante o dia. Se a vaga envolve trabalho isolado, pergunte sobre contato de emergência, rendição e procedimento quando o colega seguinte atrasa.</p>
+<p><strong>Exemplo ilustrativo:</strong> uma candidata considera um turno das 20h às 4h. Durante a simulação percebe que o primeiro ônibus de retorno parte muito depois da saída. Ela pergunta se existe transporte, local seguro de espera ou outro horário e inclui o custo real na comparação da proposta, sem presumir que o adicional compensará qualquer logística.</p>
+<h2>Reconcilie plantão, ponto e folha</h2>
+<p>Escolha uma competência já fechada e numere os plantões. Para cada um, compare escala, marcações, intervalo, troca autorizada e rubrica. Envie ao RH uma pergunta por divergência, citando a data, sem publicar o holerite completo. Se houver extensão depois das 5h, peça que a empresa explique o tratamento usado no cálculo em vez de aplicar uma fórmula genérica.</p>
 <p>Esses sinais pedem esclarecimento, não provam irregularidade por si mesmos. Se ponto e holerite divergirem ou houver risco à saúde e segurança, reúna documentos e procure RH, sindicato, inspeção do trabalho ou orientação profissional.</p>
 `.trim()
   },
@@ -1167,9 +1225,9 @@ const overrides: Record<string, EditorialContentOverride> = {
 `.trim()
   },
   "vale-alimentacao-ou-refeicao-diferenca": {
-    reviewedAt: "2026-10-12",
+    reviewedAt: "2026-10-15",
     contentHtml: `
-<p><strong>Revisão editorial: 12 de outubro de 2026.</strong> Vale-alimentação e vale-refeição não devem ser comparados só pelo valor mensal. Rede aceita, frequência de crédito, regras do empregador, eventual participação do trabalhador e rotina de alimentação podem mudar a utilidade real em São Luís.</p>
+<p><strong>Revisão editorial: 15 de outubro de 2026.</strong> Vale-alimentação e vale-refeição não devem ser comparados só pelo valor mensal. Rede aceita, frequência de crédito, regras do empregador, eventual participação do trabalhador e rotina de alimentação podem mudar a utilidade real em São Luís.</p>
 <h2>O que cada nome costuma indicar</h2>
 <p>O vale-refeição costuma ser direcionado a refeições prontas; o vale-alimentação, à compra de gêneros alimentícios. A aceitação concreta depende do arranjo e da rede credenciada. Não prometa que todo mercado ou restaurante aceitará: consulte o aplicativo ou canal oficial do emissor antes de contar com o saldo.</p>
 <p>O <a href="https://www.gov.br/trabalho-e-emprego/pt-br/servicos/empregador/programa-de-alimentacao-do-trabalhador-pat/programa-de-alimentacao-do-trabalhador-pat-1/" target="_blank" rel="noopener noreferrer">Programa de Alimentação do Trabalhador</a> e a <a href="https://www.planalto.gov.br/ccivil_03/_ato2019-2022/2022/lei/l14442.htm" target="_blank" rel="noopener noreferrer">Lei nº 14.442/2022</a> tratam do benefício alimentar e de sua finalidade. O Ministério do Trabalho também publica <a href="https://www.gov.br/trabalho-e-emprego/pt-br/noticias-e-conteudo/2026/julho/regras-do-auxilio-alimentacao-e-do-auxilio-refeicao-passam-a-valer-para-todas-as-empresas" target="_blank" rel="noopener noreferrer">orientações atuais sobre as regras do auxílio-alimentação e refeição</a>. Benefício, valor e condições do seu vínculo devem ser confirmados no contrato, política e instrumento coletivo; não presuma obrigação universal a partir de um resumo.</p>
@@ -1192,6 +1250,13 @@ const overrides: Record<string, EditorialContentOverride> = {
 <p>Guarde a proposta que informa o benefício e a política entregue na admissão. No primeiro crédito, confira competência, valor e desconto no holerite. Se a rede prometida não existe na região, relate com exemplos verificáveis em vez de apenas dizer que “não funciona”.</p>
 <h2>Perguntas que evitam comparação errada</h2>
 <p>O crédito começa no primeiro dia ou segue calendário? Há valor proporcional na admissão? Existe desconto e onde ele aparece? A rede é consultada por aplicativo, site ou central? O cartão físico chega antes do início? Essas respostas importam mais do que tratar o benefício como dinheiro livre.</p>
+<h2>Separe existência, modalidade e uso</h2>
+<p>Primeiro confirme se o benefício integra a proposta ou decorre de norma coletiva. Depois identifique a modalidade, a política e eventual participação do empregado. Só então teste onde e como o saldo pode ser usado. O <a href="https://www.gov.br/trabalho-e-emprego/pt-br/servicos/empregador/programa-de-alimentacao-do-trabalhador-pat/programa-de-alimentacao-do-trabalhador-pat-1/" target="_blank" rel="noopener noreferrer">Programa de Alimentação do Trabalhador</a> é uma referência oficial, e a <a href="https://www.planalto.gov.br/ccivil_03/leis/l6321.htm" target="_blank" rel="noopener noreferrer">Lei nº 6.321/1976</a> traz sua base legal. Participação no PAT, por si só, não informa o valor ou a modalidade do seu contrato.</p>
+<h2>Faça um teste de utilidade por cinco dias</h2>
+<p>Liste cinco dias reais de trabalho e, em cada um, anote onde faria a refeição, preço observado, distância, tempo de intervalo e alternativa de levar comida. Consulte a rede oficial do emissor e confirme diretamente os locais essenciais. Repita o teste em unidade ou turno diferente, se a proposta prevê mobilidade.</p>
+<p><strong>Exemplo ilustrativo:</strong> o cartão oferece crédito de refeição, mas os estabelecimentos próximos fecham antes do turno noturno. A candidata registra três endereços e horários, pergunta sobre alternativa de alimentação e compara a proposta sem converter o saldo em dinheiro imaginário.</p>
+<h2>Reconcilie proposta, crédito e holerite</h2>
+<p>Guarde a oferta e a política vigentes na admissão. No primeiro mês, confira data e valor do crédito, dias considerados, eventual desconto e rubrica. Se houver diferença, envie ao RH a competência e os documentos, sem divulgar senha, número completo do cartão ou extrato em grupo. Mudanças posteriores devem ser comparadas com comunicação formal e norma coletiva aplicável.</p>
 <p>Se você prepara comida em casa, o vale-alimentação pode ter uso diferente do de quem almoça perto do trabalho. Se a jornada muda entre unidades, teste mais de uma região. A melhor modalidade depende da rotina e das regras confirmadas, não de uma resposta universal.</p>
 <p>Para avaliar o pacote total, some salário líquido estimado, benefícios confirmados e custo do trajeto; não converta benefício em dinheiro na sua planilha como se a rede fosse irrestrita. Dúvidas sobre natureza da parcela, instrumento coletivo ou desconto exigem orientação individual. Este guia apoia a comparação, não interpreta seu contrato.</p>
 `.trim()
