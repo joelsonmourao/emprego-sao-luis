@@ -2280,9 +2280,9 @@ const overrides: Record<string, EditorialContentOverride> = {
   },
 
   "inteligencia-emocional-entrevista": {
-    reviewedAt: "2026-10-13",
+    reviewedAt: "2026-10-15",
     contentHtml: `
-<p><strong>Revisão editorial: 13 de outubro de 2026.</strong> Em entrevista, inteligência emocional não é sorrir o tempo todo nem aceitar desrespeito. É perceber a própria reação, escutar a pergunta, escolher uma resposta profissional e estabelecer limite quando necessário.</p>
+<p><strong>Revisão editorial: 15 de outubro de 2026.</strong> Em entrevista, inteligência emocional não é sorrir o tempo todo nem aceitar desrespeito. É perceber a própria reação, escutar a pergunta, escolher uma resposta profissional e estabelecer limite quando necessário.</p>
 <h2>Prepare fatos antes de treinar a calma</h2>
 <p>Selecione três situações verdadeiras: conflito de prioridade, erro corrigido e atendimento difícil. Para cada uma, anote contexto, sua responsabilidade, ação e resultado. Se o resultado não tiver número, descreva uma mudança observável: pedido entregue, registro corrigido, cliente encaminhado ou prazo renegociado.</p>
 <p>O curso oficial <a href="https://www.escolavirtual.gov.br/curso/318" target="_blank" rel="noopener noreferrer">Inteligência Emocional</a>, da Escola Virtual de Governo, aborda gestão das próprias emoções e relações interpessoais. O conceito pode orientar preparação, mas não existe frase mágica que prove maturidade; a evidência está em como você relata decisões e limites.</p>
@@ -2298,14 +2298,29 @@ const overrides: Record<string, EditorialContentOverride> = {
 <p>Você pode redirecionar pergunta pessoal para requisito da vaga: “Posso detalhar minha disponibilidade para a escala e viagens.” A <a href="https://www.gov.br/trabalho-e-emprego/pt-br/assuntos/inspecao-do-trabalho/combate_a_discriminacao" target="_blank" rel="noopener noreferrer">área de combate à discriminação do Ministério do Trabalho</a> reúne referências sobre práticas discriminatórias. Se houver humilhação, ameaça ou critério alheio à função, encerrar a conversa pode ser uma medida de proteção, não falta de controle emocional.</p>
 <h2>Cuide do antes e do depois</h2>
 <p>Planeje trajeto, água, documento e margem de chegada. Se o atraso acontecer, avise pelo canal oficial com estimativa real. Depois da entrevista, registre perguntas e respostas enquanto lembra, mas não publique acusação impulsiva nem exponha participantes. Se ocorreu fato grave, preserve evidências e procure canal adequado.</p>
+
+<h2>Treine respostas para situações desconfortáveis</h2>
+<p>Prepare frases que preservem a conversa sem aceitar premissa falsa. Para interrupção: “Posso concluir o passo que tomei e depois responder à próxima parte?” Para pergunta confusa: “Você pode esclarecer qual aspecto da situação gostaria de avaliar?” Para informação que não possui: “Não usei essa ferramenta; posso explicar a experiência mais próxima e como aprendo um processo novo.”</p>
+<p>Essas frases não precisam ser decoradas palavra por palavra. O treino serve para reconhecer opções quando o corpo reage com pressa, silêncio ou vontade de se defender.</p>
+<h2>Separe pressão legítima de desrespeito</h2>
+<p>Pedir exemplo, prazo ou explicação de erro pode fazer parte da avaliação. Humilhação, ameaça, comentário discriminatório ou exigência de dado sem relação com a função são outra coisa. Você pode pedir que a pergunta seja conectada ao requisito, recusar exposição íntima ou encerrar a entrevista. Segurança e dignidade têm prioridade sobre a tentativa de parecer sempre disponível.</p>
+<h2>Faça uma revisão que não transforme emoção em culpa</h2>
+<ul>
+  <li>Qual pergunta ficou clara somente depois?</li>
+  <li>Em que momento você acelerou ou se perdeu?</li>
+  <li>Qual fato deveria ter aparecido antes?</li>
+  <li>Houve condição da vaga que precisa ser confirmada?</li>
+  <li>O contato e o local eram verificáveis?</li>
+</ul>
+<p>Escolha um ajuste para o próximo treino. Pode ser reduzir a resposta, preparar um exemplo ou formular uma pergunta sobre escala. Nervosismo persistente não se resolve com cobrança; se o sofrimento ultrapassa a entrevista e interfere na rotina, buscar apoio profissional pode ser mais adequado que aumentar a quantidade de simulações.</p>
 <p>Nervosismo não invalida competência. Você pode pedir alguns segundos, beber água e retomar. A melhor preparação combina histórias verdadeiras, escuta e limite — não a obrigação de parecer imperturbável.</p>
     `.trim()
   },
 
   "linkedin-emprego-sao-luis-perfil": {
-    reviewedAt: "2026-10-13",
+    reviewedAt: "2026-10-15",
     contentHtml: `
-<p><strong>Revisão editorial: 13 de outubro de 2026.</strong> Um perfil do LinkedIn pode complementar o currículo, mas não é obrigatório para toda vaga e não substitui o canal indicado no anúncio. Atualize apenas informações que consegue comprovar e decida conscientemente o que ficará público.</p>
+<p><strong>Revisão editorial: 15 de outubro de 2026.</strong> Um perfil do LinkedIn pode complementar o currículo, mas não é obrigatório para toda vaga e não substitui o canal indicado no anúncio. Atualize apenas informações que consegue comprovar e decida conscientemente o que ficará público.</p>
 <h2>Defina o cargo-alvo antes do título</h2>
 <p>Use a nomenclatura encontrada em anúncios compatíveis e confirme o significado na <a href="https://www.gov.br/trabalho-e-emprego/pt-br/assuntos/cbo/pagina-inicial/" target="_blank" rel="noopener noreferrer">Classificação Brasileira de Ocupações</a>. A CBO ajuda a identificar ocupações, mas não regulamenta profissão nem prova que há vaga aberta. Um título possível é “Auxiliar administrativo | cadastro, atendimento e conferência de documentos”, desde que essas tarefas façam parte da sua experiência.</p>
 <p>Evite “em busca de oportunidades” como única informação. Localização e preferência de trabalho devem refletir sua disponibilidade real; não prometa mudança ou turno que não consegue cumprir.</p>
@@ -2321,14 +2336,29 @@ const overrides: Record<string, EditorialContentOverride> = {
 <p>Não publique telefone pessoal em seção aberta se o contato pela plataforma ou e-mail profissional for suficiente. Ative verificação em duas etapas, revise sessões e desconfie de recrutador que migra imediatamente para número desconhecido, pede pagamento ou envia arquivo inesperado. O <a href="https://cartilha.cert.br/fasciculos/" target="_blank" rel="noopener noreferrer">fascículo de Redes Sociais do CERT.br</a> orienta sobre exposição, perfis falsos e configurações de privacidade.</p>
 <h2>Faça uma conferência cruzada</h2>
 <ul><li>datas e cargos iguais aos do currículo;</li><li>nome usado profissionalmente consistente;</li><li>links funcionando;</li><li>experiências sem informação confidencial;</li><li>competências demonstradas no texto;</li><li>preferências de localização atualizadas.</li></ul>
+
+<h2>Revise o perfil como uma sequência de respostas</h2>
+<p>Quem abre o perfil precisa entender, sem adivinhar: qual função você procura, onde pode trabalhar, quais tarefas já executou e como essas experiências se conectam. O título apresenta o alvo; o resumo explica a proposta; as experiências mostram evidências; cursos e competências complementam o que é verificável.</p>
+<ul>
+  <li><strong>Título:</strong> cargo e duas tarefas reais, sem promessa de senioridade inexistente.</li>
+  <li><strong>Sobre:</strong> contexto profissional, exemplos e disponibilidade relevante.</li>
+  <li><strong>Experiência:</strong> datas coerentes, função, tarefas e limites de responsabilidade.</li>
+  <li><strong>Formação:</strong> situação correta do curso e instituição identificável.</li>
+  <li><strong>Competências:</strong> apenas ferramentas e atividades que consegue explicar.</li>
+</ul>
+<h2>Faça uma busca local sem afirmar que há contratação</h2>
+<p>Teste o cargo com São Luís e, separadamente, municípios que realmente consegue alcançar. Leia a localização completa, porque a menção ao Maranhão no perfil da empresa não prova que a unidade da vaga seja na capital. Para trabalho remoto ou híbrido, confira onde a pessoa contratada deve residir e quantos encontros presenciais foram informados.</p>
+<p>Salve o anúncio, não apenas a página da empresa. Antes de adaptar o perfil, confirme se a oportunidade continua aberta e se o botão leva ao domínio esperado. A rede pode ajudar a descobrir o processo, mas a decisão de enviar deve usar a descrição completa.</p>
+<h2>Verifique convites de recrutadores sem transferir confiança</h2>
+<p>Compare nome, vínculo declarado, histórico do perfil, domínio do e-mail e existência da vaga em canal institucional. Um perfil com foto e conexões não substitui essa conferência. Não instale programa de acesso remoto, não envie código de autenticação e não faça pagamento para marcar entrevista. Se o contato legítimo pedir mudança de canal, registre a vaga e confirme o endereço por fonte independente.</p>
 <p>Foto, capa e publicações são opcionais; não invente rotina de conteúdo para “alimentar algoritmo”. Um perfil simples, coerente e seguro é mais útil que atividade diária genérica. Candidate-se sempre pelo canal oficial da vaga e trate convite recebido na rede como início de verificação, não como contratação.</p>
     `.trim()
   },
 
   "marca-pessoal-candidatura-sao-luis": {
-    reviewedAt: "2026-10-13",
+    reviewedAt: "2026-10-15",
     contentHtml: `
-<p><strong>Revisão editorial: 13 de outubro de 2026.</strong> Marca pessoal para candidatura não exige logotipo, ensaio fotográfico ou postagem diária. É a coerência entre o que você diz que faz, as evidências apresentadas e a forma como mantém contato.</p>
+<p><strong>Revisão editorial: 15 de outubro de 2026.</strong> Marca pessoal para candidatura não exige logotipo, ensaio fotográfico ou postagem diária. É a coerência entre o que você diz que faz, as evidências apresentadas e a forma como mantém contato.</p>
 <h2>Comece por uma frase verificável</h2>
 <p>Complete: “Posso ajudar uma equipe de ___ executando ___ e ___.” Um candidato a estoque pode citar recebimento, separação e conferência se realmente fez essas tarefas. Um candidato a atendimento pode mencionar registro de pedidos e encaminhamento de dúvidas. Troque adjetivos vagos por atividades.</p>
 <p>Consulte anúncios atuais e a <a href="https://www.gov.br/trabalho-e-emprego/pt-br/assuntos/cbo/pagina-inicial/" target="_blank" rel="noopener noreferrer">Classificação Brasileira de Ocupações</a> para entender nomes e conteúdos de ocupações. A CBO é classificatória: não use o código como certificado de competência nem como prova de que uma profissão é regulamentada.</p>
@@ -2344,6 +2374,20 @@ const overrides: Record<string, EditorialContentOverride> = {
 <p>Escolha um anúncio compatível e marque cada requisito como: comprovado, parcialmente comprovado ou ausente. Ajuste o currículo para destacar evidências verdadeiras; não adicione ferramenta só porque aparece na vaga. O serviço <a href="https://www.gov.br/pt-br/servicos/buscar-emprego-no-sistema-nacional-de-emprego-sine" target="_blank" rel="noopener noreferrer">Buscar Emprego no SINE</a> é um canal público para consulta e candidatura, além dos sites institucionais das empresas.</p>
 <h2>Evite custos sem problema definido</h2>
 <p>Antes de pagar foto, curso, domínio ou consultoria, escreva qual lacuna pretende resolver e qual evidência mostrará melhora. Muitas vezes basta corrigir contato, simplificar o PDF ou preparar exemplos. Nenhum serviço legítimo pode prometer contratação.</p>
+
+<h2>Monte uma relação entre afirmação e prova</h2>
+<p>Para cada frase de apresentação, anote uma evidência que poderia explicar em entrevista. “Organização de estoque” pode apontar para conferência de entrada, separação por pedido ou inventário realizado. “Atendimento” pode apontar para registro de solicitação, orientação ao cliente ou encaminhamento de problema. Se não houver exemplo, retire ou reformule a afirmação.</p>
+<p>Essa relação também mostra lacunas. Se a vaga pede planilha e você só conhece o conceito, apresente o curso ou exercício como aprendizado, não como domínio profissional. A coerência vale mais que uma lista longa de competências.</p>
+<h2>Escolha provas adequadas ao tipo de trabalho</h2>
+<ul>
+  <li><strong>Administrativo:</strong> planilha fictícia, organização de agenda ou modelo de controle sem dados reais.</li>
+  <li><strong>Estoque e logística:</strong> descrição de rotina, checklist criado ou resultado que consiga contextualizar.</li>
+  <li><strong>Atendimento:</strong> exemplo escrito de resposta, fluxo de encaminhamento ou situação resolvida sem identificar cliente.</li>
+  <li><strong>Função criativa:</strong> portfólio autorizado, com sua participação explicada.</li>
+</ul>
+<p>Não há obrigação de produzir portfólio quando a função não pede. O material existe para esclarecer competência, não para expor documentos ou criar uma aparência sofisticada sem conteúdo.</p>
+<h2>Faça uma auditoria de consistência antes do envio</h2>
+<p>Compare currículo, perfil, mensagem e portfólio. Datas, cargos e formação precisam contar a mesma história. O e-mail deve funcionar; o telefone deve receber contato; links precisam abrir sem pedir acesso privado. Se usa uma versão curta do nome, mantenha-a reconhecível nos canais. Corrija divergência factual antes de investir em nova identidade visual.</p>
 <p>Revise o conjunto a cada mudança real de experiência ou cargo-alvo. Marca pessoal útil é a repetição coerente de fatos: mesma trajetória, exemplos compreensíveis e contato seguro. Ela não substitui qualificação, processo seletivo ou disponibilidade para a vaga.</p>
     `.trim()
   },
@@ -2374,9 +2418,9 @@ const overrides: Record<string, EditorialContentOverride> = {
   },
 
   "networking-emprego-sao-luis": {
-    reviewedAt: "2026-10-13",
+    reviewedAt: "2026-10-15",
     contentHtml: `
-<p><strong>Revisão editorial: 13 de outubro de 2026.</strong> Networking não é pedir emprego a toda pessoa conhecida. É manter relações profissionais, trocar informação verificável e fazer pedidos que o contato consegue entender, aceitar ou recusar sem constrangimento.</p>
+<p><strong>Revisão editorial: 15 de outubro de 2026.</strong> Networking não é pedir emprego a toda pessoa conhecida. É manter relações profissionais, trocar informação verificável e fazer pedidos que o contato consegue entender, aceitar ou recusar sem constrangimento.</p>
 <h2>Mapeie relações reais</h2>
 <p>Comece por ex-colegas, professores, fornecedores, clientes com contato autorizado e pessoas de cursos ou projetos. Registre de onde você conhece cada pessoa e qual assunto profissional compartilham. Não importe agenda inteira para plataforma, adicione desconhecidos em massa nem use grupo alheio para propaganda.</p>
 <p>O <a href="https://cartilha.cert.br/fasciculos/" target="_blank" rel="noopener noreferrer">CERT.br</a> orienta sobre exposição em redes sociais, perfis falsos e privacidade. Antes de responder a um novo contato, confirme identidade, vínculo com a empresa e domínio do link enviado.</p>
@@ -2393,6 +2437,20 @@ const overrides: Record<string, EditorialContentOverride> = {
 <p>Compartilhe edital público, curso oficial ou anúncio verificável que combine com o perfil da pessoa. Revise um currículo se você tiver disponibilidade e conhecimento. Não espere que cada ajuda retorne como vaga. Relação profissional se sustenta por respeito e atualização honesta, não contabilidade de favores.</p>
 <h2>Acompanhe sem insistência</h2>
 <p>Se alguém pediu seu currículo, confirme o envio uma vez. Se não respondeu, não cobre toda semana. Volte a conversar quando houver atualização real: curso concluído, mudança de alvo ou vaga específica. Respeite “não posso ajudar” e não adicione familiares do contato para contornar a resposta.</p>
+
+<h2>Use um registro mínimo para respeitar o contexto</h2>
+<p>Anote nome, origem do contato, assunto, data da última conversa e se a pessoa autorizou receber currículo. O registro evita mensagens repetidas e pedidos desconectados da relação. Não armazene dados pessoais além do necessário nem compartilhe essa lista.</p>
+<p>Se a pessoa pediu material, envie uma versão compatível e identifique a vaga ou área. Se não houve convite, prefira uma pergunta curta. Um único retorno educado pode confirmar o recebimento; insistência ou mensagens em canais pessoais diferentes não aumentam a qualidade da relação.</p>
+<h2>Participe de grupos e eventos com verificação</h2>
+<p>Em grupo profissional, leia regras antes de publicar e confirme a origem de anúncios. Um logotipo, nome de empresa ou encaminhamento por conhecido não prova autenticidade. Abra o domínio oficial, compare o cargo e procure contato institucional. Em evento, explique seu objetivo sem pressionar a pessoa a decidir naquele momento.</p>
+<p>Quando receber cartão, perfil ou e-mail, registre de onde veio. Ao escrever depois, mencione o contexto: “Conversamos na atividade sobre logística e você autorizou o envio do meu currículo.” Essa identificação ajuda o contato a entender a mensagem e permite que recuse sem constrangimento.</p>
+<h2>Diferencie três tipos de conversa</h2>
+<ul>
+  <li><strong>Informação:</strong> perguntar sobre rotina, ferramentas ou canal público.</li>
+  <li><strong>Apresentação:</strong> explicar brevemente o que busca e o que já fez.</li>
+  <li><strong>Indicação:</strong> enviar material somente quando houver consentimento e vaga compatível.</li>
+</ul>
+<p>Não pule da apresentação para uma cobrança por indicação. Se a informação recebida não combina com seu perfil, agradeça e não force candidatura. Networking responsável também significa recusar anúncio duvidoso e proteger o contato de exposição.</p>
 <p>Networking útil amplia acesso a informação, mas não garante seleção. Continue consultando canais abertos, adapte o currículo e preserve a autonomia de quem ajuda. O melhor pedido é curto, verificável e fácil de recusar.</p>
     `.trim()
   },
@@ -2446,9 +2504,9 @@ const overrides: Record<string, EditorialContentOverride> = {
   },
 
   "plano-semanal-vagas-sao-luis": {
-    reviewedAt: "2026-10-13",
+    reviewedAt: "2026-10-15",
     contentHtml: `
-<p><strong>Revisão editorial: 13 de outubro de 2026.</strong> Um plano semanal de busca de emprego deve caber na rotina e produzir candidaturas rastreáveis. Não existe número obrigatório de envios: qualidade, compatibilidade e prazo do anúncio importam mais que uma meta usada para gerar culpa.</p>
+<p><strong>Revisão editorial: 15 de outubro de 2026.</strong> Um plano semanal de busca de emprego deve caber na rotina e produzir candidaturas rastreáveis. Não existe número obrigatório de envios: qualidade, compatibilidade e prazo do anúncio importam mais que uma meta usada para gerar culpa.</p>
 <h2>Defina três resultados para a semana</h2>
 <ol><li>vagas compatíveis lidas até o fim;</li><li>currículos adaptados e enviados pelo canal correto;</li><li>uma melhoria concreta em currículo, entrevista ou qualificação.</li></ol>
 <p>Escolha quantidades possíveis para sua disponibilidade. Quem trabalha, estuda ou cuida de outra pessoa pode usar blocos menores. Uma semana com duas candidaturas fortes pode ser melhor que vinte envios para funções incompatíveis.</p>
@@ -2465,14 +2523,29 @@ const overrides: Record<string, EditorialContentOverride> = {
 <p>No fim da semana, conte anúncios lidos, candidaturas compatíveis, convites e respostas. Pouco retorno em sete dias não prova que o currículo falhou. Observe várias semanas e procure padrões concretos: contatos incorretos, requisitos ausentes, vagas vencidas ou mensagens sem identificação do cargo.</p>
 <p>A Escola Virtual de Governo oferece o curso <a href="https://www.escolavirtual.gov.br/curso/468" target="_blank" rel="noopener noreferrer">Produtividade e Gestão do Tempo</a>. Use técnicas de planejamento para reduzir retrabalho, não para transformar a busca em jornada sem descanso.</p>
 <h2>Preserve um período sem candidatura</h2>
+
+<h2>Exemplo de distribuição para não misturar as etapas</h2>
+<p>Uma rotina possível é usar o primeiro bloco para localizar e salvar anúncios, o segundo para verificar empresa e requisitos, e o terceiro para adaptar e enviar. Em outro dia, revise respostas e prepare entrevista. Isso reduz o risco de enviar no impulso enquanto ainda está pesquisando.</p>
+<ul>
+  <li><strong>Início da semana:</strong> limpar vagas vencidas e escolher cargos prioritários.</li>
+  <li><strong>Bloco de leitura:</strong> abrir anúncios completos e separar obrigatórios de desejáveis.</li>
+  <li><strong>Bloco de candidatura:</strong> adaptar currículo, revisar contato e seguir o canal informado.</li>
+  <li><strong>Bloco de preparação:</strong> estudar a empresa e reunir exemplos reais.</li>
+  <li><strong>Fechamento:</strong> atualizar status, guardar comprovantes e decidir o foco seguinte.</li>
+</ul>
+<p>Os dias e quantidades são ajustáveis. O ponto é concluir uma etapa antes de iniciar outra, mantendo espaço para trabalho, estudo, cuidado e descanso.</p>
+<h2>Evite duplicidade entre portais</h2>
+<p>A mesma vaga pode aparecer em redes diferentes. Compare empresa, cargo, local, descrição e canal antes de enviar outra vez. Registre a URL de origem e, quando existir, o endereço oficial da candidatura. Se duas publicações parecem iguais, mas apresentam contatos ou condições diferentes, não escolha pela pressa: confirme no site institucional ou pergunte à empresa.</p>
+<h2>Termine a semana com uma decisão, não só com contagem</h2>
+<p>Classifique o que encontrou em três grupos: continuar buscando, ajustar um item comprovado ou suspender aquele alvo por incompatibilidade real. Exemplo: se os anúncios exigem turno noturno e esse horário não cabe na sua rotina, alterar o filtro é mais útil do que aumentar o número de envios. Se o contato estava incorreto, corrija imediatamente. Se não há padrão claro, preserve o material e colete mais evidência.</p>
 <p>Defina quando a busca termina naquele dia. Desative alertas que repetem vagas incompatíveis e retome no próximo bloco. O plano funciona quando ajuda a escolher, registrar e aprender; ele falha quando mede apenas quantidade e empurra a pessoa para anúncios duvidosos.</p>
     `.trim()
   },
 
   "produtividade-busca-emprego-sao-luis": {
-    reviewedAt: "2026-10-13",
+    reviewedAt: "2026-10-15",
     contentHtml: `
-<p><strong>Revisão editorial: 13 de outubro de 2026.</strong> Produtividade na busca de emprego é concluir etapas úteis com qualidade: localizar uma vaga real, verificar compatibilidade, adaptar o material, enviar e registrar. Abrir muitas abas ou permanecer conectado o dia inteiro não mede avanço.</p>
+<p><strong>Revisão editorial: 15 de outubro de 2026.</strong> Produtividade na busca de emprego é concluir etapas úteis com qualidade: localizar uma vaga real, verificar compatibilidade, adaptar o material, enviar e registrar. Abrir muitas abas ou permanecer conectado o dia inteiro não mede avanço.</p>
 <h2>Comece com uma decisão de entrada</h2>
 <p>Antes de pesquisar, defina cargo, localização, modalidade e limite de deslocamento. Isso reduz anúncios irrelevantes. Mantenha uma lista curta de variações verdadeiras do cargo, como atendimento, recepção ou apoio administrativo; não misture funções que exigem experiências diferentes só para aumentar resultados.</p>
 <h2>Use um bloco com começo e fim</h2>
@@ -2488,14 +2561,30 @@ const overrides: Record<string, EditorialContentOverride> = {
 <p>Escolha um ou dois horários para conferir respostas. Atualize a etapa e a próxima ação. O <a href="https://www.linkedin.com/help/linkedin/answer/a8684146" target="_blank" rel="noopener noreferrer">Job tracker</a> mostra uma forma de organizar oportunidades; uma tabela local também funciona quando inclui data, canal e status.</p>
 <h2>Meça o que pode mudar</h2>
 <p>Revise semanalmente: anúncios compatíveis encontrados, envios concluídos, retornos, entrevistas e erros detectados. Não use visualizações de perfil como prova isolada. Se o contato está errado, corrija. Se faltam exemplos, prepare-os. Se não há vaga compatível naquele período, amplie fontes ou cargos adjacentes sem inventar experiência.</p>
+
+<h2>Limite o trabalho em andamento</h2>
+<p>Evite manter dezenas de anúncios “para depois”. Use estados simples: salvar para verificar, pronta para adaptar, enviada, aguardando e encerrada. Só avance quando a etapa anterior estiver completa. Um anúncio sem empresa identificável, prazo ou canal verificável não deve ocupar o mesmo espaço de uma oportunidade pronta para candidatura.</p>
+<p>Defina um limite pequeno para a fila de adaptação. Quando ela estiver cheia, termine ou descarte itens antes de buscar novos. Esse limite não é meta de contratação; é uma forma de impedir que a pesquisa substitua o envio e que vagas vencidas permaneçam abertas indefinidamente.</p>
+<h2>Separe trabalho repetível de decisão individual</h2>
+<p>Revisar telefone, nome do arquivo e ortografia pode usar um checklist fixo. Já o objetivo, a ordem das experiências e a mensagem exigem leitura daquela vaga. Automatizar ou copiar a parte que exige julgamento produz currículo genérico. Preserve um modelo-base, mas registre qual evidência foi escolhida para cada anúncio.</p>
+<h2>Use um quadro de erros para reduzir retrabalho</h2>
+<ul>
+  <li>link vencido ou redirecionamento inesperado;</li>
+  <li>arquivo errado anexado;</li>
+  <li>contato incompleto;</li>
+  <li>requisito obrigatório percebido somente no fim;</li>
+  <li>vaga duplicada em outra fonte;</li>
+  <li>mensagem sem identificação do cargo.</li>
+</ul>
+<p>No fechamento semanal, conte quais erros se repetiram e ajuste o processo. Se muitos anúncios são descartados pelo deslocamento, aplique o filtro antes de adaptar. Se o arquivo errado foi enviado, melhore o nome das versões. Produtividade cresce quando a próxima execução tem menos correções, não quando o candidato passa mais horas conectado.</p>
 <p>Produtividade sustentável deixa tempo para descanso, trabalho atual e vida pessoal. O objetivo é manter um processo claro que possa ser repetido, não transformar cada hora livre em candidatura.</p>
     `.trim()
   },
 
   "rejeicao-processo-seletivo-como-reagir": {
-    reviewedAt: "2026-10-13",
+    reviewedAt: "2026-10-15",
     contentHtml: `
-<p><strong>Revisão editorial: 13 de outubro de 2026.</strong> Uma rejeição informa somente que aquela candidatura não avançou naquela seleção. Ela não revela automaticamente o motivo e não autoriza concluir que você é incapaz, que a vaga era falsa ou que o currículo inteiro precisa ser refeito.</p>
+<p><strong>Revisão editorial: 15 de outubro de 2026.</strong> Uma rejeição informa somente que aquela candidatura não avançou naquela seleção. Ela não revela automaticamente o motivo e não autoriza concluir que você é incapaz, que a vaga era falsa ou que o currículo inteiro precisa ser refeito.</p>
 <h2>Registre o que realmente aconteceu</h2>
 <p>Anote cargo, empresa, etapas concluídas, data do retorno e texto objetivo da resposta. Separe fatos de interpretações. “Recebi e-mail de encerramento depois da entrevista” é fato; “o recrutador não gostou de mim” é hipótese sem evidência.</p>
 <p>Em candidaturas pelo LinkedIn, a página <a href="https://www.linkedin.com/help/linkedin/answer/a508716" target="_blank" rel="noopener noreferrer">O que esperar depois de se candidatar</a> explica que o responsável pode analisar os dados enviados. A plataforma não garante resposta individual nem aprovação, e outros canais seguem processos próprios.</p>
@@ -2511,14 +2600,28 @@ const overrides: Record<string, EditorialContentOverride> = {
 <p>Não se candidate de novo à mesma vaga usando dados diferentes. Se ela reaparecer e seu perfil mudou de forma real, confira o prazo e o canal antes de novo envio.</p>
 <h2>Reconheça quando precisa reduzir o ritmo</h2>
 <p>Se a busca está impedindo sono, alimentação, trabalho atual ou cuidado básico, diminua blocos e procure apoio de pessoas de confiança ou serviço de saúde. Rejeição repetida pode ser difícil, mas conselho genérico de “ser positivo” não substitui descanso nem atendimento profissional quando necessário.</p>
+
+<h2>Escolha o ajuste conforme a etapa em que o processo parou</h2>
+<ul>
+  <li><strong>Sem confirmação de envio:</strong> confira canal, prazo, arquivo anexado e endereço de contato; não presuma que houve avaliação.</li>
+  <li><strong>Após triagem de currículo:</strong> compare requisitos obrigatórios com evidências visíveis nas primeiras seções.</li>
+  <li><strong>Após entrevista:</strong> anote perguntas que exigiram exemplos, condições incompatíveis e respostas que ficaram vagas.</li>
+  <li><strong>Após proposta recusada por você:</strong> registre salário informado, escala, local e o limite que impediu o aceite, sem tratar a decisão como fracasso.</li>
+</ul>
+<p>Essa separação evita respostas desproporcionais. Um telefone incorreto pede correção de contato; uma escala incompatível pede filtro de anúncio; uma pergunta mal respondida pede preparo. Nenhum desses sinais, isoladamente, exige refazer toda a trajetória profissional.</p>
+<h2>Faça um pequeno teste antes de mudar tudo</h2>
+<p>Escolha uma alteração que possa ser observada nas próximas candidaturas: tornar a tarefa principal mais visível, revisar o objetivo ou preparar dois episódios reais para entrevista. Mantenha o restante estável por algumas seleções compatíveis e registre o que ocorreu. Mudar cargo-alvo, currículo, perfil e mensagem ao mesmo tempo impede saber qual ajuste ajudou.</p>
+<p>Quando não houver feedback, use critérios internos: o currículo representa o anúncio sem copiar? Datas e contatos estão certos? A vaga ainda estava aberta? O canal era oficial? Essa revisão não descobre o motivo da empresa, mas elimina erros sob seu controle sem inventar uma explicação.</p>
+<h2>Encerre o registro com uma próxima ação concreta</h2>
+<p>Marque a candidatura como encerrada, guarde apenas os documentos necessários e defina uma ação: corrigir contato, pesquisar outra vaga, praticar uma resposta ou não mudar nada por falta de evidência. Não compartilhe nome de recrutador, e-mail privado ou print de conversa em postagem pública. O aprendizado útil cabe em uma frase objetiva e não precisa expor terceiros.</p>
 <p>A resposta mais útil combina registro, ajuste proporcional e continuidade. Não transforme uma decisão externa em sentença sobre sua carreira. Use apenas evidência verificável para mudar currículo, alvo ou preparação.</p>
     `.trim()
   },
 
   "retorno-mercado-trabalho-gap-curriculo": {
-    reviewedAt: "2026-10-13",
+    reviewedAt: "2026-10-15",
     contentHtml: `
-<p><strong>Revisão editorial: 13 de outubro de 2026.</strong> Um intervalo sem vínculo formal pode ocorrer por cuidado familiar, saúde, estudo, busca de trabalho, mudança de cidade ou decisão pessoal. O currículo não precisa esconder a pausa nem expor detalhes íntimos; precisa apresentar datas corretas e o que você pode demonstrar agora.</p>
+<p><strong>Revisão editorial: 15 de outubro de 2026.</strong> Um intervalo sem vínculo formal pode ocorrer por cuidado familiar, saúde, estudo, busca de trabalho, mudança de cidade ou decisão pessoal. O currículo não precisa esconder a pausa nem expor detalhes íntimos; precisa apresentar datas corretas e o que você pode demonstrar agora.</p>
 <h2>Confira primeiro o histórico objetivo</h2>
 <p>Liste empregos, atividades autônomas verdadeiras, cursos e projetos com mês e ano. Consulte seus registros na <a href="https://www.gov.br/pt-br/apps/ctps-digital" target="_blank" rel="noopener noreferrer">Carteira de Trabalho Digital</a> quando houver vínculo formal. Não altere datas para eliminar o intervalo e não crie trabalho informal que não existiu.</p>
 <h2>Decida se a pausa precisa aparecer</h2>
@@ -2535,6 +2638,27 @@ const overrides: Record<string, EditorialContentOverride> = {
 <p>Se não fez curso durante a pausa, não peça desculpa. Mostre experiências anteriores e como pretende aprender a ferramenta da empresa. Retorno ao trabalho não exige uma história de produtividade permanente.</p>
 <h2>Teste a volta com condições sustentáveis</h2>
 <p>Antes de enviar, confira jornada, deslocamento, remuneração informada e responsabilidades. O serviço <a href="https://www.gov.br/pt-br/servicos/buscar-emprego-no-sistema-nacional-de-emprego-sine" target="_blank" rel="noopener noreferrer">Buscar Emprego no SINE</a> permite consultar oportunidades conforme o cadastro. Começar por função adjacente pode ser adequado, desde que as condições sejam reais e não haja promessa de crescimento inventada.</p>
+
+<h2>Organize um plano de retorno em quatro frentes</h2>
+<ol>
+  <li><strong>Documentos:</strong> confira contatos, registros profissionais e arquivos que precisará apresentar somente nas etapas adequadas.</li>
+  <li><strong>Evidências:</strong> escolha experiências anteriores e atividades recentes que tenham relação com o cargo.</li>
+  <li><strong>Condições:</strong> defina jornada, local, deslocamento e data real de disponibilidade.</li>
+  <li><strong>Busca:</strong> selecione canais oficiais e registre cada candidatura.</li>
+</ol>
+<p>Esse plano evita tentar compensar a pausa com curso aleatório ou disponibilidade impossível. A prioridade é tornar claro o que você consegue fazer agora e quais condições permitem sustentar o retorno.</p>
+<h2>Adapte a explicação ao espaço disponível</h2>
+<p>No currículo, datas corretas podem ser suficientes. No resumo, uma linha curta pode indicar retorno quando isso ajuda a entender a disponibilidade. Na entrevista, responda apenas o necessário e volte à função: experiência anterior, atualização relevante e condições atuais. Não transforme a pausa em pedido de desculpas nem forneça documento médico sem necessidade legítima.</p>
+<h2>Compare oportunidades pelo retorno possível</h2>
+<ul>
+  <li>tarefas compatíveis com experiência ou aprendizado atual;</li>
+  <li>jornada que cabe na rotina reorganizada;</li>
+  <li>deslocamento viável na entrada e na saída;</li>
+  <li>remuneração e benefícios informados de forma compreensível;</li>
+  <li>empresa e canal verificáveis;</li>
+  <li>possibilidade de cumprir a data de início.</li>
+</ul>
+<p>Uma função adjacente pode facilitar a volta, mas não deve ser aceita com promessa vaga de promoção. Peça condições por escrito e avalie a oportunidade atual. Se o anúncio exige experiência que não possui, procure outro alvo ou formação adequada; não elimine o intervalo criando cargo ou projeto fictício.</p>
 <p>A pausa é uma informação da trajetória, não a identidade do candidato. Datas corretas, evidências atuais e limites claros permitem que o recrutador avalie a compatibilidade com a função sem exigir exposição desnecessária.</p>
     `.trim()
   },
