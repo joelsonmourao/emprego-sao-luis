@@ -54,9 +54,17 @@ describe("editorial structured data", () => {
       <p><a href="https://empregossaoluis.com.br/contato">Interno</a></p>
       <p><a href="http://example.com/inseguro">HTTP</a></p>
       <p><a href="mailto:redacao@example.com">E-mail</a></p>
-    `, base.siteUrl);
+    `, base.siteUrl, [
+      "https://www.gov.br/trabalho#servico",
+      "https://www.gov.br/trabalho",
+      "http://example.com/inseguro",
+      "https://empregossaoluis.com.br/interno"
+    ]);
 
-    expect(citations).toEqual(["https://www.planalto.gov.br/lei?x=1&y=2"]);
+    expect(citations).toEqual([
+      "https://www.planalto.gov.br/lei?x=1&y=2",
+      "https://www.gov.br/trabalho"
+    ]);
     expect(buildEditorialSchema({ ...base, citations })).toHaveProperty("citation", citations);
   });
 
@@ -106,7 +114,7 @@ describe("editorial structured data", () => {
       expect(page).toContain('import { buildEditorialSchema, extractExternalEditorialCitations, isNewsroomAuthor } from "../../lib/editorial-schema"');
       expect(page).toContain("buildEditorialSchema({");
       expect(page).toContain("updatedAt: reviewedAt ?? article.updatedAt");
-      expect(page).toContain("extractExternalEditorialCitations(contentHtml, runtimeSite.toString())");
+      expect(page).toContain("!editorialOverride && article.sourceUrl ? [article.sourceUrl] : []");
       expect(page).toContain("...(citations.length ? { citations } : {})");
       expect(page).not.toContain('author: { "@type": "Person", name: authorName }');
       expect(page).toContain('href="/redacao"');

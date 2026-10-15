@@ -25,12 +25,21 @@ function normalizeExternalHttpsCitation(value: string, siteUrl: string): string 
   }
 }
 
-export function extractExternalEditorialCitations(contentHtml: string, siteUrl: string): string[] {
+export function extractExternalEditorialCitations(
+  contentHtml: string,
+  siteUrl: string,
+  additionalCitations: readonly string[] = []
+): string[] {
   const citations = new Set<string>();
   const linkPattern = /<a\b[^>]*\bhref\s*=\s*(["'])(https:\/\/[^"'<>]+)\1/gi;
 
   for (const match of contentHtml.matchAll(linkPattern)) {
     const citation = normalizeExternalHttpsCitation(match[2] ?? "", siteUrl);
+    if (citation) citations.add(citation);
+  }
+
+  for (const value of additionalCitations) {
+    const citation = normalizeExternalHttpsCitation(value, siteUrl);
     if (citation) citations.add(citation);
   }
 
