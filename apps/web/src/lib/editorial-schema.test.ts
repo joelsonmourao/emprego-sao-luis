@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
-import { buildEditorialSchema, buildNewsroomOrganization, isNewsroomAuthor } from "./editorial-schema";
+import { buildEditorialSchema, buildNewsroomOrganization, extractExternalEditorialCitations, isNewsroomAuthor } from "./editorial-schema";
 
 const base = {
   type: "Article" as const,
@@ -47,6 +47,34 @@ describe("editorial structured data", () => {
     expect(institutionalPage).toContain("pageSchemaMainEntity={pageSchemaMainEntity}");
   });
 
+  it("extracts only visible, unique and external HTTPS citations", () => {
+    const citations = extractExternalEditorialCitations(`
+      <p><a href="https://www.planalto.gov.br/lei?x=1&amp;y=2#trecho">Lei</a></p>
+      <p><a href='https://www.planalto.gov.br/lei?x=1&amp;y=2'>Lei repetida</a></p>
+      <p><a href="https://empregossaoluis.com.br/contato">Interno</a></p>
+      <p><a href="http://example.com/inseguro">HTTP</a></p>
+      <p><a href="mailto:redacao@example.com">E-mail</a></p>
+    `, base.siteUrl);
+
+    expect(citations).toEqual(["https://www.planalto.gov.br/lei?x=1&y=2"]);
+    expect(buildEditorialSchema({ ...base, citations })).toHaveProperty("citation", citations);
+  });
+
+  it("drops invalid, internal and non-HTTPS citations passed directly to the schema", () => {
+    const schema = buildEditorialSchema({
+      ...base,
+      citations: [
+        "https://www.gov.br/trabalho",
+        "https://www.gov.br/trabalho#secao",
+        "http://example.com/inseguro",
+        "https://empregossaoluis.com.br/contato",
+        "não é URL"
+      ]
+    });
+
+    expect(schema.citation).toEqual(["https://www.gov.br/trabalho"]);
+  });
+
   it("does not invent a publication date", () => {
     expect(buildEditorialSchema({ ...base, publishedAt: null })).not.toHaveProperty("datePublished");
   });
@@ -75,9 +103,11 @@ describe("editorial structured data", () => {
     ];
 
     for (const page of pages) {
-      expect(page).toContain('import { buildEditorialSchema, isNewsroomAuthor } from "../../lib/editorial-schema"');
+      expect(page).toContain('import { buildEditorialSchema, extractExternalEditorialCitations, isNewsroomAuthor } from "../../lib/editorial-schema"');
       expect(page).toContain("buildEditorialSchema({");
       expect(page).toContain("updatedAt: reviewedAt ?? article.updatedAt");
+      expect(page).toContain("extractExternalEditorialCitations(contentHtml, runtimeSite.toString())");
+      expect(page).toContain("...(citations.length ? { citations } : {})");
       expect(page).not.toContain('author: { "@type": "Person", name: authorName }');
       expect(page).toContain('href="/redacao"');
       expect(page).toContain('rel="author"');
