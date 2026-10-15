@@ -79,7 +79,7 @@ describe("revisões editoriais substanciais para AdSense", () => {
       const override = getEditorialContentOverride(slug);
       const words = textOnly(override?.contentHtml ?? "").split(/\s+/).filter(Boolean);
       expect(override).not.toBeNull();
-      expect(override?.reviewedAt).toBe("2026-10-14");
+      expect(override?.reviewedAt).toBe(slug === "mapa-setores-vagas-sao-luis" ? "2026-10-15" : "2026-10-14");
       expect(words.length).toBeGreaterThanOrEqual(500);
       expect(override?.contentHtml).toMatch(/<a href="https:\/\//);
       expect(override?.contentHtml).not.toMatch(/No tema em pauta|Leitura útil do cenário/i);
@@ -100,7 +100,7 @@ describe("revisões editoriais substanciais para AdSense", () => {
       const words = textOnly(html).split(/\s+/).filter(Boolean);
 
       expect(override).not.toBeNull();
-      expect(override?.reviewedAt).toBe("2026-10-14");
+      expect(override?.reviewedAt).toBe(slug === "fgts-consultar-trabalhador-clt" ? "2026-10-15" : "2026-10-14");
       expect(words.length).toBeGreaterThanOrEqual(550);
       expect(html).toMatch(/<a href="https:\/\//);
       expect(html).toMatch(/gov\.br|fgts\.gov\.br|planalto\.gov\.br/);
@@ -157,7 +157,7 @@ describe("revisões editoriais substanciais para AdSense", () => {
       const outbound = [...html.matchAll(/href="(https:\/\/[^"]+)"/g)].map((match) => match[1]);
 
       expect(override).not.toBeNull();
-      expect(override?.reviewedAt).toBe(slug === "trabalhador-terceirizado-direitos" ? "2026-10-15" : "2026-10-14");
+      expect(override?.reviewedAt).toBe(["trabalhador-terceirizado-direitos", "ponto-eletronico-atraso-trabalho"].includes(slug) ? "2026-10-15" : "2026-10-14");
       expect(words.length).toBeGreaterThanOrEqual(550);
       expect(new Set(outbound).size).toBeGreaterThanOrEqual(2);
       expect(outbound.every((url) => /https:\/\/(?:www\.)?(?:gov\.br|planalto\.gov\.br|mpt\.mp\.br|sistemas\.cfm\.org\.br|cnes\.trabalho\.gov\.br)\//.test(url))).toBe(true);
@@ -314,6 +314,57 @@ describe("revisões editoriais substanciais para AdSense", () => {
       {
         slug: "trabalhador-terceirizado-direitos",
         required: ["Não confunda terceirização com trabalho temporário", "Escolha o canal conforme o problema"]
+      }
+    ];
+
+    for (const item of cases) {
+      const override = getEditorialContentOverride(item.slug);
+      const html = override?.contentHtml ?? "";
+      const words = textOnly(html).split(/\s+/).filter(Boolean);
+      const outbound = [...html.matchAll(/href="(https:\/\/[^"]+)"/g)].map((match) => match[1]);
+
+      expect(override).not.toBeNull();
+      expect(override?.reviewedAt).toBe("2026-10-15");
+      expect(words.length).toBeGreaterThanOrEqual(740);
+      expect(new Set(outbound).size).toBeGreaterThanOrEqual(2);
+      for (const excerpt of item.required) expect(html).toContain(excerpt);
+      expect(html).not.toMatch(/vagas abertas hoje|salário médio|contratação garantida|aprovação garantida/i);
+    }
+  });
+
+  it("aprofunda o lote 8c com fontes, extensao e controles por URL", () => {
+    const cases = [
+      {
+        slug: "mapa-setores-vagas-sao-luis",
+        required: ["Monte uma coleta de 14 dias", "Separe fluxo de anúncios de estoque de empregos"]
+      },
+      {
+        slug: "follow-up-apos-entrevista-mensagem",
+        required: ["Use uma linha do tempo, não a ansiedade", "Guarde prova sem montar um arquivo de dados pessoais"]
+      },
+      {
+        slug: "cursos-no-curriculo-sem-enchimento",
+        required: ["Dê uma nota que possa ser explicada", "Trate pendência, validade e comprovação sem maquiar"]
+      },
+      {
+        slug: "excel-basico-vagas-emprego",
+        required: ["Valide a planilha como se outra pessoa fosse recebê-la", "Tenha cuidado ao importar CSV e trocar de versão"]
+      },
+      {
+        slug: "vagas-estoque-logistica-sao-luis",
+        required: ["Compare o processo antes de comparar o nome do cargo", "Avalie turno e deslocamento em São Luís"]
+      },
+      {
+        slug: "vagas-motorista-entregador-sao-luis",
+        required: ["Confirme qual regra se aplica à atividade descrita", "Calcule custo e risco sem chamar faturamento de renda"]
+      },
+      {
+        slug: "ponto-eletronico-atraso-trabalho",
+        required: ["Identifique o sistema e preserve o comprovante", "Consulte também a regra coletiva aplicável"]
+      },
+      {
+        slug: "fgts-consultar-trabalhador-clt",
+        required: ["Faça uma conciliação por competência", "Diferencie ausência, atraso de processamento e leitura incompleta"]
       }
     ];
 
