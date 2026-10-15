@@ -72,10 +72,7 @@ describe("editorial structured data", () => {
       ]
     });
 
-    expect(schema.citation).toEqual([
-      "https://www.gov.br/trabalho",
-      "https://www.gov.br/trabalho"
-    ]);
+    expect(schema.citation).toEqual(["https://www.gov.br/trabalho"]);
   });
 
   it("does not invent a publication date", () => {
