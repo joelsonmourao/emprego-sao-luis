@@ -1,6 +1,7 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import Breadcrumbs from "../../components/ui/Breadcrumbs.astro";
+import EditorialSources from "../../components/EditorialSources.astro";
 import {
   articlePublicPath,
   findPublishedArticle,
@@ -52,6 +53,9 @@ const citations = extractExternalEditorialCitations(
   runtimeSite.toString(),
   !editorialOverride && article.sourceUrl ? [article.sourceUrl] : []
 );
+const sourceLabels = !editorialOverride && article.sourceUrl && article.sourceName
+  ? { [article.sourceUrl]: article.sourceName }
+  : {};
 const reviewedAt = editorialOverride ? new Date(`${editorialOverride.reviewedAt}T12:00:00-03:00`) : null;
 const schema = buildEditorialSchema({
   type: "Article",
@@ -84,7 +88,7 @@ const schema = buildEditorialSchema({
     {article.subtitle && <p class="mt-4 text-xl text-[var(--es-muted)]">{article.subtitle}</p>}<p class="mt-4 text-sm text-[var(--es-muted)]">Por {newsroomAuthor ? <a class="underline" href="/redacao" rel="author">{authorName}</a> : authorName} · {article.publishedAt?.toLocaleDateString("pt-BR")}{reviewedAt ? ` · Revisado em ${reviewedAt.toLocaleDateString("pt-BR")}` : ""}</p>
     {article.coverImageUrl && <figure class="mt-8"><img src={article.coverImageUrl} alt={effectiveCoverAlt} class="w-full max-h-[34rem] rounded-2xl bg-[var(--es-cream)] object-contain" width={effectiveCoverWidth} height={effectiveCoverHeight} loading="eager" decoding="async" fetchpriority="high" />{(effectiveCoverCaption || effectiveCoverCredit) && <figcaption class="mt-2 text-xs text-[var(--es-muted)]">{effectiveCoverCaption}{effectiveCoverCaption && effectiveCoverCredit ? " · " : ""}{effectiveCoverCredit ? `Crédito: ${effectiveCoverCredit}` : ""}</figcaption>}</figure>}
     <div class="es-prose mt-8 max-w-none break-words" set:html={contentHtml} />
-    {!editorialOverride && article.sourceUrl && <p class="mt-8 text-sm">Fonte: <a class="underline" href={article.sourceUrl} rel="nofollow noopener">{article.sourceName ?? "fonte original"}</a></p>}
+    <EditorialSources citations={citations} sourceLabels={sourceLabels} />
     <aside class="mt-10 rounded-2xl bg-[var(--es-cream)] p-5">
       <p class="font-bold">Continue gratuitamente</p>
       <div class="mt-3 flex flex-wrap gap-3">
