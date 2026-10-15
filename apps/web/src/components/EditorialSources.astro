@@ -8,8 +8,10 @@ const { citations, sourceLabels = {} } = Astro.props;
 
 function normalizeHttpsUrl(value: string): string | null {
   try {
-    const url = new URL(value);
-    return url.protocol === "https:" ? url.toString() : null;
+    const url = new URL(value.replaceAll("&amp;", "&"));
+    if (url.protocol !== "https:") return null;
+    url.hash = "";
+    return url.toString();
   } catch {
     return null;
   }
