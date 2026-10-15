@@ -230,3 +230,4 @@ describe("revisões editoriais substanciais para AdSense", () => {
       expect(html).not.toMatch(/vagas abertas hoje|salário médio|contratação garantida|aprovação garantida/i);
     }
   });
+});
