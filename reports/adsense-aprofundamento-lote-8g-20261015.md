@@ -11,7 +11,7 @@ Oito guias já existentes receberam reescrita substantiva e individual, sem alte
 | `teste-online-processo-seletivo-dicas` | 982 | privacidade, ensaio técnico e protocolo de falhas |
 | `entrevista-por-video-emprego` | 994 | ensaio curto, proteção da tela e contingência |
 | `referencias-profissionais-emprego` | 995 | autorização atual, dossiê mínimo e substituição |
-| `ingles-no-curriculo-nivel-honesto` | 985 | matriz por habilidade e descritores CEFR |
+| `ingles-no-curriculo-nivel-honesto` | 1.009 | matriz por habilidade e descritores CEFR |
 | `plano-90-dias-emprego-sao-luis` | 996 | ciclos de 15 dias, métricas controláveis e realidade local |
 | `esgotamento-busca-emprego-sinais` | 1.021 | observação sem autodiagnóstico, apoio e retomada gradual |
 
@@ -22,6 +22,7 @@ Contagem calculada a partir do HTML sem tags, com tokenização Unicode equivale
 - Lei Geral de Proteção de Dados, especialmente princípios de finalidade, necessidade e transparência e direitos do titular: https://www.planalto.gov.br/ccivil_03/_ato2015-2018/2018/lei/l13709.htm
 - Cartilha de Segurança para Internet do CERT.br: https://cartilha.cert.br/fasciculos/
 - Níveis A1 a C2 e descritores do Quadro Europeu Comum de Referência, Conselho da Europa: https://www.coe.int/en/web/common-european-framework-reference-languages/level-descriptions
+- Grade de autoavaliação CEFR por habilidade, Europass/União Europeia: https://europass.europa.eu/en/common-european-framework-reference-language-skills
 - Serviço Buscar Emprego no SINE: https://www.gov.br/pt-br/servicos/buscar-emprego-no-sistema-nacional-de-emprego-sine
 - Saúde Mental e Rede de Atenção Psicossocial, Ministério da Saúde: https://www.gov.br/saude/pt-br/assuntos/saude-de-a-a-z/s/saude-mental
 - Delimitação de burnout ao contexto ocupacional, OMS: https://www.who.int/news/item/28-05-2019-burn-out-an-occupational-phenomenon-international-classification-of-diseases
