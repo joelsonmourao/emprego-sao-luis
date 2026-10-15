@@ -383,4 +383,31 @@ describe("revisões editoriais substanciais para AdSense", () => {
     }
   });
 
+  it("aprofunda o lote 8d com fontes e controles especificos por URL", () => {
+    const cases = [
+      { slug: "gap-habilidades-candidatura-como-fechar", required: ["Priorize por frequência, necessidade e possibilidade de prova", "Use uma regra de parada"] },
+      { slug: "avaliacao-de-desempenho-preparacao", required: ["Faça uma tabela de expectativa, fato e dependência", "Teste se o feedback pode virar ação"] },
+      { slug: "trabalho-hibrido-sao-luis-checklist", required: ["Classifique cada presença antes de aceitar a rotina", "Reconcilie o combinado com a prática"] },
+      { slug: "alfabetizacao-digital-emprego-basico", required: ["Treine permissões e tamanho de arquivo", "Crie um teste mensal de autonomia"] },
+      { slug: "conflito-com-chefe-trabalho-dicas", required: ["Escolha uma frase que peça decisão", "Use uma escala de resposta"] },
+      { slug: "empatia-atendimento-cliente-entrevista", required: ["Use apenas o dado necessário para resolver", "Prepare uma resposta para dizer não"] },
+      { slug: "negociar-horario-deslocamento-emprego", required: ["Compare três cenários antes da conversa", "Registre o que foi aprovado e por quanto tempo"] },
+      { slug: "primeira-semana-emprego-novo", required: ["Use as primeiras 72 horas para mapear riscos", "Classifique tarefas por autonomia"] }
+    ];
+
+    for (const item of cases) {
+      const override = getEditorialContentOverride(item.slug);
+      const html = override?.contentHtml ?? "";
+      const words = textOnly(html).split(/\s+/).filter(Boolean);
+      const outbound = [...html.matchAll(/href="(https:\/\/[^"]+)"/g)].map((match) => match[1]);
+
+      expect(override).not.toBeNull();
+      expect(override?.reviewedAt).toBe("2026-10-15");
+      expect(words.length).toBeGreaterThanOrEqual(760);
+      expect(new Set(outbound).size).toBeGreaterThanOrEqual(2);
+      for (const excerpt of item.required) expect(html).toContain(excerpt);
+      expect(html).not.toMatch(/vagas abertas hoje|salário médio|contratação garantida|aprovação garantida/i);
+    }
+  });
+
 });
