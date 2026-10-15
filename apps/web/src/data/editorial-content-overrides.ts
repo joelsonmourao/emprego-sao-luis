@@ -1654,9 +1654,9 @@ const overrides: Record<string, EditorialContentOverride> = {
   },
 
   "entrevista-por-video-emprego": {
-    reviewedAt: "2026-10-12",
+    reviewedAt: "2026-10-15",
     contentHtml: `
-<p><strong>Revisão editorial: 12 de outubro de 2026.</strong> Entrevista por vídeo combina conteúdo, tecnologia e privacidade. Preparar o aparelho reduz ruído, mas não transforma conexão instável em falta de competência. Este roteiro organiza teste, ambiente, resposta e plano alternativo.</p>
+<p><strong>Revisão editorial: 15 de outubro de 2026.</strong> Entrevista por vídeo combina conteúdo, tecnologia e privacidade. Preparar o aparelho reduz ruído, mas não transforma conexão instável em falta de competência. Este roteiro organiza teste, ambiente, resposta e plano alternativo.</p>
 <h2>Confirme o convite antes de instalar qualquer coisa</h2>
 <p>Leia remetente, empresa, data, fuso, duração, plataforma e nome do entrevistador. Compare o domínio do convite com o canal institucional. Aplicativo baixado por link desconhecido, extensão sem necessidade ou pedido de acesso remoto ao computador são motivos para parar e verificar. Consulte as recomendações do <a href="https://cartilha.cert.br/fasciculos/" target="_blank" rel="noopener noreferrer">CERT.br sobre links, aplicativos de mensagem e proteção de contas</a>.</p>
 <p>Pergunte se haverá gravação, teste técnico, compartilhamento de tela ou dinâmica em grupo. Se a gravação for informada, você pode solicitar finalidade, acesso e prazo de retenção. A <a href="https://www.planalto.gov.br/ccivil_03/_ato2015-2018/2018/lei/l13709.htm" target="_blank" rel="noopener noreferrer">LGPD</a> trata imagem e voz identificáveis como dados pessoais e exige transparência e segurança no tratamento.</p>
@@ -1673,6 +1673,18 @@ const overrides: Record<string, EditorialContentOverride> = {
 <h2>Quando a conexão falhar</h2>
 <p>Espere alguns segundos, tente retornar uma vez e envie uma mensagem objetiva: “A conexão caiu às 10h18. Estou entrando novamente; se preferir, posso continuar por áudio ou reagendar.” Não transforme a falha em longa justificativa. Depois, registre o ocorrido e o combinado.</p>
 <p>Se o entrevistador pedir senha, código, pagamento, acesso remoto ou documento sem explicar finalidade, encerre a etapa e valide a empresa. Uma entrevista segura avalia experiência e aderência; não precisa controlar o aparelho do candidato.</p>
+<h2>Faça um ensaio com roteiro de cinco minutos</h2>
+<p>Grave uma chamada de teste apenas para você, sem dados da empresa. Diga nome, cargo da seleção e um exemplo de experiência em até noventa segundos; depois responda a uma pergunta situacional e faça uma pergunta sobre a função. Assista verificando volume, velocidade, luz e se informações pessoais aparecem ao fundo. Apague o teste se não precisar guardá-lo.</p>
+<p>Use notas com três palavras por exemplo, nunca respostas completas. Posicione-as perto da câmera e treine a transição entre ouvir, pensar e responder. A preparação deve melhorar clareza, não criar personagem. Se você não sabe uma ferramenta citada, explique o que conhece e como aprenderia; não finja uso profissional.</p>
+<h2>Proteja a tela e as pessoas ao redor</h2>
+<ul><li>Crie um perfil de navegador separado ou feche e-mail, mensageiros e arquivos pessoais.</li><li>Se compartilhar, selecione uma janela específica em vez da tela inteira.</li><li>Oculte favoritos, nomes de clientes, documentos e notificações.</li><li>Avise moradores sobre câmera e microfone, mas não exponha a conversa a terceiros.</li><li>Use fundo simples; não mostre documento para a câmera sem finalidade explicada.</li></ul>
+<p>A LGPD prevê finalidade, necessidade e transparência no tratamento de dados pessoais. Em vez de declarar que toda gravação é proibida, confirme quem grava, por que grava e qual canal atende o titular. Se não se sentir seguro, peça esclarecimento antes da chamada. Uma recusa ou alternativa pode ser avaliada pela organização; não há garantia de resultado.</p>
+<h2>Prepare dois planos de contingência por escrito</h2>
+<table><thead><tr><th>Problema</th><th>Plano principal</th><th>Mensagem curta</th></tr></thead><tbody><tr><td>áudio com eco</td><td>trocar para fone já testado</td><td>“Vou reconectar o áudio; retorno em um minuto.”</td></tr><tr><td>queda de internet</td><td>voltar pelo mesmo link e avisar</td><td>“A conexão caiu às 14h06; estou retornando.”</td></tr><tr><td>falta de energia</td><td>usar telefone carregado se autorizado</td><td>“Houve interrupção de energia; posso continuar por áudio?”</td></tr></tbody></table>
+<p>Teste o plano no endereço e horário aproximados. Não prometa rede móvel, bateria ou sala alternativa sem verificar. Tenha nome, telefone e e-mail do contato fora do aplicativo para não perder a comunicação junto com a chamada.</p>
+<h2>Feche a entrevista com um registro verificável</h2>
+<p>Anote data, participantes, próximos passos, prazo informado e canal. Envie agradecimento curto somente pelo contato confirmado. Se receber tarefa depois, compare domínio, instruções e dados solicitados com o processo original. Não pague taxa, não instale acesso remoto e não forneça código de autenticação.</p>
+<p>Uma falha técnica pode acontecer mesmo após o teste. Registre o que ocorreu sem exagero e concentre-se no combinado para continuar. O preparo reduz riscos previsíveis; ele não garante conexão perfeita nem decisão favorável.</p>
     `.trim()
   },
 
@@ -1712,9 +1724,9 @@ const overrides: Record<string, EditorialContentOverride> = {
   },
 
   "referencias-profissionais-emprego": {
-    reviewedAt: "2026-10-12",
+    reviewedAt: "2026-10-15",
     contentHtml: `
-<p><strong>Revisão editorial: 12 de outubro de 2026.</strong> Referência profissional é uma pessoa que presenciou seu trabalho e aceitou falar sobre ele. Não é favor para preencher campo, nem autorização para divulgar telefone alheio sem aviso. Uma referência coerente sustenta fatos que já aparecem no currículo.</p>
+<p><strong>Revisão editorial: 15 de outubro de 2026.</strong> Referência profissional é uma pessoa que presenciou seu trabalho e aceitou falar sobre ele. Não é favor para preencher campo, nem autorização para divulgar telefone alheio sem aviso. Uma referência coerente sustenta fatos que já aparecem no currículo.</p>
 <h2>Escolha quem viu uma entrega</h2>
 <p>Prefira liderança, colega experiente, cliente institucional, professor de projeto ou responsável por trabalho voluntário que consiga descrever contexto e comportamento. Cargo famoso não substitui convivência. Parente pode conhecer seu esforço, mas costuma ter menos independência para avaliar desempenho profissional.</p>
 <p>Faça uma lista de três pessoas e, para cada uma, anote: onde trabalharam juntas, qual período, quais tarefas ela observou e qual contato ainda funciona. Se ninguém acompanhou seu trabalho formal, considere responsável por atividade informal, curso prático ou projeto. A referência deve dizer o que viu, não inventar vínculo.</p>
@@ -1732,6 +1744,18 @@ const overrides: Record<string, EditorialContentOverride> = {
 <h2>Quando a checagem der errado</h2>
 <p>Número desatualizado não precisa encerrar uma seleção se você agir cedo. Avise o recrutador, substitua por contato autorizado e explique a relação. Se a referência trouxe crítica, peça ao recrutador que avalie evidências do trabalho; não ataque a pessoa.</p>
 <p>Depois, agradeça sem pedir detalhes confidenciais da conversa. Uma boa rede se mantém com respeito. O objetivo da referência é acrescentar contexto verificável, não garantir contratação.</p>
+<h2>Monte um dossiê mínimo para cada referência</h2>
+<p>Guarde em local privado o nome, relação profissional, período aproximado, contato autorizado, horário preferido e a data em que a pessoa concordou. Acrescente duas entregas que ela presenciou. Não registre opinião íntima, endereço, CPF ou dados que não ajudam a checagem. Revise antes de cada processo: autorização antiga não significa disponibilidade permanente.</p>
+<p>Se a pessoa mudou de organização, informe o cargo e a empresa da época, distinguindo do trabalho atual. Um exemplo: “supervisora direta na Empresa A em 2024; contato pessoal autorizado”. Isso evita que o recrutador interprete o vínculo de forma errada. Se o contato só aceita e-mail, não substitua por telefone encontrado em rede social.</p>
+<h2>Escolha referências diferentes para perguntas diferentes</h2>
+<table><thead><tr><th>O que a vaga precisa verificar</th><th>Quem pode ter observado</th><th>Evidência possível</th></tr></thead><tbody><tr><td>atendimento</td><td>liderança ou cliente institucional</td><td>registro e solução de demandas</td></tr><tr><td>organização</td><td>colega responsável pelo fluxo</td><td>conferência, arquivo ou prazo</td></tr><tr><td>aprendizagem</td><td>professor de projeto ou mentor</td><td>entrega após orientação</td></tr><tr><td>atividade informal</td><td>responsável pelo trabalho</td><td>tarefas, período e contexto real</td></tr></tbody></table>
+<p>Não peça a mesma pessoa para confirmar aquilo que ela nunca viu. Também não apresente amigo como ex-chefe. Se o formulário exige uma categoria que você não possui, explique e proponha contato alternativo; a empresa decidirá se aceita.</p>
+<h2>Envie um aviso antes de cada contato provável</h2>
+<p>Uma mensagem útil contém empresa, cargo, etapa, prazo aproximado e link confirmado. Relembre fatos do currículo, sem escrever respostas. Exemplo: “A seleção da Empresa B pode entrar em contato até sexta. O foco é organização de pedidos; mencionei nosso trabalho no projeto X entre abril e julho. Se algo estiver incorreto, avise antes de eu enviar seu contato.”</p>
+<p>Essa revisão protege os dois lados. A LGPD trata telefone e informação ligada a pessoa identificável como dado pessoal e estabelece necessidade e transparência. Compartilhar somente o canal autorizado e para a finalidade informada é uma prática coerente; não transforme o artigo em parecer jurídico sobre uma situação que depende dos fatos.</p>
+<h2>Tenha uma substituição que não pareça improviso</h2>
+<p>Mantenha uma segunda referência autorizada quando possível. Se a primeira ficar indisponível, avise o recrutador antes da tentativa: explique a relação da substituta e por que ela consegue falar sobre o trabalho. Nunca altere datas ou invente contato para preencher o campo.</p>
+<p>Depois do processo, informe que a etapa terminou e agradeça. Atualize seu registro se a pessoa preferir não ser contatada novamente. Uma referência profissional confiável nasce de consentimento atual, contexto preciso e fatos observáveis — não da quantidade de nomes no currículo.</p>
     `.trim()
   },
 
@@ -1794,14 +1818,15 @@ const overrides: Record<string, EditorialContentOverride> = {
   },
 
   "ingles-no-curriculo-nivel-honesto": {
-    reviewedAt: "2026-10-12",
+    reviewedAt: "2026-10-15",
     contentHtml: `
-<p><strong>Revisão editorial: 12 de outubro de 2026.</strong> “Básico”, “intermediário” e “fluente” significam coisas diferentes para pessoas diferentes. Um currículo útil informa o que você consegue fazer no idioma, em qual contexto e com que segurança. Honestidade evita uma expectativa que a entrevista pode testar imediatamente.</p>
+<p><strong>Revisão editorial: 15 de outubro de 2026.</strong> “Básico”, “intermediário” e “fluente” significam coisas diferentes para pessoas diferentes. Um currículo útil informa o que você consegue fazer no idioma, em qual contexto e com que segurança. Honestidade evita uma expectativa que a entrevista pode testar imediatamente.</p>
 <h2>Comece pela tarefa da vaga</h2>
 <p>Leia por que o inglês aparece no anúncio. Pode ser leitura de manual, resposta a e-mail, atendimento oral, reunião ou contato diário com equipe estrangeira. Pergunte quando não estiver claro. A mesma pessoa pode ler documentação bem e ainda precisar de apoio para conversar ao vivo.</p>
 <p>Não coloque o idioma no centro do currículo se a vaga não usa inglês. Para posição que exige uso diário, leve a informação para uma seção visível e descreva evidência. Certificado antigo sem prática recente deve ser apresentado como formação, não como prova automática de desempenho atual.</p>
 <h2>Use uma referência compreensível</h2>
 <p>O <a href="https://www.coe.int/en/web/common-european-framework-reference-languages/level-descriptions" target="_blank" rel="noopener noreferrer">Quadro Europeu Comum de Referência para Línguas, do Conselho da Europa</a>, organiza níveis de A1 a C2 e descreve capacidades de compreensão, fala e escrita. Ele é referência, não certificado individual. Só escreva “B2” se você entende o descritor e possui avaliação ou autoavaliação consistente que possa explicar.</p>
+<p>A <a href="https://europass.europa.eu/en/common-european-framework-reference-language-skills" target="_blank" rel="noopener noreferrer">grade de autoavaliação do Europass</a> separa compreensão, leitura, interação, produção oral e escrita. Use-a para comparar capacidades, não como emissão automática de certificado.</p>
 <p>Se não usa CEFR, prefira descrição concreta: “inglês para leitura de manuais; escrita de e-mails simples com revisão; conversação básica”. Isso é mais informativo que “intermediário” isolado. Evite porcentagens como “inglês 80%”: elas não revelam tarefa nem critério.</p>
 <h2>Faça um teste ligado ao trabalho</h2>
 <p>Escolha três atividades do anúncio e simule sem ferramenta automática no primeiro momento:</p>
@@ -1816,6 +1841,18 @@ const overrides: Record<string, EditorialContentOverride> = {
 <h2>Revise sem diminuir sua experiência</h2>
 <p>Idioma é uma competência entre outras. Para vagas de atendimento local, estoque, administração ou serviços em São Luís, as tarefas principais podem pesar mais. Não elimine experiência relevante para abrir espaço a uma longa lista de cursos de inglês.</p>
 <p>Atualize a descrição quando sua prática mudar. Um nível honesto não é fraqueza: ele permite que a empresa avalie treinamento e que você entre sabendo o que será cobrado. A decisão final deve se apoiar em capacidade demonstrável, não em adjetivo inflado.</p>
+<h2>Faça uma matriz por habilidade, não uma média abstrata</h2>
+<table><thead><tr><th>Habilidade</th><th>Tarefa de teste</th><th>Registro honesto</th></tr></thead><tbody><tr><td>leitura</td><td>entender manual ou e-mail</td><td>sozinho, com dicionário ou com tradução</td></tr><tr><td>escrita</td><td>confirmar prazo em mensagem curta</td><td>primeira versão ou precisa de revisão</td></tr><tr><td>escuta</td><td>identificar instruções de áudio</td><td>velocidade e sotaque compreendidos</td></tr><tr><td>fala</td><td>explicar uma experiência</td><td>autonomia e pausas necessárias</td></tr></tbody></table>
+<p>Não some as quatro linhas para produzir porcentagem. A empresa pode precisar de apenas uma delas ou testar todas separadamente. Compare a matriz com o anúncio e descreva a competência mais relevante. Se sua leitura é forte e a fala é inicial, registrar essa diferença é mais útil que “intermediário”.</p>
+<h2>Use os níveis A1 a C2 com o descritor correspondente</h2>
+<p>O Conselho da Europa organiza a proficiência em seis níveis, de A1 a C2, definidos por descritores do que a pessoa consegue fazer. Antes de escrever um nível, leia os descritores de recepção, produção, interação e mediação. Uma autoavaliação ajuda a localizar capacidade, mas não equivale automaticamente a exame ou certificado.</p>
+<p>Registre a origem quando relevante: “autoavaliação baseada no CEFR”, “certificado emitido em 2025” ou “uso semanal em atendimento”. Se o certificado é antigo e a prática diminuiu, mantenha-o na formação e atualize a descrição funcional. O recrutador precisa saber a capacidade atual e a evidência, não apenas o nome do curso.</p>
+<h2>Prepare um portfólio pequeno sem expor terceiros</h2>
+<p>Para vaga que exige escrita, crie amostras fictícias: um e-mail de confirmação, um resumo de manual público e uma resposta de atendimento. Indique que são exercícios. Não copie mensagem de cliente nem documento interno de emprego anterior. Para leitura técnica, use material público e registre o link.</p>
+<p>Faça uma versão sem tradutor e outra com ferramentas permitidas no trabalho. Compare erros e tempo. Se a autonomia depende de consulta, diga isso. Ferramenta pode aumentar produtividade, mas não substitui compreensão quando a vaga exige conversa em tempo real.</p>
+<h2>Responda à mudança de idioma durante a entrevista</h2>
+<p>Se o entrevistador mudar para inglês, confirme quando necessário: “Would you like me to answer in English?” Organize respostas curtas com contexto, ação e resultado. Peça repetição ou reformulação quando não entender. Não use frase decorada para esconder que a pergunta foi diferente.</p>
+<p>Ao final, anote quais tarefas foram difíceis e ajuste currículo ou estudo. Não aumente o nível por ter concluído uma conversa nem reduza toda a trajetória por uma pergunta difícil. O registro deve evoluir com evidência repetida e com o tipo de uso exigido pela vaga.</p>
     `.trim()
   },
 
@@ -2022,9 +2059,9 @@ const overrides: Record<string, EditorialContentOverride> = {
   },
 
   "teste-online-processo-seletivo-dicas": {
-    reviewedAt: "2026-10-12",
+    reviewedAt: "2026-10-15",
     contentHtml: `
-<p><strong>Revisão editorial: 12 de outubro de 2026.</strong> Testes on-line variam: podem avaliar raciocínio, escrita, ferramenta, idioma ou situação de trabalho. A regra válida é a informada pela empresa ou plataforma. Este guia ajuda a preparar ambiente, segurança e registro de falha sem ensinar a burlar avaliação.</p>
+<p><strong>Revisão editorial: 15 de outubro de 2026.</strong> Testes on-line variam: podem avaliar raciocínio, escrita, ferramenta, idioma ou situação de trabalho. A regra válida é a informada pela empresa ou plataforma. Este guia ajuda a preparar ambiente, segurança e registro de falha sem ensinar a burlar avaliação.</p>
 <h2>Confirme o convite antes de abrir</h2>
 <p>Compare remetente, empresa, cargo e processo ao qual você se candidatou. Volte ao canal oficial por um endereço digitado por você e confirme se houver divergência. Desconfie de cobrança, instalação de programa de acesso remoto, pedido de senha, código de autenticação ou documento bancário.</p>
 <p>A <a href="https://cartilha.cert.br/fasciculos/" target="_blank" rel="noopener noreferrer">Cartilha de Segurança para Internet do CERT.br</a> reúne orientações sobre phishing, senhas, autenticação, privacidade e dispositivos móveis. Use essas práticas também em processos seletivos.</p>
@@ -2044,6 +2081,17 @@ const overrides: Record<string, EditorialContentOverride> = {
 <h2>Depois do envio</h2>
 <p>Guarde confirmação, data e contato de suporte. Não publique perguntas ou respostas. Registre quais competências apareceram e prepare exemplos verdadeiros para a entrevista. Se não avançar, o resultado não revela sozinho o motivo; evite inventar explicações sobre algoritmo ou nota de corte.</p>
 <p>A preparação correta reduz falhas evitáveis, mas não garante aprovação. Segurança, honestidade e respeito às regras preservam a candidatura e os seus dados.</p>
+<h2>Faça uma ficha de privacidade antes de iniciar</h2>
+<p>Quando a plataforma pedir câmera, microfone, documento ou monitoramento da tela, registre quatro respostas: quem conduz o processo, qual dado será coletado, para qual finalidade e onde solicitar esclarecimento. A LGPD adota princípios de finalidade, necessidade e transparência; isso não permite concluir, sem contexto, que a ferramenta é ilegal, mas sustenta pedir informação clara ao controlador. Não envie documento extra por mensagem paralela apenas porque alguém criou urgência.</p>
+<p>Leia o aviso de privacidade e salve o link ou protocolo. Se a página não identifica empresa, plataforma ou contato, volte ao recrutador pelo canal já confirmado. Para teste com gravação, pergunte se a gravação é obrigatória, como será usada e por quanto tempo ficará acessível. Não tente desativar recurso exigido às escondidas; peça alternativa ou orientação formal.</p>
+<h2>Simule o percurso completo sem acessar a prova</h2>
+<ol><li>Abra a página inicial e confirme navegador, sistema e resolução aceitos.</li><li>Teste login, recuperação de acesso e autenticação sem compartilhar código.</li><li>Crie um arquivo fictício no formato solicitado e verifique tamanho e nome.</li><li>Desative notificações e feche documentos pessoais antes de eventual compartilhamento.</li><li>Anote suporte, prazo e número de inscrição em papel ou arquivo local.</li></ol>
+<p>Esse ensaio técnico não deve revelar ou copiar questões. Se a plataforma oferece teste de exemplo, use apenas o material disponibilizado por ela. Instalar extensão ou programa requer atenção: confirme o fornecedor no convite original, verifique permissões e remova acessos que não serão mais necessários depois da etapa, quando isso não contrariar instrução válida.</p>
+<h2>Decida o que fazer em três tipos de falha</h2>
+<table><thead><tr><th>Falha</th><th>Ação imediata</th><th>Registro adequado</th></tr></thead><tbody><tr><td>Conexão caiu</td><td>retorne uma vez pelo mesmo link</td><td>horário e mensagem exibida</td></tr><tr><td>Arquivo recusado</td><td>confira formato e tamanho</td><td>nome do arquivo, sem expor conteúdo sensível</td></tr><tr><td>Recurso inacessível</td><td>pare e contate suporte</td><td>barreira encontrada e tecnologia assistiva usada</td></tr></tbody></table>
+<p>Evite criar outra conta, trocar identidade ou pedir que alguém responda. Se o prazo terminar durante a falha, envie relato objetivo e peça decisão do responsável. Guarde a resposta, mas não publique enunciados nem dados de outros candidatos.</p>
+<h2>Revogue permissões e organize evidências depois</h2>
+<p>Após a confirmação de envio, encerre a sessão em computador compartilhado, confira downloads e permissões concedidas e guarde somente comprovante, data e contato. Não armazene capturas de perguntas sigilosas. Se houver preocupação com tratamento de dados, use primeiro o canal indicado pelo controlador e formule pedido específico sobre o dado, a finalidade ou o acesso; não presuma resposta jurídica antes de receber os fatos.</p>
     `.trim()
   },
 
@@ -2134,9 +2182,9 @@ const overrides: Record<string, EditorialContentOverride> = {
   },
 
   "esgotamento-busca-emprego-sinais": {
-    reviewedAt: "2026-10-12",
+    reviewedAt: "2026-10-15",
     contentHtml: `
-<p><strong>Revisão editorial: 12 de outubro de 2026.</strong> Procurar emprego exige atenção, repetição e tolerância à incerteza. Quando a busca invade sono, alimentação e relações, aumentar o volume pode piorar decisões. Pausa não é abandono: pode ser parte de um plano que protege saúde e qualidade das candidaturas.</p>
+<p><strong>Revisão editorial: 15 de outubro de 2026.</strong> Procurar emprego exige atenção, repetição e tolerância à incerteza. Quando a busca invade sono, alimentação e relações, aumentar o volume pode piorar decisões. Pausa não é abandono: pode ser parte de um plano que protege saúde e qualidade das candidaturas.</p>
 <h2>Troque a palavra “fraqueza” por observações</h2>
 <p>Registre por sete dias o horário de início e fim da busca, quantas vagas foram lidas, quantas eram compatíveis e como você terminou o bloco. Irritação, choro, insônia, dificuldade de concentração e sensação constante de ameaça merecem atenção, especialmente quando persistem ou impedem atividades básicas.</p>
 <p>Este guia não diagnostica burnout, ansiedade ou depressão. A <a href="https://www.who.int/news/item/28-05-2019-burn-out-an-occupational-phenomenon-international-classification-of-diseases" target="_blank" rel="noopener noreferrer">OMS</a> descreve burnout no contexto ocupacional; estar desempregado e esgotado exige olhar mais amplo, não adaptação automática desse rótulo.</p>
@@ -2154,6 +2202,18 @@ const overrides: Record<string, EditorialContentOverride> = {
 <p>Uma rotina sustentável não garante contratação, mas preserva capacidade de ler, decidir e conversar. A meta útil é candidatura compatível e verificável, não atividade contínua até o esgotamento.</p>
 <p>Se a pressão financeira impede uma pausa completa, reduza o escopo: uma fonte confiável, um cargo e um bloco curto. Peça ajuda para tarefa definida, como revisar um PDF, não para outra pessoa se passar por você. Mantenha alimentação, sono e obrigações essenciais no plano; eles não são prêmio a ser recebido somente depois da contratação.</p>
 <p>Combine com quem mora com você um horário sem interrupção e outro em que a busca termina. Limite mensagens de grupos e silencie notificações fora do bloco. Essa organização não elimina preocupação financeira, mas cria uma fronteira que pode ser revista com apoio.</p>
+<h2>Use um semáforo de funcionamento, não um autodiagnóstico</h2>
+<table><thead><tr><th>Estado observado</th><th>Sinais práticos</th><th>Ação de rotina</th></tr></thead><tbody><tr><td>verde</td><td>sono preservado, leitura clara, erros raros</td><td>manter blocos e pausas</td></tr><tr><td>amarelo</td><td>irritação, pressa, anexos trocados, busca fora do horário</td><td>reduzir volume e pedir apoio específico</td></tr><tr><td>vermelho</td><td>sofrimento intenso, incapacidade de funcionar ou risco à segurança</td><td>interromper a tarefa e buscar cuidado urgente adequado</td></tr></tbody></table>
+<p>O quadro organiza observações; não define diagnóstico. Sintomas podem ter causas diferentes e precisam de avaliação quando intensos ou persistentes. A OMS limita o conceito de burnout ao contexto ocupacional, por isso o desgaste de quem está desempregado não deve receber automaticamente esse rótulo.</p>
+<h2>Faça uma revisão de energia junto com a de candidaturas</h2>
+<p>Ao fim de cada bloco, anote duração, número de anúncios realmente compatíveis, erros percebidos e uma escala simples de energia escolhida por você. Procure padrões: grupos de mensagens à noite aumentam ansiedade? Formulários longos depois de certo horário geram anexos errados? Use o padrão para mudar ambiente e horário, não para culpar a pessoa.</p>
+<p>Exemplo hipotético: alguém percebe que ler anúncios ao acordar mantém preocupação o dia inteiro. Move a busca para três tardes, silencia grupos pela manhã e deixa uma lista curta de respostas pendentes. Depois de duas semanas, verifica se sono, erros e candidaturas melhoraram. O exemplo não é tratamento nem garantia; é um modo de testar fronteiras.</p>
+<h2>Prepare apoio concreto para dias difíceis</h2>
+<ul><li>Uma pessoa pode conferir nome do arquivo e telefone, sem acessar sua conta.</li><li>Outra pode ajudar a confirmar rota ou empresa em canal público.</li><li>Um horário de encerramento pode ser combinado com quem mora junto.</li><li>Contatos de saúde e documentos necessários podem ficar acessíveis.</li><li>Em risco imediato, a prioridade é segurança e serviço de urgência, não candidatura.</li></ul>
+<p>O Ministério da Saúde informa que situações de crise podem ser atendidas nos dispositivos da Rede de Atenção Psicossocial e que o CAPS pode receber procura direta, conforme a organização local. Atenção básica também integra o cuidado. Consulte os serviços do seu território; esta página não substitui avaliação profissional.</p>
+<h2>Retome por uma tarefa pequena e verificável</h2>
+<p>Após pausa, comece por atualizar um currículo, confirmar uma fonte ou responder a um contato, e não por compensar dias sem busca. Defina vinte ou trinta minutos e pare no horário. Se a atividade volta a gerar sofrimento intenso ou incapacidade de funcionar, procure atendimento e ajuste o plano com apoio.</p>
+<p>Saúde mental também é influenciada por condições sociais, econômicas e apoio disponível, segundo a página do Ministério da Saúde. Portanto, a resposta não pode ser apenas “organize-se melhor”. Reduzir carga, buscar rede pública, pedir ajuda prática e tratar a urgência financeira em serviços adequados podem fazer parte do mesmo cuidado.</p>
     `.trim()
   },
 
@@ -2258,9 +2318,9 @@ const overrides: Record<string, EditorialContentOverride> = {
   },
 
   "plano-90-dias-emprego-sao-luis": {
-    reviewedAt: "2026-10-12",
+    reviewedAt: "2026-10-15",
     contentHtml: `
-<p><strong>Revisão editorial: 12 de outubro de 2026.</strong> Noventa dias são uma janela de organização, não prazo para conseguir emprego. O plano divide pesquisa, material, candidaturas e revisão em ciclos curtos. Ele deve caber na sua renda, saúde, cuidado familiar e deslocamento.</p>
+<p><strong>Revisão editorial: 15 de outubro de 2026.</strong> Noventa dias são uma janela de organização, não prazo para conseguir emprego. O plano divide pesquisa, material, candidaturas e revisão em ciclos curtos. Ele deve caber na sua renda, saúde, cuidado familiar e deslocamento.</p>
 <h2>Semana zero: defina limites e duas funções</h2>
 <p>Escolha até dois cargos relacionados a tarefas que consegue demonstrar. Registre turnos possíveis, distância máxima, renda mínima e impedimentos documentais. Leia anúncios atuais antes de editar o currículo; não use lista antiga para concluir que existe contratação hoje.</p>
 <p>O serviço <a href="https://www.gov.br/pt-br/servicos/buscar-emprego-no-sistema-nacional-de-emprego-sine" target="_blank" rel="noopener noreferrer">Buscar Emprego no SINE</a> informa os canais públicos de consulta. O <a href="https://www.gov.br/trabalho-e-emprego/pt-br/assuntos/sistema-nacional-de-emprego-sine/portal-emprega-brasil" target="_blank" rel="noopener noreferrer">Portal Emprega Brasil</a> permite registrar perfil e procurar vagas compatíveis no município. Use também páginas institucionais de empresas e anúncios com origem confirmável.</p>
@@ -2280,6 +2340,18 @@ const overrides: Record<string, EditorialContentOverride> = {
 <p>No dia 90, escreva uma página: fontes usadas, vagas compatíveis, respostas, entrevistas, impedimentos e próximo teste. Continue, pause ou mude o plano com base nisso. Se a busca estiver prejudicando sono e funcionamento, reduza o ritmo e procure apoio de saúde quando necessário.</p>
 <p>O valor dos 90 dias é permitir comparação e correção. A contratação depende de processos externos; o plano mede apenas ações e evidências sob seu controle.</p>
 <p>Faça revisões nos dias 15, 30, 60 e 90. Em cada uma, altere apenas o que a evidência sustenta. Se passou a receber contatos depois de esclarecer o cargo no currículo, mantenha a mudança. Se o retorno não mudou, confira anúncios e canais antes de concluir que precisa comprar curso, foto profissional ou serviço de candidatura.</p>
+<h2>Transforme os 90 dias em seis ciclos de quinze</h2>
+<p>Cada ciclo deve terminar com uma decisão pequena, não com julgamento sobre seu valor. Nos dias 1 a 15, confirme fontes e cargos. De 16 a 30, teste currículo e canais. De 31 a 45, prepare entrevistas. De 46 a 60, reveja deslocamento e horários. De 61 a 75, trate a principal lacuna. De 76 a 90, consolide aprendizados e escolha o próximo ciclo.</p>
+<p>Use o SINE, páginas institucionais e anúncios com origem identificável, mas registre a data de cada consulta. O serviço público pode mostrar oportunidades compatíveis com o cadastro; isso não significa que haverá vaga para cada função ou que a candidatura resultará em contato. Preserve o anúncio usado para tomar decisões.</p>
+<h2>Crie um painel com métricas que você controla</h2>
+<table><thead><tr><th>Métrica</th><th>Como contar</th><th>Decisão possível</th></tr></thead><tbody><tr><td>anúncios confirmados</td><td>URL, fonte e data verificadas</td><td>manter ou trocar fontes</td></tr><tr><td>compatíveis</td><td>requisito, local e jornada cabem</td><td>ajustar cargo ou raio</td></tr><tr><td>envios concluídos</td><td>confirmação ou protocolo</td><td>rever capacidade semanal</td></tr><tr><td>contatos</td><td>mensagem identificável do processo</td><td>preparar próxima etapa</td></tr><tr><td>entrevistas</td><td>conversa realmente realizada</td><td>revisar exemplos e condições</td></tr></tbody></table>
+<p>Não use taxa de resposta como sentença quando a amostra é pequena. Compare dois ciclos com critérios semelhantes e escreva hipóteses, não certezas. Se nada mudou após aumentar candidaturas, volte à compatibilidade e à origem antes de comprar curso ou serviço.</p>
+<h2>Inclua São Luís na agenda sem inventar condição local</h2>
+<p>Para cada vaga, registre unidade, entrada, saída, conexões, custo informado por você e uma alternativa segura. Verifique horários perto da entrevista; não presuma último ônibus, vale-transporte ou transferência de unidade. Se o local está ausente, mantenha “a confirmar” e pergunte antes de aceitar deslocamento.</p>
+<p>Agrupe entrevistas presenciais quando datas e rotas permitirem, mas não sacrifique margem de atraso. Para vídeo, teste conexão no endereço e horário aproximados. O plano local é feito de endereços e escalas concretos, não de frases genéricas sobre bairros “bons” ou setores “aquecidos”.</p>
+<h2>Defina uma regra de pausa e outra de mudança</h2>
+<p>Pare o bloco quando erros aumentarem, quando ultrapassar o horário definido ou quando a busca comprometer sono e cuidado básico. Mude um cargo-alvo somente após revisar uma amostra de anúncios, requisitos repetidos, deslocamento e evidências que possui. Uma semana silenciosa, isoladamente, não basta para abandonar trajetória.</p>
+<p>No relatório do dia 90, separe fatos, hipóteses e próxima experiência. Fato: quatro entrevistas ocorreram. Hipótese: o horário eliminou propostas. Próxima experiência: filtrar escala antes do envio. Essa disciplina impede que o plano prometa prazo de contratação e transforma o ciclo em aprendizado reproduzível.</p>
     `.trim()
   },
 
@@ -3046,9 +3118,9 @@ const overrides: Record<string, EditorialContentOverride> = {
   },
 
   "objetivo-profissional-curriculo": {
-    reviewedAt: "2026-10-14",
+    reviewedAt: "2026-10-15",
     contentHtml: `
-<p><strong>Revisão editorial: 14 de outubro de 2026.</strong> O objetivo profissional é uma linha de orientação, não uma promessa. Ele deve ajudar quem lê a identificar o cargo ou a área pretendida e verificar se o restante do currículo sustenta essa direção. Não existe frase obrigatória nem palavra capaz de garantir entrevista.</p>
+<p><strong>Revisão editorial: 15 de outubro de 2026.</strong> O objetivo profissional é uma linha de orientação, não uma promessa. Ele deve ajudar quem lê a identificar o cargo ou a área pretendida e verificar se o restante do currículo sustenta essa direção. Não existe frase obrigatória nem palavra capaz de garantir entrevista.</p>
 <h2>Comece pelo anúncio e pela sua experiência real</h2>
 <p>Leia o título e as tarefas de oportunidades compatíveis. Separe o nome do cargo, o nível e duas atividades que você já executou ou estudou. A <a href="https://www.gov.br/trabalho-e-emprego/pt-br/assuntos/trabalhador/qualificacao-profissional/classificacao-brasileira-de-ocupacoes" target="_blank" rel="noopener noreferrer">Classificação Brasileira de Ocupações</a> pode esclarecer nomes e famílias ocupacionais, mas é classificatória: não transforma curso em experiência e não prova que uma vaga está aberta.</p>
 <p>Se o anúncio usa “auxiliar administrativo” e você procura essa função, use o mesmo título. Se sua experiência é apenas atendimento, não troque para “analista” para parecer mais qualificado. O currículo precisa continuar verdadeiro quando o recrutador perguntar onde, quando e como cada tarefa foi realizada.</p>
@@ -3068,6 +3140,15 @@ const overrides: Record<string, EditorialContentOverride> = {
 <ol><li>O cargo existe no anúncio e combina com a sua trajetória?</li><li>A evidência citada aparece no restante do currículo?</li><li>A frase cabe em uma ou duas linhas sem adjetivos vazios?</li><li>Horário, cidade e modalidade não entram em conflito com sua disponibilidade?</li><li>Você consegue explicar cada palavra em uma entrevista?</li></ol>
 <p>O serviço <a href="https://www.gov.br/pt-br/servicos/buscar-emprego-no-sistema-nacional-de-emprego-sine" target="_blank" rel="noopener noreferrer">Buscar Emprego no SINE</a> permite consultar oportunidades compatíveis com o cadastro. Compare anúncios atuais antes de definir o cargo-alvo; uma publicação antiga não confirma demanda presente.</p>
 <p>Objetivo profissional útil é específico, curto e sustentado por evidência. Ele orienta a leitura, mas a decisão depende da vaga, dos requisitos, do processo e da avaliação da empresa.</p>
+<h2>Converta a frase em três testes de coerência</h2>
+<p>Depois de escrever o objetivo, compare-o com três pontos do documento: experiência, formação e disponibilidade. Se a frase diz “assistente administrativo com prática em planilhas”, o currículo precisa mostrar onde essa prática ocorreu e quais tarefas foram realizadas. Se diz “estágio no turno da manhã”, a agenda informada no formulário não pode indicar indisponibilidade nesse período. A incoerência não é corrigida com adjetivo; corrija a frase ou acrescente a evidência verdadeira.</p>
+<p>Faça também o teste de leitura em dez segundos: entregue apenas o cabeçalho e o objetivo a alguém de confiança e pergunte qual função foi entendida. Se a resposta for “qualquer coisa”, a frase ainda está ampla. Se a pessoa concluir um nível que você nunca exerceu, como analista ou supervisão, revise o título. O objetivo orienta o leitor, mas não substitui datas, tarefas e resultados verificáveis.</p>
+<h2>Exemplos por cenário e o limite de cada um</h2>
+<table><thead><tr><th>Cenário</th><th>Formulação possível</th><th>O que precisa aparecer depois</th></tr></thead><tbody><tr><td>Primeiro emprego</td><td>“Auxiliar de atendimento, com prática em projeto escolar.”</td><td>Nome do projeto, período e atividade real.</td></tr><tr><td>Experiência informal</td><td>“Apoio de vendas, com atendimento em comércio familiar.”</td><td>Contexto informal e tarefas sem vínculo inventado.</td></tr><tr><td>Transição</td><td>“Assistente de estoque, com experiência transferível em conferência.”</td><td>Onde ocorreu a conferência e quais itens eram tratados.</td></tr><tr><td>Retorno</td><td>“Recepção e atendimento, com experiência anterior em cadastro.”</td><td>Datas corretas e histórico sem esconder a pausa.</td></tr></tbody></table>
+<p>Esses exemplos são modelos de estrutura, não textos prontos. Troque função e evidência apenas por informações que possam ser explicadas. Evite adicionar salário pretendido, urgência pessoal ou elogios sobre si mesmo nesse campo; essas informações pertencem a etapas específicas quando solicitadas.</p>
+<h2>Crie versões apenas para alvos realmente diferentes</h2>
+<p>Se você busca caixa e operador de loja, talvez uma única versão clara seja suficiente. Se busca recepção e estoque, a ordem das experiências e o objetivo podem mudar porque as tarefas centrais são diferentes. Nomeie os arquivos, registre qual foi enviado e arquive versões antigas para não levar um currículo contraditório à entrevista.</p>
+<p>Reavalie o objetivo após uma amostra de anúncios atuais, não depois de cada publicação isolada. Se o título usado pelas empresas varia, escolha o mais compreensível e deixe as tarefas esclarecerem o alcance. Não use a CBO como promessa de enquadramento, salário ou abertura de vaga: ela ajuda na nomenclatura, enquanto as condições vêm do anúncio e do processo confirmado.</p>
     `.trim()
   },
 
@@ -3133,9 +3214,9 @@ const overrides: Record<string, EditorialContentOverride> = {
   },
 
   "quantas-vagas-candidatar-por-semana": {
-    reviewedAt: "2026-10-14",
+    reviewedAt: "2026-10-15",
     contentHtml: `
-<p><strong>Revisão editorial: 14 de outubro de 2026.</strong> Não existe número universal de candidaturas por semana. A quantidade útil depende de vagas compatíveis, tempo para verificar anúncios, qualidade do material e condições pessoais. Este guia propõe medir o processo sem criar meta artificial nem prometer entrevistas.</p>
+<p><strong>Revisão editorial: 15 de outubro de 2026.</strong> Não existe número universal de candidaturas por semana. A quantidade útil depende de vagas compatíveis, tempo para verificar anúncios, qualidade do material e condições pessoais. Este guia propõe medir o processo sem criar meta artificial nem prometer entrevistas.</p>
 <h2>Conte somente candidaturas concluídas e verificadas</h2>
 <p>Uma vaga salva não é candidatura. Um currículo enviado para endereço duvidoso também não deve ser contado como progresso. Registre empresa, cargo, URL, data, versão do currículo e confirmação recebida no <a href="/ferramentas/controle-candidaturas">controle de candidaturas</a>.</p>
 <p>O serviço <a href="https://www.gov.br/pt-br/servicos/buscar-emprego-no-sistema-nacional-de-emprego-sine" target="_blank" rel="noopener noreferrer">Buscar Emprego no SINE</a> oferece consulta e candidatura conforme o cadastro. Combine fontes, mas mantenha um registro único para reconhecer anúncios repetidos.</p>
@@ -3158,6 +3239,15 @@ const overrides: Record<string, EditorialContentOverride> = {
 <h2>Revisão quinzenal</h2>
 <ul><li>Quantas candidaturas tinham origem e requisitos confirmados?</li><li>Quais foram descartadas e por quê?</li><li>Qual versão do currículo gerou conversa relevante?</li><li>Quais requisitos apareceram repetidamente?</li><li>A área de busca continua compatível com deslocamento e jornada?</li></ul>
 <p>A meta adequada é aquela que preserva verificação, honestidade e acompanhamento. Aumente ou reduza com base no tempo real e nos obstáculos observados, nunca em promessa de que determinado número garante contratação.</p>
+<h2>Monte uma capacidade semanal a partir do tempo real</h2>
+<p>Durante sete dias, registre quantos minutos você gasta para confirmar a origem, ler requisitos, adaptar o currículo, preencher o formulário e guardar o comprovante. Some também o tempo de responder e-mails. Se cada candidatura completa exige quarenta minutos e você dispõe de quatro horas, sua capacidade teórica é seis; ela pode ser menor quando o anúncio pede portfólio, teste ou texto adicional. O cálculo organiza agenda, não prevê retorno.</p>
+<p>Separe uma reserva para oportunidades que aparecem perto do prazo. Usar todo o tempo nos primeiros anúncios pode forçar um envio apressado depois. Se nenhuma vaga compatível surgir, não substitua qualidade por candidaturas aleatórias: use o bloco para revisar materiais, pesquisar uma fonte oficial ou descansar.</p>
+<h2>Use uma tabela que mostre onde o processo para</h2>
+<table><thead><tr><th>Etapa</th><th>Conte somente quando</th><th>Pergunta de revisão</th></tr></thead><tbody><tr><td>Encontrada</td><td>há URL e data de acesso</td><td>A publicação ainda está ativa?</td></tr><tr><td>Confirmada</td><td>origem, empresa ou intermediário são verificáveis</td><td>O canal coincide com a fonte institucional?</td></tr><tr><td>Compatível</td><td>requisitos obrigatórios e rotina cabem</td><td>Qual evidência tenho para a tarefa central?</td></tr><tr><td>Enviada</td><td>o formulário terminou ou houve confirmação</td><td>Qual arquivo e qual canal usei?</td></tr><tr><td>Retorno</td><td>existe contato identificável</td><td>Qual é a próxima ação e o prazo?</td></tr></tbody></table>
+<p>Uma semana com poucas candidaturas enviadas pode ser produtiva se você eliminou anúncios falsos, duplicados ou incompatíveis. Uma semana com muitos cliques pode esconder formulários abandonados e currículos enviados ao endereço errado. Compare etapas, não apenas o último número.</p>
+<h2>Defina regras para aumentar ou reduzir o ritmo</h2>
+<p>Aumente uma pequena quantidade somente quando consegue manter verificação, adaptação e acompanhamento sem erros. Reduza quando troca anexos, perde prazos, repete candidatura ou deixa de dormir para cumprir a meta. Se o bloqueio é ausência de anúncios compatíveis, ampliar volume não resolve; reveja cargo, local, jornada e fontes.</p>
+<p>Compare ciclos de duas semanas com critérios iguais. Não derive “taxa ideal” de amostra pequena e não compre serviço que promete entrevistas por quantidade enviada. O SINE e os canais das empresas podem mudar a oferta disponível; consulte a fonte na data de cada busca e preserve o anúncio usado na decisão.</p>
     `.trim()
   },
 

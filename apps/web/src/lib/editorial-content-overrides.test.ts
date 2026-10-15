@@ -79,7 +79,7 @@ describe("revisões editoriais substanciais para AdSense", () => {
       const override = getEditorialContentOverride(slug);
       const words = textOnly(override?.contentHtml ?? "").split(/\s+/).filter(Boolean);
       expect(override).not.toBeNull();
-      expect(override?.reviewedAt).toBe(["mapa-setores-vagas-sao-luis", "salario-custo-de-vida-sao-luis", "vagas-comercio-servicos-sao-luis-perfil"].includes(slug) ? "2026-10-15" : "2026-10-14");
+      expect(override?.reviewedAt).toBe(["mapa-setores-vagas-sao-luis", "salario-custo-de-vida-sao-luis", "vagas-comercio-servicos-sao-luis-perfil", "objetivo-profissional-curriculo", "quantas-vagas-candidatar-por-semana"].includes(slug) ? "2026-10-15" : "2026-10-14");
       expect(words.length).toBeGreaterThanOrEqual(500);
       expect(override?.contentHtml).toMatch(/<a href="https:\/\//);
       expect(override?.contentHtml).not.toMatch(/No tema em pauta|Leitura útil do cenário/i);
@@ -460,6 +460,34 @@ describe("revisões editoriais substanciais para AdSense", () => {
       expect(override).not.toBeNull();
       expect(override?.reviewedAt).toBe("2026-10-15");
       expect(words.length).toBeGreaterThanOrEqual(860);
+      expect(new Set(outbound).size).toBeGreaterThanOrEqual(2);
+      for (const excerpt of item.required) expect(html).toContain(excerpt);
+      expect(html).not.toMatch(/vagas abertas hoje|salário médio|contratação garantida|aprovação garantida|empresa está contratando/i);
+    }
+  });
+
+
+  it("aprofunda o lote 8g com privacidade, evidencia e limites verificaveis", () => {
+    const cases = [
+      { slug: "objetivo-profissional-curriculo", minimumWords: 900, required: ["Converta a frase em três testes de coerência", "Crie versões apenas para alvos realmente diferentes"] },
+      { slug: "quantas-vagas-candidatar-por-semana", minimumWords: 880, required: ["Monte uma capacidade semanal a partir do tempo real", "Defina regras para aumentar ou reduzir o ritmo"] },
+      { slug: "teste-online-processo-seletivo-dicas", minimumWords: 900, required: ["Faça uma ficha de privacidade antes de iniciar", "Decida o que fazer em três tipos de falha"] },
+      { slug: "entrevista-por-video-emprego", minimumWords: 900, required: ["Faça um ensaio com roteiro de cinco minutos", "Prepare dois planos de contingência por escrito"] },
+      { slug: "referencias-profissionais-emprego", minimumWords: 900, required: ["Monte um dossiê mínimo para cada referência", "Tenha uma substituição que não pareça improviso"] },
+      { slug: "ingles-no-curriculo-nivel-honesto", minimumWords: 900, required: ["Faça uma matriz por habilidade, não uma média abstrata", "Use os níveis A1 a C2 com o descritor correspondente"] },
+      { slug: "plano-90-dias-emprego-sao-luis", minimumWords: 900, required: ["Transforme os 90 dias em seis ciclos de quinze", "Defina uma regra de pausa e outra de mudança"] },
+      { slug: "esgotamento-busca-emprego-sinais", minimumWords: 940, required: ["Use um semáforo de funcionamento, não um autodiagnóstico", "Prepare apoio concreto para dias difíceis"] }
+    ];
+
+    for (const item of cases) {
+      const override = getEditorialContentOverride(item.slug);
+      const html = override?.contentHtml ?? "";
+      const words = textOnly(html).split(/\s+/).filter(Boolean);
+      const outbound = [...html.matchAll(/href="(https:\/\/[^"]+)"/g)].map((match) => match[1]);
+
+      expect(override).not.toBeNull();
+      expect(override?.reviewedAt).toBe("2026-10-15");
+      expect(words.length).toBeGreaterThanOrEqual(item.minimumWords);
       expect(new Set(outbound).size).toBeGreaterThanOrEqual(2);
       for (const excerpt of item.required) expect(html).toContain(excerpt);
       expect(html).not.toMatch(/vagas abertas hoje|salário médio|contratação garantida|aprovação garantida|empresa está contratando/i);
