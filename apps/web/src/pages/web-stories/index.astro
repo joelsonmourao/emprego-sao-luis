@@ -1,0 +1,69 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import Breadcrumbs from "../../components/ui/Breadcrumbs.astro";
+import EmptyState from "../../components/ui/EmptyState.astro";
+import PageHero from "../../components/ui/PageHero.astro";
+import { createDatabase, webStories } from "@es/db";
+import { and, desc, eq, gt, isNull, or } from "drizzle-orm";
+import { getEditorialPortalMode } from "../../lib/portal-modes";
+
+const portal = await getEditorialPortalMode();
+let items: Array<{ slug: string; title: string; updatedAt: Date | null }> = [];
+if (process.env.DATABASE_URL) {
+  const connection = createDatabase(process.env.DATABASE_URL);
+  try {
+    const now = new Date();
+    items = await connection.db
+      .select({ slug: webStories.slug, title: webStories.title, updatedAt: webStories.updatedAt })
+      .from(webStories)
+      .where(
+        and(
+          eq(webStories.status, "PUBLISHED"),
+          or(isNull(webStories.expiresAt), gt(webStories.expiresAt, now))
+        )
+      )
+      .orderBy(desc(webStories.updatedAt))
+      .limit(48);
+  } catch (error) {
+    console.error("[web-stories.index]", error instanceof Error ? error.message : error);
+    items = [];
+  } finally {
+    await connection.close();
+  }
+}
+---
+<BaseLayout
+  title="Web Stories — Empregos São Luís"
+  description="Stories editoriais sobre vagas e carreira em São Luís e no Maranhão."
+  breadcrumbs={[{ name: "Web Stories", url: "/web-stories" }]}
+  pageSchemaType="CollectionPage"
+  noindex={items.length === 0}
+>
+  <PageHero kicker="Stories" title="Web Stories" description="Conteúdo curto e visual, sempre com link para o portal." pattern={false} />
+  <section class="es-section pt-0">
+    <div class="es-container">
+      <Breadcrumbs items={[{ name: "Início", url: "/" }, { name: "Web Stories" }]} />
+      {items.length === 0 ? (
+        <div class="mt-8">
+          <EmptyState
+            title="Nenhum Web Story publicado"
+            description="Esta página fica fora do índice até haver stories revisados e publicados."
+            actionHref={portal.enabled ? "/blog" : "/vagas"}
+            actionLabel={portal.enabled ? "Ver guias" : "Ver vagas"}
+          />
+        </div>
+      ) : (
+        <ul class="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {items.map((story) => (
+            <li class="es-card p-5">
+              <a class="font-display text-xl font-black" href={`/web-stories/${story.slug}`}>{story.title}</a>
+              {story.updatedAt && (
+                <p class="mt-2 text-xs text-[var(--text-secondary)]">{story.updatedAt.toLocaleDateString("pt-BR")}</p>
+              )}
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  </section>
+</BaseLayout>

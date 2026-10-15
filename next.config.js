@@ -17,6 +17,9 @@ const nextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
   typedRoutes: true,
+  // O legado não possuía ESLint. A configuração raiz pertence à nova workspace Astro.
+  // O rollback continua validado por TypeScript e build, sem aplicar regras cruzadas de framework.
+  eslint: { ignoreDuringBuilds: true },
   ...(isMonorepoAppLayout ? { outputFileTracingRoot: monorepoRoot } : {}),
   allowedDevOrigins: ["http://127.0.0.1:3000", "http://localhost:3000"],
   async redirects() {

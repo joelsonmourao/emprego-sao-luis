@@ -1,0 +1,20 @@
+---
+import AdminLayout from "../../layouts/AdminLayout.astro";
+import { getInstagramCtaSettings } from "../../lib/instagram-cta";
+
+const settings = await getInstagramCtaSettings();
+---
+<AdminLayout title="Instagram">
+  <h1 class="font-display text-3xl font-black">Chamada Instagram</h1>
+  <p class="mt-2 text-[var(--text-secondary)]">Configure título, texto e QR opcional da seção “Seguir @empregosaoluis”. Não exiba seguidores sem data de atualização.</p>
+  <form class="mt-8 max-w-2xl grid gap-4 rounded-2xl border border-[var(--brand-border)] bg-white p-6" method="post" action="/api/admin/instagram-cta">
+    <label class="grid gap-1 text-sm font-semibold">Título<input class="rounded-xl border px-3 py-2.5" name="title" value={settings.title} required /></label>
+    <label class="grid gap-1 text-sm font-semibold">Descrição<textarea class="min-h-24 rounded-xl border px-3 py-2.5" name="description" required>{settings.description}</textarea></label>
+    <label class="grid gap-1 text-sm font-semibold">URL do perfil<input class="rounded-xl border px-3 py-2.5" type="url" name="profileUrl" value={settings.profileUrl} required /></label>
+    <label class="grid gap-1 text-sm font-semibold">Nota sobre stories<textarea class="rounded-xl border px-3 py-2.5" name="storiesNote">{settings.storiesNote}</textarea></label>
+    <label class="flex items-center gap-2 text-sm"><input type="checkbox" name="showQrCode" value="1" checked={settings.showQrCode} /> Exibir QR Code (URL abaixo)</label>
+    <label class="grid gap-1 text-sm font-semibold">URL do QR (opcional)<input class="rounded-xl border px-3 py-2.5" name="qrCodeUrl" value={settings.qrCodeUrl ?? ""} /></label>
+    <label class="grid gap-1 text-sm font-semibold">Seguidores (manual, opcional)<input class="rounded-xl border px-3 py-2.5" name="followerCount" value={settings.followerCount ?? ""} placeholder="Ex.: 12,5 mil" /></label>
+    <button class="es-btn es-btn-primary w-fit" type="submit">Salvar</button>
+  </form>
+</AdminLayout>

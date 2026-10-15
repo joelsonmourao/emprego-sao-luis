@@ -1,0 +1,71 @@
+---
+import AdminLayout from "../../../layouts/AdminLayout.astro";
+import { can } from "../../../lib/auth";
+import { articles, createDatabase } from "@es/db";
+import { desc, eq } from "drizzle-orm";
+
+const auth = Astro.locals.auth!;
+if (!can(auth, "seo.manage")) return Astro.redirect("/admin?error=sem-permissao");
+
+type Row = { id: string; title: string; slug: string; pillarId: string | null; clusterId: string | null; relatedArticleIds: unknown };
+let orphans: Row[] = [];
+let weakLinks: Row[] = [];
+if (process.env.DATABASE_URL) {
+  const connection = createDatabase(process.env.DATABASE_URL);
+  try {
+    const published = await connection.db
+      .select({
+        id: articles.id,
+        title: articles.title,
+        slug: articles.slug,
+        pillarId: articles.pillarId,
+        clusterId: articles.clusterId,
+        relatedArticleIds: articles.relatedArticleIds
+      })
+      .from(articles)
+      .where(eq(articles.status, "PUBLISHED"))
+      .orderBy(desc(articles.updatedAt))
+      .limit(200);
+    orphans = published.filter((row) => !row.pillarId || !row.clusterId);
+    weakLinks = published.filter((row) => {
+      const related = Array.isArray(row.relatedArticleIds) ? row.relatedArticleIds : [];
+      return related.length === 0;
+    });
+  } finally {
+    await connection.close();
+  }
+}
+---
+<AdminLayout title="Links internos">
+  <div class="flex flex-wrap items-start justify-between gap-4">
+    <div>
+      <p class="text-sm font-bold uppercase tracking-wide text-red-700">SEO e indexação</p>
+      <h1 class="mt-2 text-3xl font-black">Links internos</h1>
+      <p class="mt-2 text-sm text-[var(--text-secondary)]">Publicados sem pilar/cluster ou sem artigos relacionados.</p>
+    </div>
+    <a class="rounded-lg border px-4 py-2 font-bold" href="/admin/conteudo/estrategia">Estratégia editorial</a>
+  </div>
+  <section class="mt-8 rounded-2xl bg-white p-6">
+    <h2 class="text-lg font-black">Sem pilar ou cluster ({orphans.length})</h2>
+    <ul class="mt-4 space-y-2 text-sm">
+      {orphans.slice(0, 40).map((row) => (
+        <li class="flex justify-between gap-3 border-b py-2">
+          <span>{row.title}</span>
+          <a class="text-red-700" href={`/admin/conteudo/${row.id}/editar`}>Corrigir</a>
+        </li>
+      ))}
+      {orphans.length === 0 && <li class="text-slate-500">Nenhum órfão estrutural.</li>}
+    </ul>
+  </section>
+  <section class="mt-8 rounded-2xl bg-white p-6">
+    <h2 class="text-lg font-black">Sem artigos relacionados ({weakLinks.length})</h2>
+    <ul class="mt-4 space-y-2 text-sm">
+      {weakLinks.slice(0, 40).map((row) => (
+        <li class="flex justify-between gap-3 border-b py-2">
+          <span>{row.title}</span>
+          <a class="text-red-700" href={`/admin/conteudo/${row.id}/editar`}>Adicionar links</a>
+        </li>
+      ))}
+    </ul>
+  </section>
+</AdminLayout>
