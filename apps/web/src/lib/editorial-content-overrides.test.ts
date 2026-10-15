@@ -79,7 +79,7 @@ describe("revisões editoriais substanciais para AdSense", () => {
       const override = getEditorialContentOverride(slug);
       const words = textOnly(override?.contentHtml ?? "").split(/\s+/).filter(Boolean);
       expect(override).not.toBeNull();
-      expect(override?.reviewedAt).toBe(["mapa-setores-vagas-sao-luis", "salario-custo-de-vida-sao-luis"].includes(slug) ? "2026-10-15" : "2026-10-14");
+      expect(override?.reviewedAt).toBe(["mapa-setores-vagas-sao-luis", "salario-custo-de-vida-sao-luis", "vagas-comercio-servicos-sao-luis-perfil"].includes(slug) ? "2026-10-15" : "2026-10-14");
       expect(words.length).toBeGreaterThanOrEqual(500);
       expect(override?.contentHtml).toMatch(/<a href="https:\/\//);
       expect(override?.contentHtml).not.toMatch(/No tema em pauta|Leitura útil do cenário/i);
@@ -157,7 +157,7 @@ describe("revisões editoriais substanciais para AdSense", () => {
       const outbound = [...html.matchAll(/href="(https:\/\/[^"]+)"/g)].map((match) => match[1]);
 
       expect(override).not.toBeNull();
-      expect(override?.reviewedAt).toBe(["trabalhador-terceirizado-direitos", "ponto-eletronico-atraso-trabalho", "ferias-clt-periodo-aquisitivo"].includes(slug) ? "2026-10-15" : "2026-10-14");
+      expect(override?.reviewedAt).toBe(["trabalhador-terceirizado-direitos", "ponto-eletronico-atraso-trabalho", "pedido-demissao-aviso-previo-acerto", "ferias-clt-periodo-aquisitivo"].includes(slug) ? "2026-10-15" : "2026-10-14");
       expect(words.length).toBeGreaterThanOrEqual(550);
       expect(new Set(outbound).size).toBeGreaterThanOrEqual(2);
       expect(outbound.every((url) => /https:\/\/(?:www\.)?(?:gov\.br|planalto\.gov\.br|mpt\.mp\.br|sistemas\.cfm\.org\.br|cnes\.trabalho\.gov\.br)\//.test(url))).toBe(true);
@@ -435,6 +435,34 @@ describe("revisões editoriais substanciais para AdSense", () => {
       expect(new Set(outbound).size).toBeGreaterThanOrEqual(2);
       for (const excerpt of item.required) expect(html).toContain(excerpt);
       expect(html).not.toMatch(/vagas abertas hoje|salário médio|contratação garantida|aprovação garantida/i);
+    }
+  });
+
+
+  it("aprofunda o lote 8f de direitos, segurança e decisões locais com controles por URL", () => {
+    const cases = [
+      { slug: "pedido-demissao-aviso-previo-acerto", required: ["Separe pedido de demissão de acordo entre as partes", "Monte uma linha do tempo do acerto"] },
+      { slug: "vagas-pcd-inclusao-emprego", required: ["Descreva a barreira antes de pedir um recurso", "Faça uma verificação de ponta a ponta"] },
+      { slug: "vagas-vendedor-loja-comissao-dicas", required: ["Crie rastreabilidade para cada etapa da comissão", "Reconcilie o primeiro demonstrativo"] },
+      { slug: "golpe-vaga-emprego-sao-luis", required: ["Use um roteiro de quinze minutos antes de responder", "Preserve evidência sem prolongar o contato"] },
+      { slug: "vagas-call-center-sao-luis", required: ["Mapeie o que será observado durante o turno", "Compare anúncio, treinamento e prática"] },
+      { slug: "vagas-comercio-servicos-sao-luis-perfil", required: ["Faça uma amostra local sem transformar anúncio em estatística", "Monte um mapa de unidades e horários"] },
+      { slug: "seguranca-candidatas-entrevista-emprego", required: ["Use dois pontos de confirmação", "Registre fatos sem ampliar exposição"] },
+      { slug: "comparar-duas-propostas-emprego", required: ["Defina um piso de decisão antes de escolher", "Aplique um portão de confirmação"] }
+    ];
+
+    for (const item of cases) {
+      const override = getEditorialContentOverride(item.slug);
+      const html = override?.contentHtml ?? "";
+      const words = textOnly(html).split(/\s+/).filter(Boolean);
+      const outbound = [...html.matchAll(/href="(https:\/\/[^"]+)"/g)].map((match) => match[1]);
+
+      expect(override).not.toBeNull();
+      expect(override?.reviewedAt).toBe("2026-10-15");
+      expect(words.length).toBeGreaterThanOrEqual(860);
+      expect(new Set(outbound).size).toBeGreaterThanOrEqual(2);
+      for (const excerpt of item.required) expect(html).toContain(excerpt);
+      expect(html).not.toMatch(/vagas abertas hoje|salário médio|contratação garantida|aprovação garantida|empresa está contratando/i);
     }
   });
 
