@@ -44,7 +44,11 @@ const editorialNoindex = isEditorialReviewPending("NEWS", article.slug) && !edit
 const normalizedHtml = normalizeEditorialHtml(editorialOverride?.contentHtml ?? article.contentHtml, { baseHeadingLevel: 2 });
 const contentHtml = portal.enabled ? rewriteJobBoardLinksForPortal(normalizedHtml) : normalizedHtml;
 const runtimeSite = getRuntimeSiteUrl(Astro.site);
-const citations = extractExternalEditorialCitations(\n  contentHtml,\n  runtimeSite.toString(),\n  !editorialOverride && article.sourceUrl ? [article.sourceUrl] : []\n);
+const citations = extractExternalEditorialCitations(
+  contentHtml,
+  runtimeSite.toString(),
+  !editorialOverride && article.sourceUrl ? [article.sourceUrl] : []
+);
 const canonical = resolveCanonicalUrl(article.canonicalUrl ?? undefined, `/noticias/${article.slug}`, runtimeSite);
 const reviewedAt = editorialOverride ? new Date(`${editorialOverride.reviewedAt}T12:00:00-03:00`) : null;
 const coverMetadata = getEditorialCoverMetadata(article.slug, article.coverImageUrl);
