@@ -89,6 +89,7 @@ describe("editorial structured data", () => {
     expect(component).toContain("Consulte a página original");
     expect(component).toContain('target="_blank"');
     expect(component).toContain('rel="noopener noreferrer"');
+    expect(component).toContain('url.hash = ""');
 
     const pages = [
       readFileSync(resolve("apps/web/src/pages/blog/[slug].astro"), "utf8"),
