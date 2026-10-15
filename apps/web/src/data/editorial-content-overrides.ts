@@ -684,9 +684,9 @@ const overrides: Record<string, EditorialContentOverride> = {
 `.trim()
   },
   "pedido-demissao-aviso-previo-acerto": {
-    reviewedAt: "2026-10-14",
+    reviewedAt: "2026-10-15",
     contentHtml: `
-<p><strong>Revisão editorial: 14 de outubro de 2026.</strong> Pedir demissão é encerrar o contrato por iniciativa do trabalhador. A decisão pode afetar aviso prévio, datas, descontos e verbas do acerto. Antes de entregar a carta, organize documentos e confirme as consequências para a sua situação; não use um modelo genérico como cálculo definitivo.</p>
+<p><strong>Revisão editorial: 15 de outubro de 2026.</strong> Pedir demissão é encerrar o contrato por iniciativa do trabalhador. A decisão pode afetar aviso prévio, datas, descontos e verbas do acerto. Antes de entregar a carta, organize documentos e confirme as consequências para a sua situação; não use um modelo genérico como cálculo definitivo.</p>
 <h2>Registre a decisão com clareza</h2>
 <p>Faça uma comunicação datada, identificando a empresa e seu pedido. Guarde uma via com recebimento. Se quiser solicitar dispensa do cumprimento do aviso, escreva isso como pedido; não trate a dispensa como garantida. A resposta e o tratamento financeiro dependem do caso e da regra aplicável.</p>
 <p>A <a href="https://www.planalto.gov.br/ccivil_03/decreto-lei/del5452.htm" target="_blank" rel="noopener noreferrer">CLT atualizada</a> reúne as normas sobre aviso prévio e término do contrato. Leia o texto oficial e busque orientação antes de assinar acordo, quitação ou declaração que não compreendeu.</p>
@@ -706,6 +706,13 @@ const overrides: Record<string, EditorialContentOverride> = {
 <h2>Quando buscar ajuda</h2>
 <p>Se houver coação, doença, acidente, estabilidade, gravidez, afastamento, acordo especial ou divergência relevante, procure o sindicato, assistência jurídica ou profissional habilitado antes de concluir. Esses elementos podem mudar a análise.</p>
 <p>Para organizar a mudança sem interromper sua busca, registre propostas reais no <a href="/ferramentas/controle-candidaturas">controle de candidaturas</a>. O Empregos São Luís não recebe cartas de demissão nem calcula verbas rescisórias.</p>
+<h2>Separe pedido de demissão de acordo entre as partes</h2>
+<p>Pedido de demissão, dispensa sem justa causa e extinção por acordo não são nomes intercambiáveis. A extinção por acordo está prevista no artigo 484-A da CLT e exige concordância real das duas partes; não transforme uma conversa informal em “acordo” nem assine um motivo diferente do que ocorreu. Antes de decidir, peça que a empresa identifique por escrito qual forma de encerramento está propondo e quais parcelas serão usadas no demonstrativo.</p>
+<p>Se você iniciou o desligamento, confira o artigo 487: a falta do aviso pelo empregado pode permitir o desconto dos salários correspondentes ao prazo. Isso não significa que todo desconto apresentado esteja automaticamente correto. Registre se o aviso seria trabalhado, se você pediu dispensa e qual resposta recebeu. Instrumento coletivo, estabilidade ou situação especial podem alterar a análise; consulte a norma da categoria no <a href="https://www3.mte.gov.br/sistemas/mediador/ConsultarInstColetivo" target="_blank" rel="noopener noreferrer">Sistema Mediador do MTE</a> e procure orientação quando houver dúvida.</p>
+<h2>Monte uma linha do tempo do acerto</h2>
+<p>Use quatro datas separadas: entrega da carta, início ou dispensa do aviso, último dia efetivamente trabalhado e data do pagamento. O artigo 477 da CLT prevê prazo de até dez dias corridos contados do término do contrato para entrega dos documentos que comprovem a comunicação da extinção e pagamento dos valores do instrumento rescisório. Conte somente depois de confirmar qual data encerrou o contrato; não use a data da carta como atalho.</p>
+<ol><li>Guarde o comprovante de recebimento da carta.</li><li>Peça resposta escrita sobre cumprimento ou dispensa do aviso.</li><li>Compare último ponto, holerite e demonstrativo de cada parcela.</li><li>Registre data e meio do pagamento sem publicar dados bancários.</li><li>Questione divergências pelo canal oficial e preserve a resposta.</li></ol>
+<p>Um demonstrativo legível deve separar a natureza e o valor das parcelas. Some os valores apenas depois de conferir bases e descontos; o portal não calcula rescisão individual. Se salário variável, férias, afastamento ou estabilidade tornarem a conta complexa, leve os documentos ao sindicato ou a profissional habilitado.</p>
 `.trim()
   },
   "abono-pecuniario-ferias-holerite": {
@@ -1275,9 +1282,9 @@ const overrides: Record<string, EditorialContentOverride> = {
   },
 
   "vagas-call-center-sao-luis": {
-    reviewedAt: "2026-10-12",
+    reviewedAt: "2026-10-15",
     contentHtml: `
-<p><strong>Revisão editorial: 12 de outubro de 2026.</strong> Este guia ajuda a avaliar processos de teleatendimento e call center; não anuncia oportunidades nem presume que uma operação em São Luís esteja contratando. O trabalho pode ser ativo, receptivo ou misto, e as condições precisam ser confirmadas no anúncio, na entrevista e no contrato.</p>
+<p><strong>Revisão editorial: 15 de outubro de 2026.</strong> Este guia ajuda a avaliar processos de teleatendimento e call center; não anuncia oportunidades nem presume que uma operação em São Luís esteja contratando. O trabalho pode ser ativo, receptivo ou misto, e as condições precisam ser confirmadas no anúncio, na entrevista e no contrato.</p>
 <h2>Diferencie o serviço antes de preparar respostas</h2><p>Pergunte qual é o objetivo principal do contato: informar, registrar solicitação, prestar suporte, negociar ou vender. Descubra também os canais usados, porque atendimento por voz, chat e e-mail exigem ritmos diferentes. No currículo, descreva fatos: quantidade de canais que operava, tipo de registro realizado e exemplo de conflito resolvido. Não invente volume, meta ou indicador.</p>
 <p>Para uma simulação, use uma situação fictícia e sem dados de cliente. Ouça até o fim, confirme o que entendeu, explique o próximo passo permitido e registre o protocolo. Evite prometer prazo que não controla. O recrutador consegue observar clareza, escuta e registro sem que você revele informações de empregos anteriores.</p>
 <h2>Use a NR 17 para formular perguntas concretas</h2><p>O <a href="https://www.gov.br/trabalho-e-emprego/pt-br/acesso-a-informacao/participacao-social/conselhos-e-orgaos-colegiados/comissao-tripartite-partitaria-permanente/arquivos/normas-regulamentadoras/nr-17-atualizada-2022.pdf" target="_blank" rel="noopener noreferrer">Anexo II da NR 17</a> trata de teleatendimento e telemarketing, abrangendo centrais ativas e receptivas com telefone e sistema. O texto oficial estabelece requisitos de mobiliário, equipamentos, organização, capacitação e condições sanitárias.</p>
@@ -1381,9 +1388,9 @@ const overrides: Record<string, EditorialContentOverride> = {
   },
 
   "vagas-pcd-inclusao-emprego": {
-    reviewedAt: "2026-10-12",
+    reviewedAt: "2026-10-15",
     contentHtml: `
-<p><strong>Revisão editorial: 12 de outubro de 2026.</strong> Este guia apoia pessoas com deficiência na avaliação de processos seletivos e postos de trabalho. Não anuncia vaga, não interpreta laudo e não promete contratação. Acessibilidade deve ser verificada na prática: deslocamento, comunicação, seleção, ferramentas, banheiro, circulação, treinamento e rotina.</p>
+<p><strong>Revisão editorial: 15 de outubro de 2026.</strong> Este guia apoia pessoas com deficiência na avaliação de processos seletivos e postos de trabalho. Não anuncia vaga, não interpreta laudo e não promete contratação. Acessibilidade deve ser verificada na prática: deslocamento, comunicação, seleção, ferramentas, banheiro, circulação, treinamento e rotina.</p>
 <h2>Comece pelas funções essenciais do posto</h2><p>Peça uma descrição clara das tarefas, do ambiente e dos equipamentos. Separe requisito essencial de preferência genérica. A pergunta central não é “você consegue fazer tudo sem apoio?”, mas quais atividades compõem o trabalho e que condições permitem realizá-las com autonomia, segurança e igualdade.</p>
 <p>Prepare exemplos verdadeiros sobre sua experiência e sobre recursos que já funcionam para você. Não é necessário transformar deficiência em narrativa inspiradora. Fale de trabalho: como acessa informação, executa tarefa, se comunica e resolve barreira. Se ainda não conhece o recurso adequado, diga que precisa entender o posto antes de definir.</p>
 <h2>O que a legislação oferece como referência</h2><p>A <a href="https://www.planalto.gov.br/ccivil_03/_ato2015-2018/2015/lei/l13146.htm" target="_blank" rel="noopener noreferrer">Lei Brasileira de Inclusão</a> trata do direito ao trabalho em ambiente acessível e inclusivo, em igualdade de oportunidades, e veda discriminação nas etapas de recrutamento, seleção, contratação, permanência e ascensão. O texto legal também aborda acessibilidade e adaptação razoável; a aplicação ao caso concreto pode exigir orientação especializada.</p>
@@ -1398,9 +1405,9 @@ const overrides: Record<string, EditorialContentOverride> = {
   },
 
   "golpe-vaga-emprego-sao-luis": {
-    reviewedAt: "2026-10-12",
+    reviewedAt: "2026-10-15",
     contentHtml: `
-<p><strong>Revisão editorial: 12 de outubro de 2026.</strong> Este guia explica como verificar uma oferta antes de enviar documentos ou dinheiro. Não anuncia vaga e não afirma que um contato específico é fraudulento. O objetivo é transformar a urgência em uma sequência curta de checagens.</p>
+<p><strong>Revisão editorial: 15 de outubro de 2026.</strong> Este guia explica como verificar uma oferta antes de enviar documentos ou dinheiro. Não anuncia vaga e não afirma que um contato específico é fraudulento. O objetivo é transformar a urgência em uma sequência curta de checagens.</p>
 <h2>Pare antes do pagamento</h2><p>Uma mensagem promete contratação rápida, mas exige PIX para uniforme, exame, curso, cadastro ou “reserva da vaga”. Não pague enquanto tenta descobrir quem está do outro lado. Alertas de órgãos públicos mostram que falsas seleções podem combinar promessa de emprego, pedido de documento e cobrança. O <a href="https://www.gov.br/ibama/pt-br/assuntos/notas/2026/alerta-sobre-tentativas-de-golpe-fique-atento-a-falsas-divulgacoes-de-concursos-publicos" target="_blank" rel="noopener noreferrer">alerta do Ibama sobre falsos processos seletivos</a> recomenda desconfiar de recadastramento, envio de documentos e pagamento de taxas. A <a href="https://www.gov.br/anvisa/pt-br/assuntos/noticias-anvisa/cuidado-com-o-golpe-a-anvisa-nao-vende-certificados-para-quem-busca-recolocacao-profissional" target="_blank" rel="noopener noreferrer">Anvisa também documentou fraude contra pessoas em recolocação</a>, com material adulterado e certificado vendido por mensagem.</p>
 <p>Gratuidade, sozinha, não prova legitimidade. Compare o endereço do site, o domínio do e-mail e o telefone com os canais publicados pela própria empresa. Não use o número enviado pelo suposto recrutador para “confirmar” a história; encontre o contato por fonte independente. Busque razão social e nome do responsável, mas não conclua que duas empresas são iguais apenas porque têm nomes parecidos.</p>
 <h2>Faça uma checagem em quatro camadas</h2><ol><li><strong>Anúncio:</strong> cargo, local, jornada, requisitos e canal devem formar uma descrição coerente. Salário muito alto sem função definida merece pausa, não entusiasmo automático.</li><li><strong>Empresa:</strong> abra o site institucional digitado por você e procure a área de carreiras. Se a marca não publicar a vaga, pergunte ao canal oficial se aquele recrutamento existe.</li><li><strong>Contato:</strong> e-mail corporativo ajuda, mas pode ser falsificado. Confirme o nome do recrutador no telefone geral ou atendimento oficial.</li><li><strong>Pedido:</strong> senha, código de autenticação, acesso ao aparelho e transferência de dinheiro não são documentos de candidatura.</li></ol>
@@ -1413,9 +1420,9 @@ const overrides: Record<string, EditorialContentOverride> = {
   },
 
   "seguranca-candidatas-entrevista-emprego": {
-    reviewedAt: "2026-10-12",
+    reviewedAt: "2026-10-15",
     contentHtml: `
-<p><strong>Revisão editorial: 12 de outubro de 2026.</strong> Este guia oferece um plano prático para candidatas verificarem entrevista, endereço e tratamento de dados. Não presume que entrevistas noturnas ou locais incomuns sejam criminosos; ensina a reduzir exposição antes do deslocamento.</p>
+<p><strong>Revisão editorial: 15 de outubro de 2026.</strong> Este guia oferece um plano prático para candidatas verificarem entrevista, endereço e tratamento de dados. Não presume que entrevistas noturnas ou locais incomuns sejam criminosos; ensina a reduzir exposição antes do deslocamento.</p>
 <h2>Confirme quem, onde e para quê</h2><p>Peça por escrito o nome da empresa, a função, o endereço completo, o horário, a duração prevista e o nome de quem receberá você. Depois confirme esses dados em canal institucional encontrado por conta própria. Um mapa mostra que o endereço existe, mas não comprova que o recrutador ocupa o local. Se for coworking, evento ou espaço compartilhado, peça o nome da sala e a recepção responsável.</p>
 <p>Avise uma pessoa de confiança sobre o trajeto e combine um horário de contato. Compartilhe apenas o necessário com essa pessoa, não em grupos públicos. Se a entrevista terminar tarde, verifique antecipadamente as opções reais de retorno. Em São Luís, o tempo de travessia e a frequência do transporte variam conforme o ponto de partida; faça a conta para o seu endereço e horário, sem aceitar estimativa genérica.</p>
 <h2>Sinais que justificam cancelar ou sair</h2><ul><li>mudança de endereço de última hora sem explicação verificável;</li><li>pedido para entrar em residência, quarto ou veículo sem relação clara com o trabalho;</li><li>tentativa de reter documento ou telefone;</li><li>perguntas ou “testes” sexuais, íntimos ou humilhantes;</li><li>pressão para ficar sozinha ou impedir contato com terceiros;</li><li>cobrança de taxa, senha, código ou acesso à conta.</li></ul>
@@ -2030,9 +2037,9 @@ const overrides: Record<string, EditorialContentOverride> = {
   },
 
   "vagas-vendedor-loja-comissao-dicas": {
-    reviewedAt: "2026-10-12",
+    reviewedAt: "2026-10-15",
     contentHtml: `
-<p><strong>Revisão editorial: 12 de outubro de 2026.</strong> Uma vaga de vendas pode combinar salário fixo, comissão, prêmio e benefícios. Esses itens não significam a mesma coisa. Antes de comparar propostas, peça a regra escrita e faça uma simulação com valores hipotéticos; não trate o melhor mês de alguém como renda garantida.</p>
+<p><strong>Revisão editorial: 15 de outubro de 2026.</strong> Uma vaga de vendas pode combinar salário fixo, comissão, prêmio e benefícios. Esses itens não significam a mesma coisa. Antes de comparar propostas, peça a regra escrita e faça uma simulação com valores hipotéticos; não trate o melhor mês de alguém como renda garantida.</p>
 <h2>Separe as partes da remuneração</h2>
 <p>Anote salário-base, percentual ou faixa de comissão, produto sobre o qual o cálculo incide, momento de apuração, data de pagamento e possíveis ajustes por cancelamento ou devolução. Pergunte se a comissão é individual, por equipe, por loja ou por meta. “Até determinado valor” não informa a média nem o mínimo.</p>
 <p>O texto oficial da <a href="https://www.planalto.gov.br/ccivil_03/decreto-lei/del5452.htm" target="_blank" rel="noopener noreferrer">Consolidação das Leis do Trabalho</a>, no artigo 457, inclui as comissões pagas pelo empregador na remuneração do empregado. Isso não permite calcular uma proposta sem conhecer contrato, política comercial e instrumento coletivo. Em dúvida sobre reflexos ou descontos, busque orientação profissional ou sindical.</p>
@@ -2308,9 +2315,9 @@ const overrides: Record<string, EditorialContentOverride> = {
   },
 
   "comparar-duas-propostas-emprego": {
-    reviewedAt: "2026-10-13",
+    reviewedAt: "2026-10-15",
     contentHtml: `
-<p><strong>Revisão editorial: 13 de outubro de 2026.</strong> Duas conversas positivas não são necessariamente duas propostas. Antes de escolher, confirme se cada empresa apresentou cargo, remuneração, jornada, local, tipo de contrato, data prevista e benefícios. Não peça demissão nem recuse outra oportunidade com base apenas em promessa informal.</p>
+<p><strong>Revisão editorial: 15 de outubro de 2026.</strong> Duas conversas positivas não são necessariamente duas propostas. Antes de escolher, confirme se cada empresa apresentou cargo, remuneração, jornada, local, tipo de contrato, data prevista e benefícios. Não peça demissão nem recuse outra oportunidade com base apenas em promessa informal.</p>
 <h2>Crie uma folha de evidências</h2>
 <p>Para cada opção, separe três estados: confirmado por escrito, informado em conversa e não esclarecido. Copie apenas os dados recebidos; não complete lacunas com estimativa. Se o recrutador não puder formalizar naquele momento, pergunte quando a informação estará disponível e até quando precisa responder.</p>
 <p>A <a href="https://www.gov.br/pt-br/apps/ctps-digital" target="_blank" rel="noopener noreferrer">Carteira de Trabalho Digital</a> permite acompanhar vínculos e dados do contrato quando registrados. Ela não substitui a conferência da proposta antes da admissão nem transforma conversa em vínculo.</p>
@@ -3103,9 +3110,9 @@ const overrides: Record<string, EditorialContentOverride> = {
   },
 
   "vagas-comercio-servicos-sao-luis-perfil": {
-    reviewedAt: "2026-10-14",
+    reviewedAt: "2026-10-15",
     contentHtml: `
-<p><strong>Revisão editorial: 14 de outubro de 2026.</strong> Este guia não afirma que comércio ou serviços estejam contratando hoje. Ele ensina a ler anúncios desses setores em São Luís, comparar tarefas e decidir se o perfil e a rotina são compatíveis. A vaga concreta deve ser confirmada no canal responsável.</p>
+<p><strong>Revisão editorial: 15 de outubro de 2026.</strong> Este guia não afirma que comércio ou serviços estejam contratando hoje. Ele ensina a ler anúncios desses setores em São Luís, comparar tarefas e decidir se o perfil e a rotina são compatíveis. A vaga concreta deve ser confirmada no canal responsável.</p>
 <h2>Comece pela função, não pelo nome amplo do setor</h2>
 <p>“Comércio” pode incluir caixa, estoque, vendas, reposição e atendimento; “serviços” reúne atividades muito diferentes. Leia as tarefas e identifique o que será feito no turno. A <a href="https://www.gov.br/trabalho-e-emprego/pt-br/assuntos/trabalhador/qualificacao-profissional/classificacao-brasileira-de-ocupacoes" target="_blank" rel="noopener noreferrer">Classificação Brasileira de Ocupações</a> ajuda a entender famílias ocupacionais, mas o anúncio e o contrato definem a função real.</p>
 <p>Não copie a descrição da CBO para o currículo. Selecione apenas atividades que você executou e consiga explicar. Atendimento pode significar registrar pedido, orientar cliente ou organizar fila; estoque pode envolver conferência, endereçamento e separação. O nome sozinho não comprova experiência.</p>
