@@ -230,4 +230,55 @@ describe("revisões editoriais substanciais para AdSense", () => {
       expect(html).not.toMatch(/vagas abertas hoje|salário médio|contratação garantida|aprovação garantida/i);
     }
   });
+  it("aprofunda oito guias curtos com método, fontes e revisão individual", () => {
+    const cases = [
+      {
+        slug: "rejeicao-processo-seletivo-como-reagir",
+        required: ["Escolha o ajuste conforme a etapa em que o processo parou", "Faça um pequeno teste antes de mudar tudo"]
+      },
+      {
+        slug: "plano-semanal-vagas-sao-luis",
+        required: ["Exemplo de distribuição para não misturar as etapas", "Evite duplicidade entre portais"]
+      },
+      {
+        slug: "produtividade-busca-emprego-sao-luis",
+        required: ["Limite o trabalho em andamento", "Use um quadro de erros para reduzir retrabalho"]
+      },
+      {
+        slug: "linkedin-emprego-sao-luis-perfil",
+        required: ["Revise o perfil como uma sequência de respostas", "Verifique convites de recrutadores sem transferir confiança"]
+      },
+      {
+        slug: "marca-pessoal-candidatura-sao-luis",
+        required: ["Monte uma relação entre afirmação e prova", "Faça uma auditoria de consistência antes do envio"]
+      },
+      {
+        slug: "networking-emprego-sao-luis",
+        required: ["Use um registro mínimo para respeitar o contexto", "Diferencie três tipos de conversa"]
+      },
+      {
+        slug: "inteligencia-emocional-entrevista",
+        required: ["Treine respostas para situações desconfortáveis", "Separe pressão legítima de desrespeito"]
+      },
+      {
+        slug: "retorno-mercado-trabalho-gap-curriculo",
+        required: ["Organize um plano de retorno em quatro frentes", "Compare oportunidades pelo retorno possível"]
+      }
+    ];
+
+    for (const item of cases) {
+      const override = getEditorialContentOverride(item.slug);
+      const html = override?.contentHtml ?? "";
+      const words = textOnly(html).split(/\s+/).filter(Boolean);
+      const outbound = [...html.matchAll(/href="(https:\/\/[^"]+)"/g)].map((match) => match[1]);
+
+      expect(override).not.toBeNull();
+      expect(override?.reviewedAt).toBe("2026-10-15");
+      expect(words.length).toBeGreaterThanOrEqual(700);
+      expect(new Set(outbound).size).toBeGreaterThanOrEqual(2);
+      for (const excerpt of item.required) expect(html).toContain(excerpt);
+      expect(html).not.toMatch(/vagas abertas hoje|salário médio|contratação garantida|aprovação garantida/i);
+    }
+  });
+
 });
