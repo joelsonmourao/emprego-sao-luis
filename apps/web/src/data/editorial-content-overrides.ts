@@ -331,40 +331,130 @@ const overrides: Record<string, EditorialContentOverride> = {
 <p>Depois do início, compare o que foi registrado na CTPS Digital com os documentos guardados. Uma diferença deve ser descrita com precisão e levada ao canal responsável. Este roteiro organiza a conversa; não substitui análise profissional do caso concreto.</p>`.trim()
   },
   "curriculo-pdf-erros-triagem": {
-    reviewedAt: "2026-10-14",
+    reviewedAt: "2026-10-15",
     contentHtml: `
-<p><strong>Revisão de 14/10/2026.</strong> Um currículo em PDF pode facilitar a leitura, mas o arquivo não compensa informações genéricas, datas incorretas ou falta de relação com a vaga. O objetivo é apresentar sua trajetória de forma clara e verificável.</p>
-<h2>Checklist antes de exportar</h2>
-<ol><li>Use o nome pelo qual deseja ser chamado e um telefone/e-mail profissional que você realmente acompanha.</li><li>Resuma o cargo desejado sem frases vazias como “busco qualquer oportunidade”.</li><li>Organize experiências da mais recente para a mais antiga, com datas coerentes.</li><li>Descreva tarefas reais. “Conferi notas e registrei entrada de materiais” informa mais do que “responsável por tudo”.</li><li>Se ainda não trabalhou formalmente, inclua projetos, curso ou atividade informal com descrição honesta.</li><li>Revise ortografia, títulos, margens e se o PDF mantém texto selecionável.</li></ol>
-<h2>Teste em duas telas</h2>
-<p>Abra o PDF no celular e no computador. Confira se o título não quebra, se os dados de contato permanecem visíveis e se os itens não foram cortados. Se o arquivo ficou ilegível no telefone, reduza elementos decorativos e prefira hierarquia simples. Não há modelo único que garanta resultado em todos os sistemas de triagem.</p>
-<h2>Exemplo de descrição objetiva</h2>
-<p><strong>Vago:</strong> “Boa comunicação e muita experiência em atividades administrativas.”</p>
-<p><strong>Específico:</strong> “Organização de agendas, atendimento telefônico e atualização semanal de planilhas de controle.”</p>
-<p>Use somente a segunda versão se essas tarefas de fato fizerem parte da sua experiência.</p>
-<h2>O que não precisa entrar</h2>
-<p>CPF, número de conta, fotografia de documentos, senha e endereço residencial completo não são exigências universais de currículo. Compartilhe dados sensíveis apenas quando houver necessidade legítima e canal verificado.</p>
-<p>Para conferir o nome e o conteúdo geral de uma ocupação, consulte a <a href="https://www.gov.br/trabalho-e-emprego/pt-br/assuntos/trabalhador/qualificacao-profissional/classificacao-brasileira-de-ocupacoes" target="_blank" rel="noopener noreferrer">Classificação Brasileira de Ocupações</a>. Use a nomenclatura como referência; não copie atribuições que você nunca exerceu.</p>
-<p>Na dúvida sobre cargo e candidatura, consulte o serviço <a href="https://www.gov.br/pt-br/servicos/buscar-emprego-no-sistema-nacional-de-emprego-sine" target="_blank" rel="noopener noreferrer">Buscar Emprego no SINE</a> ou o canal oficial divulgado e registre o envio na <a href="/ferramentas/controle-candidaturas">planilha gratuita de acompanhamento</a>. O portal não garante entrevistas por utilizar determinado formato de currículo.</p>`.trim()
+<p><strong>Revisão editorial de 15/10/2026.</strong> Salvar o currículo em PDF ajuda a preservar a apresentação, mas não corrige informação vaga, ordem confusa ou experiência inventada. Este roteiro trata o arquivo como uma peça de evidência: cada linha deve ajudar alguém a entender qual trabalho você procura, o que já fez e como entrar em contato.</p>
+
+<h2>Defina o alvo antes de escolher o modelo</h2>
+<p>Abra um anúncio real e separe três grupos: tarefas, requisitos obrigatórios e condições da vaga. Depois marque o que consegue comprovar. Se a vaga pede atendimento e uso de planilha, por exemplo, não basta escrever “sou proativo”. Informe onde atendeu, que tipo de registro fazia e qual ferramenta realmente utilizou. Um currículo pode ser curto e ainda assim específico.</p>
+<p>Para conferir a nomenclatura e o conteúdo geral de uma ocupação, consulte a <a href="https://www.gov.br/trabalho-e-emprego/pt-br/assuntos/trabalhador/qualificacao-profissional/classificacao-brasileira-de-ocupacoes" target="_blank" rel="noopener noreferrer">Classificação Brasileira de Ocupações</a>. Use a CBO como referência de pesquisa, não como texto para copiar. A descrição de uma família ocupacional não prova que você exerceu todas aquelas atividades e não substitui os requisitos do anúncio.</p>
+
+<h2>Monte uma ordem que funcione sem adivinhação</h2>
+<ol>
+  <li><strong>Cabeçalho:</strong> nome, cidade, telefone e e-mail acompanhados por você. Não é necessário expor endereço residencial completo.</li>
+  <li><strong>Objetivo:</strong> um cargo ou uma área coerente com a vaga. Evite listar funções sem relação entre si.</li>
+  <li><strong>Resumo opcional:</strong> duas ou três linhas com tempo ou contexto de experiência, tarefas centrais e ferramentas que realmente domina.</li>
+  <li><strong>Experiências:</strong> empresa ou contexto, função, período e de duas a quatro atividades concretas.</li>
+  <li><strong>Formação e cursos:</strong> instituição, nome e situação real — concluído, em andamento ou interrompido.</li>
+  <li><strong>Informações adicionais:</strong> apenas dados relevantes, como disponibilidade de horário ou habilitação quando a vaga exigir.</li>
+</ol>
+<p>Se ainda não houve emprego formal, substitua a seção de experiência por evidências honestas: projeto de curso, atividade voluntária ou trabalho informal. Identifique o contexto. “Organizei lista de materiais e conferi entregas em atividade familiar” é mais útil do que mudar o nome da atividade para criar um cargo que não existiu.</p>
+
+<h2>Transforme tarefas em descrições verificáveis</h2>
+<p><strong>Frase vaga:</strong> “Boa comunicação e muita experiência em atividades administrativas.”</p>
+<p><strong>Versão específica:</strong> “Atendimento telefônico, organização de agendas e atualização semanal de planilhas de controle.”</p>
+<p>A segunda frase só deve ser usada por quem realizou essas tarefas. Quando houver resultado medido, explique de onde veio o número; quando não houver, descreva o processo sem inventar porcentagem. Também não copie palavras-chave escondidas ou atribuições que não conseguiria explicar em uma entrevista.</p>
+<p>Faça o teste da pergunta seguinte: “como você fazia isso?”. Se não consegue responder com um exemplo, equipamento, documento ou rotina, a frase provavelmente está genérica demais ou não representa sua experiência.</p>
+
+<h2>Teste o PDF como o recrutador pode recebê-lo</h2>
+<ul>
+  <li>Abra o arquivo no celular e no computador e verifique cortes, fonte pequena e páginas em branco.</li>
+  <li>Selecione e copie o texto para um editor simples. A ordem copiada deve continuar compreensível; caixas, colunas e imagens podem embaralhar a leitura.</li>
+  <li>Pesquise no PDF seu telefone, e-mail, cargo-alvo e uma tarefa principal. Se a busca não encontra texto, o documento pode ter sido exportado como imagem.</li>
+  <li>Confira se links são opcionais e identificáveis. Um portfólio precisa abrir sem exigir acesso indevido à sua conta.</li>
+  <li>Use um nome de arquivo claro, como <em>nome-sobrenome-cargo.pdf</em>, sem CPF ou data de nascimento.</li>
+</ul>
+<p>Esses testes reduzem erros de leitura, mas nenhum formato garante aprovação em sistemas de triagem. Se um anúncio fornecer modelo, campo obrigatório ou instrução de envio, siga a orientação daquela seleção.</p>
+
+<h2>Crie uma versão por alvo, não uma história diferente</h2>
+<p>Adaptar significa mudar a ênfase, não os fatos. Para uma vaga de auxiliar de estoque, experiências de conferência, organização e inventário podem aparecer primeiro. Para atendimento, destaque contato com público e registro de solicitações. Empresa, datas, formação e atividades realizadas permanecem verdadeiras nas duas versões.</p>
+<p>Guarde uma cópia-base e nomeie as versões com cargo e data. Registre qual arquivo foi enviado a cada oportunidade na <a href="/ferramentas/controle-candidaturas">ferramenta gratuita de candidaturas</a>. Isso evita levar à entrevista uma versão diferente daquela recebida pela empresa.</p>
+
+<h2>Proteja dados e confirme o canal</h2>
+<p>CPF, RG, dados bancários, senha, código de autenticação e fotografia de documentos não pertencem ao currículo inicial. Se uma etapa posterior pedir documentação, confirme empresa, finalidade e canal por uma fonte independente. Não pague para “liberar” análise ou entrevista.</p>
+<p>O serviço federal <a href="https://www.gov.br/pt-br/servicos/buscar-emprego-no-sistema-nacional-de-emprego-sine" target="_blank" rel="noopener noreferrer">Buscar Emprego no SINE</a> explica os canais de cadastro, consulta e candidatura. Atualize formação e experiências com dados reais e consulte oportunidades no serviço ou no canal oficial indicado pelo empregador.</p>
+
+<h2>Conferência final em sete minutos</h2>
+<ol>
+  <li>Compare objetivo e primeiras tarefas com o anúncio.</li>
+  <li>Confirme datas, nomes de empresas e situação dos cursos.</li>
+  <li>Leia telefone e e-mail caractere por caractere.</li>
+  <li>Remova adjetivos que não estejam apoiados por um exemplo.</li>
+  <li>Verifique ortografia e consistência dos títulos.</li>
+  <li>Abra o PDF depois de exportar; não confie apenas no arquivo editável.</li>
+  <li>Envie pelo canal confirmado e guarde a URL ou o anúncio.</li>
+</ol>
+<p><strong>Limite editorial:</strong> este guia não avalia currículo individual nem promete entrevista. Ele oferece um procedimento para reduzir erro, preservar a verdade profissional e facilitar a leitura.</p>
+    `.trim()
   },
   "entrevista-comportamental-exemplos": {
-    reviewedAt: "2026-10-14",
+    reviewedAt: "2026-10-15",
     contentHtml: `
-<p><strong>Revisão editorial de 14/10/2026.</strong> Questões comportamentais pedem episódios da sua experiência: uma situação, uma decisão e um resultado. O melhor preparo é organizar fatos reais, não decorar respostas que qualquer pessoa poderia repetir.</p>
-<h2>Estrutura prática: contexto, ação e resultado</h2>
-<ol><li><strong>Contexto:</strong> onde ocorreu e qual era o problema?</li><li><strong>Seu papel:</strong> qual responsabilidade você realmente tinha?</li><li><strong>Ação:</strong> o que fez, com quais recursos e limites?</li><li><strong>Resultado:</strong> o que melhorou, o que não funcionou e o que aprendeu?</li></ol>
-<h2>Exemplo para atendimento</h2>
+<p><strong>Revisão editorial de 15/10/2026.</strong> Perguntas comportamentais pedem episódios, não adjetivos. Em vez de afirmar “sou organizado”, o candidato descreve uma situação real, sua responsabilidade, a ação tomada e o que aconteceu. Os exemplos abaixo são exercícios ilustrativos: não devem ser apresentados como experiência própria.</p>
+
+<h2>Monte um banco de evidências antes de decorar respostas</h2>
+<p>Escolha quatro episódios que você conhece bem: uma prioridade difícil, uma colaboração, um erro corrigido e um atendimento ou entrega. Eles podem vir de emprego formal, estágio, curso, projeto, voluntariado ou atividade informal. Anote o contexto verdadeiro e deixe claro qual era o seu papel.</p>
+<p>Compare as tarefas do anúncio com a <a href="https://www.gov.br/trabalho-e-emprego/pt-br/assuntos/trabalhador/qualificacao-profissional/classificacao-brasileira-de-ocupacoes" target="_blank" rel="noopener noreferrer">Classificação Brasileira de Ocupações</a> para entender a família ocupacional. A vaga concreta, porém, define as tarefas e os requisitos daquela seleção. A CBO não autoriza criar experiência, ferramenta ou resultado.</p>
+
+<h2>Use quatro partes para não se perder</h2>
+<ol>
+  <li><strong>Contexto:</strong> onde ocorreu e qual era a necessidade?</li>
+  <li><strong>Responsabilidade:</strong> o que dependia de você, sem assumir o trabalho da equipe inteira?</li>
+  <li><strong>Ação:</strong> quais passos tomou e quando pediu ajuda?</li>
+  <li><strong>Desfecho:</strong> o que foi entregue, corrigido ou aprendido?</li>
+</ol>
+<p>Uma boa resposta pode reconhecer limite ou resultado parcial. Não é preciso transformar todo episódio em vitória extraordinária. Quando não existe número registrado, use um desfecho observável — pedido corrigido, fila organizada, informação conferida — sem inventar porcentagem.</p>
+
+<h2>Exemplo de atendimento com limite de autorização</h2>
 <p><strong>Pergunta:</strong> “Conte sobre uma pessoa insatisfeita que você atendeu.”</p>
-<p><strong>Resposta-modelo ilustrativa, não experiência para copiar:</strong> “Durante um atendimento, um cliente contestou uma informação. Primeiro conferi o registro, depois expliquei a opção disponível e encaminhei ao responsável quando ultrapassava minha autorização. A conversa terminou com uma orientação clara, e passei a confirmar dados antes de responder.”</p>
-<p>Se você nunca viveu algo semelhante, relate uma situação de estágio, atividade escolar, trabalho informal ou projeto voluntário, deixando claro o contexto. Não afirme resultados numéricos que não mediu.</p>
-<h2>Exemplo para logística ou estoque</h2>
-<p><strong>Pergunta:</strong> “Como você lidou com erro em uma tarefa?”</p>
-<p>Uma resposta honesta descreve o momento em que percebeu diferença na conferência, como comunicou a supervisão e quais passos adotou para evitar repetição. O ponto não é parecer perfeito: é demonstrar atenção, comunicação e aprendizado.</p>
-<h2>Treine com limite de tempo</h2>
-<p>Escreva três episódios curtos: um desafio, uma colaboração e um erro corrigido. Conte cada um em cerca de um minuto, sem inventar cargos. Se a entrevista for para São Luís e exigir escala, prepare também perguntas sobre horário, unidade e deslocamento.</p>
-<p>Antes de escolher exemplos, compare as tarefas do anúncio com a <a href="https://www.gov.br/trabalho-e-emprego/pt-br/assuntos/trabalhador/qualificacao-profissional/classificacao-brasileira-de-ocupacoes" target="_blank" rel="noopener noreferrer">Classificação Brasileira de Ocupações</a>. Ela ajuda a entender a família ocupacional, mas a vaga concreta define o trabalho e nenhuma descrição oficial autoriza criar experiência.</p>
-<p>Se o convite chegou por mensagem, confirme empresa, endereço e canal. A <a href="https://cartilha.cert.br/fasciculos/" target="_blank" rel="noopener noreferrer">Cartilha de Segurança para Internet do CERT.br</a> reúne cuidados com perfis falsos, phishing, privacidade e autenticação.</p>
-<p>Depois, anote aprendizados na <a href="/ferramentas/controle-candidaturas">ferramenta de candidaturas</a>, mas não coloque dados pessoais de entrevistadores no arquivo. Nenhuma resposta-modelo garante aprovação.</p>`.trim()
+<p><strong>Resposta ilustrativa:</strong> “Durante um atendimento, uma cliente contestou uma informação do pedido. Eu conferi o registro, expliquei o que constava no sistema e encaminhei a alteração ao responsável porque não tinha autorização para concluí-la. Depois passei a confirmar o número do pedido no início da conversa.”</p>
+<p>O valor do exemplo está nos passos e no limite reconhecido. Se sua experiência foi escolar ou informal, diga isso. Não troque “ajudei em uma atividade” por “liderei uma equipe” apenas para a resposta parecer mais forte.</p>
+
+<h2>Exemplo de logística ou estoque sem número inventado</h2>
+<p><strong>Pergunta:</strong> “Como você lidou com um erro em uma tarefa?”</p>
+<p><strong>Resposta ilustrativa:</strong> “Ao conferir materiais, percebi diferença entre a etiqueta e a lista. Separei o item, refiz a contagem e avisei a pessoa responsável antes de registrar a entrada. O documento foi corrigido, e passei a fazer a conferência por lote.”</p>
+<p>Se o erro foi seu, explique como percebeu, comunicou e reduziu a chance de repetição. Culpar outra pessoa ou ocultar o problema impede o entrevistador de entender seu julgamento.</p>
+
+<h2>Exemplo administrativo com prioridade concorrente</h2>
+<p><strong>Pergunta:</strong> “Fale de um momento em que recebeu duas demandas urgentes.”</p>
+<p><strong>Resposta ilustrativa:</strong> “Eu confirmei os prazos com quem solicitou, identifiquei qual entrega bloqueava o atendimento e alinhei a ordem. Finalizei primeiro a atualização necessária para o atendimento e informei o novo horário da segunda tarefa.”</p>
+<p>Adapte somente se você já tomou decisão semelhante. Dizer que “fez tudo ao mesmo tempo” não explica critério, comunicação nem qualidade.</p>
+
+<h2>Prepare respostas para quem busca o primeiro emprego</h2>
+<p>Não ter vínculo formal não significa não ter episódios. Um trabalho em grupo pode demonstrar divisão de tarefas; uma atividade familiar pode mostrar conferência e atendimento; um curso pode oferecer exemplo de prazo e correção. Contextualize sem transformar colaboração pontual em emprego.</p>
+<p><strong>Exemplo de estrutura:</strong> “No projeto final do curso, eu fiquei responsável pela planilha de materiais. Percebi itens duplicados, confirmei com o grupo e organizei uma versão única antes da apresentação. Aprendi a registrar a origem das alterações.” Use apenas detalhes compatíveis com a sua história.</p>
+
+<h2>Responda sobre conflito sem expor terceiros</h2>
+<p>Descreva comportamento e decisão, não rotule colegas ou antigos chefes. Troque “a pessoa era impossível” por “recebemos instruções diferentes e confirmei a prioridade por escrito”. Não revele dados de clientes, documentos internos ou informação confidencial para dar mais impacto ao relato.</p>
+<p>Se a pergunta envolver falha séria ou situação sensível, seja breve e honesto. Você pode explicar que preservará informações confidenciais e ainda descrever como comunicou o problema ou buscou orientação.</p>
+
+<h2>Conecte a resposta às condições da vaga</h2>
+<p>Para oportunidade em São Luís, prepare perguntas sobre unidade, escala, horário e forma de comunicação das mudanças. Esses dados afetam deslocamento e disponibilidade. Não prometa presença em um turno que ainda precisa confirmar nem cite tarifa de transporte sem verificar o valor atual.</p>
+<p>Se a entrevista for remota, teste som, câmera, conexão e nome exibido. Tenha o anúncio aberto e use um local em que consiga ouvir. Problema técnico não exige inventar desculpa: avise pelo canal confirmado e proponha retomada possível.</p>
+
+<h2>Faça perguntas que ajudem a decidir</h2>
+<ul>
+  <li>Quais tarefas ocupam a maior parte da rotina?</li>
+  <li>Como a equipe recebe orientação e feedback?</li>
+  <li>Qual é a unidade e o horário previstos?</li>
+  <li>Existe etapa prática e como ela será avaliada?</li>
+  <li>Qual é o canal e o prazo estimado para retorno?</li>
+</ul>
+<p>Perguntar não garante contratação; ajuda a comparar o que foi anunciado com o trabalho real e a registrar condições que precisam ser confirmadas por escrito.</p>
+
+<h2>Treino de vinte minutos e revisão posterior</h2>
+<ol>
+  <li>Escolha três perguntas ligadas ao anúncio.</li>
+  <li>Conte cada episódio em até dois minutos, sem ler.</li>
+  <li>Marque trechos vagos e substitua por ação observável.</li>
+  <li>Retire números que não consegue demonstrar.</li>
+  <li>Após a entrevista, registre perguntas, respostas e próximos passos na <a href="/ferramentas/controle-candidaturas">ferramenta de candidaturas</a>, sem dados pessoais do entrevistador.</li>
+</ol>
+
+<h2>Confirme identidade e proteja seus dados</h2>
+<p>Se o convite chegar por mensagem, confirme empresa, vaga, endereço e canal por outra fonte. A <a href="https://cartilha.cert.br/fasciculos/" target="_blank" rel="noopener noreferrer">Cartilha de Segurança para Internet do CERT.br</a> reúne orientações sobre perfis falsos, phishing, privacidade e autenticação. Não compartilhe senha, código, acesso à conta gov.br nem pague por entrevista.</p>
+<p><strong>Limite editorial:</strong> não existe resposta-modelo que garanta aprovação. O objetivo é organizar evidências verdadeiras, reconhecer limites e fazer perguntas que permitam avaliar a oportunidade.</p>
+    `.trim()
   },
   "primeiro-emprego-sao-luis-checklist": {
     reviewedAt: "2026-10-14",
