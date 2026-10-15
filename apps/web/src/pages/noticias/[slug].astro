@@ -1,6 +1,7 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import Breadcrumbs from "../../components/ui/Breadcrumbs.astro";
+import EditorialSources from "../../components/EditorialSources.astro";
 import {
   articlePublicPath,
   findPublishedArticle,
@@ -49,6 +50,9 @@ const citations = extractExternalEditorialCitations(
   runtimeSite.toString(),
   !editorialOverride && article.sourceUrl ? [article.sourceUrl] : []
 );
+const sourceLabels = !editorialOverride && article.sourceUrl && article.sourceName
+  ? { [article.sourceUrl]: article.sourceName }
+  : {};
 const canonical = resolveCanonicalUrl(article.canonicalUrl ?? undefined, `/noticias/${article.slug}`, runtimeSite);
 const reviewedAt = editorialOverride ? new Date(`${editorialOverride.reviewedAt}T12:00:00-03:00`) : null;
 const coverMetadata = getEditorialCoverMetadata(article.slug, article.coverImageUrl);
@@ -115,7 +119,7 @@ const jsonLd = buildEditorialSchema({
         </figure>
       )}
       <div class="es-prose mt-8 max-w-none text-[1.05rem] leading-8" set:html={contentHtml} />
-      {!editorialOverride && article.sourceUrl && <p class="mt-8 text-sm">Fonte: <a class="underline" href={article.sourceUrl} rel="nofollow noopener">{article.sourceName ?? "fonte original"}</a></p>}
+      <EditorialSources citations={citations} sourceLabels={sourceLabels} />
       <div class="mt-8 flex flex-wrap gap-3">
         <a class="es-btn es-btn-secondary" href={`https://wa.me/?text=${encodeURIComponent(`${article.title} - ${canonical}`)}`} rel="noopener noreferrer">Compartilhar</a>
         <a class="es-btn es-btn-secondary" href="/noticias">Voltar às notícias</a>
