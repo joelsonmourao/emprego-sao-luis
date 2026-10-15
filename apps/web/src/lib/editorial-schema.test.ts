@@ -83,6 +83,26 @@ describe("editorial structured data", () => {
     expect(schema.citation).toEqual(["https://www.gov.br/trabalho"]);
   });
 
+  it("renders the same verified references visibly without duplicating the legacy footer", () => {
+    const component = readFileSync(resolve("apps/web/src/components/EditorialSources.astro"), "utf8");
+    expect(component).toContain("Referências externas citadas");
+    expect(component).toContain("Consulte a página original");
+    expect(component).toContain('target="_blank"');
+    expect(component).toContain('rel="noopener noreferrer"');
+
+    const pages = [
+      readFileSync(resolve("apps/web/src/pages/blog/[slug].astro"), "utf8"),
+      readFileSync(resolve("apps/web/src/pages/noticias/[slug].astro"), "utf8")
+    ];
+
+    for (const page of pages) {
+      expect(page).toContain('import EditorialSources from "../../components/EditorialSources.astro"');
+      expect(page).toContain("<EditorialSources citations={citations} sourceLabels={sourceLabels} />");
+      expect(page).toContain("{ [article.sourceUrl]: article.sourceName }");
+      expect(page).not.toContain(">Fonte: <a");
+    }
+  });
+
   it("does not invent a publication date", () => {
     expect(buildEditorialSchema({ ...base, publishedAt: null })).not.toHaveProperty("datePublished");
   });
