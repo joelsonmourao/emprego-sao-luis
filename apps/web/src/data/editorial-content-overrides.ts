@@ -731,9 +731,9 @@ const overrides: Record<string, EditorialContentOverride> = {
 `.trim()
   },
   "ferias-clt-periodo-aquisitivo": {
-    reviewedAt: "2026-10-14",
+    reviewedAt: "2026-10-15",
     contentHtml: `
-<p><strong>Revisão editorial: 14 de outubro de 2026.</strong> Período aquisitivo é o intervalo usado para formar o direito às férias; período concessivo é o prazo seguinte em que o empregador deve concedê-las. Saber essa diferença evita confundir aniversário do contrato com escolha automática da data de descanso.</p>
+<p><strong>Revisão editorial: 15 de outubro de 2026.</strong> Período aquisitivo é o intervalo usado para formar o direito às férias; período concessivo é o prazo seguinte em que o empregador deve concedê-las. Saber essa diferença evita confundir aniversário do contrato com escolha automática da data de descanso.</p>
 <h2>Localize o ciclo no seu vínculo</h2>
 <p>O artigo 130 da <a href="https://www.planalto.gov.br/ccivil_03/decreto-lei/del5452.htm" target="_blank" rel="noopener noreferrer">CLT</a> começa pela regra de que, após cada período de doze meses de vigência do contrato, o empregado adquire direito às férias. A própria lei trata de quantidade de dias, faltas injustificadas, concessão, comunicação e pagamento. Leia o texto atualizado e não use tabela sem fonte para decidir um caso individual.</p>
 <p>A data de admissão ajuda a identificar o primeiro ciclo, mas afastamentos, faltas e outras situações podem alterar a análise. Confirme o histórico com RH e documentos antes de concluir que a empresa atrasou ou que determinado número de dias está garantido.</p>
@@ -751,7 +751,17 @@ const overrides: Record<string, EditorialContentOverride> = {
 <h2>Se as datas não fecharem</h2>
 <p>Peça por escrito a indicação do período aquisitivo, do período programado e do documento que sustenta eventual ajuste. Não assine aviso com data que não corresponde ao que recebeu sem pedir correção. Também não publique recibos com matrícula, CPF ou dados bancários.</p>
 <p>Este guia não calcula indenização nem determina a validade de uma concessão. Em caso de atraso, afastamento, rescisão ou divergência relevante, leve contrato, avisos e recibos ao sindicato, à inspeção do trabalho ou a profissional habilitado. Se considerar converter parte do descanso, consulte o guia de <a href="/blog/abono-pecuniario-ferias-holerite">abono pecuniário</a> antes de protocolar o pedido.</p>
-`.trim()
+
+<h2>Confira comunicação, concessão e pagamento em documentos separados</h2>
+<p>No texto consolidado consultado em 15 de outubro de 2026, o artigo 134 da CLT trata da concessão das férias nos doze meses seguintes à aquisição; o artigo 135 prevê comunicação escrita com antecedência mínima de trinta dias; e o artigo 145 trata do pagamento até dois dias antes do início. Use o <a href="https://www.planalto.gov.br/ccivil_03/decreto-lei/del5452.htm" target="_blank" rel="noopener noreferrer">texto oficial compilado da CLT</a> e confirme se alterações posteriores afetam o caso.</p>
+<p>Crie três linhas na sua pasta: aviso recebido, período efetivamente concedido e comprovante de pagamento. Não altere a data de recebimento para coincidir com o sistema. Se o documento chegou por portal, salve o arquivo e a confirmação de acesso; se veio em papel, peça sua via.</p>
+<h2>Leia o fracionamento com os requisitos completos</h2>
+<p>A CLT permite, com concordância do empregado, fracionar as férias em até três períodos; um deles não pode ser inferior a quatorze dias corridos e os demais não podem ser inferiores a cinco dias corridos cada. Não use apenas a frase “pode dividir em três” sem conferir a concordância e os tamanhos dos períodos. Férias coletivas seguem regras próprias.</p>
+<p>Exemplo: antes de aceitar duas ou três datas, escreva cada intervalo, conte dias corridos e confirme a qual período aquisitivo pertencem. Se o sistema mistura saldo, abono ou outro ciclo, peça demonstrativo em vez de reconstruir o cálculo por suposição.</p>
+<h2>Monte um dossiê mínimo para divergências</h2>
+<ul><li>contrato ou registro da admissão;</li><li>histórico de afastamentos relevante, quando houver;</li><li>avisos e alterações de férias;</li><li>recibos e comprovantes de pagamento;</li><li>instrumento coletivo aplicável, se existir;</li><li>pergunta objetiva enviada ao RH e resposta recebida.</li></ul>
+<p>O conjunto ajuda a localizar o problema, mas não substitui cálculo profissional. Em atraso, rescisão, afastamento ou divergência persistente, procure sindicato, Inspeção do Trabalho ou profissional habilitado antes de concluir valor, penalidade ou medida cabível.</p>
+    `.trim()
   },
   "periodo-experiencia-clt-o-que-saber": {
     reviewedAt: "2026-10-14",
@@ -1067,9 +1077,9 @@ const overrides: Record<string, EditorialContentOverride> = {
 `.trim()
   },
   "sindicato-trabalhador-direitos-basico": {
-    reviewedAt: "2026-10-12",
+    reviewedAt: "2026-10-15",
     contentHtml: `
-<p><strong>Revisão editorial: 12 de outubro de 2026.</strong> Para procurar um sindicato, comece pela categoria e pela base territorial, não pelo nome que apareceu em uma mensagem. Entidades diferentes podem representar trabalhadores e empregadores, categorias distintas ou regiões diferentes.</p>
+<p><strong>Revisão editorial: 15 de outubro de 2026.</strong> Para procurar um sindicato, comece pela categoria e pela base territorial, não pelo nome que apareceu em uma mensagem. Entidades diferentes podem representar trabalhadores e empregadores, categorias distintas ou regiões diferentes.</p>
 <h2>Como identificar a entidade</h2>
 <ol>
 <li>anote sua função, a atividade principal do empregador e o município de trabalho;</li>
@@ -1099,7 +1109,14 @@ const overrides: Record<string, EditorialContentOverride> = {
 <p>Comece pela identificação das partes, categoria, abrangência territorial e vigência. Depois busque a palavra da sua dúvida, como jornada, piso, refeição ou auxílio. Leia a cláusula inteira e as condições próximas; uma tabela isolada pode depender de cargo, tempo de empresa ou data.</p>
 <p>Registre o número do instrumento e a página consultada. Se o texto antigo aparece primeiro no buscador, compare a vigência com a data do seu fato e procure termo aditivo. Não use o valor de outra cidade ou categoria para negociar como se fosse obrigatório no seu vínculo.</p>
 <p>O sindicato pode orientar e negociar, mas a resposta para um caso individual depende dos fatos e documentos. Em prazo de rescisão, risco à saúde, assédio ou conflito relevante, busque também assistência jurídica ou o órgão competente. Este guia ensina a verificar identidade e fonte; não indica entidade específica nem presume filiação.</p>
-`.trim()
+
+<h2>Faça o teste de quatro chaves antes de aplicar uma cláusula</h2>
+<p>Uma convenção ou acordo só deve entrar na sua análise depois de conferir <strong>partes</strong>, <strong>categoria</strong>, <strong>território</strong> e <strong>vigência</strong>. Abra o registro no serviço oficial, identifique quem assinou e leia o início do instrumento. Depois localize a cláusula e verifique exceções, datas, tabelas e termos aditivos. Um trecho encaminhado por mensagem pode estar correto e ainda assim pertencer a outra cidade, período ou categoria.</p>
+<p>Guarde o número do instrumento, a URL consultada e a página. Se RH e entidade indicarem documentos diferentes, peça que cada um identifique a base usada. Não some benefícios de instrumentos distintos nem aplique piso de categoria semelhante sem confirmação.</p>
+<h2>Diferencie entidade de trabalhadores e entidade patronal</h2>
+<p>Nomes próximos podem representar lados diferentes da relação coletiva. No CNES, confira natureza da entidade, denominação, CNPJ, base territorial e categoria. O logotipo ou a palavra “sindicato” não informa sozinho quem é representado. Para atendimento individual, confirme se o canal recebe trabalhadores daquela base e qual documentação mínima precisa.</p>
+<p>Se a dúvida envolver cobrança, peça fundamento, forma de autorização, período e canal de contestação. Não faça pagamento por chave recebida em mensagem antes de validar CNPJ e contato. Para prazo judicial, acidente, risco grave, assédio ou rescisão com divergência, uma consulta genérica pode não bastar; procure assistência jurídica ou órgão competente sem esperar resposta de rede social.</p>
+    `.trim()
   },
   "transferencia-interna-emprego-como-pedir": {
     reviewedAt: "2026-10-14",
@@ -1480,9 +1497,9 @@ const overrides: Record<string, EditorialContentOverride> = {
   },
 
   "como-pedir-aumento-salario": {
-    reviewedAt: "2026-10-12",
+    reviewedAt: "2026-10-15",
     contentHtml: `
-<p><strong>Revisão editorial: 12 de outubro de 2026.</strong> Pedir aumento é uma negociação sobre escopo, resultado e orçamento; não existe frase que garanta aprovação. Este guia ajuda a preparar evidências, entender limites coletivos e sair da conversa com um próximo passo verificável.</p>
+<p><strong>Revisão editorial: 15 de outubro de 2026.</strong> Pedir aumento é uma negociação sobre escopo, resultado e orçamento; não existe frase que garanta aprovação. Este guia ajuda a preparar evidências, entender limites coletivos e sair da conversa com um próximo passo verificável.</p>
 <h2>Separe reajuste coletivo de aumento individual</h2><p>Reajuste previsto em convenção ou acordo coletivo e aumento por desempenho, promoção ou retenção não são a mesma coisa. Antes da reunião, consulte a norma aplicável no serviço oficial <a href="https://www.gov.br/pt-br/servicos/consultar-instrumento-coletivo-de-trabalho" target="_blank" rel="noopener noreferrer">Consultar Instrumento Coletivo de Trabalho</a>. Confirme categoria, empresa, território e período de vigência. Se houver cláusula salarial, leve o documento; não trate boato de grupo como regra.</p>
 <p>Para aumento individual, verifique se a empresa possui ciclo de avaliação, faixa salarial ou processo de promoção. Pergunte ao RH como funciona. A ausência de política formal não impede conversa, mas muda a forma de documentar.</p>
 <h2>Monte um dossiê de uma página</h2><p>Escolha três a cinco entregas recentes e descreva situação, ação e efeito. Prefira evidência que a liderança reconheça: prazo cumprido, erro reduzido, cliente atendido, processo organizado, volume assumido, treinamento concluído ou responsabilidade incorporada. Não use números inventados. Quando o resultado não foi medido, descreva o antes e o depois de forma observável.</p>
@@ -1494,6 +1511,14 @@ const overrides: Record<string, EditorialContentOverride> = {
 <h2>Quando o pedido envolve equiparação</h2><p>A CLT contém regras sobre igualdade salarial e trabalho de igual valor. Consulte o <a href="https://www.planalto.gov.br/ccivil_03/decreto-lei/del5452compilado.htm" target="_blank" rel="noopener noreferrer">texto consolidado oficial</a>, mas não conclua sozinho que dois cargos são juridicamente idênticos. Tempo, função, produtividade, plano de cargos e outros elementos podem importar. Para situação concreta, busque sindicato ou orientação jurídica.</p>
 <h2>Depois da resposta</h2><p>Se houver aprovação, confirme valor, vigência, cargo e reflexo em benefícios por escrito e confira os registros posteriores. Se houver plano, acompanhe os critérios. Se houver negativa definitiva, decida com calma entre permanecer, buscar transferência ou iniciar procura externa sem usar dados confidenciais.</p>
 <p>Não pague intermediário que promete “garantir” aumento e não falsifique proposta de outra empresa. Uma boa negociação pode terminar em não; o resultado útil é clareza sobre valor, processo e próximos passos.</p>
+
+<h2>Converta o pedido em uma tabela verificável</h2>
+<p>Use quatro colunas: responsabilidade atual, evidência, frequência e diferença em relação ao escopo original. “Apoiei o fechamento” é vago; “faço a conferência final toda sexta-feira desde determinado mês” permite confirmar continuidade. Para resultado, indique a fonte interna disponível — relatório, prazo, aceite ou redução observada — e não anexe informação confidencial que a liderança já consegue consultar.</p>
+<p>Acrescente uma coluna de dependências. Uma entrega pode ter resultado do time, de sistema ou de outra área; reconhecer isso aumenta a credibilidade. O objetivo é demonstrar contribuição e ampliação de responsabilidade, não reivindicar sozinho o trabalho coletivo.</p>
+<h2>Prepare três respostas possíveis antes da reunião</h2>
+<ul><li><strong>Aprovação:</strong> confirmar valor, cargo, vigência, registro e quem formaliza.</li><li><strong>Plano:</strong> transformar critérios em entregas observáveis, responsável pela avaliação e data realmente acordada.</li><li><strong>Negativa:</strong> identificar se a barreira é orçamento, faixa, desempenho ou estrutura e decidir o próximo passo sem ameaça improvisada.</li></ul>
+<p>Se a empresa oferecer apenas benefício, título ou promessa futura, compare a proposta com o pedido original. Não trate “vamos ver” como compromisso. Envie um resumo curto e permita correção: “Entendi que a decisão ficou pendente e que voltaremos ao tema quando ocorrer X; está correto?”. Se não houver marco aceito, registre que não existe nova data confirmada.</p>
+<p>Negociação salarial não autoriza divulgar remuneração de colega, documento interno ou proposta falsa. Quando a questão for cumprimento de piso, reajuste coletivo ou possível desigualdade protegida por lei, separe-a da conversa de mérito e busque o instrumento ou orientação aplicável.</p>
     `.trim()
   },
 
@@ -1611,9 +1636,9 @@ const overrides: Record<string, EditorialContentOverride> = {
   },
 
   "entrevista-presencial-sao-luis-dicas": {
-    reviewedAt: "2026-10-12",
+    reviewedAt: "2026-10-15",
     contentHtml: `
-<p><strong>Revisão editorial: 12 de outubro de 2026.</strong> Entrevista presencial começa antes da sala: endereço confirmado, deslocamento possível e identidade do processo verificada. Este guia não promete que chegar cedo gere contratação; ajuda a evitar improvisos que escondem sua preparação.</p>
+<p><strong>Revisão editorial: 15 de outubro de 2026.</strong> Entrevista presencial começa antes da sala: endereço confirmado, deslocamento possível e identidade do processo verificada. Este guia não promete que chegar cedo gere contratação; ajuda a evitar improvisos que escondem sua preparação.</p>
 <h2>Confirme o local por um canal independente</h2>
 <p>Peça nome da empresa, cargo, endereço completo, ponto de referência, nome de quem receberá você e duração aproximada. Compare com o site institucional ou telefone geral encontrado por você. Um pino no mapa prova que o endereço existe, não que aquele recrutador está autorizado a usá-lo.</p>
 <p>Se houver mudança de última hora para residência, quarto, veículo ou lugar isolado, não siga automaticamente. Pergunte o motivo e confirme com a empresa. Consulte também a <a href="/seguranca-candidatos">política de segurança do candidato</a>. Não leve dinheiro para “garantir” vaga e não aceite retenção do telefone ou documento.</p>
@@ -1632,6 +1657,16 @@ const overrides: Record<string, EditorialContentOverride> = {
 <h2>Saída e acompanhamento</h2>
 <p>Antes de sair, confirme próximo passo e canal. Avise uma pessoa de confiança de que encerrou o compromisso. No mesmo dia, anote impressões factuais: função, jornada, local, pontos pendentes. Um agradecimento curto pode ser enviado pelo canal usado, sem insistência.</p>
 <p>Roupa limpa e compatível com a função é suficiente; não existe uniforme universal de entrevista. Preparação visível é saber onde vai, o que pode demonstrar e quais limites precisa manter.</p>
+
+<h2>Use um protocolo de chegada e saída segura</h2>
+<p>Compartilhe com alguém de confiança endereço, horário, empresa e previsão de término. Combine uma mensagem de chegada e outra de saída. Se a entrevista mudar para local isolado, transporte particular do contato ou horário muito diferente do confirmado, pause e valide pelo canal institucional. Segurança não deve ser abandonada para demonstrar interesse.</p>
+<p>Na recepção, informe apenas o necessário para acesso. Se pedirem que entregue o documento original, pergunte se a conferência visual basta e mantenha o item sob acompanhamento. Não permita fotografia ou retenção sem entender finalidade e responsável. Para formulário digital em aparelho alheio, confira o domínio e saia da conta antes de devolver.</p>
+<h2>Faça uma ficha pós-entrevista em quinze minutos</h2>
+<p>Registre o que foi informado sobre cargo, tarefas, unidade, jornada, escala, remuneração, benefícios, próxima etapa e prazo. Separe três estados: confirmado, pendente e inferido. Apague a coluna “inferido” antes de tomar decisão; transforme cada item em pergunta para o canal responsável.</p>
+<p>Anote também as perguntas que você recebeu e quais exemplos conseguiu explicar. Não grave escondido nem copie nome de outros candidatos. A ficha serve para preparar acompanhamento, comparar propostas e reconhecer mudança de condição, não para avaliar pessoas presentes.</p>
+<h2>Trate mudança de condição como nova verificação</h2>
+<p>Se depois da conversa mudarem unidade, turno, vínculo ou forma de candidatura, confirme novamente deslocamento e canal. Em São Luís, uma troca de bairro ou horário pode alterar integrações e retorno. Use valores atuais informados por você e não aceite promessa verbal de mudança futura como condição garantida.</p>
+<p>Quando houver pergunta discriminatória ou constrangimento, registre palavras lembradas, contexto, data, local e participantes sem publicar acusação em rede social. Procure MPT, sindicato ou orientação jurídica para avaliar o canal adequado. O registro factual é mais útil que uma interpretação ampliada.</p>
     `.trim()
   },
 
@@ -1660,9 +1695,9 @@ const overrides: Record<string, EditorialContentOverride> = {
   },
 
   "experiencia-informal-curriculo-como-colocar": {
-    reviewedAt: "2026-10-12",
+    reviewedAt: "2026-10-15",
     contentHtml: `
-<p><strong>Revisão editorial: 12 de outubro de 2026.</strong> Trabalho informal pode demonstrar competência quando o currículo descreve tarefa, contexto e período com honestidade. O erro não é ter experiência sem registro; é transformá-la em cargo, empresa ou vínculo que nunca existiu.</p>
+<p><strong>Revisão editorial: 15 de outubro de 2026.</strong> Trabalho informal pode demonstrar competência quando o currículo descreve tarefa, contexto e período com honestidade. O erro não é ter experiência sem registro; é transformá-la em cargo, empresa ou vínculo que nunca existiu.</p>
 <h2>Comece por um inventário de trabalho real</h2>
 <p>Liste atividades realizadas, para quem, com que frequência, quais ferramentas e como a entrega era conferida. Exemplos: vender refeições por encomenda, atender em comércio familiar, organizar agenda de profissional autônomo, cuidar de crianças, fazer manutenção, editar peças ou separar mercadorias. Não comece pelo título; comece pelo que você conseguia fazer.</p>
 <p>Depois, compare essas tarefas com o anúncio. Se a vaga pede atendimento, procure situações de dúvida, reclamação e pagamento. Se pede estoque, identifique contagem, armazenamento e conferência. Se pede organização, mostre prazo, lista ou rotina usada. Só leve para o currículo o que ajuda a entender sua aderência.</p>
@@ -1682,6 +1717,13 @@ const overrides: Record<string, EditorialContentOverride> = {
 <h2>Prepare a resposta da entrevista</h2>
 <p>Explique por que começou, como organizava a rotina, um problema que resolveu e o que aprendeu. Exemplo: “Eu ajudava na loja da família aos sábados. Percebi que faltava registro dos pedidos, criei uma planilha simples e passei a confirmar retirada. Não era gerente e não tinha equipe; eu cuidava dessa rotina.”</p>
 <p>Essa precisão gera confiança. Se a vaga exigir experiência formal específica, não tente esconder a diferença. Mostre habilidades transferíveis e pergunte se a empresa aceita experiência equivalente. Currículo bom torna o trabalho compreensível sem mudar sua natureza.</p>
+
+<h2>Monte prova em três camadas sem expor terceiros</h2>
+<p>A primeira camada é a descrição: período, frequência, tarefa e contexto. A segunda é uma amostra segura, como planilha fictícia com a mesma estrutura, foto de produto autorizado ou peça sem dados de cliente. A terceira é uma referência que aceitou ser contatada. Não dependa de uma captura de conversa privada para demonstrar trabalho; ela pode revelar telefone, endereço, preço e informação de terceiros.</p>
+<p>Para cada item, anote quem autorizou o uso e o que pode ser mostrado. Se a pessoa retirar a autorização, substitua a evidência. A LGPD não impede portfólio, mas exige finalidade, necessidade e cuidado com dados pessoais. Quando bastar explicar o processo, use exemplo reconstruído e identifique que é demonstração, não entrega real de cliente.</p>
+<h2>Cheque consistência entre currículo, entrevista e cadastro</h2>
+<p>O mesmo período não deve aparecer como emprego formal em um documento e atividade autônoma em outro. Antes de enviar, compare título, natureza da relação, datas e tarefas em todas as versões. Se um formulário oferece apenas “emprego”, procure campo de observação ou pergunte ao recrutador como registrar atividade informal; não selecione vínculo falso para avançar.</p>
+<p>Exemplo hipotético: alguém produziu bolos sob encomenda em fins de semana. No currículo escreve “Produção e atendimento por encomenda — atividade autônoma”, informa período aproximado e descreve compra de insumos, confirmação de pedidos e organização de entrega. Na entrevista explica que não havia empresa empregadora nem equipe subordinada. A precisão permite avaliar competências sem transformar a experiência em registro inexistente.</p>
     `.trim()
   },
 
@@ -2011,9 +2053,9 @@ const overrides: Record<string, EditorialContentOverride> = {
   },
 
   "saude-mental-trabalho-limites": {
-    reviewedAt: "2026-10-12",
+    reviewedAt: "2026-10-15",
     contentHtml: `
-<p><strong>Revisão editorial: 12 de outubro de 2026.</strong> Este conteúdo é educativo e não substitui avaliação de profissional de saúde. Cansaço depois de um dia difícil não permite diagnóstico. O que merece atenção é a persistência, a intensidade e o impacto no sono, na alimentação, na segurança, nas relações e na capacidade de trabalhar.</p>
+<p><strong>Revisão editorial: 15 de outubro de 2026.</strong> Este conteúdo é educativo e não substitui avaliação de profissional de saúde. Cansaço depois de um dia difícil não permite diagnóstico. O que merece atenção é a persistência, a intensidade e o impacto no sono, na alimentação, na segurança, nas relações e na capacidade de trabalhar.</p>
 <h2>Observe padrões sem se diagnosticar</h2>
 <p>Durante duas semanas, registre horário, situação, reação física ou emocional e quanto tempo levou para se recuperar. Use linguagem concreta: “acordei três vezes”, “chorei antes do turno”, “não consegui concluir a tarefa”. Evite rótulos clínicos retirados de vídeo ou postagem.</p>
 <p>A <a href="https://www.gov.br/saude/pt-br/assuntos/saude-de-a-a-z/s/saude-mental" target="_blank" rel="noopener noreferrer">página de Saúde Mental do Ministério da Saúde</a> apresenta a rede de cuidado do SUS e orientações de acesso. Procure uma Unidade Básica de Saúde, CAPS ou outro serviço indicado na sua região quando os sintomas persistirem ou prejudicarem a rotina.</p>
@@ -2031,6 +2073,13 @@ const overrides: Record<string, EditorialContentOverride> = {
 <p>Cuidar da saúde não é falha profissional. O objetivo deste guia é transformar mal-estar difuso em observações que possam ser levadas a um serviço de saúde ou conversa segura, sem minimizar sintomas nem prometer solução rápida.</p>
 <p>Para uma consulta, leve a linha do tempo dos sintomas, medicamentos em uso, mudanças recentes e o que piora ou alivia. Não interrompa tratamento por conselho de colega ou conteúdo on-line. Se receber documento ou orientação profissional, confirme como entregar à empresa sem publicar diagnóstico para pessoas que não precisam dessa informação.</p>
 <p>Também registre fatores fora do trabalho, como luto, cuidado familiar ou mudança de medicação, porque eles ajudam o profissional a avaliar o conjunto. A anotação organiza a conversa; não substitui exame, diagnóstico ou conduta clínica.</p>
+
+<h2>Separe cuidado individual de risco na organização</h2>
+<p>Dormir melhor, fazer pausa e procurar atendimento podem ajudar a pessoa, mas não corrigem sozinhos sobrecarga permanente, assédio, baixa autonomia ou jornada mal organizada. A <a href="https://www.ilo.org/pt-pt/resource/noticias/mais-de-840-mil-mortes-por-ano-ligadas-riscos-psicossociais-no-trabalho-diz" target="_blank" rel="noopener noreferrer">OIT descreve riscos psicossociais</a> como fatores ligados à forma como o trabalho é definido, organizado e gerido. Use essa referência para reconhecer que prevenção também exige medidas organizacionais, não para atribuir diagnóstico ou causa médica sem avaliação.</p>
+<p>Quando for seguro, registre demanda, recursos disponíveis, interrupções, apoio solicitado e resposta recebida. Leve ao canal adequado uma questão observável: volume sem prioridade, ameaça, violência, ausência de pausa ou tarefa incompatível com treinamento. Não publique nome de colega, prontuário ou conversa privada para pressionar resposta.</p>
+<h2>Crie um plano de escalonamento antes da crise</h2>
+<ol><li>Escolha uma pessoa de confiança e um serviço de saúde que você consiga localizar.</li><li>Liste sinais pessoais que indicam piora e situações que exigem interromper a atividade.</li><li>Registre os canais internos, sindicais ou públicos adequados ao problema.</li><li>Defina como chegar a atendimento urgente e quem pode acompanhar você.</li></ol>
+<p>Se houver risco imediato, use serviço de emergência; se os sintomas persistirem, procure avaliação profissional. O plano serve para reduzir improviso. Ele não obriga revelar diagnóstico à equipe nem substitui orientação clínica, documento profissional ou procedimento formal da empresa.</p>
     `.trim()
   },
 
@@ -2367,9 +2416,9 @@ const overrides: Record<string, EditorialContentOverride> = {
   },
 
   "entrevista-desligamento-o-que-falar": {
-    reviewedAt: "2026-10-13",
+    reviewedAt: "2026-10-15",
     contentHtml: `
-<p><strong>Revisão editorial: 13 de outubro de 2026.</strong> Entrevista de desligamento é uma conversa sobre a saída, não substitui documentos rescisórios, devolução de bens ou conferência do vínculo. Prepare fatos que você presenciou, escolha o que deseja registrar e não assine declaração que não compreendeu.</p>
+<p><strong>Revisão editorial: 15 de outubro de 2026.</strong> Entrevista de desligamento é uma conversa sobre a saída, não substitui documentos rescisórios, devolução de bens ou conferência do vínculo. Prepare fatos que você presenciou, escolha o que deseja registrar e não assine declaração que não compreendeu.</p>
 <h2>Separe quatro assuntos antes da reunião</h2>
 <ol><li><strong>motivo informado:</strong> o que a empresa comunicou e o que você deseja esclarecer;</li><li><strong>trabalho:</strong> processos que funcionavam, falhas observadas e sugestões;</li><li><strong>pendências:</strong> equipamento, acesso, documento, reembolso e contato responsável;</li><li><strong>próximos passos:</strong> datas, canais e comprovantes que serão entregues.</li></ol>
 <p>Leve anotações curtas. Datas, tarefa, impacto e tentativa de solução são mais úteis que “era tudo desorganizado”. Não fale por colegas nem revele dado de cliente para provar um ponto.</p>
@@ -2388,6 +2437,13 @@ const overrides: Record<string, EditorialContentOverride> = {
 <p>Mantenha somente documentos pessoais e comprovantes que você está autorizado a guardar. Arquivos de cliente, listas internas, código, proposta comercial e conversa de colega continuam protegidos após a saída. Se precisar comprovar um fato em disputa, procure orientação antes de copiar material confidencial por conta própria.</p>
 <p>Se pedirem assinatura, leia, solicite cópia e peça explicação do que não entendeu. Assinar presença em reunião é diferente de concordar com toda narrativa; verifique o texto concreto. Para uma saída iniciada pelo trabalhador, consulte também o guia sobre <a href="/blog/pedido-demissao-aviso-previo-acerto">pedido de demissão e aviso</a>.</p>
 <p>Encerre confirmando quem responde por cada pendência e como você receberá comprovantes. Uma entrevista de desligamento útil deixa registro claro; ela não exige gratidão forçada, ataque pessoal nem renúncia a direitos.</p>
+
+<h2>Monte uma matriz de pendências, documentos e responsáveis</h2>
+<p>Antes da conversa, crie quatro colunas: item, evidência que você já possui, responsável indicado e próxima confirmação. Separe devolução de equipamento, bloqueio de acesso, reembolso, recibos, documentos rescisórios e atualização do vínculo. A matriz não calcula direito nem substitui orientação; ela impede que uma pergunta operacional desapareça dentro de uma discussão sobre desempenho.</p>
+<p>Ao receber uma resposta, registre o canal e a data prometida pela própria empresa. Se não houver prazo, escreva “sem prazo confirmado” em vez de preencher uma data desejada. Para documento que contém dados pessoais, confirme destinatário e forma de envio; não encaminhe cópia integral para grupo ou endereço não verificado.</p>
+<h2>Diferencie relato, opinião e solicitação</h2>
+<p>Revise cada ponto com três etiquetas. <strong>Relato:</strong> fato que você presenciou e consegue situar. <strong>Opinião:</strong> sua leitura sobre processo ou ambiente, apresentada como percepção. <strong>Solicitação:</strong> documento, correção ou resposta que ainda precisa de responsável. Essa separação reduz acusações imprecisas e deixa claro o que depende de ação posterior.</p>
+<p>Exemplo: “Recebi o aviso nesta data” é relato; “o fluxo me pareceu confuso” é opinião; “peço confirmação do canal que enviará o comprovante” é solicitação. Não assine texto preparado por outra pessoa como se fosse sua narrativa sem ler, pedir explicação e solicitar cópia. Quando houver possível violação de direito, discriminação, assédio ou divergência de verba, preserve documentos próprios e procure sindicato, Inspeção do Trabalho ou profissional habilitado.</p>
     `.trim()
   },
 
@@ -2957,9 +3013,9 @@ const overrides: Record<string, EditorialContentOverride> = {
   },
 
   "salario-custo-de-vida-sao-luis": {
-    reviewedAt: "2026-10-14",
+    reviewedAt: "2026-10-15",
     contentHtml: `
-<p><strong>Revisão editorial: 14 de outubro de 2026.</strong> Este guia não publica “salário ideal” nem estima custo de vida por bairro. Ele propõe uma conta individual para comparar propostas em São Luís usando valores confirmados pelo candidato. Preços, tarifas, benefícios e descontos mudam; não use número antigo como se fosse condição atual.</p>
+<p><strong>Revisão editorial: 15 de outubro de 2026.</strong> Este guia não publica “salário ideal” nem estima custo de vida por bairro. Ele propõe uma conta individual para comparar propostas em São Luís usando valores confirmados pelo candidato. Preços, tarifas, benefícios e descontos mudam; não use número antigo como se fosse condição atual.</p>
 <h2>Comece pelo que a proposta realmente informa</h2>
 <p>Registre remuneração bruta, jornada, escala, local, benefícios, descontos informados e data prevista de início. Separe valor garantido de comissão, prêmio ou variável. Quando a proposta não detalhar uma condição, pergunte por escrito; não preencha a lacuna com média da internet.</p>
 <p>Salário bruto não é o valor disponível para todas as despesas. O líquido depende de descontos e situações individuais. Este portal não calcula folha nem substitui o holerite. Depois da admissão, confira o vínculo e informações registradas na <a href="https://www.gov.br/pt-br/apps/ctps-digital" target="_blank" rel="noopener noreferrer">Carteira de Trabalho Digital</a> e peça esclarecimento ao empregador quando houver divergência.</p>
@@ -2977,6 +3033,15 @@ const overrides: Record<string, EditorialContentOverride> = {
 <h2>Checklist antes de aceitar</h2>
 <ol><li>Recebi cargo, unidade, jornada, escala e remuneração por canal verificável?</li><li>Separei fixo de variável?</li><li>Calculei ida e volta com valores atuais?</li><li>Entendi benefícios, descontos e coparticipações?</li><li>O horário é compatível com transporte e responsabilidades pessoais?</li><li>Não há cobrança para liberar contratação, exame ou uniforme?</li></ol>
 <p>Guarde a proposta e as premissas usadas na conta. Se alguma condição mudar, refaça o cenário. Decisão responsável usa valores confirmados, limites pessoais e tempo de deslocamento — não uma média genérica chamada “custo de vida”.</p>
+
+<h2>Faça um teste de estresse do primeiro mês</h2>
+<p>O primeiro mês pode concentrar custos antes do primeiro pagamento ou benefício: deslocamento, alimentação, uniforme autorizado, cuidado de dependente e alternativa para atraso no transporte. Liste apenas despesas que a proposta e sua rotina tornam plausíveis. Não compre material, curso ou exame porque um contato não verificado prometeu reembolso.</p>
+<p>Monte três cenários: condição informada, condição ainda pendente e contingência. No cenário pendente, mantenha o campo vazio ou marcado “a confirmar”; não use média retirada de busca. No de contingência, calcule como chegaria ou voltaria se a rota habitual falhar. Essa reserva de planejamento não significa que a empresa seja obrigada a cobrir toda alternativa.</p>
+<h2>Registre o custo de tempo separado do dinheiro</h2>
+<p>Some deslocamento, espera, integração e caminhada em cada turno. Não converta automaticamente esse tempo em salário nem o chame de hora trabalhada; use-o para avaliar compatibilidade com estudo, descanso, cuidado familiar e segurança. Compare propostas na mesma semana de referência e repita a conta quando unidade ou escala mudar.</p>
+<p>Para São Luís, guarde a data em que consultou a informação municipal e confirme a operação perto da entrevista ou início. A página do Bilhete Único explica regras gerais, mas não substitui verificação de linha, horário, integração e eventual alteração operacional. Se o anúncio não identifica a unidade, a conta de deslocamento ainda não está pronta.</p>
+<h2>Feche a comparação com perguntas sem resposta</h2>
+<p>Antes de aceitar, liste quem confirmou cada condição e por qual canal. Variável possui regra e período? O benefício começa quando? Há coparticipação? A escala é fixa? A unidade pode mudar? Uma proposta com mais campos em aberto não deve receber números inventados para parecer comparável. A melhor planilha mostra incerteza em vez de escondê-la.</p>
     `.trim()
   },
 
