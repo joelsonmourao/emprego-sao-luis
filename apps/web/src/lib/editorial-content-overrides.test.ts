@@ -193,4 +193,40 @@ describe("revisões editoriais substanciais para AdSense", () => {
       expect(html).not.toMatch(/vagas abertas hoje|salário médio|contratação garantida|aprovação garantida/i);
     }
   });
-});
+
+  it("aprofunda os dois guias que ainda tinham menos de 350 palavras", () => {
+    const cases = [
+      {
+        slug: "curriculo-pdf-erros-triagem",
+        minimumWords: 800,
+        required: [
+          "Teste o PDF como o recrutador pode recebê-lo",
+          "Classificação Brasileira de Ocupações",
+          "buscar-emprego-no-sistema-nacional-de-emprego-sine"
+        ]
+      },
+      {
+        slug: "entrevista-comportamental-exemplos",
+        minimumWords: 900,
+        required: [
+          "Monte um banco de evidências antes de decorar respostas",
+          "Exemplo administrativo com prioridade concorrente",
+          "cartilha.cert.br/fasciculos"
+        ]
+      }
+    ];
+
+    for (const item of cases) {
+      const override = getEditorialContentOverride(item.slug);
+      const html = override?.contentHtml ?? "";
+      const words = textOnly(html).split(/\s+/).filter(Boolean);
+      const outbound = [...html.matchAll(/href="(https:\/\/[^"]+)"/g)].map((match) => match[1]);
+
+      expect(override).not.toBeNull();
+      expect(override?.reviewedAt).toBe("2026-10-15");
+      expect(words.length).toBeGreaterThanOrEqual(item.minimumWords);
+      expect(new Set(outbound).size).toBeGreaterThanOrEqual(2);
+      for (const excerpt of item.required) expect(html).toContain(excerpt);
+      expect(html).not.toMatch(/vagas abertas hoje|salário médio|contratação garantida|aprovação garantida/i);
+    }
+  });
