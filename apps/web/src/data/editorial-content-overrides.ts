@@ -1435,9 +1435,9 @@ const overrides: Record<string, EditorialContentOverride> = {
   },
 
   "trabalho-hibrido-sao-luis-checklist": {
-    reviewedAt: "2026-10-12",
+    reviewedAt: "2026-10-15",
     contentHtml: `
-<p><strong>Revisão editorial: 12 de outubro de 2026.</strong> Um anúncio “híbrido” pode significar dois dias em casa, comparecimento variável ou apenas flexibilidade eventual. A palavra não basta. Este roteiro ajuda a converter o rótulo em calendário, custo e cláusulas verificáveis antes de aceitar.</p>
+<p><strong>Revisão editorial: 15 de outubro de 2026.</strong> Um anúncio “híbrido” pode significar dois dias em casa, comparecimento variável ou apenas flexibilidade eventual. A palavra não basta. Este roteiro ajuda a converter o rótulo em calendário, custo e cláusulas verificáveis antes de aceitar.</p>
 <h2>Desenhe uma semana comum</h2><p>Peça um exemplo de semana: dias presenciais, dias remotos, horário, reuniões obrigatórias e local de trabalho. Pergunte se a equipe escolhe os dias ou se a liderança define uma escala. Depois trate as exceções: treinamento, fechamento, visita de cliente, manutenção do sistema e eventos. Não negocie apenas a “média mensal”; sua rotina depende de quais dias e horários exigem deslocamento.</p>
 <p>Para quem mora em São Luís ou na região metropolitana, teste o trajeto no horário da jornada e também a volta. Registre tempo, integrações e alternativa quando chover ou o turno terminar tarde. Use valores atuais informados por você na <a href="/ferramentas/custo-deslocamento">calculadora do portal</a>; o guia não publica tarifa nem presume um bairro de origem.</p>
 <h2>O que precisa ficar escrito</h2><p>A <a href="https://www.planalto.gov.br/ccivil_03/decreto-lei/del5452compilado.htm" target="_blank" rel="noopener noreferrer">CLT consolidada</a> disciplina teletrabalho nos artigos 75-A e seguintes. O regime deve constar expressamente do contrato individual; equipamento, infraestrutura e reembolso devem ser previstos em contrato escrito. Pergunte como a empresa registra a combinação presencial/remota e como comunica alterações.</p>
@@ -1449,7 +1449,15 @@ const overrides: Record<string, EditorialContentOverride> = {
 <p>Se a empresa não puder fixar dias, você pode negociar teto de comparecimentos ou janela de aviso. Se nada for previsível, avalie a vaga como predominantemente presencial. Um “não” claro antes do aceite é mais útil do que uma surpresa na segunda semana.</p>
 <p>Na experiência inicial, revise o combinado ao fim de cada semana: dias efetivamente presenciais, reuniões fora da escala, falhas de equipamento e despesas. Não espere meses para mostrar divergência. Relate por canal interno com exemplos e peça correção. Isso cria uma base factual sem transformar todo ajuste operacional em acusação.</p><h2>Verifique a norma coletiva</h2><p>Convenções e acordos podem trazer regras da categoria. O serviço oficial <a href="https://www.gov.br/pt-br/servicos/consultar-instrumento-coletivo-de-trabalho" target="_blank" rel="noopener noreferrer">Consultar Instrumento Coletivo de Trabalho</a> permite pesquisar documentos registrados no Sistema Mediador. Confirme categoria, território e vigência; não use uma convenção de outro setor ou estado.</p>
 <p>Este guia é orientação geral. Dúvida sobre alteração contratual, jornada ou reembolso exige leitura do documento e, quando necessário, sindicato, inspeção do trabalho ou assessoria jurídica.</p>
-    `.trim()
+    
+<h2>Classifique cada presença antes de aceitar a rotina</h2>
+<p>Separe dias fixos, convocações ocasionais, treinamento, plantão e visita externa. Para cada tipo, registre local, antecedência, duração e quem confirma. Uma reunião presencial mensal tem impacto diferente de comparecimento variável três vezes por semana. Se o anúncio usa “híbrido” mas não consegue descrever uma semana típica, avalie a proposta pelo cenário mais presencial que foi confirmado.</p>
+<h2>Planeje falha de internet, energia e equipamento</h2>
+<p>Pergunte qual canal comunica indisponibilidade, se existe suporte, onde o equipamento é reparado e se a ida emergencial ao escritório é prevista. Não instale programa em computador pessoal sem saber finalidade e política. Quando a empresa fornece equipamento, confira termo de entrega, acessórios e procedimento de devolução; registre avaria existente antes do uso.</p>
+<h2>Reconcilie o combinado com a prática</h2>
+<p>Nas quatro primeiras semanas, mantenha um quadro com dia previsto, local efetivo, motivo da mudança, aviso recebido e despesa. Em São Luís, inclua tempo real de ida e volta nos horários praticados, sem transformar uma viagem em média universal. Ao notar repetição, leve o quadro à liderança e pergunte se o regime precisa ser formalmente ajustado.</p>
+<p>Não use teletrabalho para esconder jornada extra nem aceite que todo custo doméstico é automaticamente reembolsável. Compare contrato, política e instrumento coletivo. A decisão deve considerar o cenário escrito e o que a rotina demonstrou, sem promessas de permanência do regime.</p>
+`.trim()
   },
 
   "pretensao-salarial-entrevista-dicas": {
@@ -1490,9 +1498,9 @@ const overrides: Record<string, EditorialContentOverride> = {
   },
 
   "negociar-horario-deslocamento-emprego": {
-    reviewedAt: "2026-10-12",
+    reviewedAt: "2026-10-15",
     contentHtml: `
-<p><strong>Revisão editorial: 12 de outubro de 2026.</strong> Um trajeto incompatível pode transformar uma boa vaga em atraso recorrente, gasto inesperado ou risco na volta. Negociar horário exige dados do caminho e entendimento da operação. Este guia não promete flexibilidade nem define vale-transporte para casos individuais.</p>
+<p><strong>Revisão editorial: 15 de outubro de 2026.</strong> Um trajeto incompatível pode transformar uma boa vaga em atraso recorrente, gasto inesperado ou risco na volta. Negociar horário exige dados do caminho e entendimento da operação. Este guia não promete flexibilidade nem define vale-transporte para casos individuais.</p>
 <h2>Teste o trajeto no horário real</h2><p>Planejar às 14h não mostra o que acontece na entrada das 8h ou na saída das 22h. Faça ao menos um teste em faixa semelhante à jornada. Anote hora de saída, espera, integrações, caminhada, chegada e alternativa. Se o emprego ainda não foi oferecido, use estimativa conservadora sem faltar a outro compromisso.</p>
 <p>Em São Luís e municípios próximos, o percurso depende do bairro, do sentido e da conexão. Evite afirmar que “sempre leva uma hora”. Leve seu registro: “No teste de terça, saí às 6h20 e cheguei às 7h42; a segunda opção chegou depois.” Um dia não prevê todos, mas é melhor que palpite.</p>
 <h2>Calcule custo com seus próprios valores</h2><p>Use a <a href="/ferramentas/custo-deslocamento">calculadora de deslocamento</a> para registrar passagens, combustível, estacionamento ou transporte alternativo. A ferramenta não publica tarifa oficial e não decide benefício. Faça cenários para dias normais, fechamento tardio e perda de conexão.</p>
@@ -1504,7 +1512,16 @@ const overrides: Record<string, EditorialContentOverride> = {
 <h2>Inclua segurança e acessibilidade</h2><p>Considere iluminação, espera em ponto, última conexão, acessibilidade do percurso e chegada ao local. Se uma condição de saúde ou deficiência exige ajuste, você pode explicar a barreira funcional sem divulgar diagnóstico além do necessário. A <a href="https://www.planalto.gov.br/ccivil_03/_ato2015-2018/2015/lei/l13146.htm" target="_blank" rel="noopener noreferrer">Lei Brasileira de Inclusão</a> trata de igualdade de oportunidades e adaptação razoável; a aplicação concreta pode requerer orientação.</p>
 <h2>Decida pelo cenário aprovado</h2><p>Não compare a vaga com o horário que gostaria de obter. Compare com o que a empresa confirmou. Se o acordo não for registrado, trate o cenário original como vigente. Guarde a proposta e reveja a conta após o primeiro mês, sem faltar ou alterar jornada por conta própria.</p>
 <p>Negociação útil é verificável: trajeto medido, pedido claro, impacto operacional discutido e resposta escrita.</p>
-    `.trim()
+    
+<h2>Compare três cenários antes da conversa</h2>
+<p>Monte uma linha para jornada original, alternativa solicitada e plano de contingência. Em cada uma, registre saída de casa, chegada, custo, última conexão, margem e impacto na atividade. Use seus próprios testes e datas. Uma rota medida em dia tranquilo não deve ser apresentada como duração garantida.</p>
+<h2>Relacione o pedido à operação</h2>
+<p>Mostre como manterá abertura, passagem de turno, reunião ou atendimento. Se a função exige presença às 8h, uma entrada às 8h30 pode não ser possível, mas talvez outra escala ou unidade exista. Pergunte antes de oferecer compensação: alteração informal pode criar jornada não registrada e não resolve transporte na saída.</p>
+<h2>Registre o que foi aprovado e por quanto tempo</h2>
+<p>Confirme jornada, intervalo, unidade, data de início, período de teste e responsável pela aprovação. Se o ajuste será revisto após experiência, anote a data e o cenário que volta a valer caso não seja mantido. Não trate silêncio ou resposta vaga como autorização.</p>
+<h2>Reavalie com dados da primeira semana</h2>
+<p>Compare horários reais, atrasos, custo e segurança. Em dias de chuva forte ou alteração de rota em São Luís, registre o evento sem transformar exceção em regra. Se o combinado ficou inviável, leve evidência e uma proposta antes de mudar a jornada por conta própria. A decisão final deve considerar o horário formalmente confirmado, não apenas a melhor simulação.</p>
+`.trim()
   },
 
   "vagas-afirmativas-como-candidatar": {
@@ -1720,9 +1737,9 @@ const overrides: Record<string, EditorialContentOverride> = {
   },
 
   "alfabetizacao-digital-emprego-basico": {
-    reviewedAt: "2026-10-12",
+    reviewedAt: "2026-10-15",
     contentHtml: `
-<p><strong>Revisão editorial: 12 de outubro de 2026.</strong> Alfabetização digital para procurar emprego não é saber usar todo aplicativo. É conseguir ler um anúncio, confirmar o canal, preparar um arquivo, preencher um formulário e proteger a própria conta. Este guia propõe um treino prático no celular ou computador, sem prometer contratação.</p>
+<p><strong>Revisão editorial: 15 de outubro de 2026.</strong> Alfabetização digital para procurar emprego não é saber usar todo aplicativo. É conseguir ler um anúncio, confirmar o canal, preparar um arquivo, preencher um formulário e proteger a própria conta. Este guia propõe um treino prático no celular ou computador, sem prometer contratação.</p>
 <h2>Faça um diagnóstico com uma candidatura simulada</h2>
 <p>Crie uma pasta de treino e tente concluir cinco tarefas: abrir um anúncio em outra aba; salvar a URL e a data; escrever uma mensagem curta; anexar um PDF; e localizar o arquivo enviado. Marque onde precisou de ajuda. O ponto fraco pode ser nomear arquivos, recuperar senha, alternar entre aplicativos ou entender um campo obrigatório.</p>
 <p>Use dados fictícios no ensaio. Não coloque CPF, RG, endereço completo, senha ou documento de outra pessoa. Quando repetir o exercício com uma vaga real, confira se o destinatário é o mesmo informado no canal institucional.</p>
@@ -1739,7 +1756,16 @@ const overrides: Record<string, EditorialContentOverride> = {
 <ol><li>Dia 1: organizar pastas e contatos.</li><li>Dia 2: revisar e exportar o currículo.</li><li>Dia 3: enviar um e-mail de teste a si mesmo.</li><li>Dia 4: preencher um formulário fictício.</li><li>Dia 5: recuperar um arquivo e uma senha com segurança.</li><li>Dia 6: conferir um anúncio e seu canal oficial.</li><li>Dia 7: repetir o ciclo sem ajuda e anotar dúvidas.</li></ol>
 <p>Peça apoio a uma pessoa de confiança apenas para observar o processo; não compartilhe senha. O objetivo é sair do “não sei mexer” para uma lista concreta de tarefas já praticadas e pontos que ainda precisam de treino.</p>
 <p>Repita o exercício no aparelho que costuma usar. No celular, pratique alternar entre navegador, e-mail e arquivos sem perder o formulário. No computador, localize downloads e anexos. Anote o caminho de cada tarefa com suas próprias palavras para conseguir repetir depois sem depender da memória.</p>
-    `.trim()
+    
+<h2>Confirme o endereço antes de preencher qualquer dado</h2>
+<p>Abra o anúncio pelo site institucional, confira domínio, cadeado e caminho da candidatura. Domínio parecido, página traduzida de forma estranha ou formulário que pede senha são sinais para interromper. O cadeado indica conexão protegida, não prova que a empresa é legítima; confirme a oportunidade por outro canal oficial.</p>
+<h2>Treine permissões e tamanho de arquivo</h2>
+<p>No celular, pratique conceder acesso somente ao arquivo escolhido, localizar downloads e remover permissão desnecessária depois. Antes do envio, confira formato, tamanho e nome solicitados. Se o portal rejeitar o PDF, faça uma cópia otimizada sem converter páginas em fotografia e abra novamente para garantir que telefone, e-mail e texto continuam legíveis.</p>
+<h2>Registre a confirmação sem duplicar candidatura</h2>
+<p>Depois do envio, anote data, URL, cargo e mensagem de confirmação. Salve protocolo ou e-mail, mas não repita o formulário apenas porque a página demorou. Primeiro consulte a área de candidaturas ou caixa de entrada. Envios duplicados podem gerar versões diferentes e confusão sobre qual currículo vale.</p>
+<h2>Crie um teste mensal de autonomia</h2>
+<p>Use uma vaga encerrada ou cenário fictício e execute o ciclo inteiro sem ajuda: verificar origem, adaptar currículo, exportar PDF, anexar, revisar e registrar. Marque cada etapa como “sozinho”, “com consulta” ou “com ajuda”. O objetivo é escolher o próximo treino, não se comparar com outra pessoa. Nunca entregue acesso remoto ao aparelho para alguém completar a candidatura em seu nome.</p>
+`.trim()
   },
 
   "certificado-ou-experiencia-curriculo": {
@@ -1831,9 +1857,9 @@ const overrides: Record<string, EditorialContentOverride> = {
   },
 
   "gap-habilidades-candidatura-como-fechar": {
-    reviewedAt: "2026-10-12",
+    reviewedAt: "2026-10-15",
     contentHtml: `
-<p><strong>Revisão editorial: 12 de outubro de 2026.</strong> Uma lacuna de habilidade é a diferença entre o que a função pede e o que você consegue demonstrar hoje. Ela não deve ser escondida nem transformada em lista aleatória de cursos. O caminho é classificar o requisito, estimar o esforço e produzir evidência proporcional.</p>
+<p><strong>Revisão editorial: 15 de outubro de 2026.</strong> Uma lacuna de habilidade é a diferença entre o que a função pede e o que você consegue demonstrar hoje. Ela não deve ser escondida nem transformada em lista aleatória de cursos. O caminho é classificar o requisito, estimar o esforço e produzir evidência proporcional.</p>
 <h2>Compare anúncios do mesmo cargo</h2>
 <p>Reúna de cinco a dez anúncios atuais com origem confirmada. Em uma tabela, registre tarefa, ferramenta, requisito obrigatório, item desejável e frequência. Não misture cargos diferentes. O que aparece uma vez pode ser particular de uma empresa; o que se repete ajuda a definir prioridade, sem provar uma regra para todo o mercado.</p>
 <p>Use a <a href="https://www.gov.br/trabalho-e-emprego/pt-br/servicos/trabalhador/mais-acoes/classificacao-brasileira-de-ocupacoes" target="_blank" rel="noopener noreferrer">Classificação Brasileira de Ocupações</a> para entender nomes de ocupações e famílias relacionadas. A CBO não substitui o anúncio nem certifica competência; ela ajuda a comparar linguagem.</p>
@@ -1851,7 +1877,15 @@ const overrides: Record<string, EditorialContentOverride> = {
 <p>Na entrevista: “Ainda não usei a ferramenta em emprego. Concluí o módulo X e montei este exercício; consigo fazer A e B, mas ainda preciso de apoio em C.” Essa resposta oferece limite e evidência. Evite “aprendo qualquer coisa rápido” sem exemplo.</p>
 <p>Revise a matriz a cada duas semanas e arquive anúncios encerrados. O objetivo não é zerar toda lacuna, mas direcionar tempo para aquilo que aparece no cargo escolhido e que pode ser comprovado honestamente.</p>
 <p>Evite comprar curso sob pressão de anúncio que expira. Primeiro confirme se a exigência se repete e se a formação tem conteúdo, instituição e suporte identificáveis. Nenhum curso legítimo pode prometer que a seleção vai aprovar você; ele só pode oferecer aprendizagem e, quando previsto, documento de participação ou conclusão.</p>
-    `.trim()
+    
+<h2>Priorize por frequência, necessidade e possibilidade de prova</h2>
+<p>Para cada requisito repetido, dê três notas de 0 a 2: frequência nos anúncios comparáveis, impacto na tarefa principal e possibilidade de produzir evidência segura. Uma exigência legal frequente pode ser decisiva, mas não vira prioridade de curso curto; precisa do caminho formal correspondente. Uma ferramenta desejável e praticável pode entrar no plano mesmo com pontuação menor.</p>
+<p>Registre também o que já possui. Se você sabe filtrar planilhas, mas ainda erra referências de célula, a lacuna é específica; não recomece um curso inteiro sem diagnóstico. Quando o anúncio usa uma palavra ampla, como “sistema”, peça exemplo da tarefa em vez de inventar a plataforma.</p>
+<h2>Defina critério de conclusão antes do estudo</h2>
+<p>Escreva uma entrega e um teste: “montar uma planilha fictícia com cadastro, filtro e total; depois refazer com dados diferentes sem consultar o passo a passo”. Para comunicação, pode ser redigir resposta, revisar tom e explicar por que cada informação foi incluída. Arquivo bonito sem critério não demonstra autonomia.</p>
+<h2>Use uma regra de parada</h2>
+<p>Revise a matriz após duas semanas ou quando reunir novos anúncios equivalentes. Pare de investir quando o requisito deixa de aparecer, quando depende de licença que você não pode obter agora ou quando outra lacuna bloqueia a candidatura primeiro. Guarde versões do exercício e anote feedback recebido, mas não publique dados reais de empresa, cliente ou colega.</p>
+`.trim()
   },
 
   "soft-skills-hard-skills-curriculo": {
@@ -2025,9 +2059,9 @@ const overrides: Record<string, EditorialContentOverride> = {
   },
 
   "conflito-com-chefe-trabalho-dicas": {
-    reviewedAt: "2026-10-12",
+    reviewedAt: "2026-10-15",
     contentHtml: `
-<p><strong>Revisão editorial: 12 de outubro de 2026.</strong> Discordar de prioridade, prazo ou método não é automaticamente assédio. O primeiro passo é identificar o fato: o que foi pedido, quando, qual orientação anterior existia e qual impacto ocorreu. Situação de violência, ameaça ou discriminação exige cuidado e apoio, não confronto improvisado.</p>
+<p><strong>Revisão editorial: 15 de outubro de 2026.</strong> Discordar de prioridade, prazo ou método não é automaticamente assédio. O primeiro passo é identificar o fato: o que foi pedido, quando, qual orientação anterior existia e qual impacto ocorreu. Situação de violência, ameaça ou discriminação exige cuidado e apoio, não confronto improvisado.</p>
 <h2>Prepare a conversa com fatos</h2>
 <p>Escreva uma linha para cada evento: data, tarefa, instrução, resposta e consequência. Separe interpretação de observação. “Ele quer me prejudicar” é interpretação; “o prazo mudou às 16h e não houve redefinição das outras entregas” é um fato que permite conversa.</p>
 <p>Peça encontro privado e leve uma pergunta concreta: “Qual das duas demandas tem prioridade?” ou “Podemos registrar o procedimento atualizado?”. Evite áudio longo, indireta em grupo e exposição de colega. Seu objetivo é esclarecer trabalho e próximo passo.</p>
@@ -2045,13 +2079,21 @@ const overrides: Record<string, EditorialContentOverride> = {
 <p>Objetividade não significa aceitar abuso. Ela ajuda a apresentar o problema de forma compreensível e escolher entre ajuste, mediação, denúncia ou saída planejada. Se o impacto emocional persistir, procure também cuidado em saúde.</p>
 <p>Evite três atalhos: gravar ou acessar conta alheia sem entender os limites legais, ameaçar divulgar conteúdo confidencial e pedir que colegas escolham “um lado” em grupo. Essas ações podem ampliar o dano e desviar a análise do fato original. Busque orientação antes de coletar ou compartilhar evidências sensíveis.</p>
 <p>Se a saída se tornar necessária, confira aviso, documentos e canais antes de tomar decisão impulsiva. Não assine texto que não compreende sob pressão. Peça tempo para ler e orientação qualificada quando houver dúvida sobre consequência trabalhista.</p>
-    `.trim()
+    
+<h2>Escolha uma frase que peça decisão</h2>
+<p>Quando duas orientações entram em conflito, use estrutura curta: fato, impacto e pergunta. Exemplo: “A tarefa A foi marcada para hoje e a B chegou com o mesmo prazo. Consigo concluir uma delas com qualidade. Qual deve vir primeiro?” Evite transformar o pedido em julgamento sobre intenção ou competência da liderança.</p>
+<h2>Monte uma cronologia que preserve origem</h2>
+<p>Guarde mensagens e documentos próprios no sistema autorizado, com data e contexto. Não recorte trechos de modo que altere sentido e não encaminhe arquivo confidencial para e-mail pessoal sem permissão. Em anotação particular, diferencie o que você viu, o que ouviu de terceiros e o que concluiu. Testemunho de colega não deve ser escrito como fato confirmado sem consentimento.</p>
+<h2>Use uma escala de resposta</h2>
+<ul><li><strong>Divergência operacional:</strong> alinhar prioridade e procedimento.</li><li><strong>Repetição sem solução:</strong> registrar e procurar liderança ou RH.</li><li><strong>Humilhação, ameaça ou discriminação:</strong> preservar segurança e buscar canal interno ou orientação externa.</li><li><strong>Risco imediato:</strong> afastar-se da situação e acionar apoio competente.</li></ul>
+<p>A escala organiza o próximo passo, mas não determina juridicamente o caso. Se o conflito afeta sono, alimentação, ansiedade ou segurança, procure cuidado em saúde e orientação apropriada. Não espere a situação se agravar para registrar o impacto.</p>
+`.trim()
   },
 
   "avaliacao-de-desempenho-preparacao": {
-    reviewedAt: "2026-10-12",
+    reviewedAt: "2026-10-15",
     contentHtml: `
-<p><strong>Revisão editorial: 12 de outubro de 2026.</strong> Uma avaliação de desempenho útil compara expectativa, evidência e próximo passo. Não é concurso de adjetivos nem momento para inventar números. Mesmo quando a empresa não tem formulário formal, você pode preparar exemplos e pedir critérios claros.</p>
+<p><strong>Revisão editorial: 15 de outubro de 2026.</strong> Uma avaliação de desempenho útil compara expectativa, evidência e próximo passo. Não é concurso de adjetivos nem momento para inventar números. Mesmo quando a empresa não tem formulário formal, você pode preparar exemplos e pedir critérios claros.</p>
 <h2>Descubra o que será avaliado</h2>
 <p>Antes da conversa, peça critérios, período e participantes. Separe metas, entregas, comportamento, aprendizagem e condições que afetaram o trabalho. Se não há documento, leve uma lista curta das responsabilidades combinadas e pergunte se ela corresponde à expectativa da liderança.</p>
 <p>A <a href="https://repositorio.enap.gov.br/items/d1dc6e7e-98b1-4941-9c8c-985215c3944e" target="_blank" rel="noopener noreferrer">Enap</a> mantém material sobre gestão do desempenho e modelos de feedback. É uma referência de aprendizagem, não regra para empresas privadas. O procedimento válido é o definido pela organização, respeitando contrato, políticas e direitos.</p>
@@ -2070,13 +2112,21 @@ const overrides: Record<string, EditorialContentOverride> = {
 <p>Chegue preparado para ouvir e perguntar. O resultado mais útil é sair sabendo o que manter, o que mudar, qual apoio existe e quando o avanço será revisto — sem teatro e sem apagar condições reais de trabalho.</p>
 <p>Mantenha um registro semanal simples até a próxima conversa: tarefa, evidência, dificuldade e apoio solicitado. Isso evita reconstruir meses de memória na véspera e permite corrigir o plano cedo. O registro não deve incluir dados pessoais de cliente, avaliação de colega ou documento que você não esteja autorizado a guardar.</p>
 <p>Se não houver nova data, proponha uma revisão breve e realista. Confirme quem acompanhará e qual evidência será observada. Sem acompanhamento, o plano vira lista esquecida e a próxima avaliação repete a mesma surpresa.</p>
-    `.trim()
+    
+<h2>Faça uma tabela de expectativa, fato e dependência</h2>
+<p>Use uma linha por responsabilidade. Na primeira coluna, copie a expectativa confirmada; na segunda, registre entrega ou comportamento observável; na terceira, anote dependências como acesso, equipe, estoque ou aprovação. A dependência não apaga sua responsabilidade, mas evita avaliar como falha individual aquilo que o processo não permitiu executar.</p>
+<p>O estudo da Enap sobre <a href="https://repositorio.enap.gov.br/bitstream/1/7439/1/v.%2073%20n.%20a%20%282022%29%20Inova%C3%A7%C3%A3o%20e%20Moderniza%C3%A7%C3%A3o%20Administrativa%20para%20os%20Estados.pdf" target="_blank" rel="noopener noreferrer">gestão do desempenho no setor público</a> relaciona resultado esperado, feedback e plano de desenvolvimento. É referência de aprendizagem, não modelo obrigatório para empresa privada. Use a lógica de clareza e acompanhamento sem importar regras administrativas que não se aplicam ao vínculo.</p>
+<h2>Teste se o feedback pode virar ação</h2>
+<p>Depois de ouvir cada ponto, complete a frase: “Na próxima situação X, farei Y e registrarei Z”. Se não consegue preencher, peça exemplo e critério. Para “melhorar comunicação”, uma ação verificável pode ser confirmar prioridade e prazo ao receber duas demandas; a evidência pode ser o resumo enviado pelo canal corporativo.</p>
+<h2>Feche a conversa com um registro equilibrado</h2>
+<p>Envie um resumo com entregas mantidas, ponto de melhoria, apoio combinado, responsável e data de revisão. Dê espaço para correção do gestor. Não escreva concordância com fatos que contesta; registre a divergência de modo objetivo e anexe apenas documento autorizado. Se o formulário exigir ciência, confirme se ciência significa recebimento ou concordância antes de interpretar o campo.</p>
+`.trim()
   },
 
   "primeira-semana-emprego-novo": {
-    reviewedAt: "2026-10-12",
+    reviewedAt: "2026-10-15",
     contentHtml: `
-<p><strong>Revisão editorial: 12 de outubro de 2026.</strong> Na primeira semana, a prioridade é entender segurança, horário, responsabilidades e canais. Você não precisa decorar tudo nem propor mudança no segundo dia. Anote processos, confirme dúvidas e preserve dados da empresa e de clientes.</p>
+<p><strong>Revisão editorial: 15 de outubro de 2026.</strong> Na primeira semana, a prioridade é entender segurança, horário, responsabilidades e canais. Você não precisa decorar tudo nem propor mudança no segundo dia. Anote processos, confirme dúvidas e preserve dados da empresa e de clientes.</p>
 <h2>Confirme o básico antes da primeira tarefa</h2>
 <p>Pergunte horário de entrada, intervalo, registro de ponto, uniforme ou equipamento, local de trabalho e quem deve ser avisado em atraso ou emergência. Saiba onde ficam saídas, itens de segurança e contatos essenciais. Não opere máquina, veículo ou sistema crítico sem orientação e autorização.</p>
 <p>Consulte os dados do vínculo na <a href="https://www.gov.br/pt-br/apps/ctps-digital" target="_blank" rel="noopener noreferrer">Carteira de Trabalho Digital</a>. O Ministério do Trabalho também mantém <a href="https://www.gov.br/trabalho-e-emprego/pt-br/servicos/trabalhador/carteira-de-trabalho/perguntas-frequentes-carteira-de-trabalho-digital/" target="_blank" rel="noopener noreferrer">perguntas frequentes</a> sobre visualização do contrato. Se informação relevante divergir do combinado, peça esclarecimento ao empregador; não altere registro por conta própria.</p>
@@ -2095,7 +2145,17 @@ const overrides: Record<string, EditorialContentOverride> = {
 <p>A primeira semana não define toda a carreira. Ela serve para construir um mapa seguro do trabalho: quem orienta, como executar, onde conferir e quando pedir ajuda.</p>
 <p>Quando pedirem dados bancários ou documentos admissionais, confirme o canal e a pessoa responsável. Não envie por número pessoal desconhecido apenas porque alguém conhece o seu nome. Guarde protocolo ou confirmação, mas não mantenha cópias desnecessárias em aparelho compartilhado. Dúvida sobre documento deve ser resolvida com RH ou responsável identificado.</p>
 <p>Reserve ainda alguns minutos para conferir o trajeto de volta, especialmente em treinamento que termina fora do horário habitual. Informe alguém de confiança quando a rota mudar. Segurança no deslocamento faz parte da adaptação e deve ser considerada antes de aceitar troca de turno.</p>
-    `.trim()
+    
+<h2>Use as primeiras 72 horas para mapear riscos</h2>
+<p>No primeiro dia, confirme emergência, ponto, responsável e limites da função. No segundo, repita tarefas com supervisão e anote divergências de orientação. No terceiro, revise o mapa com quem treina você. Não use esse prazo como meta de produtividade universal; funções e treinamentos têm ritmos diferentes.</p>
+<h2>Classifique tarefas por autonomia</h2>
+<p>Marque cada atividade como “observar”, “executar acompanhado”, “executar e conferir” ou “executar sozinho”. Equipamento, direção, movimentação de carga, atendimento sensível e operação financeira não devem avançar apenas porque você viu outra pessoa fazendo. Pergunte qual autorização ou treinamento libera cada etapa.</p>
+<h2>Registre erro e incidente sem esconder</h2>
+<p>Ao perceber erro, interrompa a propagação, preserve o registro e avise o responsável. Informe o que aconteceu, quais itens podem ter sido afetados e o que já foi feito; não altere sistema para apagar rastros. Se houver risco à saúde ou segurança, siga o procedimento de emergência antes de discutir culpa.</p>
+<h2>Feche a semana com cinco confirmações</h2>
+<ul><li>jornada e ponto correspondem ao combinado;</li><li>tarefas e responsáveis estão claros;</li><li>acessos são individuais e funcionam;</li><li>treinamentos pendentes têm responsável;</li><li>dúvidas possuem canal e prazo de resposta.</li></ul>
+<p>Envie resumo curto ao responsável e corrija sua anotação com a resposta. Não peça acesso a documento de colega para comparar. Se a Carteira de Trabalho Digital ainda não exibe informação esperada, registre a dúvida com RH e consulte o canal oficial, sem concluir irregularidade apenas por atraso de visualização.</p>
+`.trim()
   },
 
   "plano-90-dias-emprego-sao-luis": {
@@ -2249,9 +2309,9 @@ const overrides: Record<string, EditorialContentOverride> = {
   },
 
   "empatia-atendimento-cliente-entrevista": {
-    reviewedAt: "2026-10-13",
+    reviewedAt: "2026-10-15",
     contentHtml: `
-<p><strong>Revisão editorial: 13 de outubro de 2026.</strong> Em entrevista para atendimento, “ter empatia” não significa concordar com tudo nem prometer solução fora da regra. Significa compreender a demanda, mostrar que ouviu, separar fato de emoção e encaminhar o que está dentro da sua responsabilidade.</p>
+<p><strong>Revisão editorial: 15 de outubro de 2026.</strong> Em entrevista para atendimento, “ter empatia” não significa concordar com tudo nem prometer solução fora da regra. Significa compreender a demanda, mostrar que ouviu, separar fato de emoção e encaminhar o que está dentro da sua responsabilidade.</p>
 <h2>Responda com uma situação verificável</h2>
 <p>Escolha um episódio real e organize em quatro partes: demanda recebida, informação que você confirmou, ação dentro do procedimento e resultado observável. Se nunca trabalhou com clientes, use atividade escolar, voluntária ou familiar, identificando o contexto corretamente.</p>
 <p>A <a href="https://repositorio.enap.gov.br/items/391a0d4d-f3ca-4667-b63e-8e1b401748c1" target="_blank" rel="noopener noreferrer">Enap</a> disponibiliza material sobre atendimento ao cidadão que diferencia tratamento e qualidade do serviço e trabalha comunicação, cortesia e responsabilidade. O conteúdo é voltado ao serviço público, mas ajuda a compreender que falar com educação não substitui resolver ou encaminhar a demanda.</p>
@@ -2269,7 +2329,16 @@ const overrides: Record<string, EditorialContentOverride> = {
 <p>Prepare um caso com pessoa confusa, outro com erro operacional e um terceiro em que você precisou dizer “não” com respeito. Em cada um, identifique qual informação confirmou e quem tinha autoridade para decidir. Isso ajuda a responder perguntas diferentes sem repetir uma história genérica.</p>
 <p>Se o entrevistador perguntar por um erro seu, não transfira culpa ao cliente. Explique o que fez, como corrigiu e qual barreira adicionou. Exemplo: registrou o número errado, avisou a supervisão, corrigiu no sistema autorizado e passou a repetir o dado antes de concluir. Só use se for verdadeiro e sem revelar a identidade de quem foi atendido.</p>
 <p>Na entrevista, combine empatia com procedimento. Para outras respostas baseadas em fatos, veja <a href="/blog/entrevista-comportamental-exemplos">entrevista comportamental</a>. Uma boa resposta não é “eu trato todo mundo bem”; é uma sequência concreta que respeita pessoa, dado, limite e solução possível.</p>
-    `.trim()
+    
+<h2>Use apenas o dado necessário para resolver</h2>
+<p>Antes de pedir informação, pergunte qual decisão depende dela. Nome e número do pedido podem bastar; documento completo, endereço ou dados bancários não devem ser coletados por rotina sem finalidade e autorização. A ANPD explica no conteúdo para <a href="https://www.gov.br/anpd/pt-br/assuntos/titular-de-dados" target="_blank" rel="noopener noreferrer">titulares de dados</a> o que é dado pessoal e recomenda limitar o fornecimento aos casos necessários.</p>
+<h2>Demonstre empatia sem criar prazo falso</h2>
+<p>Troque “vou resolver agora” por uma sequência verificável: o que foi conferido, qual área decide, qual protocolo foi gerado e quando haverá atualização confirmada. Se não há prazo, diga isso e informe o canal de acompanhamento. Reconhecer frustração não autoriza assumir culpa, indenização ou decisão que pertence a outro setor.</p>
+<h2>Prepare uma resposta para dizer não</h2>
+<p>Escolha um caso real em que a solicitação contrariava regra ou estava fora de sua autonomia. Explique como confirmou a regra, apresentou alternativa permitida, acionou supervisão quando necessário e registrou o contato. Uma boa resposta preserva dignidade sem ceder informação, desconto ou acesso indevido.</p>
+<h2>Avalie seu exemplo antes da entrevista</h2>
+<p>Verifique se a história identifica demanda, confirmação, ação, limite e resultado. Remova nome de cliente, número de pedido e detalhes que permitam reconhecer a pessoa. Se o resultado dependeu da equipe, diga “encaminhamos” ou descreva sua parte; não transforme solução coletiva em desempenho individual.</p>
+`.trim()
   },
 
   "emprego-apos-40-anos-curriculo": {
