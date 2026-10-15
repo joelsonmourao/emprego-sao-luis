@@ -311,9 +311,9 @@ const overrides: Record<string, EditorialContentOverride> = {
 <p>Senha, código de autenticação e recuperação de conta são pessoais. Um recrutador legítimo não precisa entrar na sua conta para “validar” candidatura. Se receber link por WhatsApp ou e-mail, não use a mensagem como atalho: feche-a e abra diretamente o portal ou aplicativo oficial. Este site não consulta CTPS, não recebe senhas e não corrige registros.</p>`.trim()
   },
   "fgts-consultar-trabalhador-clt": {
-    reviewedAt: "2026-10-14",
+    reviewedAt: "2026-10-15",
     contentHtml: `
-<p><strong>Atualizado em 14/10/2026.</strong> O extrato do FGTS permite acompanhar saldo, depósitos e movimentações das contas vinculadas. Consultá-lo ajuda a organizar dúvidas, mas não autoriza saque e não revela sozinho por que um lançamento esperado não aparece. O Empregos São Luís não acessa contas, não promete liberação e não recebe documentos financeiros.</p>
+<p><strong>Atualizado em 15/10/2026.</strong> O extrato do FGTS permite acompanhar saldo, depósitos e movimentações das contas vinculadas. Consultá-lo ajuda a organizar dúvidas, mas não autoriza saque e não revela sozinho por que um lançamento esperado não aparece. O Empregos São Luís não acessa contas, não promete liberação e não recebe documentos financeiros.</p>
 <h2>Entre pelo endereço oficial, sem atalho de mensagem</h2>
 <p>A página do <a href="https://www.fgts.gov.br/Paginas/trabalhador/app-fgts.aspx" target="_blank" rel="noopener noreferrer">Aplicativo FGTS</a> informa que o app é gratuito e permite acompanhar depósitos e saldo. A página de <a href="https://www.fgts.gov.br/Paginas/subpaginas/outros-servicos-sub-extrato.aspx" target="_blank" rel="noopener noreferrer">consulta de extrato do FGTS</a> explica que o documento reúne entradas e movimentações. Use os links das lojas indicados pelo próprio Fundo e não instale arquivo enviado por número desconhecido.</p>
 <p>Antes de abrir a consulta, separe uma lista simples: nome de cada empregador, período aproximado em que trabalhou e os documentos que já possui. Isso evita comparar uma conta com o vínculo errado. Não envie essa lista a perfis que oferecem “consulta completa” mediante pagamento.</p>
@@ -327,7 +327,17 @@ const overrides: Record<string, EditorialContentOverride> = {
 <p>Se a divergência permanecer, procure os canais oficiais indicados pelo FGTS. A página do extrato orienta que, quando houver dificuldade de acesso, o trabalhador pode buscar atendimento da Caixa com documentos pessoais. Leve apenas o necessário e confirme o endereço da unidade em canal oficial antes do deslocamento.</p>
 <h2>O que não fazer em uma candidatura</h2>
 <ul><li>Não entregue senha do app FGTS para recrutador, consultor ou perfil de vagas.</li><li>Não pague para comprovar que possui conta ou saldo.</li><li>Não envie extrato completo quando a etapa não exige informação financeira.</li><li>Não confunda a obrigação do empregador com uma cobrança ao candidato.</li><li>Não publique captura de tela com CPF, saldo, telefone ou dados bancários.</li></ul>
-<p>O extrato é um documento de conferência pessoal. Se a questão envolver interpretação jurídica ou cobrança em um caso específico, busque o órgão competente ou orientação profissional. Este guia explica como organizar a verificação; não calcula depósitos nem conclui direito a saque.</p>`.trim()
+<p>O extrato é um documento de conferência pessoal. Se a questão envolver interpretação jurídica ou cobrança em um caso específico, busque o órgão competente ou orientação profissional. Este guia explica como organizar a verificação; não calcula depósitos nem conclui direito a saque.</p>
+<h2>Faça uma conciliação por competência</h2>
+<p>Crie uma tabela privada com empregador exibido, competência, vínculo correspondente, valor mostrado no extrato, documento usado na comparação e situação: “localizado”, “valor diferente”, “não localizado” ou “aguardando confirmação”. Não use saldo total para concluir que todos os meses foram depositados. Também não some contas de empregadores diferentes como se fossem um único vínculo.</p>
+<p>O contracheque e a Carteira de Trabalho Digital ajudam a organizar período e remuneração informada, mas não substituem o extrato da conta vinculada. Preserve cada arquivo com data de obtenção e nome neutro. Não altere PDF, não recorte a identificação do vínculo na cópia de trabalho e mantenha os documentos fora de computador compartilhado.</p>
+<h2>Diferencie ausência, atraso de processamento e leitura incompleta</h2>
+<p>Se um lançamento não aparece, confira primeiro conta, competência, atualização da tela e intervalo consultado. Depois obtenha novo extrato pelo canal oficial e registre a data da verificação. Sem esses passos, não afirme que houve ausência de depósito nem aceite explicação informal como conclusão. O <a href="https://www.fgts.gov.br/Pages/trabalhador/canais-de-atendimento.aspx" target="_blank" rel="noopener noreferrer">FGTS reúne seus canais de atendimento oficiais</a>; use-os para confirmar como apresentar uma dúvida.</p>
+<h2>Prepare um pedido que possa ser conferido</h2>
+<p>Informe ao empregador ou canal oficial qual vínculo, competência e diferença você encontrou, anexando somente o documento necessário pelo meio confirmado. Peça protocolo e prazo de retorno. Se houver várias competências, envie uma tabela ordenada em vez de mensagens separadas. Para orientação trabalhista ou medida formal, procure o canal público ou profissional habilitado com o conjunto original de documentos; esta página não calcula débito nem prescreve ação.</p>
+<h2>Proteja conta e extrato</h2>
+<p>Senha gov.br, código de verificação e acesso ao aplicativo são pessoais. Nenhum recrutador precisa entrar em sua conta para conferir experiência. Desconfie de promessa de “regularização imediata”, saque garantido ou cobrança antecipada. Ao compartilhar um extrato com atendimento legítimo, confira destinatário, finalidade e campos estritamente necessários.</p>
+`.trim()
   },
   "ler-contrato-trabalho-clt": {
     reviewedAt: "2026-10-14",
@@ -768,9 +778,9 @@ const overrides: Record<string, EditorialContentOverride> = {
 `.trim()
   },
   "ponto-eletronico-atraso-trabalho": {
-    reviewedAt: "2026-10-14",
+    reviewedAt: "2026-10-15",
     contentHtml: `
-<p><strong>Revisão editorial: 14 de outubro de 2026.</strong> Registro de ponto deve refletir a jornada realmente cumprida. Atraso, falha de equipamento e ajuste manual são situações diferentes. Pedir que um colega registre por você ou alterar horário para “fechar a folha” transforma uma dúvida simples em problema de confiabilidade.</p>
+<p><strong>Revisão editorial: 15 de outubro de 2026.</strong> Registro de ponto deve refletir a jornada realmente cumprida. Atraso, falha de equipamento e ajuste manual são situações diferentes. Pedir que um colega registre por você ou alterar horário para “fechar a folha” transforma uma dúvida simples em problema de confiabilidade.</p>
 <h2>O que a CLT diz sobre pequenas variações</h2>
 <p>O artigo 58, §1º, da <a href="https://www.planalto.gov.br/ccivil_03/decreto-lei/del5452.htm" target="_blank" rel="noopener noreferrer">CLT</a> estabelece que variações de até cinco minutos em cada marcação, observado o máximo de dez minutos diários, não são descontadas nem computadas como jornada extraordinária. Isso não é autorização para atrasar todos os dias: trata-se do tratamento da marcação para cálculo da jornada, enquanto assiduidade e disciplina seguem regras próprias e proporcionais.</p>
 <p>O artigo 74 determina registro de entrada e saída para estabelecimentos com mais de vinte trabalhadores. A marcação por exceção depende de acordo individual escrito, convenção ou acordo coletivo. O empregado deve saber qual sistema se aplica, sem assumir que toda empresa usa relógio eletrônico.</p>
@@ -786,6 +796,16 @@ const overrides: Record<string, EditorialContentOverride> = {
 <p>Revise o espelho antes do fechamento, não apenas quando o holerite chegar. Se o aplicativo permitir exportação, preserve o arquivo original com competência e data. Em relógio físico, guarde comprovantes sem fotografar marcações de colegas. Correção autorizada deve manter uma trilha identificável; não aceite orientação para registrar horário diferente do efetivamente trabalhado.</p>
 <ul><li>Não assine espelho que não conferiu.</li><li>Não compartilhe senha ou biometria.</li><li>Não registre jornada de outra pessoa.</li><li>Não apague comprovantes após a correção.</li><li>Não publique tela com nomes e matrículas de colegas.</li></ul>
 <p>Se ajustes são recorrentes, negados sem explicação ou não correspondem à jornada, reúna espelhos, escalas e holerites e procure RH, sindicato, inspeção do trabalho ou orientação jurídica. O guia de <a href="/blog/hora-extra-holerite-como-conferir">horas extras no holerite</a> ajuda a comparar documentos do mesmo período.</p>
+
+<h2>Identifique o sistema e preserve o comprovante</h2>
+<p>Antes de discutir cálculo, descubra se a empresa usa registro manual, mecânico ou eletrônico e qual procedimento formal existe para correção. Nos sistemas abrangidos pela Portaria MTP nº 671/2021, peça acesso ao comprovante ou espelho disponibilizado ao trabalhador e guarde a versão recebida. Captura isolada de tela não substitui o registro oficial, mas ajuda a documentar quando e como a dúvida surgiu.</p>
+<h2>Separe marcação, intervalo e justificativa</h2>
+<p>Entrada, saída e intervalos descrevem momentos diferentes. Atestado, autorização de gestor ou falha do relógio pode explicar uma ocorrência, mas não deve apagar horário efetivamente trabalhado. Anote data, marcação exibida, horário que você entende correto, motivo e documento relacionado. Não preencha horário “padrão” se ele não corresponde ao ocorrido.</p>
+<h2>Peça correção com uma linha do tempo objetiva</h2>
+<ol><li>registre a divergência assim que perceber;</li><li>use o canal definido pela empresa e guarde protocolo;</li><li>informe marcação, data e correção solicitada;</li><li>confira a resposta no espelho seguinte;</li><li>se o problema repetir, reúna os episódios sem alterar arquivos originais.</li></ol>
+<p>Exemplo: “No dia 14, o sistema exibiu entrada às 8h32. Meu comprovante mostra 8h02. Solicito conferência e orientação sobre o ajuste.” Evite acusação que não consegue provar e não entregue senha ou cartão a colega.</p>
+<h2>Consulte também a regra coletiva aplicável</h2>
+<p>Jornada, banco de horas e marcação por exceção podem envolver acordo individual escrito, acordo coletivo ou convenção, conforme o tema. Confirme sindicato, categoria e vigência do instrumento antes de citar uma cláusula. Se desconto, repetição de erro ou recusa de acesso ao registro persistir, procure orientação qualificada com documentos organizados; o guia não determina sozinho a solução jurídica.</p>
 `.trim()
   },
   "trabalhador-terceirizado-direitos": {
@@ -1255,9 +1275,9 @@ const overrides: Record<string, EditorialContentOverride> = {
   },
 
   "vagas-estoque-logistica-sao-luis": {
-    reviewedAt: "2026-10-12",
+    reviewedAt: "2026-10-15",
     contentHtml: `
-<p><strong>Revisão editorial: 12 de outubro de 2026.</strong> Este conteúdo ensina a avaliar processos para estoque e logística em São Luís. Não lista vagas abertas e não presume salário, turno ou atividade. “Estoque” pode envolver recebimento, conferência, separação, armazenagem, inventário, expedição ou apoio de loja; o anúncio precisa dizer qual combinação pertence ao posto.</p>
+<p><strong>Revisão editorial: 15 de outubro de 2026.</strong> Este conteúdo ensina a avaliar processos para estoque e logística em São Luís. Não lista vagas abertas e não presume salário, turno ou atividade. “Estoque” pode envolver recebimento, conferência, separação, armazenagem, inventário, expedição ou apoio de loja; o anúncio precisa dizer qual combinação pertence ao posto.</p>
 <h2>Traduza o cargo em etapas verificáveis</h2><p>Desenhe o caminho de uma mercadoria: chega com documento, é conferida, identificada, armazenada, separada e entregue ao destino. Marque as etapas em que você já trabalhou. No currículo, escreva verbos e objetos reais, como “conferia quantidade com pedido” ou “registrava entrada no sistema”. Evite declarar redução de perdas ou domínio de equipamento sem evidência.</p>
 <p>Se sua experiência foi informal, indique o contexto. Organizar materiais de uma associação pode demonstrar contagem, identificação e registro, mas não autoriza afirmar operação de empilhadeira, inventário contábil ou responsabilidade por depósito. Em entrevista, explique como percebeu uma divergência, quem confirmou e qual registro foi corrigido.</p>
 <h2>Segurança deve aparecer antes do primeiro turno</h2><p>A <a href="https://www.gov.br/trabalho-e-emprego/pt-br/acesso-a-informacao/participacao-social/conselhos-e-orgaos-colegiados/comissao-tripartite-partitaria-permanente/arquivos/normas-regulamentadoras/nr-11-atualizada-2022.pdf" target="_blank" rel="noopener noreferrer">NR 11 do Ministério do Trabalho e Emprego</a> trata de transporte, movimentação, armazenagem e manuseio de materiais. A norma possui requisitos específicos para equipamentos e operações. Não use este guia como autorização para operar máquina: pergunte que treinamento, habilitação interna, supervisão e equipamento de proteção o posto exige.</p>
@@ -1268,13 +1288,23 @@ const overrides: Record<string, EditorialContentOverride> = {
 <p>Em São Luís, confira o endereço do depósito, não apenas o bairro da empresa. Simule ida e volta no horário informado e registre seus próprios valores na <a href="/ferramentas/custo-deslocamento">calculadora de deslocamento</a>. Não presuma vale-transporte, adicional ou refeição sem confirmação no anúncio ou contrato. Guarde uma lista das respostas para comparar propostas sem depender da memória.</p>
 <h2>Envio seguro e limite do currículo</h2><p>Adapte o currículo para a etapa dominante do posto e inclua ferramentas apenas quando verdadeiras: leitor, planilha, sistema, carrinho ou equipamento específico. Certificado deve corresponder a curso concluído e verificável. Não envie documentos completos antes de confirmar empresa, vaga e canal.</p>
 <p>Taxa para uniforme, curso ou liberação de crachá é sinal de risco. Guarde a URL, confira o responsável e consulte a página de <a href="/seguranca-candidatos">segurança do candidato</a>. Este guia não substitui treinamento de segurança, procedimento da empresa ou avaliação profissional das condições do posto.</p>
-    `.trim()
+    
+<h2>Compare o processo antes de comparar o nome do cargo</h2>
+<p>“Auxiliar de estoque” em loja, centro de distribuição, hospital ou oficina pode lidar com unidades, riscos, documentos e ritmos diferentes. Monte uma tabela por anúncio com recebimento, endereço de armazenagem, tipo de item, separação, expedição, sistema, equipamento, peso informado e treinamento exigido. Campo ausente fica “a confirmar”; não transforme silêncio em requisito atendido.</p>
+<h2>Descreva uma divergência do início ao fim</h2>
+<p>Prepare um caso verdadeiro no formato: o que deveria chegar, o que foi observado, qual registro foi consultado, quem foi avisado e qual correção foi autorizada. Se nunca teve autonomia para alterar o sistema, diga isso. Uma resposta segura pode ser: “isolei o item, preservei a identificação e levei a diferença ao responsável”. Não declare descarte, ajuste contábil ou liberação de carga fora de sua função.</p>
+<h2>Avalie turno e deslocamento em São Luís</h2>
+<p>Anote bairro ou ponto de referência confirmado, início e fim do turno, escala declarada, transporte oferecido e canal de entrada fora do horário comercial. Teste o trajeto nos horários reais e tenha alternativa para retorno; duração estimada por aplicativo não é garantia. Para anúncio com base em outro município, não rotule como São Luís apenas porque o recrutamento ocorreu na capital.</p>
+<h2>Leve perguntas objetivas para a entrevista</h2>
+<ul><li>qual etapa ocupa a maior parte do turno;</li><li>quais equipamentos exigem autorização ou treinamento;</li><li>como divergências e avarias são registradas;</li><li>quem confere a correção no sistema;</li><li>qual é o local efetivo de trabalho e a escala.</li></ul>
+<p>Se houver movimentação manual, compare a atividade descrita com as orientações de ergonomia da <a href="https://www.gov.br/trabalho-e-emprego/pt-br/acesso-a-informacao/participacao-social/conselhos-e-orgaos-colegiados/comissao-tripartite-partitaria-permanente/arquivos/normas-regulamentadoras/nr-17-atualizada-2022.pdf" target="_blank" rel="noopener noreferrer">NR 17</a> e peça informação sobre procedimento e treinamento.</p>
+`.trim()
   },
 
   "vagas-motorista-entregador-sao-luis": {
-    reviewedAt: "2026-10-12",
+    reviewedAt: "2026-10-15",
     contentHtml: `
-<p><strong>Revisão editorial: 12 de outubro de 2026.</strong> Este guia é para analisar processos de motorista e entregador em São Luís; não anuncia vaga nem estima ganho. Antes de candidatar-se, identifique se haverá vínculo de emprego, trabalho por plataforma, prestação autônoma ou outra relação. Veículo, custos, riscos e forma de pagamento mudam completamente a comparação.</p>
+<p><strong>Revisão editorial: 15 de outubro de 2026.</strong> Este guia é para analisar processos de motorista e entregador em São Luís; não anuncia vaga nem estima ganho. Antes de candidatar-se, identifique se haverá vínculo de emprego, trabalho por plataforma, prestação autônoma ou outra relação. Veículo, custos, riscos e forma de pagamento mudam completamente a comparação.</p>
 <h2>Separe requisito legal de promessa comercial</h2><p>Leia no anúncio a categoria de habilitação exigida e compare com o documento que você possui. O serviço oficial <a href="https://www.gov.br/pt-br/servicos/consultar-online-os-dados-de-sua-habilitacao-de-transito" target="_blank" rel="noopener noreferrer">Consultar on-line os dados da habilitação</a> permite ao próprio condutor verificar informações da CNH pelo canal governamental. Use somente o aplicativo ou endereço oficial; não forneça senha gov.br ou código de autenticação ao recrutador.</p>
 <p>Não conclua que uma CNH válida basta para qualquer atividade. Tipo de veículo, carga, passageiros, atividade remunerada e exigências específicas precisam ser confirmados com o empregador e nos canais de trânsito competentes. Se o anúncio for vago, peça a descrição antes de enviar documento.</p>
 <h2>Descubra quem fornece e quem paga</h2><p>Faça uma tabela com veículo, combustível, manutenção, pneus, seguro, telefone, dados móveis, estacionamento, pedágio e equipamento de proteção. Para cada item, marque “empresa”, “trabalhador” ou “a confirmar”. Não aceite um valor bruto como renda líquida antes de registrar custos previsíveis e variações de rota.</p>
@@ -1285,7 +1315,16 @@ const overrides: Record<string, EditorialContentOverride> = {
 <p>Simule o trajeto no horário real, mas não prometa tempo impossível. Chuva, obras, fila e restrições do local alteram a rota. Registre no <a href="/ferramentas/controle-candidaturas">controle de candidaturas</a> a URL, a empresa, a data e as respostas recebidas; não armazene senha, documento completo ou dado de cliente.</p>
 <h2>Proteja documentos e dinheiro</h2><p>É legítimo que uma contratação confirmada solicite documentos necessários, mas isso deve ocorrer por canal identificável e na etapa adequada. O recrutador não precisa da sua senha gov.br, código de verificação ou acesso remoto ao telefone. Cobrança para liberar rota, aplicativo, uniforme ou cadastro é sinal para interromper e verificar.</p>
 <p>Confira a empresa e leia a página de <a href="/seguranca-candidatos">segurança do candidato</a>. Este conteúdo não substitui orientação de trânsito, contrato, sindicato ou assessoria jurídica. Ele oferece perguntas para que custos e responsabilidades não apareçam apenas depois do primeiro dia.</p>
-    `.trim()
+    
+<h2>Confirme qual regra se aplica à atividade descrita</h2>
+<p>O <a href="https://www.planalto.gov.br/ccivil_03/leis/l9503compilado.htm" target="_blank" rel="noopener noreferrer">Código de Trânsito Brasileiro compilado</a> reúne disposições sobre habilitação e atividade remunerada, além de regras específicas para determinadas operações. Motorista contratado por empresa, motociclista em motofrete, entregador por plataforma e prestador com veículo próprio não são a mesma situação. Leia veículo, carga, vínculo e serviço do anúncio e confirme exigências no órgão de trânsito competente; este guia não classifica juridicamente o caso.</p>
+<h2>Simule uma jornada completa, inclusive exceções</h2>
+<p>Desenhe retirada do veículo ou mercadoria, vistoria, sequência de paradas, confirmação de entrega, devolução e fechamento. Depois inclua endereço não localizado, avaria e pane. Para cada exceção, anote quem autoriza mudança de rota, onde registrar evidência e qual canal usar. Não fotografe documento ou residência de cliente além do procedimento formal e não publique imagem da entrega.</p>
+<h2>Calcule custo e risco sem chamar faturamento de renda</h2>
+<p>Em veículo próprio, registre por semana combustível, manutenção reservada, pneus, seguro, dados móveis, estacionamento e tempo sem entrega. Separe valor recebido de reembolso e de incentivo condicionado. Não projete mês usando o melhor dia. Em veículo da empresa, confirme responsabilidade por abastecimento, multas, avarias, pernoite e franquia, sempre no documento ou canal oficial.</p>
+<h2>Teste rota e turno em São Luís</h2>
+<p>Confirme o ponto real de saída, bairros atendidos, horário de retorno, procedimento em chuva forte e apoio quando o veículo não puder prosseguir. Compare o trajeto nos horários informados e mantenha contato de emergência da operação. Se a vaga exigir acesso a porto, área industrial, condomínio ou outro local controlado, peça a lista de credenciais antes de deslocar-se; não pague taxa a intermediário para “liberar cadastro”.</p>
+`.trim()
   },
 
   "vagas-restaurante-sao-luis-dicas": {
@@ -1728,9 +1767,9 @@ const overrides: Record<string, EditorialContentOverride> = {
   },
 
   "cursos-no-curriculo-sem-enchimento": {
-    reviewedAt: "2026-10-12",
+    reviewedAt: "2026-10-15",
     contentHtml: `
-<p><strong>Revisão editorial: 12 de outubro de 2026.</strong> A seção de cursos deve ajudar o recrutador a entender preparação para aquela função. Quantidade não compensa falta de relação, data ou aplicação. Faça uma seleção diferente para cada cargo-alvo, sem apagar o histórico do seu arquivo-base.</p>
+<p><strong>Revisão editorial: 15 de outubro de 2026.</strong> A seção de cursos deve ajudar o recrutador a entender preparação para aquela função. Quantidade não compensa falta de relação, data ou aplicação. Faça uma seleção diferente para cada cargo-alvo, sem apagar o histórico do seu arquivo-base.</p>
 <h2>Crie um inventário antes de cortar</h2>
 <p>Em uma folha separada, liste curso, instituição, situação, ano, carga horária, conteúdo principal e onde aplicou. Inclua somente dados que consegue confirmar. Depois marque A para diretamente relacionado à vaga, B para complementar e C para sem relação atual.</p>
 <p>Na versão enviada, comece pelos cursos A e use B apenas se acrescentarem informação. Os C podem permanecer no arquivo-base, mas não precisam ocupar o currículo de uma página. Curso abandonado não deve aparecer como concluído; registre “em andamento” apenas se houver atividade real.</p>
@@ -1747,13 +1786,21 @@ const overrides: Record<string, EditorialContentOverride> = {
 <p>Antes: “Informática, liderança, empreendedorismo, vendas, marketing, atendimento, inglês”. Depois: “Excel básico — instituição X, 20 h, 2026; prática com filtros e soma” e “Atendimento ao público — instituição Y, 12 h, 2025; registro e encaminhamento de solicitações”. O segundo formato permite perguntas e verificação.</p>
 <p>Guarde certificados em pasta organizada e envie somente quando solicitado. Não anexe vários documentos ao primeiro e-mail nem exponha CPF, assinatura ou código de validação em portfólio público. O objetivo da seção é facilitar a triagem, não decorar margem.</p>
 <p>Revise também o espaço consumido. Se seis cursos empurram a experiência relacionada para a segunda página, reduza a lista. O recrutador precisa localizar primeiro o que responde ao anúncio. Formação complementar pode ter três ou quatro itens fortes; o inventário completo fica guardado para outras vagas ou para comprovação quando houver pedido legítimo.</p>
-    `.trim()
+    
+<h2>Dê uma nota que possa ser explicada</h2>
+<p>Para cada curso, avalie quatro perguntas: aparece como requisito ou tarefa do anúncio? Você concluiu e consegue provar? O conteúdo ainda é aplicável à ferramenta citada? Consegue contar uma situação em que usou o aprendizado? Use 0 para “não”, 1 para “parcial” e 2 para “sim”. A soma não é ciência nem regra de recrutamento; é um filtro pessoal para comparar itens com o mesmo critério.</p>
+<p>Um curso curto pode ficar acima de outro mais longo quando responde diretamente à tarefa. Para atendimento, “registro de solicitações e resposta ao cliente” é mais informativo do que listar dez certificados genéricos. Para estoque, um curso de planilha ganha valor quando você explica que treinou cadastro, filtro e conferência com dados fictícios.</p>
+<h2>Trate pendência, validade e comprovação sem maquiar</h2>
+<p>Curso interrompido não deve ser marcado como concluído. Se você retomou uma formação, escreva “em andamento” e uma previsão apenas quando a instituição a fornece ou você mantém um plano real. Certificação vencida deve conservar a data; não use “válida” sem conferir a regra do emissor. Quando não há certificado, descreva o aprendizado como estudo ou prática, sem inventar instituição, carga horária ou credencial.</p>
+<h2>Teste a versão enviada</h2>
+<p>Abra o currículo no celular e no computador, confira se o link é legível e se não exige acesso à sua conta. O catálogo da <a href="https://www.escolavirtual.gov.br/catalogo" target="_blank" rel="noopener noreferrer">Escola Virtual.Gov</a> mostra instituição, conteúdo e carga horária dos cursos ofertados; use a página específica do curso como referência, não a página inicial como prova genérica. Antes do envio, peça a alguém para responder em 30 segundos: qual curso se relaciona à vaga e o que você sabe fazer por causa dele? Se a resposta não aparece, reescreva ou remova o item.</p>
+`.trim()
   },
 
   "excel-basico-vagas-emprego": {
-    reviewedAt: "2026-10-12",
+    reviewedAt: "2026-10-15",
     contentHtml: `
-<p><strong>Revisão editorial: 12 de outubro de 2026.</strong> “Excel básico” ou “intermediário” varia entre anúncios e empresas. Em vez de adivinhar o nível, leia as tarefas e treine operações que correspondem ao cargo. Este roteiro usa dados fictícios e não afirma o conteúdo de testes específicos.</p>
+<p><strong>Revisão editorial: 15 de outubro de 2026.</strong> “Excel básico” ou “intermediário” varia entre anúncios e empresas. Em vez de adivinhar o nível, leia as tarefas e treine operações que correspondem ao cargo. Este roteiro usa dados fictícios e não afirma o conteúdo de testes específicos.</p>
 <h2>Traduza o anúncio em tarefas de planilha</h2>
 <p>Se a vaga menciona estoque, pratique cadastro de item, quantidade, entrada, saída e alerta de reposição. Para administrativo, organize data, documento, responsável e status. Em atendimento, monte lista de solicitações sem dados pessoais reais. Cada cenário deve caber em uma tabela simples.</p>
 <p>Comece com digitação consistente: uma informação por coluna, datas como datas, valores como números e cabeçalhos claros. Uma planilha visualmente bonita, mas com texto e número misturados, dificulta filtro e cálculo.</p>
@@ -1772,7 +1819,15 @@ const overrides: Record<string, EditorialContentOverride> = {
 <ul><li>Confirme versão, duração, formato e regras informadas.</li><li>Teste teclado, mouse, navegador e conexão.</li><li>Leia a questão inteira antes de editar.</li><li>Salve quando o sistema permitir.</li><li>Se houver falha técnica, registre horário e mensagem sem fotografar conteúdo proibido.</li></ul>
 <p>Treinar o básico com conferência vale mais que decorar atalhos. A afirmação mais forte no currículo é aquela que você consegue repetir diante de uma planilha vazia.</p>
 <p>Faça o exercício novamente depois de dois dias, sem seguir passo a passo escrito. Compare o resultado com a primeira versão: fórmulas corretas, filtros removidos, datas consistentes e arquivo salvo no local certo. Se errar, documente o caminho da correção. Saber conferir e recuperar um erro também faz parte do uso cotidiano.</p>
-    `.trim()
+    
+<h2>Valide a planilha como se outra pessoa fosse recebê-la</h2>
+<p>Depois de terminar o exercício, faça uma cópia e siga uma rotina: remova filtros, confirme o intervalo das fórmulas, procure células vazias inesperadas, compare totais com uma contagem manual pequena e ordene novamente para verificar se linhas não se separaram. Erro escondido por formatação continua sendo erro. Registre em uma nota o que foi conferido, sem afirmar domínio além do que o arquivo demonstra.</p>
+<h2>Tenha cuidado ao importar CSV e trocar de versão</h2>
+<p>Arquivo CSV guarda valores separados por delimitador e pode interpretar datas, zeros à esquerda e acentos de modo diferente conforme idioma e configuração. A orientação oficial da Microsoft sobre <a href="https://support.microsoft.com/pt-br/office/importar-ou-exportar-arquivos-de-texto-txt-ou-csv-5250ac4c-663c-47ce-937b-339e391393ba" target="_blank" rel="noopener noreferrer">importar ou exportar texto e CSV</a> mostra caminhos de importação e opções de tratamento. Trabalhe sobre uma cópia, confira a prévia e compare quantidade de linhas antes e depois.</p>
+<p>Abra o exercício no ambiente que será usado na seleção, quando informado. Função disponível no aplicativo de computador pode ter nome, separador ou comportamento diferente no navegador. Se a empresa não disser a versão, peça confirmação em vez de instalar programa ou complemento enviado por link desconhecido.</p>
+<h2>Monte um exemplo pequeno, verificável e sem dados reais</h2>
+<p>Crie uma tabela fictícia com item, data, quantidade, responsável genérico e status. Produza uma visão filtrada, um total e uma coluna calculada simples. Inclua uma aba curta chamada “Leia-me” com objetivo, fonte sintética dos dados e operações praticadas. Esse arquivo não prova nível universal de Excel, mas permite explicar seu processo. Nunca use cadastro de cliente, funcionário ou empresa anterior como portfólio.</p>
+`.trim()
   },
 
   "gap-habilidades-candidatura-como-fechar": {
@@ -2268,9 +2323,9 @@ const overrides: Record<string, EditorialContentOverride> = {
   },
 
   "follow-up-apos-entrevista-mensagem": {
-    reviewedAt: "2026-10-13",
+    reviewedAt: "2026-10-15",
     contentHtml: `
-<p><strong>Revisão editorial: 13 de outubro de 2026.</strong> Follow-up é uma mensagem de acompanhamento depois da entrevista. Ele não acelera a decisão nem cria obrigação de resposta. A função é identificar o processo, respeitar o prazo informado e deixar claro que você continua disponível.</p>
+<p><strong>Revisão editorial: 15 de outubro de 2026.</strong> Follow-up é uma mensagem de acompanhamento depois da entrevista. Ele não acelera a decisão nem cria obrigação de resposta. A função é identificar o processo, respeitar o prazo informado e deixar claro que você continua disponível.</p>
 <h2>Antes de escrever, recupere o combinado</h2>
 <p>Consulte a anotação feita ao final da entrevista: cargo, data, canal, nome do contato e prazo de retorno. Se a empresa disse “até sexta”, aguarde o fim desse prazo. Se não houve data, não transforme silêncio de poucas horas em cobrança. Escolha um momento razoável e envie uma única mensagem objetiva pelo canal já usado pela seleção.</p>
 <p>O <a href="https://www.linkedin.com/help/linkedin/answer/a8684146" target="_blank" rel="noopener noreferrer">rastreador de oportunidades do LinkedIn</a> permite organizar vagas por etapa e incluir notas. Você pode obter o mesmo resultado em uma planilha própria: anúncio, candidatura, entrevista, prazo e próxima ação. Não guarde documento pessoal ou conversa confidencial nessa planilha.</p>
@@ -2287,7 +2342,15 @@ const overrides: Record<string, EditorialContentOverride> = {
 <h2>Proteja seus dados no acompanhamento</h2>
 <p>Não reenvie RG, CPF, dados bancários ou foto de documento “para agilizar” sem saber quem pediu, por que precisa e qual é o canal autorizado. O <a href="https://cartilha.cert.br/fasciculos/" target="_blank" rel="noopener noreferrer">CERT.br</a> reúne orientações sobre privacidade, perfis falsos e verificação em duas etapas. Desconfie de mudança repentina de número, domínio parecido ou link encurtado.</p>
 <p>Feche o ciclo na sua lista com data e resultado. Follow-up profissional é um registro curto, não uma tentativa de convencer depois da entrevista. Enquanto espera, mantenha outras candidaturas compatíveis ativas e não interprete silêncio como aprovação ou reprovação.</p>
-    `.trim()
+    
+<h2>Use uma linha do tempo, não a ansiedade, para decidir</h2>
+<p>Crie quatro campos: data da entrevista, prazo informado, primeiro dia útil depois do prazo e ação tomada. Se o recrutador alterou a previsão, registre a nova data e não some os dois prazos. Quando não houve previsão, prefira uma única consulta curta depois de um intervalo razoável, sempre pelo canal já usado. A linha do tempo serve para impedir mensagens sucessivas, não para calcular uma regra universal.</p>
+<h2>Adapte a mensagem ao resultado que você precisa</h2>
+<ul><li><strong>Prazo vencido:</strong> confirme cargo e entrevista, mencione a previsão e pergunte se há atualização.</li><li><strong>Pedido de documento:</strong> confirme exatamente o item solicitado e envie apenas pelo canal verificado; não junte documento que não foi pedido.</li><li><strong>Nova etapa:</strong> responda com disponibilidade objetiva e peça endereço ou link oficial quando necessário.</li><li><strong>Recusa recebida:</strong> agradeça e encerre; pedir retorno sobre pontos de melhoria é opcional e não cria dever de resposta.</li></ul>
+<p>Se a resposta for automática, não presuma que a pessoa leu a mensagem. Registre o envio e aguarde. Depois de um acompanhamento sem retorno, encerre a ação no rastreador e continue outras candidaturas, salvo se a empresa indicar outro prazo.</p>
+<h2>Guarde prova sem montar um arquivo de dados pessoais</h2>
+<p>Salve o texto enviado, data, canal e resultado em nota própria. Não copie CPF, endereço, documento de terceiros ou conversa confidencial para planilha de candidaturas. O <a href="https://cartilha.cert.br/fasciculos/" target="_blank" rel="noopener noreferrer">CERT.br</a> reúne orientações sobre autenticação, fraudes e privacidade que ajudam a reconhecer pedidos inadequados. Se a mensagem exigir senha, código de autenticação, pagamento ou instalação de aplicativo fora da loja oficial, pare e valide a identidade do contato por um canal independente.</p>
+`.trim()
   },
 
   "gestao-de-tempo-trabalho-dicas": {
@@ -2935,9 +2998,9 @@ const overrides: Record<string, EditorialContentOverride> = {
   },
 
   "mapa-setores-vagas-sao-luis": {
-    reviewedAt: "2026-10-14",
+    reviewedAt: "2026-10-15",
     contentHtml: `
-<p><strong>Revisão editorial: 14 de outubro de 2026.</strong> Não existe um mapa fixo de setores “com vagas” em São Luís. O mercado muda por período, fonte e recorte. Este guia mostra como montar um mapa pessoal com estatísticas oficiais, anúncios atuais e limites de deslocamento, sem anunciar oportunidade inexistente.</p>
+<p><strong>Revisão editorial: 15 de outubro de 2026.</strong> Não existe um mapa fixo de setores “com vagas” em São Luís. O mercado muda por período, fonte e recorte. Este guia mostra como montar um mapa pessoal com estatísticas oficiais, anúncios atuais e limites de deslocamento, sem anunciar oportunidade inexistente.</p>
 <h2>Defina setor, ocupação e vaga separadamente</h2>
 <p>Setor descreve atividade econômica; ocupação descreve o trabalho; vaga é uma oportunidade concreta. Um hospital pertence a determinado setor, mas pode contratar funções administrativas, técnicas, de limpeza ou atendimento. Não conclua que experiência em uma função se transfere automaticamente para todas as outras.</p>
 <p>Consulte a <a href="https://www.gov.br/trabalho-e-emprego/pt-br/assuntos/trabalhador/qualificacao-profissional/classificacao-brasileira-de-ocupacoes" target="_blank" rel="noopener noreferrer">Classificação Brasileira de Ocupações</a> para entender famílias e conteúdos ocupacionais. Use como referência de nomenclatura; a CBO não regulamenta profissão, não certifica competência e não comprova vaga aberta.</p>
@@ -2958,7 +3021,15 @@ const overrides: Record<string, EditorialContentOverride> = {
 <p>Registre empresa, cargo, URL, data, cidade e próxima ação no <a href="/ferramentas/controle-candidaturas">controle de candidaturas</a>. Não conte anúncio duplicado como nova oportunidade e não compartilhe documento com contato cuja identidade não foi confirmada.</p>
 <h2>O que o mapa pode responder</h2>
 <p>Ele pode mostrar onde sua experiência encontra anúncios verificáveis, quais requisitos se repetem e quais limites reduzem o campo. Ele não pode prever contratação, salário, abertura futura ou “melhor setor” para toda pessoa. Use estatística como contexto e cada vaga como decisão individual.</p>
-    `.trim()
+    
+<h2>Monte uma coleta de 14 dias que outra pessoa conseguiria repetir</h2>
+<p>Escolha antes da busca três famílias ocupacionais, quatro fontes e um período fechado. Em cada dia de coleta, registre URL, data de acesso, título, município informado, tipo de contrato declarado, turno, requisito e situação do anúncio. Se a fonte não mostra São Luís de forma inequívoca, marque “local a confirmar”; não complete o campo por inferência.</p>
+<p>Use uma linha por anúncio, não por captura de tela. Quando o mesmo texto aparecer em dois portais, compare empresa, cargo, local, jornada e canal de candidatura. Se esses elementos coincidirem, trate como possível duplicação e preserve a URL de cada origem em uma única linha. Essa limpeza evita chamar republicação de crescimento do mercado.</p>
+<h2>Separe fluxo de anúncios de estoque de empregos</h2>
+<p>RAIS e Novo Caged ajudam a observar vínculos formais e movimentações em períodos definidos; anúncios mostram apenas oportunidades que a fonte publicou e que você conseguiu localizar. São medidas diferentes. Um setor com muitos vínculos pode ter poucos anúncios na quinzena, e uma função muito anunciada pode repetir a mesma seleção. Anote essa diferença no cabeçalho do mapa para não transformar contexto estatístico em promessa de vaga.</p>
+<h2>Transforme a observação em decisão pessoal</h2>
+<p>Ao terminar a quinzena, conte requisitos repetidos somente depois de remover duplicidades. Compare cada requisito com três estados: “já demonstro”, “posso aprender” e “exige condição que não possuo”. Acrescente tempo e custo real de deslocamento para os turnos mencionados. O resultado útil não é um ranking universal de setores, mas uma lista curta de ocupações pesquisáveis, lacunas verificadas e anúncios compatíveis com seu limite de mobilidade.</p>
+`.trim()
   }
 };
 
