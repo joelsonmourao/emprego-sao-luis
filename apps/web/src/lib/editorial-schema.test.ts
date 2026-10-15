@@ -54,9 +54,17 @@ describe("editorial structured data", () => {
       <p><a href="https://empregossaoluis.com.br/contato">Interno</a></p>
       <p><a href="http://example.com/inseguro">HTTP</a></p>
       <p><a href="mailto:redacao@example.com">E-mail</a></p>
-    `, base.siteUrl);
+    `, base.siteUrl, [
+      "https://www.gov.br/trabalho#servico",
+      "https://www.gov.br/trabalho",
+      "http://example.com/inseguro",
+      "https://empregossaoluis.com.br/interno"
+    ]);
 
-    expect(citations).toEqual(["https://www.planalto.gov.br/lei?x=1&y=2"]);
+    expect(citations).toEqual([
+      "https://www.planalto.gov.br/lei?x=1&y=2",
+      "https://www.gov.br/trabalho"
+    ]);
     expect(buildEditorialSchema({ ...base, citations })).toHaveProperty("citation", citations);
   });
 

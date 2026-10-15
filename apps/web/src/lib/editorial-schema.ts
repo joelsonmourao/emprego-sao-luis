@@ -34,6 +34,11 @@ export function extractExternalEditorialCitations(\n  contentHtml: string,\n  si
     if (citation) citations.add(citation);
   }
 
+  for (const value of additionalCitations) {
+    const citation = normalizeExternalHttpsCitation(value, siteUrl);
+    if (citation) citations.add(citation);
+  }
+
   return [...citations];
 }
 
