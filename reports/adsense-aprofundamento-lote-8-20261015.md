@@ -44,3 +44,8 @@ As fontes citadas permanecem primárias ou de serviço: LinkedIn Help, gov.br/MT
 ## Publicação e limites
 
 Este relatório descreve alteração de código e sua revisão técnica. Nenhum deploy foi executado neste lote; portanto, as URLs públicas podem continuar exibindo a versão anterior até uma publicação autorizada. A existência de conteúdo revisado no código não equivale a aprovação do AdSense, que depende de avaliação do Google. Nenhuma solicitação de revisão foi enviada.
+
+## Imagens do lote
+
+Nenhum arquivo WebP foi alterado. A verificação pública amostral mostra capas ilustrativas com legenda e crédito nominal, mas o nome “Unsplash” e o nome do fotógrafo não comprovam, sozinhos, a licença do binário armazenado. Peso, dimensões e cadeia de licença dos oito arquivos continuam fora do escopo comprovado deste lote; por isso, o relatório não os marca como revisados nem usa a imagem para liberar indexação.
+
