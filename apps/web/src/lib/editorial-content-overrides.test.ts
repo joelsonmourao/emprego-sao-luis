@@ -79,7 +79,7 @@ describe("revisões editoriais substanciais para AdSense", () => {
       const override = getEditorialContentOverride(slug);
       const words = textOnly(override?.contentHtml ?? "").split(/\s+/).filter(Boolean);
       expect(override).not.toBeNull();
-      expect(override?.reviewedAt).toBe(slug === "mapa-setores-vagas-sao-luis" ? "2026-10-15" : "2026-10-14");
+      expect(override?.reviewedAt).toBe(["mapa-setores-vagas-sao-luis", "salario-custo-de-vida-sao-luis"].includes(slug) ? "2026-10-15" : "2026-10-14");
       expect(words.length).toBeGreaterThanOrEqual(500);
       expect(override?.contentHtml).toMatch(/<a href="https:\/\//);
       expect(override?.contentHtml).not.toMatch(/No tema em pauta|Leitura útil do cenário/i);
@@ -157,7 +157,7 @@ describe("revisões editoriais substanciais para AdSense", () => {
       const outbound = [...html.matchAll(/href="(https:\/\/[^"]+)"/g)].map((match) => match[1]);
 
       expect(override).not.toBeNull();
-      expect(override?.reviewedAt).toBe(["trabalhador-terceirizado-direitos", "ponto-eletronico-atraso-trabalho"].includes(slug) ? "2026-10-15" : "2026-10-14");
+      expect(override?.reviewedAt).toBe(["trabalhador-terceirizado-direitos", "ponto-eletronico-atraso-trabalho", "ferias-clt-periodo-aquisitivo"].includes(slug) ? "2026-10-15" : "2026-10-14");
       expect(words.length).toBeGreaterThanOrEqual(550);
       expect(new Set(outbound).size).toBeGreaterThanOrEqual(2);
       expect(outbound.every((url) => /https:\/\/(?:www\.)?(?:gov\.br|planalto\.gov\.br|mpt\.mp\.br|sistemas\.cfm\.org\.br|cnes\.trabalho\.gov\.br)\//.test(url))).toBe(true);
