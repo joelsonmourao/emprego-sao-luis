@@ -106,7 +106,7 @@ describe("editorial structured data", () => {
       expect(page).toContain('import { buildEditorialSchema, extractExternalEditorialCitations, isNewsroomAuthor } from "../../lib/editorial-schema"');
       expect(page).toContain("buildEditorialSchema({");
       expect(page).toContain("updatedAt: reviewedAt ?? article.updatedAt");
-      expect(page).toContain("extractExternalEditorialCitations(contentHtml, runtimeSite.toString())");
+      expect(page).toContain("!editorialOverride && article.sourceUrl ? [article.sourceUrl] : []");
       expect(page).toContain("...(citations.length ? { citations } : {})");
       expect(page).not.toContain('author: { "@type": "Person", name: authorName }');
       expect(page).toContain('href="/redacao"');

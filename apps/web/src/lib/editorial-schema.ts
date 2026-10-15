@@ -25,7 +25,7 @@ function normalizeExternalHttpsCitation(value: string, siteUrl: string): string 
   }
 }
 
-export function extractExternalEditorialCitations(contentHtml: string, siteUrl: string): string[] {
+export function extractExternalEditorialCitations(\n  contentHtml: string,\n  siteUrl: string,\n  additionalCitations: readonly string[] = []\n): string[] {
   const citations = new Set<string>();
   const linkPattern = /<a\b[^>]*\bhref\s*=\s*(["'])(https:\/\/[^"'<>]+)\1/gi;
 
