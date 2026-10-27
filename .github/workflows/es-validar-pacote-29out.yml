@@ -1,0 +1,58 @@
+name: Empregos Sao Luis - validar lote editorial outubro
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/es-validar-pacote-29out.yml
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: es-editorial-pipeline-main
+  cancel-in-progress: false
+jobs:
+  validar-e-preparar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: codex/admin-negocio-completo
+          fetch-depth: 0
+          persist-credentials: true
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+      - run: npm ci --legacy-peer-deps
+      - name: Exigir artigos originais para 29-10 e gerar apenas pacote validado
+        shell: bash
+        run: |
+          set -euo pipefail
+          node scripts/build-auto-editorial.mjs
+          node - <<'JS'
+          const fs = require("fs")
+          const plan = JSON.parse(fs.readFileSync("editorial/calendario-3-artigos-diarios-2026.json","utf8"))
+          const docs = JSON.parse(fs.readFileSync("apps/web/src/data/auto-editorial-manifest.json","utf8"))
+          const dia = plan.days.find(x=>x.date==="2026-10-29")
+          if(!dia || dia.posts.length!==3) throw Error("Calendario 29/10 inesperado")
+          const expected=new Set(dia.posts.map(x=>x.slug))
+          const validos=docs.filter(d=>expected.has(d.slug))
+          if(validos.length!==3 || validos.some(x=>x.editorialCheck!=="QA_AUTOMATIZADO_SEM_VERIFICACAO_HUMANA"))
+            throw Error("Pacote de 29/10 nao passou QA de tres artigos originais")
+          console.log("PACOTE_29_OUT_VALIDADO", validos.map(x=>x.slug).join(","))
+          JS
+      - run: npm run typecheck
+      - name: Publicar somente manifestos e capas de artigos aceitos no repositorio
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "es-editorial-bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add apps/web/src/data/auto-editorial-manifest.json apps/web/public/covers/auto-editorial/ editorial/automation-report.json
+          if git diff --cached --quiet; then
+            echo "PACOTE_SEM_ALTERACAO"
+          else
+            git commit -m "editorial(auto): aprovar pacote de 29 de outubro"
+            git push origin HEAD:codex/admin-negocio-completo
+          fi
