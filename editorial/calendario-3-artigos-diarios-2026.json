@@ -586,27 +586,33 @@
           "type": "GUIDE",
           "category": "carreira",
           "editorialTheme": "quem não possui referências profissionais recentes",
-          "workingTitle": "Como mapear experiências reais de quem não possui referências profissionais recentes sem inventar cargo",
-          "status": "PLANNED",
-          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+          "workingTitle": "Sem referências profissionais recentes? Como organizar experiências verificáveis",
+          "status": "DRAFT",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar.",
+          "slug": "referencias-profissionais-recentes-como-organizar",
+          "draftFile": "editorial/2026-10-30/09h-referencias-profissionais-recentes.md"
         },
         {
           "time": "13:00",
           "type": "GUIDE",
           "category": "setor_profissional",
           "editorialTheme": "apoio em hotelaria",
-          "workingTitle": "Como entender tarefas e responsabilidades em vagas de apoio em hotelaria",
-          "status": "PLANNED",
-          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+          "workingTitle": "Apoio em hotelaria: diferenças entre limpeza, recepção e organização de ambientes",
+          "status": "DRAFT",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar.",
+          "slug": "apoio-em-hotelaria-rotinas-e-entrevista",
+          "draftFile": "editorial/2026-10-30/13h-apoio-hotelaria-tarefas.md"
         },
         {
           "time": "17:00",
           "type": "GUIDE",
           "category": "seguranca_e_orientacao",
           "editorialTheme": "anúncio com salário variável pouco explicado",
-          "workingTitle": "Como verificar a origem de um anúncio com salário variável pouco explicado",
-          "status": "PLANNED",
-          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+          "workingTitle": "Salário variável no anúncio: perguntas essenciais antes de aceitar a entrevista",
+          "status": "DRAFT",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar.",
+          "slug": "salario-variavel-em-vaga-como-esclarecer",
+          "draftFile": "editorial/2026-10-30/17h-salario-variavel-anuncio.md"
         }
       ]
     },
@@ -618,27 +624,33 @@
           "type": "GUIDE",
           "category": "carreira",
           "editorialTheme": "quem precisa explicar um intervalo no currículo",
-          "workingTitle": "Como mapear experiências reais de quem precisa explicar um intervalo no currículo sem inventar cargo",
-          "status": "PLANNED",
-          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+          "workingTitle": "Intervalo no currículo: como explicar períodos sem emprego sem inventar cargo",
+          "status": "DRAFT",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar.",
+          "slug": "intervalo-no-curriculo-como-explicar-honestamente",
+          "draftFile": "editorial/2026-10-31/09h-intervalo-no-curriculo.md"
         },
         {
           "time": "13:00",
           "type": "GUIDE",
           "category": "setor_profissional",
           "editorialTheme": "assistente de faturamento",
-          "workingTitle": "Como entender tarefas e responsabilidades em vagas de assistente de faturamento",
-          "status": "PLANNED",
-          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+          "workingTitle": "Assistente de faturamento: conferência de documentos e cuidados na rotina",
+          "status": "DRAFT",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar.",
+          "slug": "assistente-faturamento-conferencia-documentos-rotina",
+          "draftFile": "editorial/2026-10-31/13h-assistente-faturamento-rotinas.md"
         },
         {
           "time": "17:00",
           "type": "GUIDE",
           "category": "seguranca_e_orientacao",
           "editorialTheme": "promessa de vaga remota com compra de equipamento",
-          "workingTitle": "Como verificar a origem de um promessa de vaga remota com compra de equipamento",
-          "status": "PLANNED",
-          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+          "workingTitle": "Vaga remota que exige comprar equipamento: como conferir antes de pagar",
+          "status": "DRAFT",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar.",
+          "slug": "vaga-remota-compra-de-equipamento-alertas",
+          "draftFile": "editorial/2026-10-31/17h-vaga-remota-compra-equipamento.md"
         }
       ]
     },
@@ -650,27 +662,33 @@
           "type": "GUIDE",
           "category": "carreira",
           "editorialTheme": "quem depende de transporte em horários limitados",
-          "workingTitle": "Como mapear experiências reais de quem depende de transporte em horários limitados sem inventar cargo",
-          "status": "PLANNED",
-          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+          "workingTitle": "Vaga com horário difícil para o transporte: como avaliar a rotina antes de aceitar",
+          "status": "DRAFT",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar.",
+          "slug": "vaga-emprego-horario-transporte-deslocamento",
+          "draftFile": "editorial/2026-11-01/09h-transporte-horarios-vaga.md"
         },
         {
           "time": "13:00",
           "type": "GUIDE",
           "category": "setor_profissional",
           "editorialTheme": "auxiliar de inventário",
-          "workingTitle": "Como entender tarefas e responsabilidades em vagas de auxiliar de inventário",
-          "status": "PLANNED",
-          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+          "workingTitle": "Auxiliar de inventário: contagem, divergências e como demonstrar atenção aos detalhes",
+          "status": "DRAFT",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar.",
+          "slug": "auxiliar-inventario-contagem-conferencia-experiencia",
+          "draftFile": "editorial/2026-11-01/13h-auxiliar-inventario-conferencia.md"
         },
         {
           "time": "17:00",
           "type": "GUIDE",
           "category": "seguranca_e_orientacao",
           "editorialTheme": "indicação de treinamento fora do canal oficial",
-          "workingTitle": "Como verificar a origem de um indicação de treinamento fora do canal oficial",
-          "status": "PLANNED",
-          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+          "workingTitle": "Treinamento fora do canal oficial: como confirmar se faz parte da seleção",
+          "status": "DRAFT",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar.",
+          "slug": "treinamento-recrutamento-fora-canal-oficial-verificar",
+          "draftFile": "editorial/2026-11-01/17h-treinamento-fora-canal-oficial.md"
         }
       ]
     },
