@@ -510,27 +510,33 @@
           "type": "GUIDE",
           "category": "carreira",
           "editorialTheme": "quem procura estágio na área administrativa",
-          "workingTitle": "Como mapear experiências reais de quem procura estágio na área administrativa sem inventar cargo",
-          "status": "PLANNED",
-          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+          "workingTitle": "Estágio administrativo: como apresentar competências sem inventar experiência",
+          "status": "DRAFT",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar.",
+          "slug": "estagio-administrativo-sem-experiencia-formal",
+          "draftFile": "editorial/2026-10-28/09h-estagio-administrativo-experiencia.md"
         },
         {
           "time": "13:00",
           "type": "GUIDE",
           "category": "setor_profissional",
           "editorialTheme": "auxiliar de cozinha",
-          "workingTitle": "Como entender tarefas e responsabilidades em vagas de auxiliar de cozinha",
-          "status": "PLANNED",
-          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+          "workingTitle": "Auxiliar de cozinha: tarefas, higiene e preparação para a entrevista",
+          "status": "DRAFT",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar.",
+          "slug": "auxiliar-de-cozinha-tarefas-boas-praticas",
+          "draftFile": "editorial/2026-10-28/13h-auxiliar-cozinha-boas-praticas.md"
         },
         {
           "time": "17:00",
           "type": "GUIDE",
           "category": "seguranca_e_orientacao",
           "editorialTheme": "convite de entrevista em endereço diferente do anúncio",
-          "workingTitle": "Como verificar a origem de um convite de entrevista em endereço diferente do anúncio",
-          "status": "PLANNED",
-          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+          "workingTitle": "Entrevista em endereço diferente do anúncio: como confirmar com segurança",
+          "status": "DRAFT",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar.",
+          "slug": "entrevista-endereco-diferente-do-anuncio-como-verificar",
+          "draftFile": "editorial/2026-10-28/17h-endereco-entrevista-divergente.md"
         }
       ]
     },
