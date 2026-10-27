@@ -3,6 +3,10 @@ on:
   schedule:
     - cron: "30 10,11,15,19 * * *"
   workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/es-editorial-agenda.yml
 permissions:
   contents: write
 concurrency:
