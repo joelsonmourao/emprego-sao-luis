@@ -3,20 +3,11 @@
     "start": "2026-10-13",
     "end": "2026-12-31"
   },
-  "validated": 9,
-  "blocked": 231,
+  "validated": 12,
+  "blocked": 228,
   "details": [
     {
       "reason": "ainda sem texto completo"
-    },
-    {
-      "reason": "slug inválido/repetido"
-    },
-    {
-      "reason": "slug inválido/repetido"
-    },
-    {
-      "reason": "slug inválido/repetido"
     },
     {
       "reason": "slug inválido/repetido"
