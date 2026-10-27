@@ -73,8 +73,17 @@ describe("Calendário editorial — três publicações pretendidas por dia", ()
     }
     for (const day of calendar.days.slice(1))
       for (const post of day.posts) {
-        expect(post.status).toBe("PLANNED");
-        expect(post.draftFile).toBeUndefined();
+        if (post.draftFile) {
+          expect(post.status).toBe("DRAFT");
+          expect(post.slug).toBeTruthy();
+          const draft = read(post.draftFile);
+          expect(draft).toContain(post.workingTitle);
+          expect(draft).toContain(`planned_date: "${day.date}"`);
+          expect(draft).toContain(`planned_time: "${post.time}"`);
+          expect(draft).toContain("https://");
+        } else {
+          expect(post.status).toBe("PLANNED");
+        }
       }
   });
 });
