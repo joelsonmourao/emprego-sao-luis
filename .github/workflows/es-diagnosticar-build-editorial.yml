@@ -1,0 +1,36 @@
+name: Empregos Sao Luis - verificar build dos 21 guias sem deploy
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/es-diagnosticar-build-editorial.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: codex/admin-negocio-completo
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - name: Verificar pacote real que o Coolify tentara construir
+        run: |
+          node - <<'JS'
+          const fs=require("fs")
+          const docs=JSON.parse(fs.readFileSync("apps/web/src/data/auto-editorial-manifest.json","utf8"))
+          console.log("MANIFESTO_TAMANHO",docs.length)
+          if(docs.length!==21)throw Error("Pacote do GitHub nao contem 21 guias")
+          JS
+      - name: Instalar dependencias (sem acesso a producao)
+        run: npm ci --legacy-peer-deps --no-audit --no-fund
+      - name: Construir o aplicativo Astro como no Dockerfile.web
+        run: npm run build --workspace=@es/web
+      - name: Relatorio
+        run: echo "BUILD_EDITORIAL_21_OK; Coolify nao foi chamado."
