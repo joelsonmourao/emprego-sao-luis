@@ -34,6 +34,24 @@ jobs:
             echo "Nenhuma alteracao desde o ultimo manifesto validado. Nao reinstalar npm."
             echo "## Editorial" >> "$GITHUB_STEP_SUMMARY"
             echo "Nenhum texto ou regra nova para validar; agendamento futuro permanece ativo no site." >> "$GITHUB_STEP_SUMMARY"
+            python3 - <<'PY'
+          import datetime, json, os
+          from pathlib import Path
+          timezone = datetime.timezone(datetime.timedelta(hours=-3))
+          day = datetime.datetime.now(timezone).date().isoformat()
+          path = Path("apps/web/src/data/auto-editorial-manifest.json")
+          calendar = Path("editorial/calendario-3-artigos-diarios-2026.json")
+          manifest = json.loads(path.read_text(encoding="utf-8")) if path.exists() else []
+          plan = json.loads(calendar.read_text(encoding="utf-8")) if calendar.exists() else {}
+          expected = next((len(x.get("posts", [])) for x in plan.get("days", []) if x.get("date") == day), 0)
+          prepared = sum(isinstance(x, dict) and str(x.get("publishedAt", ""))[:10] == day for x in manifest)
+          summary = f"Dia {day}: {prepared}/{expected} artigos no manifesto editorial."
+          print(summary)
+          with open(os.environ["GITHUB_STEP_SUMMARY"], "a", encoding="utf-8") as out:
+              out.write(summary + "\\n")
+          if prepared < expected:
+              print("::warning::Ha pautas sem artigo validado; cron nao cria textos ausentes.")
+          PY
           else
             echo "processar=sim" >> "$GITHUB_OUTPUT"
             echo "Alteracoes encontradas: manter validacao, build e commit completos."
