@@ -548,27 +548,33 @@
           "type": "GUIDE",
           "category": "carreira",
           "editorialTheme": "quem quer trocar de setor sem perder competências",
-          "workingTitle": "Como mapear experiências reais de quem quer trocar de setor sem perder competências sem inventar cargo",
-          "status": "PLANNED",
-          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+          "workingTitle": "Mudar de setor: como demonstrar competências transferíveis sem inventar experiência",
+          "status": "DRAFT",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar.",
+          "slug": "mudar-de-setor-competencias-transferiveis",
+          "draftFile": "editorial/2026-10-29/09h-trocar-setor-habilidades-transferiveis.md"
         },
         {
           "time": "13:00",
           "type": "GUIDE",
           "category": "setor_profissional",
           "editorialTheme": "operador de telefonia",
-          "workingTitle": "Como entender tarefas e responsabilidades em vagas de operador de telefonia",
-          "status": "PLANNED",
-          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+          "workingTitle": "Operador de telefonia: rotina, registros e preparação para a entrevista",
+          "status": "DRAFT",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar.",
+          "slug": "operador-telefonia-rotina-registros-entrevista",
+          "draftFile": "editorial/2026-10-29/13h-operador-telefonia-atendimento.md"
         },
         {
           "time": "17:00",
           "type": "GUIDE",
           "category": "seguranca_e_orientacao",
           "editorialTheme": "uso de e-mail pessoal se passando por empresa",
-          "workingTitle": "Como verificar a origem de um uso de e-mail pessoal se passando por empresa",
-          "status": "PLANNED",
-          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+          "workingTitle": "E-mail de recrutamento suspeito: como verificar remetente e links antes de responder",
+          "status": "DRAFT",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar.",
+          "slug": "email-recrutamento-suspeito-verificar-remetente",
+          "draftFile": "editorial/2026-10-29/17h-email-falso-recrutamento.md"
         }
       ]
     },
