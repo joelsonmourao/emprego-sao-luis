@@ -17,17 +17,42 @@ jobs:
         uses: actions/checkout@v4
         with:
           ref: codex/admin-negocio-completo
+          fetch-depth: 0
           persist-credentials: true
+      - name: Detectar alteracoes editoriais ainda nao processadas
+        id: gate
+        shell: bash
+        run: |
+          set -euo pipefail
+          # Evita instalar todo o monorepo para revalidar exatamente os
+          # mesmos arquivos quatro vezes ao dia. Qualquer alteracao dos
+          # textos, calendario ou validador libera o processamento normal.
+          source_commit="$(git log -1 --format=%H -- editorial scripts/build-auto-editorial.mjs apps/web/src/lib/auto-editorial.ts || true)"
+          manifest_commit="$(git log -1 --format=%H -- apps/web/src/data/auto-editorial-manifest.json || true)"
+          if [ -n "$source_commit" ] && [ -n "$manifest_commit" ] && git merge-base --is-ancestor "$source_commit" "$manifest_commit"; then
+            echo "processar=nao" >> "$GITHUB_OUTPUT"
+            echo "Nenhuma alteracao desde o ultimo manifesto validado. Nao reinstalar npm."
+            echo "## Editorial" >> "$GITHUB_STEP_SUMMARY"
+            echo "Nenhum texto ou regra nova para validar; agendamento futuro permanece ativo no site." >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "processar=sim" >> "$GITHUB_OUTPUT"
+            echo "Alteracoes encontradas: manter validacao, build e commit completos."
+          fi
       - uses: actions/setup-node@v4
+        if: steps.gate.outputs.processar == 'sim'
         with:
           node-version: "22"
           cache: npm
       - run: npm ci --legacy-peer-deps
+        if: steps.gate.outputs.processar == 'sim'
       - name: Validar textos existentes, bloquear duplicatas, gerar capas de autoresponsabilidade
+        if: steps.gate.outputs.processar == 'sim'
         run: node scripts/build-auto-editorial.mjs
       - name: Checar integridade do projeto antes da entrega
+        if: steps.gate.outputs.processar == 'sim'
         run: npm run typecheck
       - name: Atualizar apenas material aprovado na branch de producao
+        if: steps.gate.outputs.processar == 'sim'
         shell: bash
         run: |
           git config user.name "es-editorial-bot"
@@ -40,7 +65,7 @@ jobs:
             git push origin HEAD:codex/admin-negocio-completo
           fi
       - name: Guardar resultado de validacao e bloqueios
-        if: always()
+        if: steps.gate.outputs.processar == 'sim'
         uses: actions/upload-artifact@v4
         with:
           name: es-editorial-agenda
