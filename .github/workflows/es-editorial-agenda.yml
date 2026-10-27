@@ -59,6 +59,7 @@ jobs:
           else
             echo "processar=sim" >> "$GITHUB_OUTPUT"
             echo "Alteracoes encontradas: manter validacao, build e commit completos."
+            echo "Guias novos entram somente apos QA de texto, fontes e capas."
           fi
       - uses: actions/setup-node@v4
         if: steps.gate.outputs.processar == 'sim'
