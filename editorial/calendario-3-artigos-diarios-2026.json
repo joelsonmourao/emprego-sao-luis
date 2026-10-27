@@ -472,27 +472,33 @@
           "type": "GUIDE",
           "category": "carreira",
           "editorialTheme": "quem teve vários contratos de curta duração",
-          "workingTitle": "Como mapear experiências reais de quem teve vários contratos de curta duração sem inventar cargo",
-          "status": "PLANNED",
-          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+          "workingTitle": "Como apresentar contratos de curta duração no currículo sem inventar cargos",
+          "status": "DRAFT",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar.",
+          "slug": "contratos-curtos-curriculo-com-provas",
+          "draftFile": "editorial/2026-10-27/09h-contratos-curtos-curriculo-com-provas.md"
         },
         {
           "time": "13:00",
           "type": "GUIDE",
           "category": "setor_profissional",
           "editorialTheme": "assistente de arquivo",
-          "workingTitle": "Como entender tarefas e responsabilidades em vagas de assistente de arquivo",
-          "status": "PLANNED",
-          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+          "workingTitle": "Assistente de arquivo: tarefas, organização e perguntas para a entrevista",
+          "status": "DRAFT",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar.",
+          "slug": "assistente-de-arquivo-rotina-organizacao-documentos",
+          "draftFile": "editorial/2026-10-27/13h-rotina-assistente-arquivo.md"
         },
         {
           "time": "17:00",
           "type": "GUIDE",
           "category": "seguranca_e_orientacao",
           "editorialTheme": "ausência de identificação do empregador",
-          "workingTitle": "Como verificar a origem de um ausência de identificação do empregador",
-          "status": "PLANNED",
-          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+          "workingTitle": "Vaga sem nome da empresa: como verificar a origem antes de se candidatar",
+          "status": "DRAFT",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar.",
+          "slug": "vaga-sem-nome-empresa-como-verificar",
+          "draftFile": "editorial/2026-10-27/17h-vaga-sem-identificacao-empregador.md"
         }
       ]
     },
