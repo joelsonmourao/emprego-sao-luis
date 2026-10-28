@@ -701,8 +701,10 @@
           "category": "carreira",
           "editorialTheme": "quem busca primeiro emprego após o ensino médio",
           "workingTitle": "Evidências simples para entrevistas de quem busca primeiro emprego após o ensino médio: o que preparar",
-          "status": "PLANNED",
-          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+          "status": "DRAFT",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar.",
+          "slug": "primeiro-emprego-ensino-medio-evidencias-entrevista",
+          "draftFile": "editorial/2026-11-02/09h-primeiro-emprego-evidencias-ensino-medio.md"
         },
         {
           "time": "13:00",
@@ -710,8 +712,10 @@
           "category": "setor_profissional",
           "editorialTheme": "recepção de escola",
           "workingTitle": "Perguntas importantes antes de aceitar uma vaga de recepção de escola",
-          "status": "PLANNED",
-          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+          "status": "DRAFT",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar.",
+          "slug": "recepcao-escola-perguntas-rotina-entrevista",
+          "draftFile": "editorial/2026-11-02/13h-recepcao-escola-perguntas-antes-aceitar.md"
         },
         {
           "time": "17:00",
@@ -719,8 +723,10 @@
           "category": "seguranca_e_orientacao",
           "editorialTheme": "pedido de CPF antes de confirmação do processo",
           "workingTitle": "Quais provas guardar ao receber um pedido de CPF antes de confirmação do processo",
-          "status": "PLANNED",
-          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+          "status": "DRAFT",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar.",
+          "slug": "pedido-cpf-antes-confirmacao-selecao-como-verificar",
+          "draftFile": "editorial/2026-11-02/17h-cpf-antes-confirmacao-processo.md"
         }
       ]
     },
