@@ -738,27 +738,33 @@
           "type": "GUIDE",
           "category": "carreira",
           "editorialTheme": "quem trabalhou como autônomo e quer voltar à CLT",
-          "workingTitle": "Evidências simples para entrevistas de quem trabalhou como autônomo e quer voltar à CLT: o que preparar",
-          "status": "PLANNED",
-          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+          "workingTitle": "Trabalhou por conta própria? Como apresentar experiência verificável ao voltar à CLT",
+          "status": "DRAFT",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar.",
+          "slug": "autonomo-voltar-clt-experiencia-verificavel",
+          "draftFile": "editorial/2026-11-03/09h-autonomo-retorno-clt-evidencias.md"
         },
         {
           "time": "13:00",
           "type": "GUIDE",
           "category": "setor_profissional",
           "editorialTheme": "apoio de biblioteca",
-          "workingTitle": "Perguntas importantes antes de aceitar uma vaga de apoio de biblioteca",
-          "status": "PLANNED",
-          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+          "workingTitle": "Apoio em biblioteca: o que perguntar sobre acervo, atendimento e organização",
+          "status": "DRAFT",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar.",
+          "slug": "apoio-biblioteca-rotina-atendimento-entrevista",
+          "draftFile": "editorial/2026-11-03/13h-apoio-biblioteca-rotina-perguntas.md"
         },
         {
           "time": "17:00",
           "type": "GUIDE",
           "category": "seguranca_e_orientacao",
           "editorialTheme": "boleto para treinamento obrigatório antes da admissão",
-          "workingTitle": "Quais provas guardar ao receber um boleto para treinamento obrigatório antes da admissão",
-          "status": "PLANNED",
-          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+          "workingTitle": "Boleto de treinamento antes da admissão: como verificar a cobrança e guardar provas",
+          "status": "DRAFT",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar.",
+          "slug": "boleto-treinamento-obrigatorio-recrutamento-verificar",
+          "draftFile": "editorial/2026-11-03/17h-boleto-treinamento-antes-admissao.md"
         }
       ]
     },
