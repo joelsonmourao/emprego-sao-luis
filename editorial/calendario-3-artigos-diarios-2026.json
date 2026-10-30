@@ -777,8 +777,10 @@
           "category": "carreira",
           "editorialTheme": "quem retorna após pausa para cuidar da família",
           "workingTitle": "Evidências simples para entrevistas de quem retorna após pausa para cuidar da família: o que preparar",
-          "status": "PLANNED",
-          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+          "status": "DRAFT",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar.",
+          "slug": "retorno-ao-trabalho-pausa-cuidados-familia-evidencias",
+          "draftFile": "editorial/2026-11-04/09h-retorno-pausa-cuidados-familia.md"
         },
         {
           "time": "13:00",
@@ -786,8 +788,10 @@
           "category": "setor_profissional",
           "editorialTheme": "assistente de compras",
           "workingTitle": "Perguntas importantes antes de aceitar uma vaga de assistente de compras",
-          "status": "PLANNED",
-          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+          "status": "DRAFT",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar.",
+          "slug": "assistente-compras-perguntas-rotina-entrevista",
+          "draftFile": "editorial/2026-11-04/13h-assistente-compras-entrevista.md"
         },
         {
           "time": "17:00",
@@ -795,8 +799,10 @@
           "category": "seguranca_e_orientacao",
           "editorialTheme": "link encurtado enviado por recrutador desconhecido",
           "workingTitle": "Quais provas guardar ao receber um link encurtado enviado por recrutador desconhecido",
-          "status": "PLANNED",
-          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+          "status": "DRAFT",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar.",
+          "slug": "link-encurtado-recrutador-desconhecido-verificar-provas",
+          "draftFile": "editorial/2026-11-04/17h-link-encurtado-recrutador.md"
         }
       ]
     },
