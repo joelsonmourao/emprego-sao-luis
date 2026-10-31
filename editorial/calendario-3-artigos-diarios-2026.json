@@ -815,8 +815,10 @@
           "category": "carreira",
           "editorialTheme": "quem trabalha à noite e procura outra vaga",
           "workingTitle": "Evidências simples para entrevistas de quem trabalha à noite e procura outra vaga: o que preparar",
-          "status": "PLANNED",
-          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+          "status": "DRAFT",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar.",
+          "slug": "trabalho-noturno-procurar-outra-vaga-evidencias-entrevista",
+          "draftFile": "editorial/2026-11-05/09h-trabalho-noturno-busca-outra-vaga.md"
         },
         {
           "time": "13:00",
@@ -824,8 +826,10 @@
           "category": "setor_profissional",
           "editorialTheme": "reposição em loja",
           "workingTitle": "Perguntas importantes antes de aceitar uma vaga de reposição em loja",
-          "status": "PLANNED",
-          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+          "status": "DRAFT",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar.",
+          "slug": "reposicao-loja-perguntas-rotina-antes-aceitar",
+          "draftFile": "editorial/2026-11-05/13h-reposicao-loja-rotina-perguntas.md"
         },
         {
           "time": "17:00",
@@ -833,8 +837,10 @@
           "category": "seguranca_e_orientacao",
           "editorialTheme": "convite de entrevista sem identificação da empresa",
           "workingTitle": "Quais provas guardar ao receber um convite de entrevista sem identificação da empresa",
-          "status": "PLANNED",
-          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+          "status": "DRAFT",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar.",
+          "slug": "convite-entrevista-sem-empresa-provas-verificacao",
+          "draftFile": "editorial/2026-11-05/17h-convite-entrevista-sem-empresa.md"
         }
       ]
     },
