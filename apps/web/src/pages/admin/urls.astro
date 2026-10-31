@@ -1,0 +1,48 @@
+---
+import AdminLayout from "../../layouts/AdminLayout.astro";
+import { can } from "../../lib/auth";
+import { getAdsenseIndexInventory, type IndexInventoryType } from "../../lib/adsense-index-inventory";
+
+const auth = Astro.locals.auth!;
+if (!can(auth, "seo.manage")) return new Response("Proibido", { status: 403 });
+
+const inventory = await getAdsenseIndexInventory();
+const type = Astro.url.searchParams.get("tipo") as IndexInventoryType | null;
+const indexable = Astro.url.searchParams.get("indexavel");
+const problem = Astro.url.searchParams.get("problema");
+const quality = Astro.url.searchParams.get("qualidade");
+const page = Math.max(1, Number(Astro.url.searchParams.get("pagina") ?? 1) || 1);
+const pageSize = 100;
+const filtered = inventory.rows.filter((row) =>
+  (!type || row.type === type) &&
+  (!indexable || String(row.indexable) === indexable) &&
+  (!problem || (problem === "sim" ? Boolean(row.problem) : !row.problem)) &&
+  (!quality || row.quality === quality)
+);
+const pages = Math.max(1, Math.ceil(filtered.length / pageSize));
+const current = Math.min(page, pages);
+const rows = filtered.slice((current - 1) * pageSize, current * pageSize);
+const types = [...new Set(inventory.rows.map((row) => row.type))].sort();
+const qualities = [...new Set(inventory.rows.map((row) => row.quality))].sort();
+const query = new URLSearchParams(Astro.url.searchParams);
+const pageHref = (value: number) => { const next = new URLSearchParams(query); next.set("pagina", String(value)); return `?${next}`; };
+---
+<AdminLayout title="Inventário de URLs" description="Visão interna de status, robots, canonical, sitemap e qualidade das rotas públicas conhecidas.">
+  <aside class="rounded-xl border border-sky-200 bg-sky-50 p-4 text-sm text-sky-950" role="note">Indicador interno calculado a partir das rotas e dos registros conhecidos. O status não representa cobertura ou aprovação do Google.</aside>
+  {!inventory.dataAvailable && <p class="mt-4 rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-950">O banco ativo não está disponível neste ambiente; a tabela contém apenas as rotas estáticas conhecidas.</p>}
+  <form class="mt-6 grid gap-3 rounded-2xl border bg-white p-5 sm:grid-cols-2 xl:grid-cols-5" method="get">
+    <label class="grid gap-1 text-sm font-bold">Tipo<select class="es-input !mt-0" name="tipo"><option value="">Todos</option>{types.map((value) => <option value={value} selected={type === value}>{value}</option>)}</select></label>
+    <label class="grid gap-1 text-sm font-bold">Indexável<select class="es-input !mt-0" name="indexavel"><option value="">Todos</option><option value="true" selected={indexable === "true"}>Sim</option><option value="false" selected={indexable === "false"}>Não</option></select></label>
+    <label class="grid gap-1 text-sm font-bold">Problema<select class="es-input !mt-0" name="problema"><option value="">Todos</option><option value="sim" selected={problem === "sim"}>Com problema</option><option value="nao" selected={problem === "nao"}>Sem problema</option></select></label>
+    <label class="grid gap-1 text-sm font-bold">Qualidade<select class="es-input !mt-0" name="qualidade"><option value="">Todas</option>{qualities.map((value) => <option value={value} selected={quality === value}>{value}</option>)}</select></label>
+    <div class="flex items-end gap-2"><button class="es-btn es-btn-primary" type="submit">Filtrar</button><a class="es-btn es-btn-secondary" href="/admin/urls">Limpar</a></div>
+  </form>
+  <section class="mt-6 overflow-hidden rounded-2xl border bg-white">
+    <div class="border-b p-5"><h2 class="text-xl font-black">URLs auditadas</h2><p class="mt-1 text-sm text-slate-600">{filtered.length} resultado(s) no filtro atual · {inventory.summary.total} no inventário completo.</p></div>
+    <div class="overflow-x-auto"><table class="min-w-[1450px] text-sm"><thead class="bg-slate-50 text-left text-xs uppercase tracking-wide text-slate-600"><tr><th class="p-3">URL</th><th class="p-3">Tipo</th><th class="p-3">HTTP</th><th class="p-3">Indexável</th><th class="p-3">Robots</th><th class="p-3">Canonical</th><th class="p-3">Sitemap</th><th class="p-3">Qualidade</th><th class="p-3">Última análise</th><th class="p-3">Problema</th><th class="p-3">Ação sugerida</th></tr></thead><tbody>
+      {rows.map((row) => <tr class="border-t align-top"><td class="max-w-xs break-all p-3 font-semibold"><a class="underline" href={row.path} target="_blank">{row.path}</a></td><td class="p-3">{row.type}</td><td class="p-3">{row.statusHttp}</td><td class="p-3 font-bold">{row.indexable ? "Sim" : "Não"}</td><td class="p-3">{row.robots}</td><td class="max-w-xs break-all p-3 text-xs">{row.canonical}</td><td class="p-3">{row.sitemap ? "Sim" : "Não"}</td><td class="p-3">{row.quality}</td><td class="p-3">{new Date(row.lastAnalyzed).toLocaleString("pt-BR")}</td><td class="max-w-sm p-3">{row.problem ?? "—"}<span class="mt-1 block text-xs text-slate-500">{row.reason}</span></td><td class="p-3">{row.action ? <a class="font-bold underline" href={row.action}>Revisar</a> : "Nenhuma"}</td></tr>)}
+      {rows.length === 0 && <tr><td class="p-8 text-center text-slate-600" colspan="11">Nenhuma URL corresponde aos filtros.</td></tr>}
+    </tbody></table></div>
+    {pages > 1 && <nav class="flex items-center justify-between border-t p-4 text-sm" aria-label="Paginação"><a class={`font-bold ${current <= 1 ? "pointer-events-none opacity-40" : ""}`} href={pageHref(Math.max(1, current - 1))}>Anterior</a><span>Página {current} de {pages}</span><a class={`font-bold ${current >= pages ? "pointer-events-none opacity-40" : ""}`} href={pageHref(Math.min(pages, current + 1))}>Próxima</a></nav>}
+  </section>
+</AdminLayout>

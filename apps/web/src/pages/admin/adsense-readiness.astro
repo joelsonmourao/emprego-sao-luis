@@ -1,0 +1,164 @@
+---
+import AdminLayout from "../../layouts/AdminLayout.astro";
+import { getAdsenseReadiness } from "../../lib/adsense-readiness";
+
+const baseUrl = new URL(process.env.SITE_URL ?? Astro.url.origin);
+const report = await getAdsenseReadiness(baseUrl);
+const tone =
+  report.classification === "PRONTO PARA SOLICITAR ANÁLISE"
+    ? "border-emerald-300 bg-emerald-50 text-emerald-950"
+    : report.classification === "QUASE PRONTO"
+      ? "border-amber-300 bg-amber-50 text-amber-950"
+      : "border-rose-300 bg-rose-50 text-rose-950";
+const message = Astro.url.searchParams.get("message");
+---
+<AdminLayout title="Preparação AdSense" description="Controles e diagnóstico interno para a fase de revisão AdSense.">
+  <h1 class="text-3xl font-black">Preparação AdSense</h1>
+  <p class="mt-2 text-sm text-[var(--text-secondary)]">
+    Controles internos para preparação AdSense. Classificações e pontuações são métricas internas — não são do Google.
+  </p>
+  {message && <p class="mt-4 rounded-xl border border-emerald-300 bg-emerald-50 p-3 text-sm text-emerald-950">{message}</p>}
+
+  <section class="mt-6 grid gap-4 lg:grid-cols-2" id="configuracoes">
+    <article class="rounded-2xl border bg-white p-6">
+      <h2 class="text-xl font-black">Modo Portal Editorial</h2>
+      <p class="mt-2 text-sm text-[var(--text-secondary)]">
+        Oculta temporariamente a experiência pública de vagas enquanto mantém coleta, banco, importações, workers e administração funcionando.
+      </p>
+      <p class="mt-3 text-sm font-bold">PORTAL EDITORIAL: {report.portalMode.enabled ? "ATIVO" : "DESATIVADO"}</p>
+      <form class="mt-4" method="post" action="/api/admin/editorial-portal-mode" onsubmit={`return confirm('${report.portalMode.enabled ? "Desativar" : "Ativar"} o Modo Portal Editorial?')`}>
+        <input type="hidden" name="enabled" value={report.portalMode.enabled ? "false" : "true"} />
+        <button class="es-btn es-btn-primary" type="submit">{report.portalMode.enabled ? "Desativar" : "Ativar"} Modo Portal Editorial</button>
+      </form>
+    </article>
+    <article class="rounded-2xl border bg-white p-6">
+      <h2 class="text-xl font-black">Modo de Revisão AdSense</h2>
+      <p class="mt-2 text-sm text-[var(--text-secondary)]">
+        Aplica as regras de indexação e exposição definidas para a fase de preparação/revisão. Não substitui o Modo Portal Editorial e não faz cloaking.
+      </p>
+      <p class="mt-3 text-sm font-bold">REVISÃO ADSENSE: {report.reviewMode.enabled ? "ATIVA" : "DESATIVADA"}</p>
+      <form class="mt-4" method="post" action="/api/admin/adsense-review-mode" onsubmit={`return confirm('${report.reviewMode.enabled ? "Desativar" : "Ativar"} o Modo de Revisão AdSense?')`}>
+        <input type="hidden" name="enabled" value={report.reviewMode.enabled ? "false" : "true"} />
+        <button class="es-btn es-btn-secondary" type="submit">{report.reviewMode.enabled ? "Desativar" : "Ativar"} Modo de Revisão</button>
+      </form>
+    </article>
+  </section>
+
+  <section class={`mt-6 rounded-2xl border p-6 ${tone}`}>
+    <p class="text-sm font-bold uppercase">Classificação interna</p>
+    <strong class="mt-2 block text-3xl">{report.classification}</strong>
+    <p class="mt-3 text-sm font-semibold">{report.disclaimer}</p>
+    <p class="mt-2 text-xs">Gerado em {report.generatedAt.toLocaleString("pt-BR")}</p>
+  </section>
+
+  <section class="mt-6 rounded-2xl border border-slate-200 bg-white p-6" id="conteudo">
+    <h2 class="text-xl font-black">Conteúdo e qualidade</h2>
+    <p class="mt-2 text-sm text-[var(--text-secondary)]">{report.editorialMeta.countExplanation}</p>
+    <div class="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <article><p class="text-sm">Publicados</p><strong class="text-3xl">{report.editorialMeta.published}</strong></article>
+      <article><p class="text-sm">Auditados (todos status)</p><strong class="text-3xl">{report.editorialMeta.auditedTotal}</strong></article>
+      <article><p class="text-sm">Manter (publicados)</p><strong class="text-3xl">{report.publishedQuality.manter}</strong></article>
+      <article><p class="text-sm">Melhorar (publicados)</p><strong class="text-3xl">{report.publishedQuality.melhorar}</strong></article>
+      <article><p class="text-sm">Noindex (publicados)</p><strong class="text-3xl">{report.publishedQuality.noindex}</strong></article>
+      <article><p class="text-sm">Revisar (publicados)</p><strong class="text-3xl">{report.publishedQuality.revisar}</strong></article>
+      <article><p class="text-sm">Substanciais</p><strong class="text-3xl">{report.editorialMeta.substantialPublished}/{report.editorialMeta.minPublished}</strong></article>
+      <article><p class="text-sm">Web Stories</p><strong class="text-3xl">{report.editorialMeta.publishedStories}</strong></article>
+    </div>
+    <p class="mt-4 text-sm">
+      <a class="font-bold underline" href="/admin/qualidade-editorial">Abrir Qualidade Editorial</a>
+    </p>
+  </section>
+
+  <section class="mt-6 rounded-2xl border bg-white p-6" id="motivos">
+    <h2 class="text-xl font-black">Motivos de auditoria (publicados)</h2>
+    <p class="mt-2 text-sm text-[var(--text-secondary)]">
+      Contagem por código de issue nos conteúdos publicados. Use para separar revisão factual de governança leve.
+    </p>
+    {report.publishedIssueBreakdown.length === 0 ? (
+      <p class="mt-3 text-sm">Sem issues nos publicados ou sem DATABASE_URL neste ambiente.</p>
+    ) : (
+      <ul class="mt-4 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+        {report.publishedIssueBreakdown.map((item) => (
+          <li class="rounded-xl border px-3 py-2 text-sm"><strong>{item.code}</strong>: {item.count}</li>
+        ))}
+      </ul>
+    )}
+  </section>
+
+  <section class="mt-6 grid gap-4 lg:grid-cols-2" id="inventarios">
+    <article class="rounded-2xl border bg-white p-6">
+      <h2 class="text-xl font-black">Imagens (publicados)</h2>
+      <ul class="mt-3 grid gap-2 text-sm">
+        <li>Com capa completa: <strong>{report.imageInventory.publishedWithCover}</strong></li>
+        <li>Sem capa completa: <strong>{report.imageInventory.publishedMissingCover}</strong></li>
+        <li>URLs de capa repetidas: <strong>{report.imageInventory.repeatedCovers}</strong></li>
+        <li>Total publicados amostrados: <strong>{report.imageInventory.totalPublished}</strong></li>
+      </ul>
+    </article>
+    <article class="rounded-2xl border bg-white p-6">
+      <h2 class="text-xl font-black">Vagas (amostra)</h2>
+      <ul class="mt-3 grid gap-2 text-sm">
+        <li>Publicadas na amostra: <strong>{report.jobInventory.publishedSample}</strong></li>
+        <li>Inválidas na amostra: <strong>{report.jobInventory.invalidPublished}</strong></li>
+      </ul>
+      <p class="mt-3 text-xs text-[var(--text-secondary)]">{report.jobInventory.note}</p>
+      <p class="mt-2 text-sm"><a class="font-bold underline" href="/admin/qualidade-vagas">Abrir Qualidade das Vagas</a></p>
+    </article>
+  </section>
+
+  <section class="mt-6 rounded-2xl border bg-white p-6" id="bloqueadores">
+    <h2 class="text-xl font-black">Bloqueadores ({report.detailedBlockers.length})</h2>
+    {!report.detailedBlockers.length ? (
+      <p class="mt-3 text-sm text-emerald-800">Nenhum bloqueador técnico aberto neste momento.</p>
+    ) : (
+      <div class="mt-4 grid gap-4">
+        {report.detailedBlockers.map((item, index) => (
+          <article class="rounded-xl border border-rose-200 bg-rose-50 p-4 text-rose-950">
+            <p class="text-xs font-bold uppercase">Bloqueador {index + 1} · {item.category}</p>
+            <h3 class="mt-1 text-lg font-black">{item.label}</h3>
+            <p class="mt-2 text-sm"><strong>Tipo:</strong> {item.type}</p>
+            <p class="mt-1 text-sm"><strong>Descrição:</strong> {item.description}</p>
+            <p class="mt-1 text-sm"><strong>Como resolver:</strong> {item.howToFix}</p>
+            <p class="mt-1 text-sm"><strong>Status:</strong> {item.status} · {item.severity}</p>
+          </article>
+        ))}
+      </div>
+    )}
+  </section>
+
+  <div class="mt-6 grid gap-4 md:grid-cols-3">
+    <article class="rounded-xl bg-white p-5"><p class="text-sm">Bloqueadores</p><strong class="text-3xl">{report.blockers.length}</strong></article>
+    <article class="rounded-xl bg-white p-5"><p class="text-sm">Verificações</p><strong class="text-3xl">{report.checks.length}</strong></article>
+    <article class="rounded-xl bg-white p-5"><p class="text-sm">Etapas</p><strong class="text-3xl">{report.stages.length}</strong></article>
+  </div>
+
+  {report.stages.map((stage) => (
+    <section class="mt-8 overflow-x-auto rounded-2xl bg-white p-6">
+      <h2 class="text-xl font-black">{stage.title}</h2>
+      <table class="mt-4 min-w-full text-sm">
+        <thead>
+          <tr class="border-b text-left">
+            <th class="p-3">Item</th>
+            <th class="p-3">Severidade</th>
+            <th class="p-3">Status</th>
+            <th class="p-3">Evidência</th>
+            <th class="p-3">Correção</th>
+          </tr>
+        </thead>
+        <tbody>
+          {stage.checks.map((check) => (
+            <tr class="border-b align-top">
+              <td class="p-3 font-bold">{check.label}</td>
+              <td class="p-3">{check.severity}</td>
+              <td class="p-3 font-black">{check.status}</td>
+              <td class="max-w-xl p-3">{check.evidence}</td>
+              <td class="p-3">
+                {check.action ? <a class="font-bold text-red-700 underline" href={check.action}>Resolver</a> : "—"}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </section>
+  ))}
+</AdminLayout>

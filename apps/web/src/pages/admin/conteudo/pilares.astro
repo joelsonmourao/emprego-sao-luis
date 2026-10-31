@@ -1,0 +1,95 @@
+---
+import AdminLayout from "../../../layouts/AdminLayout.astro";
+import { can } from "../../../lib/auth";
+import { contentClusters, contentPillars, createDatabase } from "@es/db";
+import { asc } from "drizzle-orm";
+
+const auth = Astro.locals.auth!;
+if (!can(auth, "content.manage")) return Astro.redirect("/admin?error=sem-permissao");
+
+let pillars: typeof contentPillars.$inferSelect[] = [];
+let clusters: typeof contentClusters.$inferSelect[] = [];
+const saved = Astro.url.searchParams.get("saved") === "1";
+if (process.env.DATABASE_URL) {
+  const connection = createDatabase(process.env.DATABASE_URL);
+  try {
+    pillars = await connection.db.select().from(contentPillars).orderBy(asc(contentPillars.name));
+    clusters = await connection.db.select().from(contentClusters).orderBy(asc(contentClusters.name));
+  } finally {
+    await connection.close();
+  }
+}
+---
+<AdminLayout title="Pilares e clusters">
+  <div class="flex flex-wrap items-start justify-between gap-4">
+    <div>
+      <p class="text-sm font-bold uppercase tracking-wide text-red-700">Conteúdo</p>
+      <h1 class="mt-2 text-3xl font-black">Pilares e clusters</h1>
+      <p class="mt-2 text-sm text-[var(--text-secondary)]">
+        Estratégia editorial interna (não use “Blog Fantasma” publicamente). Conteúdo para candidatos permanece gratuito.
+      </p>
+    </div>
+    <a class="rounded-lg border px-4 py-2 font-bold" href="/admin/conteudo/estrategia">Redação assistida</a>
+  </div>
+  {saved && <p class="mt-4 rounded-lg border border-emerald-200 bg-emerald-50 p-3 text-sm">Alterações salvas.</p>}
+  <div class="mt-8 grid gap-8 lg:grid-cols-2">
+    <section class="rounded-2xl bg-white p-6">
+      <h2 class="text-xl font-black">Novo pilar</h2>
+      <form class="mt-4 grid gap-3" method="post" action="/api/admin/content-pillars">
+        <input type="hidden" name="action" value="CREATE_PILLAR" />
+        <label>Nome<input class="mt-1 w-full rounded-lg border p-3" name="name" required maxlength="120" /></label>
+        <label>Slug<input class="mt-1 w-full rounded-lg border p-3" name="slug" required maxlength="120" /></label>
+        <label>Descrição<textarea class="mt-1 w-full rounded-lg border p-3" name="description" maxlength="500"></textarea></label>
+        <label>Audiência
+          <select class="mt-1 w-full rounded-lg border p-3" name="audience">
+            <option value="CANDIDATE">Candidato</option>
+            <option value="COMPANY">Empresa</option>
+            <option value="BOTH">Ambos</option>
+          </select>
+        </label>
+        <button class="rounded-xl bg-red-700 px-4 py-3 font-bold text-white" type="submit">Criar pilar</button>
+      </form>
+    </section>
+    <section class="rounded-2xl bg-white p-6">
+      <h2 class="text-xl font-black">Novo cluster</h2>
+      <form class="mt-4 grid gap-3" method="post" action="/api/admin/content-pillars">
+        <input type="hidden" name="action" value="CREATE_CLUSTER" />
+        <label>Pilar
+          <select class="mt-1 w-full rounded-lg border p-3" name="pillarId" required>
+            {pillars.map((pillar) => <option value={pillar.id}>{pillar.name}</option>)}
+          </select>
+        </label>
+        <label>Nome<input class="mt-1 w-full rounded-lg border p-3" name="name" required maxlength="160" /></label>
+        <label>Slug<input class="mt-1 w-full rounded-lg border p-3" name="slug" required maxlength="160" /></label>
+        <label>Descrição<textarea class="mt-1 w-full rounded-lg border p-3" name="description" maxlength="500"></textarea></label>
+        <button class="rounded-xl bg-red-700 px-4 py-3 font-bold text-white" type="submit">Criar cluster</button>
+      </form>
+    </section>
+  </div>
+  <section class="mt-8 space-y-4">
+    {pillars.map((pillar) => (
+      <article class="rounded-2xl bg-white p-6">
+        <div class="flex flex-wrap items-start justify-between gap-3">
+          <div>
+            <h2 class="text-xl font-black">{pillar.name}</h2>
+            <p class="text-sm text-slate-600">{pillar.description}</p>
+            <p class="mt-1 text-xs uppercase tracking-wide text-slate-500">{pillar.audience} · {pillar.active ? "ativo" : "inativo"}</p>
+          </div>
+          <form method="post" action="/api/admin/content-pillars">
+            <input type="hidden" name="action" value="TOGGLE_PILLAR" />
+            <input type="hidden" name="id" value={pillar.id} />
+            <button class="rounded-lg border px-3 py-2 text-sm font-bold" type="submit">{pillar.active ? "Desativar" : "Ativar"}</button>
+          </form>
+        </div>
+        <ul class="mt-4 grid gap-2 text-sm md:grid-cols-2">
+          {clusters.filter((cluster) => cluster.pillarId === pillar.id).map((cluster) => (
+            <li class="rounded-lg border p-3">
+              <strong>{cluster.name}</strong>
+              <span class="mt-1 block text-xs text-slate-500">{cluster.description ?? "sem descrição"} · {cluster.active ? "ativo" : "inativo"}</span>
+            </li>
+          ))}
+        </ul>
+      </article>
+    ))}
+  </section>
+</AdminLayout>

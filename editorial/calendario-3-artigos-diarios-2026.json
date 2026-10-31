@@ -1,0 +1,2640 @@
+{
+  "site": "https://empregossaoluis.com.br",
+  "timezone": "America/Sao_Paulo",
+  "period": {
+    "start": "2026-10-13",
+    "end": "2026-12-31"
+  },
+  "postSlotsPerDay": 3,
+  "totalDays": 80,
+  "totalSlots": 240,
+  "policy": "Títulos futuros são pautas provisórias, NÃO textos produzidos nem postagens programadas no banco. Publicação depende de texto individual, verificação de fontes, mídia válida e autorização editorial; não preencher o site com conteúdo repetitivo para AdSense.",
+  "days": [
+    {
+      "date": "2026-10-13",
+      "posts": [
+        {
+          "time": "09:00",
+          "type": "GUIDE",
+          "category": "seguranca_e_orientacao",
+          "editorialTheme": "autenticidade do contato pelo WhatsApp",
+          "workingTitle": "Recebeu convite de recrutador no WhatsApp? Confira antes de enviar seus dados",
+          "status": "DRAFT",
+          "slug": "confirmar-convite-recrutador-whatsapp-seguranca",
+          "draftFile": "editorial/2026-10-13/09h-como-confirmar-convite-de-recrutador-no-whatsapp.md",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+        },
+        {
+          "time": "13:00",
+          "type": "GUIDE",
+          "category": "setor_profissional",
+          "editorialTheme": "recepção de clínicas",
+          "workingTitle": "Entrevista para recepção de clínica: demonstre como organiza o atendimento",
+          "status": "DRAFT",
+          "slug": "entrevista-recepcao-clinica-organizacao-atendimento",
+          "draftFile": "editorial/2026-10-13/13h-entrevista-recepcao-clinica-fluxo-de-atendimento.md",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+        },
+        {
+          "time": "17:00",
+          "type": "GUIDE",
+          "category": "carreira",
+          "editorialTheme": "busca de emprego trabalhando em turnos",
+          "workingTitle": "Já trabalha por turnos? Organize a busca de outro emprego sem prejudicar sua rotina",
+          "status": "DRAFT",
+          "slug": "buscar-outro-emprego-trabalhando-por-turnos",
+          "draftFile": "editorial/2026-10-13/17h-buscar-emprego-trabalhando-em-turnos.md",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+        }
+      ]
+    },
+    {
+      "date": "2026-10-14",
+      "posts": [
+        {
+          "time": "09:00",
+          "type": "GUIDE",
+          "category": "carreira",
+          "editorialTheme": "quem trabalhou como autônomo e quer voltar à CLT",
+          "workingTitle": "Como mapear experiências reais de quem trabalhou como autônomo e quer voltar à CLT sem inventar cargo",
+          "status": "PLANNED",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+        },
+        {
+          "time": "13:00",
+          "type": "GUIDE",
+          "category": "setor_profissional",
+          "editorialTheme": "apoio de biblioteca",
+          "workingTitle": "Como entender tarefas e responsabilidades em vagas de apoio de biblioteca",
+          "status": "PLANNED",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+        },
+        {
+          "time": "17:00",
+          "type": "GUIDE",
+          "category": "seguranca_e_orientacao",
+          "editorialTheme": "boleto para treinamento obrigatório antes da admissão",
+          "workingTitle": "Como verificar a origem de um boleto para treinamento obrigatório antes da admissão",
+          "status": "PLANNED",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+        }
+      ]
+    },
+    {
+      "date": "2026-10-15",
+      "posts": [
+        {
+          "time": "09:00",
+          "type": "GUIDE",
+          "category": "carreira",
+          "editorialTheme": "quem retorna após pausa para cuidar da família",
+          "workingTitle": "Como mapear experiências reais de quem retorna após pausa para cuidar da família sem inventar cargo",
+          "status": "PLANNED",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+        },
+        {
+          "time": "13:00",
+          "type": "GUIDE",
+          "category": "setor_profissional",
+          "editorialTheme": "assistente de compras",
+          "workingTitle": "Como entender tarefas e responsabilidades em vagas de assistente de compras",
+          "status": "PLANNED",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+        },
+        {
+          "time": "17:00",
+          "type": "GUIDE",
+          "category": "seguranca_e_orientacao",
+          "editorialTheme": "link encurtado enviado por recrutador desconhecido",
+          "workingTitle": "Como verificar a origem de um link encurtado enviado por recrutador desconhecido",
+          "status": "PLANNED",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+        }
+      ]
+    },
+    {
+      "date": "2026-10-16",
+      "posts": [
+        {
+          "time": "09:00",
+          "type": "GUIDE",
+          "category": "carreira",
+          "editorialTheme": "quem trabalha à noite e procura outra vaga",
+          "workingTitle": "Como mapear experiências reais de quem trabalha à noite e procura outra vaga sem inventar cargo",
+          "status": "PLANNED",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+        },
+        {
+          "time": "13:00",
+          "type": "GUIDE",
+          "category": "setor_profissional",
+          "editorialTheme": "reposição em loja",
+          "workingTitle": "Como entender tarefas e responsabilidades em vagas de reposição em loja",
+          "status": "PLANNED",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+        },
+        {
+          "time": "17:00",
+          "type": "GUIDE",
+          "category": "seguranca_e_orientacao",
+          "editorialTheme": "convite de entrevista sem identificação da empresa",
+          "workingTitle": "Como verificar a origem de um convite de entrevista sem identificação da empresa",
+          "status": "PLANNED",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+        }
+      ]
+    },
+    {
+      "date": "2026-10-17",
+      "posts": [
+        {
+          "time": "09:00",
+          "type": "GUIDE",
+          "category": "carreira",
+          "editorialTheme": "quem concluiu curso técnico sem experiência formal",
+          "workingTitle": "Como mapear experiências reais de quem concluiu curso técnico sem experiência formal sem inventar cargo",
+          "status": "PLANNED",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+        },
+        {
+          "time": "13:00",
+          "type": "GUIDE",
+          "category": "setor_profissional",
+          "editorialTheme": "auxiliar de almoxarifado",
+          "workingTitle": "Como entender tarefas e responsabilidades em vagas de auxiliar de almoxarifado",
+          "status": "PLANNED",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+        },
+        {
+          "time": "17:00",
+          "type": "GUIDE",
+          "category": "seguranca_e_orientacao",
+          "editorialTheme": "pedido de senha da conta gov.br",
+          "workingTitle": "Como verificar a origem de um pedido de senha da conta gov.br",
+          "status": "PLANNED",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+        }
+      ]
+    },
+    {
+      "date": "2026-10-18",
+      "posts": [
+        {
+          "time": "09:00",
+          "type": "GUIDE",
+          "category": "carreira",
+          "editorialTheme": "quem mudou de município na Grande Ilha",
+          "workingTitle": "Como mapear experiências reais de quem mudou de município na Grande Ilha sem inventar cargo",
+          "status": "PLANNED",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+        },
+        {
+          "time": "13:00",
+          "type": "GUIDE",
+          "category": "setor_profissional",
+          "editorialTheme": "apoio de laboratório",
+          "workingTitle": "Como entender tarefas e responsabilidades em vagas de apoio de laboratório",
+          "status": "PLANNED",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+        },
+        {
+          "time": "17:00",
+          "type": "GUIDE",
+          "category": "seguranca_e_orientacao",
+          "editorialTheme": "promessa de contratação garantida após Pix",
+          "workingTitle": "Como verificar a origem de um promessa de contratação garantida após Pix",
+          "status": "PLANNED",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+        }
+      ]
+    },
+    {
+      "date": "2026-10-19",
+      "posts": [
+        {
+          "time": "09:00",
+          "type": "GUIDE",
+          "category": "carreira",
+          "editorialTheme": "quem quer migrar do comércio para escritório",
+          "workingTitle": "Como mapear experiências reais de quem quer migrar do comércio para escritório sem inventar cargo",
+          "status": "PLANNED",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+        },
+        {
+          "time": "13:00",
+          "type": "GUIDE",
+          "category": "setor_profissional",
+          "editorialTheme": "atendimento de farmácia",
+          "workingTitle": "Como entender tarefas e responsabilidades em vagas de atendimento de farmácia",
+          "status": "PLANNED",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+        },
+        {
+          "time": "17:00",
+          "type": "GUIDE",
+          "category": "seguranca_e_orientacao",
+          "editorialTheme": "uso indevido de logotipo de empresa",
+          "workingTitle": "Como verificar a origem de um uso indevido de logotipo de empresa",
+          "status": "PLANNED",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+        }
+      ]
+    },
+    {
+      "date": "2026-10-20",
+      "posts": [
+        {
+          "time": "09:00",
+          "type": "GUIDE",
+          "category": "carreira",
+          "editorialTheme": "quem busca ocupação com jornada parcial",
+          "workingTitle": "Como mapear experiências reais de quem busca ocupação com jornada parcial sem inventar cargo",
+          "status": "PLANNED",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+        },
+        {
+          "time": "13:00",
+          "type": "GUIDE",
+          "category": "setor_profissional",
+          "editorialTheme": "assistente de manutenção predial",
+          "workingTitle": "Como entender tarefas e responsabilidades em vagas de assistente de manutenção predial",
+          "status": "PLANNED",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+        },
+        {
+          "time": "17:00",
+          "type": "GUIDE",
+          "category": "seguranca_e_orientacao",
+          "editorialTheme": "envio de contrato por aplicativo desconhecido",
+          "workingTitle": "Como verificar a origem de um envio de contrato por aplicativo desconhecido",
+          "status": "PLANNED",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+        }
+      ]
+    },
+    {
+      "date": "2026-10-21",
+      "posts": [
+        {
+          "time": "09:00",
+          "type": "GUIDE",
+          "category": "carreira",
+          "editorialTheme": "quem precisa conciliar trabalho e estudo",
+          "workingTitle": "Como mapear experiências reais de quem precisa conciliar trabalho e estudo sem inventar cargo",
+          "status": "PLANNED",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+        },
+        {
+          "time": "13:00",
+          "type": "GUIDE",
+          "category": "setor_profissional",
+          "editorialTheme": "conferência de mercadorias",
+          "workingTitle": "Como entender tarefas e responsabilidades em vagas de conferência de mercadorias",
+          "status": "PLANNED",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+        },
+        {
+          "time": "17:00",
+          "type": "GUIDE",
+          "category": "seguranca_e_orientacao",
+          "editorialTheme": "recebimento de oferta com escala incompleta",
+          "workingTitle": "Como verificar a origem de um recebimento de oferta com escala incompleta",
+          "status": "PLANNED",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+        }
+      ]
+    },
+    {
+      "date": "2026-10-22",
+      "posts": [
+        {
+          "time": "09:00",
+          "type": "GUIDE",
+          "category": "carreira",
+          "editorialTheme": "quem já foi auxiliar mas quer cargo de conferência",
+          "workingTitle": "Como mapear experiências reais de quem já foi auxiliar mas quer cargo de conferência sem inventar cargo",
+          "status": "PLANNED",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+        },
+        {
+          "time": "13:00",
+          "type": "GUIDE",
+          "category": "setor_profissional",
+          "editorialTheme": "auxiliar de cadastro",
+          "workingTitle": "Como entender tarefas e responsabilidades em vagas de auxiliar de cadastro",
+          "status": "PLANNED",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+        },
+        {
+          "time": "17:00",
+          "type": "GUIDE",
+          "category": "seguranca_e_orientacao",
+          "editorialTheme": "mensagem que exige resposta em poucos minutos",
+          "workingTitle": "Como verificar a origem de um mensagem que exige resposta em poucos minutos",
+          "status": "PLANNED",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+        }
+      ]
+    },
+    {
+      "date": "2026-10-23",
+      "posts": [
+        {
+          "time": "09:00",
+          "type": "GUIDE",
+          "category": "carreira",
+          "editorialTheme": "quem tem experiência de trabalho informal em atendimento",
+          "workingTitle": "Como mapear experiências reais de quem tem experiência de trabalho informal em atendimento sem inventar cargo",
+          "status": "PLANNED",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+        },
+        {
+          "time": "13:00",
+          "type": "GUIDE",
+          "category": "setor_profissional",
+          "editorialTheme": "apoio em eventos",
+          "workingTitle": "Como entender tarefas e responsabilidades em vagas de apoio em eventos",
+          "status": "PLANNED",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+        },
+        {
+          "time": "17:00",
+          "type": "GUIDE",
+          "category": "seguranca_e_orientacao",
+          "editorialTheme": "exigência de dados bancários na primeira mensagem",
+          "workingTitle": "Como verificar a origem de um exigência de dados bancários na primeira mensagem",
+          "status": "PLANNED",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+        }
+      ]
+    },
+    {
+      "date": "2026-10-24",
+      "posts": [
+        {
+          "time": "09:00",
+          "type": "GUIDE",
+          "category": "carreira",
+          "editorialTheme": "quem está retornando ao mercado depois dos 40",
+          "workingTitle": "Como mapear experiências reais de quem está retornando ao mercado depois dos 40 sem inventar cargo",
+          "status": "PLANNED",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+        },
+        {
+          "time": "13:00",
+          "type": "GUIDE",
+          "category": "setor_profissional",
+          "editorialTheme": "controle de qualidade básico",
+          "workingTitle": "Como entender tarefas e responsabilidades em vagas de controle de qualidade básico",
+          "status": "PLANNED",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+        },
+        {
+          "time": "17:00",
+          "type": "GUIDE",
+          "category": "seguranca_e_orientacao",
+          "editorialTheme": "formulário que pede selfie com documento",
+          "workingTitle": "Como verificar a origem de um formulário que pede selfie com documento",
+          "status": "PLANNED",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+        }
+      ]
+    },
+    {
+      "date": "2026-10-25",
+      "posts": [
+        {
+          "time": "09:00",
+          "type": "GUIDE",
+          "category": "carreira",
+          "editorialTheme": "quem quer demonstrar Excel básico sem exagerar",
+          "workingTitle": "Como mapear experiências reais de quem quer demonstrar Excel básico sem exagerar sem inventar cargo",
+          "status": "PLANNED",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+        },
+        {
+          "time": "13:00",
+          "type": "GUIDE",
+          "category": "setor_profissional",
+          "editorialTheme": "auxiliar de expedição",
+          "workingTitle": "Como entender tarefas e responsabilidades em vagas de auxiliar de expedição",
+          "status": "PLANNED",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+        },
+        {
+          "time": "17:00",
+          "type": "GUIDE",
+          "category": "seguranca_e_orientacao",
+          "editorialTheme": "pedido de currículo contendo documentos digitalizados",
+          "workingTitle": "Como verificar a origem de um pedido de currículo contendo documentos digitalizados",
+          "status": "PLANNED",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+        }
+      ]
+    },
+    {
+      "date": "2026-10-26",
+      "posts": [
+        {
+          "time": "09:00",
+          "type": "GUIDE",
+          "category": "carreira",
+          "editorialTheme": "quem realizou trabalho voluntário",
+          "workingTitle": "Como mapear experiências reais de quem realizou trabalho voluntário sem inventar cargo",
+          "status": "PLANNED",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+        },
+        {
+          "time": "13:00",
+          "type": "GUIDE",
+          "category": "setor_profissional",
+          "editorialTheme": "atendimento ao turista",
+          "workingTitle": "Como entender tarefas e responsabilidades em vagas de atendimento ao turista",
+          "status": "PLANNED",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+        },
+        {
+          "time": "17:00",
+          "type": "GUIDE",
+          "category": "seguranca_e_orientacao",
+          "editorialTheme": "falta de informação sobre local da entrevista",
+          "workingTitle": "Como verificar a origem de um falta de informação sobre local da entrevista",
+          "status": "PLANNED",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+        }
+      ]
+    },
+    {
+      "date": "2026-10-27",
+      "posts": [
+        {
+          "time": "09:00",
+          "type": "GUIDE",
+          "category": "carreira",
+          "editorialTheme": "quem teve vários contratos de curta duração",
+          "workingTitle": "Como apresentar contratos de curta duração no currículo sem inventar cargos",
+          "status": "DRAFT",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar.",
+          "slug": "contratos-curtos-curriculo-com-provas",
+          "draftFile": "editorial/2026-10-27/09h-contratos-curtos-curriculo-com-provas.md"
+        },
+        {
+          "time": "13:00",
+          "type": "GUIDE",
+          "category": "setor_profissional",
+          "editorialTheme": "assistente de arquivo",
+          "workingTitle": "Assistente de arquivo: tarefas, organização e perguntas para a entrevista",
+          "status": "DRAFT",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar.",
+          "slug": "assistente-de-arquivo-rotina-organizacao-documentos",
+          "draftFile": "editorial/2026-10-27/13h-rotina-assistente-arquivo.md"
+        },
+        {
+          "time": "17:00",
+          "type": "GUIDE",
+          "category": "seguranca_e_orientacao",
+          "editorialTheme": "ausência de identificação do empregador",
+          "workingTitle": "Vaga sem nome da empresa: como verificar a origem antes de se candidatar",
+          "status": "DRAFT",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar.",
+          "slug": "vaga-sem-nome-empresa-como-verificar",
+          "draftFile": "editorial/2026-10-27/17h-vaga-sem-identificacao-empregador.md"
+        }
+      ]
+    },
+    {
+      "date": "2026-10-28",
+      "posts": [
+        {
+          "time": "09:00",
+          "type": "GUIDE",
+          "category": "carreira",
+          "editorialTheme": "quem procura estágio na área administrativa",
+          "workingTitle": "Estágio administrativo: como apresentar competências sem inventar experiência",
+          "status": "DRAFT",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar.",
+          "slug": "estagio-administrativo-sem-experiencia-formal",
+          "draftFile": "editorial/2026-10-28/09h-estagio-administrativo-experiencia.md"
+        },
+        {
+          "time": "13:00",
+          "type": "GUIDE",
+          "category": "setor_profissional",
+          "editorialTheme": "auxiliar de cozinha",
+          "workingTitle": "Auxiliar de cozinha: tarefas, higiene e preparação para a entrevista",
+          "status": "DRAFT",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar.",
+          "slug": "auxiliar-de-cozinha-tarefas-boas-praticas",
+          "draftFile": "editorial/2026-10-28/13h-auxiliar-cozinha-boas-praticas.md"
+        },
+        {
+          "time": "17:00",
+          "type": "GUIDE",
+          "category": "seguranca_e_orientacao",
+          "editorialTheme": "convite de entrevista em endereço diferente do anúncio",
+          "workingTitle": "Entrevista em endereço diferente do anúncio: como confirmar com segurança",
+          "status": "DRAFT",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar.",
+          "slug": "entrevista-endereco-diferente-do-anuncio-como-verificar",
+          "draftFile": "editorial/2026-10-28/17h-endereco-entrevista-divergente.md"
+        }
+      ]
+    },
+    {
+      "date": "2026-10-29",
+      "posts": [
+        {
+          "time": "09:00",
+          "type": "GUIDE",
+          "category": "carreira",
+          "editorialTheme": "quem quer trocar de setor sem perder competências",
+          "workingTitle": "Mudar de setor: como demonstrar competências transferíveis sem inventar experiência",
+          "status": "DRAFT",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar.",
+          "slug": "mudar-de-setor-competencias-transferiveis",
+          "draftFile": "editorial/2026-10-29/09h-trocar-setor-habilidades-transferiveis.md"
+        },
+        {
+          "time": "13:00",
+          "type": "GUIDE",
+          "category": "setor_profissional",
+          "editorialTheme": "operador de telefonia",
+          "workingTitle": "Operador de telefonia: rotina, registros e preparação para a entrevista",
+          "status": "DRAFT",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar.",
+          "slug": "operador-telefonia-rotina-registros-entrevista",
+          "draftFile": "editorial/2026-10-29/13h-operador-telefonia-atendimento.md"
+        },
+        {
+          "time": "17:00",
+          "type": "GUIDE",
+          "category": "seguranca_e_orientacao",
+          "editorialTheme": "uso de e-mail pessoal se passando por empresa",
+          "workingTitle": "E-mail de recrutamento suspeito: como verificar remetente e links antes de responder",
+          "status": "DRAFT",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar.",
+          "slug": "email-recrutamento-suspeito-verificar-remetente",
+          "draftFile": "editorial/2026-10-29/17h-email-falso-recrutamento.md"
+        }
+      ]
+    },
+    {
+      "date": "2026-10-30",
+      "posts": [
+        {
+          "time": "09:00",
+          "type": "GUIDE",
+          "category": "carreira",
+          "editorialTheme": "quem não possui referências profissionais recentes",
+          "workingTitle": "Sem referências profissionais recentes? Como organizar experiências verificáveis",
+          "status": "DRAFT",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar.",
+          "slug": "referencias-profissionais-recentes-como-organizar",
+          "draftFile": "editorial/2026-10-30/09h-referencias-profissionais-recentes.md"
+        },
+        {
+          "time": "13:00",
+          "type": "GUIDE",
+          "category": "setor_profissional",
+          "editorialTheme": "apoio em hotelaria",
+          "workingTitle": "Apoio em hotelaria: diferenças entre limpeza, recepção e organização de ambientes",
+          "status": "DRAFT",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar.",
+          "slug": "apoio-em-hotelaria-rotinas-e-entrevista",
+          "draftFile": "editorial/2026-10-30/13h-apoio-hotelaria-tarefas.md"
+        },
+        {
+          "time": "17:00",
+          "type": "GUIDE",
+          "category": "seguranca_e_orientacao",
+          "editorialTheme": "anúncio com salário variável pouco explicado",
+          "workingTitle": "Salário variável no anúncio: perguntas essenciais antes de aceitar a entrevista",
+          "status": "DRAFT",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar.",
+          "slug": "salario-variavel-em-vaga-como-esclarecer",
+          "draftFile": "editorial/2026-10-30/17h-salario-variavel-anuncio.md"
+        }
+      ]
+    },
+    {
+      "date": "2026-10-31",
+      "posts": [
+        {
+          "time": "09:00",
+          "type": "GUIDE",
+          "category": "carreira",
+          "editorialTheme": "quem precisa explicar um intervalo no currículo",
+          "workingTitle": "Intervalo no currículo: como explicar períodos sem emprego sem inventar cargo",
+          "status": "DRAFT",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar.",
+          "slug": "intervalo-no-curriculo-como-explicar-honestamente",
+          "draftFile": "editorial/2026-10-31/09h-intervalo-no-curriculo.md"
+        },
+        {
+          "time": "13:00",
+          "type": "GUIDE",
+          "category": "setor_profissional",
+          "editorialTheme": "assistente de faturamento",
+          "workingTitle": "Assistente de faturamento: conferência de documentos e cuidados na rotina",
+          "status": "DRAFT",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar.",
+          "slug": "assistente-faturamento-conferencia-documentos-rotina",
+          "draftFile": "editorial/2026-10-31/13h-assistente-faturamento-rotinas.md"
+        },
+        {
+          "time": "17:00",
+          "type": "GUIDE",
+          "category": "seguranca_e_orientacao",
+          "editorialTheme": "promessa de vaga remota com compra de equipamento",
+          "workingTitle": "Vaga remota que exige comprar equipamento: como conferir antes de pagar",
+          "status": "DRAFT",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar.",
+          "slug": "vaga-remota-compra-de-equipamento-alertas",
+          "draftFile": "editorial/2026-10-31/17h-vaga-remota-compra-equipamento.md"
+        }
+      ]
+    },
+    {
+      "date": "2026-11-01",
+      "posts": [
+        {
+          "time": "09:00",
+          "type": "GUIDE",
+          "category": "carreira",
+          "editorialTheme": "quem depende de transporte em horários limitados",
+          "workingTitle": "Vaga com horário difícil para o transporte: como avaliar a rotina antes de aceitar",
+          "status": "DRAFT",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar.",
+          "slug": "vaga-emprego-horario-transporte-deslocamento",
+          "draftFile": "editorial/2026-11-01/09h-transporte-horarios-vaga.md"
+        },
+        {
+          "time": "13:00",
+          "type": "GUIDE",
+          "category": "setor_profissional",
+          "editorialTheme": "auxiliar de inventário",
+          "workingTitle": "Auxiliar de inventário: contagem, divergências e como demonstrar atenção aos detalhes",
+          "status": "DRAFT",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar.",
+          "slug": "auxiliar-inventario-contagem-conferencia-experiencia",
+          "draftFile": "editorial/2026-11-01/13h-auxiliar-inventario-conferencia.md"
+        },
+        {
+          "time": "17:00",
+          "type": "GUIDE",
+          "category": "seguranca_e_orientacao",
+          "editorialTheme": "indicação de treinamento fora do canal oficial",
+          "workingTitle": "Treinamento fora do canal oficial: como confirmar se faz parte da seleção",
+          "status": "DRAFT",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar.",
+          "slug": "treinamento-recrutamento-fora-canal-oficial-verificar",
+          "draftFile": "editorial/2026-11-01/17h-treinamento-fora-canal-oficial.md"
+        }
+      ]
+    },
+    {
+      "date": "2026-11-02",
+      "posts": [
+        {
+          "time": "09:00",
+          "type": "GUIDE",
+          "category": "carreira",
+          "editorialTheme": "quem busca primeiro emprego após o ensino médio",
+          "workingTitle": "Evidências simples para entrevistas de quem busca primeiro emprego após o ensino médio: o que preparar",
+          "status": "DRAFT",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar.",
+          "slug": "primeiro-emprego-ensino-medio-evidencias-entrevista",
+          "draftFile": "editorial/2026-11-02/09h-primeiro-emprego-evidencias-ensino-medio.md"
+        },
+        {
+          "time": "13:00",
+          "type": "GUIDE",
+          "category": "setor_profissional",
+          "editorialTheme": "recepção de escola",
+          "workingTitle": "Perguntas importantes antes de aceitar uma vaga de recepção de escola",
+          "status": "DRAFT",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar.",
+          "slug": "recepcao-escola-perguntas-rotina-entrevista",
+          "draftFile": "editorial/2026-11-02/13h-recepcao-escola-perguntas-antes-aceitar.md"
+        },
+        {
+          "time": "17:00",
+          "type": "GUIDE",
+          "category": "seguranca_e_orientacao",
+          "editorialTheme": "pedido de CPF antes de confirmação do processo",
+          "workingTitle": "Quais provas guardar ao receber um pedido de CPF antes de confirmação do processo",
+          "status": "DRAFT",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar.",
+          "slug": "pedido-cpf-antes-confirmacao-selecao-como-verificar",
+          "draftFile": "editorial/2026-11-02/17h-cpf-antes-confirmacao-processo.md"
+        }
+      ]
+    },
+    {
+      "date": "2026-11-03",
+      "posts": [
+        {
+          "time": "09:00",
+          "type": "GUIDE",
+          "category": "carreira",
+          "editorialTheme": "quem trabalhou como autônomo e quer voltar à CLT",
+          "workingTitle": "Trabalhou por conta própria? Como apresentar experiência verificável ao voltar à CLT",
+          "status": "DRAFT",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar.",
+          "slug": "autonomo-voltar-clt-experiencia-verificavel",
+          "draftFile": "editorial/2026-11-03/09h-autonomo-retorno-clt-evidencias.md"
+        },
+        {
+          "time": "13:00",
+          "type": "GUIDE",
+          "category": "setor_profissional",
+          "editorialTheme": "apoio de biblioteca",
+          "workingTitle": "Apoio em biblioteca: o que perguntar sobre acervo, atendimento e organização",
+          "status": "DRAFT",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar.",
+          "slug": "apoio-biblioteca-rotina-atendimento-entrevista",
+          "draftFile": "editorial/2026-11-03/13h-apoio-biblioteca-rotina-perguntas.md"
+        },
+        {
+          "time": "17:00",
+          "type": "GUIDE",
+          "category": "seguranca_e_orientacao",
+          "editorialTheme": "boleto para treinamento obrigatório antes da admissão",
+          "workingTitle": "Boleto de treinamento antes da admissão: como verificar a cobrança e guardar provas",
+          "status": "DRAFT",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar.",
+          "slug": "boleto-treinamento-obrigatorio-recrutamento-verificar",
+          "draftFile": "editorial/2026-11-03/17h-boleto-treinamento-antes-admissao.md"
+        }
+      ]
+    },
+    {
+      "date": "2026-11-04",
+      "posts": [
+        {
+          "time": "09:00",
+          "type": "GUIDE",
+          "category": "carreira",
+          "editorialTheme": "quem retorna após pausa para cuidar da família",
+          "workingTitle": "Evidências simples para entrevistas de quem retorna após pausa para cuidar da família: o que preparar",
+          "status": "DRAFT",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar.",
+          "slug": "retorno-ao-trabalho-pausa-cuidados-familia-evidencias",
+          "draftFile": "editorial/2026-11-04/09h-retorno-pausa-cuidados-familia.md"
+        },
+        {
+          "time": "13:00",
+          "type": "GUIDE",
+          "category": "setor_profissional",
+          "editorialTheme": "assistente de compras",
+          "workingTitle": "Perguntas importantes antes de aceitar uma vaga de assistente de compras",
+          "status": "DRAFT",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar.",
+          "slug": "assistente-compras-perguntas-rotina-entrevista",
+          "draftFile": "editorial/2026-11-04/13h-assistente-compras-entrevista.md"
+        },
+        {
+          "time": "17:00",
+          "type": "GUIDE",
+          "category": "seguranca_e_orientacao",
+          "editorialTheme": "link encurtado enviado por recrutador desconhecido",
+          "workingTitle": "Quais provas guardar ao receber um link encurtado enviado por recrutador desconhecido",
+          "status": "DRAFT",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar.",
+          "slug": "link-encurtado-recrutador-desconhecido-verificar-provas",
+          "draftFile": "editorial/2026-11-04/17h-link-encurtado-recrutador.md"
+        }
+      ]
+    },
+    {
+      "date": "2026-11-05",
+      "posts": [
+        {
+          "time": "09:00",
+          "type": "GUIDE",
+          "category": "carreira",
+          "editorialTheme": "quem trabalha à noite e procura outra vaga",
+          "workingTitle": "Evidências simples para entrevistas de quem trabalha à noite e procura outra vaga: o que preparar",
+          "status": "DRAFT",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar.",
+          "slug": "trabalho-noturno-procurar-outra-vaga-evidencias-entrevista",
+          "draftFile": "editorial/2026-11-05/09h-trabalho-noturno-busca-outra-vaga.md"
+        },
+        {
+          "time": "13:00",
+          "type": "GUIDE",
+          "category": "setor_profissional",
+          "editorialTheme": "reposição em loja",
+          "workingTitle": "Perguntas importantes antes de aceitar uma vaga de reposição em loja",
+          "status": "DRAFT",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar.",
+          "slug": "reposicao-loja-perguntas-rotina-antes-aceitar",
+          "draftFile": "editorial/2026-11-05/13h-reposicao-loja-rotina-perguntas.md"
+        },
+        {
+          "time": "17:00",
+          "type": "GUIDE",
+          "category": "seguranca_e_orientacao",
+          "editorialTheme": "convite de entrevista sem identificação da empresa",
+          "workingTitle": "Quais provas guardar ao receber um convite de entrevista sem identificação da empresa",
+          "status": "DRAFT",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar.",
+          "slug": "convite-entrevista-sem-empresa-provas-verificacao",
+          "draftFile": "editorial/2026-11-05/17h-convite-entrevista-sem-empresa.md"
+        }
+      ]
+    },
+    {
+      "date": "2026-11-06",
+      "posts": [
+        {
+          "time": "09:00",
+          "type": "GUIDE",
+          "category": "carreira",
+          "editorialTheme": "quem concluiu curso técnico sem experiência formal",
+          "workingTitle": "Evidências simples para entrevistas de quem concluiu curso técnico sem experiência formal: o que preparar",
+          "status": "PLANNED",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+        },
+        {
+          "time": "13:00",
+          "type": "GUIDE",
+          "category": "setor_profissional",
+          "editorialTheme": "auxiliar de almoxarifado",
+          "workingTitle": "Perguntas importantes antes de aceitar uma vaga de auxiliar de almoxarifado",
+          "status": "PLANNED",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+        },
+        {
+          "time": "17:00",
+          "type": "GUIDE",
+          "category": "seguranca_e_orientacao",
+          "editorialTheme": "pedido de senha da conta gov.br",
+          "workingTitle": "Quais provas guardar ao receber um pedido de senha da conta gov.br",
+          "status": "PLANNED",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+        }
+      ]
+    },
+    {
+      "date": "2026-11-07",
+      "posts": [
+        {
+          "time": "09:00",
+          "type": "GUIDE",
+          "category": "carreira",
+          "editorialTheme": "quem mudou de município na Grande Ilha",
+          "workingTitle": "Evidências simples para entrevistas de quem mudou de município na Grande Ilha: o que preparar",
+          "status": "PLANNED",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+        },
+        {
+          "time": "13:00",
+          "type": "GUIDE",
+          "category": "setor_profissional",
+          "editorialTheme": "apoio de laboratório",
+          "workingTitle": "Perguntas importantes antes de aceitar uma vaga de apoio de laboratório",
+          "status": "PLANNED",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+        },
+        {
+          "time": "17:00",
+          "type": "GUIDE",
+          "category": "seguranca_e_orientacao",
+          "editorialTheme": "promessa de contratação garantida após Pix",
+          "workingTitle": "Quais provas guardar ao receber um promessa de contratação garantida após Pix",
+          "status": "PLANNED",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+        }
+      ]
+    },
+    {
+      "date": "2026-11-08",
+      "posts": [
+        {
+          "time": "09:00",
+          "type": "GUIDE",
+          "category": "carreira",
+          "editorialTheme": "quem quer migrar do comércio para escritório",
+          "workingTitle": "Evidências simples para entrevistas de quem quer migrar do comércio para escritório: o que preparar",
+          "status": "PLANNED",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+        },
+        {
+          "time": "13:00",
+          "type": "GUIDE",
+          "category": "setor_profissional",
+          "editorialTheme": "atendimento de farmácia",
+          "workingTitle": "Perguntas importantes antes de aceitar uma vaga de atendimento de farmácia",
+          "status": "PLANNED",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+        },
+        {
+          "time": "17:00",
+          "type": "GUIDE",
+          "category": "seguranca_e_orientacao",
+          "editorialTheme": "uso indevido de logotipo de empresa",
+          "workingTitle": "Quais provas guardar ao receber um uso indevido de logotipo de empresa",
+          "status": "PLANNED",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+        }
+      ]
+    },
+    {
+      "date": "2026-11-09",
+      "posts": [
+        {
+          "time": "09:00",
+          "type": "GUIDE",
+          "category": "carreira",
+          "editorialTheme": "quem busca ocupação com jornada parcial",
+          "workingTitle": "Evidências simples para entrevistas de quem busca ocupação com jornada parcial: o que preparar",
+          "status": "PLANNED",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+        },
+        {
+          "time": "13:00",
+          "type": "GUIDE",
+          "category": "setor_profissional",
+          "editorialTheme": "assistente de manutenção predial",
+          "workingTitle": "Perguntas importantes antes de aceitar uma vaga de assistente de manutenção predial",
+          "status": "PLANNED",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+        },
+        {
+          "time": "17:00",
+          "type": "GUIDE",
+          "category": "seguranca_e_orientacao",
+          "editorialTheme": "envio de contrato por aplicativo desconhecido",
+          "workingTitle": "Quais provas guardar ao receber um envio de contrato por aplicativo desconhecido",
+          "status": "PLANNED",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+        }
+      ]
+    },
+    {
+      "date": "2026-11-10",
+      "posts": [
+        {
+          "time": "09:00",
+          "type": "GUIDE",
+          "category": "carreira",
+          "editorialTheme": "quem precisa conciliar trabalho e estudo",
+          "workingTitle": "Evidências simples para entrevistas de quem precisa conciliar trabalho e estudo: o que preparar",
+          "status": "PLANNED",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+        },
+        {
+          "time": "13:00",
+          "type": "GUIDE",
+          "category": "setor_profissional",
+          "editorialTheme": "conferência de mercadorias",
+          "workingTitle": "Perguntas importantes antes de aceitar uma vaga de conferência de mercadorias",
+          "status": "PLANNED",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+        },
+        {
+          "time": "17:00",
+          "type": "GUIDE",
+          "category": "seguranca_e_orientacao",
+          "editorialTheme": "recebimento de oferta com escala incompleta",
+          "workingTitle": "Quais provas guardar ao receber um recebimento de oferta com escala incompleta",
+          "status": "PLANNED",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+        }
+      ]
+    },
+    {
+      "date": "2026-11-11",
+      "posts": [
+        {
+          "time": "09:00",
+          "type": "GUIDE",
+          "category": "carreira",
+          "editorialTheme": "quem já foi auxiliar mas quer cargo de conferência",
+          "workingTitle": "Evidências simples para entrevistas de quem já foi auxiliar mas quer cargo de conferência: o que preparar",
+          "status": "PLANNED",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+        },
+        {
+          "time": "13:00",
+          "type": "GUIDE",
+          "category": "setor_profissional",
+          "editorialTheme": "auxiliar de cadastro",
+          "workingTitle": "Perguntas importantes antes de aceitar uma vaga de auxiliar de cadastro",
+          "status": "PLANNED",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+        },
+        {
+          "time": "17:00",
+          "type": "GUIDE",
+          "category": "seguranca_e_orientacao",
+          "editorialTheme": "mensagem que exige resposta em poucos minutos",
+          "workingTitle": "Quais provas guardar ao receber um mensagem que exige resposta em poucos minutos",
+          "status": "PLANNED",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+        }
+      ]
+    },
+    {
+      "date": "2026-11-12",
+      "posts": [
+        {
+          "time": "09:00",
+          "type": "GUIDE",
+          "category": "carreira",
+          "editorialTheme": "quem tem experiência de trabalho informal em atendimento",
+          "workingTitle": "Evidências simples para entrevistas de quem tem experiência de trabalho informal em atendimento: o que preparar",
+          "status": "PLANNED",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+        },
+        {
+          "time": "13:00",
+          "type": "GUIDE",
+          "category": "setor_profissional",
+          "editorialTheme": "apoio em eventos",
+          "workingTitle": "Perguntas importantes antes de aceitar uma vaga de apoio em eventos",
+          "status": "PLANNED",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+        },
+        {
+          "time": "17:00",
+          "type": "GUIDE",
+          "category": "seguranca_e_orientacao",
+          "editorialTheme": "exigência de dados bancários na primeira mensagem",
+          "workingTitle": "Quais provas guardar ao receber um exigência de dados bancários na primeira mensagem",
+          "status": "PLANNED",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+        }
+      ]
+    },
+    {
+      "date": "2026-11-13",
+      "posts": [
+        {
+          "time": "09:00",
+          "type": "GUIDE",
+          "category": "carreira",
+          "editorialTheme": "quem está retornando ao mercado depois dos 40",
+          "workingTitle": "Evidências simples para entrevistas de quem está retornando ao mercado depois dos 40: o que preparar",
+          "status": "PLANNED",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+        },
+        {
+          "time": "13:00",
+          "type": "GUIDE",
+          "category": "setor_profissional",
+          "editorialTheme": "controle de qualidade básico",
+          "workingTitle": "Perguntas importantes antes de aceitar uma vaga de controle de qualidade básico",
+          "status": "PLANNED",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+        },
+        {
+          "time": "17:00",
+          "type": "GUIDE",
+          "category": "seguranca_e_orientacao",
+          "editorialTheme": "formulário que pede selfie com documento",
+          "workingTitle": "Quais provas guardar ao receber um formulário que pede selfie com documento",
+          "status": "PLANNED",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+        }
+      ]
+    },
+    {
+      "date": "2026-11-14",
+      "posts": [
+        {
+          "time": "09:00",
+          "type": "GUIDE",
+          "category": "carreira",
+          "editorialTheme": "quem quer demonstrar Excel básico sem exagerar",
+          "workingTitle": "Evidências simples para entrevistas de quem quer demonstrar Excel básico sem exagerar: o que preparar",
+          "status": "PLANNED",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+        },
+        {
+          "time": "13:00",
+          "type": "GUIDE",
+          "category": "setor_profissional",
+          "editorialTheme": "auxiliar de expedição",
+          "workingTitle": "Perguntas importantes antes de aceitar uma vaga de auxiliar de expedição",
+          "status": "PLANNED",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+        },
+        {
+          "time": "17:00",
+          "type": "GUIDE",
+          "category": "seguranca_e_orientacao",
+          "editorialTheme": "pedido de currículo contendo documentos digitalizados",
+          "workingTitle": "Quais provas guardar ao receber um pedido de currículo contendo documentos digitalizados",
+          "status": "PLANNED",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+        }
+      ]
+    },
+    {
+      "date": "2026-11-15",
+      "posts": [
+        {
+          "time": "09:00",
+          "type": "GUIDE",
+          "category": "carreira",
+          "editorialTheme": "quem realizou trabalho voluntário",
+          "workingTitle": "Evidências simples para entrevistas de quem realizou trabalho voluntário: o que preparar",
+          "status": "PLANNED",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+        },
+        {
+          "time": "13:00",
+          "type": "GUIDE",
+          "category": "setor_profissional",
+          "editorialTheme": "atendimento ao turista",
+          "workingTitle": "Perguntas importantes antes de aceitar uma vaga de atendimento ao turista",
+          "status": "PLANNED",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+        },
+        {
+          "time": "17:00",
+          "type": "GUIDE",
+          "category": "seguranca_e_orientacao",
+          "editorialTheme": "falta de informação sobre local da entrevista",
+          "workingTitle": "Quais provas guardar ao receber um falta de informação sobre local da entrevista",
+          "status": "PLANNED",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+        }
+      ]
+    },
+    {
+      "date": "2026-11-16",
+      "posts": [
+        {
+          "time": "09:00",
+          "type": "GUIDE",
+          "category": "carreira",
+          "editorialTheme": "quem teve vários contratos de curta duração",
+          "workingTitle": "Evidências simples para entrevistas de quem teve vários contratos de curta duração: o que preparar",
+          "status": "PLANNED",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+        },
+        {
+          "time": "13:00",
+          "type": "GUIDE",
+          "category": "setor_profissional",
+          "editorialTheme": "assistente de arquivo",
+          "workingTitle": "Perguntas importantes antes de aceitar uma vaga de assistente de arquivo",
+          "status": "PLANNED",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+        },
+        {
+          "time": "17:00",
+          "type": "GUIDE",
+          "category": "seguranca_e_orientacao",
+          "editorialTheme": "ausência de identificação do empregador",
+          "workingTitle": "Quais provas guardar ao receber um ausência de identificação do empregador",
+          "status": "PLANNED",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+        }
+      ]
+    },
+    {
+      "date": "2026-11-17",
+      "posts": [
+        {
+          "time": "09:00",
+          "type": "GUIDE",
+          "category": "carreira",
+          "editorialTheme": "quem procura estágio na área administrativa",
+          "workingTitle": "Evidências simples para entrevistas de quem procura estágio na área administrativa: o que preparar",
+          "status": "PLANNED",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+        },
+        {
+          "time": "13:00",
+          "type": "GUIDE",
+          "category": "setor_profissional",
+          "editorialTheme": "auxiliar de cozinha",
+          "workingTitle": "Perguntas importantes antes de aceitar uma vaga de auxiliar de cozinha",
+          "status": "PLANNED",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+        },
+        {
+          "time": "17:00",
+          "type": "GUIDE",
+          "category": "seguranca_e_orientacao",
+          "editorialTheme": "convite de entrevista em endereço diferente do anúncio",
+          "workingTitle": "Quais provas guardar ao receber um convite de entrevista em endereço diferente do anúncio",
+          "status": "PLANNED",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+        }
+      ]
+    },
+    {
+      "date": "2026-11-18",
+      "posts": [
+        {
+          "time": "09:00",
+          "type": "GUIDE",
+          "category": "carreira",
+          "editorialTheme": "quem quer trocar de setor sem perder competências",
+          "workingTitle": "Evidências simples para entrevistas de quem quer trocar de setor sem perder competências: o que preparar",
+          "status": "PLANNED",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+        },
+        {
+          "time": "13:00",
+          "type": "GUIDE",
+          "category": "setor_profissional",
+          "editorialTheme": "operador de telefonia",
+          "workingTitle": "Perguntas importantes antes de aceitar uma vaga de operador de telefonia",
+          "status": "PLANNED",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+        },
+        {
+          "time": "17:00",
+          "type": "GUIDE",
+          "category": "seguranca_e_orientacao",
+          "editorialTheme": "uso de e-mail pessoal se passando por empresa",
+          "workingTitle": "Quais provas guardar ao receber um uso de e-mail pessoal se passando por empresa",
+          "status": "PLANNED",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+        }
+      ]
+    },
+    {
+      "date": "2026-11-19",
+      "posts": [
+        {
+          "time": "09:00",
+          "type": "GUIDE",
+          "category": "carreira",
+          "editorialTheme": "quem não possui referências profissionais recentes",
+          "workingTitle": "Evidências simples para entrevistas de quem não possui referências profissionais recentes: o que preparar",
+          "status": "PLANNED",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+        },
+        {
+          "time": "13:00",
+          "type": "GUIDE",
+          "category": "setor_profissional",
+          "editorialTheme": "apoio em hotelaria",
+          "workingTitle": "Perguntas importantes antes de aceitar uma vaga de apoio em hotelaria",
+          "status": "PLANNED",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+        },
+        {
+          "time": "17:00",
+          "type": "GUIDE",
+          "category": "seguranca_e_orientacao",
+          "editorialTheme": "anúncio com salário variável pouco explicado",
+          "workingTitle": "Quais provas guardar ao receber um anúncio com salário variável pouco explicado",
+          "status": "PLANNED",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+        }
+      ]
+    },
+    {
+      "date": "2026-11-20",
+      "posts": [
+        {
+          "time": "09:00",
+          "type": "GUIDE",
+          "category": "carreira",
+          "editorialTheme": "quem precisa explicar um intervalo no currículo",
+          "workingTitle": "Evidências simples para entrevistas de quem precisa explicar um intervalo no currículo: o que preparar",
+          "status": "PLANNED",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+        },
+        {
+          "time": "13:00",
+          "type": "GUIDE",
+          "category": "setor_profissional",
+          "editorialTheme": "assistente de faturamento",
+          "workingTitle": "Perguntas importantes antes de aceitar uma vaga de assistente de faturamento",
+          "status": "PLANNED",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+        },
+        {
+          "time": "17:00",
+          "type": "GUIDE",
+          "category": "seguranca_e_orientacao",
+          "editorialTheme": "promessa de vaga remota com compra de equipamento",
+          "workingTitle": "Quais provas guardar ao receber um promessa de vaga remota com compra de equipamento",
+          "status": "PLANNED",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+        }
+      ]
+    },
+    {
+      "date": "2026-11-21",
+      "posts": [
+        {
+          "time": "09:00",
+          "type": "GUIDE",
+          "category": "carreira",
+          "editorialTheme": "quem depende de transporte em horários limitados",
+          "workingTitle": "Evidências simples para entrevistas de quem depende de transporte em horários limitados: o que preparar",
+          "status": "PLANNED",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+        },
+        {
+          "time": "13:00",
+          "type": "GUIDE",
+          "category": "setor_profissional",
+          "editorialTheme": "auxiliar de inventário",
+          "workingTitle": "Perguntas importantes antes de aceitar uma vaga de auxiliar de inventário",
+          "status": "PLANNED",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+        },
+        {
+          "time": "17:00",
+          "type": "GUIDE",
+          "category": "seguranca_e_orientacao",
+          "editorialTheme": "indicação de treinamento fora do canal oficial",
+          "workingTitle": "Quais provas guardar ao receber um indicação de treinamento fora do canal oficial",
+          "status": "PLANNED",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+        }
+      ]
+    },
+    {
+      "date": "2026-11-22",
+      "posts": [
+        {
+          "time": "09:00",
+          "type": "GUIDE",
+          "category": "carreira",
+          "editorialTheme": "quem busca primeiro emprego após o ensino médio",
+          "workingTitle": "Currículo em dois formatos para quem busca primeiro emprego após o ensino médio: quando usar cada um",
+          "status": "PLANNED",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+        },
+        {
+          "time": "13:00",
+          "type": "GUIDE",
+          "category": "setor_profissional",
+          "editorialTheme": "recepção de escola",
+          "workingTitle": "Três situações de entrevista para recepção de escola com exemplos ilustrativos",
+          "status": "PLANNED",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+        },
+        {
+          "time": "17:00",
+          "type": "GUIDE",
+          "category": "seguranca_e_orientacao",
+          "editorialTheme": "pedido de CPF antes de confirmação do processo",
+          "workingTitle": "O que perguntar à empresa diante de um pedido de CPF antes de confirmação do processo",
+          "status": "PLANNED",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+        }
+      ]
+    },
+    {
+      "date": "2026-11-23",
+      "posts": [
+        {
+          "time": "09:00",
+          "type": "GUIDE",
+          "category": "carreira",
+          "editorialTheme": "quem trabalhou como autônomo e quer voltar à CLT",
+          "workingTitle": "Currículo em dois formatos para quem trabalhou como autônomo e quer voltar à CLT: quando usar cada um",
+          "status": "PLANNED",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+        },
+        {
+          "time": "13:00",
+          "type": "GUIDE",
+          "category": "setor_profissional",
+          "editorialTheme": "apoio de biblioteca",
+          "workingTitle": "Três situações de entrevista para apoio de biblioteca com exemplos ilustrativos",
+          "status": "PLANNED",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+        },
+        {
+          "time": "17:00",
+          "type": "GUIDE",
+          "category": "seguranca_e_orientacao",
+          "editorialTheme": "boleto para treinamento obrigatório antes da admissão",
+          "workingTitle": "O que perguntar à empresa diante de um boleto para treinamento obrigatório antes da admissão",
+          "status": "PLANNED",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+        }
+      ]
+    },
+    {
+      "date": "2026-11-24",
+      "posts": [
+        {
+          "time": "09:00",
+          "type": "GUIDE",
+          "category": "carreira",
+          "editorialTheme": "quem retorna após pausa para cuidar da família",
+          "workingTitle": "Currículo em dois formatos para quem retorna após pausa para cuidar da família: quando usar cada um",
+          "status": "PLANNED",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+        },
+        {
+          "time": "13:00",
+          "type": "GUIDE",
+          "category": "setor_profissional",
+          "editorialTheme": "assistente de compras",
+          "workingTitle": "Três situações de entrevista para assistente de compras com exemplos ilustrativos",
+          "status": "PLANNED",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+        },
+        {
+          "time": "17:00",
+          "type": "GUIDE",
+          "category": "seguranca_e_orientacao",
+          "editorialTheme": "link encurtado enviado por recrutador desconhecido",
+          "workingTitle": "O que perguntar à empresa diante de um link encurtado enviado por recrutador desconhecido",
+          "status": "PLANNED",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+        }
+      ]
+    },
+    {
+      "date": "2026-11-25",
+      "posts": [
+        {
+          "time": "09:00",
+          "type": "GUIDE",
+          "category": "carreira",
+          "editorialTheme": "quem trabalha à noite e procura outra vaga",
+          "workingTitle": "Currículo em dois formatos para quem trabalha à noite e procura outra vaga: quando usar cada um",
+          "status": "PLANNED",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+        },
+        {
+          "time": "13:00",
+          "type": "GUIDE",
+          "category": "setor_profissional",
+          "editorialTheme": "reposição em loja",
+          "workingTitle": "Três situações de entrevista para reposição em loja com exemplos ilustrativos",
+          "status": "PLANNED",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+        },
+        {
+          "time": "17:00",
+          "type": "GUIDE",
+          "category": "seguranca_e_orientacao",
+          "editorialTheme": "convite de entrevista sem identificação da empresa",
+          "workingTitle": "O que perguntar à empresa diante de um convite de entrevista sem identificação da empresa",
+          "status": "PLANNED",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+        }
+      ]
+    },
+    {
+      "date": "2026-11-26",
+      "posts": [
+        {
+          "time": "09:00",
+          "type": "GUIDE",
+          "category": "carreira",
+          "editorialTheme": "quem concluiu curso técnico sem experiência formal",
+          "workingTitle": "Currículo em dois formatos para quem concluiu curso técnico sem experiência formal: quando usar cada um",
+          "status": "PLANNED",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+        },
+        {
+          "time": "13:00",
+          "type": "GUIDE",
+          "category": "setor_profissional",
+          "editorialTheme": "auxiliar de almoxarifado",
+          "workingTitle": "Três situações de entrevista para auxiliar de almoxarifado com exemplos ilustrativos",
+          "status": "PLANNED",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+        },
+        {
+          "time": "17:00",
+          "type": "GUIDE",
+          "category": "seguranca_e_orientacao",
+          "editorialTheme": "pedido de senha da conta gov.br",
+          "workingTitle": "O que perguntar à empresa diante de um pedido de senha da conta gov.br",
+          "status": "PLANNED",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+        }
+      ]
+    },
+    {
+      "date": "2026-11-27",
+      "posts": [
+        {
+          "time": "09:00",
+          "type": "GUIDE",
+          "category": "carreira",
+          "editorialTheme": "quem mudou de município na Grande Ilha",
+          "workingTitle": "Currículo em dois formatos para quem mudou de município na Grande Ilha: quando usar cada um",
+          "status": "PLANNED",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+        },
+        {
+          "time": "13:00",
+          "type": "GUIDE",
+          "category": "setor_profissional",
+          "editorialTheme": "apoio de laboratório",
+          "workingTitle": "Três situações de entrevista para apoio de laboratório com exemplos ilustrativos",
+          "status": "PLANNED",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+        },
+        {
+          "time": "17:00",
+          "type": "GUIDE",
+          "category": "seguranca_e_orientacao",
+          "editorialTheme": "promessa de contratação garantida após Pix",
+          "workingTitle": "O que perguntar à empresa diante de um promessa de contratação garantida após Pix",
+          "status": "PLANNED",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+        }
+      ]
+    },
+    {
+      "date": "2026-11-28",
+      "posts": [
+        {
+          "time": "09:00",
+          "type": "GUIDE",
+          "category": "carreira",
+          "editorialTheme": "quem quer migrar do comércio para escritório",
+          "workingTitle": "Currículo em dois formatos para quem quer migrar do comércio para escritório: quando usar cada um",
+          "status": "PLANNED",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+        },
+        {
+          "time": "13:00",
+          "type": "GUIDE",
+          "category": "setor_profissional",
+          "editorialTheme": "atendimento de farmácia",
+          "workingTitle": "Três situações de entrevista para atendimento de farmácia com exemplos ilustrativos",
+          "status": "PLANNED",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+        },
+        {
+          "time": "17:00",
+          "type": "GUIDE",
+          "category": "seguranca_e_orientacao",
+          "editorialTheme": "uso indevido de logotipo de empresa",
+          "workingTitle": "O que perguntar à empresa diante de um uso indevido de logotipo de empresa",
+          "status": "PLANNED",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+        }
+      ]
+    },
+    {
+      "date": "2026-11-29",
+      "posts": [
+        {
+          "time": "09:00",
+          "type": "GUIDE",
+          "category": "carreira",
+          "editorialTheme": "quem busca ocupação com jornada parcial",
+          "workingTitle": "Currículo em dois formatos para quem busca ocupação com jornada parcial: quando usar cada um",
+          "status": "PLANNED",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+        },
+        {
+          "time": "13:00",
+          "type": "GUIDE",
+          "category": "setor_profissional",
+          "editorialTheme": "assistente de manutenção predial",
+          "workingTitle": "Três situações de entrevista para assistente de manutenção predial com exemplos ilustrativos",
+          "status": "PLANNED",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+        },
+        {
+          "time": "17:00",
+          "type": "GUIDE",
+          "category": "seguranca_e_orientacao",
+          "editorialTheme": "envio de contrato por aplicativo desconhecido",
+          "workingTitle": "O que perguntar à empresa diante de um envio de contrato por aplicativo desconhecido",
+          "status": "PLANNED",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+        }
+      ]
+    },
+    {
+      "date": "2026-11-30",
+      "posts": [
+        {
+          "time": "09:00",
+          "type": "GUIDE",
+          "category": "carreira",
+          "editorialTheme": "quem precisa conciliar trabalho e estudo",
+          "workingTitle": "Currículo em dois formatos para quem precisa conciliar trabalho e estudo: quando usar cada um",
+          "status": "PLANNED",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+        },
+        {
+          "time": "13:00",
+          "type": "GUIDE",
+          "category": "setor_profissional",
+          "editorialTheme": "conferência de mercadorias",
+          "workingTitle": "Três situações de entrevista para conferência de mercadorias com exemplos ilustrativos",
+          "status": "PLANNED",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+        },
+        {
+          "time": "17:00",
+          "type": "GUIDE",
+          "category": "seguranca_e_orientacao",
+          "editorialTheme": "recebimento de oferta com escala incompleta",
+          "workingTitle": "O que perguntar à empresa diante de um recebimento de oferta com escala incompleta",
+          "status": "PLANNED",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+        }
+      ]
+    },
+    {
+      "date": "2026-12-01",
+      "posts": [
+        {
+          "time": "09:00",
+          "type": "GUIDE",
+          "category": "carreira",
+          "editorialTheme": "quem já foi auxiliar mas quer cargo de conferência",
+          "workingTitle": "Currículo em dois formatos para quem já foi auxiliar mas quer cargo de conferência: quando usar cada um",
+          "status": "PLANNED",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+        },
+        {
+          "time": "13:00",
+          "type": "GUIDE",
+          "category": "setor_profissional",
+          "editorialTheme": "auxiliar de cadastro",
+          "workingTitle": "Três situações de entrevista para auxiliar de cadastro com exemplos ilustrativos",
+          "status": "PLANNED",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+        },
+        {
+          "time": "17:00",
+          "type": "GUIDE",
+          "category": "seguranca_e_orientacao",
+          "editorialTheme": "mensagem que exige resposta em poucos minutos",
+          "workingTitle": "O que perguntar à empresa diante de um mensagem que exige resposta em poucos minutos",
+          "status": "PLANNED",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+        }
+      ]
+    },
+    {
+      "date": "2026-12-02",
+      "posts": [
+        {
+          "time": "09:00",
+          "type": "GUIDE",
+          "category": "carreira",
+          "editorialTheme": "quem tem experiência de trabalho informal em atendimento",
+          "workingTitle": "Currículo em dois formatos para quem tem experiência de trabalho informal em atendimento: quando usar cada um",
+          "status": "PLANNED",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+        },
+        {
+          "time": "13:00",
+          "type": "GUIDE",
+          "category": "setor_profissional",
+          "editorialTheme": "apoio em eventos",
+          "workingTitle": "Três situações de entrevista para apoio em eventos com exemplos ilustrativos",
+          "status": "PLANNED",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+        },
+        {
+          "time": "17:00",
+          "type": "GUIDE",
+          "category": "seguranca_e_orientacao",
+          "editorialTheme": "exigência de dados bancários na primeira mensagem",
+          "workingTitle": "O que perguntar à empresa diante de um exigência de dados bancários na primeira mensagem",
+          "status": "PLANNED",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+        }
+      ]
+    },
+    {
+      "date": "2026-12-03",
+      "posts": [
+        {
+          "time": "09:00",
+          "type": "GUIDE",
+          "category": "carreira",
+          "editorialTheme": "quem está retornando ao mercado depois dos 40",
+          "workingTitle": "Currículo em dois formatos para quem está retornando ao mercado depois dos 40: quando usar cada um",
+          "status": "PLANNED",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+        },
+        {
+          "time": "13:00",
+          "type": "GUIDE",
+          "category": "setor_profissional",
+          "editorialTheme": "controle de qualidade básico",
+          "workingTitle": "Três situações de entrevista para controle de qualidade básico com exemplos ilustrativos",
+          "status": "PLANNED",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+        },
+        {
+          "time": "17:00",
+          "type": "GUIDE",
+          "category": "seguranca_e_orientacao",
+          "editorialTheme": "formulário que pede selfie com documento",
+          "workingTitle": "O que perguntar à empresa diante de um formulário que pede selfie com documento",
+          "status": "PLANNED",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+        }
+      ]
+    },
+    {
+      "date": "2026-12-04",
+      "posts": [
+        {
+          "time": "09:00",
+          "type": "GUIDE",
+          "category": "carreira",
+          "editorialTheme": "quem quer demonstrar Excel básico sem exagerar",
+          "workingTitle": "Currículo em dois formatos para quem quer demonstrar Excel básico sem exagerar: quando usar cada um",
+          "status": "PLANNED",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+        },
+        {
+          "time": "13:00",
+          "type": "GUIDE",
+          "category": "setor_profissional",
+          "editorialTheme": "auxiliar de expedição",
+          "workingTitle": "Três situações de entrevista para auxiliar de expedição com exemplos ilustrativos",
+          "status": "PLANNED",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+        },
+        {
+          "time": "17:00",
+          "type": "GUIDE",
+          "category": "seguranca_e_orientacao",
+          "editorialTheme": "pedido de currículo contendo documentos digitalizados",
+          "workingTitle": "O que perguntar à empresa diante de um pedido de currículo contendo documentos digitalizados",
+          "status": "PLANNED",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+        }
+      ]
+    },
+    {
+      "date": "2026-12-05",
+      "posts": [
+        {
+          "time": "09:00",
+          "type": "GUIDE",
+          "category": "carreira",
+          "editorialTheme": "quem realizou trabalho voluntário",
+          "workingTitle": "Currículo em dois formatos para quem realizou trabalho voluntário: quando usar cada um",
+          "status": "PLANNED",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+        },
+        {
+          "time": "13:00",
+          "type": "GUIDE",
+          "category": "setor_profissional",
+          "editorialTheme": "atendimento ao turista",
+          "workingTitle": "Três situações de entrevista para atendimento ao turista com exemplos ilustrativos",
+          "status": "PLANNED",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+        },
+        {
+          "time": "17:00",
+          "type": "GUIDE",
+          "category": "seguranca_e_orientacao",
+          "editorialTheme": "falta de informação sobre local da entrevista",
+          "workingTitle": "O que perguntar à empresa diante de um falta de informação sobre local da entrevista",
+          "status": "PLANNED",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+        }
+      ]
+    },
+    {
+      "date": "2026-12-06",
+      "posts": [
+        {
+          "time": "09:00",
+          "type": "GUIDE",
+          "category": "carreira",
+          "editorialTheme": "quem teve vários contratos de curta duração",
+          "workingTitle": "Currículo em dois formatos para quem teve vários contratos de curta duração: quando usar cada um",
+          "status": "PLANNED",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+        },
+        {
+          "time": "13:00",
+          "type": "GUIDE",
+          "category": "setor_profissional",
+          "editorialTheme": "assistente de arquivo",
+          "workingTitle": "Três situações de entrevista para assistente de arquivo com exemplos ilustrativos",
+          "status": "PLANNED",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+        },
+        {
+          "time": "17:00",
+          "type": "GUIDE",
+          "category": "seguranca_e_orientacao",
+          "editorialTheme": "ausência de identificação do empregador",
+          "workingTitle": "O que perguntar à empresa diante de um ausência de identificação do empregador",
+          "status": "PLANNED",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+        }
+      ]
+    },
+    {
+      "date": "2026-12-07",
+      "posts": [
+        {
+          "time": "09:00",
+          "type": "GUIDE",
+          "category": "carreira",
+          "editorialTheme": "quem procura estágio na área administrativa",
+          "workingTitle": "Currículo em dois formatos para quem procura estágio na área administrativa: quando usar cada um",
+          "status": "PLANNED",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+        },
+        {
+          "time": "13:00",
+          "type": "GUIDE",
+          "category": "setor_profissional",
+          "editorialTheme": "auxiliar de cozinha",
+          "workingTitle": "Três situações de entrevista para auxiliar de cozinha com exemplos ilustrativos",
+          "status": "PLANNED",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+        },
+        {
+          "time": "17:00",
+          "type": "GUIDE",
+          "category": "seguranca_e_orientacao",
+          "editorialTheme": "convite de entrevista em endereço diferente do anúncio",
+          "workingTitle": "O que perguntar à empresa diante de um convite de entrevista em endereço diferente do anúncio",
+          "status": "PLANNED",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+        }
+      ]
+    },
+    {
+      "date": "2026-12-08",
+      "posts": [
+        {
+          "time": "09:00",
+          "type": "GUIDE",
+          "category": "carreira",
+          "editorialTheme": "quem quer trocar de setor sem perder competências",
+          "workingTitle": "Currículo em dois formatos para quem quer trocar de setor sem perder competências: quando usar cada um",
+          "status": "PLANNED",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+        },
+        {
+          "time": "13:00",
+          "type": "GUIDE",
+          "category": "setor_profissional",
+          "editorialTheme": "operador de telefonia",
+          "workingTitle": "Três situações de entrevista para operador de telefonia com exemplos ilustrativos",
+          "status": "PLANNED",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+        },
+        {
+          "time": "17:00",
+          "type": "GUIDE",
+          "category": "seguranca_e_orientacao",
+          "editorialTheme": "uso de e-mail pessoal se passando por empresa",
+          "workingTitle": "O que perguntar à empresa diante de um uso de e-mail pessoal se passando por empresa",
+          "status": "PLANNED",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+        }
+      ]
+    },
+    {
+      "date": "2026-12-09",
+      "posts": [
+        {
+          "time": "09:00",
+          "type": "GUIDE",
+          "category": "carreira",
+          "editorialTheme": "quem não possui referências profissionais recentes",
+          "workingTitle": "Currículo em dois formatos para quem não possui referências profissionais recentes: quando usar cada um",
+          "status": "PLANNED",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+        },
+        {
+          "time": "13:00",
+          "type": "GUIDE",
+          "category": "setor_profissional",
+          "editorialTheme": "apoio em hotelaria",
+          "workingTitle": "Três situações de entrevista para apoio em hotelaria com exemplos ilustrativos",
+          "status": "PLANNED",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+        },
+        {
+          "time": "17:00",
+          "type": "GUIDE",
+          "category": "seguranca_e_orientacao",
+          "editorialTheme": "anúncio com salário variável pouco explicado",
+          "workingTitle": "O que perguntar à empresa diante de um anúncio com salário variável pouco explicado",
+          "status": "PLANNED",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+        }
+      ]
+    },
+    {
+      "date": "2026-12-10",
+      "posts": [
+        {
+          "time": "09:00",
+          "type": "GUIDE",
+          "category": "carreira",
+          "editorialTheme": "quem precisa explicar um intervalo no currículo",
+          "workingTitle": "Currículo em dois formatos para quem precisa explicar um intervalo no currículo: quando usar cada um",
+          "status": "PLANNED",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+        },
+        {
+          "time": "13:00",
+          "type": "GUIDE",
+          "category": "setor_profissional",
+          "editorialTheme": "assistente de faturamento",
+          "workingTitle": "Três situações de entrevista para assistente de faturamento com exemplos ilustrativos",
+          "status": "PLANNED",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+        },
+        {
+          "time": "17:00",
+          "type": "GUIDE",
+          "category": "seguranca_e_orientacao",
+          "editorialTheme": "promessa de vaga remota com compra de equipamento",
+          "workingTitle": "O que perguntar à empresa diante de um promessa de vaga remota com compra de equipamento",
+          "status": "PLANNED",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+        }
+      ]
+    },
+    {
+      "date": "2026-12-11",
+      "posts": [
+        {
+          "time": "09:00",
+          "type": "GUIDE",
+          "category": "carreira",
+          "editorialTheme": "quem depende de transporte em horários limitados",
+          "workingTitle": "Currículo em dois formatos para quem depende de transporte em horários limitados: quando usar cada um",
+          "status": "PLANNED",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+        },
+        {
+          "time": "13:00",
+          "type": "GUIDE",
+          "category": "setor_profissional",
+          "editorialTheme": "auxiliar de inventário",
+          "workingTitle": "Três situações de entrevista para auxiliar de inventário com exemplos ilustrativos",
+          "status": "PLANNED",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+        },
+        {
+          "time": "17:00",
+          "type": "GUIDE",
+          "category": "seguranca_e_orientacao",
+          "editorialTheme": "indicação de treinamento fora do canal oficial",
+          "workingTitle": "O que perguntar à empresa diante de um indicação de treinamento fora do canal oficial",
+          "status": "PLANNED",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+        }
+      ]
+    },
+    {
+      "date": "2026-12-12",
+      "posts": [
+        {
+          "time": "09:00",
+          "type": "GUIDE",
+          "category": "carreira",
+          "editorialTheme": "quem busca primeiro emprego após o ensino médio",
+          "workingTitle": "Plano de busca de sete dias para quem busca primeiro emprego após o ensino médio: prioridades e limites",
+          "status": "PLANNED",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+        },
+        {
+          "time": "13:00",
+          "type": "GUIDE",
+          "category": "setor_profissional",
+          "editorialTheme": "recepção de escola",
+          "workingTitle": "Horários, deslocamento e formação: como comparar anúncios de recepção de escola",
+          "status": "PLANNED",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+        },
+        {
+          "time": "17:00",
+          "type": "GUIDE",
+          "category": "seguranca_e_orientacao",
+          "editorialTheme": "pedido de CPF antes de confirmação do processo",
+          "workingTitle": "Como proteger seus dados e buscar ajuda após um pedido de CPF antes de confirmação do processo",
+          "status": "PLANNED",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+        }
+      ]
+    },
+    {
+      "date": "2026-12-13",
+      "posts": [
+        {
+          "time": "09:00",
+          "type": "GUIDE",
+          "category": "carreira",
+          "editorialTheme": "quem trabalhou como autônomo e quer voltar à CLT",
+          "workingTitle": "Plano de busca de sete dias para quem trabalhou como autônomo e quer voltar à CLT: prioridades e limites",
+          "status": "PLANNED",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+        },
+        {
+          "time": "13:00",
+          "type": "GUIDE",
+          "category": "setor_profissional",
+          "editorialTheme": "apoio de biblioteca",
+          "workingTitle": "Horários, deslocamento e formação: como comparar anúncios de apoio de biblioteca",
+          "status": "PLANNED",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+        },
+        {
+          "time": "17:00",
+          "type": "GUIDE",
+          "category": "seguranca_e_orientacao",
+          "editorialTheme": "boleto para treinamento obrigatório antes da admissão",
+          "workingTitle": "Como proteger seus dados e buscar ajuda após um boleto para treinamento obrigatório antes da admissão",
+          "status": "PLANNED",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+        }
+      ]
+    },
+    {
+      "date": "2026-12-14",
+      "posts": [
+        {
+          "time": "09:00",
+          "type": "GUIDE",
+          "category": "carreira",
+          "editorialTheme": "quem retorna após pausa para cuidar da família",
+          "workingTitle": "Plano de busca de sete dias para quem retorna após pausa para cuidar da família: prioridades e limites",
+          "status": "PLANNED",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+        },
+        {
+          "time": "13:00",
+          "type": "GUIDE",
+          "category": "setor_profissional",
+          "editorialTheme": "assistente de compras",
+          "workingTitle": "Horários, deslocamento e formação: como comparar anúncios de assistente de compras",
+          "status": "PLANNED",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+        },
+        {
+          "time": "17:00",
+          "type": "GUIDE",
+          "category": "seguranca_e_orientacao",
+          "editorialTheme": "link encurtado enviado por recrutador desconhecido",
+          "workingTitle": "Como proteger seus dados e buscar ajuda após um link encurtado enviado por recrutador desconhecido",
+          "status": "PLANNED",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+        }
+      ]
+    },
+    {
+      "date": "2026-12-15",
+      "posts": [
+        {
+          "time": "09:00",
+          "type": "GUIDE",
+          "category": "carreira",
+          "editorialTheme": "quem trabalha à noite e procura outra vaga",
+          "workingTitle": "Plano de busca de sete dias para quem trabalha à noite e procura outra vaga: prioridades e limites",
+          "status": "PLANNED",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+        },
+        {
+          "time": "13:00",
+          "type": "GUIDE",
+          "category": "setor_profissional",
+          "editorialTheme": "reposição em loja",
+          "workingTitle": "Horários, deslocamento e formação: como comparar anúncios de reposição em loja",
+          "status": "PLANNED",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+        },
+        {
+          "time": "17:00",
+          "type": "GUIDE",
+          "category": "seguranca_e_orientacao",
+          "editorialTheme": "convite de entrevista sem identificação da empresa",
+          "workingTitle": "Como proteger seus dados e buscar ajuda após um convite de entrevista sem identificação da empresa",
+          "status": "PLANNED",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+        }
+      ]
+    },
+    {
+      "date": "2026-12-16",
+      "posts": [
+        {
+          "time": "09:00",
+          "type": "GUIDE",
+          "category": "carreira",
+          "editorialTheme": "quem concluiu curso técnico sem experiência formal",
+          "workingTitle": "Plano de busca de sete dias para quem concluiu curso técnico sem experiência formal: prioridades e limites",
+          "status": "PLANNED",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+        },
+        {
+          "time": "13:00",
+          "type": "GUIDE",
+          "category": "setor_profissional",
+          "editorialTheme": "auxiliar de almoxarifado",
+          "workingTitle": "Horários, deslocamento e formação: como comparar anúncios de auxiliar de almoxarifado",
+          "status": "PLANNED",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+        },
+        {
+          "time": "17:00",
+          "type": "GUIDE",
+          "category": "seguranca_e_orientacao",
+          "editorialTheme": "pedido de senha da conta gov.br",
+          "workingTitle": "Como proteger seus dados e buscar ajuda após um pedido de senha da conta gov.br",
+          "status": "PLANNED",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+        }
+      ]
+    },
+    {
+      "date": "2026-12-17",
+      "posts": [
+        {
+          "time": "09:00",
+          "type": "GUIDE",
+          "category": "carreira",
+          "editorialTheme": "quem mudou de município na Grande Ilha",
+          "workingTitle": "Plano de busca de sete dias para quem mudou de município na Grande Ilha: prioridades e limites",
+          "status": "PLANNED",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+        },
+        {
+          "time": "13:00",
+          "type": "GUIDE",
+          "category": "setor_profissional",
+          "editorialTheme": "apoio de laboratório",
+          "workingTitle": "Horários, deslocamento e formação: como comparar anúncios de apoio de laboratório",
+          "status": "PLANNED",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+        },
+        {
+          "time": "17:00",
+          "type": "GUIDE",
+          "category": "seguranca_e_orientacao",
+          "editorialTheme": "promessa de contratação garantida após Pix",
+          "workingTitle": "Como proteger seus dados e buscar ajuda após um promessa de contratação garantida após Pix",
+          "status": "PLANNED",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+        }
+      ]
+    },
+    {
+      "date": "2026-12-18",
+      "posts": [
+        {
+          "time": "09:00",
+          "type": "GUIDE",
+          "category": "carreira",
+          "editorialTheme": "quem quer migrar do comércio para escritório",
+          "workingTitle": "Plano de busca de sete dias para quem quer migrar do comércio para escritório: prioridades e limites",
+          "status": "PLANNED",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+        },
+        {
+          "time": "13:00",
+          "type": "GUIDE",
+          "category": "setor_profissional",
+          "editorialTheme": "atendimento de farmácia",
+          "workingTitle": "Horários, deslocamento e formação: como comparar anúncios de atendimento de farmácia",
+          "status": "PLANNED",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+        },
+        {
+          "time": "17:00",
+          "type": "GUIDE",
+          "category": "seguranca_e_orientacao",
+          "editorialTheme": "uso indevido de logotipo de empresa",
+          "workingTitle": "Como proteger seus dados e buscar ajuda após um uso indevido de logotipo de empresa",
+          "status": "PLANNED",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+        }
+      ]
+    },
+    {
+      "date": "2026-12-19",
+      "posts": [
+        {
+          "time": "09:00",
+          "type": "GUIDE",
+          "category": "carreira",
+          "editorialTheme": "quem busca ocupação com jornada parcial",
+          "workingTitle": "Plano de busca de sete dias para quem busca ocupação com jornada parcial: prioridades e limites",
+          "status": "PLANNED",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+        },
+        {
+          "time": "13:00",
+          "type": "GUIDE",
+          "category": "setor_profissional",
+          "editorialTheme": "assistente de manutenção predial",
+          "workingTitle": "Horários, deslocamento e formação: como comparar anúncios de assistente de manutenção predial",
+          "status": "PLANNED",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+        },
+        {
+          "time": "17:00",
+          "type": "GUIDE",
+          "category": "seguranca_e_orientacao",
+          "editorialTheme": "envio de contrato por aplicativo desconhecido",
+          "workingTitle": "Como proteger seus dados e buscar ajuda após um envio de contrato por aplicativo desconhecido",
+          "status": "PLANNED",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+        }
+      ]
+    },
+    {
+      "date": "2026-12-20",
+      "posts": [
+        {
+          "time": "09:00",
+          "type": "GUIDE",
+          "category": "carreira",
+          "editorialTheme": "quem precisa conciliar trabalho e estudo",
+          "workingTitle": "Plano de busca de sete dias para quem precisa conciliar trabalho e estudo: prioridades e limites",
+          "status": "PLANNED",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+        },
+        {
+          "time": "13:00",
+          "type": "GUIDE",
+          "category": "setor_profissional",
+          "editorialTheme": "conferência de mercadorias",
+          "workingTitle": "Horários, deslocamento e formação: como comparar anúncios de conferência de mercadorias",
+          "status": "PLANNED",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+        },
+        {
+          "time": "17:00",
+          "type": "GUIDE",
+          "category": "seguranca_e_orientacao",
+          "editorialTheme": "recebimento de oferta com escala incompleta",
+          "workingTitle": "Como proteger seus dados e buscar ajuda após um recebimento de oferta com escala incompleta",
+          "status": "PLANNED",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+        }
+      ]
+    },
+    {
+      "date": "2026-12-21",
+      "posts": [
+        {
+          "time": "09:00",
+          "type": "GUIDE",
+          "category": "carreira",
+          "editorialTheme": "quem já foi auxiliar mas quer cargo de conferência",
+          "workingTitle": "Plano de busca de sete dias para quem já foi auxiliar mas quer cargo de conferência: prioridades e limites",
+          "status": "PLANNED",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+        },
+        {
+          "time": "13:00",
+          "type": "GUIDE",
+          "category": "setor_profissional",
+          "editorialTheme": "auxiliar de cadastro",
+          "workingTitle": "Horários, deslocamento e formação: como comparar anúncios de auxiliar de cadastro",
+          "status": "PLANNED",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+        },
+        {
+          "time": "17:00",
+          "type": "GUIDE",
+          "category": "seguranca_e_orientacao",
+          "editorialTheme": "mensagem que exige resposta em poucos minutos",
+          "workingTitle": "Como proteger seus dados e buscar ajuda após um mensagem que exige resposta em poucos minutos",
+          "status": "PLANNED",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+        }
+      ]
+    },
+    {
+      "date": "2026-12-22",
+      "posts": [
+        {
+          "time": "09:00",
+          "type": "GUIDE",
+          "category": "carreira",
+          "editorialTheme": "quem tem experiência de trabalho informal em atendimento",
+          "workingTitle": "Plano de busca de sete dias para quem tem experiência de trabalho informal em atendimento: prioridades e limites",
+          "status": "PLANNED",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+        },
+        {
+          "time": "13:00",
+          "type": "GUIDE",
+          "category": "setor_profissional",
+          "editorialTheme": "apoio em eventos",
+          "workingTitle": "Horários, deslocamento e formação: como comparar anúncios de apoio em eventos",
+          "status": "PLANNED",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+        },
+        {
+          "time": "17:00",
+          "type": "GUIDE",
+          "category": "seguranca_e_orientacao",
+          "editorialTheme": "exigência de dados bancários na primeira mensagem",
+          "workingTitle": "Como proteger seus dados e buscar ajuda após um exigência de dados bancários na primeira mensagem",
+          "status": "PLANNED",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+        }
+      ]
+    },
+    {
+      "date": "2026-12-23",
+      "posts": [
+        {
+          "time": "09:00",
+          "type": "GUIDE",
+          "category": "carreira",
+          "editorialTheme": "quem está retornando ao mercado depois dos 40",
+          "workingTitle": "Plano de busca de sete dias para quem está retornando ao mercado depois dos 40: prioridades e limites",
+          "status": "PLANNED",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+        },
+        {
+          "time": "13:00",
+          "type": "GUIDE",
+          "category": "setor_profissional",
+          "editorialTheme": "controle de qualidade básico",
+          "workingTitle": "Horários, deslocamento e formação: como comparar anúncios de controle de qualidade básico",
+          "status": "PLANNED",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+        },
+        {
+          "time": "17:00",
+          "type": "GUIDE",
+          "category": "seguranca_e_orientacao",
+          "editorialTheme": "formulário que pede selfie com documento",
+          "workingTitle": "Como proteger seus dados e buscar ajuda após um formulário que pede selfie com documento",
+          "status": "PLANNED",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+        }
+      ]
+    },
+    {
+      "date": "2026-12-24",
+      "posts": [
+        {
+          "time": "09:00",
+          "type": "GUIDE",
+          "category": "carreira",
+          "editorialTheme": "quem quer demonstrar Excel básico sem exagerar",
+          "workingTitle": "Plano de busca de sete dias para quem quer demonstrar Excel básico sem exagerar: prioridades e limites",
+          "status": "PLANNED",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+        },
+        {
+          "time": "13:00",
+          "type": "GUIDE",
+          "category": "setor_profissional",
+          "editorialTheme": "auxiliar de expedição",
+          "workingTitle": "Horários, deslocamento e formação: como comparar anúncios de auxiliar de expedição",
+          "status": "PLANNED",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+        },
+        {
+          "time": "17:00",
+          "type": "GUIDE",
+          "category": "seguranca_e_orientacao",
+          "editorialTheme": "pedido de currículo contendo documentos digitalizados",
+          "workingTitle": "Como proteger seus dados e buscar ajuda após um pedido de currículo contendo documentos digitalizados",
+          "status": "PLANNED",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+        }
+      ]
+    },
+    {
+      "date": "2026-12-25",
+      "posts": [
+        {
+          "time": "09:00",
+          "type": "GUIDE",
+          "category": "carreira",
+          "editorialTheme": "quem realizou trabalho voluntário",
+          "workingTitle": "Plano de busca de sete dias para quem realizou trabalho voluntário: prioridades e limites",
+          "status": "PLANNED",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+        },
+        {
+          "time": "13:00",
+          "type": "GUIDE",
+          "category": "setor_profissional",
+          "editorialTheme": "atendimento ao turista",
+          "workingTitle": "Horários, deslocamento e formação: como comparar anúncios de atendimento ao turista",
+          "status": "PLANNED",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+        },
+        {
+          "time": "17:00",
+          "type": "GUIDE",
+          "category": "seguranca_e_orientacao",
+          "editorialTheme": "falta de informação sobre local da entrevista",
+          "workingTitle": "Como proteger seus dados e buscar ajuda após um falta de informação sobre local da entrevista",
+          "status": "PLANNED",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+        }
+      ]
+    },
+    {
+      "date": "2026-12-26",
+      "posts": [
+        {
+          "time": "09:00",
+          "type": "GUIDE",
+          "category": "carreira",
+          "editorialTheme": "quem teve vários contratos de curta duração",
+          "workingTitle": "Plano de busca de sete dias para quem teve vários contratos de curta duração: prioridades e limites",
+          "status": "PLANNED",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+        },
+        {
+          "time": "13:00",
+          "type": "GUIDE",
+          "category": "setor_profissional",
+          "editorialTheme": "assistente de arquivo",
+          "workingTitle": "Horários, deslocamento e formação: como comparar anúncios de assistente de arquivo",
+          "status": "PLANNED",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+        },
+        {
+          "time": "17:00",
+          "type": "GUIDE",
+          "category": "seguranca_e_orientacao",
+          "editorialTheme": "ausência de identificação do empregador",
+          "workingTitle": "Como proteger seus dados e buscar ajuda após um ausência de identificação do empregador",
+          "status": "PLANNED",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+        }
+      ]
+    },
+    {
+      "date": "2026-12-27",
+      "posts": [
+        {
+          "time": "09:00",
+          "type": "GUIDE",
+          "category": "carreira",
+          "editorialTheme": "quem procura estágio na área administrativa",
+          "workingTitle": "Plano de busca de sete dias para quem procura estágio na área administrativa: prioridades e limites",
+          "status": "PLANNED",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+        },
+        {
+          "time": "13:00",
+          "type": "GUIDE",
+          "category": "setor_profissional",
+          "editorialTheme": "auxiliar de cozinha",
+          "workingTitle": "Horários, deslocamento e formação: como comparar anúncios de auxiliar de cozinha",
+          "status": "PLANNED",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+        },
+        {
+          "time": "17:00",
+          "type": "GUIDE",
+          "category": "seguranca_e_orientacao",
+          "editorialTheme": "convite de entrevista em endereço diferente do anúncio",
+          "workingTitle": "Como proteger seus dados e buscar ajuda após um convite de entrevista em endereço diferente do anúncio",
+          "status": "PLANNED",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+        }
+      ]
+    },
+    {
+      "date": "2026-12-28",
+      "posts": [
+        {
+          "time": "09:00",
+          "type": "GUIDE",
+          "category": "carreira",
+          "editorialTheme": "quem quer trocar de setor sem perder competências",
+          "workingTitle": "Plano de busca de sete dias para quem quer trocar de setor sem perder competências: prioridades e limites",
+          "status": "PLANNED",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+        },
+        {
+          "time": "13:00",
+          "type": "GUIDE",
+          "category": "setor_profissional",
+          "editorialTheme": "operador de telefonia",
+          "workingTitle": "Horários, deslocamento e formação: como comparar anúncios de operador de telefonia",
+          "status": "PLANNED",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+        },
+        {
+          "time": "17:00",
+          "type": "GUIDE",
+          "category": "seguranca_e_orientacao",
+          "editorialTheme": "uso de e-mail pessoal se passando por empresa",
+          "workingTitle": "Como proteger seus dados e buscar ajuda após um uso de e-mail pessoal se passando por empresa",
+          "status": "PLANNED",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+        }
+      ]
+    },
+    {
+      "date": "2026-12-29",
+      "posts": [
+        {
+          "time": "09:00",
+          "type": "GUIDE",
+          "category": "carreira",
+          "editorialTheme": "quem não possui referências profissionais recentes",
+          "workingTitle": "Plano de busca de sete dias para quem não possui referências profissionais recentes: prioridades e limites",
+          "status": "PLANNED",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+        },
+        {
+          "time": "13:00",
+          "type": "GUIDE",
+          "category": "setor_profissional",
+          "editorialTheme": "apoio em hotelaria",
+          "workingTitle": "Horários, deslocamento e formação: como comparar anúncios de apoio em hotelaria",
+          "status": "PLANNED",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+        },
+        {
+          "time": "17:00",
+          "type": "GUIDE",
+          "category": "seguranca_e_orientacao",
+          "editorialTheme": "anúncio com salário variável pouco explicado",
+          "workingTitle": "Como proteger seus dados e buscar ajuda após um anúncio com salário variável pouco explicado",
+          "status": "PLANNED",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+        }
+      ]
+    },
+    {
+      "date": "2026-12-30",
+      "posts": [
+        {
+          "time": "09:00",
+          "type": "GUIDE",
+          "category": "carreira",
+          "editorialTheme": "quem precisa explicar um intervalo no currículo",
+          "workingTitle": "Plano de busca de sete dias para quem precisa explicar um intervalo no currículo: prioridades e limites",
+          "status": "PLANNED",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+        },
+        {
+          "time": "13:00",
+          "type": "GUIDE",
+          "category": "setor_profissional",
+          "editorialTheme": "assistente de faturamento",
+          "workingTitle": "Horários, deslocamento e formação: como comparar anúncios de assistente de faturamento",
+          "status": "PLANNED",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+        },
+        {
+          "time": "17:00",
+          "type": "GUIDE",
+          "category": "seguranca_e_orientacao",
+          "editorialTheme": "promessa de vaga remota com compra de equipamento",
+          "workingTitle": "Como proteger seus dados e buscar ajuda após um promessa de vaga remota com compra de equipamento",
+          "status": "PLANNED",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+        }
+      ]
+    },
+    {
+      "date": "2026-12-31",
+      "posts": [
+        {
+          "time": "09:00",
+          "type": "GUIDE",
+          "category": "carreira",
+          "editorialTheme": "quem depende de transporte em horários limitados",
+          "workingTitle": "Plano de busca de sete dias para quem depende de transporte em horários limitados: prioridades e limites",
+          "status": "PLANNED",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+        },
+        {
+          "time": "13:00",
+          "type": "GUIDE",
+          "category": "setor_profissional",
+          "editorialTheme": "auxiliar de inventário",
+          "workingTitle": "Horários, deslocamento e formação: como comparar anúncios de auxiliar de inventário",
+          "status": "PLANNED",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+        },
+        {
+          "time": "17:00",
+          "type": "GUIDE",
+          "category": "seguranca_e_orientacao",
+          "editorialTheme": "indicação de treinamento fora do canal oficial",
+          "workingTitle": "Como proteger seus dados e buscar ajuda após um indicação de treinamento fora do canal oficial",
+          "status": "PLANNED",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+        }
+      ]
+    }
+  ]
+}

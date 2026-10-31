@@ -1,0 +1,54 @@
+---
+import AdminLayout from "../../layouts/AdminLayout.astro";
+import { can } from "../../lib/auth";
+import { articles, createDatabase } from "@es/db";
+import { desc, isNotNull, or } from "drizzle-orm";
+
+const auth = Astro.locals.auth!;
+if (!can(auth, "content.manage")) return Astro.redirect("/admin?error=sem-permissao");
+
+type SourceRow = { title: string; slug: string; sourceName: string | null; sourceUrl: string | null; status: string };
+let rows: SourceRow[] = [];
+if (process.env.DATABASE_URL) {
+  const connection = createDatabase(process.env.DATABASE_URL);
+  try {
+    rows = await connection.db
+      .select({
+        title: articles.title,
+        slug: articles.slug,
+        sourceName: articles.sourceName,
+        sourceUrl: articles.sourceUrl,
+        status: articles.status
+      })
+      .from(articles)
+      .where(or(isNotNull(articles.sourceName), isNotNull(articles.sourceUrl)))
+      .orderBy(desc(articles.updatedAt))
+      .limit(100);
+  } finally {
+    await connection.close();
+  }
+}
+---
+<AdminLayout title="Fontes">
+  <div>
+    <p class="text-sm font-bold uppercase tracking-wide text-red-700">Conteúdo</p>
+    <h1 class="mt-2 text-3xl font-black">Fontes editoriais</h1>
+    <p class="mt-2 text-sm text-[var(--text-secondary)]">Fontes declaradas em conteúdos. Edite a origem no formulário do artigo.</p>
+  </div>
+  <div class="mt-8 overflow-auto rounded-2xl bg-white">
+    <table class="w-full text-left text-sm">
+      <thead><tr class="border-b"><th class="p-4">Conteúdo</th><th>Fonte</th><th>URL</th><th>Status</th></tr></thead>
+      <tbody>
+        {rows.map((row) => (
+          <tr class="border-b">
+            <td class="p-4 font-bold">{row.title}<div class="text-xs font-normal text-slate-500">/{row.slug}</div></td>
+            <td>{row.sourceName ?? "—"}</td>
+            <td class="max-w-xs truncate">{row.sourceUrl ? <a class="text-red-700" href={row.sourceUrl} rel="noopener noreferrer" target="_blank">{row.sourceUrl}</a> : "—"}</td>
+            <td>{row.status}</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+    {rows.length === 0 && <p class="p-6 text-sm text-slate-600">Nenhuma fonte cadastrada ainda.</p>}
+  </div>
+</AdminLayout>

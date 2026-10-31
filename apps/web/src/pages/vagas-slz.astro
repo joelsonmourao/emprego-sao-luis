@@ -1,0 +1,191 @@
+---
+import JobBoardPaused from "../components/JobBoardPaused.astro";
+import { jobBoardPublicGate } from "../lib/job-board-gate";
+import BaseLayout from "../layouts/BaseLayout.astro";
+import JobCard from "../components/ui/JobCard.astro";
+import EmptyState from "../components/ui/EmptyState.astro";
+import PageHero from "../components/ui/PageHero.astro";
+import SectionHeading from "../components/ui/SectionHeading.astro";
+import { categories, cities, companies, createDatabase, jobs, states } from "@es/db";
+import { and, count, desc, eq, gt, sql } from "drizzle-orm";
+
+const gate = await jobBoardPublicGate();
+
+type JobRow = {
+  id: string;
+  title: string;
+  slug: string;
+  code: string;
+  company: string;
+  city: string;
+  state: string;
+  workplace: string;
+  contract: string;
+  publishedAt: Date | null;
+  featured: boolean;
+  sponsored: boolean;
+  logoUrl: string | null;
+  salaryVisible: boolean;
+  salaryMin: string | null;
+  salaryMax: string | null;
+  salaryCurrency: string;
+  salaryPeriod: string | null;
+};
+let rows: JobRow[] = [];
+let total = 0;
+let categoryRows: Array<{ name: string; slug: string; total: number }> = [];
+if (!gate.paused && process.env.DATABASE_URL) {
+  const connection = createDatabase(process.env.DATABASE_URL);
+  try {
+    const [city] = await connection.db
+      .select({ id: cities.id })
+      .from(cities)
+      .innerJoin(states, eq(cities.stateId, states.id))
+      .where(and(eq(cities.slug, "sao-luis"), eq(cities.active, true)))
+      .limit(1);
+    if (city) {
+      const active = and(
+        eq(jobs.publicationStatus, "PUBLISHED"),
+        gt(jobs.expiresAt, new Date()),
+        eq(jobs.cityId, city.id)
+      );
+      const fields = {
+        id: jobs.id,
+        title: jobs.normalizedTitle,
+        slug: jobs.slug,
+        code: jobs.publicCode,
+        company: sql<string>`case when ${jobs.confidentialCompany} then 'Empresa confidencial' else coalesce(${companies.publicName}, ${companies.name}) end`,
+        city: cities.name,
+        state: states.code,
+        workplace: jobs.workplaceType,
+        contract: jobs.employmentType,
+        publishedAt: jobs.publishedAt,
+        featured: jobs.featured,
+        sponsored: jobs.sponsored,
+        logoUrl: sql<string | null>`case when ${jobs.confidentialCompany} then null else ${companies.logoUrl} end`,
+        salaryVisible: jobs.salaryVisible,
+        salaryMin: jobs.salaryMin,
+        salaryMax: jobs.salaryMax,
+        salaryCurrency: jobs.salaryCurrency,
+        salaryPeriod: jobs.salaryPeriod
+      };
+      const [countRows, jobRows, cats] = await Promise.all([
+        connection.db.select({ value: count() }).from(jobs).where(active),
+        connection.db
+          .select(fields)
+          .from(jobs)
+          .innerJoin(companies, eq(jobs.companyId, companies.id))
+          .innerJoin(cities, eq(jobs.cityId, cities.id))
+          .innerJoin(states, eq(jobs.stateId, states.id))
+          .where(active)
+          .orderBy(desc(jobs.publishedAt))
+          .limit(24),
+        connection.db
+          .select({ name: categories.name, slug: categories.slug, total: count(jobs.id) })
+          .from(categories)
+          .innerJoin(jobs, eq(jobs.categoryId, categories.id))
+          .where(active)
+          .groupBy(categories.id)
+          .orderBy(desc(count(jobs.id)))
+          .limit(8)
+      ]);
+      total = countRows[0]?.value ?? 0;
+      rows = jobRows;
+      categoryRows = cats;
+    }
+  } finally {
+    await connection.close();
+  }
+}
+const title = "Vagas SLZ e Empregos SLZ em São Luís — Empregos São Luís";
+const description =
+  "Vagas SLZ e empregos SLZ atualizados em São Luís (MA). Portal local com oportunidades verificadas para quem busca emprego na capital maranhense.";
+---
+{gate.paused ? (
+  <JobBoardPaused title="Vagas SLZ temporariamente pausadas" />
+) : (
+<BaseLayout
+  title={title}
+  description={description}
+  canonical="/vagas-slz"
+  breadcrumbs={[
+    { name: "Início", url: "/" },
+    { name: "Vagas SLZ", url: "/vagas-slz" }
+  ]}
+>
+  <PageHero
+    kicker="São Luís · SLZ"
+    title="Vagas SLZ e empregos SLZ em São Luís"
+    description="SLZ é a sigla de São Luís. Aqui você encontra vagas SLZ e empregos SLZ atualizados na capital do Maranhão — sem cadastro obrigatório para se candidatar."
+  >
+    <div class="mt-6 flex flex-wrap gap-3">
+      <a class="es-btn es-btn-primary" href="/vagas/cidade/sao-luis">Ver todas em São Luís</a>
+      <a class="es-btn es-btn-secondary" href="/vagas">Buscar por cargo</a>
+    </div>
+  </PageHero>
+
+  <section class="es-section">
+    <div class="es-container">
+      <SectionHeading
+        kicker="Atualizado"
+        title={`${total} vaga(s) SLZ abertas`}
+        actionHref="/vagas/cidade/sao-luis"
+        actionLabel="Lista completa"
+      />
+      {rows.length ? (
+        <div class="mt-8 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+          {rows.map((job) => <JobCard {...job} />)}
+        </div>
+      ) : (
+        <div class="mt-8">
+          <EmptyState
+            title="Novas vagas SLZ em breve"
+            description="Estamos atualizando as oportunidades de emprego em São Luís. Volte em breve ou explore outras cidades da Grande Ilha."
+            actionHref="/vagas"
+            actionLabel="Explorar vagas"
+          />
+        </div>
+      )}
+    </div>
+  </section>
+
+  {categoryRows.length > 0 && (
+    <section class="es-section bg-white">
+      <div class="es-container">
+        <SectionHeading kicker="Áreas em SLZ" title="Empregos SLZ por categoria" />
+        <div class="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          {categoryRows.map((item) => (
+            <a class="es-card block p-4 hover:border-[var(--brand-primary)]" href={`/categorias/${item.slug}`}>
+              <span class="font-display font-black">{item.name}</span>
+              <span class="mt-1 block text-sm text-[var(--es-muted)]">{item.total} vaga(s) em São Luís</span>
+            </a>
+          ))}
+        </div>
+      </div>
+    </section>
+  )}
+
+  <section class="es-section">
+    <div class="es-container max-w-3xl">
+      <h2 class="font-display text-2xl font-black">Por que buscar vagas SLZ aqui?</h2>
+      <div class="mt-4 space-y-4 text-[var(--text-secondary)]">
+        <p>
+          Quem pesquisa <strong>slz vagas</strong>, <strong>slz empregos</strong>, <strong>vagas slz</strong> ou
+          <strong> empregos slz</strong> quer oportunidades em São Luís/MA. O Empregos São Luís concentra essas vagas SLZ
+          com foco local — capital e Grande Ilha.
+        </p>
+        <p>
+          Diferente de portais genéricos, priorizamos anúncios da região, com páginas claras por cidade, categoria e
+          empresa. Use a busca por cargo ou abra a lista completa de
+          <a class="font-semibold text-[var(--brand-primary)] underline" href="/vagas/cidade/sao-luis">vagas em São Luís</a>.
+        </p>
+        <p>
+          Também publicamos guias e notícias para candidatos em São Luís no
+          <a class="font-semibold text-[var(--brand-primary)] underline" href="/blog">blog</a> e nas
+          <a class="font-semibold text-[var(--brand-primary)] underline" href="/noticias">notícias</a>.
+        </p>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+)}

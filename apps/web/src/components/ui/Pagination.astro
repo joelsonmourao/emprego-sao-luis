@@ -1,0 +1,85 @@
+---
+interface Props {
+  current: number;
+  pages: number;
+  hrefForPage: (page: number) => string;
+  label?: string;
+}
+
+const { current, pages, hrefForPage, label = "Paginação" } = Astro.props;
+
+function pageWindow(currentPage: number, totalPages: number) {
+  if (totalPages <= 7) {
+    return Array.from({ length: totalPages }, (_, index) => index + 1);
+  }
+  const items: Array<number | "ellipsis"> = [1];
+  const start = Math.max(2, currentPage - 1);
+  const end = Math.min(totalPages - 1, currentPage + 1);
+  if (start > 2) items.push("ellipsis");
+  for (let page = start; page <= end; page += 1) items.push(page);
+  if (end < totalPages - 1) items.push("ellipsis");
+  items.push(totalPages);
+  return items;
+}
+
+const items = pages > 1 ? pageWindow(current, pages) : [];
+---
+{pages > 1 && (
+  <nav class="mt-10 flex flex-col items-center gap-4" aria-label={label}>
+    <p class="text-sm font-medium text-[var(--text-secondary)]">
+      Página <span class="font-bold text-[var(--text-primary)]">{current}</span> de{" "}
+      <span class="font-bold text-[var(--text-primary)]">{pages}</span>
+    </p>
+    <div class="flex flex-wrap items-center justify-center gap-2">
+      {current > 1 ? (
+        <a
+          class="inline-flex min-h-11 items-center justify-center rounded-xl border border-[var(--brand-border)] bg-white px-4 text-sm font-bold text-[var(--text-primary)] transition hover:border-[var(--brand-primary)] hover:text-[var(--brand-primary)]"
+          href={hrefForPage(current - 1)}
+          rel="prev"
+        >
+          Anterior
+        </a>
+      ) : (
+        <span class="inline-flex min-h-11 cursor-not-allowed items-center justify-center rounded-xl border border-transparent px-4 text-sm font-bold text-[var(--text-secondary)] opacity-40">
+          Anterior
+        </span>
+      )}
+
+      {items.map((item) =>
+        item === "ellipsis" ? (
+          <span class="inline-flex min-h-11 min-w-11 items-center justify-center text-sm font-bold text-[var(--text-secondary)]" aria-hidden="true">
+            …
+          </span>
+        ) : (
+          <a
+            class:list={[
+              "inline-flex min-h-11 min-w-11 items-center justify-center rounded-xl border text-sm font-bold transition",
+              item === current
+                ? "border-[var(--brand-primary)] bg-[var(--brand-primary)] text-white"
+                : "border-[var(--brand-border)] bg-white text-[var(--text-primary)] hover:border-[var(--brand-primary)] hover:text-[var(--brand-primary)]"
+            ]}
+            href={hrefForPage(item)}
+            aria-current={item === current ? "page" : undefined}
+            aria-label={`Página ${item}`}
+          >
+            {item}
+          </a>
+        )
+      )}
+
+      {current < pages ? (
+        <a
+          class="inline-flex min-h-11 items-center justify-center rounded-xl border border-[var(--brand-border)] bg-white px-4 text-sm font-bold text-[var(--text-primary)] transition hover:border-[var(--brand-primary)] hover:text-[var(--brand-primary)]"
+          href={hrefForPage(current + 1)}
+          rel="next"
+        >
+          Próxima
+        </a>
+      ) : (
+        <span class="inline-flex min-h-11 cursor-not-allowed items-center justify-center rounded-xl border border-transparent px-4 text-sm font-bold text-[var(--text-secondary)] opacity-40">
+          Próxima
+        </span>
+      )}
+    </div>
+  </nav>
+)}

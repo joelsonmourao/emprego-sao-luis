@@ -1,0 +1,127 @@
+---
+import { authors, contentClusters, contentPillars, createDatabase, users } from "@es/db";
+import AdminLayout from "../../../layouts/AdminLayout.astro";
+
+let authorRows: typeof authors.$inferSelect[] = [];
+let reviewerRows: Array<{ id: string; email: string }> = [];
+let pillarRows: typeof contentPillars.$inferSelect[] = [];
+let clusterRows: typeof contentClusters.$inferSelect[] = [];
+if (process.env.DATABASE_URL) {
+  const connection = createDatabase(process.env.DATABASE_URL);
+  try {
+    [authorRows, reviewerRows, pillarRows, clusterRows] = await Promise.all([
+      connection.db.select().from(authors).orderBy(authors.name),
+      connection.db.select({ id: users.id, email: users.email }).from(users).orderBy(users.email),
+      connection.db.select().from(contentPillars).orderBy(contentPillars.name),
+      connection.db.select().from(contentClusters).orderBy(contentClusters.name)
+    ]);
+  }
+  finally { await connection.close(); }
+}
+const preferredTemplate = Astro.url.searchParams.get("template") === "POST_MAGNETICO" ? "POST_MAGNETICO" : "STANDARD";
+---
+
+<AdminLayout title="Novo conteúdo">
+  <h1 class="text-3xl font-black">Novo conteúdo</h1>
+  <section class="mt-6 rounded-xl border border-sky-200 bg-sky-50 p-5">
+    <h2 class="font-bold">Cadastro rápido de autor</h2>
+    <form id="quick-author-form" class="mt-3 grid gap-3 md:grid-cols-4" method="post" action="/api/admin/authors">
+      <input type="hidden" name="returnTo" value="json" />
+      <input class="rounded-lg border p-3" name="name" placeholder="Nome" minlength="2" required />
+      <input class="rounded-lg border p-3" name="slug" placeholder="slug opcional" />
+      <input class="rounded-lg border p-3" name="bio" placeholder="Biografia curta" />
+      <button class="rounded-lg border bg-white font-bold">Cadastrar e selecionar</button>
+    </form>
+  </section>
+  <form class="mt-6 grid gap-4 rounded-2xl bg-white p-6" method="post" action="/api/admin/articles">
+    <div class="grid gap-4 md:grid-cols-3">
+      <label>Tipo<select class="mt-1 w-full rounded-lg border p-3" name="type"><option value="NEWS">Notícia</option><option value="GUIDE">Guia</option><option value="DATA_REPORT">Relatório</option></select></label>
+      <label>Autor<select id="article-author" class="mt-1 w-full rounded-lg border p-3" name="authorId" required>{authorRows.map((author)=><option value={author.id}>{author.name}</option>)}</select></label>
+      <label>Status<select class="mt-1 w-full rounded-lg border p-3" name="status"><option value="DRAFT">Rascunho</option><option value="PENDING_REVIEW">Em revisão</option><option value="SCHEDULED">Agendado</option><option value="PUBLISHED">Publicado</option></select></label>
+    </div>
+    <div class="grid gap-4 md:grid-cols-3">
+      <label>Revisor<select class="mt-1 w-full rounded-lg border p-3" name="reviewerId"><option value="">Pendente</option>{reviewerRows.map((reviewer)=><option value={reviewer.id}>{reviewer.email}</option>)}</select></label>
+      <label>Pilar<select id="article-pillar" class="mt-1 w-full rounded-lg border p-3" name="pillarId"><option value="">Pendente</option>{pillarRows.map((pillar)=><option value={pillar.id}>{pillar.name}</option>)}</select></label>
+      <label>Cluster<select id="article-cluster" class="mt-1 w-full rounded-lg border p-3" name="clusterId"><option value="">Pendente</option>{clusterRows.map((cluster)=><option value={cluster.id} data-pillar-id={cluster.pillarId}>{cluster.name}</option>)}</select></label>
+    </div>
+    <div class="grid gap-4 md:grid-cols-3">
+      <label>Etapa editorial<select class="mt-1 w-full rounded-lg border p-3" name="editorialStage"><option value="PITCH">Pauta</option><option value="SOURCES">Fontes</option><option value="BRIEF">Briefing</option><option value="DRAFT">Rascunho</option><option value="FACT_REVIEW">Revisão factual</option><option value="EDITORIAL_REVIEW">Revisão editorial</option><option value="INTERNAL_LINKS">Links internos</option><option value="SEO">SEO</option><option value="APPROVED">Aprovado</option></select></label>
+      <label>Template editorial<select class="mt-1 w-full rounded-lg border p-3" name="editorialTemplate"><option value="STANDARD" selected={preferredTemplate==="STANDARD"}>Padrão</option><option value="POST_MAGNETICO" selected={preferredTemplate==="POST_MAGNETICO"}>Post Magnético</option></select></label>
+      <label>Intenção de busca<select class="mt-1 w-full rounded-lg border p-3" name="searchIntent"><option value="INFORMATIONAL">Informacional</option><option value="LOCAL">Local</option><option value="TRANSACTIONAL">Transacional</option><option value="NAVIGATIONAL">Navegacional</option></select></label>
+    </div>
+    <div class="grid gap-4 md:grid-cols-2">
+      <label>Resposta principal<textarea class="mt-1 w-full rounded-lg border p-3" name="directAnswer" placeholder="Obrigatória no Post Magnético"></textarea></label>
+      <label>Gancho local<textarea class="mt-1 w-full rounded-lg border p-3" name="localHook" placeholder="Por que importa para São Luís/Grande Ilha/MA"></textarea></label>
+      <label>CTA candidato<input class="mt-1 w-full rounded-lg border p-3" name="candidateCta" placeholder="Buscar vagas gratuitas" /></label>
+      <label>CTA empresa<input class="mt-1 w-full rounded-lg border p-3" name="companyCta" placeholder="Opcional — nunca como condição do candidato" /></label>
+    </div>
+    <div class="grid gap-3 md:grid-cols-3">
+      <label><input class="mr-2" name="discoverEligible" type="checkbox" />Elegível Discover (interno)</label>
+      <label><input class="mr-2" name="newsEligible" type="checkbox" />Elegível Google News (interno)</label>
+      <label><input class="mr-2" name="webStoryEligible" type="checkbox" />Elegível Web Story</label>
+    </div>
+    <div class="grid gap-4 md:grid-cols-1">
+      <label>Modelo de estrutura HTML<select id="editorial-template" class="mt-1 w-full rounded-lg border p-3"><option value="">Sem modelo</option><option value="guide">Guia completo</option><option value="news">Notícia local</option><option value="opportunities">Lista de oportunidades</option><option value="profession">Explicação de profissão</option><option value="report">Relatório do mercado local</option><option value="company">Conteúdo para empresas</option><option value="scam">Alerta contra golpe</option><option value="update">Artigo de atualização</option><option value="magnetic">Post Magnético</option></select></label>
+    </div>
+    {authorRows.length === 0 && <p id="author-required-message" class="rounded-lg bg-amber-50 p-3 text-sm text-amber-900">Cadastre um autor acima; ele será selecionado automaticamente.</p>}
+    <label>Título<input class="mt-1 w-full rounded-lg border p-3" name="title" minlength="5" required /></label>
+    <label>Subtítulo<input class="mt-1 w-full rounded-lg border p-3" name="subtitle" /></label>
+    <label>Slug<input class="mt-1 w-full rounded-lg border p-3" name="slug" placeholder="gerado pelo título" /></label>
+    <label>Resumo<textarea class="mt-1 w-full rounded-lg border p-3" name="excerpt" minlength="10" required></textarea></label>
+    <label>
+      Conteúdo (HTML ou Markdown)
+      <textarea id="article-content" class="mt-1 min-h-72 w-full rounded-lg border p-3 font-mono text-sm" name="contentHtml" minlength="20" required placeholder={"## Título\n\nTexto em **Markdown** ou HTML.\n\n- item 1\n- item 2"}></textarea>
+      <span class="mt-1 block text-xs text-slate-500">Cole HTML completo ou Markdown (`##`, listas `-`, `**negrito**`, links `[texto](url)`). O sistema converte e armazena HTML seguro.</span>
+    </label>
+    <label>Palavra-chave principal<input class="mt-1 w-full rounded-lg border p-3" name="primaryKeyword" maxlength="180" /></label>
+    <div class="grid gap-4 md:grid-cols-2">
+      <label>Imagem principal da biblioteca<input class="mt-1 w-full rounded-lg border p-3" name="coverImageUrl" type="url" /><span class="mt-1 block text-xs text-slate-500">Para publicar, use mídia processada com original de pelo menos 1200 px.</span></label><label>Texto alternativo (ALT)<input class="mt-1 w-full rounded-lg border p-3" name="coverImageAlt" /></label>
+      <label>Legenda da imagem<input class="mt-1 w-full rounded-lg border p-3" name="coverImageCaption" /></label><label>Crédito/origem da imagem<input class="mt-1 w-full rounded-lg border p-3" name="coverImageCredit" /></label>
+      <label>Seção/categoria<input class="mt-1 w-full rounded-lg border p-3" name="section" /></label><label>Tags separadas por vírgula<input class="mt-1 w-full rounded-lg border p-3" name="tags" /></label>
+      <label>Fonte<input class="mt-1 w-full rounded-lg border p-3" name="sourceName" /></label><label>URL da fonte<input class="mt-1 w-full rounded-lg border p-3" name="sourceUrl" type="url" /></label>
+      <label class="md:col-span-2">Fontes adicionais (uma por linha: Nome | URL)<textarea class="mt-1 min-h-28 w-full rounded-lg border p-3" name="sources"></textarea></label>
+      <label>Revisão factual em<input class="mt-1 w-full rounded-lg border p-3" name="factCheckedAt" type="datetime-local" /></label><label>Notas da revisão factual<input class="mt-1 w-full rounded-lg border p-3" name="factReviewNotes" /></label>
+      <label>IDs de artigos relacionados<input class="mt-1 w-full rounded-lg border p-3" name="relatedArticleIds" placeholder="UUIDs separados por vírgula" /></label><label>IDs de vagas relacionadas<input class="mt-1 w-full rounded-lg border p-3" name="relatedJobIds" placeholder="UUIDs separados por vírgula" /></label>
+      <label>Agendar para<input class="mt-1 w-full rounded-lg border p-3" name="scheduledAt" type="datetime-local" /></label><label>Expira em<input class="mt-1 w-full rounded-lg border p-3" name="expiresAt" type="datetime-local" /></label>
+      <label>Título SEO<input class="mt-1 w-full rounded-lg border p-3" name="seoTitle" /></label><label>Descrição SEO<input class="mt-1 w-full rounded-lg border p-3" name="metaDescription" /></label>
+      <label>Canônica opcional<input class="mt-1 w-full rounded-lg border p-3" name="canonicalUrl" type="url" placeholder="gerada automaticamente quando vazia" /></label>
+    </div>
+    <label><input class="mr-2" name="featured" type="checkbox" />Destaque</label>
+    <label><input class="mr-2" name="aiAssisted" type="checkbox" />IA auxiliou no briefing ou rascunho (nunca publica automaticamente)</label>
+    <label><input class="mr-2" name="sponsoredContent" type="checkbox" />Conteúdo patrocinado</label>
+    <label>Identificação do patrocínio<input class="mt-1 w-full rounded-lg border p-3" name="sponsorshipDisclosure" placeholder="Obrigatória quando patrocinado" /></label>
+    <label>Notas internas<textarea class="mt-1 w-full rounded-lg border p-3" name="internalNotes"></textarea></label>
+    <button class="rounded-xl bg-red-700 p-4 font-bold text-white">Salvar conteúdo</button>
+  </form>
+  <script>
+    const templates: Record<string, string> = {
+      guide: "<h2>Visão geral</h2><p></p><h2>Passo a passo</h2><p></p><h2>Contexto local</h2><p></p><h2>Fontes</h2><p></p>",
+      news: "<p><strong>Resumo:</strong></p><h2>O que aconteceu</h2><p></p><h2>Impacto para candidatos</h2><p></p><h2>Fontes verificadas</h2><p></p>",
+      opportunities: "<p><strong>Atualizado em:</strong></p><h2>Oportunidades confirmadas</h2><p></p><h2>Como se candidatar gratuitamente</h2><p></p>",
+      profession: "<h2>O que faz</h2><p></p><h2>Formação e habilidades</h2><p></p><h2>Mercado local</h2><p></p>",
+      report: "<h2>Metodologia</h2><p></p><h2>Dados locais</h2><p></p><h2>Análise</h2><p></p><h2>Fontes</h2><p></p>",
+      company: "<h2>Desafio de contratação</h2><p></p><h2>Práticas recomendadas</h2><p></p><p><a href=\"/publicar-vaga\">Conheça os planos empresariais</a></p>",
+      scam: "<h2>Sinais de alerta</h2><p></p><h2>Como verificar</h2><p></p><h2>Como denunciar</h2><p></p>",
+      update: "<p><strong>O que mudou:</strong></p><h2>Informação atualizada</h2><p></p><h2>Fontes e data da revisão</h2><p></p>",
+      magnetic: "<p><strong>Resposta principal:</strong></p><p></p><h2>Por que isso importa na Grande Ilha</h2><p></p><h2>Passo a passo</h2><ol><li></li></ol><h2>Erros comuns</h2><ul><li></li></ul><h2>Fontes</h2><p></p><h2>Próximas ações gratuitas</h2><p><a href=\"/vagas\">Buscar vagas</a></p>"
+    };
+    document.getElementById("editorial-template")?.addEventListener("change", (event) => {
+      const select = event.currentTarget as HTMLSelectElement;
+      const content = document.getElementById("article-content") as HTMLTextAreaElement | null;
+      if (content && select.value && !content.value.trim()) content.value = templates[select.value] ?? "";
+    });
+    const pillar = document.getElementById("article-pillar") as HTMLSelectElement | null;
+    const cluster = document.getElementById("article-cluster") as HTMLSelectElement | null;
+    pillar?.addEventListener("change", () => { if (!cluster) return; for (const option of [...cluster.options]) option.hidden = Boolean(option.dataset.pillarId && option.dataset.pillarId !== pillar.value); if (cluster.selectedOptions[0]?.hidden) cluster.value = ""; });
+    document.addEventListener("admin:operation-success", ((event: CustomEvent) => {
+      const author = event.detail?.data?.author;
+      if (!author?.id || !author?.name) return;
+      const select = document.getElementById("article-author") as HTMLSelectElement | null;
+      if (!select) return;
+      select.add(new Option(author.name, author.id, true, true));
+      select.value = author.id;
+      document.getElementById("author-required-message")?.remove();
+      (document.getElementById("quick-author-form") as HTMLFormElement | null)?.reset();
+    }) as EventListener);
+  </script>
+</AdminLayout>

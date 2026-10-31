@@ -1,0 +1,14 @@
+---
+description: Sempre commit e push ao concluir alterações
+alwaysApply: true
+---
+
+# Git: commit e push obrigatórios
+
+Ao concluir qualquer alteração de código, configuração ou documentação:
+
+1. Faça **commit** com mensagem clara (foco no porquê).
+2. Faça **push** imediatamente para o remote da branch atual (`git push -u origin HEAD`).
+3. Informe o **SHA** e a **branch** na resposta.
+
+Não espere o usuário pedir “sobe pro git” / “push”. Exceções só se o usuário pedir explicitamente para **não** commit/push, ou se houver segredos (`.env`, tokens) no diff — nesse caso avise e não inclua esses arquivos.

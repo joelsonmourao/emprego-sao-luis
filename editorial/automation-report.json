@@ -1,0 +1,631 @@
+{
+  "period": {
+    "start": "2026-10-13",
+    "end": "2026-12-31"
+  },
+  "validated": 33,
+  "blocked": 207,
+  "details": [
+    {
+      "reason": "ainda sem texto completo"
+    },
+    {
+      "reason": "slug inválido/repetido"
+    },
+    {
+      "reason": "slug inválido/repetido"
+    },
+    {
+      "reason": "slug inválido/repetido"
+    },
+    {
+      "reason": "slug inválido/repetido"
+    },
+    {
+      "reason": "slug inválido/repetido"
+    },
+    {
+      "reason": "slug inválido/repetido"
+    },
+    {
+      "reason": "slug inválido/repetido"
+    },
+    {
+      "reason": "slug inválido/repetido"
+    },
+    {
+      "reason": "slug inválido/repetido"
+    },
+    {
+      "reason": "slug inválido/repetido"
+    },
+    {
+      "reason": "slug inválido/repetido"
+    },
+    {
+      "reason": "slug inválido/repetido"
+    },
+    {
+      "reason": "slug inválido/repetido"
+    },
+    {
+      "reason": "slug inválido/repetido"
+    },
+    {
+      "reason": "slug inválido/repetido"
+    },
+    {
+      "reason": "slug inválido/repetido"
+    },
+    {
+      "reason": "slug inválido/repetido"
+    },
+    {
+      "reason": "slug inválido/repetido"
+    },
+    {
+      "reason": "slug inválido/repetido"
+    },
+    {
+      "reason": "slug inválido/repetido"
+    },
+    {
+      "reason": "slug inválido/repetido"
+    },
+    {
+      "reason": "slug inválido/repetido"
+    },
+    {
+      "reason": "slug inválido/repetido"
+    },
+    {
+      "reason": "slug inválido/repetido"
+    },
+    {
+      "reason": "slug inválido/repetido"
+    },
+    {
+      "reason": "slug inválido/repetido"
+    },
+    {
+      "reason": "slug inválido/repetido"
+    },
+    {
+      "reason": "slug inválido/repetido"
+    },
+    {
+      "reason": "slug inválido/repetido"
+    },
+    {
+      "reason": "slug inválido/repetido"
+    },
+    {
+      "reason": "slug inválido/repetido"
+    },
+    {
+      "reason": "slug inválido/repetido"
+    },
+    {
+      "reason": "slug inválido/repetido"
+    },
+    {
+      "reason": "slug inválido/repetido"
+    },
+    {
+      "reason": "slug inválido/repetido"
+    },
+    {
+      "reason": "slug inválido/repetido"
+    },
+    {
+      "reason": "slug inválido/repetido"
+    },
+    {
+      "reason": "slug inválido/repetido"
+    },
+    {
+      "reason": "slug inválido/repetido"
+    },
+    {
+      "reason": "slug inválido/repetido"
+    },
+    {
+      "reason": "slug inválido/repetido"
+    },
+    {
+      "reason": "slug inválido/repetido"
+    },
+    {
+      "reason": "slug inválido/repetido"
+    },
+    {
+      "reason": "slug inválido/repetido"
+    },
+    {
+      "reason": "slug inválido/repetido"
+    },
+    {
+      "reason": "slug inválido/repetido"
+    },
+    {
+      "reason": "slug inválido/repetido"
+    },
+    {
+      "reason": "slug inválido/repetido"
+    },
+    {
+      "reason": "slug inválido/repetido"
+    },
+    {
+      "reason": "slug inválido/repetido"
+    },
+    {
+      "reason": "slug inválido/repetido"
+    },
+    {
+      "reason": "slug inválido/repetido"
+    },
+    {
+      "reason": "slug inválido/repetido"
+    },
+    {
+      "reason": "slug inválido/repetido"
+    },
+    {
+      "reason": "slug inválido/repetido"
+    },
+    {
+      "reason": "slug inválido/repetido"
+    },
+    {
+      "reason": "slug inválido/repetido"
+    },
+    {
+      "reason": "slug inválido/repetido"
+    },
+    {
+      "reason": "slug inválido/repetido"
+    },
+    {
+      "reason": "slug inválido/repetido"
+    },
+    {
+      "reason": "slug inválido/repetido"
+    },
+    {
+      "reason": "slug inválido/repetido"
+    },
+    {
+      "reason": "slug inválido/repetido"
+    },
+    {
+      "reason": "slug inválido/repetido"
+    },
+    {
+      "reason": "slug inválido/repetido"
+    },
+    {
+      "reason": "slug inválido/repetido"
+    },
+    {
+      "reason": "slug inválido/repetido"
+    },
+    {
+      "reason": "slug inválido/repetido"
+    },
+    {
+      "reason": "slug inválido/repetido"
+    },
+    {
+      "reason": "slug inválido/repetido"
+    },
+    {
+      "reason": "slug inválido/repetido"
+    },
+    {
+      "reason": "slug inválido/repetido"
+    },
+    {
+      "reason": "slug inválido/repetido"
+    },
+    {
+      "reason": "slug inválido/repetido"
+    },
+    {
+      "reason": "slug inválido/repetido"
+    },
+    {
+      "reason": "slug inválido/repetido"
+    },
+    {
+      "reason": "slug inválido/repetido"
+    },
+    {
+      "reason": "slug inválido/repetido"
+    },
+    {
+      "reason": "slug inválido/repetido"
+    },
+    {
+      "reason": "slug inválido/repetido"
+    },
+    {
+      "reason": "slug inválido/repetido"
+    },
+    {
+      "reason": "slug inválido/repetido"
+    },
+    {
+      "reason": "slug inválido/repetido"
+    },
+    {
+      "reason": "slug inválido/repetido"
+    },
+    {
+      "reason": "slug inválido/repetido"
+    },
+    {
+      "reason": "slug inválido/repetido"
+    },
+    {
+      "reason": "slug inválido/repetido"
+    },
+    {
+      "reason": "slug inválido/repetido"
+    },
+    {
+      "reason": "slug inválido/repetido"
+    },
+    {
+      "reason": "slug inválido/repetido"
+    },
+    {
+      "reason": "slug inválido/repetido"
+    },
+    {
+      "reason": "slug inválido/repetido"
+    },
+    {
+      "reason": "slug inválido/repetido"
+    },
+    {
+      "reason": "slug inválido/repetido"
+    },
+    {
+      "reason": "slug inválido/repetido"
+    },
+    {
+      "reason": "slug inválido/repetido"
+    },
+    {
+      "reason": "slug inválido/repetido"
+    },
+    {
+      "reason": "slug inválido/repetido"
+    },
+    {
+      "reason": "slug inválido/repetido"
+    },
+    {
+      "reason": "slug inválido/repetido"
+    },
+    {
+      "reason": "slug inválido/repetido"
+    },
+    {
+      "reason": "slug inválido/repetido"
+    },
+    {
+      "reason": "slug inválido/repetido"
+    },
+    {
+      "reason": "slug inválido/repetido"
+    },
+    {
+      "reason": "slug inválido/repetido"
+    },
+    {
+      "reason": "slug inválido/repetido"
+    },
+    {
+      "reason": "slug inválido/repetido"
+    },
+    {
+      "reason": "slug inválido/repetido"
+    },
+    {
+      "reason": "slug inválido/repetido"
+    },
+    {
+      "reason": "slug inválido/repetido"
+    },
+    {
+      "reason": "slug inválido/repetido"
+    },
+    {
+      "reason": "slug inválido/repetido"
+    },
+    {
+      "reason": "slug inválido/repetido"
+    },
+    {
+      "reason": "slug inválido/repetido"
+    },
+    {
+      "reason": "slug inválido/repetido"
+    },
+    {
+      "reason": "slug inválido/repetido"
+    },
+    {
+      "reason": "slug inválido/repetido"
+    },
+    {
+      "reason": "slug inválido/repetido"
+    },
+    {
+      "reason": "slug inválido/repetido"
+    },
+    {
+      "reason": "slug inválido/repetido"
+    },
+    {
+      "reason": "slug inválido/repetido"
+    },
+    {
+      "reason": "slug inválido/repetido"
+    },
+    {
+      "reason": "slug inválido/repetido"
+    },
+    {
+      "reason": "slug inválido/repetido"
+    },
+    {
+      "reason": "slug inválido/repetido"
+    },
+    {
+      "reason": "slug inválido/repetido"
+    },
+    {
+      "reason": "slug inválido/repetido"
+    },
+    {
+      "reason": "slug inválido/repetido"
+    },
+    {
+      "reason": "slug inválido/repetido"
+    },
+    {
+      "reason": "slug inválido/repetido"
+    },
+    {
+      "reason": "slug inválido/repetido"
+    },
+    {
+      "reason": "slug inválido/repetido"
+    },
+    {
+      "reason": "slug inválido/repetido"
+    },
+    {
+      "reason": "slug inválido/repetido"
+    },
+    {
+      "reason": "slug inválido/repetido"
+    },
+    {
+      "reason": "slug inválido/repetido"
+    },
+    {
+      "reason": "slug inválido/repetido"
+    },
+    {
+      "reason": "slug inválido/repetido"
+    },
+    {
+      "reason": "slug inválido/repetido"
+    },
+    {
+      "reason": "slug inválido/repetido"
+    },
+    {
+      "reason": "slug inválido/repetido"
+    },
+    {
+      "reason": "slug inválido/repetido"
+    },
+    {
+      "reason": "slug inválido/repetido"
+    },
+    {
+      "reason": "slug inválido/repetido"
+    },
+    {
+      "reason": "slug inválido/repetido"
+    },
+    {
+      "reason": "slug inválido/repetido"
+    },
+    {
+      "reason": "slug inválido/repetido"
+    },
+    {
+      "reason": "slug inválido/repetido"
+    },
+    {
+      "reason": "slug inválido/repetido"
+    },
+    {
+      "reason": "slug inválido/repetido"
+    },
+    {
+      "reason": "slug inválido/repetido"
+    },
+    {
+      "reason": "slug inválido/repetido"
+    },
+    {
+      "reason": "slug inválido/repetido"
+    },
+    {
+      "reason": "slug inválido/repetido"
+    },
+    {
+      "reason": "slug inválido/repetido"
+    },
+    {
+      "reason": "slug inválido/repetido"
+    },
+    {
+      "reason": "slug inválido/repetido"
+    },
+    {
+      "reason": "slug inválido/repetido"
+    },
+    {
+      "reason": "slug inválido/repetido"
+    },
+    {
+      "reason": "slug inválido/repetido"
+    },
+    {
+      "reason": "slug inválido/repetido"
+    },
+    {
+      "reason": "slug inválido/repetido"
+    },
+    {
+      "reason": "slug inválido/repetido"
+    },
+    {
+      "reason": "slug inválido/repetido"
+    },
+    {
+      "reason": "slug inválido/repetido"
+    },
+    {
+      "reason": "slug inválido/repetido"
+    },
+    {
+      "reason": "slug inválido/repetido"
+    },
+    {
+      "reason": "slug inválido/repetido"
+    },
+    {
+      "reason": "slug inválido/repetido"
+    },
+    {
+      "reason": "slug inválido/repetido"
+    },
+    {
+      "reason": "slug inválido/repetido"
+    },
+    {
+      "reason": "slug inválido/repetido"
+    },
+    {
+      "reason": "slug inválido/repetido"
+    },
+    {
+      "reason": "slug inválido/repetido"
+    },
+    {
+      "reason": "slug inválido/repetido"
+    },
+    {
+      "reason": "slug inválido/repetido"
+    },
+    {
+      "reason": "slug inválido/repetido"
+    },
+    {
+      "reason": "slug inválido/repetido"
+    },
+    {
+      "reason": "slug inválido/repetido"
+    },
+    {
+      "reason": "slug inválido/repetido"
+    },
+    {
+      "reason": "slug inválido/repetido"
+    },
+    {
+      "reason": "slug inválido/repetido"
+    },
+    {
+      "reason": "slug inválido/repetido"
+    },
+    {
+      "reason": "slug inválido/repetido"
+    },
+    {
+      "reason": "slug inválido/repetido"
+    },
+    {
+      "reason": "slug inválido/repetido"
+    },
+    {
+      "reason": "slug inválido/repetido"
+    },
+    {
+      "reason": "slug inválido/repetido"
+    },
+    {
+      "reason": "slug inválido/repetido"
+    },
+    {
+      "reason": "slug inválido/repetido"
+    },
+    {
+      "reason": "slug inválido/repetido"
+    },
+    {
+      "reason": "slug inválido/repetido"
+    },
+    {
+      "reason": "slug inválido/repetido"
+    },
+    {
+      "reason": "slug inválido/repetido"
+    },
+    {
+      "reason": "slug inválido/repetido"
+    },
+    {
+      "reason": "slug inválido/repetido"
+    },
+    {
+      "reason": "slug inválido/repetido"
+    },
+    {
+      "reason": "slug inválido/repetido"
+    },
+    {
+      "reason": "slug inválido/repetido"
+    },
+    {
+      "reason": "slug inválido/repetido"
+    },
+    {
+      "reason": "slug inválido/repetido"
+    },
+    {
+      "reason": "slug inválido/repetido"
+    },
+    {
+      "reason": "slug inválido/repetido"
+    },
+    {
+      "reason": "slug inválido/repetido"
+    },
+    {
+      "reason": "slug inválido/repetido"
+    },
+    {
+      "reason": "slug inválido/repetido"
+    }
+  ]
+}
