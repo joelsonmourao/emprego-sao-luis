@@ -853,8 +853,10 @@
           "category": "carreira",
           "editorialTheme": "quem concluiu curso técnico sem experiência formal",
           "workingTitle": "Evidências simples para entrevistas de quem concluiu curso técnico sem experiência formal: o que preparar",
-          "status": "PLANNED",
-          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+          "status": "DRAFT",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar.",
+          "slug": "curso-tecnico-sem-experiencia-evidencias-entrevista",
+          "draftFile": "editorial/2026-11-06/09h-curso-tecnico-sem-experiencia-evidencias.md"
         },
         {
           "time": "13:00",
@@ -862,8 +864,10 @@
           "category": "setor_profissional",
           "editorialTheme": "auxiliar de almoxarifado",
           "workingTitle": "Perguntas importantes antes de aceitar uma vaga de auxiliar de almoxarifado",
-          "status": "PLANNED",
-          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+          "status": "DRAFT",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar.",
+          "slug": "auxiliar-almoxarifado-perguntas-rotina-antes-aceitar",
+          "draftFile": "editorial/2026-11-06/13h-auxiliar-almoxarifado-perguntas-entrevista.md"
         },
         {
           "time": "17:00",
@@ -871,8 +875,10 @@
           "category": "seguranca_e_orientacao",
           "editorialTheme": "pedido de senha da conta gov.br",
           "workingTitle": "Quais provas guardar ao receber um pedido de senha da conta gov.br",
-          "status": "PLANNED",
-          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+          "status": "DRAFT",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar.",
+          "slug": "pedido-senha-govbr-recrutamento-provas-seguranca",
+          "draftFile": "editorial/2026-11-06/17h-pedido-senha-govbr-recrutamento.md"
         }
       ]
     },
