@@ -891,8 +891,10 @@
           "category": "carreira",
           "editorialTheme": "quem mudou de município na Grande Ilha",
           "workingTitle": "Evidências simples para entrevistas de quem mudou de município na Grande Ilha: o que preparar",
-          "status": "PLANNED",
-          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+          "status": "DRAFT",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar.",
+          "slug": "mudanca-municipio-grande-ilha-evidencias-entrevista",
+          "draftFile": "editorial/2026-11-07/09h-mudanca-municipio-grande-ilha-entrevista.md"
         },
         {
           "time": "13:00",
@@ -900,17 +902,21 @@
           "category": "setor_profissional",
           "editorialTheme": "apoio de laboratório",
           "workingTitle": "Perguntas importantes antes de aceitar uma vaga de apoio de laboratório",
-          "status": "PLANNED",
-          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+          "status": "DRAFT",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar.",
+          "slug": "apoio-laboratorio-perguntas-rotina-seguranca-entrevista",
+          "draftFile": "editorial/2026-11-07/13h-apoio-laboratorio-perguntas-rotina.md"
         },
         {
           "time": "17:00",
           "type": "GUIDE",
           "category": "seguranca_e_orientacao",
           "editorialTheme": "promessa de contratação garantida após Pix",
-          "workingTitle": "Quais provas guardar ao receber um promessa de contratação garantida após Pix",
-          "status": "PLANNED",
-          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+          "workingTitle": "Quais provas guardar ao receber uma promessa de contratação garantida após Pix",
+          "status": "DRAFT",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar.",
+          "slug": "promessa-contratacao-apos-pix-provas-verificacao",
+          "draftFile": "editorial/2026-11-07/17h-promessa-contratacao-pix-provas.md"
         }
       ]
     },
