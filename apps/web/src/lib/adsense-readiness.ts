@@ -5,6 +5,7 @@ import { eq } from "drizzle-orm";
 import { getEditorialAuditReport } from "./editorial-audit";
 import { getAdsenseReviewMode, getEditorialPortalMode } from "./portal-modes";
 import { getInstitutionalPages } from "./site-pages";
+import { getEditorialContentOverride } from "../data/editorial-content-overrides";
 
 export type ReadinessKind = "OFFICIAL" | "INTERNAL" | "RECOMMENDATION";
 export type ReadinessStatus = "BLOQUEADOR" | "PENDENTE" | "EM_REVISÃO" | "APROVADO_INTERNAMENTE" | "NÃO_APLICÁVEL";
@@ -23,6 +24,10 @@ export type ReadinessCheck = {
 
 const placeholderPattern = /\[configur[aá]vel no painel administrativo\]|data-admin-field=/i;
 const plainLength = (html: string) => html.replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim().length;
+// O painel deve avaliar o texto realmente servido ao leitor; parte das revisões
+// editoriais é aplicada na camada de apresentação e não regrava o HTML no banco.
+const effectiveArticleHtml = (article: typeof articles.$inferSelect) =>
+  getEditorialContentOverride(article.slug)?.contentHtml ?? article.contentHtml;
 
 type CacheEntry = { at: number; value: Awaited<ReturnType<typeof buildAdsenseReadiness>> };
 const readinessCache = new Map<string, CacheEntry>();
@@ -171,7 +176,7 @@ async function buildAdsenseReadiness(baseUrl: URL) {
       (coverUrlCounts.get(article.coverImageUrl.trim()) ?? 0) === 1
   );
   const substantialPublished = uniqueCoverPublished.filter(
-    (article) => plainLength(article.contentHtml) >= MIN_USEFUL_CHARS
+    (article) => plainLength(effectiveArticleHtml(article)) >= MIN_USEFUL_CHARS
   );
   checks.push(
     pass({
@@ -202,7 +207,7 @@ async function buildAdsenseReadiness(baseUrl: URL) {
       action: "/admin/conteudo/estrategia"
     })
   );
-  const thin = publishedArticles.filter((article) => plainLength(article.contentHtml) < MIN_USEFUL_CHARS);
+  const thin = publishedArticles.filter((article) => plainLength(effectiveArticleHtml(article)) < MIN_USEFUL_CHARS);
   checks.push(
     pass({
       id: "thin-content",
