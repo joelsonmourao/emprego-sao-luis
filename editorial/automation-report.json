@@ -124,10 +124,12 @@
       "reason": "slug inválido/repetido"
     },
     {
-      "reason": "slug inválido/repetido"
+      "slug": "atendimento-farmacia-perguntas-rotina-antes-aceitar",
+      "reason": "fonte citada apenas nos metadados, sem referência no texto"
     },
     {
-      "reason": "slug inválido/repetido"
+      "slug": "uso-indevido-logotipo-empresa-recrutamento-provas",
+      "reason": "fonte citada apenas nos metadados, sem referência no texto"
     },
     {
       "reason": "slug inválido/repetido"
