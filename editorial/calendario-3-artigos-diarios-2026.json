@@ -940,8 +940,10 @@
           "category": "setor_profissional",
           "editorialTheme": "atendimento de farmácia",
           "workingTitle": "Perguntas importantes antes de aceitar uma vaga de atendimento de farmácia",
-          "status": "PLANNED",
-          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+          "status": "DRAFT",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar.",
+          "slug": "atendimento-farmacia-perguntas-rotina-antes-aceitar",
+          "draftFile": "editorial/2026-11-08/13h-atendimento-farmacia-perguntas-rotina.md"
         },
         {
           "time": "17:00",
@@ -949,8 +951,10 @@
           "category": "seguranca_e_orientacao",
           "editorialTheme": "uso indevido de logotipo de empresa",
           "workingTitle": "Quais provas guardar ao receber um uso indevido de logotipo de empresa",
-          "status": "PLANNED",
-          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+          "status": "DRAFT",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar.",
+          "slug": "uso-indevido-logotipo-empresa-recrutamento-provas",
+          "draftFile": "editorial/2026-11-08/17h-logotipo-empresa-uso-indevido-provas.md"
         }
       ]
     },
