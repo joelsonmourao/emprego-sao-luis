@@ -967,8 +967,10 @@
           "category": "carreira",
           "editorialTheme": "quem busca ocupação com jornada parcial",
           "workingTitle": "Evidências simples para entrevistas de quem busca ocupação com jornada parcial: o que preparar",
-          "status": "PLANNED",
-          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+          "status": "DRAFT",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar.",
+          "slug": "jornada-parcial-evidencias-entrevista",
+          "draftFile": "editorial/2026-11-09/09h-jornada-parcial-evidencias-entrevista.md"
         },
         {
           "time": "13:00",
