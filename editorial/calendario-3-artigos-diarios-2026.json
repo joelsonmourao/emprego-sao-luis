@@ -978,8 +978,10 @@
           "category": "setor_profissional",
           "editorialTheme": "assistente de manutenção predial",
           "workingTitle": "Perguntas importantes antes de aceitar uma vaga de assistente de manutenção predial",
-          "status": "PLANNED",
-          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+          "status": "DRAFT",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar.",
+          "slug": "assistente-manutencao-predial-perguntas-antes-aceitar",
+          "draftFile": "editorial/2026-11-09/13h-assistente-manutencao-predial-perguntas.md"
         },
         {
           "time": "17:00",
