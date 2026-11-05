@@ -989,8 +989,10 @@
           "category": "seguranca_e_orientacao",
           "editorialTheme": "envio de contrato por aplicativo desconhecido",
           "workingTitle": "Quais provas guardar ao receber um envio de contrato por aplicativo desconhecido",
-          "status": "PLANNED",
-          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+          "status": "DRAFT",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar.",
+          "slug": "contrato-aplicativo-desconhecido-recrutamento-provas",
+          "draftFile": "editorial/2026-11-09/17h-contrato-aplicativo-desconhecido-provas.md"
         }
       ]
     },
