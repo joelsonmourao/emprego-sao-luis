@@ -3,8 +3,8 @@
     "start": "2026-10-13",
     "end": "2026-12-31"
   },
-  "validated": 43,
-  "blocked": 197,
+  "validated": 46,
+  "blocked": 194,
   "details": [
     {
       "reason": "ainda sem texto completo"
@@ -130,15 +130,6 @@
     {
       "slug": "uso-indevido-logotipo-empresa-recrutamento-provas",
       "reason": "fonte citada apenas nos metadados, sem referência no texto"
-    },
-    {
-      "reason": "slug inválido/repetido"
-    },
-    {
-      "reason": "slug inválido/repetido"
-    },
-    {
-      "reason": "slug inválido/repetido"
     },
     {
       "reason": "slug inválido/repetido"
