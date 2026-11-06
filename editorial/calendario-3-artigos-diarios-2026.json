@@ -1005,8 +1005,10 @@
           "category": "carreira",
           "editorialTheme": "quem precisa conciliar trabalho e estudo",
           "workingTitle": "Evidências simples para entrevistas de quem precisa conciliar trabalho e estudo: o que preparar",
-          "status": "PLANNED",
-          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+          "status": "DRAFT",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar.",
+          "slug": "conciliar-trabalho-estudo-evidencias-entrevista",
+          "draftFile": "editorial/2026-11-10/09h-conciliar-trabalho-estudo-evidencias-entrevista.md"
         },
         {
           "time": "13:00",
@@ -1014,17 +1016,21 @@
           "category": "setor_profissional",
           "editorialTheme": "conferência de mercadorias",
           "workingTitle": "Perguntas importantes antes de aceitar uma vaga de conferência de mercadorias",
-          "status": "PLANNED",
-          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+          "status": "DRAFT",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar.",
+          "slug": "conferencia-mercadorias-perguntas-antes-aceitar",
+          "draftFile": "editorial/2026-11-10/13h-conferencia-mercadorias-perguntas-antes-aceitar.md"
         },
         {
           "time": "17:00",
           "type": "GUIDE",
           "category": "seguranca_e_orientacao",
           "editorialTheme": "recebimento de oferta com escala incompleta",
-          "workingTitle": "Quais provas guardar ao receber um recebimento de oferta com escala incompleta",
-          "status": "PLANNED",
-          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+          "workingTitle": "Quais provas guardar ao receber uma oferta de emprego com escala incompleta",
+          "status": "DRAFT",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar.",
+          "slug": "oferta-emprego-escala-incompleta-provas",
+          "draftFile": "editorial/2026-11-10/17h-oferta-emprego-escala-incompleta-provas.md"
         }
       ]
     },
