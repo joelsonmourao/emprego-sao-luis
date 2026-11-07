@@ -1,0 +1,46 @@
+---
+import type { BrandAssetKey } from "../lib/brand/constants";
+import { FALLBACK_PATHS } from "../lib/brand/constants";
+import { getBrandIdentity } from "../lib/brand/identity-service";
+import { getEditorialPortalMode } from "../lib/portal-modes";
+import { resolveLogoAltForPortal } from "../lib/portal-content-rewrite";
+
+interface Props {
+  assetKey: BrandAssetKey;
+  variant?: string;
+  alt?: string;
+  class?: string;
+  width?: number;
+  height?: number;
+  loading?: "lazy" | "eager";
+  picture?: boolean;
+}
+
+const {
+  assetKey,
+  variant,
+  alt,
+  class: className = "h-10 w-auto object-contain",
+  width,
+  height,
+  loading = "lazy",
+  picture = false
+} = Astro.props;
+
+const identity = await getBrandIdentity();
+const portal = await getEditorialPortalMode();
+const asset = identity.assets[assetKey];
+const resolvedAlt = resolveLogoAltForPortal(alt ?? asset?.altText ?? identity.logoAlt, portal.enabled);
+const url = asset?.url ?? FALLBACK_PATHS[assetKey];
+const webp = variant && asset?.variants[variant] ? asset.variants[variant] : (asset?.variants.medium ?? url);
+const png = asset?.variants["medium-png"] ?? asset?.originalUrl ?? url;
+const isWebp = webp.endsWith(".webp") || webp.includes("image/webp");
+---
+{picture && isWebp ? (
+  <picture>
+    <source srcset={webp} type="image/webp" />
+    <img src={png} alt={resolvedAlt} class={className} width={width} height={height} loading={loading} />
+  </picture>
+) : (
+  <img src={url} alt={resolvedAlt} class={className} width={width} height={height} loading={loading} />
+)}

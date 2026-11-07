@@ -1,0 +1,128 @@
+---
+import AdminLayout from "../../../layouts/AdminLayout.astro";
+import { can } from "../../../lib/auth";
+
+const auth = Astro.locals.auth!;
+if (!can(auth, "seo.manage")) return new Response("Proibido", { status: 403 });
+
+const SEVERITY_LABELS: Record<string, string> = {
+  critical: "Crítico",
+  warning: "Aviso",
+  info: "Info"
+};
+---
+<AdminLayout title="Auditoria SEO">
+  <div class="flex flex-wrap items-end justify-between gap-4">
+    <div>
+      <h1 class="font-display text-3xl font-black">Auditoria SEO</h1>
+      <p class="mt-2 text-[var(--text-secondary)]">Verificação automática de vagas publicadas e problemas detectados.</p>
+    </div>
+    <button type="button" id="btn-run-audit" class="es-btn es-btn-primary">Executar auditoria</button>
+  </div>
+
+  <p id="audit-status" class="mt-4 hidden rounded-xl border border-green-200 bg-green-50 p-4 text-sm text-green-800"></p>
+
+  <div class="mt-6 flex flex-wrap gap-3">
+    <select id="filter-severity" class="rounded-xl border border-[var(--brand-border)] bg-white px-4 py-2 text-sm">
+      <option value="">Todas as severidades</option>
+      {Object.entries(SEVERITY_LABELS).map(([value, label]) => (
+        <option value={value}>{label}</option>
+      ))}
+    </select>
+    <select id="filter-resolved" class="rounded-xl border border-[var(--brand-border)] bg-white px-4 py-2 text-sm">
+      <option value="false">Abertas</option>
+      <option value="true">Resolvidas</option>
+      <option value="">Todas</option>
+    </select>
+    <button type="button" id="btn-reload" class="es-btn es-btn-secondary">Atualizar</button>
+  </div>
+
+  <div class="mt-6 overflow-x-auto rounded-2xl border border-[var(--brand-border)] bg-white">
+    <table class="min-w-full text-sm">
+      <thead class="border-b bg-[var(--brand-background)] text-left">
+        <tr>
+          <th class="p-3">Severidade</th>
+          <th class="p-3">Problema</th>
+          <th class="p-3">URL</th>
+          <th class="p-3">Impacto</th>
+          <th class="p-3">Verificado</th>
+          <th class="p-3">Ações</th>
+        </tr>
+      </thead>
+      <tbody id="issues-body">
+        <tr><td class="p-6 text-[var(--text-secondary)]" colspan="6">Carregando…</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <script define:vars={{ SEVERITY_LABELS }}>
+    const body = document.getElementById("issues-body");
+    const statusEl = document.getElementById("audit-status");
+
+    function severityClass(s) {
+      if (s === "critical") return "bg-red-100 text-red-800";
+      if (s === "warning") return "bg-amber-100 text-amber-800";
+      return "bg-blue-100 text-blue-800";
+    }
+
+    async function loadIssues() {
+      const severity = document.getElementById("filter-severity").value;
+      const resolved = document.getElementById("filter-resolved").value;
+      const params = new URLSearchParams();
+      if (severity) params.set("severity", severity);
+      if (resolved) params.set("resolved", resolved);
+      const res = await fetch(`/api/admin/seo/audit?${params}`);
+      const data = await res.json();
+      const issues = data.issues ?? [];
+      if (!issues.length) {
+        body.innerHTML = '<tr><td class="p-6 text-[var(--text-secondary)]" colspan="6">Nenhum problema encontrado.</td></tr>';
+        return;
+      }
+      body.innerHTML = issues.map((i) => `
+        <tr class="border-b hover:bg-[var(--brand-background)]">
+          <td class="p-3"><span class="rounded-full px-2 py-0.5 text-xs ${severityClass(i.severity)}">${SEVERITY_LABELS[i.severity] ?? i.severity}</span></td>
+          <td class="p-3"><strong>${i.message}</strong><p class="mt-1 text-xs text-[var(--text-secondary)]">${i.recommendation}</p></td>
+          <td class="p-3"><a class="text-xs text-[var(--brand-primary)] hover:underline" href="${i.url}" target="_blank">${i.url.replace(/^https?:\/\/[^/]+/, "")}</a></td>
+          <td class="p-3">-${i.scoreImpact}</td>
+          <td class="p-3 text-xs">${new Date(i.checkedAt).toLocaleString("pt-BR")}</td>
+          <td class="p-3">
+            ${!i.resolved ? `
+              <button type="button" class="btn-resolve rounded border px-2 py-1 text-xs" data-id="${i.id}">Resolver</button>
+              <button type="button" class="btn-ignore rounded border px-2 py-1 text-xs" data-id="${i.id}">Ignorar</button>
+            ` : "—"}
+          </td>
+        </tr>`).join("");
+    }
+
+    document.getElementById("btn-run-audit").addEventListener("click", async () => {
+      const res = await fetch("/api/admin/seo/audit", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "run", limit: 50 })
+      });
+      const data = await res.json();
+      statusEl.textContent = `Auditoria concluída: ${data.scanned ?? 0} vagas verificadas, ${data.issues ?? 0} novos problemas registrados.`;
+      statusEl.classList.remove("hidden");
+      await loadIssues();
+    });
+
+    body.addEventListener("click", async (e) => {
+      const id = e.target.dataset?.id;
+      if (!id) return;
+      if (e.target.classList.contains("btn-resolve")) {
+        await fetch("/api/admin/seo/audit", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: "resolve", id }) });
+        await loadIssues();
+      }
+      if (e.target.classList.contains("btn-ignore")) {
+        const reason = prompt("Motivo para ignorar (opcional):") ?? "Ignorado";
+        await fetch("/api/admin/seo/audit", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: "ignore", id, reason }) });
+        await loadIssues();
+      }
+    });
+
+    document.getElementById("btn-reload").addEventListener("click", loadIssues);
+    document.getElementById("filter-severity").addEventListener("change", loadIssues);
+    document.getElementById("filter-resolved").addEventListener("change", loadIssues);
+    loadIssues();
+  </script>
+</AdminLayout>

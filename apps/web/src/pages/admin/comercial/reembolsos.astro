@@ -1,0 +1,105 @@
+---
+import AdminLayout from "../../../layouts/AdminLayout.astro";
+import { can } from "../../../lib/auth";
+
+const auth = Astro.locals.auth!;
+if (!can(auth, "commercial.manage")) return new Response("Proibido", { status: 403 });
+
+const STATUS_LABELS: Record<string, string> = {
+  REQUESTED: "Solicitado",
+  COMPLETED: "Concluído",
+  REJECTED: "Rejeitado"
+};
+---
+<AdminLayout title="Reembolsos">
+  <div class="flex flex-wrap items-end justify-between gap-4">
+    <div>
+      <h1 class="font-display text-3xl font-black">Reembolsos</h1>
+      <p class="mt-2 text-[var(--text-secondary)]">Solicitações de reembolso de pagamentos comerciais.</p>
+    </div>
+    <button type="button" id="btn-new-refund" class="es-btn es-btn-primary">Solicitar reembolso</button>
+  </div>
+
+  <div class="mt-6 overflow-x-auto rounded-2xl border border-[var(--brand-border)] bg-white">
+    <table class="min-w-full text-sm">
+      <thead class="border-b bg-[var(--brand-background)] text-left">
+        <tr>
+          <th class="p-3">ID</th>
+          <th class="p-3">Valor</th>
+          <th class="p-3">Parcial</th>
+          <th class="p-3">Status</th>
+          <th class="p-3">Motivo</th>
+          <th class="p-3">Solicitado em</th>
+        </tr>
+      </thead>
+      <tbody id="refunds-body">
+        <tr><td class="p-6 text-[var(--text-secondary)]" colspan="6">Carregando…</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <dialog id="refund-modal" class="w-full max-w-md rounded-2xl border border-[var(--brand-border)] p-6 shadow-xl backdrop:bg-black/40">
+    <h2 class="font-display text-lg font-bold">Solicitar reembolso</h2>
+    <form id="refund-form" class="mt-4 grid gap-3">
+      <label class="text-sm">ID do pagamento<input id="refund-payment" class="mt-1 w-full rounded-lg border border-[var(--brand-border)] p-2 font-mono text-xs" required /></label>
+      <label class="text-sm">ID do pedido<input id="refund-order" class="mt-1 w-full rounded-lg border border-[var(--brand-border)] p-2 font-mono text-xs" required /></label>
+      <label class="text-sm">Valor (R$)<input id="refund-amount" type="number" step="0.01" min="0" class="mt-1 w-full rounded-lg border border-[var(--brand-border)] p-2" required /></label>
+      <label class="text-sm">Motivo<textarea id="refund-reason" class="mt-1 w-full rounded-lg border border-[var(--brand-border)] p-2" rows="2" required></textarea></label>
+      <label class="flex items-center gap-2 text-sm"><input type="checkbox" id="refund-partial" /> Reembolso parcial</label>
+      <div class="flex gap-3 pt-2">
+        <button type="submit" class="es-btn es-btn-primary">Enviar solicitação</button>
+        <button type="button" id="refund-cancel" class="es-btn es-btn-secondary">Cancelar</button>
+      </div>
+    </form>
+  </dialog>
+
+  <script define:vars={{ STATUS_LABELS }}>
+    const fmt = (v) => Number(v ?? 0).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+    const body = document.getElementById("refunds-body");
+    const modal = document.getElementById("refund-modal");
+
+    async function loadRefunds() {
+      const res = await fetch("/api/admin/commercial/refunds");
+      const data = await res.json();
+      const items = data.items ?? [];
+      if (!items.length) {
+        body.innerHTML = '<tr><td class="p-6 text-[var(--text-secondary)]" colspan="6">Nenhum reembolso registrado.</td></tr>';
+        return;
+      }
+      body.innerHTML = items.map((r) => `
+        <tr class="border-b hover:bg-[var(--brand-background)]">
+          <td class="p-3 font-mono text-xs">${r.id.slice(0, 8)}…</td>
+          <td class="p-3">${fmt(r.amount)}</td>
+          <td class="p-3">${r.partial ? "Sim" : "Não"}</td>
+          <td class="p-3">${STATUS_LABELS[r.status] ?? r.status}</td>
+          <td class="p-3 max-w-xs truncate">${r.reason}</td>
+          <td class="p-3 text-xs">${new Date(r.createdAt).toLocaleString("pt-BR")}</td>
+        </tr>`).join("");
+    }
+
+    document.getElementById("btn-new-refund").addEventListener("click", () => modal.showModal());
+    document.getElementById("refund-cancel").addEventListener("click", () => modal.close());
+
+    document.getElementById("refund-form").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const res = await fetch("/api/admin/commercial/refunds", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          paymentId: document.getElementById("refund-payment").value,
+          orderId: document.getElementById("refund-order").value,
+          amount: document.getElementById("refund-amount").value,
+          reason: document.getElementById("refund-reason").value,
+          partial: document.getElementById("refund-partial").checked
+        })
+      });
+      const data = await res.json();
+      if (!res.ok) { alert(data.error ?? "Erro ao solicitar reembolso."); return; }
+      modal.close();
+      e.target.reset();
+      await loadRefunds();
+    });
+
+    loadRefunds();
+  </script>
+</AdminLayout>

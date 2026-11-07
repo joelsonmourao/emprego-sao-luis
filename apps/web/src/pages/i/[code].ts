@@ -1,0 +1,42 @@
+import type { APIRoute } from "astro";
+import { createDatabase, jobs, shortLinks } from "@es/db";
+import { eq, sql } from "drizzle-orm";
+import { getEditorialPortalMode } from "../../lib/portal-modes";
+
+export const GET: APIRoute = async ({ params, url, redirect }) => {
+  const portal = await getEditorialPortalMode();
+  if (portal.enabled) return redirect("/quadro-pausado", 302);
+
+  const code = (params.code ?? "").toUpperCase();
+  if (!/^ES-\d{6}$/.test(code) || !process.env.DATABASE_URL) return redirect("/vagas", 302);
+  const connection = createDatabase(process.env.DATABASE_URL);
+  try {
+    const [job] = await connection.db
+      .select({ slug: jobs.slug, id: jobs.id })
+      .from(jobs)
+      .where(eq(jobs.publicCode, code))
+      .limit(1);
+    if (!job) return redirect("/vagas", 302);
+    await connection.db
+      .insert(shortLinks)
+      .values({
+        code,
+        destinationUrl: `/vagas/${job.slug}`,
+        entityType: "JOB",
+        entityId: job.id,
+        clicks: 1
+      })
+      .onConflictDoUpdate({
+        target: shortLinks.code,
+        set: { clicks: sql`${shortLinks.clicks} + 1`, updatedAt: new Date() }
+      });
+    const destination = new URL(`/vagas/${job.slug}`, url.origin);
+    for (const [key, value] of url.searchParams)
+      if (key.startsWith("utm_")) destination.searchParams.set(key, value);
+    if (!destination.searchParams.has("utm_source"))
+      destination.searchParams.set("utm_source", "shortlink");
+    return redirect(destination.pathname + destination.search, 302);
+  } finally {
+    await connection.close();
+  }
+};

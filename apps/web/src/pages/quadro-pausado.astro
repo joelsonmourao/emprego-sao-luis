@@ -1,0 +1,8 @@
+---
+import JobBoardPaused from "../components/JobBoardPaused.astro";
+import { jobBoardPublicGate } from "../lib/job-board-gate";
+
+const gate = await jobBoardPublicGate();
+if (!gate.paused) return Astro.redirect("/", 302);
+---
+<JobBoardPaused title="Publicação de vagas temporariamente pausada" />

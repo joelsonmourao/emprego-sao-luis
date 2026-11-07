@@ -1,0 +1,56 @@
+---
+interface Props {
+  citations: readonly string[];
+  sourceLabels?: Readonly<Record<string, string>>;
+}
+
+const { citations, sourceLabels = {} } = Astro.props;
+
+function normalizeHttpsUrl(value: string): string | null {
+  try {
+    const url = new URL(value.replaceAll("&amp;", "&"));
+    if (url.protocol !== "https:") return null;
+    url.hash = "";
+    return url.toString();
+  } catch {
+    return null;
+  }
+}
+
+const normalizedLabels = new Map(
+  Object.entries(sourceLabels).flatMap(([value, label]) => {
+    const url = normalizeHttpsUrl(value);
+    const trimmedLabel = label.trim();
+    return url && trimmedLabel ? [[url, trimmedLabel] as const] : [];
+  })
+);
+
+const sources = [...new Set(citations)].flatMap((value) => {
+  const normalizedUrl = normalizeHttpsUrl(value);
+  if (!normalizedUrl) return [];
+  const url = new URL(normalizedUrl);
+  return [{
+    url: normalizedUrl,
+    host: url.hostname.replace(/^www\./, ""),
+    label: normalizedLabels.get(normalizedUrl)
+  }];
+});
+---
+
+{sources.length > 0 && (
+  <aside class="mt-10 rounded-2xl border border-[var(--brand-border)] bg-[var(--brand-surface)] p-5" aria-labelledby="editorial-sources-title">
+    <h2 id="editorial-sources-title" class="font-display text-xl font-black">Referências externas citadas</h2>
+    <p class="mt-2 text-sm text-[var(--es-muted)]">
+      Estes links aparecem no conteúdo como apoio à verificação. Consulte a página original para conferir data, escopo e eventuais atualizações.
+    </p>
+    <ol class="mt-4 space-y-2 text-sm">
+      {sources.map((source, index) => (
+        <li>
+          <a class="underline break-all" href={source.url} target="_blank" rel="noopener noreferrer">
+            {index + 1}. {source.label ? `${source.label} (${source.host})` : source.host}
+          </a>
+        </li>
+      ))}
+    </ol>
+  </aside>
+)}

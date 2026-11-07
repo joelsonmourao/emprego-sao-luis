@@ -1,0 +1,52 @@
+{
+  "generatedFor": "adsense-preflight-image-review",
+  "policy": "Marcar para substituição — não gerar em massa agora.",
+  "replacePriority": [
+    {
+      "slug": "objetivo-profissional-curriculo",
+      "cover": "/covers/adsense-quality/objetivo-profissional-curriculo.webp",
+      "reason": "Arquivo leve (~26KB); composição genérica de mesa/notebook; prioridade alta (publicado)."
+    },
+    {
+      "slug": "perguntas-comuns-entrevista-emprego",
+      "cover": "/covers/adsense-quality/perguntas-comuns-entrevista-emprego.webp",
+      "reason": "Arquivo leve; cena de entrevista genérica repetível; prioridade alta (publicado)."
+    },
+    {
+      "slug": "pesquisar-empresa-antes-entrevista",
+      "cover": "/covers/adsense-quality/pesquisar-empresa-antes-entrevista.webp",
+      "reason": "Arquivo leve; notebook genérico; publicar em breve."
+    },
+    {
+      "slug": "linkedin-primeiro-emprego",
+      "cover": "/covers/adsense-quality/linkedin-primeiro-emprego.webp",
+      "reason": "Arquivo leve; visual semelhante a outras capas 'pessoa no notebook'."
+    },
+    {
+      "slug": "comparar-duas-propostas-emprego",
+      "cover": "/covers/sl-local/comparar-duas-propostas-emprego.webp",
+      "reason": "Arquivo <35KB; risco de baixa nitidez."
+    },
+    {
+      "slug": "ctps-digital-carteira-trabalho-consultar",
+      "cover": "/covers/sl-local/ctps-digital-carteira-trabalho-consultar.webp",
+      "reason": "Arquivo <35KB; tema factual — capa deve sugerir app/documento, não escritório genérico."
+    },
+    {
+      "slug": "decimo-terceiro-salario-pagamento-clt",
+      "cover": "/covers/sl-local/decimo-terceiro-salario-pagamento-clt.webp",
+      "reason": "Arquivo <35KB; tema salarial/factual."
+    },
+    {
+      "slug": "ler-contrato-trabalho-clt",
+      "cover": "/covers/sl-local/ler-contrato-trabalho-clt.webp",
+      "reason": "Arquivo <35KB."
+    },
+    {
+      "slug": "mitos-direitos-trabalhistas-whatsapp",
+      "cover": "/covers/sl-local/mitos-direitos-trabalhistas-whatsapp.webp",
+      "reason": "Arquivo <35KB; assunto específico (boato/WhatsApp)."
+    }
+  ],
+  "okForNow": "Demais capas WebP 1280x720 presentes; substituir aos poucos evitando série visual idêntica (mesmo ângulo de escritório)."
+}

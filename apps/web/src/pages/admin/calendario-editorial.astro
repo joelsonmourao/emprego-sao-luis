@@ -1,0 +1,57 @@
+---
+import AdminLayout from "../../layouts/AdminLayout.astro";
+import { can } from "../../lib/auth";
+import { articles, createDatabase } from "@es/db";
+import { asc, isNotNull } from "drizzle-orm";
+
+const auth = Astro.locals.auth!;
+if (!can(auth, "content.manage")) return Astro.redirect("/admin?error=sem-permissao");
+
+let scheduled: Array<{ id: string; title: string; status: string; scheduledAt: Date | null; editorialStage: string | null }> = [];
+if (process.env.DATABASE_URL) {
+  const connection = createDatabase(process.env.DATABASE_URL);
+  try {
+    scheduled = await connection.db
+      .select({
+        id: articles.id,
+        title: articles.title,
+        status: articles.status,
+        scheduledAt: articles.scheduledAt,
+        editorialStage: articles.editorialStage
+      })
+      .from(articles)
+      .where(isNotNull(articles.scheduledAt))
+      .orderBy(asc(articles.scheduledAt))
+      .limit(100);
+  } finally {
+    await connection.close();
+  }
+}
+---
+<AdminLayout title="Calendário editorial">
+  <div class="flex flex-wrap items-start justify-between gap-4">
+    <div>
+      <p class="text-sm font-bold uppercase tracking-wide text-red-700">Conteúdo</p>
+      <h1 class="mt-2 text-3xl font-black">Calendário editorial</h1>
+      <p class="mt-2 text-sm text-[var(--text-secondary)]">Publicações agendadas. IA não publica automaticamente.</p>
+    </div>
+    <a class="rounded-lg bg-red-700 px-4 py-2 font-bold text-white" href="/admin/conteudo/novo">Novo conteúdo</a>
+  </div>
+  <div class="mt-8 overflow-auto rounded-2xl bg-white">
+    <table class="w-full text-left text-sm">
+      <thead><tr class="border-b"><th class="p-4">Agendado para</th><th>Título</th><th>Etapa</th><th>Status</th><th></th></tr></thead>
+      <tbody>
+        {scheduled.map((row) => (
+          <tr class="border-b">
+            <td class="p-4">{row.scheduledAt ? row.scheduledAt.toLocaleString("pt-BR") : "—"}</td>
+            <td class="font-bold">{row.title}</td>
+            <td>{row.editorialStage ?? "—"}</td>
+            <td>{row.status}</td>
+            <td class="p-4"><a class="text-red-700" href={`/admin/conteudo/${row.id}/editar`}>Editar</a></td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+    {scheduled.length === 0 && <p class="p-6 text-sm text-slate-600">Nenhum conteúdo agendado.</p>}
+  </div>
+</AdminLayout>

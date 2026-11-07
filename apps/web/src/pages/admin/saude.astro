@@ -1,0 +1,63 @@
+---
+import { diagnoseStorage } from "@es/storage";
+import AdminLayout from "../../layouts/AdminLayout.astro";
+
+const storage = await diagnoseStorage();
+const storageOk = storage.exists && storage.read && storage.write && storage.delete;
+---
+
+<AdminLayout title="Saúde da infraestrutura">
+  <h1 class="font-display text-3xl font-black">Saúde</h1>
+  <p class="mt-2 text-[var(--text-secondary)]">Status em tempo real do banco, filas, armazenamento e dependências.</p>
+  <div class="mt-8 grid gap-4 lg:grid-cols-2">
+    <section class="es-card rounded-2xl p-6">
+      <h2 class="text-lg font-bold">Armazenamento administrativo</h2>
+      <p class={`mt-2 inline-flex rounded-full px-3 py-1 text-xs font-bold ${storageOk ? "bg-emerald-100 text-emerald-800" : "bg-rose-100 text-rose-800"}`}>
+        {storageOk ? "Disponível" : "Indisponível"}
+      </p>
+      <dl class="mt-4 grid grid-cols-[auto_1fr] gap-x-4 gap-y-2 text-sm">
+        <dt class="font-bold">Provedor</dt><dd>{storage.provider === "s3" ? "R2/S3" : "Volume local"}</dd>
+        <dt class="font-bold">Caminho</dt><dd class="break-all"><code>{storage.path}</code></dd>
+        <dt class="font-bold">Diretório</dt><dd>{storage.exists ? "OK" : "Falha"}</dd>
+        <dt class="font-bold">Leitura</dt><dd>{storage.read ? "OK" : "Falha"}</dd>
+        <dt class="font-bold">Escrita</dt><dd>{storage.write ? "OK" : "Falha"}</dd>
+        <dt class="font-bold">Exclusão temporária</dt><dd>{storage.delete ? "OK" : "Falha"}</dd>
+        <dt class="font-bold">Última verificação</dt><dd>{new Date(storage.checkedAt).toLocaleString("pt-BR")}</dd>
+      </dl>
+      {storage.error && <p class="mt-4 rounded-xl border border-rose-200 bg-rose-50 p-3 text-sm text-rose-900">{storage.error}</p>}
+      <p class="mt-4 text-xs text-[var(--text-secondary)]">No Coolify, web e worker devem compartilhar o volume persistente montado em <code>/app/data</code>.</p>
+    </section>
+
+    <section class="es-card rounded-2xl p-6">
+      <h2 class="text-lg font-bold">Readiness</h2>
+      <p class="mt-2 text-sm text-[var(--text-secondary)]">Consulta <code>/api/ready</code> sem cache.</p>
+      <pre id="ready-json" class="mt-4 max-h-80 overflow-auto rounded-xl bg-[var(--brand-background)] p-4 text-xs">Carregando…</pre>
+      <button class="es-btn es-btn-secondary mt-4" type="button" id="refresh-ready">Atualizar</button>
+    </section>
+
+    <section class="es-card rounded-2xl p-6 lg:col-span-2">
+      <h2 class="text-lg font-bold">Atalhos</h2>
+      <ul class="mt-4 flex flex-wrap gap-4 text-sm">
+        <li><button class="font-bold text-[var(--brand-primary)]" type="button" id="open-health">Health check</button></li>
+        <li><a class="font-bold text-[var(--brand-primary)]" href="/admin/operacao">Filas e jobs</a></li>
+        <li><a class="font-bold text-[var(--brand-primary)]" href="/admin/auditoria">Auditoria</a></li>
+      </ul>
+    </section>
+  </div>
+  <script is:inline>
+    async function loadEndpoint(path) {
+      const el = document.getElementById("ready-json");
+      if (!el) return;
+      try {
+        const res = await fetch(path, { cache: "no-store" });
+        const data = await res.json();
+        el.textContent = JSON.stringify(data, null, 2);
+      } catch (error) {
+        el.textContent = String(error);
+      }
+    }
+    document.getElementById("refresh-ready")?.addEventListener("click", () => loadEndpoint("/api/ready"));
+    document.getElementById("open-health")?.addEventListener("click", () => loadEndpoint("/api/health"));
+    loadEndpoint("/api/ready");
+  </script>
+</AdminLayout>

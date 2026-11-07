@@ -1,0 +1,78 @@
+---
+import JobBoardPaused from "../components/JobBoardPaused.astro";
+import { jobBoardPublicGate } from "../lib/job-board-gate";
+import BaseLayout from "../layouts/BaseLayout.astro";
+import Breadcrumbs from "../components/ui/Breadcrumbs.astro";
+import PageHero from "../components/ui/PageHero.astro";
+
+const gate = await jobBoardPublicGate();
+
+const whatsapp = import.meta.env.PUBLIC_WHATSAPP_CHANNEL_URL as string | undefined;
+const status = Astro.url.searchParams.get("status");
+const benefits = [
+  "Receba vagas compatíveis com seus filtros",
+  "Escolha frequência diária, semanal ou imediata",
+  "Cancele quando quiser, sem burocracia"
+];
+---
+{gate.paused ? (
+  <JobBoardPaused title="Alertas de vagas temporariamente pausados" />
+) : (
+<BaseLayout title="Alertas de vagas — Empregos São Luís" breadcrumbs={[{ name: "Alertas", url: "/alertas" }]}>
+  <PageHero kicker="Alertas" title="Receba vagas compatíveis com você" description="A inscrição é opcional e não limita o acesso às vagas. Confirme seu e-mail para ativar os alertas." pattern={false} />
+
+  <section class="es-section pt-0">
+    <div class="es-container grid gap-8 lg:grid-cols-[1fr_420px]">
+      <div>
+        <Breadcrumbs items={[{ name: "Início", url: "/" }, { name: "Alertas" }]} />
+        <ul class="mt-6 grid gap-3">
+          {benefits.map((item) => (
+            <li class="es-card flex items-start gap-3 p-4 text-sm text-[var(--es-muted)]">
+              <span class="mt-0.5 font-black text-[var(--brand-primary)]" aria-hidden="true">✓</span>
+              {item}
+            </li>
+          ))}
+        </ul>
+        {whatsapp && <a class="es-btn es-btn-secondary mt-6" href={whatsapp} rel="noopener noreferrer">Canal oficial no WhatsApp</a>}
+      </div>
+
+      <div class="es-card p-6 sm:p-8">
+        {status === "verifique-email" && <p class="mb-4 rounded-xl border border-blue-200 bg-blue-50 p-4 text-sm text-blue-900">Enviamos um link de confirmação. Verifique sua caixa de entrada.</p>}
+        {status === "confirmado" && <p class="mb-4 rounded-xl border border-green-200 bg-green-50 p-4 text-sm text-green-900">Alerta confirmado com sucesso.</p>}
+        {status === "descadastrado" && <p class="mb-4 rounded-xl border border-[var(--es-border)] bg-[var(--es-cream)] p-4 text-sm">Você foi descadastrado dos alertas por e-mail.</p>}
+
+        <h2 class="font-display text-2xl font-black">Criar alerta</h2>
+        <form class="es-light-form-panel mt-6 grid gap-4" method="post" action="/api/subscriptions">
+          <fieldset class="grid gap-4">
+            <legend class="font-bold">Contato</legend>
+            <label class="grid gap-1 text-sm font-semibold">E-mail<input class="rounded-xl border border-[var(--es-border)] px-3 py-2.5" type="email" name="email" required /></label>
+          </fieldset>
+          <fieldset class="grid gap-4">
+            <legend class="font-bold">Preferências</legend>
+            <label class="grid gap-1 text-sm font-semibold">Cargo ou palavra-chave<input class="rounded-xl border border-[var(--es-border)] px-3 py-2.5" name="title" maxlength="120" placeholder="Ex.: auxiliar administrativo" /></label>
+            <label class="grid gap-1 text-sm font-semibold">Cidade<input class="rounded-xl border border-[var(--es-border)] px-3 py-2.5" name="city" maxlength="120" /></label>
+            <label class="grid gap-1 text-sm font-semibold">Área profissional<input class="rounded-xl border border-[var(--es-border)] px-3 py-2.5" name="category" maxlength="120" /></label>
+            <label class="grid gap-1 text-sm font-semibold">Empresa<input class="rounded-xl border border-[var(--es-border)] px-3 py-2.5" name="company" maxlength="120" /></label>
+            <label class="grid gap-1 text-sm font-semibold">Modalidade
+              <select class="rounded-xl border border-[var(--es-border)] px-3 py-2.5" name="workplaceType">
+                <option value="">Qualquer</option><option value="presencial">Presencial</option><option value="hibrido">Híbrido</option><option value="remoto">Remoto</option>
+              </select>
+            </label>
+            <label class="grid gap-1 text-sm font-semibold">Frequência
+              <select class="rounded-xl border border-[var(--es-border)] px-3 py-2.5" name="frequency">
+                <option value="DAILY">Diária</option><option value="WEEKLY">Semanal</option><option value="INSTANT">Imediata</option>
+              </select>
+            </label>
+          </fieldset>
+          <fieldset class="grid gap-3">
+            <legend class="font-bold">Canais e consentimento</legend>
+            <label class="flex items-start gap-3 text-sm"><input class="mt-1" type="checkbox" name="webPush" value="yes" /><span>Quero receber Web Push quando disponível (opcional).</span></label>
+            <label class="flex items-start gap-3 text-sm"><input class="mt-1" type="checkbox" name="consent" value="yes" required /><span>Concordo em receber alertas e li a <a class="underline" href="/privacidade">política de privacidade</a>.</span></label>
+          </fieldset>
+          <button class="es-btn es-btn-primary w-full py-3.5" type="submit">Criar alerta gratuito</button>
+        </form>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+)}
