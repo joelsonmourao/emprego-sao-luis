@@ -1043,8 +1043,10 @@
           "category": "carreira",
           "editorialTheme": "quem já foi auxiliar mas quer cargo de conferência",
           "workingTitle": "Evidências simples para entrevistas de quem já foi auxiliar mas quer cargo de conferência: o que preparar",
-          "status": "PLANNED",
-          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+          "status": "DRAFT",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar.",
+          "slug": "auxiliar-para-conferencia-evidencias-entrevista",
+          "draftFile": "editorial/2026-11-11/09h-auxiliar-para-conferencia-evidencias-entrevista.md"
         },
         {
           "time": "13:00",
