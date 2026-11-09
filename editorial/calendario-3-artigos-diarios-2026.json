@@ -1054,8 +1054,10 @@
           "category": "setor_profissional",
           "editorialTheme": "auxiliar de cadastro",
           "workingTitle": "Perguntas importantes antes de aceitar uma vaga de auxiliar de cadastro",
-          "status": "PLANNED",
-          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+          "status": "DRAFT",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar.",
+          "slug": "auxiliar-cadastro-perguntas-antes-aceitar",
+          "draftFile": "editorial/2026-11-11/13h-auxiliar-cadastro-perguntas-antes-aceitar.md"
         },
         {
           "time": "17:00",
@@ -1063,8 +1065,10 @@
           "category": "seguranca_e_orientacao",
           "editorialTheme": "mensagem que exige resposta em poucos minutos",
           "workingTitle": "Quais provas guardar ao receber um mensagem que exige resposta em poucos minutos",
-          "status": "PLANNED",
-          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+          "status": "DRAFT",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar.",
+          "slug": "mensagem-urgente-recrutamento-guardar-provas",
+          "draftFile": "editorial/2026-11-11/17h-mensagem-urgente-recrutamento-guardar-provas.md"
         }
       ]
     },
