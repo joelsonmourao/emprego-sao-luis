@@ -3,8 +3,8 @@
     "start": "2026-10-13",
     "end": "2026-12-31"
   },
-  "validated": 50,
-  "blocked": 190,
+  "validated": 51,
+  "blocked": 189,
   "details": [
     {
       "reason": "ainda sem texto completo"
@@ -122,10 +122,6 @@
     },
     {
       "reason": "slug inválido/repetido"
-    },
-    {
-      "slug": "mensagem-urgente-recrutamento-guardar-provas",
-      "reason": "metadados divergentes do calendário"
     },
     {
       "reason": "slug inválido/repetido"
