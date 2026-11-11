@@ -1080,9 +1080,11 @@
           "type": "GUIDE",
           "category": "carreira",
           "editorialTheme": "quem tem experiência de trabalho informal em atendimento",
-          "workingTitle": "Evidências simples para entrevistas de quem tem experiência de trabalho informal em atendimento: o que preparar",
-          "status": "PLANNED",
-          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+          "workingTitle": "Como apresentar experiência informal em atendimento durante uma entrevista",
+          "status": "DRAFT",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar.",
+          "slug": "atendimento-informal-evidencias-entrevista",
+          "file": "editorial/2026-11-12/09h-atendimento-informal-evidencias-entrevista.md"
         },
         {
           "time": "13:00",
