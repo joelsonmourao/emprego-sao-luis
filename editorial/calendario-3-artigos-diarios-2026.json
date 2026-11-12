@@ -1092,17 +1092,21 @@
           "category": "setor_profissional",
           "editorialTheme": "apoio em eventos",
           "workingTitle": "Perguntas importantes antes de aceitar uma vaga de apoio em eventos",
-          "status": "PLANNED",
-          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+          "status": "DRAFT",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar.",
+          "slug": "apoio-eventos-perguntas-antes-aceitar",
+          "draftFile": "editorial/2026-11-12/13h-apoio-eventos-perguntas-antes-aceitar.md"
         },
         {
           "time": "17:00",
           "type": "GUIDE",
           "category": "seguranca_e_orientacao",
           "editorialTheme": "exigência de dados bancários na primeira mensagem",
-          "workingTitle": "Quais provas guardar ao receber um exigência de dados bancários na primeira mensagem",
-          "status": "PLANNED",
-          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+          "workingTitle": "Pedido de dados bancários no primeiro contato de recrutamento: o que registrar",
+          "status": "DRAFT",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar.",
+          "slug": "dados-bancarios-primeiro-contato-recrutamento",
+          "draftFile": "editorial/2026-11-12/17h-dados-bancarios-primeiro-contato-recrutamento.md"
         }
       ]
     },
