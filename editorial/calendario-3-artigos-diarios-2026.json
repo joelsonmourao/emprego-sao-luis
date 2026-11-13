@@ -1150,9 +1150,10 @@
           "type": "GUIDE",
           "category": "carreira",
           "editorialTheme": "quem quer demonstrar Excel básico sem exagerar",
-          "workingTitle": "Evidências simples para entrevistas de quem quer demonstrar Excel básico sem exagerar: o que preparar",
-          "status": "PLANNED",
-          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+          "workingTitle": "Como demonstrar Excel básico em uma entrevista sem exagerar suas habilidades",
+          "status": "DRAFT",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar.",
+          "slug": "excel-basico-entrevista-evidencias-sem-exagero"
         },
         {
           "time": "13:00",
