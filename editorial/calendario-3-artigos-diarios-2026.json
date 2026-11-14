@@ -1183,9 +1183,10 @@
           "type": "GUIDE",
           "category": "carreira",
           "editorialTheme": "quem realizou trabalho voluntário",
-          "workingTitle": "Evidências simples para entrevistas de quem realizou trabalho voluntário: o que preparar",
-          "status": "PLANNED",
-          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+          "workingTitle": "Como apresentar trabalho voluntário em entrevistas com evidências reais",
+          "status": "DRAFT",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar.",
+          "slug": "trabalho-voluntario-evidencias-entrevista"
         },
         {
           "time": "13:00",
