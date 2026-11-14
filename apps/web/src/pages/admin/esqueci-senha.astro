@@ -1,0 +1,136 @@
+---
+import "../../styles/global.css";
+import BrandLogo from "../../components/BrandLogo.astro";
+import { BRAND_ASSET_KEYS } from "../../lib/brand/constants";
+import { cssVariablesFromIdentity } from "../../lib/design-tokens";
+import { getBrandIdentity } from "../../lib/brand/identity-service";
+import { getVisualIdentity, type VisualIdentity } from "../../lib/visual-identity";
+import { ADMIN_PASSWORD_RESET_NEUTRAL_MESSAGE } from "../../lib/admin-password-reset";
+
+if (Astro.locals.auth) return Astro.redirect("/admin");
+
+let identity: VisualIdentity | null = null;
+let brandPalette = undefined;
+try {
+  identity = await getVisualIdentity();
+  brandPalette = (await getBrandIdentity()).palette;
+} catch {
+  // Mantém fallback visual quando identidade opcional estiver indisponível.
+}
+const siteName = identity?.siteName ?? "Empregos São Luís";
+const faviconUrl = identity?.faviconUrl ?? "/favicon.ico";
+---
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width" />
+    <meta name="robots" content="noindex,nofollow" />
+    <title>Recuperar senha — Painel administrativo</title>
+    <link rel="icon" href={faviconUrl} />
+    {brandPalette && identity && <style is:inline set:html={cssVariablesFromIdentity(identity, brandPalette)} />}
+  </head>
+  <body class="grid min-h-screen place-items-center bg-slate-950 p-4">
+    <main class="es-light-form-panel w-full max-w-md rounded-2xl bg-white p-8">
+      <a href="/admin/login" aria-label={siteName}>
+        <BrandLogo assetKey={BRAND_ASSET_KEYS.LOGIN_LOGO} class="h-10 w-auto" width={160} height={40} />
+      </a>
+      <h1 class="mt-6 text-3xl font-black">Recuperar senha</h1>
+      <p class="mt-2 text-sm text-[var(--text-secondary)]">
+        Informe o e-mail administrativo para receber instruções de redefinição.
+      </p>
+      <p
+        id="admin-reset-success"
+        class="mt-4 hidden rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800"
+        role="status"
+        aria-live="polite"
+      />
+      <p
+        id="admin-reset-error"
+        class="mt-4 hidden rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-800"
+        role="alert"
+        aria-live="polite"
+      />
+      <form id="admin-reset-form" class="mt-8 grid gap-5" novalidate>
+        <label>
+          E-mail
+          <input
+            class="mt-1 w-full rounded-xl border p-3"
+            type="email"
+            name="email"
+            autocomplete="email"
+            required
+          />
+        </label>
+        <button class="rounded-xl bg-red-700 p-3 font-bold text-white" type="submit" data-submit-button>
+          Enviar instruções
+        </button>
+      </form>
+      <a class="mt-5 inline-block font-bold text-red-700" href="/admin/login">Voltar ao login</a>
+    </main>
+    <script define:vars={{ neutralMessage: ADMIN_PASSWORD_RESET_NEUTRAL_MESSAGE }}>
+      const form = document.getElementById("admin-reset-form");
+      const successEl = document.getElementById("admin-reset-success");
+      const errorEl = document.getElementById("admin-reset-error");
+      const submitButton = document.querySelector("[data-submit-button]");
+
+      const showSuccess = (message) => {
+        if (successEl instanceof HTMLElement) {
+          successEl.textContent = message;
+          successEl.classList.remove("hidden");
+        }
+        if (errorEl instanceof HTMLElement) errorEl.classList.add("hidden");
+        if (form instanceof HTMLFormElement) form.classList.add("hidden");
+      };
+
+      const showError = (message) => {
+        if (errorEl instanceof HTMLElement) {
+          errorEl.textContent = message;
+          errorEl.classList.remove("hidden");
+        }
+      };
+
+      if (form instanceof HTMLFormElement) {
+        form.addEventListener("submit", async (event) => {
+          event.preventDefault();
+          if (!form.reportValidity()) return;
+
+          const emailInput = form.querySelector('input[name="email"]');
+          const email = emailInput instanceof HTMLInputElement ? emailInput.value.trim() : "";
+          if (!email) return;
+
+          if (submitButton instanceof HTMLButtonElement) {
+            submitButton.disabled = true;
+            submitButton.textContent = "Enviando...";
+          }
+
+          try {
+            const response = await fetch("/api/auth/admin-password/request", {
+              method: "POST",
+              credentials: "same-origin",
+              mode: "same-origin",
+              headers: {
+                "Content-Type": "application/json",
+                Accept: "application/json"
+              },
+              body: JSON.stringify({ email })
+            });
+            const payload = await response.json().catch(() => null);
+            const message =
+              payload && typeof payload.message === "string" && payload.message.trim()
+                ? payload.message
+                : neutralMessage;
+            showSuccess(message);
+          } catch {
+            showError("Falha de conexão. Tente novamente em instantes.");
+          } finally {
+            if (submitButton instanceof HTMLButtonElement) {
+              submitButton.disabled = false;
+              submitButton.textContent = "Enviar instruções";
+            }
+          }
+        });
+      }
+    </script>
+  </body>
+</html>

@@ -1,0 +1,181 @@
+---
+import AdminLayout from "../../layouts/AdminLayout.astro";
+import { getEditorialAuditReport, type EditorialClassification, type IssueSeverity } from "../../lib/editorial-audit";
+
+const report = await getEditorialAuditReport();
+const filter = Astro.url.searchParams.get("filtro") ?? "todos";
+const success = Astro.url.searchParams.get("success");
+const applied = Astro.url.searchParams.get("applied");
+
+const severityRank: Record<IssueSeverity, number> = {
+  CRÍTICA: 0,
+  ALTA: 1,
+  MÉDIA: 2,
+  BAIXA: 3
+};
+
+function worstSeverity(assessment: (typeof report.assessments)[number]): IssueSeverity {
+  let best: IssueSeverity = "BAIXA";
+  for (const item of assessment.issues) {
+    if (severityRank[item.severity] < severityRank[best]) best = item.severity;
+  }
+  return assessment.issues.length ? best : "BAIXA";
+}
+
+function matches(filterKey: string, assessment: (typeof report.assessments)[number]) {
+  if (filterKey === "todos") return true;
+  if (filterKey === "manter") return assessment.classification === "MANTER";
+  if (filterKey === "melhorar") return assessment.classification === "MELHORAR";
+  if (filterKey === "noindex") return assessment.classification === "NOINDEX";
+  if (filterKey === "revisar") return assessment.classification === "REVISAR MANUALMENTE";
+  if (filterKey === "artigos") return assessment.article.type !== "NEWS";
+  if (filterKey === "noticias") return assessment.article.type === "NEWS";
+  if (filterKey === "fontes") return assessment.issues.some((item) => item.category === "FONTES");
+  if (filterKey === "revisao") return assessment.issues.some((item) => item.code === "APPROVED_WITHOUT_REVIEWER");
+  if (filterKey === "duplicidade") return assessment.issues.some((item) => item.category === "DUPLICIDADE");
+  if (filterKey === "seo") return assessment.issues.some((item) => item.category === "SEO");
+  if (filterKey === "tecnico") return assessment.issues.some((item) => item.category === "TÉCNICO");
+  if (filterKey === "imagem") return assessment.issues.some((item) => item.category === "IMAGEM");
+  if (filterKey === "autocorrigivel") return assessment.autoFixableCount > 0;
+  if (filterKey === "critico") return assessment.issues.some((item) => item.severity === "CRÍTICA");
+  if (filterKey === "alta") return assessment.issues.some((item) => item.severity === "ALTA" || item.severity === "CRÍTICA");
+  return true;
+}
+
+const rows = report.assessments
+  .filter((item) => matches(filter, item))
+  .sort((a, b) => {
+    const sev = severityRank[worstSeverity(a)] - severityRank[worstSeverity(b)];
+    if (sev !== 0) return sev;
+    return b.issues.length - a.issues.length;
+  });
+
+const autoFixableIssues = report.summary.autoFixableIssues;
+const autoFixCodes = new Map<string, number>();
+for (const assessment of report.assessments) {
+  for (const item of assessment.issues) {
+    if (!item.autoFixable) continue;
+    autoFixCodes.set(item.code, (autoFixCodes.get(item.code) ?? 0) + 1);
+  }
+}
+const autoFixBreakdown = [...autoFixCodes.entries()].sort((a, b) => b[1] - a[1]);
+
+const filters: Array<[string, string]> = [
+  ["todos", "Todos"],
+  ["manter", "Manter"],
+  ["melhorar", "Melhorar"],
+  ["noindex", "Noindex"],
+  ["revisar", "Revisar manualmente"],
+  ["artigos", "Artigos"],
+  ["noticias", "Notícias"],
+  ["fontes", "Problemas de fontes"],
+  ["revisao", "Revisão pendente"],
+  ["duplicidade", "Duplicidade"],
+  ["seo", "SEO"],
+  ["tecnico", "Técnico"],
+  ["imagem", "Imagem"],
+  ["autocorrigivel", "Autocorrigível"],
+  ["critico", "Crítico"],
+  ["alta", "Alta prioridade"]
+];
+const tone = (value: EditorialClassification) =>
+  value === "MANTER" ? "bg-emerald-50 text-emerald-900" : value === "MELHORAR" ? "bg-amber-50 text-amber-950" : value === "NOINDEX" ? "bg-slate-100 text-slate-800" : "bg-rose-50 text-rose-950";
+---
+<AdminLayout title="Qualidade editorial">
+  <h1 class="text-3xl font-black">Qualidade editorial</h1>
+  <p class="mt-2 text-sm text-slate-600">*Faixas internas de qualidade (não são pontuação oficial do Google). Score deixa de premiar texto curto só por passar de um mínimo de caracteres.</p>
+  <p class="mt-2 max-w-3xl text-sm text-[var(--text-secondary)]">
+    Classificação interna (não é nota do Google). Noindex nunca é aplicado em massa automaticamente.
+    Fontes institucionais do próprio portal não comprovam fatos trabalhistas.
+    Lista ordenada por severidade (CRÍTICA → BAIXA).
+  </p>
+  <p class="mt-2 text-sm text-slate-600">
+    {report.summary.published} conteúdos publicados · {report.summary.total} registros editoriais auditados (inclui rascunhos/agendados/arquivados quando presentes).
+  </p>
+
+  {success === "autofix" && (
+    <p class="mt-4 rounded-xl border border-emerald-300 bg-emerald-50 p-4 text-sm text-emerald-950">
+      Correções seguras aplicadas: {applied ?? "0"} campos atualizados. Reauditoria já disponível abaixo (compare com os totais anteriores na sua própria anotações, se necessário).
+    </p>
+  )}
+
+  <section class="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
+    <article class="rounded-xl border bg-white p-4"><p class="text-sm">Auditados</p><strong class="text-3xl">{report.summary.total}</strong><p class="mt-1 text-xs text-slate-500">{report.summary.published} publicados</p></article>
+    <article class="rounded-xl border bg-white p-4"><p class="text-sm">Manter</p><strong class="text-3xl">{report.summary.manter}</strong></article>
+    <article class="rounded-xl border bg-white p-4"><p class="text-sm">Melhorar</p><strong class="text-3xl">{report.summary.melhorar}</strong></article>
+    <article class="rounded-xl border bg-white p-4"><p class="text-sm">Noindex</p><strong class="text-3xl">{report.summary.noindex}</strong></article>
+    <article class="rounded-xl border bg-white p-4"><p class="text-sm">Revisar</p><strong class="text-3xl">{report.summary.revisar}</strong></article>
+  </section>
+
+  <section class="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
+    <article class="rounded-xl border bg-white p-4"><p class="text-sm">Excelente*</p><strong class="text-3xl">{report.summary.excelente}</strong></article>
+    <article class="rounded-xl border bg-white p-4"><p class="text-sm">Bom*</p><strong class="text-3xl">{report.summary.bom}</strong></article>
+    <article class="rounded-xl border bg-white p-4"><p class="text-sm">Precisa melhorar*</p><strong class="text-3xl">{report.summary.precisaMelhorar}</strong></article>
+    <article class="rounded-xl border bg-white p-4"><p class="text-sm">Revisão humana*</p><strong class="text-3xl">{report.summary.revisaoHumana}</strong></article>
+    <article class="rounded-xl border bg-white p-4"><p class="text-sm">Baixo valor*</p><strong class="text-3xl">{report.summary.baixoValor}</strong></article>
+  </section>
+  <p class="mt-2 text-xs text-slate-500">*Faixas internas de qualidade editorial — não são pontuação oficial do Google. Texto curto/template não recebe 100/100 só por passar de um mínimo de caracteres.</p>
+
+  <section class="mt-8 rounded-2xl border bg-white p-6" id="correcoes">
+    <h2 class="text-xl font-black">Correções automáticas seguras</h2>
+    <p class="mt-2 text-sm text-[var(--text-secondary)]">
+      {autoFixableIssues} problema(s) técnicos detectados que podem ser corrigidos sem inventar fatos, autores, fontes ou leis.
+    </p>
+    {autoFixBreakdown.length > 0 && (
+      <ul class="mt-3 grid gap-1 text-sm text-slate-700 sm:grid-cols-2">
+        {autoFixBreakdown.map(([code, count]) => (
+          <li><strong>{count}</strong> × {code}</li>
+        ))}
+      </ul>
+    )}
+    <p class="mt-3 text-xs text-slate-500">Impacto: metadados SEO, canonical técnico e ALT derivável. Não altera texto factual.</p>
+    <form class="mt-4" method="post" action="/api/admin/editorial-audit/safe-fix" onsubmit="return confirm('Aplicar correções seguras (SEO title, meta, canonical técnico, ALT derivável)?')">
+      <input type="hidden" name="confirm" value="APPLY_SAFE_FIXES" />
+      <button class="es-btn es-btn-primary" type="submit" disabled={autoFixableIssues === 0}>Aplicar correções seguras</button>
+    </form>
+  </section>
+
+  <nav class="mt-8 flex flex-wrap gap-2" aria-label="Filtros">
+    {filters.map(([key, label]) => (
+      <a class={`rounded-full border px-3 py-1 text-sm ${filter === key ? "bg-slate-900 text-white" : "bg-white"}`} href={`?filtro=${key}`}>{label}</a>
+    ))}
+  </nav>
+
+  <div class="mt-6 overflow-x-auto rounded-2xl border bg-white">
+    <table class="min-w-full text-sm">
+      <thead>
+        <tr class="border-b text-left">
+          <th class="p-3">Conteúdo</th>
+          <th class="p-3">Status</th>
+          <th class="p-3">Classificação</th>
+          <th class="p-3">Severidade</th>
+          <th class="p-3">Score</th>
+          <th class="p-3">Problemas</th>
+          <th class="p-3">Ação</th>
+        </tr>
+      </thead>
+      <tbody>
+        {rows.slice(0, 300).map((item) => (
+          <tr class="border-b align-top">
+            <td class="p-3">
+              <strong>{item.article.title}</strong>
+              <p class="text-xs text-slate-500">{item.article.type} · /{item.article.type === "NEWS" ? "noticias" : "blog"}/{item.article.slug}</p>
+            </td>
+            <td class="p-3">{item.article.status}<br/><span class="text-xs">{item.article.editorialStage}</span></td>
+            <td class="p-3"><span class={`rounded px-2 py-1 text-xs font-bold ${tone(item.classification)}`}>{item.classification}</span><p class="mt-1 text-[11px] text-slate-500">{item.qualityBand}</p></td>
+            <td class="p-3 text-xs font-bold">{item.issues.length ? worstSeverity(item) : "—"}</td>
+            <td class="p-3">{item.score}/100</td>
+            <td class="p-3">
+              <p class="font-semibold">{item.issues.length} observação(ões)</p>
+              <ul class="mt-1 list-disc pl-4 text-xs text-slate-600">
+                {item.issues.slice(0, 3).map((issue) => <li>{issue.severity} — {issue.title}</li>)}
+              </ul>
+            </td>
+            <td class="p-3"><a class="font-bold text-[var(--brand-primary)]" href={`/admin/conteudo/${item.article.id}/editar#auditoria`}>Revisar</a></td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+    {!rows.length && <p class="p-6 text-sm text-slate-600">Nenhum item neste filtro.</p>}
+  </div>
+</AdminLayout>

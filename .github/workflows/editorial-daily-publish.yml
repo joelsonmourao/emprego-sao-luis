@@ -1,0 +1,55 @@
+name: Empregos Sao Luis - validar e liberar editoriais
+on:
+  schedule:
+    - cron: "30 10,11,15,19 * * *"
+  workflow_dispatch:
+  pull_request:
+    branches: [codex/admin-negocio-completo]
+    paths:
+      - ".github/workflows/editorial-daily-publish.yml"
+      - "scripts/build-auto-editorial.mjs"
+      - "apps/web/src/lib/auto-editorial.ts"
+permissions:
+  contents: write
+concurrency:
+  group: es-editorial-daily
+  cancel-in-progress: false
+jobs:
+  validate-publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event_name == 'pull_request' && github.head_ref || 'codex/admin-negocio-completo' }}
+          persist-credentials: true
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+      - run: npm ci --legacy-peer-deps
+      - name: Validar artigos completos, fontes, SEO, duplicidade e gerar capas WebP
+        run: node scripts/build-auto-editorial.mjs
+      - name: Conferir metadados, dimensoes, tipos e TypeScript
+        run: npm run typecheck
+      - name: Registrar somente manifestos e capas validados
+        if: github.event_name != 'pull_request'
+        shell: bash
+        run: |
+          git config user.name "es-editorial-bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add apps/web/src/data/auto-editorial-manifest.json apps/web/public/covers/auto-editorial/ editorial/automation-report.json
+          if git diff --cached --quiet; then
+            echo "Nenhum artigo novo validado: sem commit e sem deploy artificial"
+          else
+            git commit -m "editorial(auto): atualizar guias agendados e capas aprovadas"
+            git push origin HEAD:codex/admin-negocio-completo
+          fi
+      - name: Arquivar relatorio de artigos aceitos e bloqueados
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: es-editorial-daily-report
+          path: editorial/automation-report.json
+          if-no-files-found: warn
+          retention-days: 30
