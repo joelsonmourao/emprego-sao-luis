@@ -1216,9 +1216,10 @@
           "type": "GUIDE",
           "category": "carreira",
           "editorialTheme": "quem teve vários contratos de curta duração",
-          "workingTitle": "Evidências simples para entrevistas de quem teve vários contratos de curta duração: o que preparar",
-          "status": "PLANNED",
-          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+          "workingTitle": "Evidências de contratos curtos na entrevista: como explicar sua trajetória",
+          "status": "DRAFT",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar.",
+          "slug": "contratos-curtos-entrevista-evidencias-trajetoria"
         },
         {
           "time": "13:00",
