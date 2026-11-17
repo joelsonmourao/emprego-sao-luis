@@ -1282,8 +1282,10 @@
           "category": "carreira",
           "editorialTheme": "quem quer trocar de setor sem perder competências",
           "workingTitle": "Evidências simples para entrevistas de quem quer trocar de setor sem perder competências: o que preparar",
-          "status": "PLANNED",
-          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+          "status": "DRAFT",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar.",
+          "slug": "trocar-setor-entrevista-competencias-evidencias",
+          "draftFile": "editorial/2026-11-18/09h-trocar-setor-entrevista-competencias-evidencias.md"
         },
         {
           "time": "13:00",
