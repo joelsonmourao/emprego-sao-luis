@@ -1316,8 +1316,10 @@
           "category": "carreira",
           "editorialTheme": "quem não possui referências profissionais recentes",
           "workingTitle": "Evidências simples para entrevistas de quem não possui referências profissionais recentes: o que preparar",
-          "status": "PLANNED",
-          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+          "status": "DRAFT",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar.",
+          "slug": "entrevista-sem-referencias-profissionais-recentes-evidencias",
+          "draftFile": "editorial/2026-11-19/09h-entrevista-sem-referencias-profissionais-recentes-evidencias.md"
         },
         {
           "time": "13:00",
