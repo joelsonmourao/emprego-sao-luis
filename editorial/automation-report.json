@@ -3,8 +3,8 @@
     "start": "2026-10-13",
     "end": "2026-12-31"
   },
-  "validated": 54,
-  "blocked": 186,
+  "validated": 55,
+  "blocked": 185,
   "details": [
     {
       "reason": "ainda sem texto completo"
@@ -159,9 +159,6 @@
     {
       "slug": "contratos-curtos-entrevista-evidencias-trajetoria",
       "reason": "ainda sem texto completo"
-    },
-    {
-      "reason": "slug inválido/repetido"
     },
     {
       "reason": "slug inválido/repetido"
