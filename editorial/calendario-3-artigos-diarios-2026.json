@@ -1349,9 +1349,11 @@
           "type": "GUIDE",
           "category": "carreira",
           "editorialTheme": "quem precisa explicar um intervalo no currículo",
-          "workingTitle": "Evidências simples para entrevistas de quem precisa explicar um intervalo no currículo: o que preparar",
-          "status": "PLANNED",
-          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+          "workingTitle": "Como explicar uma pausa no currículo durante a entrevista sem inventar justificativas",
+          "status": "DRAFT",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar.",
+          "slug": "explicar-pausa-curriculo-entrevista-exemplos-reais",
+          "draftFile": "editorial/2026-11-20/09h-explicar-pausa-curriculo-entrevista-exemplos-reais.md"
         },
         {
           "time": "13:00",
