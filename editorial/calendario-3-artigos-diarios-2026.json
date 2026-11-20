@@ -1384,8 +1384,10 @@
           "category": "carreira",
           "editorialTheme": "quem depende de transporte em horários limitados",
           "workingTitle": "Evidências simples para entrevistas de quem depende de transporte em horários limitados: o que preparar",
-          "status": "PLANNED",
-          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+          "status": "DRAFT",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar.",
+          "slug": "entrevista-transporte-horarios-limitados-evidencias",
+          "draftFile": "editorial/2026-11-21/09h-entrevista-transporte-horarios-limitados-evidencias.md"
         },
         {
           "time": "13:00",
