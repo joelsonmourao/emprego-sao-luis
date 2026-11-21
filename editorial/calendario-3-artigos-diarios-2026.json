@@ -1417,9 +1417,11 @@
           "type": "GUIDE",
           "category": "carreira",
           "editorialTheme": "quem busca primeiro emprego após o ensino médio",
-          "workingTitle": "Currículo em dois formatos para quem busca primeiro emprego após o ensino médio: quando usar cada um",
-          "status": "PLANNED",
-          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+          "workingTitle": "Primeiro emprego após o ensino médio: dois modelos de currículo e como escolher",
+          "status": "DRAFT",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar.",
+          "slug": "primeiro-emprego-ensino-medio-dois-modelos-curriculo",
+          "draftFile": "editorial/2026-11-22/09h-primeiro-emprego-ensino-medio-dois-modelos-curriculo.md"
         },
         {
           "time": "13:00",
