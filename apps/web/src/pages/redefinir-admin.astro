@@ -1,0 +1,4 @@
+---
+const token = Astro.url.searchParams.get("token");
+return Astro.redirect(token ? `/admin/redefinir-senha?token=${encodeURIComponent(token)}` : "/admin/redefinir-senha", 301);
+---

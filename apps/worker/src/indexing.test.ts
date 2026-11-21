@@ -1,0 +1,2 @@
+import { describe, expect, it } from "vitest"; import { buildIndexNowUrl } from "./indexing.js";
+describe("IndexNow", () => { it("uses the official endpoint and public key location", () => { const url = buildIndexNowUrl("https://empregossaoluis.com.br/vagas/teste", "abc123", "https://empregossaoluis.com.br"); expect(url.origin).toBe("https://api.indexnow.org"); expect(url.searchParams.get("keyLocation")).toBe("https://empregossaoluis.com.br/abc123.txt"); }); });

@@ -1,0 +1,65 @@
+---
+import AdminLayout from "../../../layouts/AdminLayout.astro";
+---
+<AdminLayout title="Configuração de pagamentos">
+  <h1 class="font-display text-3xl font-black">Pagamentos</h1>
+  <p class="mt-2 text-[var(--text-secondary)]">Pix manual e instruções exibidas no checkout quando o gateway não estiver configurado.</p>
+  <form id="payment-form" class="es-card mt-8 max-w-2xl rounded-2xl p-6">
+    <label class="flex items-center gap-2 text-sm font-bold">
+      <input type="checkbox" name="manualPixEnabled" id="manualPixEnabled" />
+      Habilitar Pix manual no checkout
+    </label>
+    <label class="mt-4 block text-sm font-bold">Titular da chave
+      <input class="mt-1 w-full rounded-xl border border-[var(--brand-border)] p-3" name="manualPixHolder" id="manualPixHolder" />
+    </label>
+    <label class="mt-4 block text-sm font-bold">Chave Pix
+      <input class="mt-1 w-full rounded-xl border border-[var(--brand-border)] p-3" name="manualPixKey" id="manualPixKey" autocomplete="off" placeholder="Deixe em branco para manter a atual" />
+      <span class="mt-1 block text-xs text-[var(--text-secondary)]">A chave não é exibida após salvar.</span>
+    </label>
+    <label class="mt-4 block text-sm font-bold">URL do QR Code (imagem)
+      <input class="mt-1 w-full rounded-xl border border-[var(--brand-border)] p-3" name="manualPixQrUrl" id="manualPixQrUrl" type="url" />
+    </label>
+    <label class="mt-4 block text-sm font-bold">Instruções ao pagador
+      <textarea class="mt-1 w-full rounded-xl border border-[var(--brand-border)] p-3" name="manualPixInstructions" id="manualPixInstructions" rows="4"></textarea>
+    </label>
+    <label class="mt-4 block text-sm font-bold">URL do contato comercial
+      <input class="mt-1 w-full rounded-xl border border-[var(--brand-border)] p-3" name="commercialContactUrl" id="commercialContactUrl" placeholder="/contato ou https://..." />
+      <span class="mt-1 block text-xs text-[var(--text-secondary)]">O botão comercial só aparece no site quando este campo estiver configurado.</span>
+    </label>
+    <p class="mt-4 text-xs text-[var(--text-secondary)]">Mercado Pago: configure <code>PAYMENT_PROVIDER=mercadopago</code> e <code>MERCADOPAGO_ACCESS_TOKEN</code> no ambiente.</p>
+    <button class="es-btn es-btn-primary mt-6" type="submit">Salvar configurações</button>
+    <p id="save-msg" class="mt-3 text-sm"></p>
+  </form>
+  <script is:inline>
+    async function loadSettings() {
+      const res = await fetch("/api/admin/commercial/payment-settings");
+      const data = await res.json();
+      if (!data.ok) return;
+      const s = data.settings;
+      document.getElementById("manualPixEnabled").checked = Boolean(s.manualPixEnabled);
+      document.getElementById("manualPixHolder").value = s.manualPixHolder || "";
+      document.getElementById("manualPixKey").value = s.manualPixKey || "";
+      document.getElementById("manualPixQrUrl").value = s.manualPixQrUrl || "";
+      document.getElementById("manualPixInstructions").value = s.manualPixInstructions || "";
+      document.getElementById("commercialContactUrl").value = s.commercialContactUrl || "";
+    }
+    document.getElementById("payment-form")?.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const form = e.target;
+      const body = {
+        manualPixEnabled: form.manualPixEnabled.checked,
+        manualPixHolder: form.manualPixHolder.value,
+        manualPixKey: form.manualPixKey.value,
+        manualPixQrUrl: form.manualPixQrUrl.value,
+        manualPixInstructions: form.manualPixInstructions.value,
+        commercialContactUrl: form.commercialContactUrl.value
+      };
+      const res = await fetch("/api/admin/commercial/payment-settings", { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
+      const data = await res.json();
+      const msg = document.getElementById("save-msg");
+      if (msg) msg.textContent = data.ok ? "Salvo com sucesso." : (data.error || "Erro ao salvar.");
+      if (data.ok) loadSettings();
+    });
+    loadSettings();
+  </script>
+</AdminLayout>

@@ -1,0 +1,79 @@
+---
+import JobBoardPaused from "../components/JobBoardPaused.astro";
+import { jobBoardPublicGate } from "../lib/job-board-gate";
+import BaseLayout from "../layouts/BaseLayout.astro";
+import Breadcrumbs from "../components/ui/Breadcrumbs.astro";
+import PageHero from "../components/ui/PageHero.astro";
+import { cities, createDatabase, jobs, states } from "@es/db";
+import { and, asc, count, eq, gt } from "drizzle-orm";
+
+const gate = await jobBoardPublicGate();
+
+type CityRow = { name: string; slug: string; state: string; total: number };
+let rows: CityRow[] = [];
+if (!gate.paused && process.env.DATABASE_URL) {
+  const connection = createDatabase(process.env.DATABASE_URL);
+  try {
+    const active = and(eq(jobs.publicationStatus, "PUBLISHED"), gt(jobs.expiresAt, new Date()));
+    rows = await connection.db
+      .select({
+        name: cities.name,
+        slug: cities.slug,
+        state: states.code,
+        total: count(jobs.id)
+      })
+      .from(cities)
+      .innerJoin(states, eq(cities.stateId, states.id))
+      .innerJoin(jobs, eq(jobs.cityId, cities.id))
+      .where(and(active, eq(cities.active, true)))
+      .groupBy(cities.id, states.code)
+      .orderBy(asc(cities.name));
+  } finally {
+    await connection.close();
+  }
+}
+const title = "Cidades com vagas — Empregos São Luís";
+const description =
+  "Explore vagas por cidade no Maranhão e região. Encontre oportunidades em São Luís e outras localidades com páginas otimizadas para busca.";
+const itemList = {
+  "@context": "https://schema.org",
+  "@type": "ItemList",
+  name: "Cidades com vagas",
+  numberOfItems: rows.length,
+  itemListElement: rows.map((city, index) => ({
+    "@type": "ListItem",
+    position: index + 1,
+    name: `${city.name}/${city.state}`,
+    url: new URL(`/vagas/cidade/${city.slug}`, Astro.site).toString()
+  }))
+};
+---
+{gate.paused ? (
+  <JobBoardPaused title="Cidades com vagas temporariamente pausadas" />
+) : (
+<BaseLayout title={title} description={description} canonical={new URL("/cidades", Astro.site).toString()} schemas={[itemList]}>
+  <PageHero
+    kicker="Localidades"
+    title="Vagas por cidade"
+    description="Escolha a cidade e veja oportunidades abertas com página dedicada para ranquear melhor no Google."
+    pattern={false}
+  />
+  <section class="es-section pt-0">
+    <div class="es-container">
+      <Breadcrumbs items={[{ name: "Início", url: "/" }, { name: "Cidades" }]} />
+      {rows.length ? (
+        <div class="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          {rows.map((city) => (
+            <a class="es-card block p-5 hover:border-[var(--brand-primary)]" href={`/vagas/cidade/${city.slug}`}>
+              <span class="font-display text-xl font-black">{city.name}/{city.state}</span>
+              <span class="mt-1 block text-sm text-[var(--es-muted)]">{city.total} vaga(s) aberta(s)</span>
+            </a>
+          ))}
+        </div>
+      ) : (
+        <p class="mt-8 rounded-2xl border bg-white p-6">Nenhuma cidade com vagas ativas no momento.</p>
+      )}
+    </div>
+  </section>
+</BaseLayout>
+)}

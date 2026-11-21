@@ -1,0 +1,30 @@
+# syntax=docker/dockerfile:1
+FROM node:22-alpine
+ENV NODE_ENV=production TZ=America/Sao_Paulo APP_TIME_ZONE=America/Sao_Paulo
+WORKDIR /app
+RUN apk add --no-cache tzdata
+COPY package.json package-lock.json ./
+COPY apps/web/package.json apps/web/package.json
+COPY apps/worker/package.json apps/worker/package.json
+COPY packages/config/package.json packages/config/package.json
+COPY packages/db/package.json packages/db/package.json
+COPY packages/seo/package.json packages/seo/package.json
+COPY packages/shared/package.json packages/shared/package.json
+COPY packages/social/package.json packages/social/package.json
+COPY packages/storage/package.json packages/storage/package.json
+COPY packages/ui/package.json packages/ui/package.json
+RUN npm ci --legacy-peer-deps --include=dev --no-audit --no-fund
+COPY packages/db packages/db
+COPY packages/shared packages/shared
+COPY scripts/migrate-entrypoint.sh scripts/migrate-entrypoint.sh
+COPY scripts/seed-adsense-editorial-schedule.mjs scripts/seed-adsense-editorial-schedule.mjs
+COPY scripts/unpublish-adsense-editorial-seed.mjs scripts/unpublish-adsense-editorial-seed.mjs
+COPY scripts/seed-local-editorial-schedule.mjs scripts/seed-local-editorial-schedule.mjs
+COPY scripts/activate-sl-local-editorial.mjs scripts/activate-sl-local-editorial.mjs
+COPY scripts/data/sl-local-editorial-catalog.mjs scripts/data/sl-local-editorial-catalog.mjs
+COPY scripts/data/sl-local-article-html.mjs scripts/data/sl-local-article-html.mjs
+COPY scripts/data/sl-local-tip-followups-46-105.mjs scripts/data/sl-local-tip-followups-46-105.mjs
+COPY apps/web/public/covers/sl-local/credits.json apps/web/public/covers/sl-local/credits.json
+RUN chmod +x scripts/migrate-entrypoint.sh
+USER node
+CMD ["sh", "scripts/migrate-entrypoint.sh"]

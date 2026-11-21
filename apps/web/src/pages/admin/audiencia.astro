@@ -1,0 +1,86 @@
+---
+import AdminLayout from "../../layouts/AdminLayout.astro";
+import { can } from "../../lib/auth";
+import { createDatabase, subscriptions, alerts, notificationDeliveries } from "@es/db";
+import { count, desc, eq } from "drizzle-orm";
+
+const auth = Astro.locals.auth!;
+if (!can(auth, "audience.manage")) return new Response("Proibido", { status: 403 });
+
+let rows: Array<{ id: string; email: string; status: string; createdAt: Date | null; alertCount: number }> = [];
+let deliveries: Array<typeof notificationDeliveries.$inferSelect> = [];
+let activeCount = 0;
+let pendingCount = 0;
+
+if (process.env.DATABASE_URL) {
+  const connection = createDatabase(process.env.DATABASE_URL);
+  try {
+    rows = await connection.db
+      .select({ id: subscriptions.id, email: subscriptions.email, status: subscriptions.status, createdAt: subscriptions.createdAt, alertCount: count(alerts.id) })
+      .from(subscriptions)
+      .leftJoin(alerts, eq(alerts.subscriptionId, subscriptions.id))
+      .groupBy(subscriptions.id)
+      .orderBy(desc(subscriptions.createdAt))
+      .limit(50);
+    deliveries = await connection.db.select().from(notificationDeliveries).orderBy(desc(notificationDeliveries.createdAt)).limit(30);
+    const [activeRow] = await connection.db.select({ value: count() }).from(subscriptions).where(eq(subscriptions.status, "ACTIVE"));
+    const [pendingRow] = await connection.db.select({ value: count() }).from(subscriptions).where(eq(subscriptions.status, "PENDING"));
+    activeCount = activeRow?.value ?? 0;
+    pendingCount = pendingRow?.value ?? 0;
+  } finally {
+    await connection.close();
+  }
+}
+
+const emailConfigured = Boolean(process.env.RESEND_API_KEY && process.env.EMAIL_FROM);
+---
+<AdminLayout title="Audiência e alertas">
+  <h1 class="text-3xl font-black">Audiência e alertas</h1>
+  <p class="mt-2 text-slate-600">Inscrições, preferências, entregas e status das integrações de e-mail.</p>
+
+  <section class="mt-8 grid gap-4 md:grid-cols-3">
+    <article class="rounded-2xl bg-white p-5"><p class="text-sm text-slate-500">Inscrições ativas</p><p class="mt-2 text-3xl font-black">{activeCount}</p></article>
+    <article class="rounded-2xl bg-white p-5"><p class="text-sm text-slate-500">Aguardando confirmação</p><p class="mt-2 text-3xl font-black">{pendingCount}</p></article>
+    <article class="rounded-2xl bg-white p-5"><p class="text-sm text-slate-500">Resend</p><p class="mt-2 text-lg font-bold">{emailConfigured ? "Configurado" : "Fallback local (sem envio real)"}</p></article>
+  </section>
+
+  <section class="mt-8 rounded-2xl bg-white p-6">
+    <h2 class="text-xl font-black">Inscrições recentes</h2>
+    <div class="mt-4 overflow-auto">
+      <table class="min-w-full text-sm">
+        <thead><tr class="text-left text-slate-500"><th class="py-2">E-mail</th><th>Status</th><th>Alertas</th><th>Desde</th><th></th></tr></thead>
+        <tbody>
+          {rows.map((row) => (
+            <tr class="border-t">
+              <td class="py-2 pr-3">{row.email}</td>
+              <td class="pr-3">{row.status}</td>
+              <td class="pr-3">{row.alertCount}</td>
+              <td class="pr-3 whitespace-nowrap">{row.createdAt?.toLocaleString("pt-BR")}</td>
+              <td>{row.status !== "UNSUBSCRIBED" && <form method="post" action={`/api/admin/audience/${row.id}/cancel`}><button class="rounded border px-2 py-1">Cancelar</button></form>}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="mt-8 rounded-2xl bg-white p-6">
+    <h2 class="text-xl font-black">Entregas recentes</h2>
+    <div class="mt-4 overflow-auto">
+      <table class="min-w-full text-sm">
+        <thead><tr class="text-left text-slate-500"><th class="py-2">Canal</th><th>Template</th><th>Status</th><th>Erro</th><th>Enviado</th></tr></thead>
+        <tbody>
+          {deliveries.map((delivery) => (
+            <tr class="border-t">
+              <td class="py-2 pr-3">{delivery.channel}</td>
+              <td class="pr-3">{delivery.template}</td>
+              <td class="pr-3">{delivery.status}</td>
+              <td class="max-w-xs truncate pr-3" title={delivery.error ?? ""}>{delivery.error ?? "—"}</td>
+              <td class="pr-3 whitespace-nowrap">{delivery.sentAt?.toLocaleString("pt-BR") ?? "—"}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  </section>
+</AdminLayout>

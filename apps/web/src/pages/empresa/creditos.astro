@@ -1,0 +1,42 @@
+---
+import EmpresaLayout from "../../layouts/EmpresaLayout.astro";
+import { listCompanyCredits } from "../../lib/company-dashboard";
+
+const company = Astro.locals.company!;
+const { balance, items } = await listCompanyCredits(company.email);
+---
+<EmpresaLayout title="Créditos">
+  <h1 class="font-display text-3xl font-black">Créditos</h1>
+  <p class="mt-2 text-[var(--text-secondary)]">Saldo e lotes de créditos para publicação de vagas.</p>
+  <section class="es-card mt-6 inline-block p-5">
+    <p class="text-sm text-[var(--text-secondary)]">Saldo disponível</p>
+    <strong class="mt-1 block font-display text-4xl text-[var(--brand-primary)]">{balance}</strong>
+  </section>
+  <div class="mt-8 overflow-x-auto es-card">
+    <table class="min-w-full text-sm">
+      <thead class="border-b border-[var(--brand-border)] bg-[var(--brand-background)] text-left">
+        <tr>
+          <th class="p-3">Total</th>
+          <th class="p-3">Usados</th>
+          <th class="p-3">Disponíveis</th>
+          <th class="p-3">Expira em</th>
+        </tr>
+      </thead>
+      <tbody>
+        {items.length ? items.map((c) => (
+          <tr class="border-b border-[var(--brand-border)]">
+            <td class="p-3">{c.totalCredits}</td>
+            <td class="p-3">{c.usedCredits}</td>
+            <td class="p-3">{c.totalCredits - c.usedCredits}</td>
+            <td class="p-3">{c.expiresAt ? new Date(c.expiresAt).toLocaleDateString("pt-BR") : "—"}</td>
+          </tr>
+        )) : (
+          <tr><td class="p-6 text-[var(--text-secondary)]" colspan="4">Nenhum crédito liberado.</td></tr>
+        )}
+      </tbody>
+    </table>
+  </div>
+  {balance > 0 && (
+    <a class="es-btn es-btn-primary mt-6" href="/publicar-vaga">Cadastrar vaga</a>
+  )}
+</EmpresaLayout>

@@ -1,0 +1,36 @@
+name: AdSense - Auditoria Publica Completa
+on:
+  pull_request:
+    branches: [codex/admin-negocio-completo]
+    paths:
+      - "scripts/audit-public-adsense.mjs"
+      - ".github/workflows/adsense-public-content-audit.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  content-audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Validar script de auditoria
+        run: node --check scripts/audit-public-adsense.mjs
+      - name: Auditar sitemap e paginas publicas (somente leitura)
+        run: node scripts/audit-public-adsense.mjs
+        env:
+          AUDIT_REPORT: audit-results/adsense-public-audit.json
+          AUDIT_REPORT_MD: audit-results/adsense-public-audit.md
+      - name: Guardar inventario de problemas por URL
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: inventario-publico-adsense
+          path: audit-results/
+          if-no-files-found: warn
+          retention-days: 14
