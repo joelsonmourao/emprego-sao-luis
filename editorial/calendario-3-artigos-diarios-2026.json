@@ -1452,8 +1452,10 @@
           "category": "carreira",
           "editorialTheme": "quem trabalhou como autônomo e quer voltar à CLT",
           "workingTitle": "Currículo em dois formatos para quem trabalhou como autônomo e quer voltar à CLT: quando usar cada um",
-          "status": "PLANNED",
-          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+          "status": "DRAFT",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar.",
+          "slug": "curriculo-trabalho-autonomo-retorno-clt-dois-formatos",
+          "draftFile": "editorial/2026-11-23/09h-curriculo-autonomo-retorno-clt.md"
         },
         {
           "time": "13:00",
