@@ -206,7 +206,8 @@
       "reason": "slug inválido/repetido"
     },
     {
-      "reason": "slug inválido/repetido"
+      "slug": "curriculo-trabalho-autonomo-retorno-clt-dois-formatos",
+      "reason": "metadados divergentes do calendário"
     },
     {
       "reason": "slug inválido/repetido"
