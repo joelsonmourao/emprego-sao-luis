@@ -216,10 +216,12 @@
       "reason": "slug inválido/repetido"
     },
     {
-      "reason": "slug inválido/repetido"
+      "slug": "retorno-cuidado-familia-curriculo-dois-formatos",
+      "reason": "metadados divergentes do calendário"
     },
     {
-      "reason": "slug inválido/repetido"
+      "slug": "assistente-compras-entrevista-tres-situacoes-praticas",
+      "reason": "metadados divergentes do calendário"
     },
     {
       "reason": "slug inválido/repetido"
