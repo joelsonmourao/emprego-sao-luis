@@ -1,0 +1,52 @@
+---
+import "../../styles/global.css";
+import BrandLogo from "../../components/BrandLogo.astro";
+import { BRAND_ASSET_KEYS } from "../../lib/brand/constants";
+import { cssVariablesFromIdentity } from "../../lib/design-tokens";
+import { getBrandIdentity } from "../../lib/brand/identity-service";
+import { getVisualIdentity } from "../../lib/visual-identity";
+
+if (Astro.locals.company) return Astro.redirect("/empresa/dashboard");
+const next = Astro.url.searchParams.get("next") ?? "/empresa/dashboard";
+const activated = Astro.url.searchParams.get("activated") === "1";
+const identity = await getVisualIdentity();
+const brand = await getBrandIdentity();
+---
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width" />
+    <meta name="robots" content="noindex,nofollow" />
+    <title>Entrar — Área da empresa</title>
+    <link rel="icon" href={identity.faviconUrl ?? "/favicon.ico"} />
+    <style is:inline set:html={cssVariablesFromIdentity(identity, brand.palette)} />
+  </head>
+  <body class="grid min-h-screen place-items-center bg-[var(--brand-background)] p-4">
+    <main class="es-card w-full max-w-md p-8">
+      <a href="/" aria-label={identity.siteName}>
+        <BrandLogo assetKey={BRAND_ASSET_KEYS.LOGIN_LOGO} class="h-10 w-auto" width={160} height={40} />
+      </a>
+      <h1 class="mt-6 font-display text-2xl font-black">Área da empresa</h1>
+      <p class="mt-2 text-sm text-[var(--text-secondary)]">Para empresas e recrutadores que compraram planos. Não é o painel administrativo do portal.</p>
+      {activated && (
+        <p class="mt-4 rounded-xl border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-800">Conta ativada. Faça login com sua nova senha.</p>
+      )}
+      <form class="es-light-form-panel mt-8 grid gap-5" method="post" action="/api/empresa/login">
+        <input type="hidden" name="next" value={next} />
+        <label class="es-field">
+          <span class="es-label">E-mail</span>
+          <input class="es-input" type="email" name="email" autocomplete="username" required />
+        </label>
+        <label class="es-field">
+          <span class="es-label">Senha</span>
+          <input class="es-input" type="password" name="password" autocomplete="current-password" minlength="8" required />
+        </label>
+        <button class="es-btn es-btn-primary w-full" type="submit">Entrar</button>
+      </form>
+      <p class="mt-6 text-sm text-[var(--text-secondary)]">
+        Ainda não tem acesso? <a class="font-semibold text-[var(--brand-primary)]" href="/publicar-vaga">Publicar vaga</a>
+      </p>
+    </main>
+  </body>
+</html>

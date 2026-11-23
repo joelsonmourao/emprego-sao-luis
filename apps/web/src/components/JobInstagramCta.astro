@@ -1,0 +1,43 @@
+---
+import { BRAND_ASSETS } from "../lib/brand-assets";
+import { getInstagramCtaSettings } from "../lib/instagram-cta";
+
+interface Props {
+  compact?: boolean;
+}
+
+const { compact = true } = Astro.props;
+const settings = await getInstagramCtaSettings();
+const href = settings.profileUrl || BRAND_ASSETS.instagramUrl;
+---
+<aside
+  class={`rounded-2xl border border-pink-200 bg-gradient-to-br from-pink-50 to-orange-50 ${compact ? "p-4" : "p-5"}`}
+  aria-label="Seguir no Instagram"
+>
+  <p class="text-xs font-bold uppercase tracking-wide text-pink-800">Instagram oficial</p>
+  <p class="mt-1 font-display text-lg font-black text-[#111827]">
+    Siga {BRAND_ASSETS.instagramHandle}
+  </p>
+  <p class="mt-1 text-sm text-[var(--es-muted)]">
+    Vagas em stories e no feed, com link direto para o portal.
+  </p>
+  <a
+    class="es-btn es-btn-primary mt-3 w-full py-2.5 text-center"
+    href={href}
+    target="_blank"
+    rel="noopener noreferrer"
+    data-track="instagram_job_follow_click"
+  >
+    Seguir no Instagram
+  </a>
+</aside>
+<script is:inline>
+  document.querySelectorAll("[data-track='instagram_job_follow_click']").forEach((el) => {
+    el.addEventListener("click", () => {
+      navigator.sendBeacon?.("/api/events/instagram", JSON.stringify({
+        event: "instagram_job_follow_click",
+        path: location.pathname
+      }));
+    });
+  });
+</script>

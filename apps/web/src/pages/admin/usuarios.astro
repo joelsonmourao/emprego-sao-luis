@@ -1,0 +1,160 @@
+---
+import AdminLayout from "../../layouts/AdminLayout.astro";
+import { can } from "../../lib/auth";
+import { isPortalUser } from "../../lib/users-admin";
+import { alerts, candidateSessions, consentLogs, createDatabase, roles, savedJobs, subscriptions, userRoles, users } from "@es/db";
+import { and, count, desc, eq, ilike, isNull } from "drizzle-orm";
+
+const auth = Astro.locals.auth!;
+if (!can(auth, "users.manage")) return new Response("Proibido", { status: 403 });
+
+const q = Astro.url.searchParams.get("q")?.trim() ?? "";
+const page = Math.max(1, Number(Astro.url.searchParams.get("page") ?? "1"));
+const perPage = 25;
+const offset = (page - 1) * perPage;
+const updated = Astro.url.searchParams.get("updated") === "1";
+
+type PortalRow = {
+  id: string;
+  email: string;
+  name: string;
+  active: boolean;
+  createdAt: Date;
+  savedCount: number;
+  sessionCount: number;
+  alertCount: number;
+};
+
+let rows: PortalRow[] = [];
+let total = 0;
+let consentRows: Array<typeof consentLogs.$inferSelect> = [];
+
+if (process.env.DATABASE_URL) {
+  const connection = createDatabase(process.env.DATABASE_URL);
+  try {
+    const allUsers = await connection.db
+      .select({ id: users.id, email: users.email, name: users.name, active: users.active, createdAt: users.createdAt })
+      .from(users)
+      .where(q ? ilike(users.email, `%${q}%`) : undefined)
+      .orderBy(desc(users.createdAt))
+      .limit(300);
+
+    const roleRows = await connection.db
+      .select({ userId: userRoles.userId, roleKey: roles.key })
+      .from(userRoles)
+      .innerJoin(roles, eq(userRoles.roleId, roles.id));
+
+    const rolesByUser = new Map<string, string[]>();
+    for (const row of roleRows) {
+      const list = rolesByUser.get(row.userId) ?? [];
+      list.push(row.roleKey);
+      rolesByUser.set(row.userId, list);
+    }
+
+    const portalUsers = allUsers.filter((user) => isPortalUser(rolesByUser.get(user.id) ?? []));
+    total = portalUsers.length;
+    const pageUsers = portalUsers.slice(offset, offset + perPage);
+
+    for (const user of pageUsers) {
+      const [saved] = await connection.db.select({ value: count() }).from(savedJobs).where(eq(savedJobs.userId, user.id));
+      const [sessions] = await connection.db
+        .select({ value: count() })
+        .from(candidateSessions)
+        .where(and(eq(candidateSessions.userId, user.id), isNull(candidateSessions.revokedAt)));
+      const [sub] = await connection.db.select({ id: subscriptions.id }).from(subscriptions).where(eq(subscriptions.email, user.email)).limit(1);
+      let alertTotal = 0;
+      if (sub) {
+        const [alertsCount] = await connection.db.select({ value: count() }).from(alerts).where(eq(alerts.subscriptionId, sub.id));
+        alertTotal = alertsCount?.value ?? 0;
+      }
+      rows.push({ ...user, savedCount: saved?.value ?? 0, sessionCount: sessions?.value ?? 0, alertCount: alertTotal });
+    }
+
+    consentRows = await connection.db.select().from(consentLogs).orderBy(desc(consentLogs.createdAt)).limit(20);
+  } finally {
+    await connection.close();
+  }
+}
+
+const pages = Math.max(1, Math.ceil(total / perPage));
+---
+<AdminLayout title="Usuários do portal">
+  <nav class="text-sm text-slate-600">
+    <a class="font-bold text-slate-900" href="/admin/usuarios">Usuários</a>
+    · <a href="/admin/administradores">Administradores</a>
+    · <a href="/admin/permissoes">Permissões</a>
+    · <a href="/admin/auditoria">Auditoria</a>
+  </nav>
+  <h1 class="mt-4 text-3xl font-black">Usuários do portal</h1>
+  <p class="mt-2 text-slate-600">Contas de candidatos, vagas salvas, alertas e consentimentos.</p>
+  {updated && <p class="mt-4 rounded-xl border border-blue-200 bg-blue-50 p-4 text-blue-900">Ação registrada com auditoria.</p>}
+
+  <form class="mt-6 flex flex-wrap gap-3" method="get">
+    <input class="rounded-lg border px-3 py-2" name="q" placeholder="Buscar por e-mail" value={q} />
+    <button class="rounded-lg bg-slate-900 px-4 py-2 font-bold text-white">Buscar</button>
+    <a class="rounded-lg border px-4 py-2" href="/api/admin/users/export.csv" data-admin-download data-filename="usuarios.csv">Exportar CSV</a>
+  </form>
+
+  <section class="mt-8 rounded-2xl bg-white p-6">
+    <p class="text-sm text-slate-500">{total} usuário(s) do portal</p>
+    <div class="mt-4 overflow-auto">
+      <table class="min-w-full text-sm">
+        <thead>
+          <tr class="text-left text-slate-500">
+            <th class="py-2">Nome</th><th>E-mail</th><th>Status</th><th>Salvas</th><th>Sessões</th><th>Alertas</th><th>Desde</th><th></th>
+          </tr>
+        </thead>
+        <tbody>
+          {rows.length === 0 && <tr><td class="py-6 text-slate-500" colspan="8">Nenhum usuário do portal encontrado.</td></tr>}
+          {rows.map((row) => (
+            <tr class="border-t">
+              <td class="py-2 pr-3">{row.name}</td>
+              <td class="pr-3">{row.email}</td>
+              <td class="pr-3">{row.active ? "Ativo" : "Bloqueado"}</td>
+              <td class="pr-3">{row.savedCount}</td>
+              <td class="pr-3">{row.sessionCount}</td>
+              <td class="pr-3">{row.alertCount}</td>
+              <td class="pr-3 whitespace-nowrap">{row.createdAt.toLocaleString("pt-BR")}</td>
+              <td class="flex flex-wrap gap-2">
+                {row.active ? (
+                  <form method="post" action={`/api/admin/users/${row.id}/block`}><input type="hidden" name="confirm" value="1" /><button class="rounded border px-2 py-1 text-red-700">Bloquear</button></form>
+                ) : (
+                  <form method="post" action={`/api/admin/users/${row.id}/unblock`}><button class="rounded border px-2 py-1">Desbloquear</button></form>
+                )}
+                <form method="post" action={`/api/admin/users/${row.id}/sessions/revoke`}><button class="rounded border px-2 py-1">Encerrar sessões</button></form>
+                <form method="post" action={`/api/admin/users/${row.id}/anonymize`} onsubmit="return confirm('Anonimizar dados deste usuário? Ação irreversível para LGPD.')"><input type="hidden" name="confirm" value="lgpd" /><button class="rounded border px-2 py-1">Anonimizar</button></form>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+    {pages > 1 && (
+      <div class="mt-4 flex gap-2">
+        {page > 1 && <a class="rounded border px-3 py-1" href={`?page=${page - 1}${q ? `&q=${encodeURIComponent(q)}` : ""}`}>Anterior</a>}
+        <span class="px-3 py-1">Página {page} de {pages}</span>
+        {page < pages && <a class="rounded border px-3 py-1" href={`?page=${page + 1}${q ? `&q=${encodeURIComponent(q)}` : ""}`}>Próxima</a>}
+      </div>
+    )}
+  </section>
+
+  <section class="mt-8 rounded-2xl bg-white p-6">
+    <h2 class="text-xl font-black">Consentimentos recentes</h2>
+    <div class="mt-4 overflow-auto">
+      <table class="min-w-full text-sm">
+        <thead><tr class="text-left text-slate-500"><th class="py-2">Data</th><th>Finalidade</th><th>Ação</th><th>Origem</th><th>IP hash</th></tr></thead>
+        <tbody>
+          {consentRows.map((row) => (
+            <tr class="border-t">
+              <td class="py-2 pr-3 whitespace-nowrap">{row.createdAt.toLocaleString("pt-BR")}</td>
+              <td class="pr-3">{row.purpose}</td>
+              <td class="pr-3">{row.action}</td>
+              <td class="pr-3">{row.source}</td>
+              <td class="pr-3 font-mono text-xs">{row.ipHash?.slice(0, 12) ?? "—"}…</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  </section>
+</AdminLayout>

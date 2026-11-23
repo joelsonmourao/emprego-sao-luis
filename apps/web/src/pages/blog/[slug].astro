@@ -1,0 +1,110 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import Breadcrumbs from "../../components/ui/Breadcrumbs.astro";
+import EditorialSources from "../../components/EditorialSources.astro";
+import {
+  articlePublicPath,
+  findPublishedArticle,
+  findPublishedSlLocalByNumber,
+  resolveSlLocalSeoSlug
+} from "../../lib/articles";
+import { getEditorialPortalMode } from "../../lib/portal-modes";
+import { rewriteJobBoardLinksForPortal } from "../../lib/portal-content-rewrite";
+import { normalizeEditorialHtml } from "@es/shared";
+import { getEditorialContentOverride } from "../../data/editorial-content-overrides";
+import { isEditorialReviewPending } from "../../data/editorial-review-pending";
+import { findAutoEditorialArticle } from "../../lib/auto-editorial";
+import { getRuntimeSiteUrl, resolveCanonicalUrl, resolvePublicHttpUrl } from "../../lib/canonical-url";
+import { buildEditorialSchema, extractExternalEditorialCitations, isNewsroomAuthor } from "../../lib/editorial-schema";
+import { buildOwnedEditorialCoverImageObject, getEditorialCoverMetadata } from "../../lib/editorial-cover-metadata";
+const slug = Astro.params.slug ?? "";
+const portal = await getEditorialPortalMode();
+const seoFromLegacy = resolveSlLocalSeoSlug(slug);
+if (seoFromLegacy && seoFromLegacy !== slug) {
+  const moved = await findPublishedArticle(seoFromLegacy, ["GUIDE", "DATA_REPORT", "NEWS"]);
+  if (moved) return Astro.redirect(articlePublicPath(moved.article.type, moved.article.slug), 301);
+}
+const result = (await findPublishedArticle(slug, ["GUIDE", "DATA_REPORT"])) ?? findAutoEditorialArticle(slug);
+if (!result) {
+  const news = await findPublishedArticle(slug, "NEWS");
+  if (news) return Astro.redirect(`/noticias/${slug}`, 301);
+  const renamed = await findPublishedSlLocalByNumber(slug, ["GUIDE", "DATA_REPORT", "NEWS"]);
+  if (renamed) return Astro.redirect(articlePublicPath(renamed.article.type, renamed.article.slug), 301);
+  return new Response("Conteúdo não encontrado", { status: 404, headers: { "X-Robots-Tag": "noindex, follow" } });
+}
+const { article, authorName } = result;
+const newsroomAuthor = isNewsroomAuthor(authorName);
+const runtimeSite = getRuntimeSiteUrl(Astro.site);
+const canonical = resolveCanonicalUrl(article.canonicalUrl ?? undefined, `/blog/${article.slug}`, runtimeSite);
+const structuredImage = resolvePublicHttpUrl(article.coverImageUrl ?? undefined, runtimeSite);
+const coverMetadata = getEditorialCoverMetadata(article.slug, article.coverImageUrl);
+const ownedStructuredImage = buildOwnedEditorialCoverImageObject(coverMetadata, structuredImage);
+const effectiveCoverAlt = coverMetadata?.alt ?? article.coverImageAlt ?? article.title;
+const effectiveCoverCaption = coverMetadata?.caption ?? article.coverImageCaption;
+const effectiveCoverCredit = coverMetadata?.credit ?? article.coverImageCredit;
+const effectiveCoverWidth = coverMetadata?.width ?? article.coverImageWidth ?? 1200;
+const effectiveCoverHeight = coverMetadata?.height ?? article.coverImageHeight ?? 675;
+const editorialOverride = getEditorialContentOverride(article.slug);
+const editorialNoindex = isEditorialReviewPending(article.type, article.slug) && !editorialOverride;
+const normalizedHtml = normalizeEditorialHtml(editorialOverride?.contentHtml ?? article.contentHtml, { baseHeadingLevel: 2 });
+const contentHtml = portal.enabled ? rewriteJobBoardLinksForPortal(normalizedHtml) : normalizedHtml;
+const citations = extractExternalEditorialCitations(
+  contentHtml,
+  runtimeSite.toString(),
+  !editorialOverride && article.sourceUrl ? [article.sourceUrl] : []
+);
+const sourceLabels = !editorialOverride && article.sourceUrl && article.sourceName
+  ? { [article.sourceUrl]: article.sourceName }
+  : {};
+const reviewedAt = editorialOverride ? new Date(`${editorialOverride.reviewedAt}T12:00:00-03:00`) : null;
+const schema = buildEditorialSchema({
+  type: "Article",
+  title: article.title,
+  description: article.metaDescription || article.excerpt,
+  canonical,
+  authorName,
+  publishedAt: article.publishedAt,
+  updatedAt: reviewedAt ?? article.updatedAt,
+  ...(citations.length ? { citations } : {}),
+  ...(structuredImage ? {
+    image: [ownedStructuredImage ?? {
+      "@type": "ImageObject",
+      url: structuredImage,
+      width: effectiveCoverWidth,
+      height: effectiveCoverHeight,
+      ...(effectiveCoverCaption ? { caption: effectiveCoverCaption } : {}),
+      ...(effectiveCoverCredit ? { creditText: effectiveCoverCredit } : {})
+    }]
+  } : {}),
+  siteUrl: runtimeSite.toString()
+});
+---
+<BaseLayout title={article.seoTitle || article.title} description={article.metaDescription || article.excerpt} canonical={canonical} ogImage={article.ogImageUrl ?? article.coverImageUrl ?? undefined} breadcrumbs={[{ name: "Guias", url: "/blog" }, { name: article.title, url: `/blog/${article.slug}` }]} schemas={[schema]} noindex={editorialNoindex}>
+  <article class="es-section bg-white"><div class="mx-auto max-w-3xl px-4">
+    <Breadcrumbs items={[{ name: "Início", url: "/" }, { name: "Guias", url: "/blog" }, { name: article.title }]} />
+    {"autoGenerated" in article && article.autoGenerated && <p class="mt-5 rounded-xl border border-[var(--brand-border)] bg-[var(--brand-surface)] p-4 text-sm">Este guia foi preparado e verificado por um processo editorial automatizado, sem revisão factual humana individual. Consulte as fontes oficiais citadas e <a href="/contato" class="underline">avise a redação</a> caso encontre informação incorreta.</p>}
+    {article.sponsoredContent && <p class="mt-6 rounded-lg bg-amber-50 p-3 text-sm font-bold text-amber-950">Conteúdo patrocinado{article.sponsorshipDisclosure ? ` — ${article.sponsorshipDisclosure}` : ""}</p>}
+    <p class="es-kicker mt-6">{article.type === "DATA_REPORT" ? "Relatório" : "Guia gratuito"}</p><h1 class="font-display mt-3 text-4xl font-black sm:text-5xl">{article.title}</h1>
+    {article.subtitle && <p class="mt-4 text-xl text-[var(--es-muted)]">{article.subtitle}</p>}<p class="mt-4 text-sm text-[var(--es-muted)]">Por {newsroomAuthor ? <a class="underline" href="/redacao" rel="author">{authorName}</a> : authorName} · {article.publishedAt?.toLocaleDateString("pt-BR")}{reviewedAt ? ` · Revisado em ${reviewedAt.toLocaleDateString("pt-BR")}` : ""}</p>
+    {article.coverImageUrl && <figure class="mt-8"><img src={article.coverImageUrl} alt={effectiveCoverAlt} class="w-full max-h-[34rem] rounded-2xl bg-[var(--es-cream)] object-contain" width={effectiveCoverWidth} height={effectiveCoverHeight} loading="eager" decoding="async" fetchpriority="high" />{(effectiveCoverCaption || effectiveCoverCredit) && <figcaption class="mt-2 text-xs text-[var(--es-muted)]">{effectiveCoverCaption}{effectiveCoverCaption && effectiveCoverCredit ? " · " : ""}{effectiveCoverCredit ? `Crédito: ${effectiveCoverCredit}` : ""}</figcaption>}</figure>}
+    <div class="es-prose mt-8 max-w-none break-words" set:html={contentHtml} />
+    <EditorialSources citations={citations} sourceLabels={sourceLabels} />
+    <aside class="mt-10 rounded-2xl bg-[var(--es-cream)] p-5">
+      <p class="font-bold">Continue gratuitamente</p>
+      <div class="mt-3 flex flex-wrap gap-3">
+        {portal.enabled ? (
+          <>
+            <a class="es-btn es-btn-primary" href="/blog">Mais guias</a>
+            <a class="es-btn es-btn-secondary" href="/noticias">Ver notícias</a>
+            <a class="es-btn es-btn-secondary" href="/contato">Falar com a redação</a>
+          </>
+        ) : (
+          <>
+            <a class="es-btn es-btn-primary" href="/vagas">Ver vagas</a>
+            <a class="es-btn es-btn-secondary" href="/alertas">Criar alerta gratuito</a>
+          </>
+        )}
+      </div>
+    </aside>
+  </div></article>
+</BaseLayout>

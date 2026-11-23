@@ -1,0 +1,104 @@
+---
+import { BRAND_ASSETS } from "../lib/brand-assets";
+import { getInstagramCtaSettings } from "../lib/instagram-cta";
+import { getEditorialPortalMode } from "../lib/portal-modes";
+
+interface Props {
+  variant?: "home" | "compact" | "alert" | "empty";
+  trackEvent?: string;
+}
+
+const { variant = "home", trackEvent = "instagram_follow_click" } = Astro.props;
+const settings = await getInstagramCtaSettings();
+const portal = await getEditorialPortalMode();
+const profileUrl = settings.profileUrl || BRAND_ASSETS.instagramUrl;
+const title = portal.enabled
+  ? "Boas oportunidades começam com informação."
+  : "Seu próximo passo também está no Instagram.";
+const description = portal.enabled
+  ? "Acompanhe orientações para entrevistas, currículo e a rotina de quem está buscando crescer profissionalmente em São Luís."
+  : "Confira conteúdos de carreira e oportunidades divulgadas pelo nosso perfil oficial. Sempre confirme os detalhes antes de se candidatar.";
+const showQr = settings.showQrCode && settings.qrCodeUrl;
+---
+
+<section class={`es-section es-instagram-section ${variant === "compact" ? "es-instagram-compact" : ""}`} aria-labelledby="instagram-cta-title">
+  <div class="es-container">
+    <div class="es-instagram-feature">
+      <div class="es-instagram-copy">
+        <p class="es-instagram-eyebrow"><span class="es-instagram-eyebrow-mark" aria-hidden="true"></span> Nossa comunidade</p>
+        <h2 id="instagram-cta-title" class="font-display es-instagram-title">{title}</h2>
+        <p class="es-instagram-description">{description}</p>
+        <div class="es-instagram-benefits" aria-label="Temas compartilhados no perfil">
+          <span><span aria-hidden="true">✓</span> Orientação de carreira</span>
+          <span><span aria-hidden="true">✓</span> Dicas de entrevistas</span>
+          <span><span aria-hidden="true">✓</span> Informação local</span>
+        </div>
+        <div class="es-instagram-actions">
+          <a
+            class="es-btn es-btn-primary es-instagram-follow"
+            href={profileUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            data-track={trackEvent}
+          >
+            Acompanhar no Instagram <span aria-hidden="true">↗</span>
+          </a>
+          <a class="es-instagram-text-link" href="/instagram">Conhecer o perfil <span aria-hidden="true">→</span></a>
+        </div>
+        {settings.followerCount && settings.followerCountUpdatedAt && (
+          <p class="es-instagram-footnote">
+            {settings.followerCount} seguidores · dado atualizado em {new Date(settings.followerCountUpdatedAt).toLocaleDateString("pt-BR")}
+          </p>
+        )}
+      </div>
+      <div class="es-instagram-showcase">
+        <div class="es-instagram-orbit es-instagram-orbit-one" aria-hidden="true"></div>
+        <div class="es-instagram-orbit es-instagram-orbit-two" aria-hidden="true"></div>
+        <div class="es-instagram-profile-card">
+          <div class="es-instagram-profile-top">
+            <img
+              src="/brand/icon-instagram.webp"
+              alt="Símbolo do Empregos São Luís"
+              class="es-instagram-avatar"
+              width="66"
+              height="66"
+              loading="lazy"
+              decoding="async"
+            />
+            <div class="es-instagram-profile-identity">
+              <p class="es-instagram-account">{BRAND_ASSETS.instagramHandle}</p>
+              <p class="es-instagram-subtitle">Empregos São Luís · Perfil oficial</p>
+            </div>
+            <span class="es-instagram-profile-indicator" aria-hidden="true">↗</span>
+          </div>
+          <div class="es-instagram-profile-divider"></div>
+          <p class="es-instagram-card-kicker">Em destaque no perfil</p>
+          <div class="es-instagram-topic-list">
+            <div><span class="es-instagram-topic-number">01</span><span>Como se preparar para entrevistas</span><span aria-hidden="true">↗</span></div>
+            <div><span class="es-instagram-topic-number">02</span><span>Cuidados na hora da candidatura</span><span aria-hidden="true">↗</span></div>
+            <div><span class="es-instagram-topic-number">03</span><span>Orientações para o currículo</span><span aria-hidden="true">↗</span></div>
+          </div>
+          {showQr && (
+            <div class="es-instagram-qr">
+              <img src={settings.qrCodeUrl!} alt="QR Code para acessar o Instagram Empregos São Luís" width="76" height="76" loading="lazy" decoding="async" />
+              <span>Acesse o perfil pelo QR Code</span>
+            </div>
+          )}
+          <a href={profileUrl} target="_blank" rel="noopener noreferrer" data-track={trackEvent} class="es-instagram-card-footer">
+            Visitar perfil oficial <span aria-hidden="true">↗</span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+<script is:inline>
+  document.querySelectorAll("[data-track]").forEach((el) => {
+    if (el.closest("footer")) return;
+    el.addEventListener("click", () => {
+      const event = el.getAttribute("data-track");
+      if (!event) return;
+      navigator.sendBeacon?.("/api/events/instagram", JSON.stringify({ event, path: location.pathname }));
+    });
+  });
+</script>

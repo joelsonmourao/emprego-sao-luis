@@ -1,0 +1,20 @@
+---
+interface Props {
+  title: string;
+  description: string;
+  actionHref?: string;
+  actionLabel?: string;
+  secondaryHref?: string;
+  secondaryLabel?: string;
+}
+const { title, description, actionHref, actionLabel, secondaryHref, secondaryLabel } = Astro.props;
+---
+<div class="es-card rounded-3xl p-8 text-center sm:p-10">
+  <div class="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-[color-mix(in_srgb,var(--brand-primary)_12%,white)] text-2xl" aria-hidden="true">◎</div>
+  <h2 class="font-display mt-5 text-2xl font-black">{title}</h2>
+  <p class="mx-auto mt-3 max-w-lg text-[var(--es-muted)]">{description}</p>
+  <div class="mt-6 flex flex-wrap justify-center gap-3">
+    {actionHref && actionLabel && <a class="es-btn es-btn-primary" href={actionHref}>{actionLabel}</a>}
+    {secondaryHref && secondaryLabel && <a class="es-btn es-btn-secondary" href={secondaryHref}>{secondaryLabel}</a>}
+  </div>
+</div>

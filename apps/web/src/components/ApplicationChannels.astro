@@ -1,0 +1,122 @@
+---
+interface Channel {
+  type: "URL" | "WHATSAPP" | "EMAIL";
+  href?: string | null;
+  label: string;
+  hint: string;
+  email?: string | null;
+  subject?: string | null;
+  primary?: boolean;
+}
+
+interface Props {
+  jobId: string;
+  accepting: boolean;
+  instructions?: string | null;
+  channels: Channel[];
+  placement: "summary" | "footer";
+}
+
+const { jobId, accepting, instructions, channels, placement } = Astro.props;
+const headingId = `candidatura-${placement}`;
+---
+{accepting && channels.length > 0 && (
+  <section class="mt-6 rounded-2xl border border-[var(--es-border)] bg-[var(--es-cream)] p-5" aria-labelledby={headingId} data-application-block={placement}>
+    <h2 id={headingId} class="font-display text-xl font-black">Como se candidatar</h2>
+    <p class="mt-2 text-sm text-[var(--es-muted)]">Acesso gratuito, sem cadastro obrigatório neste portal. Escolha o canal que preferir — todos os disponíveis ficam visíveis.</p>
+    {instructions && <p class="mt-3 rounded-lg bg-white/80 p-3 text-sm">{instructions}</p>}
+    <div class="mt-4 grid gap-3">
+      {channels.map((channel) => (
+        <div class="rounded-xl border border-[var(--es-border)] bg-white p-4">
+          <div class="flex flex-wrap items-center gap-2">
+            <strong class="font-display">{channel.label}</strong>
+            {channel.primary && <span class="chip chip-active">Opção principal</span>}
+          </div>
+          <p class="mt-1 text-sm text-[var(--es-muted)]">{channel.hint}</p>
+          {channel.type === "EMAIL" && channel.email ? (
+            <div class="mt-3 grid gap-2" data-email-channel data-email={channel.email} data-mailto={channel.href ?? ""} data-job-id={jobId} data-placement={placement}>
+              <button class="es-btn es-btn-primary w-full py-3 text-center" type="button" data-email-reveal>Ver e-mail de candidatura</button>
+              <p class="hidden break-all text-sm font-semibold" data-email-value role="status"></p>
+              <div class="hidden grid gap-2 sm:grid-cols-2" data-email-actions>
+                <button class="es-btn es-btn-secondary" type="button" data-email-copy>Copiar e-mail</button>
+                <a class="es-btn es-btn-secondary text-center" href={channel.href ?? "#"} rel="nofollow" data-email-open>Abrir aplicativo de e-mail</a>
+              </div>
+              {channel.subject && <p class="text-xs text-[var(--es-muted)]">Assunto sugerido: {channel.subject}</p>}
+            </div>
+          ) : channel.href ? (
+            <a
+              class:list={["es-btn mt-3 w-full py-3 text-center text-base", channel.type === "WHATSAPP" ? "bg-emerald-700 font-bold text-white hover:bg-emerald-800" : "es-btn-primary"]}
+              href={channel.href}
+              rel="nofollow noopener noreferrer"
+              target="_blank"
+              data-track-application
+              data-job-id={jobId}
+              data-channel={channel.type}
+              data-placement={placement}
+            >
+              {channel.type === "WHATSAPP" ? "Continuar no WhatsApp" : "Candidatar-se no site"}
+            </a>
+          ) : null}
+        </div>
+      ))}
+    </div>
+  </section>
+)}
+<script is:inline>
+  (() => {
+    const track = (payload) => {
+      try {
+        navigator.sendBeacon?.("/api/jobs/application-click", new Blob([JSON.stringify(payload)], { type: "application/json" }));
+      } catch {}
+    };
+    document.querySelectorAll("[data-track-application]").forEach((el) => {
+      el.addEventListener("click", () => {
+        track({
+          jobId: el.getAttribute("data-job-id"),
+          channel: el.getAttribute("data-channel"),
+          placement: el.getAttribute("data-placement"),
+          action: "OPEN"
+        });
+      });
+    });
+    document.querySelectorAll("[data-email-channel]").forEach((root) => {
+      const email = root.getAttribute("data-email") || "";
+      const reveal = root.querySelector("[data-email-reveal]");
+      const value = root.querySelector("[data-email-value]");
+      const actions = root.querySelector("[data-email-actions]");
+      const copy = root.querySelector("[data-email-copy]");
+      const open = root.querySelector("[data-email-open]");
+      reveal?.addEventListener("click", () => {
+        if (value) {
+          value.textContent = email;
+          value.classList.remove("hidden");
+        }
+        actions?.classList.remove("hidden");
+        reveal.classList.add("hidden");
+        track({
+          jobId: root.getAttribute("data-job-id"),
+          channel: "EMAIL",
+          placement: root.getAttribute("data-placement"),
+          action: "REVEAL"
+        });
+      });
+      copy?.addEventListener("click", async () => {
+        try { await navigator.clipboard?.writeText(email); } catch {}
+        track({
+          jobId: root.getAttribute("data-job-id"),
+          channel: "EMAIL",
+          placement: root.getAttribute("data-placement"),
+          action: "COPY"
+        });
+      });
+      open?.addEventListener("click", () => {
+        track({
+          jobId: root.getAttribute("data-job-id"),
+          channel: "EMAIL",
+          placement: root.getAttribute("data-placement"),
+          action: "OPEN_MAILTO"
+        });
+      });
+    });
+  })();
+</script>

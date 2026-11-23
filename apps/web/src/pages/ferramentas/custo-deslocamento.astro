@@ -1,0 +1,133 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import Breadcrumbs from "../../components/ui/Breadcrumbs.astro";
+---
+<BaseLayout
+  title="Calculadora de deslocamento para o trabalho — Empregos São Luís"
+  description="Estime o custo mensal de transporte para uma vaga em São Luís, com valor de passagem informado por você, dias trabalhados e deslocamentos. Ferramenta gratuita sem cadastro."
+  canonical="/ferramentas/custo-deslocamento"
+  breadcrumbs={[{ name: "Início", url: "/" }, { name: "Custo de deslocamento", url: "/ferramentas/custo-deslocamento" }]}
+>
+  <article class="es-section">
+    <div class="es-container max-w-4xl">
+      <Breadcrumbs items={[{ name: "Início", url: "/" }, { name: "Calculadora de deslocamento" }]} />
+      <p class="es-kicker mt-7">Ferramenta gratuita • Planejamento profissional</p>
+      <h1 class="mt-3 font-display text-4xl font-black leading-tight sm:text-5xl">Quanto custa ir e voltar do trabalho todos os meses?</h1>
+      <p class="mt-5 max-w-3xl text-lg leading-8 text-[var(--text-secondary)]">
+        Antes de se candidatar a uma vaga em São Luís ou em outra cidade da região,
+        estime o impacto do trajeto no orçamento. Informe os valores que realmente paga:
+        <strong>esta calculadora não presume tarifas de ônibus, salário nem benefícios atuais.</strong>
+        O resultado é uma estimativa para planejamento, não uma promessa de desconto na folha.
+      </p>
+
+      <form id="deslocamento-form" class="es-card mt-8 grid gap-5 p-5 sm:grid-cols-2 sm:p-8" autocomplete="off">
+        <label class="grid gap-2 text-sm font-bold">
+          Custo de um trajeto (R$)
+          <input id="custo-trecho" type="number" min="0" max="1000" step="0.01" value="0" required class="rounded-xl border border-[var(--brand-border)] bg-white px-3 py-3" />
+          <span class="text-xs font-normal text-[var(--text-secondary)]">Informe sua tarifa efetiva ou custo médio por viagem, sem valor sugerido.</span>
+        </label>
+        <label class="grid gap-2 text-sm font-bold">
+          Quantos trajetos por dia?
+          <input id="trechos-dia" type="number" min="1" max="12" step="1" value="2" required class="rounded-xl border border-[var(--brand-border)] bg-white px-3 py-3" />
+          <span class="text-xs font-normal text-[var(--text-secondary)]">Ex.: ida + volta = dois trajetos, se não houver baldeações cobradas.</span>
+        </label>
+        <label class="grid gap-2 text-sm font-bold">
+          Quantos dias presenciais no mês?
+          <input id="dias-mes" type="number" min="0" max="31" step="1" value="22" required class="rounded-xl border border-[var(--brand-border)] bg-white px-3 py-3" />
+          <span class="text-xs font-normal text-[var(--text-secondary)]">Informe dias previstos no mês; ajuste para escala, folgas e home office.</span>
+        </label>
+        <label class="grid gap-2 text-sm font-bold">
+          Outros gastos mensais do deslocamento (R$)
+          <input id="gastos-extras" type="number" min="0" max="30000" step="0.01" value="0" required class="rounded-xl border border-[var(--brand-border)] bg-white px-3 py-3" />
+          <span class="text-xs font-normal text-[var(--text-secondary)]">Ex.: estacionamento ou transporte adicional. Não some a mesma passagem duas vezes.</span>
+        </label>
+        <label class="grid gap-2 text-sm font-bold sm:col-span-2">
+          Salário mensal para comparação (R$) — opcional
+          <input id="salario-comparar" type="number" min="0" max="1000000" step="0.01" placeholder="Deixe vazio para mostrar só o gasto" class="rounded-xl border border-[var(--brand-border)] bg-white px-3 py-3" />
+        </label>
+        <button type="submit" class="es-btn es-btn-primary sm:col-span-2">Calcular meu deslocamento</button>
+      </form>
+      <section id="resultado-deslocamento" class="mt-7 hidden rounded-2xl border border-[var(--brand-primary)] bg-[var(--brand-surface)] p-6" aria-live="polite" role="status">
+        <h2 class="font-display text-2xl font-black">Estimativa do mês</h2>
+        <p class="mt-5 text-sm font-semibold">Somente passagens/trechos</p>
+        <p id="custo-transporte" class="mt-1 text-2xl font-black"></p>
+        <p class="mt-4 text-sm font-semibold">Deslocamento total, incluindo extras</p>
+        <p id="custo-total" class="mt-1 text-3xl font-black text-[var(--brand-primary)]"></p>
+        <p id="custo-percentual" class="mt-3 text-sm"></p>
+        <p class="mt-4 text-sm leading-7 text-[var(--text-secondary)]">
+          Valores brutos informados por você, sem aplicar regras de vale-transporte, impostos ou descontos.
+          Consulte as condições reais do anúncio e do empregador antes de comparar propostas.
+        </p>
+      </section>
+      <section class="es-prose mt-12 max-w-none">
+        <h2>Como comparar duas oportunidades em bairros diferentes</h2>
+        <p>
+          A vaga mais próxima nem sempre é a melhor, e a mais distante nem sempre compensa.
+          Para comparar de maneira útil, calcule cada rota separadamente, mantendo os mesmos
+          critérios de dias e trajetos. Depois confira o tempo de deslocamento, o horário da escala,
+          a segurança do percurso e a possibilidade de transporte disponível na hora da saída.
+        </p>
+        <p>
+          Imagine uma vaga com dois ônibus pagos por sentido e outra com apenas um. Em vez de assumir
+          uma tarifa genérica para toda São Luís, registre quantas cobranças de fato ocorrem no seu
+          trajeto e informe o valor de cada viagem no campo correspondente. Se os trechos custam
+          valores diferentes, calcule o total diário à parte e divida pelo número de trajetos
+          para inserir uma média aproximada. A calculadora apresenta uma estimativa, não a tarifa oficial.
+        </p>
+        <h2>O que considerar além do dinheiro</h2>
+        <ul>
+          <li><strong>Escala:</strong> quem trabalha em turnos, feriados ou finais de semana deve usar a quantidade real de dias presenciais.</li>
+          <li><strong>Baldeação:</strong> não confunda trocar de veículo com pagar outro trecho. Confira as regras e o custo que se aplicam ao seu trajeto.</li>
+          <li><strong>Benefício:</strong> caso a vaga informe vale-transporte ou transporte fornecido pela empresa, confirme as condições antes de decidir quanto será gasto pessoalmente.</li>
+          <li><strong>Tempo:</strong> considere períodos de espera e transporte no horário em que precisará viajar, não apenas em um domingo sem movimento.</li>
+          <li><strong>Segurança:</strong> avalie pontos de embarque, iluminação e possibilidade de retorno, especialmente para saídas noturnas.</li>
+        </ul>
+        <h2>Por que não informamos um valor fixo de passagem?</h2>
+        <p>
+          Tarifas, gratuidades, integrações e rotas podem variar conforme município, modalidade e
+          data. Exibir um valor não confirmado seria menos útil do que calcular com os dados que o
+          próprio candidato verificou. Esta ferramenta serve para organizar números reais, não
+          substitui os canais oficiais de transporte, nem faz aconselhamento trabalhista.
+        </p>
+        <h2>O próximo passo</h2>
+        <p>
+          Depois de avaliar o trajeto, use o <a href="/ferramentas/controle-candidaturas">controle gratuito de candidaturas</a>
+          para registrar a vaga, o canal de contato e o prazo informado. Se ainda está buscando uma
+          oportunidade, consulte o <a href="/guias/emprego-sine-maranhao">guia de canais oficiais do SINE Maranhão</a>.
+          Nunca pague para participar de um processo seletivo.
+        </p>
+      </section>
+    </div>
+  </article>
+</BaseLayout>
+<script is:inline>
+  (() => {
+    const form = document.getElementById("deslocamento-form");
+    const result = document.getElementById("resultado-deslocamento");
+    if (!form || !result) return;
+    const money = new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" });
+    const field = (id) => Number(document.getElementById(id)?.value);
+    form.addEventListener("submit", (event) => {
+      event.preventDefault();
+      if (!form.reportValidity()) return;
+      const unit = field("custo-trecho");
+      const legs = field("trechos-dia");
+      const days = field("dias-mes");
+      const extras = field("gastos-extras");
+      const salaryInput = document.getElementById("salario-comparar");
+      const salary = salaryInput?.value ? Number(salaryInput.value) : null;
+      const valid = [unit, legs, days, extras].every(Number.isFinite) && unit >= 0 && legs >= 1 &&
+        days >= 0 && days <= 31 && extras >= 0 && Number.isInteger(legs) && Number.isInteger(days);
+      if (!valid) return;
+      const travel = unit * legs * days;
+      const total = travel + extras;
+      document.getElementById("custo-transporte").textContent = money.format(travel);
+      document.getElementById("custo-total").textContent = money.format(total);
+      const share = document.getElementById("custo-percentual");
+      if (salary !== null && salary > 0 && Number.isFinite(salary)) {
+        share.textContent = "Equivalente a " + (total / salary * 100).toFixed(1).replace(".", ",") + "% do salário informado, antes de benefícios ou descontos.";
+      } else share.textContent = "Informe um salário, se quiser comparar o gasto com a remuneração.";
+      result.classList.remove("hidden");
+    });
+  })();
+</script>

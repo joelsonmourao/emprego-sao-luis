@@ -1,0 +1,91 @@
+import { readFileSync } from "node:fs";
+import { resolve } from "node:path";
+import { afterEach, describe, expect, it } from "vitest";
+import { getRuntimeSiteUrl, resolveCanonicalUrl, resolvePublicHttpUrl } from "./canonical-url";
+
+const site = new URL("https://empregossaoluis.com.br");
+const originalSiteUrl = process.env.SITE_URL;
+
+afterEach(() => {
+  if (originalSiteUrl === undefined) delete process.env.SITE_URL;
+  else process.env.SITE_URL = originalSiteUrl;
+});
+
+describe("resolveCanonicalUrl", () => {
+  it("aplica a resolução segura de canonical no layout público", () => {
+    const layout = readFileSync(resolve("apps/web/src/layouts/BaseLayout.astro"), "utf8");
+    expect(layout).toContain("getRuntimeSiteUrl(Astro.site)");
+    expect(layout).toContain("resolveCanonicalUrl(canonical, Astro.url.pathname, runtimeSite)");
+    expect(layout).not.toContain("canonical ? new URL(canonical");
+  });
+
+  it("usa a mesma canonical segura no JSON-LD de guias e notícias", () => {
+    const blog = readFileSync(resolve("apps/web/src/pages/blog/[slug].astro"), "utf8");
+    const news = readFileSync(resolve("apps/web/src/pages/noticias/[slug].astro"), "utf8");
+    const schema = readFileSync(resolve("apps/web/src/lib/editorial-schema.ts"), "utf8");
+    for (const page of [blog, news]) {
+      expect(page).toContain("getRuntimeSiteUrl(Astro.site)");
+      expect(page).toContain("resolveCanonicalUrl(article.canonicalUrl ?? undefined");
+      expect(page).toContain("buildEditorialSchema({");
+      expect(page).toContain("canonical,");
+    }
+    expect(schema).toContain('mainEntityOfPage: { "@type": "WebPage", "@id": input.canonical }');
+  });
+
+  it("normaliza imagens estruturadas para URLs públicas absolutas", () => {
+    const blog = readFileSync(resolve("apps/web/src/pages/blog/[slug].astro"), "utf8");
+    const news = readFileSync(resolve("apps/web/src/pages/noticias/[slug].astro"), "utf8");
+    expect(blog).toContain("resolvePublicHttpUrl(article.coverImageUrl ?? undefined, runtimeSite)");
+    expect(news).toContain("resolvePublicHttpUrl(image?.url, runtimeSite)");
+    expect(news).not.toContain("url: image.url");
+  });
+
+  it("removes tracking parameters and trailing slash", () => {
+    expect(resolveCanonicalUrl("/blog/guia/?utm_source=teste#topo", "/blog/guia", site))
+      .toBe("https://empregossaoluis.com.br/blog/guia");
+  });
+
+  it("does not allow an external canonical for an owned page", () => {
+    expect(resolveCanonicalUrl("https://example.com/copia", "/noticias/local", site))
+      .toBe("https://empregossaoluis.com.br/noticias/local");
+  });
+
+  it("uses the requested path when the candidate is invalid", () => {
+    expect(resolveCanonicalUrl("http://[", "/", site)).toBe("https://empregossaoluis.com.br/");
+  });
+
+  it("prefers SITE_URL from runtime over the value baked into Astro.site", () => {
+    process.env.SITE_URL = "https://runtime.empregossaoluis.com.br";
+    expect(getRuntimeSiteUrl(new URL("http://localhost:4321")).toString())
+      .toBe("https://runtime.empregossaoluis.com.br/");
+  });
+
+  it("rejects localhost SITE_URL and Astro.site fallbacks", () => {
+    delete process.env.SITE_URL;
+    expect(getRuntimeSiteUrl(new URL("http://localhost:4321")).toString())
+      .toBe("https://empregossaoluis.com.br/");
+    process.env.SITE_URL = "http://127.0.0.1:4321";
+    expect(getRuntimeSiteUrl().toString()).toBe("https://empregossaoluis.com.br/");
+  });
+
+  it("normalizes SITE_URL to its HTTP origin", () => {
+    process.env.SITE_URL = "https://empregossaoluis.com.br/subpath?preview=1#fragment";
+    expect(getRuntimeSiteUrl().toString()).toBe("https://empregossaoluis.com.br/");
+    process.env.SITE_URL = "ftp://empregossaoluis.com.br";
+    expect(getRuntimeSiteUrl().toString()).toBe("https://empregossaoluis.com.br/");
+  });
+
+  it("ignores stored canonical that points to a different owned path", () => {
+    expect(resolveCanonicalUrl("/", "/blog/guia", site)).toBe("https://empregossaoluis.com.br/blog/guia");
+    expect(resolveCanonicalUrl("https://empregossaoluis.com.br/", "/vagas/auxiliar", site))
+      .toBe("https://empregossaoluis.com.br/vagas/auxiliar");
+    expect(resolveCanonicalUrl("https://empregossaoluis.com.br/blog/outro", "/blog/guia", site))
+      .toBe("https://empregossaoluis.com.br/blog/guia");
+  });
+
+  it("only resolves public HTTP assets", () => {
+    expect(resolvePublicHttpUrl("/brand/capa.png", site)).toBe("https://empregossaoluis.com.br/brand/capa.png");
+    expect(resolvePublicHttpUrl("javascript:alert(1)", site)).toBeUndefined();
+    expect(resolvePublicHttpUrl("http://localhost:4321/brand/capa.png", site)).toBeUndefined();
+  });
+});

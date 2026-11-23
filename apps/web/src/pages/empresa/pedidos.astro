@@ -1,0 +1,46 @@
+---
+import EmpresaLayout from "../../layouts/EmpresaLayout.astro";
+import { listCompanyOrders } from "../../lib/company-dashboard";
+
+const company = Astro.locals.company!;
+const rows = await listCompanyOrders(company.email);
+
+const statusLabels: Record<string, string> = {
+  DRAFT: "Rascunho",
+  PENDING_PAYMENT: "Aguardando pagamento",
+  PAID: "Pago",
+  CANCELLED: "Cancelado",
+  EXPIRED: "Expirado",
+  MANUAL_REVIEW: "Em análise"
+};
+---
+<EmpresaLayout title="Pedidos">
+  <h1 class="font-display text-3xl font-black">Pedidos</h1>
+  <p class="mt-2 text-[var(--text-secondary)]">Histórico de compras de planos vinculados ao seu e-mail.</p>
+  <div class="mt-8 overflow-x-auto es-card">
+    <table class="min-w-full text-sm">
+      <thead class="border-b border-[var(--brand-border)] bg-[var(--brand-background)] text-left">
+        <tr>
+          <th class="p-3">Código</th>
+          <th class="p-3">Plano</th>
+          <th class="p-3">Valor</th>
+          <th class="p-3">Status</th>
+          <th class="p-3">Data</th>
+        </tr>
+      </thead>
+      <tbody>
+        {rows.length ? rows.map(({ order, planName }) => (
+          <tr class="border-b border-[var(--brand-border)]">
+            <td class="p-3 font-mono text-xs">{order.orderCode}</td>
+            <td class="p-3">{planName ?? "—"}</td>
+            <td class="p-3">R$ {Number(order.amount).toFixed(2)}</td>
+            <td class="p-3">{statusLabels[order.status] ?? order.status}</td>
+            <td class="p-3">{new Date(order.createdAt).toLocaleDateString("pt-BR")}</td>
+          </tr>
+        )) : (
+          <tr><td class="p-6 text-[var(--text-secondary)]" colspan="5">Nenhum pedido encontrado.</td></tr>
+        )}
+      </tbody>
+    </table>
+  </div>
+</EmpresaLayout>

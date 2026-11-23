@@ -1,0 +1,99 @@
+---
+import { createDatabase, jobs } from "@es/db";
+import { eq } from "drizzle-orm";
+import AdminLayout from "../../../../layouts/AdminLayout.astro";
+import { getJobFormOptions, EMPLOYMENT_TYPES, WORKPLACE_TYPES } from "../../../../lib/admin-data";
+import { can } from "../../../../lib/auth";
+import { toDatetimeLocalValue, UNIDENTIFIED_COMPANY_ID } from "@es/shared";
+import { validateJobPosting } from "@es/seo";
+
+const auth = Astro.locals.auth!;
+if (!can(auth, "jobs.create")) return new Response("Proibido", { status: 403 });
+if (!Astro.params.id || !process.env.DATABASE_URL) return new Response("Não encontrada", { status: 404 });
+const connection = createDatabase(process.env.DATABASE_URL);
+let job;
+try { [job] = await connection.db.select().from(jobs).where(eq(jobs.id, Astro.params.id)).limit(1); }
+finally { await connection.close(); }
+if (!job) return new Response("Não encontrada", { status: 404 });
+const options = await getJobFormOptions();
+const company = options.companies.find((item) => item.id === job.companyId);
+const city = options.cities.find((item) => item.id === job.cityId);
+const state = options.states.find((item) => item.id === job.stateId);
+const schemaDiagnosis = validateJobPosting({
+  title: job.normalizedTitle,
+  description: job.descriptionHtml,
+  publishedAt: job.publishedAt,
+  expiresAt: job.expiresAt,
+  employmentType: job.employmentType,
+  workplaceType: job.workplaceType,
+  companyName: company?.name ?? "",
+  cityName: city?.name ?? "",
+  stateCode: state?.code ?? "",
+  applicationUrl: job.applicationUrl,
+  applicationType: job.applicationType,
+  salaryMin: job.salaryMin,
+  salaryMax: job.salaryMax,
+  salaryCurrency: job.salaryCurrency,
+  salaryPeriod: job.salaryPeriod,
+  salaryVisible: job.salaryVisible,
+  publicCode: job.publicCode,
+  canonicalUrl: job.canonicalUrl || new URL(`/vagas/${job.slug}`, Astro.site).toString(),
+  publicationStatus: job.publicationStatus,
+  confidentialCompany: job.confidentialCompany,
+  unidentifiedCompany: job.unidentifiedCompany,
+  organizationPubliclyIdentifiable: !job.confidentialCompany && !job.unidentifiedCompany
+});
+const localDate = (value: Date | null) => toDatetimeLocalValue(value);
+---
+
+<AdminLayout title={`Editar ${job.publicCode}`}>
+  <div class="flex flex-wrap items-center justify-between gap-3">
+    <div><p class="font-mono text-red-700">{job.publicCode}</p><h1 class="text-3xl font-black">Editar vaga</h1></div>
+    <div class="flex flex-wrap gap-3"><a href={`/vagas/${job.slug}`} target="_blank">Preview público</a><a href={`/admin/vagas/${job.id}/historico`}>Histórico</a></div>
+  </div>
+  <div class="mt-4 flex flex-wrap gap-2">
+    <form method="post" action={`/api/admin/jobs/${job.id}/duplicate`}><button class="rounded-lg border px-3 py-2 text-sm font-bold">Duplicar</button></form>
+    {job.publicationStatus === "PUBLISHED" && <form method="post" action={`/api/admin/jobs/${job.id}/status`}><input type="hidden" name="status" value="PAUSED"/><button class="rounded-lg border px-3 py-2 text-sm font-bold">Pausar</button></form>}
+    <form method="post" action={`/api/admin/jobs/${job.id}/status`}><input type="hidden" name="status" value="ARCHIVED"/><button class="rounded-lg border border-red-200 px-3 py-2 text-sm font-bold text-red-700">Arquivar</button></form>
+  </div>
+  <aside class={`mt-5 rounded-xl border p-4 text-sm ${schemaDiagnosis.valid ? "border-emerald-200 bg-emerald-50 text-emerald-950" : "border-amber-200 bg-amber-50 text-amber-950"}`}>
+    <strong>Elegibilidade JobPosting: {schemaDiagnosis.valid ? "apta" : "não apta"}.</strong>
+    {!schemaDiagnosis.valid && <p class="mt-1">Diagnóstico: {schemaDiagnosis.missing.join(", ") || "vaga fora da janela de publicação"}. A página pode continuar pública sem o schema.</p>}
+  </aside>
+  <form class="mt-8 grid gap-5 rounded-2xl bg-white p-6" method="post" action={`/api/admin/jobs/${job.id}/update`}>
+    <input type="hidden" name="version" value={job.version}/>
+    <div class="grid gap-4 md:grid-cols-2"><label>Título original<input class="mt-1 w-full rounded-lg border p-3" name="originalTitle" value={job.originalTitle} required/></label><label>Título público<input class="mt-1 w-full rounded-lg border p-3" name="normalizedTitle" value={job.normalizedTitle} required/></label></div>
+    <label>Slug<input class="mt-1 w-full rounded-lg border p-3" name="slug" value={job.slug} required/></label>
+    <div class="grid gap-4 md:grid-cols-2">
+      <label>Empresa<select class="mt-1 w-full rounded-lg border p-3" name="companyId" required><option value={UNIDENTIFIED_COMPANY_ID} selected={job.companyId===UNIDENTIFIED_COMPANY_ID}>Contratante não identificada na fonte</option>{options.companies.filter((item)=>item.id!==UNIDENTIFIED_COMPANY_ID).map((item)=><option value={item.id} selected={item.id===job.companyId}>{item.name}</option>)}</select></label>
+      <label>Categoria<select class="mt-1 w-full rounded-lg border p-3" name="categoryId"><option value="">Sem categoria</option>{options.categories.map((item)=><option value={item.id} selected={item.id===job.categoryId}>{item.name}</option>)}</select></label>
+      <label>Cidade<select class="mt-1 w-full rounded-lg border p-3" name="cityId" required>{options.cities.map((item)=><option value={item.id} selected={item.id===job.cityId}>{item.name}</option>)}</select></label>
+      <label>UF<select class="mt-1 w-full rounded-lg border p-3" name="stateId" required>{options.states.map((item)=><option value={item.id} selected={item.id===job.stateId}>{item.name} ({item.code})</option>)}</select></label>
+      <label>Bairro<input class="mt-1 w-full rounded-lg border p-3" name="neighborhood" value={job.neighborhood ?? ""}/></label>
+      <label>Jornada<input class="mt-1 w-full rounded-lg border p-3" name="schedule" value={job.schedule ?? ""}/></label>
+    </div>
+    <div class="grid gap-4 md:grid-cols-2"><label>Contrato<select class="mt-1 w-full rounded-lg border p-3" name="employmentType">{EMPLOYMENT_TYPES.map((value)=><option value={value} selected={value===job.employmentType}>{value}</option>)}</select></label><label>Modalidade<select class="mt-1 w-full rounded-lg border p-3" name="workplaceType">{WORKPLACE_TYPES.map((value)=><option value={value.value} selected={value.value===job.workplaceType}>{value.label}</option>)}</select></label></div>
+    <section>
+      <h2 class="text-lg font-black">Descrição da vaga</h2>
+      <label class="mt-2 block">
+        Conteúdo completo (HTML ou Markdown)
+        <textarea class="mt-1 min-h-64 w-full rounded-lg border p-3 font-mono text-sm" name="descriptionHtml" minlength="80" required>{job.descriptionHtml}</textarea>
+      </label>
+      <p class="mt-1 text-xs text-slate-500">Aceita HTML ou Markdown. Ao salvar, o conteúdo é normalizado para HTML estruturado (portal + JobPosting).</p>
+    </section>
+    <div class="grid gap-4 md:grid-cols-2">
+      <label>Site de candidatura (opcional)<input class="mt-1 w-full rounded-lg border p-3" type="url" name="applicationUrl" value={job.applicationUrl ?? ""}/></label><label>Fonte<input class="mt-1 w-full rounded-lg border p-3" name="sourceName" value={job.sourceName} required/></label>
+      <label>E-mail de candidatura (opcional)<input class="mt-1 w-full rounded-lg border p-3" type="email" name="applicationEmail" value={job.applicationEmail ?? ""}/></label><label>Assunto do e-mail (opcional)<input class="mt-1 w-full rounded-lg border p-3" name="applicationEmailSubject" value={job.applicationEmailSubject ?? ""}/></label>
+      <label>WhatsApp de candidatura (opcional)<input class="mt-1 w-full rounded-lg border p-3" type="tel" name="applicationWhatsapp" value={job.applicationWhatsappOriginal ?? job.applicationWhatsapp ?? ""}/><span class="mt-1 block text-xs text-slate-500">Normalizado: {job.applicationWhatsapp ?? "pendente"} · validação: {job.applicationWhatsappValid ? "formato válido" : "não validado"} · origem: {job.applicationWhatsappSource ?? "não informada"} · última validação: {job.applicationWhatsappValidatedAt?.toLocaleString("pt-BR") ?? "nunca"}</span></label><label>Mensagem inicial do WhatsApp<input class="mt-1 w-full rounded-lg border p-3" name="applicationWhatsappMessage" value={job.applicationWhatsappMessage ?? ""}/></label>
+      <label class="md:col-span-2">Instruções de candidatura<textarea class="mt-1 min-h-24 w-full rounded-lg border p-3" name="applicationInstructions">{job.applicationInstructions ?? ""}</textarea></label>
+      <label>URL da fonte<input class="mt-1 w-full rounded-lg border p-3" type="url" name="sourceUrl" value={job.sourceUrl ?? ""}/></label><label>Evidência da fonte<input class="mt-1 w-full rounded-lg border p-3" name="sourceEvidence" value={job.sourceEvidence ?? ""}/></label>
+      <label>Validade<input class="mt-1 w-full rounded-lg border p-3" type="datetime-local" name="expiresAt" value={localDate(job.expiresAt)} required/></label><label>Publicar em<input class="mt-1 w-full rounded-lg border p-3" type="datetime-local" name="scheduledAt" value={localDate(job.scheduledAt)}/></label>
+      <label>Salário mínimo<input class="mt-1 w-full rounded-lg border p-3" type="number" name="salaryMin" value={job.salaryMin ?? ""}/></label><label>Salário máximo<input class="mt-1 w-full rounded-lg border p-3" type="number" name="salaryMax" value={job.salaryMax ?? ""}/></label>
+    </div>
+    <div class="grid gap-4 md:grid-cols-3"><label>Título SEO<input class="mt-1 w-full rounded-lg border p-3" name="seoTitle" value={job.seoTitle ?? ""}/></label><label>Descrição SEO<input class="mt-1 w-full rounded-lg border p-3" name="metaDescription" value={job.metaDescription ?? ""}/></label><label>Canônica<input class="mt-1 w-full rounded-lg border p-3" type="url" name="canonicalUrl" value={job.canonicalUrl ?? ""}/></label></div>
+    <label>Status<select class="mt-1 w-full rounded-lg border p-3" name="publicationStatus">{["DRAFT","PENDING_REVIEW","APPROVED","SCHEDULED","PUBLISHED"].map((status)=><option value={status} selected={job.publicationStatus===status}>{status}</option>)}</select></label>
+    <div class="flex flex-wrap gap-5"><label><input class="mr-2" type="checkbox" name="featured" checked={job.featured}/>Destaque</label><label><input class="mr-2" type="checkbox" name="confidentialCompany" checked={job.confidentialCompany}/>Ocultar empresa real publicamente</label><label><input class="mr-2" type="checkbox" name="unidentifiedCompany" checked={job.unidentifiedCompany}/>Contratante não identificada na fonte</label><label><input class="mr-2" type="checkbox" name="salaryVisible" checked={job.salaryVisible}/>Exibir salário</label></div>
+    <label class="flex items-start gap-2 rounded-lg border border-amber-200 bg-amber-50 p-3 text-sm text-amber-950"><input type="checkbox" name="reviewConfirmed" />Confirmo que revisei os campos críticos. Obrigatório para aprovar, agendar ou publicar.</label>
+    <button class="rounded-xl bg-red-700 p-4 font-bold text-white">Salvar alterações</button>
+  </form>
+</AdminLayout>

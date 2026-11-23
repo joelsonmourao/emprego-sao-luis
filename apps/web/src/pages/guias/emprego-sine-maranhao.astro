@@ -1,0 +1,175 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import Breadcrumbs from "../../components/ui/Breadcrumbs.astro";
+
+const sources = [
+  {
+    label: "Serviço federal: buscar emprego no SINE",
+    url: "https://www.gov.br/pt-br/servicos/buscar-emprego-no-sistema-nacional-de-emprego-sine",
+    detail: "Etapas do cadastro, consulta e candidatura; atendimento gratuito"
+  },
+  {
+    label: "Ministério do Trabalho: Carteira de Trabalho Digital",
+    url: "https://www.gov.br/trabalho-e-emprego/pt-br/servicos/trabalhador/carteira-de-trabalho",
+    detail: "Orientações sobre CTPS Digital e atualização do perfil para vagas"
+  },
+  {
+    label: "Portal oficial Emprega Brasil",
+    url: "https://empregabrasil.trabalho.gov.br/",
+    detail: "Acesso ao serviço digital, que pode exigir login gov.br"
+  },
+  {
+    label: "Governo do Maranhão: contatos da Secretaria do Trabalho",
+    url: "https://www.pge.ma.gov.br/contatos",
+    detail: "Referência institucional de localização da SETRES; confirme atendimento antes de ir"
+  }
+];
+---
+<BaseLayout
+  title="SINE Maranhão e Carteira de Trabalho Digital: guia prático de busca de vagas"
+  description="Como buscar emprego pelos canais oficiais do SINE no Maranhão e pelo aplicativo Carteira de Trabalho Digital, com orientações de cadastro, endereço de referência, segurança e checklist."
+  canonical="/guias/emprego-sine-maranhao"
+  breadcrumbs={[{ name: "Início", url: "/" }, { name: "Guia SINE Maranhão", url: "/guias/emprego-sine-maranhao" }]}
+>
+  <article class="es-section">
+    <div class="es-container max-w-4xl">
+      <Breadcrumbs items={[{ name: "Início", url: "/" }, { name: "SINE Maranhão e Carteira Digital" }]} />
+      <p class="es-kicker mt-7">Serviço público • São Luís e Maranhão</p>
+      <h1 class="mt-3 font-display text-4xl font-black leading-tight sm:text-5xl">Onde buscar emprego pelo SINE e pela Carteira de Trabalho Digital no Maranhão</h1>
+      <p class="mt-5 text-lg leading-8 text-[var(--text-secondary)]">
+        Este é um guia de acesso, não uma lista de vagas disponíveis hoje. Ele reúne os caminhos
+        oficiais para cadastrar o perfil profissional, procurar oportunidades e preparar uma candidatura.
+        A seleção depende de cada empregador e da disponibilidade real de vagas no sistema.
+      </p>
+      <p class="mt-4 text-sm text-[var(--text-secondary)]">
+        Conferência das fontes: 12/10/2026 • Elaboração editorial: Empregos São Luís •
+        <a class="underline" href="/politica-correcoes">Solicitar correção</a>
+      </p>
+
+      <nav class="mt-8 grid gap-3 rounded-2xl border border-[var(--brand-border)] bg-[var(--brand-surface)] p-5 sm:grid-cols-2" aria-label="Navegação neste guia">
+        <a class="font-semibold underline" href="#canais">1. Canais oficiais para procurar vagas</a>
+        <a class="font-semibold underline" href="#perfil">2. Preparar o cadastro profissional</a>
+        <a class="font-semibold underline" href="#presencial">3. Referência de atendimento presencial</a>
+        <a class="font-semibold underline" href="#seguranca">4. Verificar a oportunidade e evitar golpes</a>
+        <a class="font-semibold underline" href="#checklist">5. Checklist para a candidatura</a>
+        <a class="font-semibold underline" href="#fontes">Fontes e limitações da informação</a>
+      </nav>
+
+      <div class="es-prose mt-10 max-w-none text-base leading-8">
+        <section id="canais">
+          <h2>1. Dois caminhos oficiais para começar</h2>
+          <p>
+            A plataforma do governo federal permite que trabalhadores registrem suas informações e consultem
+            oportunidades compatíveis com o perfil, quando disponibilizadas. Para começar,
+            use a página <a href="https://www.gov.br/pt-br/servicos/buscar-emprego-no-sistema-nacional-de-emprego-sine" target="_blank" rel="noopener noreferrer">Buscar Emprego no SINE no gov.br</a>.
+            Ela explica as etapas e oferece o botão de acesso ao serviço.
+          </p>
+          <p>
+            Outro caminho é a <a href="https://www.gov.br/trabalho-e-emprego/pt-br/servicos/trabalhador/carteira-de-trabalho" target="_blank" rel="noopener noreferrer">Carteira de Trabalho Digital</a>,
+            que pode ser consultada pelo aplicativo correspondente. O Ministério do Trabalho informa que dados
+            cadastrais e preferências profissionais são importantes para o cruzamento com as vagas. Algumas
+            funções podem pedir autenticação com a conta gov.br.
+          </p>
+          <p>
+            Não confunda acesso ao aplicativo com candidatura efetivada: abra o detalhe da oportunidade,
+            confira os requisitos e conclua as etapas indicadas pelo serviço. Caso não apareçam vagas,
+            isso não significa que sua conta esteja inválida; pode ser necessário ampliar funções ou regiões
+            de interesse, desde que você realmente tenha disponibilidade para elas.
+          </p>
+        </section>
+
+        <section id="perfil" class="mt-10">
+          <h2>2. Como preparar um perfil que represente suas experiências</h2>
+          <p>Antes de procurar vagas, faça uma conferência prática:</p>
+          <ol>
+            <li><strong>Dados de contato:</strong> mantenha e-mail e telefone acessíveis. Canais desatualizados podem dificultar respostas.</li>
+            <li><strong>Experiência verdadeira:</strong> informe atividades que efetivamente desempenhou. Se nunca trabalhou, destaque projetos, estágio, curso ou atividades relevantes sem inventar emprego.</li>
+            <li><strong>Escolaridade e formação:</strong> confira se o nível concluído está descrito corretamente. Diferencie curso em andamento de curso concluído.</li>
+            <li><strong>Preferências profissionais:</strong> escolha funções compatíveis com suas habilidades e com a rotina que pode cumprir.</li>
+            <li><strong>Local de trabalho:</strong> se mora em São Luís, avalie deslocamento para bairros ou municípios próximos antes de ampliar a pesquisa.</li>
+          </ol>
+          <p>
+            Por exemplo, uma pessoa com experiência em atendimento pode registrar tarefas concretas como
+            recepção, organização de agenda e contato com clientes, se realmente as executou. Isso comunica
+            mais do que dizer apenas “profissional dinâmico”. Para quem procura primeiro emprego, as informações
+            sobre disponibilidade e formação devem ser tão precisas quanto a experiência de um candidato experiente.
+          </p>
+        </section>
+
+        <section id="presencial" class="mt-10">
+          <h2>3. Atendimento presencial: verifique o endereço antes de sair</h2>
+          <p>
+            A Secretaria de Estado do Trabalho e Economia Solidária do Maranhão apresenta como referência
+            para o SINE o <strong>Dalplaza Center, Avenida Jerônimo de Albuquerque, nº 619,
+            Cohab Anil I, São Luís (MA)</strong>, conforme referência de endereço
+            publicada em página institucional do governo estadual.
+            <strong>Confirme previamente se a unidade, horário e serviço continuam ativos.</strong>
+            Não é possível garantir que uma vaga específica estará disponível presencialmente.
+          </p>
+          <p>
+            Se optar pelo atendimento presencial, leve documentação pessoal e as informações necessárias
+            para cadastrar o perfil, observando as exigências atuais do posto. Os próprios serviços federais
+            descrevem alternativas pela internet e por postos do SINE. Use o canal que seja mais acessível
+            para você; não há necessidade de pagar intermediários para acessar esse serviço público.
+          </p>
+        </section>
+
+        <section id="seguranca" class="mt-10">
+          <h2>4. Como conferir se uma vaga é legítima</h2>
+          <p>
+            A existência de um anúncio não garante contratação. Antes de enviar currículo ou dados,
+            identifique a empresa, procure o canal oficial e confira função, local, jornada, remuneração
+            quando informada e prazo de candidatura. Se uma oferta apareceu em rede social, procure também
+            a publicação original ou o sistema oficial de inscrição.
+          </p>
+          <p>
+            Desconfie de pessoas que afirmam garantir aprovação mediante taxa, Pix ou compra obrigatória.
+            O serviço SINE descrito no portal gov.br é gratuito para o cidadão.
+            Mensagens solicitando senha gov.br ou código de autenticação não devem ser tratadas como etapa
+            normal de candidatura. Use <a href="/seguranca-candidatos">nosso guia de segurança</a> para
+            identificar outras situações suspeitas.
+          </p>
+        </section>
+
+        <section id="checklist" class="mt-10">
+          <h2>5. Checklist de cada candidatura</h2>
+          <ul>
+            <li>Verifiquei o anúncio na plataforma oficial ou no canal da empresa.</li>
+            <li>Conferi requisitos e local de trabalho antes de me candidatar.</li>
+            <li>Revisei contatos, qualificações e disponibilidade no perfil.</li>
+            <li>Guardei a data, o cargo e o canal utilizado na candidatura.</li>
+            <li>Não paguei intermediário nem compartilhei senha ou código de acesso.</li>
+            <li>Registrei eventual entrevista e o prazo informado pela empresa.</li>
+          </ul>
+          <p>
+            Você pode acompanhar as tentativas usando nosso <a href="/ferramentas/controle-candidaturas">controle gratuito de candidaturas</a>:
+            ele organiza datas e situações no navegador e permite exportar um CSV para guardar em segurança.
+            Ele não é integrado ao SINE e não consulta informações pessoais do governo.
+          </p>
+        </section>
+        <section id="fontes" class="mt-10">
+          <h2>Fontes utilizadas e limitações</h2>
+          <p>
+            Os links abaixo são serviços e páginas institucionais consultados na elaboração deste guia.
+            Os endereços, horários e interfaces podem mudar. Não extraímos vagas atuais nem coletamos dados
+            pessoais desses sistemas. Em caso de divergência, a informação atualizada do órgão responsável
+            deve prevalecer sobre a descrição deste portal.
+          </p>
+        </section>
+      </div>
+
+      <ul class="mt-6 grid gap-4 sm:grid-cols-2" aria-label="Referências oficiais">
+        {sources.map((item) => (
+          <li class="rounded-2xl border border-[var(--brand-border)] p-5">
+            <h3 class="font-bold leading-6"><a class="underline" href={item.url} target="_blank" rel="noopener noreferrer">{item.label}</a></h3>
+            <p class="mt-2 text-sm leading-6 text-[var(--text-secondary)]">{item.detail}</p>
+          </li>
+        ))}
+      </ul>
+      <div class="mt-10 flex flex-wrap gap-3">
+        <a class="es-btn es-btn-primary" href="/ferramentas/controle-candidaturas">Organizar candidaturas</a>
+        <a class="es-btn es-btn-secondary" href="/contato">Sugerir correção</a>
+      </div>
+    </div>
+  </article>
+</BaseLayout>

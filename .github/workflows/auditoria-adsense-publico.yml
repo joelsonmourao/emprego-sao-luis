@@ -1,0 +1,35 @@
+name: Auditoria pública completa - AdSense
+on:
+  push:
+    branches: [codex/admin-negocio-completo]
+    paths:
+      - ".github/workflows/auditoria-adsense-publico.yml"
+  pull_request:
+    branches: [codex/admin-negocio-completo]
+    paths:
+      - ".github/workflows/auditoria-adsense-publico.yml"
+      - "scripts/audit-public-adsense.mjs"
+  workflow_dispatch:
+  schedule:
+    - cron: "20 11 * * *"
+permissions:
+  contents: read
+jobs:
+  auditoria:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Auditar todas URLs publicas e imagens do sitemap
+        run: node scripts/audit-public-adsense.mjs
+      - name: Salvar evidencias de HTML, SEO, conteudo e imagens
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: auditoria-adsense-publico
+          path: audit-results/
+          if-no-files-found: warn
+          retention-days: 30
