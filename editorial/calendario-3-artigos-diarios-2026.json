@@ -1486,8 +1486,10 @@
           "category": "carreira",
           "editorialTheme": "quem retorna após pausa para cuidar da família",
           "workingTitle": "Currículo em dois formatos para quem retorna após pausa para cuidar da família: quando usar cada um",
-          "status": "PLANNED",
-          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+          "status": "DRAFT",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar.",
+          "slug": "retorno-cuidado-familia-curriculo-dois-formatos",
+          "draftFile": "editorial/2026-11-24/09h-retorno-cuidado-familia-curriculo-dois-formatos.md"
         },
         {
           "time": "13:00",
@@ -1495,8 +1497,10 @@
           "category": "setor_profissional",
           "editorialTheme": "assistente de compras",
           "workingTitle": "Três situações de entrevista para assistente de compras com exemplos ilustrativos",
-          "status": "PLANNED",
-          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar."
+          "status": "DRAFT",
+          "qualityGate": "Exigir texto original e utilidade concreta, nenhuma afirmação factual sem fonte, título e slug inéditos, imagem com direitos verificados, revisão antes de publicar.",
+          "slug": "assistente-compras-entrevista-tres-situacoes-praticas",
+          "draftFile": "editorial/2026-11-24/13h-assistente-compras-entrevista-tres-situacoes-praticas.md"
         },
         {
           "time": "17:00",
